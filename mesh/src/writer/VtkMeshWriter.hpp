@@ -174,6 +174,15 @@ public:
     void AddPointData(std::string name, std::vector<c_vector<double, SPACE_DIM> > data);
 
     /**
+     * Add a tensor data field to each point.
+     * @param name is a meaningful name with which to annotate the data
+     * @param data is the data which should appear in the same order as the node numbering
+     * The length of the data vector is assumed to match the number of nodes in the mesh
+     * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
+     */
+    void AddTensorPointData(std::string name, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > data);
+
+    /**
      * Should be called to enable files to be written in parallel (i.e. a .pvtu file and .vtu files for each
      * process's sub-mesh).
      *

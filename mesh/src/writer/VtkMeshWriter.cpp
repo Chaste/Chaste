@@ -528,6 +528,40 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
+{
+    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+    p_vectors->SetName(dataName.c_str());
+    p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
+    for (unsigned i=0; i<dataPayload.size(); i++)
+    {
+        if(SPACE_DIM == 2)
+        {
+            p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
+            p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
+            p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
+            p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+        }
+        else if (SPACE_DIM == 3)
+        {
+            p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
+            p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
+            p_vectors->InsertNextValue(dataPayload[i](0,2)); //a13
+            p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
+            p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+            p_vectors->InsertNextValue(dataPayload[i](1,2)); //a23
+            p_vectors->InsertNextValue(dataPayload[i](2,0)); //a31
+            p_vectors->InsertNextValue(dataPayload[i](2,1)); //a32
+            p_vectors->InsertNextValue(dataPayload[i](2,2)); //a33
+        }
+    }
+
+    vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
+    p_point_data->AddArray(p_vectors);
+    p_vectors->Delete(); //Reference counted
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh )
 {
     //Have we got a parallel mesh?

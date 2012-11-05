@@ -488,6 +488,16 @@ public:
         writer.AddTensorCellData("Jacobian", jacobian);
         writer.AddTensorCellData("SquaredJacobian", squared_jacobian);
 
+        //Add tensor point data, we use the outer product of the node's location
+        std::vector< c_matrix<double, 3, 3> > location_outer_product;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            c_matrix<double, 3, 3> element_location_outer_product;
+            element_location_outer_product = outer_prod(trans(mesh.GetNode(i)->rGetLocation()), mesh.GetNode(i)->rGetLocation());
+            location_outer_product.push_back(element_location_outer_product);
+        }
+        writer.AddTensorPointData("LocationProduct", location_outer_product);
+
         writer.WriteFilesUsingMesh(mesh);
         //32K uncompressed, 19K compressed
 
@@ -516,8 +526,6 @@ public:
             vtk_reader.GetCellData("Centroid", centroid_read);
             TS_ASSERT_EQUALS(centroid_read.size(),centroid.size());
             ///\todo #1731 - need to read the tensors too.
-
-            ///\todo #2254  Implement reading of tensor data & test.
         }
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
@@ -702,9 +710,10 @@ public:
             VtkMeshReader<1,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/branched_1d_in_3d_mesh.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
-///\todo There should be 3 terminals (boundary nodes/elements)
-//            TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), reader.GetNumEdges());
-//            TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), mesh.GetNumBoundaryElements());
+
+            //There should be 3 terminals (boundary nodes/elements)
+            TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), reader.GetNumEdges());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumEdges(), mesh.GetNumBoundaryElements());
         }
 
 #else
