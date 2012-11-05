@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 
 
-class triangulateio; /**< Forward declaration for triangle helper methods (used in MutableMesh QuadraticMesh)*/
+struct triangulateio; /**< Forward declaration for triangle helper methods (used in MutableMesh QuadraticMesh)*/
 
 //////////////////////////////////////////////////////////////////////////
 //   DECLARATION

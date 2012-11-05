@@ -704,7 +704,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
             std::string face_extras;
             face_header_line >> face_extras;
             assert (mFilesAreBinary == (face_extras == "BIN"));
-            if ((mNumFaceAttributes==1))
+            if (mNumFaceAttributes==1)
             {
                 unsigned num_boundary_faces = 0;
                 bool end_of_file=false;
