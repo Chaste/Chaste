@@ -632,9 +632,9 @@ public:
     {
         QuadraticMesh<3> quad_mesh_read_back;
         QuadraticMesh<3> quad_mesh_constructed;
-        double width  = 3.0;
-        double height = 3.0;
-        double depth  = 3.0;
+        double width  = 2.0;
+        double height = 2.0;
+        double depth  = 2.0;
         {
             //Three-dimensional cubes
             TetrahedralMesh<3,3> mesh;
@@ -683,12 +683,12 @@ public:
             }
         }
 
-//        for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
-//        {
-//            BoundaryElement<2,3>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
-//            BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
-//            ///\todo #2224 TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
-//        }
+        for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
+        {
+            BoundaryElement<2,3>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
+            BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
+            TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
+        }
                             
     }
 

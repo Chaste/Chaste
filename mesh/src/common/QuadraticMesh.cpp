@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "QuadraticMeshHelper.hpp"
 
-#include "Debug.hpp"
-
 //Jonathan Shewchuk's Triangle and Hang Si's TetGen
 #define REAL double
 #define VOID void
@@ -165,6 +163,8 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         }
     }
     CountVertices();
+    
+//    assert(edge_to_internal_map.size() == this->GetNumNodes()-this->GetNumVertices());
     for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
@@ -224,6 +224,10 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
             boundary = true;
         }
     }
+    if (DIM == 2)
+    {
+//        PRINT_3_VARIABLES(rIndex, rLocation[0], rLocation[1]);
+    }
     if (DIM == 3)
     {
 //        PRINT_4_VARIABLES(rIndex, rLocation[0], rLocation[1], rLocation[2]);
@@ -267,11 +271,17 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
         node_pos[2] = k;
         for (unsigned j=0; j<numElemY+1; j++)
         {
+            unsigned lo_z_lo_y = (numElemX+1)*((numElemY+1)*k + j);
+            unsigned lo_z_hi_y = (numElemX+1)*((numElemY+1)*k + j + 1);
+            
             node_pos[1] = j;
             
             //The midpoints along the horizontal (y fixed) edges
             for (unsigned i=0; i<numElemX+1; i++)
             {
+                // i+.5, j, k
+                std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, lo_z_lo_y+i+1);
+                edge_to_internal_map[edge] = node_index;
                 node_pos[0] = i+0.5;
                 MakeNewInternalNode(node_index, node_pos, top);
             }
@@ -279,9 +289,15 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
             node_pos[1] = j+0.5;
             for (unsigned i=0; i<numElemX+1; i++)
             {
+                // i, j+0.5, k
+                std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, lo_z_hi_y+i);
+                edge_to_internal_map[edge] = node_index;
                 node_pos[0] = i;
                 MakeNewInternalNode(node_index, node_pos, top);
                 //Centre of face node
+                // i+0.5, j+0.5, k
+                std::pair<unsigned,unsigned> edge2(lo_z_lo_y+i, lo_z_hi_y+i+1);
+                edge_to_internal_map[edge2] = node_index;
                 node_pos[0] = i+0.5;
                 MakeNewInternalNode(node_index, node_pos, top);
             }
@@ -291,22 +307,38 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
         for (unsigned j=0; j<numElemY+1; j++)
         {
             node_pos[1] = j;
+            unsigned lo_z_lo_y = (numElemX+1)*((numElemY+1)*k + j);
+            unsigned hi_z_lo_y = (numElemX+1)*((numElemY+1)*(k+1) + j);
+            unsigned hi_z_hi_y = (numElemX+1)*((numElemY+1)*(k+1) + j + 1);
             
             //The midpoints along the horizontal (y fixed) edges
             for (unsigned i=0; i<numElemX+1; i++)
             {
+                // i, j, k+0.5
+                std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, hi_z_lo_y+i);
+                edge_to_internal_map[edge] = node_index;
                 node_pos[0] = i;
                 MakeNewInternalNode(node_index, node_pos, top);
+                
+                // i+0.5, j, k+0.5
                 node_pos[0] = i+0.5;
+                std::pair<unsigned,unsigned> edge2(lo_z_lo_y+i, hi_z_lo_y+i+1);
+                edge_to_internal_map[edge2] = node_index;
                 MakeNewInternalNode(node_index, node_pos, top);
             }
             //The midpoints and face centres between two horizontal (y-fixed) strips
             node_pos[1] = j+0.5;
             for (unsigned i=0; i<numElemX+1; i++)
             {
+                // i, j+0.5, k+0.5
+                std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, hi_z_hi_y+i);
+                edge_to_internal_map[edge] = node_index;
                 node_pos[0] = i;
                 MakeNewInternalNode(node_index, node_pos, top);
-                //Centre of face node
+                //Centre of face node on the main diagonal
+                // i+0.5, j+0.5, k+0.5
+                std::pair<unsigned,unsigned> edge2(lo_z_lo_y+i, hi_z_hi_y+i+1);
+                edge_to_internal_map[edge2] = node_index;
                 node_pos[0] = i+0.5;
                 MakeNewInternalNode(node_index, node_pos, top);
             }
@@ -314,19 +346,36 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
         
     }
     CountVertices();
-//    for (unsigned j=0; j<numElemY+1; j++)
-//    {
-//        bool boundary = (j==0) || (j==numElemY);
-//        //Add mid-way nodes to horizontal edges in this slice
-//        for (unsigned i=0; i<numElemX; i++)
-//    
-//    //Dump the map
-//    for (std::map<std::pair<unsigned,unsigned>, unsigned>::const_iterator iter=edge_to_internal_map.begin();
-//        iter!=edge_to_internal_map.end();
-//        ++iter)
-//    {
-//        std::cout<<iter->first.first<<" -- "<<iter->second<<" -- "<<iter->first.second<<"\n";
-//    }
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+         iter != this->GetElementIteratorEnd();
+         ++iter)
+    {
+        //
+    }
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter = this->GetBoundaryElementIteratorBegin();
+         iter != this->GetBoundaryElementIteratorEnd();
+         ++iter)
+    {
+        unsigned local_index1=0;
+        for (unsigned index=0; index<DIM; index++)
+        {
+            local_index1 = (local_index1+1)%(DIM);
+            unsigned local_index2 = (local_index1+1)%(DIM);
+            unsigned global_index1 =  (*iter)->GetNodeGlobalIndex(local_index1);
+            unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(local_index2);
+            if (global_index1 > global_index2)
+            {
+                unsigned tmp=global_index1;
+                global_index1=global_index2;
+                global_index2=tmp;
+            }
+            unsigned node_index = edge_to_internal_map[std::pair<unsigned,unsigned>(global_index1, global_index2)];
+            assert(node_index != 0); //Failure here means that we can't find something in the map
+            (*iter)->AddNode(this->mNodes[node_index]);
+            this->mNodes[node_index]->AddElement((*iter)->GetIndex());
+        }
+        
+    }
 }
 
 template<unsigned DIM>
