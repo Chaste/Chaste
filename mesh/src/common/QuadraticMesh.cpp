@@ -121,7 +121,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     for (unsigned j=0; j<numElemY+1; j++)
     {
         node_pos[1]=j;
-        bool boundary = (j==0) || (j==numElemY);
+        //bool boundary = (j==0) || (j==numElemY);
         //Add mid-way nodes to horizontal edges in this slice
         for (unsigned i=0; i<numElemX; i++)
         {
@@ -140,7 +140,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             unsigned left_index = j*(numElemX+1) + i;
             std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
             edge_to_internal_map[edge] = node_index;
-            boundary = (i==0) || (i==numElemX);
+            //boundary = (i==0) || (i==numElemX);
             MakeNewInternalNode(node_index, node_pos, top);
 //                    unsigned parity=(i+(numElemY-j))%2;
 //                    if (parity==1)
