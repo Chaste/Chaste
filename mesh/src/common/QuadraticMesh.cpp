@@ -33,9 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <map>
-//#include <pair>
-
 #include "QuadraticMesh.hpp"
 #include "OutputFileHandler.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -176,13 +173,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             unsigned local_index2 = (local_index1+1)%(DIM+1);
             unsigned global_index1 =  iter->GetNodeGlobalIndex(local_index1);
             unsigned global_index2 =  iter->GetNodeGlobalIndex(local_index2);
-            if (global_index1 > global_index2)
-            {
-                unsigned tmp=global_index1;
-                global_index1=global_index2;
-                global_index2=tmp;
-            }
-            unsigned node_index = edge_to_internal_map[std::pair<unsigned,unsigned>(global_index1, global_index2)];
+            unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
             iter->AddNode(this->mNodes[node_index]);
             this->mNodes[node_index]->AddElement(iter->GetIndex());
         }        
@@ -194,20 +185,14 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     {
         unsigned global_index1 =  (*iter)->GetNodeGlobalIndex(0);
         unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(1);
-        if (global_index1 > global_index2)
-        {
-            unsigned tmp=global_index1;
-            global_index1=global_index2;
-            global_index2=tmp;
-        }
-        unsigned node_index = edge_to_internal_map[std::pair<unsigned,unsigned>(global_index1, global_index2)];
+        unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
         (*iter)->AddNode(this->mNodes[node_index]);
         this->mNodes[node_index]->AddBoundaryElement((*iter)->GetIndex());
     }
     
-            
-
+    this->RefreshMesh();
 }
+
 template<unsigned DIM>
 Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop) 
 {
@@ -224,14 +209,6 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
             boundary = true;
         }
     }
-    if (DIM == 2)
-    {
-//        PRINT_3_VARIABLES(rIndex, rLocation[0], rLocation[1]);
-    }
-    if (DIM == 3)
-    {
-//        PRINT_4_VARIABLES(rIndex, rLocation[0], rLocation[1], rLocation[2]);
-    }
     //The caller needs to know that rIndex is in sync with what's in the mesh
     assert(rIndex == this->mNodes.size());
     Node<DIM>* p_node   = new Node<DIM>(rIndex++, rLocation, boundary);
@@ -243,6 +220,24 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
         this->mBoundaryNodes.push_back(p_node);
     }
     return p_node;     
+}
+
+template<unsigned DIM>
+unsigned QuadraticMesh<DIM>::LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap) 
+{
+    unsigned node_index = 0u;
+    assert(globalIndex1 != globalIndex2);
+    if (globalIndex1 < globalIndex2)
+    {
+        node_index = rEdgeMap[std::pair<unsigned,unsigned>(globalIndex1, globalIndex2)];
+    }
+    else
+    {
+        node_index = rEdgeMap[std::pair<unsigned,unsigned>(globalIndex2, globalIndex1)];
+    }
+    //A failure to find the key would result in a new zero entry in the map.  Note that no *internal* node will have global index zero.
+    assert(node_index != 0u);
+    return node_index;
 }
 
 template<unsigned DIM>
@@ -350,7 +345,43 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
-        //
+        /* The standard tetgen ordering of the internal nodes 4,5,6..9 (using the 
+         * zero-based numbering scheme) is
+         * 4 (0,1), 5 (1,2), 6 (0,2) 7 (0,3), 8 (1,3), 9 (2,3)
+         * i.e. internal node with local index 4 is half-way between vertex nodes
+         * with local indices 0 and 1.
+         */
+         unsigned v0=iter->GetNodeGlobalIndex(0);
+         unsigned v1=iter->GetNodeGlobalIndex(1);
+         unsigned v2=iter->GetNodeGlobalIndex(2);
+         unsigned v3=iter->GetNodeGlobalIndex(3);
+         unsigned internal_index;
+         
+         //4
+         internal_index=LookupInternalNode(v0, v1, edge_to_internal_map);
+         iter->AddNode(this->mNodes[internal_index]);
+         this->mNodes[internal_index]->AddElement(iter->GetIndex());
+         //5
+         internal_index=LookupInternalNode(v1, v2, edge_to_internal_map);
+         iter->AddNode(this->mNodes[internal_index]);
+         this->mNodes[internal_index]->AddElement(iter->GetIndex());
+         //6
+         internal_index=LookupInternalNode(v0, v2, edge_to_internal_map);
+         iter->AddNode(this->mNodes[internal_index]);
+         this->mNodes[internal_index]->AddElement(iter->GetIndex());
+         //7
+         internal_index=LookupInternalNode(v0, v3, edge_to_internal_map);
+         iter->AddNode(this->mNodes[internal_index]);
+         this->mNodes[internal_index]->AddElement(iter->GetIndex());
+         //8
+         internal_index=LookupInternalNode(v1, v3, edge_to_internal_map);
+         iter->AddNode(this->mNodes[internal_index]);
+         this->mNodes[internal_index]->AddElement(iter->GetIndex());
+         //9
+         internal_index=LookupInternalNode(v2, v3, edge_to_internal_map);
+         iter->AddNode(this->mNodes[internal_index]);
+         this->mNodes[internal_index]->AddElement(iter->GetIndex());
+
     }
     for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter = this->GetBoundaryElementIteratorBegin();
          iter != this->GetBoundaryElementIteratorEnd();
@@ -363,19 +394,13 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
             unsigned local_index2 = (local_index1+1)%(DIM);
             unsigned global_index1 =  (*iter)->GetNodeGlobalIndex(local_index1);
             unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(local_index2);
-            if (global_index1 > global_index2)
-            {
-                unsigned tmp=global_index1;
-                global_index1=global_index2;
-                global_index2=tmp;
-            }
-            unsigned node_index = edge_to_internal_map[std::pair<unsigned,unsigned>(global_index1, global_index2)];
-            assert(node_index != 0); //Failure here means that we can't find something in the map
+            unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
             (*iter)->AddNode(this->mNodes[node_index]);
             this->mNodes[node_index]->AddElement((*iter)->GetIndex());
         }
         
     }
+    this->RefreshMesh();
 }
 
 template<unsigned DIM>

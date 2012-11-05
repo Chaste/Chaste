@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <map>
+#include <vector>
 
 #include "TetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
-
-#include <vector>
 
 /**
  * A concrete quadratic mesh class that inherits from TetrahedralMesh.
@@ -124,6 +124,20 @@ protected:
      * @param rTop  the position of top-most node in the line/slab/cuboid
      */
     Node<DIM>* MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop); 
+
+    /** 
+     * A helper method used in the private structured mesh constructors (ConstructRectangularMesh etc).
+     * 
+     * Gets the internal node index between two vertex node indices assuming ordered pairs have
+     * been used as keys in the map
+     * 
+     * @param globalIndex1  is the index of one of the vertex nodes
+     * @param globalIndex2  is the index of the other vertex node (ordering is unimportant)
+     * @param rEdgeMap  the map from ordered pairs of vertex indices to internal node index
+     * @return  global node index of the internal node between globalIndex1 and globalIndex2
+     */
+    unsigned LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap); 
+
 public:
     /**
      * Hard-coded version

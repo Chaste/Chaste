@@ -632,9 +632,9 @@ public:
     {
         QuadraticMesh<3> quad_mesh_read_back;
         QuadraticMesh<3> quad_mesh_constructed;
-        double width  = 2.0;
+        double width  = 1.0;
         double height = 2.0;
-        double depth  = 2.0;
+        double depth  = 3.0;
         {
             //Three-dimensional cubes
             TetrahedralMesh<3,3> mesh;
@@ -647,17 +647,9 @@ public:
             TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "TempGrid3d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
             
-            {
-                TrianglesMeshWriter<3,3> mesh_writer2("TestQuadraticMesh", "SingleGrid3dRead", false);
-                mesh_writer2.WriteFilesUsingMesh(quad_mesh_read_back);
-            }
             //quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
             //quad_mesh_constructed.ConstructCuboid(width, height, depth);
             quad_mesh_constructed.ConstructCuboidNewImp(width, height, depth);
-            {
-                TrianglesMeshWriter<3,3> mesh_writer2("TestQuadraticMesh", "SingleGrid3dConst", false);
-                mesh_writer2.WriteFilesUsingMesh(quad_mesh_constructed);
-            }
         }
 
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
@@ -670,7 +662,7 @@ public:
         {
             Element<3,3>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
             Element<3,3>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
-            //TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
+            TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
             {
                 c_vector<double, 3> loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
