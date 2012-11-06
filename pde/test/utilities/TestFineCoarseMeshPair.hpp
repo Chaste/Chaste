@@ -144,9 +144,9 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*3*3*3u);
 
         // Some hardcoded values, just to check element_nums not all zero
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[0].ElementNum, 4846u);
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[10].ElementNum, 3149u);
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[20].ElementNum, 1209u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[0].ElementNum, 1280u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[10].ElementNum, 1902u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[20].ElementNum, 1315u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {
@@ -186,8 +186,6 @@ public:
 
         FineCoarseMeshPair<3> mesh_pair(fine_mesh,coarse_mesh);
 
-        //TS_ASSERT_EQUALS(mesh_pair.mIdenticalMeshes, false);
-
         GaussianQuadratureRule<3> quad_rule(3,3);
 
         // Need to call SetUpBoxesOnFineMesh first
@@ -198,8 +196,8 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 16u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 16u);
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 22u); // hardcoded
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 22u);
 
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*3*3*3u);
 
@@ -324,8 +322,8 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, false /* non-safe mode*/);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 16u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 16u);
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 22u); // hardcoded
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 22u);
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*3*3*3u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)

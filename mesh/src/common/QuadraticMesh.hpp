@@ -89,8 +89,9 @@ protected:
 
     /**
      * Create a quadratic mesh on a rectangle from (0,0) to (numElemX,numElemY)
-     * with that number of elements in each direction. This writes a temporary node file and uses
-     * triangle to mesh this nodefile. The method overloads the equivalent method in
+     * with that number of elements in each direction.  
+     * 
+     * The method overloads the equivalent method in
      * AbstractTetrahedralMesh. This is private, users should call ConstructRegularSlabMesh();
      *
      * @param numElemX Number of elements in x-direction (also, the width of the final mesh)
@@ -103,8 +104,8 @@ protected:
 
     /**
      * Create a quadratic mesh on a cuobid from (0,0,0) to (numElemX,numElemY,numElemZ)
-     * with that number of elements in each direction. This writes a temporary node file and uses
-     * tetgen to mesh this nodefile. The method overloads the equivalent method in
+     * with that number of elements in each direction. 
+     * The method overloads the equivalent method in
      * AbstractTetrahedralMesh. This is private, users should call ConstructRegularSlabMesh();
      *
      * @param numElemX Number of elements in x-direction (also, the width of the final mesh)
@@ -138,18 +139,6 @@ protected:
      */
     unsigned LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap); 
 
-public:
-    /**
-     * Hard-coded version
-     * Create a quadratic mesh on a cuobid from (0,0,0) to (numElemX,numElemY,numElemZ)
-     * with that number of elements in each direction.  The method overloads the equivalent method in
-     * AbstractTetrahedralMesh. This is private, users should call ConstructRegularSlabMesh();
-     *
-     * @param numElemX Number of elements in x-direction (also, the width of the final mesh)
-     * @param numElemY Number of elements in y-direction (also, the height of the final mesh)
-     * @param numElemZ Number of elements in y-direction (also, the depth of the final mesh)
-     */
-    void ConstructCuboidNewImp(unsigned numElemX, unsigned numElemY, unsigned numElemZ);
 
 public:
 

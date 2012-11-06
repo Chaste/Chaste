@@ -175,6 +175,10 @@ public:
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
+        c_vector<double,3> undeformed_node_1 = mechanics_mesh.GetNode(1)->rGetLocation();
+        TS_ASSERT_DELTA(undeformed_node_1(0), 0.1, 1e-6);
+        TS_ASSERT_DELTA(undeformed_node_1(1), 0.0, 1e-6);
+        TS_ASSERT_DELTA(undeformed_node_1(2), 0.0, 1e-6);
         std::vector<c_vector<double,3> >& r_deformed_position = problem.rGetDeformedPosition();
         TS_ASSERT_DELTA(r_deformed_position[1](0), 0.0879, 1e-3);
 
@@ -215,26 +219,21 @@ public:
                                                   "TestCardiacElectroMech3dTwistingCube");
 
 
-/////// Use the following to set up the fibres file
-////        GaussianQuadratureRule<3> quad_rule(UNSIGNED_UNSET, 3);
-////        QuadraturePointsGroup<3> quad_points(mechanics_mesh, quad_rule);
-////        std::cout << quad_points.Size() << "\n";
-////        for(unsigned i=0; i<quad_points.Size(); i++)
-////        {
-////            ////std::cout << quad_points.Get(i)(0) << " " << quad_points.Get(i)(1) << " " << quad_points.Get(i)(2) << " ";
-////            double x = quad_points.Get(i)(0);
-////            double theta = M_PI/3 - 10*x*2*M_PI/3; // 60 degrees when x=0, -60 when x=0.1;
-////            std::cout <<  "0 " << cos(theta)  << " " << sin(theta)
-////                      << " 0 " << -sin(theta) << " " << cos(theta)
-////                      << " 1 0 0\n";
-////        }
-////        return;
-
 
         problem.Solve();
 
         // verified that it twists by visualising, some hardcoded values here..
-
+        {
+            //Check that we are indexing the relevant corners of the cube
+            c_vector<double, 3> undeformed_node1 = mechanics_mesh.GetNode(6*6*5)->rGetLocation();
+            TS_ASSERT_DELTA(undeformed_node1(0),  0.0, 1e-6);
+            TS_ASSERT_DELTA(undeformed_node1(1),  0.0, 1e-6);
+            TS_ASSERT_DELTA(undeformed_node1(2),  0.1, 1e-6);
+            c_vector<double, 3> undeformed_node2 = mechanics_mesh.GetNode(6*6*6-1)->rGetLocation();
+            TS_ASSERT_DELTA(undeformed_node2(0), 0.1, 1e-6);
+            TS_ASSERT_DELTA(undeformed_node2(1), 0.1, 1e-6);
+            TS_ASSERT_DELTA(undeformed_node2(2), 0.1, 1e-6);
+        }
         std::vector<c_vector<double,3> >& r_deformed_position = problem.rGetDeformedPosition();
         TS_ASSERT_DELTA(r_deformed_position[6*6*5](0),  0.0116, 1e-3);
         TS_ASSERT_DELTA(r_deformed_position[6*6*5](1), -0.0141, 1e-3);
@@ -465,8 +464,8 @@ public:
         TS_ASSERT_LESS_THAN(tissue_initial_size, r_deformed_position_fibres_alongY1[7](2));
 
         // hardcoded test to check nothing changes
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0486, 1e-4);
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0506, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0483, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0509, 1e-4);
 
 
         //////////////////////////////////////////////////////////////////

@@ -738,7 +738,7 @@ public:
         std::string elem_file1 = results_dir + "/solution_3d_quadviz_0.exelem";
         std::string elem_file2 = "mesh/test/data/TestCmguiDeformedSolutionsWriter/solution_3d_quadviz_0.exelem";
 
-        FileComparison comparer(node_file1,node_file2);
+        FileComparison comparer(node_file1, node_file2);
         TS_ASSERT(comparer.CompareFiles());
 
         FileComparison comparer2(elem_file1,elem_file2);

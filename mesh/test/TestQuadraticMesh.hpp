@@ -581,8 +581,8 @@ public:
     {
         QuadraticMesh<2> quad_mesh_read_back;
         QuadraticMesh<2> quad_mesh_constructed;
-        double width  = 1.0;
-        double height = 2.0;
+        unsigned width  = 1.0;
+        unsigned height = 2.0;
         {
             //Two-dimensional two squares
             TetrahedralMesh<2,2> mesh;
@@ -647,9 +647,7 @@ public:
             TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "TempGrid3d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
             
-            //quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
-            //quad_mesh_constructed.ConstructCuboid(width, height, depth);
-            quad_mesh_constructed.ConstructCuboidNewImp(width, height, depth);
+            quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
         }
 
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());

@@ -121,7 +121,6 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     for (unsigned j=0; j<numElemY+1; j++)
     {
         node_pos[1]=j;
-        //bool boundary = (j==0) || (j==numElemY);
         //Add mid-way nodes to horizontal edges in this slice
         for (unsigned i=0; i<numElemX; i++)
         {
@@ -140,7 +139,6 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             unsigned left_index = j*(numElemX+1) + i;
             std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
             edge_to_internal_map[edge] = node_index;
-            //boundary = (i==0) || (i==numElemX);
             MakeNewInternalNode(node_index, node_pos, top);
 //                    unsigned parity=(i+(numElemY-j))%2;
 //                    if (parity==1)
@@ -241,7 +239,7 @@ unsigned QuadraticMesh<DIM>::LookupInternalNode(unsigned globalIndex1, unsigned 
 }
 
 template<unsigned DIM>
-void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
+void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
 {
     assert(DIM==3);
 
@@ -403,49 +401,6 @@ void QuadraticMesh<DIM>::ConstructCuboidNewImp(unsigned numElemX, unsigned numEl
     this->RefreshMesh();
 }
 
-template<unsigned DIM>
-void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ)
-{
-    assert(DIM==3);
-
-    assert(numElemX > 0);
-    assert(numElemY > 0);
-    assert(numElemZ > 0);
-    this->mMeshIsLinear = false;
-    unsigned num_nodes = (numElemX+1)*(numElemY+1)*(numElemZ+1);
-
-    struct tetgen::tetgenio mesher_input;
-    mesher_input.pointlist = new double[num_nodes * DIM];
-    mesher_input.numberofpoints = num_nodes;
-    unsigned new_index = 0;
-    for (unsigned k=0; k<=numElemZ; k++)
-    {
-        double z = k;
-        for (unsigned j=0; j<=numElemY; j++)
-        {
-            double y = j;
-            for (unsigned i=0; i<=numElemX; i++)
-            {
-                double x = i;
-                mesher_input.pointlist[DIM*new_index] = x;
-                mesher_input.pointlist[DIM*new_index + 1] = y;
-                mesher_input.pointlist[DIM*new_index + 2] = z;
-                new_index++;
-            }
-        }
-    }
-
-    // Library call
-    struct tetgen::tetgenio mesher_output;
-    tetgen::tetrahedralize((char*)"Qo2", &mesher_input, &mesher_output, NULL);
-
-    assert(mesher_output.numberofcorners == (DIM+1)*(DIM+2)/2);//Nodes per element (including internals, one per edge)
-
-    this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, NULL);
-
-    CountVertices();
-    QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, NULL);
-}
 
 
 template<unsigned DIM>
