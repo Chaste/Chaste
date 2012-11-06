@@ -164,7 +164,7 @@ public:
                 //
                 // \int_0^3 x^p dx = [(1/(p+1))*x^(p+1)]_1^3
                 //
-                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-14);
+                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-12);
                 
                 delete nodes2[0];
                 delete nodes2[1];
