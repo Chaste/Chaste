@@ -196,7 +196,7 @@ public:
     // Jacobian
     void TestAssembleSystem() throw (Exception)
     {
-        QuadraticMesh<2> mesh(1.0/2, 1.0, 1.0);
+        QuadraticMesh<2> mesh(1.0/2.0, 1.0, 1.0);
         CompressibleExponentialLaw<2> law;
 
         SolidMechanicsProblemDefinition<2> problem_defn(mesh);
@@ -244,15 +244,18 @@ public:
                 {
                     double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec[i])/h;
-                    if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
+
+                    double average_val = (fabs(analytic_matrix_val)+fabs(numerical_matrix_val))/2.0;
+
+                    if (average_val > 1.0)
                     {
                         // relative error
-                        TS_ASSERT_DELTA( (analytic_matrix_val-numerical_matrix_val)/analytic_matrix_val, 0.0, 1e-3);
+                        TS_ASSERT_DELTA( (analytic_matrix_val-numerical_matrix_val)/average_val, 0.0, 1e-3);
                     }
                     else
                     {
-                        // absolute error
-                        TS_ASSERT_DELTA(analytic_matrix_val, numerical_matrix_val, 1e-4);
+                        // absolute error - tolerance chosen for finer grid: QuadraticMesh<2> mesh(1.0/4.0, 1.0, 1.0);
+                        TS_ASSERT_DELTA(analytic_matrix_val, numerical_matrix_val, 6e-4);
                     }
 
 //                    double difference =  analytic_matrix_val - numerical_matrix_val;
