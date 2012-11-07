@@ -126,7 +126,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
         phi_e_bath_rows[index] = 2*rBathNodes[index] + 1;
     }
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    ISCreateGeneral(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, PETSC_OWN_POINTER, &A22_bath_rows);
+    ISCreateGeneral(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, PETSC_USE_POINTER, &A22_bath_rows);
  #else
     ISCreateGeneralWithArray(PETSC_COMM_WORLD, rBathNodes.size(), phi_e_bath_rows, &A22_bath_rows);
 #endif

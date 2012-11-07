@@ -89,7 +89,7 @@ typedef PetscBool PetscTruth;
  *
  * @param method  a command or block of code to run if master process
  */
-#define TRY_IF_MASTER(method) {      \
+#define TRY_IF_MASTER(method) {              \
     if (PetscTools::AmMaster())              \
     { try {                                  \
         method;                              \
