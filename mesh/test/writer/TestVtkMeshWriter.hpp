@@ -371,6 +371,15 @@ public:
         writer.AddTensorCellData("Jacobian", jacobian);
         writer.AddTensorCellData("SquaredJacobian", squared_jacobian);
 
+        //Add tensor point data, we use the outer product of the node's location
+        std::vector< c_matrix<double, 2, 2> > location_outer_product;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            c_matrix<double, 2, 2> element_location_outer_product;
+            element_location_outer_product = outer_prod(trans(mesh.GetNode(i)->rGetLocation()), mesh.GetNode(i)->rGetLocation());
+            location_outer_product.push_back(element_location_outer_product);
+        }
+        writer.AddTensorPointData("LocationProduct", location_outer_product);
 
         writer.WriteFilesUsingMesh(mesh);
         //13K uncompressed, 3.7K compressed
