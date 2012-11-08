@@ -1,4 +1,4 @@
-! Created by Chaste version 3.0.16515 (with uncommitted modifications) on Tue, 04 Sep 2012 20:46:32 +0000.  Chaste was built on Thu, 09 Aug 2012 09:28:49 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64' using settings: _3, shared libraries.  Checked-out project versions: Eikonal=24:32M; QTpredict=12626; jmpf=15136M; papers=15773:16502.
+! Created by Chaste version 3.1.17273 (with uncommitted modifications) on Wed, 07 Nov 2012 11:24:09 +0000.  Chaste was built on Mon, 05 Nov 2012 17:04:22 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: default, shared libraries.  Checked-out project versions: jmpf=17163:17174; papers=exported.
 Group name: solution_2d_quadviz
 Shape.  Dimension=2, simplex(2)*simplex
  #Scale factor sets= 0
@@ -45,19 +45,19 @@ Shape.  Dimension=2, simplex(2)*simplex
       6.  #Values=1
        Value indices:     1
        Scale factor indices:   6
-Element:	1 0 0 Nodes:	4	19	2	23	20	5	
-Element:	2 0 0 Nodes:	2	19	4	16	18	1	
+Element:	1 0 0 Nodes:	4	18	1	23	19	5	
+Element:	2 0 0 Nodes:	2	20	5	16	19	1	
 Element:	3 0 0 Nodes:	5	21	3	24	22	6	
 Element:	4 0 0 Nodes:	3	21	5	17	20	2	
 Element:	5 0 0 Nodes:	7	26	5	30	27	8	
 Element:	6 0 0 Nodes:	5	26	7	23	25	4	
-Element:	7 0 0 Nodes:	8	28	6	31	29	9	
-Element:	8 0 0 Nodes:	6	28	8	24	27	5	
-Element:	9 0 0 Nodes:	10	33	8	37	34	11	
-Element:	10 0 0 Nodes:	8	33	10	30	32	7	
+Element:	7 0 0 Nodes:	8	27	5	31	28	9	
+Element:	8 0 0 Nodes:	6	29	9	24	28	5	
+Element:	9 0 0 Nodes:	10	32	7	37	33	11	
+Element:	10 0 0 Nodes:	8	34	11	30	33	7	
 Element:	11 0 0 Nodes:	11	35	9	38	36	12	
 Element:	12 0 0 Nodes:	9	35	11	31	34	8	
 Element:	13 0 0 Nodes:	13	40	11	44	41	14	
 Element:	14 0 0 Nodes:	11	40	13	37	39	10	
-Element:	15 0 0 Nodes:	14	42	12	45	43	15	
-Element:	16 0 0 Nodes:	12	42	14	38	41	11	
+Element:	15 0 0 Nodes:	14	41	11	45	42	15	
+Element:	16 0 0 Nodes:	12	43	15	38	42	11	

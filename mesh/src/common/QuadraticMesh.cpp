@@ -97,15 +97,13 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 
 
 template<unsigned DIM>
-void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool unused)
+void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool stagger)
 {
     assert(DIM==2);
-
     assert(numElemX > 0);
     assert(numElemY > 0);
-    assert(unused);
-    ///\todo #2224 The call looks like it is going to apply a stagger, but it does not.
-    AbstractTetrahedralMesh<DIM,DIM>::ConstructRectangularMesh(numElemX, numElemY, false);
+
+    AbstractTetrahedralMesh<DIM,DIM>::ConstructRectangularMesh(numElemX, numElemY, stagger);
 
     this->mMeshIsLinear=false;
     //Make the internal nodes in y-order.  This is important for the distributed case, since we want the top and bottom
@@ -140,19 +138,19 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1) ) ;
             edge_to_internal_map[edge] = node_index;
             MakeNewInternalNode(node_index, node_pos, top);
-//                    unsigned parity=(i+(numElemY-j))%2;
-//                    if (parity==1)
+            unsigned parity=(i+(numElemY-j))%2;
+            if (stagger==false || parity==1) //Default when no stagger
             {
                 //backslash
                 std::pair<unsigned,unsigned> edge(left_index+1, left_index+(numElemX+1) ) ;
                 edge_to_internal_map[edge] = node_index;
             }
-//                    else
-//                    {
-//                        //foward slash
-//                        std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1)+1 ) ;
-//                        edge_to_internal_map[edge] = node_index;
-//                    }
+            else
+            {
+                //foward slash
+                std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1)+1 ) ;
+                edge_to_internal_map[edge] = node_index;
+            }
             node_pos[0] = i+0.5;
             MakeNewInternalNode(node_index, node_pos, top);
         }

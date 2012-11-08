@@ -131,7 +131,7 @@ public:
         // visualised, looks good - contracts in X-direction near the fixed surface,
         // but on the other side the fibres are in the (1,1) direction, so contraction
         // pulls the tissue downward a bit
-        TS_ASSERT_DELTA(r_deformed_position[5](0), 0.8988, 2e-3); ///\todo  #2224 Verify screenshot in ticket
+        TS_ASSERT_DELTA(r_deformed_position[5](0), 0.9055, 2e-3);
         //IntelProduction differs by about 1.6e-3...
 
         MechanicsEventHandler::Headings();

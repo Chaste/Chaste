@@ -1,4 +1,4 @@
-! Created by Chaste version 3.0.16515 (with uncommitted modifications) on Tue, 04 Sep 2012 20:38:40 +0000.  Chaste was built on Thu, 09 Aug 2012 09:28:49 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64' using settings: _3, shared libraries.  Checked-out project versions: Eikonal=24:32M; QTpredict=12626; jmpf=15136M; papers=15773:16502.
+! Created by Chaste version 3.1.17273 (with uncommitted modifications) on Wed, 07 Nov 2012 11:20:16 +0000.  Chaste was built on Mon, 05 Nov 2012 17:04:22 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: default, shared libraries.  Checked-out project versions: jmpf=17163:17174; papers=exported.
 Group name: solution
 Shape.  Dimension=2, simplex(2)*simplex
  #Scale factor sets= 0
@@ -27,11 +27,11 @@ Shape.  Dimension=2, simplex(2)*simplex
       3.  #Values=1
        Value indices:     1
        Scale factor indices:   3
-Element:	1 0 0 Nodes:	4	2	5	
-Element:	2 0 0 Nodes:	2	4	1	
+Element:	1 0 0 Nodes:	4	1	5	
+Element:	2 0 0 Nodes:	2	5	1	
 Element:	3 0 0 Nodes:	5	3	6	
 Element:	4 0 0 Nodes:	3	5	2	
 Element:	5 0 0 Nodes:	7	5	8	
 Element:	6 0 0 Nodes:	5	7	4	
-Element:	7 0 0 Nodes:	8	6	9	
-Element:	8 0 0 Nodes:	6	8	5	
+Element:	7 0 0 Nodes:	8	5	9	
+Element:	8 0 0 Nodes:	6	9	5	

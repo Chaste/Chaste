@@ -778,8 +778,8 @@ public:
 
         std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
-        TS_ASSERT_DELTA(r_solution[5](0), 1.06156, 1e-4);
-        TS_ASSERT_DELTA(r_solution[5](1), 0.00510, 1e-4);
+        TS_ASSERT_DELTA(r_solution[5](0), 1.0609, 1e-4);
+        TS_ASSERT_DELTA(r_solution[5](1), 0.0048, 1e-4);
     }
 
     /**

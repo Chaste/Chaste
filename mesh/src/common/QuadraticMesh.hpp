@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class QuadraticMesh : public TetrahedralMesh<DIM, DIM>
 {
+    friend class TestQuadraticMesh;
 protected:
 
     /** Number of vertices, ie non-internal (non-quadratic), nodes. */
@@ -96,10 +97,11 @@ protected:
      *
      * @param numElemX Number of elements in x-direction (also, the width of the final mesh)
      * @param numElemY Number of elements in y-direction (also, the height of the final mesh)
-     * @param unused (defaults to true; must always be true) is for compatibility of the
-     *   interface of this method with same name in AbstractTetrahedralMesh.
+     * @param stagger is the same as the over-ridden method with same name in AbstractTetrahedralMesh.
+     *        stagger = false gives all back-slash diagonals
+     *        stagger = true check-boards the diagonals as forward and back slashes
      */
-    void ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool unused=true);
+    void ConstructRectangularMesh(unsigned numElemX, unsigned numElemY, bool stagger=true);
 
 
     /**
