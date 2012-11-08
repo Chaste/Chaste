@@ -20,10 +20,10 @@ and library calls, e.g.
 scons test_suite=projects/example/test/TestHello.hpp
 
 We suggest you use the projects directory in this manner to store your
-own source and test files if you do not wish to modify the chaste
+own source and test files if you do not wish to modify the Chaste
 source code.
 
-For more information please refer to the chaste website at: 
+For more information please refer to the Chaste website at: 
 http://www.cs.ox.ac.uk/chaste/
 
 Information on changes in this release can be found in the file
@@ -32,5 +32,5 @@ docs/ReleaseNotes.html.
 Tutorial examples for this release are available at:
 https://chaste.cs.ox.ac.uk/chaste/tutorials/release_3.1
 
-Documentation generated from the code by Doxygen is available at:
+API documentation generated from the code by Doxygen is available at:
 https://chaste.cs.ox.ac.uk/chaste/docs/release_3.1
