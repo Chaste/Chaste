@@ -211,6 +211,31 @@
 #  fun:_ZN10PetscSetup13tearDownWorldEv
 }
 
+{
+   OpenMPI PETSc init (invalid read 8)
+   Memcheck:Addr8
+   fun:_wordcopy_fwd_dest_aligned
+   fun:__GI_memmove
+   fun:argz_insert
+   obj:*/libopen-pal*
+   ...
+   fun:orte_init
+   obj:*/libmpi.so*
+   fun:PMPI_Init
+   fun:*PetscInitialize*
+}
+
+{
+   OpenMPI PETSc init (invalid read 4)
+   Memcheck:Addr4
+   fun:opal_os_dirpath_create
+   fun:orte_session_dir
+   ...
+   fun:orte_init
+   obj:*/libmpi.so*
+   fun:PMPI_Init
+   fun:*PetscInitialize*
+}
 
 {
    Unset filename in HYPRE_BoomerAMG todo: should this be set?
