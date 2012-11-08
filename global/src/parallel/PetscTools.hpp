@@ -102,6 +102,12 @@ typedef PetscBool PetscTruth;
 
 /**
  * A helper class of static methods.
+ *
+ * Any PETSc operation that can be performed using the methods in this class, should be.
+ *
+ * This ensures a consistent interface in Chaste even when PETSc arguments change between
+ * PETSc versions. For example VecDestroy takes different arguments in 3.2, and using
+ * PetscTools::Destroy(vec); takes care of this.
  */
 class PetscTools
 {
