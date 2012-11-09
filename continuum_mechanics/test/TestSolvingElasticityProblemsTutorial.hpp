@@ -330,7 +330,7 @@ public:
 
 
         /* Another quick check */
-        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 3 rather than 4 this time
+        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 4u);
 
         /* Visualise as before by going to the output directory and doing
          * `x=load('solution.nodes'); plot(x(:,1),x(:,2),'m*')` in Matlab/octave, or by using Cmgui.
@@ -342,7 +342,7 @@ public:
         solver.CreateCmguiOutput();
 
         /* This is just to check that nothing has been accidentally changed in this test */
-        TS_ASSERT_DELTA(solver.rGetDeformedPosition()[8](0), 0.8574, 1e-3);
+        TS_ASSERT_DELTA(solver.rGetDeformedPosition()[8](0), 0.8561, 1e-3);
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[8](1), 0.0310, 1e-3);
     }
 };
@@ -360,7 +360,7 @@ public:
      *
      * ''HYPRE should be considered a pre-requisite for large incompressible mechanics problems.''
      *
-     * To use HYRPE, you need to have PETSc installed with HYPRE. However, if you followed installation
+     * To use HYPRE, you need to have PETSc installed with HYPRE. However, if you followed installation
      * instructions for Chaste 2.1 or later, you probably do already have PETSc installed with HYPRE.
      *
      * To switch on HYPRE, open the file `continuum_mechanics/src/solver/AbstractNonlinearElasticitySolver` and uncomment the line
