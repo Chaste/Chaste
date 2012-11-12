@@ -136,18 +136,6 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Initialize CellData
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions.
-         */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("nutrient", cell_population.GetLocationIndexUsingCell(*cell_iter));
-        }
-
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsSimulationWithPdesThrowsException");
@@ -192,18 +180,6 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Initialize CellData
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions.
-         */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("nutrient", cell_population.GetLocationIndexUsingCell(*cell_iter));
-        }
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -302,18 +278,6 @@ public:
 		// Create cell population
 		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-		// Initialize CellData
-		/*
-		 * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-		 * we need to pass it some initial conditions.
-		 */
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-			cell_iter->GetCellData()->SetItem("nutrient", 0.0);
-		}
-
 		// Set up cell-based simulation
 		OnLatticeSimulation<2> simulator(cell_population);
 		simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnNaturalMesh");
@@ -392,18 +356,6 @@ public:
 		// Create cell population
 		MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-		// Initialize CellData
-		/*
-		 * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-		 * we need to pass it some initial conditions.
-		 */
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-			cell_iter->GetCellData()->SetItem("nutrient", 0.0);
-		}
-
 		// Set up cell-based simulation
 		OnLatticeSimulation<2> simulator(cell_population);
 		simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesWithCellsOutsideMesh");
@@ -455,18 +407,6 @@ public:
 
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
-
-        // Initialize CellData
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions.
-         */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("nutrient", 0.0);
-        }
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -572,9 +512,6 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        cell_population.SetDataOnAllCells("quantity 1", 1.0);
-        cell_population.SetDataOnAllCells("quantity 2", 1.0);
-
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestPottsBasedCellPopulationWithTwoPdes");
@@ -648,24 +585,14 @@ public:
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
-        // Initialize CellData
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions.
-         */
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("nutrient", 0.0);
-        }
-
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOnLatticeSpheroidWithNutrient");
         simulator.SetDt(0.1);
-        simulator.SetEndTime(1); // Runs to 400 fine
-         // Set up PDE and pass to simulation via handler
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(10);
+
+        // Set up PDE and pass to simulation via handler
         double nutrient_uptake_rate=-0.1;
         AveragedSourcePde<2> pde(cell_population, nutrient_uptake_rate);
         ConstBoundaryCondition<2> bc(1.0);
@@ -705,12 +632,12 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        OutputFileHandler handler("TestPottsBasedCellPopulationWithPdes", false);
+        OutputFileHandler handler("TestOnLatticeSpheroidWithNutrient", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
 
-        NumericFileComparison comp_nut(results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestPottsBasedCellPopulationWithPdes/results.vizcoarsepdesolution");
+        NumericFileComparison comp_nut(results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizcoarsepdesolution");
         TS_ASSERT(comp_nut.CompareFiles());
-        FileComparison( results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestPottsBasedCellPopulationWithPdes/results.vizcoarsepdesolution").CompareFiles();
+        FileComparison( results_dir + "/results.vizcoarsepdesolution", "cell_based/test/data/TestOnLatticeSpheroidWithNutrient/results.vizcoarsepdesolution").CompareFiles();
     }
 };
 

@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 #include <ctime>
 
-#include "ArchiveOpener.hpp"
 #include "CheckpointArchiveTypes.hpp"
 
 #include "CellBasedPdeHandler.hpp"
@@ -61,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
 #include "FunctionalBoundaryCondition.hpp"
+#include "ArchiveOpener.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
@@ -706,60 +706,6 @@ public:
         pde_handler.mpAverageRadialPdeSolutionResultsFile->close();
     }
 
-    // Note that this test doesn't solve a PDE it just sets some random initial data and checks its written to file correctly.
-    void TestWritePdeSolution() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a cell population
-        HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        //Put random data on the cells
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->GetCellData()->SetItem("variable", RandomNumberGenerator::Instance()->ranf());
-        }
-
-        // Create a PDE handler object using this cell population
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-
-        // Create a single PDE and pass to the handler
-        SimpleUniformSourcePde<2> pde(-0.1);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("variable");
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-
-        // Open result file ourselves
-        OutputFileHandler output_file_handler("TestWritePdeSolution", false);
-        pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
-
-        // Write average radial PDE solution to file
-        pde_handler.WritePdeSolution(SimulationTime::Instance()->GetTime());
-
-        // Test that this is correct by comparing with an existing results file
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        NumericFileComparison comparison(results_dir + "/results.vizpdesolution", "cell_based/test/data/TestCellBasedPdeHandler/results.vizpdesolution");
-        TS_ASSERT(comparison.CompareFiles());
-
-        // Close result file ourselves
-        pde_handler.mpVizPdeSolutionResultsFile->close();
-
-
-        // Coverage for GetPdeSolutionAtPoint method
-        TS_ASSERT_THROWS_THIS(pde_handler.GetPdeSolutionAtPoint(zero_vector<double>(2),"variable"), "Tried to get the solution of a variable name: variable. This PDE has not been solved yet.");
-    }
-
     void TestSolvePdeAndWriteResultsToFileAndGetPDESolutionAtPointWithoutCoarsePdeMeshDirichlet() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -779,8 +725,6 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-
-        cell_population.SetDataOnAllCells("variable", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -803,8 +747,23 @@ public:
 
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
-        // Solve PDE (set sampling timestep multiple to be large to avoid writing results to file)
+        // Open result file ourselves
+        OutputFileHandler output_file_handler("TestWritePdeSolution", false);
+        pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+
+        // Solve PDE (set sampling timestep multiple to be large doesn't do anything as always output on 1st timestep)
         pde_handler.SolvePdeAndWriteResultsToFile(10);
+
+        // Close result file ourselves
+        pde_handler.mpVizPdeSolutionResultsFile->close();
+
+        // Test that this is correct by comparing with an existing results file
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+
+        NumericFileComparison comparison(results_dir + "results.vizpdesolution", "cell_based/test/data/TestCellBasedPdeHandler/results.vizpdesolution");
+        TS_ASSERT(comparison.CompareFiles());
+
 
         // Check the correct solution was obtained
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -833,6 +792,7 @@ public:
 			TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location,"variable"), cell_data_solution, 1e-6);
 		}
 
+
 		// Now choose some other points
 
 		// Centre
@@ -853,7 +813,6 @@ public:
 		point(1) = 0.0;
 
 		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0, 1e-6);
-
 
     }
 
@@ -877,8 +836,6 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        cell_population.SetDataOnAllCells("", 1.0);
-
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
@@ -900,8 +857,15 @@ public:
 
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
-        // Solve PDE (set sampling timestep multiple to be large to avoid writing results to file)
+        // Open result file ourselves
+        OutputFileHandler output_file_handler("TestWritePdeSolution", false);
+        pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+
+        // Solve PDE (set sampling timestep multiple to be large doesn't do anything as always output on 1st timestep)
         pde_handler.SolvePdeAndWriteResultsToFile(10);
+
+        // Close result file ourselves
+        pde_handler.mpVizPdeSolutionResultsFile->close();
 
         // Check the correct solution was obtained
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -933,8 +897,6 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        cell_population.SetDataOnAllCells("variable", 1.0);
-
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
@@ -963,8 +925,15 @@ public:
         Vec vector = PetscTools::CreateVec(data);
         pde_and_bc.SetSolution(vector);
 
-        // Solve PDEs (set sampling timestep multiple to be large to avoid writing results to file)
+        // Open result file ourselves
+        OutputFileHandler output_file_handler("TestWritePdeSolution", false);
+        pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+
+        // Solve PDE (set sampling timestep multiple to be large doesn't do anything as always output on 1st timestep)
         pde_handler.SolvePdeAndWriteResultsToFile(10);
+
+        // Close result file ourselves
+        pde_handler.mpVizPdeSolutionResultsFile->close();
 
         // Test that boundary cells experience the right boundary condition
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -994,9 +963,6 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        cell_population.SetDataOnAllCells("quantity 1", 1.0);
-        cell_population.SetDataOnAllCells("quantity 2", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -1119,9 +1085,6 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        cell_population.SetDataOnAllCells("first variable", 1.0);
-        cell_population.SetDataOnAllCells("second variable", 1.0);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);

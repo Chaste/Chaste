@@ -348,7 +348,14 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         {
             *this->mpVizSetupFile << "PDE \n";
         }
+
+        // If any PDEs have been defined, solve them here before updating cells and store their solution in results files.
+        // This also initializes the relevant CellData. NOTE that this works as the PDEs are elliptic
+        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
+        mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
+        CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
     }
+
 
     SetupSolve();
 
@@ -391,6 +398,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // Update cell locations and topology
         UpdateCellLocationsAndTopology();
 
+        // Increment simulation time here, so results files look sensible
+        p_simulation_time->IncrementTimeOneStep();
+
         // If any PDEs have been defined, solve them and store their solution in results files
         if (mpCellBasedPdeHandler != NULL)
         {
@@ -403,9 +413,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         UpdateAtEndOfTimeStep();
         CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
-
-        // Increment simulation time here, so results files look sensible
-        p_simulation_time->IncrementTimeOneStep();
 
         // Output current results to file
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);

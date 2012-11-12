@@ -221,8 +221,8 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
     }
 
     mDirPath = outputDirectory; // caching the path to the output directory for VTK
-    double current_time = SimulationTime::Instance()->GetTime();
-    WritePdeSolution(current_time);
+    //double current_time = SimulationTime::Instance()->GetTime();
+    //WritePdeSolution(current_time);
 }
 
 template<unsigned DIM>
@@ -510,15 +510,12 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             cell_iter->GetCellData()->SetItem(mPdeAndBcCollection[pde_index]->rGetDependentVariableName(), solution_at_node);
         }
     }
-
     // Write results to file if required
     SimulationTime* p_time = SimulationTime::Instance();
-    double time_next_step = p_time->GetTime() + p_time->GetTimeStep();
-    if ((p_time->GetTimeStepsElapsed()+1)%samplingTimestepMultiple == 0)
+    if ((p_time->GetTimeStepsElapsed())%samplingTimestepMultiple == 0)
     {
-        WritePdeSolution(time_next_step);
+    	WritePdeSolution(p_time->GetTime());
     }
-
 #define COVERAGE_IGNORE
     ///\todo enable this in the case where a coarse PDE mesh is used
     if (!using_coarse_pde_mesh)
@@ -527,11 +524,10 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         {
             ///\todo Worry about round-off errors (#1891)
             p_time = SimulationTime::Instance();
-            time_next_step = p_time->GetTime() + p_time->GetTimeStep();
             unsigned num_timesteps_per_day = (unsigned) (DBL_EPSILON + 24/SimulationTime::Instance()->GetTimeStep());
-            if ((p_time->GetTimeStepsElapsed()+1) % num_timesteps_per_day == 0)
+            if ((p_time->GetTimeStepsElapsed()) % num_timesteps_per_day == 0)
             {
-                WriteAverageRadialPdeSolution(time_next_step);
+                WriteAverageRadialPdeSolution(p_time->GetTime());
             }
         }
     }
@@ -623,26 +619,8 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                     }
                     else
                     {
-                    	// Only come in here if there is no solution to the PDE i.e this is called once at the begining of the simulation.
-                        ///\todo consider whether a different initial condition is more appropriate (#1891)
-
-                        // Find the nearest cell to this coarse mesh node
-                        unsigned nearest_node_index = 0;
-                        double nearest_node_distance = DBL_MAX;
-                        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
-                             cell_iter != mpCellPopulation->End();
-                             ++cell_iter)
-                        {
-                            c_vector<double, DIM> node_location = mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
-                            if (norm_2(node_location - location) < nearest_node_distance)
-                            {
-                                nearest_node_index = mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
-                            }
-                        }
-
-                        CellPtr p_cell = mpCellPopulation->GetCellUsingLocationIndex(nearest_node_index);
-                        double solution = p_cell->GetCellData()->GetItem(mPdeAndBcCollection[pde_index]->rGetDependentVariableName());
-                        (*mpVizPdeSolutionResultsFile) << solution << " ";
+                    	// should only come into this method AFTER solving the PDE
+                    	NEVER_REACHED;
                     }
                 }
             }
@@ -793,8 +771,8 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> poin
 	}
 	else
 	{
-		// No PDE solution yet so use Cell data??
-		EXCEPTION("Tried to get the solution of a variable name: " + Variable + ". This PDE has not been solved yet.");
+    	// should only come into this method AFTER solving the PDE
+    	NEVER_REACHED;
 	}
 
 	return solution_at_point;

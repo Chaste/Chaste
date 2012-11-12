@@ -199,14 +199,6 @@ public:
          */
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /*
-         * Here we use the {{{CellData}}} class, which stores the
-         * value of the current nutrient concentration for each cell. We have to
-         * tell the {{{CellData}}} class that there is one variable per cell, namely the oxygen
-         * concentration.  We initialise the oxygen concentration for each node (to 1.0), by
-         * calling {{{SetItem}}}.
-         */
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         /*
          * Next we instantiate an instance of the PDE class which we defined above.
@@ -245,7 +237,9 @@ public:
          * the boundary condition itself can be made spatially varying or time-dependent.
          *
          * The PDE is tagged to show that the quantity to be solved for (the quantity of interest in
-         * the cells' data is "oxygen"
+         * the cells' data is "oxygen".
+         *
+         * The {{{CellData}}} class, is used to stores the value of the current nutrient concentration for each cell.
          */
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, is_neumann_bc);
         pde_and_bc.SetDependentVariableName("oxygen");

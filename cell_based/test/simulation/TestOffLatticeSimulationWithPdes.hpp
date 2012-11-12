@@ -67,7 +67,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
-
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
 public:
@@ -160,9 +159,6 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -257,9 +253,6 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -367,9 +360,6 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
 
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("OffLatticeSimulationWithPdes");
@@ -450,10 +440,6 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
-        cell_population.SetDataOnAllCells("dunno", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -540,9 +526,6 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -644,10 +627,6 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
-        cell_population.SetDataOnAllCells("dunno", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -801,9 +780,6 @@ public:
         // cells are ghost nodes using the mesh and cell_location_indices
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, cell_location_indices);
 
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("nutrient", 1.0);
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestCoarseSourceMeshWithGhostNodes");
@@ -890,9 +866,6 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -987,9 +960,6 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory(output_directory);
@@ -1057,9 +1027,6 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
-
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("OffLatticeSimulationWithOxygen3d");
@@ -1125,9 +1092,6 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("oxygen", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1248,9 +1212,6 @@ public:
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("nutrient", 5.0);
-
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedCellPopulationWithpoutCoarseMeshThrowsException");
@@ -1311,9 +1272,6 @@ public:
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("nutrient", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1406,9 +1364,6 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("nutrient", 1.0);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1518,22 +1473,6 @@ public:
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
-         */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            c_vector<double,2> location = p_mesh->GetNode(i)->rGetLocation();
-
-            double initial_condition = 0.0;
-            if (norm_2(location-centre_of_mesh) >= 1.0)
-            {
-                initial_condition = 1.0;
-            }
-            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem("nutrient", initial_condition);
-        }
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1625,9 +1564,6 @@ public:
         NodeBasedCellPopulation<1> cell_population(*p_mesh, cells);
         cell_population.SetMechanicsCutOffLength(1.5);
 
-        // Set up cell data on the cell population
-        cell_population.SetDataOnAllCells("nutrient", 1.0);
-
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
         simulator.SetEndTime(0.01);
@@ -1701,22 +1637,6 @@ public:
         c_vector<double,2> centre_of_mesh;
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
-         */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            c_vector<double,2> location = p_mesh->GetNode(i)->rGetLocation();
-
-            double initial_condition = 0.0;
-            if (norm_2(location-centre_of_mesh) >= 1.0)
-            {
-                initial_condition = 1.0;
-            }
-            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem("nutrient",initial_condition);
-        }
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1788,22 +1708,6 @@ public:
         centre_of_mesh[0] = 5.0;
         centre_of_mesh[1] = 5.0;
         centre_of_mesh[2] = 5.0;
-        /*
-         * Since values are first passed in to CellData before it is updated in UpdateAtEndOfTimeStep(),
-         * we need to pass it some initial conditions to avoid memory errors.
-         */
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
-        {
-            c_vector<double,3> location = p_mesh->GetNode(i)->rGetLocation();
-
-            double initial_condition = 0.0;
-            if (norm_2(location-centre_of_mesh) >= 1.0)
-            {
-                initial_condition = 1.0;
-            }
-            CellPtr p_cell = cell_population.GetCellUsingLocationIndex(p_mesh->GetNode(i)->GetIndex());
-            p_cell->GetCellData()->SetItem("nutrient",initial_condition);
-        }
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
