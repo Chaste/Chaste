@@ -706,6 +706,7 @@ public:
         pde_handler.mpAverageRadialPdeSolutionResultsFile->close();
     }
 
+    // Note that this test doesn't solve a PDE it just sets some random initial data and checks its written to file correctly.
     void TestWritePdeSolution() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -753,9 +754,13 @@ public:
 
         // Close result file ourselves
         pde_handler.mpVizPdeSolutionResultsFile->close();
+
+
+        // Coverage for GetPdeSolutionAtPoint method
+        TS_ASSERT_THROWS_THIS(pde_handler.GetPdeSolutionAtPoint(zero_vector<double>(2),"variable"), "Tried to get the solution of a variable name: variable. This PDE has not been solved yet.");
     }
 
-    void TestSolvePdeAndWriteResultsToFileWithoutCoarsePdeMeshDirichlet() throw(Exception)
+    void TestSolvePdeAndWriteResultsToFileAndGetPDESolutionAtPointWithoutCoarsePdeMeshDirichlet() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -812,6 +817,44 @@ public:
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), analytic_solution, 0.02);
         }
+
+
+        // Now check the GetPdeSolutionAtPoint method
+
+		// First loop over nodes and check it works
+		// Check the correct solution was obtained
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter)
+		{
+			double cell_data_solution(cell_iter->GetCellData()->GetItem("variable"));
+			c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+
+			TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location,"variable"), cell_data_solution, 1e-6);
+		}
+
+		// Now choose some other points
+
+		// Centre
+		c_vector<double,2> point;
+		point(0) = 0.0;
+		point(1) = 0.0;
+
+		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 0.75, 0.01);
+
+		// Random point
+		point(0) = 0.5;
+		point(1) = 0.5;
+
+		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0 - (1.0-2.0*0.5*0.5)/4.0, 0.01);
+
+		// Point on the boundary
+		point(0) = 1.0;
+		point(1) = 0.0;
+
+		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0, 1e-6);
+
+
     }
 
     void TestSolvePdeAndWriteResultsToFileWithoutCoarsePdeMeshNeumann() throw(Exception)
