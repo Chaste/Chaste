@@ -147,11 +147,13 @@ def graph(req, type, revision, machine, buildType, graphName):
     Send the given graph file (a .gif) back to the user.
     """
     test_set_dir = _testResultsDir(type, revision, machine, buildType)
-    graphName = os.path.basename(graphName) # Foil hackers
-    graph_path = os.path.join(test_set_dir, graphName)
-    if os.path.isfile(graph_path):
-        req.content_type = 'image/gif'
-        req.sendfile(graph_path)
+    graph_name = os.path.basename(graphName) # Foil hackers
+    for graph_name in _test_suite_name_aliases(graph_name):
+        graph_path = os.path.join(test_set_dir, graph_name)
+        if os.path.isfile(graph_path):
+            req.content_type = 'image/gif'
+            req.sendfile(graph_path)
+            break
     else:
         req.content_type = 'text/html'
         req.write(_header(), 0)
