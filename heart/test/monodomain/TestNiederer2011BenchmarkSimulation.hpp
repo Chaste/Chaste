@@ -111,7 +111,7 @@ public:
 class TestNiederer2011BenchmarkSimulation : public CxxTest::TestSuite
 {
 private:
-    void RunBenchMark(double h, double dt, double endTime)
+    void RunBenchMark(double h, double dt, double endTime, bool useSvi)
     {
         TetrahedralMesh<3,3> mesh;
 
@@ -132,7 +132,7 @@ private:
 
         // The Chaste results for the benchmark paper use STATE-VARIABLE INTERPOLATION switched on
         // (see comments above)
-        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
+        HeartConfig::Instance()->SetUseStateVariableInterpolation(useSvi);
 
         // Regarding the second paper described above, to run the simulations with ICI, comment out the
         // above line. To run the simulation with operator splitting, or with (full) mass-lumping,
@@ -158,7 +158,7 @@ private:
 
     // this method loads the output file from the previous method and computes the activation
     // time (defined as the time V becomes positive) for each node.
-    void ConvertToActivationMap(double h, double dt)
+    void ConvertToActivationMap(double h, double dt, bool useSvi)
     {
         //TetrahedralMesh<3,3> mesh1;
         //double h1=0.01;    // 0.01, 0.02, 0.05
@@ -178,18 +178,6 @@ private:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        unsigned the_node = 0; //corner node
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
-        {
-
-            double x = mesh.GetNode(i)->rGetLocation()[0];
-            double y = mesh.GetNode(i)->rGetLocation()[1];
-            double z = mesh.GetNode(i)->rGetLocation()[2];
-            if( fabs(x-2.0) + fabs(y-0.7) + fabs(z-0.3) < 1e-8)
-            {
-                the_node = i;
-            }
-        }
 
         std::vector<double> activation_times(mesh.GetNumNodes(), -1.0);
         std::vector<double> last_negative_voltage(mesh.GetNumNodes(), 1.0);
@@ -214,24 +202,60 @@ private:
             }
         }
 
-        if (PetscTools::AmMaster())
-        {
-            std::cout << "h, dt = " << h << ", " << dt << "\n\t";
-            std::cout << "activation_times[" << the_node << "] = " << activation_times[the_node] << "\n";
-        }
         OutputFileHandler handler("ActivationMaps", false);
+        if (PetscTools::AmMaster() == false)
+        {
+            return;
+        }
+        //Only master proceeds to write
+
+
+        c_vector<double, 3> top_corner;
+        top_corner[0] = 2.0;
+        top_corner[1] = 0.7;
+        top_corner[2] = 0.3;
+        c_vector<double, 3> unit_diagonal = top_corner/norm_2(top_corner);
+
+        std::stringstream output_file1;
+        output_file1 << "diagonal" << "_h" << h << "_dt" << dt;
+        if (useSvi)
+        {
+            output_file1 << "_svi.dat";
+        }
+        else
+        {
+            output_file1 << "_ici.dat";
+        }
+        out_stream p_diag_file = handler.OpenOutputFile(output_file1.str());
+
+        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            c_vector<double, 3> position =  mesh.GetNode(i)->rGetLocation();
+            c_vector<double, 3>  projected_diagonal = unit_diagonal*inner_prod(unit_diagonal, position);
+            double off_diagonal = norm_2(position - projected_diagonal);
+
+            if (off_diagonal < h/3)
+            {
+                double distance = norm_2(position);
+                (*p_diag_file) << distance<<"\t"<< activation_times[i]<<"\t"<<off_diagonal<<"\n";
+                if( fabs(position[0]-2.0) < 1e-8)
+                {
+                    std::cout << "h, dt = " << h << ", " << dt << "\n\t";
+                    std::cout << "activation_times[" << i << "] = " << activation_times[i] << "\n";
+                }
+            }
+        }
+        p_diag_file->close();
+
         std::stringstream output_file;
         output_file << "activation" << "_h" << h << "_dt" << dt << ".dat";
-        if (PetscTools::AmMaster())
-        {
-            out_stream p_file = handler.OpenOutputFile(output_file.str());
+        out_stream p_file = handler.OpenOutputFile(output_file.str());
 
-            for(unsigned i=0; i<activation_times.size(); i++)
-            {
-                *p_file << activation_times[i] << "\n";
-            }
-            p_file->close();
+        for(unsigned i=0; i<activation_times.size(); i++)
+        {
+            *p_file << activation_times[i] << "\n";
         }
+        p_file->close();
 
         for(unsigned i=0; i<activation_times.size(); i++)
         {
@@ -246,18 +270,17 @@ private:
         }
     }
 
-
-    void Run(double h, double dt, double endTime)
+    void Run(double h, double dt, double endTime, bool useSvi)
     {
-        RunBenchMark(h, dt, endTime);
-        ConvertToActivationMap(h, dt);
+        RunBenchMark(h, dt, endTime, useSvi);
+        ConvertToActivationMap(h, dt, useSvi);
     }
 
 public:
     void TestRunOnCoarsestMesh() throw(Exception)
     {
-        // run with h=0.05 and dt=0.01
-        Run(0.05, 0.01, 40);
+        // run with h=0.05 and dt=0.01.  SVI is turned on
+        Run(0.05, 0.01, 40, true);
 
         // test the activation times produced match those given for the Niederer et al paper
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "ActivationMaps";
@@ -266,7 +289,35 @@ public:
 
         NumericFileComparison num_comp(output_file, base_file);
         TS_ASSERT(num_comp.CompareFiles(1.5e-3)); //Absolute difference of 1.5 microsecond is tolerated
+    }
+    void donotTestRunOtherSvi() throw(Exception)
+    {
+        /* To reproduce Code A panel of
+         *  Figure 1 Pathmanathan et al. == Figure 2 Niederer et al.
+         * we require
+         * Run(0.05, 0.005, 40, true);
+         * Run(0.02, 0.005, 50, true);
+         * Run(0.01, 0.005, 50, true);
+         *
+         */
+        /* This (together with the above) produces Pathmanathan et al. Figure 1 panel A "SVI"
+         *
+         * NB. Verify time-step
+         */
 
+        Run(0.02, 0.01, 50, true);
+        Run(0.01, 0.01, 50, true);
+    }
+
+    void donotTestRunAllIci() throw(Exception)
+    {
+        /* This produces Pathmanathan et al. Figure 1 panel B "ICI"
+         *
+         * NB. Verify time-step
+         */
+        Run(0.05, 0.01, 60, false);
+        Run(0.02, 0.01, 50, false);
+        Run(0.01, 0.01, 50, false);
     }
 };
 
