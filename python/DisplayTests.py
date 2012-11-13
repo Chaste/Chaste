@@ -129,14 +129,16 @@ def testsuite(req, type, revision, machine, buildType, testsuite, status, runtim
     test_set_dir = _testResultsDir(type, revision, machine, buildType)
     buildTypesModule = _importBuildTypesModule(revision)
     build = _getBuildObject(buildTypesModule, buildType)
-    testsuite_file = build.ResultsFileName(test_set_dir, testsuite, status, runtime)
-    if os.path.isfile(testsuite_file):
-        req.write('\n<pre>\n', 0)
-        fp = open(testsuite_file)
-        for line in fp:
-            req.write(line.replace('&', '&amp;').replace('<', '&lt;'))
-        fp.close()
-        req.write('\n</pre>\n', 0)
+    for suite_name in _test_suite_name_aliases(testsuite):
+        testsuite_file = build.ResultsFileName(test_set_dir, suite_name, status, runtime)
+        if os.path.isfile(testsuite_file):
+            req.write('\n<pre>\n', 0)
+            fp = open(testsuite_file)
+            for line in fp:
+                req.write(line.replace('&', '&amp;').replace('<', '&lt;'))
+            fp.close()
+            req.write('\n</pre>\n', 0)
+            break
     else:
         req.write(_error('The requested test suite was not found.'))
     req.write(_footer())
@@ -670,7 +672,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     
     return ''.join(output)
 
-def _handle_renamed_test_suites(runTimes):
+def _handle_renamed_test_suites(runTimes, graphs={}):
     """Cope with the test result naming convention change in #2195.
     
     Test suite results files used to be named after just the leaf name of the test file.  They
@@ -682,11 +684,15 @@ def _handle_renamed_test_suites(runTimes):
     for suite_name in runTimes.iterkeys():
         if '-' in suite_name:
             leaf_name = suite_name[1+suite_name.rfind('-'):]
-            if not leaf_name in name_map and leaf_name in runTimes:
+            if not leaf_name in name_map and (leaf_name in runTimes or leaf_name in graphs):
                 name_map[leaf_name] = suite_name
     for leaf_name, full_name in name_map.iteritems():
-        runTimes[full_name].update(runTimes[leaf_name])
-        del runTimes[leaf_name]
+        if leaf_name in runTimes:
+            runTimes[full_name].update(runTimes[leaf_name])
+            del runTimes[leaf_name]
+        if leaf_name in graphs:
+            graphs[full_name] = graphs[leaf_name]
+            del graphs[leaf_name]
 
 def _test_suite_name_aliases(suiteName):
     """Cope with the test result naming convention change in #2195.
@@ -935,14 +941,17 @@ def _getTestStatus(test_set_dir, build, summary=False):
     for filename in result_files:
         ext = os.path.splitext(filename)[1]
         if ext == '.gif':
-            testsuite = build.ParseGraphFilename(filename)
-            graphs[testsuite] = filename
+            if not summary:
+                testsuite = build.ParseGraphFilename(filename)
+                graphs[testsuite] = filename
         elif not (ext in ignores or filename[0] == '.'):
             d = build.GetInfoFromResultsFileName(filename)
             testsuite = d['testsuite']
             testsuite_status[testsuite] = d['status']
             if not summary:
                 runtime[testsuite] = d['runtime']
+    if graphs:
+        _handle_renamed_test_suites(runtime, graphs)
     overall_status, colour = _overallStatus(testsuite_status, build)
 
     # Check for build failure
