@@ -35,11 +35,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import glob
 import os
 
+# If you are an active developer, committing back to the trunk, 
+# please uncomment the following line to run tests on duplicate file names, 
+# orphaned tests and copyright notices.
+# do_inf_tests = 1
+
 # Check which version of Ubuntu this is
 fp = open('/etc/issue')
 ubuntu_ver = fp.read().split()[1]
 fp.close()
-#First deal with special cases for beta releases etc.
+
+# First deal with special cases for beta releases etc.
 if ubuntu_ver == 'natty':
     ubuntu_ver = [11,04]
 else:
@@ -73,6 +79,7 @@ libs_for_petsc = ['petsccontrib', 'X11',
                   'HYPRE', 'spooles', 'superlu',
                   'umfpack', 'amd' # Both for Umfpack
                   ]
+
 #Fixes (possibly temporary) for Natty
 if ubuntu_ver >= [11,04]:
     libs_for_petsc.append(['HYPRE_utilities', 
