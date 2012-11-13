@@ -601,8 +601,8 @@ public:
 
 
 
-		TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
-		problem.SetOutputDeformationGradientsAndStress(3.0);
+        TS_ASSERT_THROWS_CONTAINS(problem.SetOutputDeformationGradientsAndStress(3.4),"not a multiple");
+        problem.SetOutputDeformationGradientsAndStress(3.0);
 
         problem.Solve();
 
