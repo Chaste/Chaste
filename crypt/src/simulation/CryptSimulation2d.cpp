@@ -222,7 +222,7 @@ void CryptSimulation2d::UpdateAtEndOfTimeStep()
 {
     SimulationTime* p_time = SimulationTime::Instance();
 
-    if ((p_time->GetTimeStepsElapsed()+1)%mSamplingTimestepMultiple == 0)
+    if ((p_time->GetTimeStepsElapsed())%mSamplingTimestepMultiple == 0)
     {
         /*
          * If there are any cells in the simulation, and mWriteBetaCatenin has been set
@@ -232,8 +232,7 @@ void CryptSimulation2d::UpdateAtEndOfTimeStep()
         bool any_cells_present = (mrCellPopulation.Begin() != mrCellPopulation.End());
         if (any_cells_present && mWriteBetaCatenin)
         {
-            double time_next_step = p_time->GetTime() + p_time->GetTimeStep();
-            WriteBetaCatenin(time_next_step);
+            WriteBetaCatenin(p_time->GetTime());
         }
     }
 }
