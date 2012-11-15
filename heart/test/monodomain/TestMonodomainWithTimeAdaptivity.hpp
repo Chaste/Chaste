@@ -179,8 +179,9 @@ public:
                 VecMax(solution, &index, &max_non_adaptive);
                 //std::cout << "Non adaptive: range at final time: " << min_non_adaptive << "mV to " << max_non_adaptive << "mV\n";
 
-                TS_ASSERT_DELTA(min_non_adaptive, 22.0383, 1e-3);
-                TS_ASSERT_DELTA(max_non_adaptive, 29.0697, 1e-3);
+                //This test assumes no exception.  Requires PETSc > 2.3.2
+                TS_ASSERT_DELTA(min_non_adaptive, 21.9062, 1e-3);
+                TS_ASSERT_DELTA(max_non_adaptive, 28.8346, 1e-3);
             }
 
 
@@ -205,8 +206,9 @@ public:
                 ///std::cout << "Adaptive:     range at final time: " << min_adaptive << "mV to " << max_adaptive << "mV\n";
 
                 // compare
-                TS_ASSERT_DELTA(min_adaptive, 19.8749, 1e-3);
-                TS_ASSERT_DELTA(max_adaptive, 25.0398, 1e-3);
+                //This test assumes no exception.  Requires PETSc > 2.3.2
+                TS_ASSERT_DELTA(min_adaptive, 19.9009, 1e-3);
+                TS_ASSERT_DELTA(max_adaptive, 25.6082, 1e-3);
             }
         }
         catch (Exception& e)
