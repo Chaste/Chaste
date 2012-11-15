@@ -150,8 +150,8 @@ public:
             }
         }
 
-        // a hardcoded values
-        TS_ASSERT_DELTA(sol_repl[2*404], 39.7258, 1e-3);
+        // a hardcoded value
+        TS_ASSERT_DELTA(sol_repl[2*404], 39.6833, 1e-3);
     }
 
 // see #1061

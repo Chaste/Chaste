@@ -136,10 +136,10 @@ public:
 
         // compare
 
-        TS_ASSERT_DELTA(min_non_adaptive, 22.0383, 1e-3);
-        TS_ASSERT_DELTA(max_non_adaptive, 29.0697, 1e-3);
-        TS_ASSERT_DELTA(min_adaptive, 19.8749, 1e-3);
-        TS_ASSERT_DELTA(max_adaptive, 25.0398, 1e-3);
+        TS_ASSERT_DELTA(min_non_adaptive, 21.9062, 1e-3);
+        TS_ASSERT_DELTA(max_non_adaptive, 28.8345, 1e-3);
+        TS_ASSERT_DELTA(min_adaptive, 19.9010, 1e-3);
+        TS_ASSERT_DELTA(max_adaptive, 25.6083, 1e-3);
     }
 
     void TestWithChebyshevAndFixedIterations() throw(Exception)

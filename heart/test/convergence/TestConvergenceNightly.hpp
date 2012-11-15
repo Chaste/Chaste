@@ -227,7 +227,7 @@ public:
         tester.RelativeConvergenceCriterion=4e-2;//Just to prove the thing works
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
-        TS_ASSERT_EQUALS(tester.MeshNum, 1u); ///Just to prove the thing works
+        TS_ASSERT_EQUALS(tester.MeshNum, 2u); ///Just to prove the thing works
         HeartConfig::Instance()->Reset();
     }
 

@@ -166,7 +166,7 @@ public:
 
         /* This part is just to check nothing has accidentally been changed in this example */
         ReplicatableVector voltage(monodomain_problem.GetSolution());
-        TS_ASSERT_DELTA(voltage[0], 35.0939, 1e-2);
+        TS_ASSERT_DELTA(voltage[0], 34.9032, 1e-2);
     }
 };
 #endif /*TESTMONODOMAIN3DEXAMPLETUTORIAL_HPP_*/

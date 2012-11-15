@@ -244,20 +244,19 @@ AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEM
 {
     assert(pMesh);
 
-    ///\todo #2232 Check if second order Gauss quadrature is the correct default for Chaste assemblers
     switch (ELEMENT_DIM)
 	{
 	case 0:
 		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
 		break;
 	case 1:
-		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2); ///\todo #2232 Changed from 3 to 2
+		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
 		break;
 	case 2:
 		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
 		break;
 	case 3:
-		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 1);///\todo #2232  Looks like under-quadrature
+		mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
 		break;
 	default:
 		NEVER_REACHED;

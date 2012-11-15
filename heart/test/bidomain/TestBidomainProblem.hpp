@@ -737,15 +737,15 @@ public:
         //V_m and phi_e samples
         std::vector<double> v_at_last, v_at_50, phi_at_50;
         mesh_reader.GetPointData( "V_000050", v_at_50);
-        TS_ASSERT_DELTA( v_at_50[0],  -83.6564, 1e-3 );
+        TS_ASSERT_DELTA( v_at_50[0],  -83.6547, 1e-3 );
         TS_ASSERT_DELTA( v_at_50[25], -83.8549, 1e-3 );
-        TS_ASSERT_DELTA( v_at_50[49], -83.8539, 1e-3 );
+        TS_ASSERT_DELTA( v_at_50[49], -83.8557, 1e-3 );
         mesh_reader.GetPointData( "Phi_e_000050", phi_at_50);
         TS_ASSERT_DELTA( phi_at_50[0],  -0.0332, 1e-3 );
         TS_ASSERT_DELTA( phi_at_50[25],  0.0064, 1e-3 );
         TS_ASSERT_DELTA( phi_at_50[49],  0.0062, 1e-3 );
         mesh_reader.GetPointData( "V_000100", v_at_last);
-        TS_ASSERT_DELTA( v_at_last[0],   -83.6881, 1e-3 );
+        TS_ASSERT_DELTA( v_at_last[0],   -83.6863, 1e-3 );
 
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());

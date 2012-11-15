@@ -235,11 +235,10 @@ public:
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
         CardiacSimulation simulation("heart/test/data/xml/base_monodomain_short.xml");
-        std::string foldername = "BaseMonodomainShort";
 
        // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "base_monodomain_short_results", false,
-                                                 foldername, "SimulationResults", true, 1e-6));
+                                                 "BaseMonodomainShort", "SimulationResults", true, 1e-6));
     }
 
     void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
@@ -288,7 +287,8 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "resume_bidomain_short_results", false,
-                                                 foldername, "SimulationResults", true, 1e-6));
+                                                 foldername, "SimulationResults", true, 1e-6));                                          
+        //assert(0);
     }
 
     void TestCardiacSimulationArchiveMonodomain() throw(Exception)

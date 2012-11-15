@@ -825,10 +825,10 @@ public:
         ReplicatableVector voltage_replicated(monodomain_problem.GetSolution());
         double atol = 5e-3;
 
-        TS_ASSERT_DELTA(voltage_replicated[1], 31.9227, atol);
-        TS_ASSERT_DELTA(voltage_replicated[3], 32.1385, atol);
-        TS_ASSERT_DELTA(voltage_replicated[5], 32.7569, atol);
-        TS_ASSERT_DELTA(voltage_replicated[7], 33.7192, atol);
+        TS_ASSERT_DELTA(voltage_replicated[1], 31.8958, atol);
+        TS_ASSERT_DELTA(voltage_replicated[3], 32.1109, atol);
+        TS_ASSERT_DELTA(voltage_replicated[5], 32.7315, atol);
+        TS_ASSERT_DELTA(voltage_replicated[7], 33.7011, atol);
 
 
 #ifdef CHASTE_VTK
@@ -911,13 +911,13 @@ public:
         //Last time step and midway time step for V_m
         std::vector<double> v_at_last, v_at_100;
         mesh_reader.GetPointData( "V_000100", v_at_100);
-        TS_ASSERT_DELTA( v_at_100[0],    47.9573, 1e-3 );
-        TS_ASSERT_DELTA( v_at_100[665],  26.6333, 1e-3 );
-        TS_ASSERT_DELTA( v_at_100[1330], -55.0584, 1e-3 );
+        TS_ASSERT_DELTA( v_at_100[0],    48.0637, 1e-3 );
+        TS_ASSERT_DELTA( v_at_100[665],  26.5404, 1e-3 );
+        TS_ASSERT_DELTA( v_at_100[1330], -55.3058, 1e-3 );
         mesh_reader.GetPointData( "V_000200", v_at_last);
-        TS_ASSERT_DELTA( v_at_last[0],    31.8997, 1e-3 );
-        TS_ASSERT_DELTA( v_at_last[665],  32.6873, 1e-3 );
-        TS_ASSERT_DELTA( v_at_last[1330], 34.5176, 1e-3 );
+        TS_ASSERT_DELTA( v_at_last[0],    31.8730, 1e-3 );
+        TS_ASSERT_DELTA( v_at_last[665],  32.6531, 1e-3 );
+        TS_ASSERT_DELTA( v_at_last[1330], 34.5152, 1e-3 );
 
         //HeartConfig XML
         TS_ASSERT(FileFinder(results_dir + "ChasteParameters.xml").Exists());
