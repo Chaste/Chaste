@@ -108,8 +108,9 @@ public:
 
     void TestMono2dSmall() throw(Exception)
     {
+        //Clear any warnings from previous tests
+        Warnings::QuietDestroy();
         {
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
             CardiacSimulation simulation("heart/test/data/xml/monodomain2d_small.xml", false, true);
             boost::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
             TS_ASSERT(p_problem);
@@ -124,11 +125,21 @@ public:
                 TS_ASSERT_DELTA(p_cell->GetParameter("membrane_fast_sodium_current_conductance"), 23 * 0.99937539038101175, 1e-6);
                 TS_ASSERT_DELTA(p_cell->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"), 0.282/3.0, 1e-6);
             }
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
+            
             if (p_vector_factory->GetLocalOwnership() > 0)
             {
+                TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
                 std::stringstream msg;
                 msg << "Cannot apply drug to cell at node " << p_vector_factory->GetLow() << " as it has no parameter named 'not_a_current_conductance'.";
+                TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
+            }
+            else
+            {
+                //There is now a warning on the top processes about the fact that no cells were assigned
+                TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+                std::stringstream msg;
+                msg << "No cells were assigned to process "<< PetscTools::GetMyRank();
+                msg << " in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh";
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), msg.str());
             }
         }
