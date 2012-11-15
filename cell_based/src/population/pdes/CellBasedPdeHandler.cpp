@@ -721,25 +721,27 @@ void CellBasedPdeHandler<DIM>::WriteAverageRadialPdeSolution(double time)
 }
 
 template<unsigned DIM>
-double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> point, std::string Variable)
+double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> point, std::string variable)
 {
 	double solution_at_point = 0.0;
 
+	unsigned pde_index = UINT_MAX;
 
 	// Loop over elements of mPdeAndBcCollection to find correct PDE
-	PdeAndBoundaryConditions<DIM>* p_pde_and_bc;
-	for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
+	for (unsigned i=0; i<mPdeAndBcCollection.size(); i++)
 	{
-		if (mPdeAndBcCollection[pde_index]->rGetDependentVariableName() == Variable)
+		if (mPdeAndBcCollection[i]->rGetDependentVariableName() == variable)
 		{
-			p_pde_and_bc = mPdeAndBcCollection[pde_index];
+			pde_index = i;
 			break;
 		}
 	}
-	if (p_pde_and_bc == NULL)
+	if (pde_index == UINT_MAX)
 	{
-		EXCEPTION("Tried to get the solution of a variable name: " + Variable + ". There is no PDE with that variable.");
+		EXCEPTION("Tried to get the solution of a variable name: " + variable + ". There is no PDE with that variable.");
 	}
+	PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+
 
 	Element<DIM,DIM>* p_containing_element;
 
