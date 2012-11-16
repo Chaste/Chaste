@@ -75,7 +75,7 @@ unsigned ChasteBuildInfo::GetMinorReleaseNumber()
 
 unsigned ChasteBuildInfo::GetRevisionNumber()
 {
-    return %(revision)d;
+    return %(revision)s;
 }
 
 bool ChasteBuildInfo::IsWorkingCopyModified()
