@@ -1022,7 +1022,7 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
     }
 
     // If you are beyond the user estimate increment step by step
-    if ( mCurrentTimeStep >= (long) mEstimatedUnlimitedLength )
+    if ( mCurrentTimeStep >= (long unsigned) mEstimatedUnlimitedLength )
     {
         mDatasetDims[0]++;
         mNeedExtend = true;
