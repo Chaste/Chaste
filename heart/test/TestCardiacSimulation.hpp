@@ -379,7 +379,9 @@ public:
      *
        scons build=GccOpt_hostconfig,boost=1-34_4 test_suite=heart/test/TestCardiacSimulation.hpp
        cp -r /tmp/$USER/testoutput/SaveBidomainShort_checkpoints/0.2ms heart/test/data/checkpoint_migration_via_xml/
-       rm heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/progress_status.txt
+       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/progress_status.txt
+       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/mesh.ncl
+       rm -f heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort_0.2ms/ChasteParameters_?_?xsd
        rm -rf heart/test/data/checkpoint_migration_via_xml/0.2ms/SaveBidomainShort/output
      */
     void TestCardiacSimulationResumeMigration() throw(Exception)

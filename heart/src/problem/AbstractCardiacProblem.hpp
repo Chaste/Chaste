@@ -772,18 +772,22 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
         }
         else
         {
-            // The BCs will only actually be different if using a distributed tetrahedral mesh
-            DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_dist_mesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh);
-            if (p_dist_mesh)
-            {
-                mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
-            }
-            else
-            {
-                // Load into the temporary container, which will get thrown away shortly
-                p_bcc->LoadFromArchive(archive, mpMesh);
-                /// \todo #1159 sanity check that the contents of p_bcc and mpBoundaryConditionsContainer match.
-            }
+//            // The BCs will only actually be different if using a distributed tetrahedral mesh
+//            DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_dist_mesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh);
+//            if (p_dist_mesh)
+//            {
+//                mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
+//            }
+//            else
+//            {
+//                // Loading from a tetrahedral (not distributed) mesh
+//                //TestCardiacSimulation::TestCardiacSimulationResumeMigration used to cover this, but doesn't now.
+//                // Load into the temporary container, which will get thrown away shortly
+//                p_bcc->LoadFromArchive(archive, mpMesh);
+//                /// \todo #1159 sanity check that the contents of p_bcc and mpBoundaryConditionsContainer match.
+//            }
+            /// \todo #1159 All meshes might assume that the BCs are different and require merging 
+            mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
         }
     }
     BccType p_default_bcc;
