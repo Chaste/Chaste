@@ -78,8 +78,8 @@ public:
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "postprocess_monodomain_results", false,
                    foldername, "SimulationResults", true));
     }
-    ///#2232 This test is not longer portable between IntelProduction and GccOpt/GccOptNative
-    void doNotTest_TestCardiacSimulationSaveBidomain() throw(Exception)
+
+    void TestCardiacSimulationSaveBidomain() throw(Exception)
     {
         // run a bidomain simulation
         CardiacSimulation simulation("heart/test/data/xml/save_bidomain.xml");
@@ -87,8 +87,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_bidomain_results", false,
-                   foldername, "SimulationResults", true,
-                   1e-6 /*tol*/));
+                   foldername, "SimulationResults", true));
 
         FileFinder file(foldername + "_checkpoints/10ms/" + foldername + "_10ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);

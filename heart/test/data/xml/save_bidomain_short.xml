@@ -60,7 +60,7 @@
 	<Numerical>
 		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
 		<KSPTolerances>
-			<KSPAbsolute>2e-4</KSPAbsolute>
+			<KSPAbsolute>1e-4</KSPAbsolute>
 		</KSPTolerances>
 		<KSPSolver>gmres</KSPSolver>
 		<KSPPreconditioner>jacobi</KSPPreconditioner>
