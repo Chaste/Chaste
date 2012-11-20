@@ -56,6 +56,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
       mOutputVoronoiData(false),
       mOutputCellPopulationVolumes(false),
       mWriteVtkAsPoints(false),
+      mOutputMeshInVtk(false),
       mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
@@ -505,9 +506,15 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
         cellwise_data.push_back(cellwise_data_var);
     }
 
+    if (mOutputMeshInVtk)
+    {
+		VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "mesh_"+time.str(), false);
+		mesh_writer.WriteFilesUsingMesh(rGetMesh());
+    }
+
     if (mWriteVtkAsPoints)
     {
-        VtkMeshWriter<SPACE_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+    	VtkMeshWriter<SPACE_DIM,SPACE_DIM> cells_writer(this->mDirPath, "results_"+time.str(), false);
 
         // Loop over cells
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
@@ -549,29 +556,29 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
         if (this->mOutputCellProliferativeTypes)
         {
-            mesh_writer.AddPointData("Cell types", cell_types);
+            cells_writer.AddPointData("Cell types", cell_types);
         }
         if (this->mOutputCellAncestors)
         {
-            mesh_writer.AddPointData("Ancestors", cell_ancestors);
+            cells_writer.AddPointData("Ancestors", cell_ancestors);
         }
         if (this->mOutputCellMutationStates)
         {
-            mesh_writer.AddPointData("Mutation states", cell_mutation_states);
+            cells_writer.AddPointData("Mutation states", cell_mutation_states);
         }
         if (this->mOutputCellAges)
         {
-            mesh_writer.AddPointData("Ages", cell_ages);
+            cells_writer.AddPointData("Ages", cell_ages);
         }
         if (this->mOutputCellCyclePhases)
         {
-            mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
+            cells_writer.AddPointData("Cycle phases", cell_cycle_phases);
         }
         if (num_cell_data_items > 0)
         {
             for (unsigned var=0; var<cellwise_data.size(); var++)
             {
-                mesh_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
+                cells_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
             }
         }
 
@@ -586,7 +593,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
             NodesOnlyMesh<SPACE_DIM> mesh;
             mesh.ConstructNodesWithoutMesh(nodes);
-            mesh_writer.WriteFilesUsingMesh(mesh);
+            cells_writer.WriteFilesUsingMesh(mesh);
         }
 
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
@@ -851,6 +858,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetWriteVtkAsPoints()
 {
     return mWriteVtkAsPoints;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputMeshInVtk(bool outputMeshInVtk)
+{
+	mOutputMeshInVtk = outputMeshInVtk;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputMeshInVtk()
+{
+    return mOutputMeshInVtk;
 }
 
 //////////////////////////////////////////////////////////////////////////////

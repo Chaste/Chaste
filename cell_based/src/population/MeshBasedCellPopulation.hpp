@@ -91,6 +91,7 @@ private:
         archive & mOutputVoronoiData;
         archive & mOutputCellPopulationVolumes;
         archive & mWriteVtkAsPoints;
+        archive & mOutputMeshInVtk;
         archive & mHasVariableRestLength;
 
 
@@ -154,6 +155,9 @@ protected:
 
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
+
+    /** Whether to output the underlying MutableMesh  in VTK. */
+    bool mOutputMeshInVtk;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
@@ -562,6 +566,18 @@ public:
      * @return mWriteVtkAsPoints.
      */
     bool GetWriteVtkAsPoints();
+
+    /**
+     * Set mOutputMeshInVtk.
+     *
+     * @param outputMeshInVtk whether to write cells as points in VTK
+     */
+    void SetOutputMeshInVtk(bool outputMeshInVtk);
+
+    /**
+     * @return mOutputMeshInVtk.
+     */
+    bool GetOutputMeshInVtk();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.

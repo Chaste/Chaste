@@ -685,10 +685,12 @@ public:
         cell_population.SetOutputVoronoiData(true);
         cell_population.SetOutputCellIdData(true);
         cell_population.SetWriteVtkAsPoints(true);
+        cell_population.SetOutputMeshInVtk(true);
 
         TS_ASSERT_EQUALS(cell_population.GetOutputVoronoiData(), true);
         TS_ASSERT_EQUALS(cell_population.GetOutputCellIdData(), true);
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
+        TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), true);
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
