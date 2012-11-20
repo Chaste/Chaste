@@ -169,6 +169,14 @@ public:
     virtual unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
     /**
+     * Helper method to add an element to the mesh.
+     *
+     * @param pNewElement pointer to the new element object. The object will be updated with the index assigned to the element.
+     * @return new element index
+     */
+    unsigned AddElement(Element<ELEMENT_DIM,SPACE_DIM>* pNewElement);
+
+    /**
      * Move the node with a particular index to a new point in space and
      * verifies that the signed areas of the supporting Elements are positive.
      *
@@ -261,14 +269,22 @@ public:
     void ReMesh();
 #undef COVERAGE_IGNORE
 
-//#define COVERAGE_IGNORE
-//    /**
-//     * Find edges in the mesh longer than the given cutoff length and split them creating new elements as required.
-//     * @param cutoffLength cutoff length for edge splitting
-//     * @return returns a vector of triples with pointers to the new node followed by pointers to the nodes defining the bisected edge.
-//     */
-//    std::vector<c_vector<Node<SPACE_DIM>*, 3> > SplitLongEdges(double cutoffLength);
-//#undef COVERAGE_IGNORE
+#define COVERAGE_IGNORE
+    /**
+     * Find edges in the mesh longer than the given cutoff length and split them creating new elements as required.
+     * @param cutoffLength cutoff length for edge splitting
+     * @return returns a vector of triples with pointers to the new node followed by pointers to the nodes defining the bisected edge.
+     */
+    std::vector<c_vector<Node<SPACE_DIM>*, 3> > SplitLongEdges(double cutoffLength);
+#undef COVERAGE_IGNORE
+
+    /**
+     * Splits an edge in two and create all the relevant new elements and nodes
+     *
+     * @param pNodeA first point defining the edge
+     * @param pNodeB second point defining the edge
+     */
+    void SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
 #define COVERAGE_IGNORE
     /**
