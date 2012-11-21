@@ -125,6 +125,10 @@ public:
         simulator.Solve();
         CellBasedSimulationArchiver<2, CryptSimulation2d>::Save(&simulator);
 
+        /*
+        * HOW_TO_TAG Cell Based/Simulation
+        * Save and load ('checkpoint') a cell-based simulation to file.
+        */
         for (double t=time_of_each_run; t<end_of_simulation+0.5; t += time_of_each_run)
         {
             CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("SteadyStateCrypt",t);
