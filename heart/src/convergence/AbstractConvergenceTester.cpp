@@ -42,7 +42,7 @@ AbstractUntemplatedConvergenceTester::AbstractUntemplatedConvergenceTester()
       OdeTimeStep(0.0025),//Justification from 1D test with this->PdeTimeStep held at 0.01 (allowing two hits at convergence)
       PdeTimeStep(0.005),//Justification from 1D test with this->OdeTimeStep held at 0.0025
       MeshNum(5u),//Justification from 1D test
-      RelativeConvergenceCriterion(1e-4),
+      RelativeConvergenceCriterion(1e-2),
       LastDifference(1.0),
       Apd90FirstQn(0.0),
       Apd90ThirdQn(0.0),

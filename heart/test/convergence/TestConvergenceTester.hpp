@@ -96,7 +96,7 @@ public:
         PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -8e6; // The default of -1e7 causes V to go out of range for lookup tables
-        tester.RelativeConvergenceCriterion=9e-4;
+        tester.RelativeConvergenceCriterion=3e-2;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02); // Was 0.01 before using lookup tables
@@ -107,7 +107,7 @@ public:
         OdePdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
-        tester.RelativeConvergenceCriterion=7e-4;
+        tester.RelativeConvergenceCriterion=0.026458;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.005);
@@ -119,7 +119,7 @@ public:
         tester.MeshNum=1;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Stimulus=QUARTER;
-        tester.RelativeConvergenceCriterion=5e-4;
+        tester.RelativeConvergenceCriterion=0.022361;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.01);
@@ -130,7 +130,7 @@ public:
         PdeConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         tester.MeshNum=1;
         tester.Stimulus=NEUMANN;
-        tester.RelativeConvergenceCriterion=5e-4;
+        tester.RelativeConvergenceCriterion=0.022361;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.PdeTimeStep, 0.02);
@@ -142,13 +142,13 @@ public:
     {
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, MonodomainProblem<1>, 1, 1> tester;
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-4);
-        tester.RelativeConvergenceCriterion=2e-2;
+        tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.IsConverged());
         TS_ASSERT_EQUALS(tester.GetMeshNum(), 2);
         TS_ASSERT_DELTA(tester.GetSpaceStep(), 0.0125, 1e-8);
-        TS_ASSERT_LESS_THAN(tester.LastDifference, 5e-3);
+        TS_ASSERT_LESS_THAN(tester.LastDifference, 0.070711);
         HeartConfig::Instance()->Reset();
     }
 
@@ -159,13 +159,13 @@ public:
 
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-4);
-        tester.RelativeConvergenceCriterion=2e-2;
+        tester.RelativeConvergenceCriterion=0.14142;
         tester.AbsoluteStimulus = -5.5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.IsConverged());
         TS_ASSERT_EQUALS(tester.GetMeshNum(), 2);
         TS_ASSERT_DELTA(tester.GetSpaceStep(), 0.0125, 1e-8);
-        TS_ASSERT_LESS_THAN(tester.LastDifference, 3.9e-3); // Was 2.9e-3 before using lookup tables
+        TS_ASSERT_LESS_THAN(tester.LastDifference, 0.062450);
         HeartConfig::Instance()->Reset();
      }
 };

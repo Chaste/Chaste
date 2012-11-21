@@ -83,7 +83,7 @@ public:
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 5u);
-        TS_ASSERT_LESS_THAN(tester.LastDifference, 1.68417e-05);
+        TS_ASSERT_LESS_THAN(tester.LastDifference, 0.0041039);
         //Has to be at least as good as the 1D with Rtol=1e-7
         //Note the final line fails with ksp_atol=1e-4
         HeartConfig::Instance()->Reset();
@@ -138,7 +138,7 @@ public:
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
         TS_ASSERT_EQUALS(tester.MeshNum, 5u);
-        TS_ASSERT_LESS_THAN(tester.LastDifference, 6.65582e-05);
+        TS_ASSERT_LESS_THAN(tester.LastDifference, 0.0081583);
         //Comes in at 1.17118e-5
         //Has to be at least as good as the 2D with Rtol=5e-8
         HeartConfig::Instance()->Reset();

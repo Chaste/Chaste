@@ -252,7 +252,7 @@ public:
         unsigned file_num=0;
 
         // Create a file for storing conduction velocity and AP data and write the header
-        OutputFileHandler conv_info_handler("ConvergencePlots", false);
+        OutputFileHandler conv_info_handler("ConvergencePlots"+nameOfTest, false);
         out_stream p_conv_info_file;
         if (PetscTools::AmMaster())
         {
@@ -298,7 +298,7 @@ public:
                 HeartConfig::Instance()->SetSimulationDuration(8.0);
             }
 #undef COVERAGE_IGNORE
-            HeartConfig::Instance()->SetOutputDirectory("Convergence");
+            HeartConfig::Instance()->SetOutputDirectory("Convergence"+nameOfTest);
             HeartConfig::Instance()->SetOutputFilenamePrefix("Results");
 
             DistributedTetrahedralMesh<DIM, DIM> mesh;
@@ -431,14 +431,14 @@ public:
 
             std::cout << "Time to solve = " << MPI_Wtime()-time_before << " seconds\n";
 
-            OutputFileHandler results_handler("Convergence", false);
+            OutputFileHandler results_handler("Convergence"+nameOfTest, false);
             Hdf5DataReader results_reader = cardiac_problem.GetDataReader();
 
             {
                 std::vector<double> transmembrane_potential = results_reader.GetVariableOverTime("V", third_quadrant_node);
                 std::vector<double> time_series = results_reader.GetUnlimitedDimensionValues();
 
-                OutputFileHandler plot_file_handler("ConvergencePlots", false);
+                OutputFileHandler plot_file_handler("ConvergencePlots"+nameOfTest, false);
                 if (PetscTools::AmMaster())
                 {
                     // Write out the time series for the node at third quadrant
@@ -563,6 +563,9 @@ public:
                     prev_times = time_series;
                 }
 
+                double l2_norm_upstroke = sqrt(sum_sq_abs_error/sum_sq_prev_voltage);
+                double l2_norm_full = sqrt(sum_sq_abs_error_full/sum_sq_prev_voltage_full);
+
                 if (this->PopulatedResult)
                 {
 
@@ -570,16 +573,16 @@ public:
                     {
                         (*p_conv_info_file) << std::setprecision(8)
                                             << Abscissa() << "\t"
-                                            << sqrt(sum_sq_abs_error_full/sum_sq_prev_voltage_full) << "\t"
-                                            << sqrt(sum_sq_abs_error/sum_sq_prev_voltage) << "\t"
+                                            << l2_norm_full << "\t"
+                                            << l2_norm_upstroke << "\t"
                                             << max_abs_error << "\t"
                                             << Apd90FirstQn <<" "<< apd90_first_qn_error <<""<< "\t"
                                             << Apd90ThirdQn <<" "<< apd90_third_qn_error <<""<< "\t"
                                             << ConductionVelocity <<" "<< cond_velocity_error  <<""<< std::endl;
                     }
                     // convergence criterion
-                    this->Converged = sum_sq_abs_error/sum_sq_prev_voltage<this->RelativeConvergenceCriterion;
-                    this->LastDifference=sum_sq_abs_error/sum_sq_prev_voltage;
+                    this->Converged = l2_norm_full < this->RelativeConvergenceCriterion;
+                    this->LastDifference = l2_norm_full;
 #define COVERAGE_IGNORE
                     if (time_series.size() == 1u)
                     {
