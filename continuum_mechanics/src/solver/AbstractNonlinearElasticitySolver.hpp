@@ -263,14 +263,29 @@ protected:
      */
     double mLastDampingValue;
 
+	/** 
+	 *  Whether this is the first Newton iteration or not
+	 */
+    bool mFirstStep;
+    
+    /**
+     *  Whether to take a full first Newton step or not - see documentation for
+     *  SetTakeFullFirstNewtonStep()
+     */
+    bool mTakeFullFirstNewtonStep;
+    
+    /**
+     *  Get Petsc to do a direct solve
+     */
+    bool mPetscDirectSolve;
 
-   /**
-    * Whether to call AddActiveStressAndStressDerivative() when computing stresses or not.
-    *
-    * Subclasses, such as the cardiac mechanics solvers, may implement the above method to add
-    * active contributions to the stress. However, sometimes we might want to switch this off.
-    * Defaults to true.
-    */
+    /**
+     * Whether to call AddActiveStressAndStressDerivative() when computing stresses or not.
+     *
+     * Subclasses, such as the cardiac mechanics solvers, may implement the above method to add
+     * active contributions to the stress. However, sometimes we might want to switch this off.
+     * Defaults to true.
+     */
     bool mIncludeActiveTension;
 
     /**
@@ -638,6 +653,38 @@ public:
     }
 
     /**
+     *  The following odd behaviour has been observed: for some problems the solver
+     *  will fail in the first Newton iteration, with the residual not decreasing
+     *  in the direction of the Newton update, but: if you take a full Newton 
+     *  step anyway (increasing the residual-norm), the solver then converges 
+     *  perfectly. This method allows the user to choose this.
+     *  
+     *  Does nothing if the SNES solver is used.
+     *
+     *  See ticket #2304
+     */
+    void SetTakeFullFirstNewtonStep(bool takeFullFirstStep = true)
+    {
+        mTakeFullFirstNewtonStep = takeFullFirstStep;
+    }
+
+	/**
+	 *  Get Petsc to do a direct solve on the linear system (instead of using
+	 *  an iterative solve). This is equivalent to passing in command line
+	 *  arguments -ksp_type pre_only -pc_type lu through to Petsc, but also
+	 *  makes sure the preconditioner is equal to the Jacobian in the incompressible
+	 *  case. Using a direct solve can lead to huge computation time savings if
+	 *  there is enough memory for it: the linear solve may be faster and 
+	 *  nonlinear convergence likely to be much better, as the linear solve is exact.
+	 *  
+	 */
+    void SetUsePetscDirectSolve(bool usePetscDirectSolve = true)
+    {
+        mPetscDirectSolve = usePetscDirectSolve;
+    }
+
+
+    /**
      * This solver is for static problems, however the body force or surface tractions
      * could be a function of time. This method is for setting the time.
      *
@@ -738,6 +785,9 @@ AbstractNonlinearElasticitySolver<DIM>::AbstractNonlinearElasticitySolver(Abstra
                       CommandLineArguments::Instance()->OptionExists("-mech_use_snes") );
 
     mChangeOfBasisMatrix = identity_matrix<double>(DIM,DIM);
+
+    mTakeFullFirstNewtonStep = CommandLineArguments::Instance()->OptionExists("-mech_full_first_newton_step");
+    mPetscDirectSolve = CommandLineArguments::Instance()->OptionExists("-mech_petsc_direct_solve");
 }
 
 template<unsigned DIM>
@@ -1459,60 +1509,71 @@ void AbstractNonlinearElasticitySolver<DIM>::Solve(double tol)
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
 {
-    // Three alternatives
-    //   (a) Incompressible: GMRES with ILU preconditioner (or bjacobi=ILU on each process) [default]. Very poor on large problems.
-    //   (b) Incompressible: GMRES with AMG preconditioner. Uncomment #define MECH_USE_HYPRE above. Requires Petsc3 with HYPRE installed.
-    //   (c) Compressible: CG with ???
+    // Four alternatives
+    //   (a) Petsc direct solve
+    //   Otherwise iterative solve with:
+    //   (b) Incompressible: GMRES with ILU preconditioner (or bjacobi=ILU on each process) [default]. Very poor on large problems.
+    //   (c) Incompressible: GMRES with AMG preconditioner. Uncomment #define MECH_USE_HYPRE above. Requires Petsc3 with HYPRE installed.
+    //   (d) Compressible: CG with ICC
 
     PC pc;
     KSPGetPC(solver, &pc);
 
-    if (this->mCompressibilityType==COMPRESSIBLE)
+
+    if (mPetscDirectSolve)
     {
-        KSPSetType(solver,KSPCG);
-        if(PetscTools::IsSequential())
-        {
-            PCSetType(pc, PCICC);
-//Note that PetscOptionsSetValue is dangerous because we can't easily do
-//regression testing.  If a name changes, then the behaviour of the code changes
-//because it won't recognise the old name.  However, it won't fail to compile/run.
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
-            PetscOptionsSetValue("-pc_factor_shift_type", "positive_definite");
-#else
-            PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
-#endif
-        }
-        else
-        {
-            PCSetType(pc, PCBJACOBI);
-        }
+        KSPSetType(solver,KSPPREONLY);
+        PCSetType(pc, PCLU);
     }
     else
     {
-        unsigned num_restarts = 100;
-        KSPSetType(solver,KSPGMRES);
-        KSPGMRESSetRestart(solver,num_restarts);
+        if (this->mCompressibilityType==COMPRESSIBLE)
+        {
+            KSPSetType(solver,KSPCG);
+            if(PetscTools::IsSequential())
+            {
+                PCSetType(pc, PCICC);
+                //Note that PetscOptionsSetValue is dangerous because we can't easily do
+                //regression testing.  If a name changes, then the behaviour of the code changes
+                //because it won't recognise the old name.  However, it won't fail to compile/run.
+                #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 1) //PETSc 3.1 or later
+                    PetscOptionsSetValue("-pc_factor_shift_type", "positive_definite");
+                #else
+                    PetscOptionsSetValue("-pc_factor_shift_positive_definite", "");
+                #endif
+            }
+            else
+            {
+                PCSetType(pc, PCBJACOBI);
+            }
+        }
+        else
+        {
+            unsigned num_restarts = 100;
+            KSPSetType(solver,KSPGMRES);
+            KSPGMRESSetRestart(solver,num_restarts);
 
-        #ifndef MECH_USE_HYPRE
-            PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
-        #else
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
-            // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
-            // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
+            #ifndef MECH_USE_HYPRE
+                PCSetType(pc, PCBJACOBI); // BJACOBI = ILU on each block (block = part of matrix on each process)
+            #else
+                /////////////////////////////////////////////////////////////////////////////////////////////////////
+                // Speed up linear solve time massively for larger simulations (in fact GMRES may stagnate without
+                // this for larger problems), by using a AMG preconditioner -- needs HYPRE installed
+                /////////////////////////////////////////////////////////////////////////////////////////////////////
+                PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
+                // PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
+                // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
 
-            PCSetType(pc, PCHYPRE);
-            KSPSetPreconditionerSide(solver, PC_RIGHT);
+                PCSetType(pc, PCHYPRE);
+                KSPSetPreconditionerSide(solver, PC_RIGHT);
 
-            // other possible preconditioners..
-            //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
-            //remember to delete memory..
-            //KSPSetPreconditionerSide(solver, PC_RIGHT);
-        #endif
+                // other possible preconditioners..
+                //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+                //PCLDUFactorisationMechanics* p_custom_pc = new PCLDUFactorisationMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
+                //remember to delete memory..
+                //KSPSetPreconditionerSide(solver, PC_RIGHT);
+            #endif
+        }
     }
 }
 
@@ -1553,6 +1614,7 @@ template<unsigned DIM>
 double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
 {
     double norm;
+///\todo Change to NORM_1 and remove the division by mNumDofs...    
     VecNorm(this->mResidualVector, NORM_2, &norm);
     return norm/this->mNumDofs;
 }
@@ -1829,21 +1891,66 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
         best_index = index-2;
     }
 
+    // See documentation for SetTakeFullFirstNewtonStep()
+    bool full_first_step = mTakeFullFirstNewtonStep && mFirstStep;
+
+
     // Check out best was better than the original residual-norm
-    if (initial_norm_resid < current_resid_norm)
+    if (initial_norm_resid < current_resid_norm && !full_first_step)
     {
         #define COVERAGE_IGNORE
-        // Have to use an assert/exit here as the following exception causes a seg fault (in cardiac mech problems?)
-        // Don't know why
-        std::cout << "CHASTE ERROR: (AbstractNonlinearElasticitySolver.hpp): Residual does not appear to decrease in newton direction, quitting.\n" << std::flush;
         EXCEPTION("Residual does not appear to decrease in newton direction, quitting");
         #undef COVERAGE_IGNORE
     }
 
+	// See documentation for SetTakeFullFirstNewtonStep()
+    if(full_first_step)
+    {
+        if(this->mVerbose)
+        {
+            std::cout << "\tTaking full first Newton step...\n";
+        }
+        best_index = 0;
+    }
+
     if(this->mVerbose)
     {
-        std::cout << "\tBest s = " << damping_values[best_index] << "\n"  << std::flush;
+        std::cout << "\tChoosing s = " << damping_values[best_index] << "\n"  << std::flush;
     }
+
+
+///// Print the maximum change in the displacement and pressure (for debugging robustness issues). Assumes incompressible
+//
+//    double l_inf_disp = 0.0;
+//    double l_inf_pressure = 0.0;
+//
+//    if( this->mCompressibilityType==INCOMPRESSIBLE )
+//    {
+//        for(unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+//        {
+//            for(unsigned j=0; j<DIM; j++)
+//            {
+//                double value = update[(DIM+1)*i + j]*damping_values[best_index];
+//                l_inf_disp = std::max(l_inf_disp, fabs(value));
+//            }
+//            l_inf_pressure = std::max(l_inf_pressure, fabs(update[(DIM+1)*i + DIM]*damping_values[best_index]));
+//        }
+//        std::cout << "l_inf_disp, l_inf_pressure = " << l_inf_disp << " " << l_inf_pressure << "\n";
+//    }
+//    else
+//    {
+//        for(unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+//        {
+//            for(unsigned j=0; j<DIM; j++)
+//            {
+//                double value = update[DIM*i + j]*damping_values[best_index];
+//                l_inf_disp = std::max(l_inf_disp, fabs(value));
+//            }
+//        }
+//        std::cout << "l_inf_disp = " << l_inf_disp << "\n";
+//    }
+
+
 
     VectorSum(old_solution, update, -damping_values[best_index], this->mCurrentSolution);
 
@@ -1908,6 +2015,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveNonSnes(double tol)
         }
 
         // take newton step (and get returned residual)
+        mFirstStep = (iteration_number==1);
         norm_resid = TakeNewtonStep();
 
         if(this->mVerbose)

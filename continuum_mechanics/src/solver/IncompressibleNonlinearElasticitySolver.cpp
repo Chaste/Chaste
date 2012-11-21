@@ -547,21 +547,31 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
 
     if (assembleJacobian)
     {
-        // Fill in the other blocks of the preconditioner matrix, by adding
-        // the Jacobian matrix (this doesn't effect the pressure-pressure block
-        // of rAElemPrecond as the pressure-pressure block of rAElem is zero),
-        // and the zero a block.
-        //
-        // The following altogether gives the preconditioner  [ A  B1^T ]
-        //                                                    [ 0  M    ]
-        rAElemPrecond = rAElemPrecond + rAElem;
-        for (unsigned i=NUM_NODES_PER_ELEMENT*DIM; i<STENCIL_SIZE; i++)
+        if(this->mPetscDirectSolve)
         {
-            for (unsigned j=0; j<NUM_NODES_PER_ELEMENT*DIM; j++)
-            {
-                rAElemPrecond(i,j) = 0.0;
-            }
-        }
+            // Petsc will do an LU factorisation of the preconditioner, which we 
+            // need to be equal to the Jacobian
+	        rAElemPrecond = rAElem;
+	    }
+	    else
+	    {
+            // Fill in the other blocks of the preconditioner matrix, by adding
+            // the Jacobian matrix (this doesn't effect the pressure-pressure block
+            // of rAElemPrecond as the pressure-pressure block of rAElem is zero),
+            // and the zero a block.
+            //
+            // The following altogether gives the preconditioner  [ A  B1^T ]
+            //                                                    [ 0  M    ]
+	        rAElemPrecond = rAElemPrecond + rAElem;
+	        
+	        for (unsigned i=NUM_NODES_PER_ELEMENT*DIM; i<STENCIL_SIZE; i++)
+	        {
+    	        for (unsigned j=0; j<NUM_NODES_PER_ELEMENT*DIM; j++)
+        	    {
+            	    rAElemPrecond(i,j) = 0.0;
+	            }
+	        }
+	    }
     }
 
 
