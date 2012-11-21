@@ -163,7 +163,6 @@ public:
 
     void TestFullActionPotentialWithRampedStimulus() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<1>, 1, 2> tester;
         tester.SimulateFullActionPotential=true;
         //Time steps are okay for giving a sensible upstroke
@@ -186,7 +185,6 @@ public:
     //This is much longer (1 hour?) with default ksp
     void Test2DSpaceSymmLq() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2, 2> tester;
@@ -204,7 +202,6 @@ public:
 
     void Test2DSpaceWithRegionStimulus() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<2>, 2, 2> tester;
@@ -219,10 +216,9 @@ public:
 
 
 
-    //Currently takes about 3 minutes to do mesh0 and mesh1
+    //Currently takes about 15 seconds to do mesh0, mesh1 and mesh2
     void Test3DSpace() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         HeartConfig::Instance()->SetKSPSolver("symmlq");
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
         SpaceConvergenceTester<CellLuoRudy1991FromCellMLBackwardEuler, BidomainProblem<3>, 3, 2> tester;
@@ -237,7 +233,6 @@ public:
 
     void TestSpaceConvergencein1DWithBackwardN98() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         SpaceConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
@@ -248,7 +243,6 @@ public:
 
     void TestOdeConvergencein1DWithBackwardN98() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         OdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
@@ -257,7 +251,6 @@ public:
 
     void TestOdePdeConvergencein1DWithBackwardN98() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
         tester.Stimulus = NEUMANN;
@@ -269,7 +262,6 @@ public:
 
     void TestOdePdeConvergencein1DWithForwardLookupN98() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLOpt,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
         tester.Stimulus = NEUMANN;
@@ -280,7 +272,6 @@ public:
     }
     void TestOdePdeConvergencein1DWithForwardBasicN98() throw(Exception)
     {
-        assert(Warnings::Instance()->GetNumWarnings() == 0u);
         OdePdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellML,  MonodomainProblem<1>, 1, 1> tester;
         tester.NeumannStimulus = 5000;
         tester.Stimulus = NEUMANN;

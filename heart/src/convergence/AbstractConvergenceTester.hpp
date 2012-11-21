@@ -243,7 +243,6 @@ public:
      */
     void Converge(std::string nameOfTest)
     {
-        std::cout << "=========================== Beginning Test...==================================\n";
         // Create the meshes on which the test will be based
         const std::string mesh_dir = "ConvergenceMesh";
         OutputFileHandler output_file_handler(mesh_dir);
@@ -256,6 +255,7 @@ public:
         out_stream p_conv_info_file;
         if (PetscTools::AmMaster())
         {
+            std::cout << "=========================== Beginning Test...==================================\n";
             p_conv_info_file = conv_info_handler.OpenOutputFile(nameOfTest+"_info.csv");
             (*p_conv_info_file) << "#Abcisa\t"
                                 << "l2-norm-full\t"
@@ -429,7 +429,10 @@ public:
                 std::cout << e.GetMessage() << std::endl;
             }
 
-            std::cout << "Time to solve = " << MPI_Wtime()-time_before << " seconds\n";
+            if (PetscTools::AmMaster())
+			{
+            	std::cout << "Time to solve = " << MPI_Wtime()-time_before << " seconds\n";
+			}
 
             OutputFileHandler results_handler("Convergence"+nameOfTest, false);
             Hdf5DataReader results_reader = cardiac_problem.GetDataReader();
@@ -629,7 +632,11 @@ public:
 
     void DisplayRun()
     {
-        unsigned num_ele_across = (unsigned) SmallPow(2, this->MeshNum+2);// number of elements in each dimension
+        if (!PetscTools::AmMaster())
+        {
+        	return; //Only master displays this
+        }
+    	unsigned num_ele_across = (unsigned) SmallPow(2, this->MeshNum+2);// number of elements in each dimension
         double scaling = mMeshWidth/(double) num_ele_across;
 
         std::cout<<"================================================================================"<<std::endl;
