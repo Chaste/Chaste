@@ -86,11 +86,13 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned deprecated, unsigned 
     {
 		case 0:
         case 1: // 1d, 1st order
+                // 1 point rule
             mWeights.push_back(1);
             mPoints.push_back(ChastePoint<1>(0.5));
             break;
         case 2:
         case 3: // 1d, 3rd order
+                // 2 point rule
             mWeights.push_back(0.5);
             mWeights.push_back(0.5);
             {
@@ -101,6 +103,7 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned deprecated, unsigned 
             break;
         case 4:
         case 5: // 1d, 5th order
+                // 3 point rule
             mWeights.push_back(5.0/18.0);
             mWeights.push_back(4.0/9.0);
             mWeights.push_back(5.0/18.0);
@@ -136,14 +139,13 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned 
     {
         case 0: // 2d, 0th order
         case 1: // 2d, 1st order
-        	//This is now order 1
-            mNumQuadPoints = 1;
+                // 1 point rule
             mWeights.push_back(0.5);
             mPoints.push_back(ChastePoint<2>(one_third, one_third));
             break;
 
         case 2: // 2d, 2nd order
-        	mNumQuadPoints = 3;
+                // 3 point rule
             mWeights.push_back(one_sixth);
             mWeights.push_back(one_sixth);
             mWeights.push_back(one_sixth);
@@ -154,8 +156,8 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned 
             break;
 
         case 3: // 2d, 3rd order - derived by hand and using a Macsyma script to solve the cubic
-                //                60*x^3  - 60*x^2  + 15*x - 1; .
-            mNumQuadPoints = 6;
+                //                60*x^3  - 60*x^2  + 15*x - 1; 
+                // 6 point rule
             {
                 double w = 1.0/12.0;
                 mWeights.push_back(w);
@@ -183,9 +185,8 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned 
                 mPoints.push_back(ChastePoint<2>(c, b));
             }
             break;
-        //case 3:
         case 4: // 2d, 4th order
-        	mNumQuadPoints = 9;
+                // 9-point rule derived from scaled cude
             mWeights.push_back(0.06846437766975);
             mWeights.push_back(0.10954300427160);
             mWeights.push_back(0.06846437766975);
@@ -210,7 +211,7 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned 
             EXCEPTION("Gauss quadrature order not supported.");
     }
     assert(mPoints.size() == mWeights.size());
-    assert(mNumQuadPoints == mPoints.size());
+    mNumQuadPoints = mPoints.size();
 }
 
 /**
@@ -225,31 +226,14 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned deprecated, unsigned 
     switch (quadratureOrder)
     {
         case 0: // 3d, 0th order
-            mWeights.push_back(1.0/6.0);
-            mPoints.push_back(ChastePoint<3>(0.25000000000000,0.50000000000000,0.12500000000000));
-            break;
-
         case 1: // 3d, 1st order
-            mWeights.push_back(0.06132032652029);
-            mWeights.push_back(0.01643073197073);
-            mWeights.push_back(0.00440260136261);
-            mWeights.push_back(0.00117967347971);
-            mWeights.push_back(0.06132032652029);
-            mWeights.push_back(0.01643073197073);
-            mWeights.push_back(0.00440260136261);
-            mWeights.push_back(0.00117967347971);
-
-            mPoints.push_back(ChastePoint<3>(0.16666666666667,   0.21132486540519,   0.13144585576580));
-            mPoints.push_back(ChastePoint<3>(0.62200846792815,   0.21132486540519,   0.03522081090086));
-            mPoints.push_back(ChastePoint<3>(0.04465819873852,   0.78867513459481,   0.03522081090086));
-            mPoints.push_back(ChastePoint<3>(0.16666666666667,   0.78867513459481,   0.00943738783766));
-            mPoints.push_back(ChastePoint<3>(0.16666666666667,   0.21132486540519,   0.49056261216234));
-            mPoints.push_back(ChastePoint<3>(0.62200846792815,   0.21132486540519,   0.13144585576580));
-            mPoints.push_back(ChastePoint<3>(0.04465819873852,   0.78867513459481,   0.13144585576580));
-            mPoints.push_back(ChastePoint<3>(0.16666666666667,   0.78867513459481,   0.03522081090086));
+                // 1 point rule
+            mWeights.push_back(1.0/6.0);
+            mPoints.push_back(ChastePoint<3>(0.25, 0.25, 0.25));
             break;
 
-        case 2: //2nd order 4 point rule
+        case 2: //2nd order
+                // 4 point rule
             {    
                 double sqrt_fifth = 1.0/sqrt(5.0);
                 double a = (1.0 + 3.0*sqrt_fifth)/4.0; //0.585410196624969;
@@ -269,6 +253,7 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned deprecated, unsigned 
             break;
         
         case 3: // 3d, 3rd order
+            ///\todo #2232
             mWeights.push_back(0.01497274736603);
             mWeights.push_back(0.01349962850795);
             mWeights.push_back(0.00190178826891);

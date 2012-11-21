@@ -153,23 +153,8 @@ AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abstrac
 {
     assert(pMesh);
     assert(pBoundaryConditions);
-
-
-    ///\todo #2232 Switch is used to select order and maintain backwards compatibility with tests
-    switch (ELEMENT_DIM-1)
-    {
-    case 0:
-        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2);
-        break;
-    case 1:
-        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2); ///\todo #2232 Down from 3 to 2
-        break;
-    case 2:
-        mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2);
-        break;
-    default:
-        NEVER_REACHED;
-    }
+    // Default to 2nd order quadrature 
+    mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

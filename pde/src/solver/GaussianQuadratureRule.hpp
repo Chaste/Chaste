@@ -39,11 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 
 /**
- * This class encapsulates tables of gaussian quadrature points and the
+ * This class encapsulates tables of Gaussian quadrature points and the
  * associated weights.
  *
  * Data is available for 1d, 2d and 3d quadrature over (canonical) triangles,
- * with between 1 and 3 (inclusive) Gauss points in each dimension.
+ * with appropriate numbers of Gauss points.  Weights sum to 1 and are non-negative.
  * The values are computed when an object is instantiated.
  */
 template<unsigned ELEMENT_DIM>
