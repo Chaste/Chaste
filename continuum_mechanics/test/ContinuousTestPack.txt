@@ -3,6 +3,7 @@ TestCompressibleNonlinearElasticitySolver.hpp
 TestContinuumMechanicsNeumannBcsAssembler.hpp
 TestIncompressibleNonlinearElasticitySolver.hpp
 TestMaterialLaws.hpp
+TestMoreMechanics.hpp
 TestNonlinearElasticityTools.hpp
 TestProblemDefinitions.hpp
 TestStokesFlowAssembler.hpp
