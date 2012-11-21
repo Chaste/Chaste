@@ -1204,6 +1204,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParamet
     *rParamsFile << "\t\t<AreaBasedDampingConstantParameter>" <<  mAreaBasedDampingConstantParameter << "</AreaBasedDampingConstantParameter>\n";
     *rParamsFile << "\t\t<OutputVoronoiData>" <<  mOutputVoronoiData << "</OutputVoronoiData>\n";
     *rParamsFile << "\t\t<OutputCellPopulationVolumes>" << mOutputCellPopulationVolumes << "</OutputCellPopulationVolumes>\n";
+    *rParamsFile << "\t\t<WriteVtkAsPoints>" << mWriteVtkAsPoints << "</WriteVtkAsPoints>\n";
+    *rParamsFile << "\t\t<OutputMeshInVtk>" << mOutputMeshInVtk << "</OutputMeshInVtk>\n";
+    *rParamsFile << "\t\t<HasVariableRestLength>" << mHasVariableRestLength << "</HasVariableRestLength>\n";
 
     // Call method on direct parent class
     AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(rParamsFile);
