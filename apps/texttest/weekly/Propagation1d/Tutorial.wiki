@@ -3,10 +3,10 @@
 === Getting the data ===
 
 Download and save the attached file [attachment:Propagation1d.tgz Propagation1d.tgz].
-Either use an Archive Manager to extract the content to disk or save it and then unpack it with
+Either use an Archive Manager to extract the contents to disk or save it and then unpack it with
 {{{
 #!sh
-tar xvfz  Propagation1d.tgz
+tar xvfz Propagation1d.tgz
 }}}
 
 === Running the simulation ===

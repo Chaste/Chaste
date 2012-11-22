@@ -55,7 +55,6 @@ and visualise the results by loading the `S1S2Results_V.dat` file
 
 There are more details on visualising your results at ChasteGuides/VisualisationGuides.
 
-
 === Understanding the XML parameters file ===
 
 Open `ChasteParameters.xml` (it is sensible to do this in a web-browser or XML editor in order to get syntax highlighting). The file should be reasonably readable; it defines: 
