@@ -1,6 +1,5 @@
 = 3D on a realistic cardiac geometry =
 
-
 === Getting the data ===
 
 Download and save the attached file [attachment:Propagation3d.tgz Propagation3d.tgz].

@@ -280,7 +280,6 @@ public:
         /* {{{Report()}}} prints a single line with times spent in each catagory.  When run in parallel it prints one line of times per process and also lines for average
          * and maximum times.  (This can be useful if you need to identify a load imbalance.)*/
         HeartEventHandler::Report();
-
     }
 };
 

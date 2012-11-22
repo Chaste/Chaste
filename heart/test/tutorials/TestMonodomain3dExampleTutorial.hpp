@@ -51,8 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * To go from monodomain to bidomain or vice versa is trivial, and for 2d to 3d is
  * also very easy.
  *
- * EMPTYLINE
- *
  * First include the headers, `MonodomainProblem` this time.
  */
 #include <cxxtest/TestSuite.h>

@@ -415,7 +415,6 @@ public:
         }
         p_file2->close();
 
-
         /*
          * We use the `FileFinder` class to identify locations of files.
          * `OutputFileHandler` has a handy method called `FindFile()` which returns a `FileFinder` to a file in the folder it points to.
@@ -431,7 +430,6 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMech3dTwistingCube");
-
 
         /* Now call `Solve`. This will take a while to run, so watch progress using the log file to estimate when
          * it will finish. `build=GccOpt_ndebug` will speed this up by a factor of about 5. Visualise in Cmgui as usual.
