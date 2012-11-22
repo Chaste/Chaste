@@ -72,3 +72,4 @@ Open `ChasteParameters.xml` (it is sensible to do this in a web-browser or XML e
    * in monodomain problems, the defined intracellular conductivity is used '''not''' a harmonic mean. The extracellular conductivity is therefore ignored, as are the components in normal directions since this is a 2D simulation.
  * Numerical parameters including ODE, PDE and printing timesteps
    * Note: 'KSP' stands for Krylov subspace and just refers to solvers of linear systems (a [http://www.mcs.anl.gov/petsc/ PETSc] acronym)
+ 

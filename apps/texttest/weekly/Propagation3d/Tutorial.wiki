@@ -105,4 +105,3 @@ The file should be reasonably readable; it defines:
  * physiological parameters: conductivities, capacitance, surface-area-to-volume ratio
    * in monodomain problems, the defined intracellular conductivity is used, '''not''' a harmonic mean.
  * Numerical parameters including ODE, PDE and printing timesteps
-
