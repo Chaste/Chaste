@@ -98,5 +98,3 @@ In addition, the following parameters need to be modified:
 }}}
 
 Rerun the simulation and follow the previous section to visualise the results.
-
-
