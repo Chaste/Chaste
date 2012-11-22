@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVectorFactory.hpp"
 #include "Hdf5DataReader.hpp"
 #include "Hdf5DataWriter.hpp"
+#include "Warnings.hpp"
 
 /*
  * Archiving extravaganza:
@@ -749,6 +750,14 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
     DistributedVectorFactory* p_mesh_factory;
     archive >> p_mesh_factory;
 
+    // How many processes were used by the saving simulation?
+    DistributedVectorFactory* p_original_factory = p_mesh_factory->GetOriginalFactory();
+    unsigned orig_num_procs = 1;
+    if (p_original_factory)
+    {
+        orig_num_procs = p_original_factory->GetNumProcs();
+    }
+
     // The cardiac cells - load only the cells we actually own
     mpCardiacTissue->LoadCardiacCells(archive, version);
 
@@ -772,21 +781,16 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
         }
         else
         {
-//            // The BCs will only actually be different if using a distributed tetrahedral mesh
-//            DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_dist_mesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh);
-//            if (p_dist_mesh)
-//            {
-//                mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
-//            }
-//            else
-//            {
-//                // Loading from a tetrahedral (not distributed) mesh
-//                //TestCardiacSimulation::TestCardiacSimulationResumeMigration used to cover this, but doesn't now.
-//                // Load into the temporary container, which will get thrown away shortly
-//                p_bcc->LoadFromArchive(archive, mpMesh);
-//                /// \todo #1159 sanity check that the contents of p_bcc and mpBoundaryConditionsContainer match.
-//            }
-            /// \todo #1159 All meshes might assume that the BCs are different and require merging 
+            // If the mesh which was archived was a TetrahedralMesh then we have all the boundary conditions
+            // in every process-specific archive.  We no longer test for this.
+#define COVERAGE_IGNORE
+            if(!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
+            {
+                // The correct way to do this should be:
+                // p_bcc->LoadFromArchive(archive, mpMesh);
+                WARNING("Loading from a parallel archive which used a non-distributed mesh.  This scenario should work but is not fully tested.");
+            }
+#undef COVERAGE_IGNORE
             mpBoundaryConditionsContainer->MergeFromArchive(archive, mpMesh);
         }
     }

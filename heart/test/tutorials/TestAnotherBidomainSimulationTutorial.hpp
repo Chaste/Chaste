@@ -131,11 +131,11 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75*scale, 0.19*scale));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0*scale, 2.4*scale));
 
-        /* HOW_TO_TAG Cardiac/Problem definition
+        /* HOW_TO_TAG Cardiac/Output
          * Specify output formats (for different visualisers)
          *
-         * The output will be written to /tmp/USER_NAME/testoutput/BidomainTutorial
-         * in hdf5 format, and converted to meshalyzer format at the end of the simulation.
+         * The output will be written to `/tmp/$USER/testoutput/BidomainFibresTutorial`
+         * in HDF5 format, and converted to Meshalyzer format at the end of the simulation.
          * To adjust this, or convert to Cmgui or VTK format as well, use methods in
          * `HeartConfig`,  e.g.
          */
@@ -155,6 +155,8 @@ public:
 
         /* The results can now be visualised - the effect of the fibres changing direction at x=0.05
          * on the wave should be very clear.
+         *
+         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
          *
          * We described in the previous tutorial how to access the latest voltage vector using
          * `ReplicatableVector`, here we illustrate how to access the voltage values using the

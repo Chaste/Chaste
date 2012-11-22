@@ -190,6 +190,15 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
+        /* It is possible to over-ride the default visualisation output (which is done during simulation
+         * post-processing).
+         */
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
+        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
+        /* If the mesh is a DistributedTetrahedralMesh then we can use parallel VTK files (.pvtu)*/
+        //HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
+
         /* Next, we have to create a cell factory of the type we defined above. */
         PointStimulus2dCellFactory cell_factory;
 
@@ -226,18 +235,23 @@ public:
         bidomain_problem.Initialise();
 
         /* Now we call Solve() to run the simulation. The output will be written to
-         * /tmp/USER_NAME/testoutput/BidomainTutorial in hdf5 format.  By default the
-         * output will also be converted to meshalyzer format at the end of the simulation.
+         * `/tmp/$USER/testoutput/BidomainTutorial` in HDF5 format.  The
+         * output will also be converted to selected visualiser formats at the end of the simulation.
          * Note that if you want to view the progress of longer simulations
          * go to the the output directory and look at the file
          * {{{progress_status.txt}}}, which will say the percentage of the
          * simulation run. */
         bidomain_problem.Solve();
 
-        /* To now visualise the results, go to /tmp/USER_NAME/testoutput/BidomainTutorial/output,
-         * where you should find the mesh and output, and run meshalyzer.
+        /*
+         * == Examining the output ==
+         * In order to visualise the results, go to one of the sub-folders
+         *  * `/tmp/$USER/testoutput/BidomainTutorial/output` for Meshalyzer
+         *  * `/tmp/$USER/testoutput/BidomainTutorial/cmgui_output` for Cmgui
+         *  * `/tmp/$USER/testoutput/BidomainTutorial/vtk_output` for Paraview (VTK)
+         * where you should find the geometric mesh data and simulation output.
          *
-         * EMPTYLINE
+         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
          *
          * Note: the easiest way to look at the resultant voltage values from the code
          * (for the last timestep - the data for the previous timesteps is written to file

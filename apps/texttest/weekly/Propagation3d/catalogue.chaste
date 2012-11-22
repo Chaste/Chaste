@@ -27,3 +27,8 @@ The following new files/directories were created:
 ------------3dResults_mesh.tri
 ------------3dResults_times.info
 ------------ChasteParameters.xml
+--------vtk_output
+------------.chaste_deletable_folder
+------------3dResults.vtu
+------------3dResults_times.info
+------------ChasteParameters.xml

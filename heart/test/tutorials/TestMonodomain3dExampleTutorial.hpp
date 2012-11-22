@@ -140,8 +140,8 @@ public:
         /* By default data for all nodes is output, but for big simulations, sometimes this
          * might not be required, and the action potential only at certain nodes required.
          * The following code shows how to output the results at the first, middle and last
-         * nodes, for example. (The output is written to the HDF5 file; no meshalyzer output
-         * will be made. HDF5 files can be read using Matlab). We are not using this in this
+         * nodes, for example. (The output is written to the HDF5 file; regular visualisation output
+         * will be turned off. HDF5 files can be read using Matlab). We are not using this in this
          * simulation however (hence the boolean being set to false).
          */
         bool partial_output = false;

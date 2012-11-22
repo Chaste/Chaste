@@ -46,7 +46,7 @@
 		<OutputDirectory>ChasteResults</OutputDirectory>
 		<OutputFilenamePrefix>3dResults</OutputFilenamePrefix>
 		<!-- Postprocess for possible visualizers --> 
-		<OutputVisualizer meshalyzer="yes" vtk="no" cmgui="yes"/> 		
+		<OutputVisualizer meshalyzer="yes" vtk="yes" cmgui="yes"/> 		
 		
 	</Simulation>
 	

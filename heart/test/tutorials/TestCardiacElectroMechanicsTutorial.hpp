@@ -197,18 +197,20 @@ public:
         /* Go to the output directory. There should be log file (which, note, can be used to watch progress
          * during a simulation), and a directory for the electrics output and the mechanics output. The electrics
          * directory is not the same as when running an electrics solve: the basic HDF5 data is there but
-         * there is no meshalyzer output, and there is always cmgui output, including the electrics solution downsampled
+         * there is no Meshalyzer output, and there is always Cmgui output, including the electrics solution downsampled
          * onto the mechanics mesh.
          * The deformation output directory contains the deformed solution each timestep in several simple
-         * Mtlab-readable files, and a cmgui output directory. The latter has a script for automatically loading
+         * MATLAB-readable files, and a cmgui output directory. The latter has a script for automatically loading
          * all the results.
          *
          * HOW_TO_TAG Cardiac/Electro-mechanics
-         * Visualise results in cmgui (very brief description)
+         * Visualise results in Cmgui (very brief description)
          *
          * Visualise the results by calling `cmgui LoadSolutions.com` in the directory
          * `TestCardiacElectroMechanicsExample/deformation/cmgui` . The electrics data can be visualised on the
-         * deforming mesh by using the Scene and Spectrum Editors. (See cmgui website for information on how
+         * deforming mesh by using the Scene and Spectrum Editors.  See also ChasteGuides/UsingCmgui.
+         *
+         * (See cmgui website for information on how
          * to use cmgui, but very briefly: graphics -> scene editor -> select surfaces -> add, then check 'Data'. Then
          * graphics -> Spectrum editor -> min=-90, max=50.).
          *

@@ -53,6 +53,8 @@ Launch Meshalyzer with
 }}}
 and visualise the results by loading the `S1S2Results_V.dat` file
 
+There are more details on visualising your results at ChasteGuides/VisualisationGuides.
+
 
 === Understanding the XML parameters file ===
 

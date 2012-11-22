@@ -41,10 +41,14 @@ cd testoutput/ChasteResults
 In this folder you will find the following files and folders:
  * `progress_status.txt`  -- this file can be viewed whilst the simulation is running to gauge how long it will take
  * `3dResults.h5` -- the output of the simulation, in HDF5 format
- * `output` (folder) -- contains the output converted into meshalyzer format
+ * `output` (folder) -- contains the output converted into Meshalyzer format
+ * `cmgui_output` (folder) -- contains the output converted into CMGUI format
+ * `vtk_output` (folder) -- contains the output converted into Paraview (VTK) format
+
+There are more details on visualising your results at ChasteGuides/VisualisationGuides.
 
 === Visualising with Meshalyzer ===
-For Meshalyzer visualization, now move into the Meshalyzer-compatible output folder 
+For Meshalyzer visualisation, now move into the Meshalyzer-compatible output folder 
 {{{
 #!sh
 cd output
@@ -55,31 +59,50 @@ Launch Meshalyzer with
 }}}
 and visualise the results by loading the `3dResults_V.dat` file.
 
-=== Visualising with CMGUI ===
-For Meshalyzer visualization, now move into the CMGUI-compatible output folder 
+=== Visualising with Cmgui ===
+For Cmgui visualisation, now move into the Cmgui-compatible output folder 
 {{{
 #!sh
 cd cmgui_output
 }}}
-Launch the cmgui visualizer with
+Launch the cmgui visualiser with
 {{{
 <path_to_cmgui>/cmgui script.com
 }}}
-The script will ensure that all the time-step files are loaded into CMGUI.
+The script will ensure that all the time-step files are loaded into Cmgui.
 
+=== Visualising the VTK data with Paraview ===
+For Paraview visualisation, now move into the VTK output folder 
+{{{
+#!sh
+cd vtk_output
+}}}
+
+For easy animation of cardiac simulations, we have written a Python script to add Paraview-specific
+time annotation features to the standard VTK output.  Run this with
+{{{
+<path_to_Chaste>/python/utils/AddVtuTimeAnnotations.py 3dResults.vtu 3dResultsAnnotated.vtu
+}}}
+
+Launch Paraview with
+{{{
+#!sh
+paraview --data=3dResultsAnnotated.vtu
+}}}
 
 === Understanding the XML parameters file ===
 
-Open `ChasteParameters.xml` (it is sensible to do this in a web-browser or XML editor in order to get syntax highlighting). The file should be reasonably readable; it defines: 
+Open `ChasteParameters.xml` (it is sensible to do this in a web-browser or XML editor in order to get syntax highlighting).
+The file should be reasonably readable; it defines: 
  * a 3D simulation that lasts for 5ms
  * the use of the monodomain model 
    * to use bidomain, the only thing that needs to be done is to change `Mono` to `Bi`
  * a `LuoRudyIBackwardEuler` cell model as the default cell model
  * a 3D mesh generated from an anatomical geometry. The are three files defining the mesh `heart_chaste2_renum_i_triangles`(`.node`, `.ele`, `.face`) representing respectively nodes elements and faces files.
- * an axisimmetric orinetation of the fibers is used and is given in the file `heart_chaste2_renum_i_triangles.axi` where the longitidunal direction of the fibers is defined in each element.
+ * an axisymmetric orientation of the fibres is used and is given in the file `heart_chaste2_renum_i_triangles.axi` where the longitudinal direction of the fibres is defined in each element.
  * a stimulated region  is defined in the apex. It starts at the beginning of the simulation and its duration is 2ms.
  * output directory and filenames
- * a cmgui OutputVisualizer 
+ * an `OutputVisualizer` element giving which visualiser formats to write
  * physiological parameters: conductivities, capacitance, surface-area-to-volume ratio
-   * in monodomain problems, the defined intracellular conductivity is used '''not''' a harmonic mean.
+   * in monodomain problems, the defined intracellular conductivity is used, '''not''' a harmonic mean.
  * Numerical parameters including ODE, PDE and printing timesteps

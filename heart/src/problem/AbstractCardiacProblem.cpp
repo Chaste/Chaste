@@ -114,7 +114,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Initialise()
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::READ_MESH);
-    if (mpMesh==NULL)
+    if (mpMesh)
+    {
+        if (PetscTools::IsParallel() && !dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh))
+        {
+            WARNING("Using a non-distributed mesh in a parallel simulation is not a good idea.");
+        }
+    }
+    else
     {
         // If no mesh has been passed, we get it from the configuration file
         try

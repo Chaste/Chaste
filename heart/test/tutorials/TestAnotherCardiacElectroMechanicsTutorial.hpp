@@ -238,7 +238,7 @@ public:
          * and activation occurs.
          *
          * For MEF simulations, we may want to visualise the electrical results on the electrics mesh using
-         * meshalyzer, for example to more easily visualise action potentials. This isn't (and currently
+         * Meshalyzer, for example to more easily visualise action potentials. This isn't (and currently
          * can't be) created by `CardiacElectroMechanicsProblem`. We can use a converter as follows
          * to post-process:
          */
