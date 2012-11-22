@@ -27,7 +27,6 @@ Binaries {{{Chaste, MeshConvert...}}} are made in {{{apps/src}}}.
 You may get a speed improvement from using a "no debug" build-type like {{{build=GccOpt_ndebug}}}, but
 this is at the expense of doing less error checking.
 
-
 === Running the converter ===
 
 You may want to download and save the attached file [attachment:MeshConvert.tgz MeshConvert.tgz] and 

@@ -60,7 +60,6 @@ Open `ChasteParameters.xml` (it is sensible to do this in a web-browser or XML e
 }}}
 As we wish to record an action potential for comparing control and drug action.
 
-
 === Running the simulation ===
 
 Change directory to {{{DrugAction}}}

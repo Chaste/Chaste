@@ -3,7 +3,7 @@
 == Fibres ==
 
 Fibres directions must currently be read from a file. Hence simulations with fibres can ''only'' be done for meshes that are read in, not auto-generated.
-Altering the xml parameters file to tell the executable to read fibres is trivial: instead of doing
+Altering the XML parameters file to tell the executable to read fibres is trivial: instead of doing
 {{{
 #!xml
 <Mesh unit="cm">

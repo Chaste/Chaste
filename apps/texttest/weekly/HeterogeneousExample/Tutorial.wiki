@@ -16,7 +16,6 @@ Run using the full xml file from the attachment, although first simulate for onl
 
 Further experiments can be run with different conductivities in the myocardial tissue (higher conductivities likely to uncouple the tissue and prevent propagation) and/or different Purkinje geometries of cell models.
 
-
 {{{
 #!xml
 

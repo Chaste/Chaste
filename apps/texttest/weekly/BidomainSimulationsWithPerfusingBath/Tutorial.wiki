@@ -2,7 +2,6 @@
 
 ''This tutorial is based on a nightly acceptance test apps/texttest/chaste/bidomain_with_bath''
 
-
 To run a bidomain simulation of cardiac tissue contained in a perfusing bath, we need to make three additions.
 
 Firstly, we have to define the `domain` field to be `BiWithBath`, rather than `Mono` or `Bi`.
