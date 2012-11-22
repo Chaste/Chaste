@@ -388,15 +388,26 @@ public:
     {
         // We can only load simulations from CHASTE_TEST_OUTPUT, so copy the archives there
         std::string source_directory = "heart/test/data/checkpoint_migration_via_xml/0.2ms/";
-        // Clear the target directories
-        OutputFileHandler h1("SaveBidomainShort");
-        OutputFileHandler h2("SaveBidomainShort_0.2ms");
-        if (PetscTools::AmMaster())
-        {
-            ABORT_IF_NON0(system, "cp " + source_directory + "SaveBidomainShort/* " + h1.GetOutputDirectoryFullPath());
-            ABORT_IF_NON0(system, "cp " + source_directory + "SaveBidomainShort_0.2ms/* " + h2.GetOutputDirectoryFullPath());
-        }
-        PetscTools::Barrier("TestCardiacSimulationResumeMigration");
+        std::string folder_1 = "SaveBidomainShort";
+        std::string folder_2 = "SaveBidomainShort_0.2ms";
+
+        FileFinder to_directory1(OutputFileHandler::GetChasteTestOutputDirectory() + folder_1, RelativeTo::Absolute);
+        FileFinder to_directory2(OutputFileHandler::GetChasteTestOutputDirectory() + folder_2, RelativeTo::Absolute);
+
+        to_directory1.Remove();
+        to_directory2.Remove();
+        TS_ASSERT_EQUALS(to_directory1.Exists(), false);
+        TS_ASSERT_EQUALS(to_directory2.Exists(), false);
+
+        //FileFinder test_output(OutputFileHandler::GetChasteTestOutputDirectory(), RelativeTo::Absolute);
+
+        FileFinder from_directory1(source_directory + folder_1, RelativeTo::ChasteSourceRoot);
+        FileFinder from_directory2(source_directory + folder_2, RelativeTo::ChasteSourceRoot);
+
+        TRY_IF_MASTER(
+	        from_directory1.CopyTo(to_directory1);
+            from_directory2.CopyTo(to_directory2);
+        );
 
         // Resume
         CardiacSimulation simulation("heart/test/data/xml/resume_migration.xml");
