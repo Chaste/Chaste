@@ -566,11 +566,10 @@ public:
                     prev_times = time_series;
                 }
 
-                double l2_norm_upstroke = sqrt(sum_sq_abs_error/sum_sq_prev_voltage);
-                double l2_norm_full = sqrt(sum_sq_abs_error_full/sum_sq_prev_voltage_full);
-
                 if (this->PopulatedResult)
                 {
+                    double l2_norm_upstroke = sqrt(sum_sq_abs_error/sum_sq_prev_voltage);
+                    double l2_norm_full = sqrt(sum_sq_abs_error_full/sum_sq_prev_voltage_full);
 
                     if (PetscTools::AmMaster())
                     {
