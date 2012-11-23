@@ -394,17 +394,14 @@ public:
         FileFinder to_directory1(OutputFileHandler::GetChasteTestOutputDirectory() + folder_1, RelativeTo::Absolute);
         FileFinder to_directory2(OutputFileHandler::GetChasteTestOutputDirectory() + folder_2, RelativeTo::Absolute);
 
-        to_directory1.Remove();
-        to_directory2.Remove();
-        TS_ASSERT_EQUALS(to_directory1.Exists(), false);
-        TS_ASSERT_EQUALS(to_directory2.Exists(), false);
-
-        //FileFinder test_output(OutputFileHandler::GetChasteTestOutputDirectory(), RelativeTo::Absolute);
-
         FileFinder from_directory1(source_directory + folder_1, RelativeTo::ChasteSourceRoot);
         FileFinder from_directory2(source_directory + folder_2, RelativeTo::ChasteSourceRoot);
 
         TRY_IF_MASTER(
+            to_directory1.Remove();
+            to_directory2.Remove();
+            TS_ASSERT_EQUALS(to_directory1.Exists(), false);
+            TS_ASSERT_EQUALS(to_directory2.Exists(), false);
 	        from_directory1.CopyTo(to_directory1);
             from_directory2.CopyTo(to_directory2);
         );
