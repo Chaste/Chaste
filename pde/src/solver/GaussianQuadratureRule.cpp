@@ -253,63 +253,49 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned deprecated, unsigned 
             break;
         
         case 3: // 3d, 3rd order
-            ///\todo #2232
-            mWeights.push_back(0.01497274736603);
-            mWeights.push_back(0.01349962850795);
-            mWeights.push_back(0.00190178826891);
-            mWeights.push_back(0.00760715307442);
-            mWeights.push_back(0.00685871056241);
-            mWeights.push_back(0.00096623512860);
-            mWeights.push_back(0.00024155878219);
-            mWeights.push_back(0.00021779261632);
-            mWeights.push_back(0.00003068198821);
-            mWeights.push_back(0.02395639578565);
-            mWeights.push_back(0.02159940561273);
-            mWeights.push_back(0.00304286123026);
-            mWeights.push_back(0.01217144491907);
-            mWeights.push_back(0.01097393689986);
-            mWeights.push_back(0.00154597620576);
-            mWeights.push_back(0.00038649405150);
-            mWeights.push_back(0.00034846818612);
-            mWeights.push_back(0.00004909118114);
-            mWeights.push_back(0.01497274736603);
-            mWeights.push_back(0.01349962850795);
-            mWeights.push_back(0.00190178826891);
-            mWeights.push_back(0.00760715307442);
-            mWeights.push_back(0.00685871056241);
-            mWeights.push_back(0.00096623512860);
-            mWeights.push_back(0.00024155878219);
-            mWeights.push_back(0.00021779261632);
-            mWeights.push_back(0.00003068198821);
+        	// 8 point rule
+        	/* The main options were
+        	 *  5-point rule.  Commonly published rule has four symmetric points and
+        	 *                 a negative weight in the centre.  We would like to avoid
+        	 *                 negative weight (certainly for interpolation.
+        	 *  8-point rule.  Uses two sets of symmetric points (as 4 point rule with a,b and then with c,d).
+        	 *                 This one is hard to derive a closed form solution to.
+        	 */
+        	{
+        		double root_seventeen = sqrt(17);
+        		double root_term = sqrt(1022.0-134.0*root_seventeen);
+        		double b = (55.0 - 3.0*root_seventeen + root_term)/196; //b = 0.328055
+                double d = (55.0 - 3.0*root_seventeen - root_term)/196; //d = 0.106952
 
-            mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.11270166540000,   0.08872983347426));
-            mPoints.push_back(ChastePoint<3>(0.44364916730000,   0.11270166540000,   0.05000000000803));
-            mPoints.push_back(ChastePoint<3>(0.78729833458393,   0.11270166540000,   0.01127016654181));
-            mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.50000000000000,   0.05000000000803));
-            mPoints.push_back(ChastePoint<3>(0.25000000000000,   0.50000000000000,   0.02817541635000));
-            mPoints.push_back(ChastePoint<3>(0.44364916730000,   0.50000000000000,   0.00635083269197));
-            mPoints.push_back(ChastePoint<3>(0.01270166538393,   0.88729833460000,   0.01127016654181));
-            mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.88729833460000,   0.00635083269197));
-            mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.88729833460000,   0.00143149884212));
-            mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.11270166540000,   0.39364916729197));
-            mPoints.push_back(ChastePoint<3>(0.44364916730000,   0.11270166540000,   0.22182458365000));
-            mPoints.push_back(ChastePoint<3>(0.78729833458393,   0.11270166540000,   0.05000000000803));
-            mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.50000000000000,   0.22182458365000));
-            mPoints.push_back(ChastePoint<3>(0.25000000000000,   0.50000000000000,   0.12500000000000));
-            mPoints.push_back(ChastePoint<3>(0.44364916730000,   0.50000000000000,   0.02817541635000));
-            mPoints.push_back(ChastePoint<3>(0.01270166538393,   0.88729833460000,   0.05000000000803));
-            mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.88729833460000,   0.02817541635000));
-            mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.88729833460000,   0.00635083269197));
-            mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.11270166540000,   0.69856850110968));
-            mPoints.push_back(ChastePoint<3>(0.44364916730000,   0.11270166540000,   0.39364916729197));
-            mPoints.push_back(ChastePoint<3>(0.78729833458393,   0.11270166540000,   0.08872983347426));
-            mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.50000000000000,   0.39364916729197));
-            mPoints.push_back(ChastePoint<3>(0.25000000000000,   0.50000000000000,   0.22182458365000));
-            mPoints.push_back(ChastePoint<3>(0.44364916730000,   0.50000000000000,   0.05000000000803));
-            mPoints.push_back(ChastePoint<3>(0.01270166538393,   0.88729833460000,   0.08872983347426));
-            mPoints.push_back(ChastePoint<3>(0.05635083270000,   0.88729833460000,   0.05000000000803));
-            mPoints.push_back(ChastePoint<3>(0.10000000001607,   0.88729833460000,   0.01127016654181));
-            break;
+        		double a = 1.0 - 3.0*b; // a = 0.0158359
+        		double c = 1.0 - 3.0*d; // c = 0.679143
+
+        		// w1 = 0.023088 (= 0.138528/6)
+        		double w1 = (20.0*d*d - 10.0*d + 1.0)/(240.0*(2.0*d*d - d - 2.0*b*b + b)); // w1 = 0.0362942
+        		double w2 = 1.0/24.0 - w1; // w2 = 0.0185787 (=0.111472/6)
+
+        		mWeights.push_back(w1);
+				mWeights.push_back(w1);
+				mWeights.push_back(w1);
+				mWeights.push_back(w1);
+
+				mWeights.push_back(w2);
+				mWeights.push_back(w2);
+				mWeights.push_back(w2);
+				mWeights.push_back(w2);
+
+				mPoints.push_back(ChastePoint<3>(a, b, b));
+				mPoints.push_back(ChastePoint<3>(b, a, b));
+				mPoints.push_back(ChastePoint<3>(b, b, a));
+				mPoints.push_back(ChastePoint<3>(b, b, b));
+
+				mPoints.push_back(ChastePoint<3>(c, d, d));
+				mPoints.push_back(ChastePoint<3>(d, c, d));
+				mPoints.push_back(ChastePoint<3>(d, d, c));
+				mPoints.push_back(ChastePoint<3>(d, d, d));
+
+        	}
+break;
 
         default:
             EXCEPTION("Gauss quadrature order not supported.");

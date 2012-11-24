@@ -141,12 +141,13 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 0u);
 
         // Check the elements and weights have been set up correctly
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*3*3*3u);
+        // 6 elements, 8 quad points
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         // Some hardcoded values, just to check element_nums not all zero
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[0].ElementNum, 1280u);
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[10].ElementNum, 1902u);
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[20].ElementNum, 1315u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[0].ElementNum,  3816u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[10].ElementNum, 217u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[20].ElementNum, 1094u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {
@@ -166,7 +167,7 @@ public:
             }
         }
 
-        TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[0], 6*3*3*3u);
+        TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[0], 6*8u);
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[1], 0u);
         mesh_pair.PrintStatistics();
 
@@ -196,10 +197,10 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 22u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 22u);
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
 
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*3*3*3u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {
@@ -322,9 +323,9 @@ public:
 
         mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, false /* non-safe mode*/);
 
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 22u); // hardcoded
-        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 22u);
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*3*3*3u);
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 2u); // hardcoded
+        TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 2u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {

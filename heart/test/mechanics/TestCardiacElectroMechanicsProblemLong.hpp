@@ -186,6 +186,15 @@ public:
         MechanicsEventHandler::Report();
     }
 
+    /* NOTE: This test has a twin in heart/test/tutorials/TestCardiacElectroMechanicsTutorial.hpp
+     * TestCardiacElectroMechanicsTutorial::dontTestTwistingCube()
+     * 
+     * If you need to re-generate the fibres for this test
+     * * Remove "dont" from the tutorial
+     * * Rerun it
+     * * Copy output
+       cp /tmp/$USER/testoutput/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad 
+     */
     void TestTwistingCube() throw(Exception)
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
@@ -464,7 +473,7 @@ public:
         TS_ASSERT_LESS_THAN(tissue_initial_size, r_deformed_position_fibres_alongY1[7](2));
 
         // hardcoded test to check nothing changes
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0483, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0484, 1e-4);
         TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0509, 1e-4);
 
 

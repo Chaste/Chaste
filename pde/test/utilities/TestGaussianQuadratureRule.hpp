@@ -300,7 +300,7 @@ public:
                         }
 
                         TS_ASSERT_DELTA(integral, expected[poly_degree_x][poly_degree_y][poly_degree_z],
-                                        1e-11);
+                                        1e-15);
                     }
                 }
             }
