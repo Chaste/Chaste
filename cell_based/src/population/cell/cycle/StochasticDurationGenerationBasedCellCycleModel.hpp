@@ -67,6 +67,8 @@ private:
         archive & p_wrapper;
     }
 
+protected:
+
     /**
      * Stochastically set the G1 duration.  Called on cell creation at
      * the start of a simulation, and for both parent and daughter
