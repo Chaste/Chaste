@@ -15,6 +15,9 @@
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
 		<OutputVoronoiData>0</OutputVoronoiData>
 		<OutputCellPopulationVolumes>0</OutputCellPopulationVolumes>
+		<WriteVtkAsPoints>0</WriteVtkAsPoints>
+		<OutputMeshInVtk>0</OutputMeshInVtk>
+		<HasVariableRestLength>0</HasVariableRestLength>
 		<MeinekeDivisionSeparation>0.3</MeinekeDivisionSeparation>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>

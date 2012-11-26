@@ -289,7 +289,7 @@ public:
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
 
         NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements");
-        TS_ASSERT(comp_ele.CompareFiles());
+        TS_ASSERT(comp_ele.CompareFiles(1e-15));
         FileComparison( results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements").CompareFiles();
 
         NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.viznodes");
