@@ -959,6 +959,8 @@ public:
         PetscMatTools::Finalise(matrix);
     }
 
+
+
     std::vector<unsigned> CalculateMatrixFill(AbstractTetrahedralMesh<2,2>& rMesh)
     {
         //Get some statistics about matrix fill
@@ -995,10 +997,11 @@ public:
         double global_error_sum = 0;
         MPI_Allreduce( &error_sum, &global_error_sum, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
 
-//        std::cout << "Error sum = " << global_error_sum << "\n";
-
         return global_hist;
     }
+
+
+
     /*
      * Permute nodes so that interior nodes are no longer at the end of the node vector
      */
@@ -1080,7 +1083,6 @@ public:
         delete [] perm;
         delete [] iperm;
 
-
         delete [] order;
         delete [] sizes;
         delete [] xadj;
@@ -1088,8 +1090,49 @@ public:
 
         quad_mesh.PermuteNodes(ipermutation);
         std::vector<unsigned> upper_hist_metis = CalculateMatrixFill(quad_mesh);
+    }
 
 
+    void TestElementsContainedByNodes3d() throw (Exception)
+    {
+        QuadraticMesh<3> mesh;
+        double h = 1.0;
+        mesh.ConstructRegularSlabMesh(h, 2.0, 1.0, 1.0);
+
+        for(unsigned node_index = 0; node_index<mesh.GetNumNodes(); node_index++)
+        {
+            std::set<unsigned> elements = mesh.GetNode(node_index)->rGetContainingElementIndices();
+            for(std::set<unsigned>::iterator iter = elements.begin(); iter != elements.end(); iter++)
+            {
+                Element<3,3>* p_element = mesh.GetElement(*iter);
+                bool found_node = false;
+                for(unsigned i=0; i<p_element->GetNumNodes(); i++)
+                {
+                    unsigned this_node = p_element->GetNodeGlobalIndex(i);
+                    if(this_node==node_index)
+                    {
+                        found_node = true;
+                    }
+                }
+                TS_ASSERT(found_node);
+            }
+
+            std::set<unsigned> boundary_elements = mesh.GetNode(node_index)->rGetContainingBoundaryElementIndices();
+            for(std::set<unsigned>::iterator iter = boundary_elements.begin(); iter != boundary_elements.end(); iter++)
+            {
+                BoundaryElement<2,3>* p_element = mesh.GetBoundaryElement(*iter);
+                bool found_node = false;
+                for(unsigned i=0; i<p_element->GetNumNodes(); i++)
+                {
+                    unsigned this_node = p_element->GetNodeGlobalIndex(i);
+                    if(this_node==node_index)
+                    {
+                        found_node = true;
+                    }
+                }
+                TS_ASSERT(found_node);
+            }
+        }
     }
 };
 

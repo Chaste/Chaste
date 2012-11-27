@@ -67,9 +67,16 @@ QuadraticMesh<DIM>::QuadraticMesh(double spaceStep, double width, double height,
     this->ConstructRegularSlabMesh(spaceStep, width, height, depth);
 }
 
+//////////////////////////////////////////////////////////
+// Badly-named (name inherited from parent class),
+// 'linear' here refers to the fact it creates a 1d mesh
+// on a line
+//////////////////////////////////////////////////////////
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 {
+    assert(DIM==1);
+
     AbstractTetrahedralMesh<DIM,DIM>::ConstructLinearMesh(numElemX);
     assert (this->mNodes.size() == numElemX+1);
     mNumVertices = numElemX+1;
@@ -392,7 +399,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(local_index2);
             unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
             (*iter)->AddNode(this->mNodes[node_index]);
-            this->mNodes[node_index]->AddElement((*iter)->GetIndex());
+            this->mNodes[node_index]->AddBoundaryElement((*iter)->GetIndex());
         }
         
     }
