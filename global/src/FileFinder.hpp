@@ -69,7 +69,7 @@ class FileFinder
 {
 public:
     /**
-     * Default constructor for subclasses to use. They @b must call
+     * Default constructor for subclasses to use. They should call
      * SetPath() in their constructor.
      *
      * This also allows classes to store a FileFinder instance that hasn't

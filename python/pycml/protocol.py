@@ -146,12 +146,13 @@ class Protocol(processors.ModelModifier):
         proto_xml = amara_parse_cellml(proto_file_path)
         assert hasattr(proto_xml, u'protocol')
         self.add_protocol_namespaces(proto_xml.xmlns_prefixes)
+        # Relative URIs must be resolved relative to this protocol file, or its xml:base if present
+        base = os.path.dirname(getattr(proto_xml.protocol, 'base', proto_file_path))
         # Any imports?
         for proto_import in getattr(proto_xml.protocol, u'import_', []):
-            # Relative URIs must be resolved relative to this protocol file
             source = proto_import.source
             if not os.path.isabs(source):
-                source = os.path.join(os.path.dirname(proto_file_path), source)
+                source = os.path.join(base, source)
             if getattr(proto_import, u'mergeDefinitions', u'0') in [u'true', u'1']:
                 # Process this import immediately
                 self.parse_protocol(source, proto_units)
