@@ -170,7 +170,7 @@ class Protocol(processors.ModelModifier):
         for nested_proto in proto_xml.protocol.xml_xpath(u'.//proto:nestedProtocol'):
             source = nested_proto.source
             if not os.path.isabs(source):
-                source = os.path.join(os.path.dirname(proto_file_path), source)
+                source = os.path.join(base, source)
             self.parse_protocol(source, self.model.get_standard_units().copy())
         if hasattr(proto_xml.protocol, u'units'):
             # Parse units definitions
