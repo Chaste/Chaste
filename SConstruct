@@ -130,6 +130,15 @@ Export('all_tests')
 compile_only = int(ARGUMENTS.get('compile_only', ARGUMENTS.get('co', 0)))
 Export('compile_only')
 
+# Special offline mode which doesn't run tests, but writes a script to run them separately
+offline_mode = int(ARGUMENTS.get('offline_mode', 0))
+Export('offline_mode')
+if offline_mode:
+    compile_only = 1
+    Export('compile_only')
+    offline_test_runners = []
+    Export('offline_test_runners')
+
 # To run a specific test suite only, give the path (relative to the Chaste root) as the test_suite=<path> argument.
 # This will force the test suite to be run even if the source is unchanged.
 # To run multiple tests in this way, separate the paths by commas.
@@ -550,3 +559,18 @@ if build_exes:
 # to do 'nice' test suite specification
 if not BUILD_TARGETS:
     BUILD_TARGETS.extend(DEFAULT_TARGETS)
+
+
+# Temporary work towards #136
+if offline_mode:
+    ld_lib_paths = other_libpaths
+    if use_chaste_libs and not static_libs:
+        ld_lib_paths[0:0] = [Dir('lib').abspath]
+    handle = open('run-tests.sh', 'w')
+    handle.write('#!/bin/bash\n\n')
+    print >> handle, "LD_LIBRARY_PATH=" + ':'.join(ld_lib_paths)
+    print >> handle, "PATH=" + env['ENV']['PATH']
+    for runner in offline_test_runners:
+        print >> handle, runner[0]
+    handle.close()
+    os.chmod('run-tests.sh', 0740)

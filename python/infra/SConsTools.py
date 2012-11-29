@@ -1204,6 +1204,8 @@ def ScheduleTests(env, allLibs, dynLibs, libDeps, libPath, testFiles, otherVars)
         is_py_test = ext == '.py'
         if not is_py_test:
             (runner_exe, runner_dummy) = ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs)
+            if otherVars['offline_mode']:
+                otherVars['offline_test_runners'].append(runner_exe)
         if not otherVars['compile_only']:
             log_file = env.File(prefix+'.log')
             test_log_files.append(log_file)
