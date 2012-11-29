@@ -48,12 +48,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class AbstractPurkinjeCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
 {
+private:
+    /**
+     * Reads in node id and resistance values of junction nodes
+     *
+     * The .pvj file path is specified by HeartConfig::Instance()->GetMeshFileName() + ".pvj"
+     *
+     * Note, this is called by SetMesh
+     */
+    void ReadJunctionsFile();
+
 protected:
     /** Saved pointer to the mixed dimension mesh */
     MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* mpMixedDimensionMesh;
 
     /** A set of local purkinje node indices */
     std::set<unsigned> mLocalPurkinjeNodes;
+
+    /** A map between junction node ids and resistances */
+	std::map<unsigned, double> mJunctionMap;
 
     /**
      * Must be overridden by subclasses to return a Purkinje cell object for the given node.
@@ -75,6 +88,21 @@ protected:
                         AbstractCardiacCellInterface* pPurkinjeCell,
                         AbstractCardiacCellInterface* pCardiacCell,
                         double resistance);
+
+
+    /**
+     * Create a purkinje-ventricular junction between the two cells provided if the junction is defined in the corresponding .pvj file.
+     *
+     * ReadJunctionsFile() must be called before calling this method
+     *
+     * @param pNode  the node in the mesh at which this junction is located
+     * @param pPurkinjeCell  the Purkinje cell
+     * @param pCardiacCell  the ventricular cell
+     */
+    void CreateJunctionFromFile(const Node<SPACE_DIM>* pNode,
+								AbstractCardiacCellInterface* pPurkinjeCell,
+								AbstractCardiacCellInterface* pCardiacCell);
+
 
 public:
 

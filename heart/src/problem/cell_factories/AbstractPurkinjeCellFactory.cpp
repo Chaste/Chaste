@@ -48,6 +48,36 @@ AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory(
 {
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
+{
+	FileFinder junction_file(HeartConfig::Instance()->GetMeshName() + ".pvj", RelativeTo::AbsoluteOrCwd);
+
+	if (junction_file.Exists())
+	{
+		std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
+
+		// Reads in file defining nodes and resistance (separated by space)
+		while(!junction_stream.eof())
+		{
+			unsigned node_id;
+			junction_stream >> node_id;
+			double resistance;
+			junction_stream >> resistance;
+
+			if(mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
+			{
+				unsigned mapped_node_id = mpMixedDimensionMesh->rGetNodePermutation()[node_id];
+
+				mJunctionMap[mapped_node_id] = resistance;
+			}
+			else
+			{
+				mJunctionMap[node_id] = resistance;
+			}
+		}
+	}
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const Node<SPACE_DIM>* pNode,
@@ -111,6 +141,8 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
         mLocalPurkinjeNodes.insert((*iter)->GetNodeGlobalIndex(1u));
     }
     AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(pMesh);
+
+    ReadJunctionsFile();
 }
 
 
@@ -138,6 +170,18 @@ MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_D
         EXCEPTION("The mixed dimension mesh object has not been set in the cell factory");
     }
     return mpMixedDimensionMesh;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunctionFromFile(const Node<SPACE_DIM>* pNode,
+																				AbstractCardiacCellInterface* pPurkinjeCell,
+																				AbstractCardiacCellInterface* pCardiacCell)
+{
+	std::map<unsigned, double>::iterator iter = mJunctionMap.find(pNode->GetIndex());
+	if(iter != mJunctionMap.end())
+	{
+		CreateJunction(pNode, pPurkinjeCell, pCardiacCell, iter->second);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////
