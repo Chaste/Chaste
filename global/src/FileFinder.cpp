@@ -140,15 +140,11 @@ void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value rel
     {
         // Iterator was decremented in the while test
     }
+    // it now points at the last non-slash character, if any
     if (it != mAbsPath.end() && (++it) != mAbsPath.end())
     {
         mAbsPath.erase(it, mAbsPath.end());
     }
-}
-
-bool FileFinder::IsPathSet() const
-{
-    return mAbsPath != UNSET_PATH;
 }
 
 void FileFinder::SetPath(const std::string& rLeafName, const FileFinder& rParentOrSibling)
@@ -165,6 +161,11 @@ void FileFinder::SetPath(const std::string& rLeafName, const FileFinder& rParent
     {
         SetPath(rParentOrSibling.GetParent().GetAbsolutePath() + rLeafName, RelativeTo::Absolute);
     }
+}
+
+bool FileFinder::IsPathSet() const
+{
+    return mAbsPath != UNSET_PATH;
 }
 
 bool FileFinder::Exists() const

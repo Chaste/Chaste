@@ -113,12 +113,7 @@ public:
      * @param rPath  the path to the file/dir to find
      * @param relativeTo  how to interpret this path
      */
-    void SetPath(const std::string& rPath, RelativeTo::Value relativeTo);
-
-    /**
-     * Test whether this FileFinder has been given a path.
-     */
-    bool IsPathSet() const;
+    virtual void SetPath(const std::string& rPath, RelativeTo::Value relativeTo);
 
     /**
      * Change this FileFinder to point at a new location, relative to some file or directory.
@@ -126,7 +121,12 @@ public:
      * @param rLeafName  the leaf name of the file/dir to find
      * @param rParentOrSibling  where to look for it
      */
-    void SetPath(const std::string& rLeafName, const FileFinder& rParentOrSibling);
+    virtual void SetPath(const std::string& rLeafName, const FileFinder& rParentOrSibling);
+
+    /**
+     * Test whether this FileFinder has been given a path.
+     */
+    bool IsPathSet() const;
 
     /**
      * Test whether we exist.
