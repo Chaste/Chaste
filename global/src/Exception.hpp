@@ -217,6 +217,29 @@ private:
 #endif
 
 /**
+ * Convenience function to convert an exception thrown by a single process into
+ * termination of the entire program.
+ *
+ * @param block  the block of code to execute
+ */
+#define ABORT_IF_THROWS(block)          \
+    try {                               \
+        block;                          \
+    } catch (const Exception& e) {      \
+        TERMINATE(e.GetMessage());      \
+    } catch (const std::exception &e) { \
+        TERMINATE(e.what());            \
+    } catch (...) {                     \
+        TERMINATE("Unexpected exception thrown."); \
+    }
+
+
+// The macros below are deprecated.  In most cases, FileFinder routines should be used
+// in preference to system() calls.
+
+/**
+ * @note This macro is deprecated.
+ *
  * Handy for calling functions like system which return non-zero on error.
  * Throws if an error occurs.
  *
@@ -237,6 +260,8 @@ private:
 
 
 /**
+ * @note This macro is deprecated, and no longer used by core code.
+ *
  * Handy for calling functions like system which return non-zero on error.
  * Terminate if the return code is non-zero, printing a suitable message.
  * @param retcode  command return code
@@ -248,6 +273,8 @@ private:
     }
 
 /**
+ * @note This macro is deprecated, and no longer used by core code.
+ *
  * Handy for calling functions like system which return non-zero on error.
  * Terminate if an error occurs.
  *
@@ -264,23 +291,8 @@ private:
     }
 
 /**
- * Convenience function to convert an exception thrown by a single process into
- * termination of the entire program.
+ * @note This macro is deprecated, and no longer used by core code.
  *
- * @param block  the block of code to execute
- */
-#define ABORT_IF_THROWS(block)          \
-    try {                               \
-        block;                          \
-    } catch (const Exception& e) {      \
-        TERMINATE(e.GetMessage());      \
-    } catch (const std::exception &e) { \
-        TERMINATE(e.what());            \
-    } catch (...) {                     \
-        TERMINATE("Unexpected exception thrown."); \
-    }
-
-/**
  * Handy for calling functions like system which return non-zero on error.
  * This time we expect failure; throws if the command succeeds.
  * @param cmd  command to call
@@ -294,6 +306,8 @@ private:
     } }
 
 /**
+ * @note This macro is deprecated.
+ *
  * Handy for calling functions like system which return non-zero on error.
  * This version ignores the return code, in case you don't care about errors for some reason...
  * @param cmd  command to call

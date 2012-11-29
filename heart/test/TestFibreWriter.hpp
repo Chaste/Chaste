@@ -124,7 +124,7 @@ public:
 
     //Following are convenience methods
 private:
-    void ConvertToBinaryOrtho(std::string fullPath, std::string baseName, bool output) throw (Exception)
+    void ConvertToBinaryOrtho(std::string fullPath, std::string baseName, bool copyOutput) throw (Exception)
     {
         FileFinder file_finder(fullPath+"/"+baseName+".ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<3> fibre_reader(file_finder, ORTHO);
@@ -161,23 +161,15 @@ private:
                 TS_ASSERT_DELTA(third[i][j], third_bin[i][j], 1e-16);
             }
         }
-        if (output)
+        if (copyOutput)
         {
-        	//The system calls below are not called by default and only exists to facilitate copying
-        	//of test output into the trunk. Hence, they have not been replaced with the C++ equivalent
-        	// DO NOT COPY THIS BLOCK
-        	// See #1002
-            std::cout<<"cp "<<
-                OutputFileHandler::GetChasteTestOutputDirectory()
-                << dir <<"/"<<baseName<<"_bin.ortho " <<
-                fullPath << "/" << baseName << ".ortho\n";
-            system(("ls -lh " + OutputFileHandler::GetChasteTestOutputDirectory()
-                + dir + "/" + baseName + "_bin.ortho " +
-                fullPath + "/" + baseName + ".ortho\n").c_str());
+            // This code is not called by default and only exists to copy test output into the trunk.
+            FileFinder file_finder_test_folder(fullPath, RelativeTo::ChasteSourceRoot);
+            file_finder_bin.CopyTo(file_finder_test_folder);
         }
     }
 
-    void ConvertToBinaryAxi(std::string fullPath, std::string baseName, bool output) throw (Exception)
+    void ConvertToBinaryAxi(std::string fullPath, std::string baseName, bool copyOutput) throw (Exception)
     {
         FileFinder file_finder(fullPath+"/"+baseName+".axi", RelativeTo::ChasteSourceRoot);
         FibreReader<3> fibre_reader(file_finder, AXISYM);
@@ -204,19 +196,11 @@ private:
                 TS_ASSERT_DELTA(fibres[i][j], fibres_bin[i][j], 1e-16);
             }
         }
-        if (output)
+        if (copyOutput)
         {
-        	//The system calls below are not called by default and only exists to facilitate copying
-        	//of test output into the trunk. Hence, they have not been replaced with the C++ equivalent
-        	// DO NOT COPY THIS BLOCK EITHER
-        	//See #1002
-            std::cout<<"cp "<<
-                OutputFileHandler::GetChasteTestOutputDirectory()
-                << dir <<"/"<<baseName<<"_bin.axi " <<
-                fullPath << "/" << baseName << ".axi\n";
-            system(("ls -lh " + OutputFileHandler::GetChasteTestOutputDirectory()
-                + dir + "/" + baseName + "_bin.axi " +
-                fullPath + "/" + baseName + ".axi\n").c_str());
+        	// This code is not called by default and only exists to copy test output into the trunk.
+            FileFinder file_finder_test_folder(fullPath, RelativeTo::ChasteSourceRoot);
+            file_finder_bin.CopyTo(file_finder_test_folder);
         }
     }
 public:

@@ -91,6 +91,10 @@ FileFinder::FileFinder(const fs::path& rPath)
     SetPath(fs::complete(rPath).string(), RelativeTo::Absolute);
 }
 
+FileFinder::~FileFinder()
+{
+}
+
 void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value relativeTo)
 {
     switch (relativeTo)

@@ -108,6 +108,11 @@ public:
     FileFinder(const fs::path& rPath);
 
     /**
+     * Needed because we have virtual methods.
+     */
+    virtual ~FileFinder();
+
+    /**
      * Change this FileFinder to point at a new location.
      *
      * @param rPath  the path to the file/dir to find

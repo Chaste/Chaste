@@ -61,6 +61,27 @@ class TestDistributedTetrahedralMesh : public CxxTest::TestSuite
 {
 private:
 
+    void ReadFileToSetOfLines(const std::string& rFilePath, std::set<std::string>& rSetOfLines)
+    {
+        std::ifstream filestream(rFilePath.c_str());
+        TS_ASSERT(filestream.is_open());
+        while (filestream.good())
+        {
+            std::string line;
+            getline(filestream, line);
+            if (filestream.fail())
+            {
+                break;
+            }
+            if ( !(line[0] == '#' || line[0] == '!' || line.substr(0, 10) == "Group name") )
+            {
+                //Even though both files were created with the same build, they may have slightly different creation
+                //times in their provenance line (so we ignore it).
+                rSetOfLines.insert(line);
+            }
+        }
+
+    }
     void ComparePermutedFiles(const std::string& rFilePath1, const std::string& rFilePath2)
     {
         if (!PetscTools::AmMaster())
@@ -69,45 +90,12 @@ private:
             return;
         }
         std::set<std::string> lines_from_file_1;
-        {
-            std::ifstream filestream1(rFilePath1.c_str());
-            TS_ASSERT(filestream1.is_open());
-            while (filestream1.good())
-            {
-                std::string line;
-                getline(filestream1, line);
-                if (filestream1.fail())
-                {
-                    break;
-                }
-                if (line[0] == '#')
-                {
-                    //Even though both files were created with the same build, they may have slightly different creation
-                    //times in their provenance line (so we ignore it).
-                    lines_from_file_1.insert(line);
-                }
-            }
-        }
+        ReadFileToSetOfLines(rFilePath1, lines_from_file_1);
 
         std::set<std::string> lines_from_file_2;
-        {
-            std::ifstream filestream2(rFilePath2.c_str());
-            TS_ASSERT(filestream2.is_open());
-            while (filestream2.good())
-            {
-                std::string line;
-                getline(filestream2, line);
-                if (filestream2.fail())
-                {
-                    break;
-                }
-                if (line[0] == '#')
-                {
-                    lines_from_file_2.insert(line);
-                }
-            }
-        }
-        // Here's the test.  Do both files contain the same lines (up to permutations)?
+        ReadFileToSetOfLines(rFilePath2, lines_from_file_2);
+
+        // Do both files contain the same lines (up to permutations)?
         TS_ASSERT(lines_from_file_1 == lines_from_file_2);
 	}
 
@@ -1809,37 +1797,35 @@ public:
         TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> sequential_mesh;
         sequential_mesh.ConstructFromMeshReader(reader);
-        MeshalyzerMeshWriter<3,3> mesh_writer("TestDistributedMeshWriter", "seq_cube_2mm_12_elements", false);
-        mesh_writer.WriteFilesUsingMesh(sequential_mesh);
-        MeshalyzerMeshWriter<3,3> mesh_writer_cg("TestDistributedMeshWriter", "seq_cube_2mm_12_elements_cg", false, true); //Don't clean, Do use CG
-        mesh_writer_cg.WriteFilesUsingMesh(sequential_mesh);
-        CmguiMeshWriter<3,3> cmgui_writer("TestDistributedMeshWriter", "seq_cube_2mm_12_elements_cmgui", false); //Don't clean
-        cmgui_writer.WriteFilesUsingMesh(sequential_mesh);
 
         DistributedTetrahedralMesh<3,3> distributed_mesh(DistributedTetrahedralMeshPartitionType::DUMB); //Makes sure that there is no permutation
         AbstractTetrahedralMesh<3,3> *p_distributed_mesh = &distributed_mesh; //Hide the fact that it's distributed from the compiler
 
         distributed_mesh.ConstructFromMeshReader(reader);
+
+        // Meshalyzer
+        MeshalyzerMeshWriter<3,3> mesh_writer("TestDistributedMeshWriter", "seq_cube_2mm_12_elements", false);
+        mesh_writer.WriteFilesUsingMesh(sequential_mesh);
+        std::string output_dir = mesh_writer.GetOutputDirectory();
         MeshalyzerMeshWriter<3,3> mesh_writer_par("TestDistributedMeshWriter", "par_efficient_cube_2mm_12_elements", false);
         mesh_writer_par.WriteFilesUsingMesh(*p_distributed_mesh, false);  //"false == Don't preserve element ordering
-
-        MeshalyzerMeshWriter<3,3> mesh_writer_par_cg("TestDistributedMeshWriter", "par_efficient_cube_2mm_12_elements_cg", false, true); //Don't clean, Do use CG
-        mesh_writer_par_cg.WriteFilesUsingMesh(*p_distributed_mesh, false);  //"false == Don't preserve element ordering
-
-        CmguiMeshWriter<3,3> cmgui_writer_par("TestDistributedMeshWriter", "par_efficient_cube_2mm_12_elements_cmgui", false);
-        cmgui_writer_par.WriteFilesUsingMesh(*p_distributed_mesh, false);  //"false == Don't preserve element ordering
-
-        std::string output_dir = mesh_writer.GetOutputDirectory();
-
         {
             FileFinder parallel(output_dir + "/par_efficient_cube_2mm_12_elements.pts");
             FileFinder sequential(output_dir + "/seq_cube_2mm_12_elements.pts");
             FileComparison comparer(parallel,sequential);
             TS_ASSERT(comparer.CompareFiles());
+
+            ComparePermutedFiles(output_dir + "/seq_cube_2mm_12_elements.tetras", output_dir + "/par_efficient_cube_2mm_12_elements.tetras");
+            ComparePermutedFiles(output_dir + "/seq_cube_2mm_12_elements.tri", output_dir + "/par_efficient_cube_2mm_12_elements.tri");
         }
 
-        // cg output is indexed from 1, but the pts file doesn't have indices
+        // Cool graphics
+        MeshalyzerMeshWriter<3,3> mesh_writer_cg("TestDistributedMeshWriter", "seq_cube_2mm_12_elements_cg", false, true); //Don't clean, Do use CG
+        mesh_writer_cg.WriteFilesUsingMesh(sequential_mesh);
+        MeshalyzerMeshWriter<3,3> mesh_writer_par_cg("TestDistributedMeshWriter", "par_efficient_cube_2mm_12_elements_cg", false, true); //Don't clean, Do use CG
+        mesh_writer_par_cg.WriteFilesUsingMesh(*p_distributed_mesh, false);  //"false == Don't preserve element ordering
         {
+            // cg output is indexed from 1, but the pts file doesn't have indices
             FileFinder parallel(output_dir + "/par_efficient_cube_2mm_12_elements_cg.pts");
             FileFinder sequential(output_dir + "/seq_cube_2mm_12_elements_cg.pts");
             FileComparison comparer(parallel,sequential);
@@ -1847,43 +1833,17 @@ public:
         }
 
         //cmgui
+        CmguiMeshWriter<3,3> cmgui_writer("TestDistributedMeshWriter", "seq_cube_2mm_12_elements_cmgui", false); //Don't clean
+        cmgui_writer.WriteFilesUsingMesh(sequential_mesh);
+        CmguiMeshWriter<3,3> cmgui_writer_par("TestDistributedMeshWriter", "par_efficient_cube_2mm_12_elements_cmgui", false);
+        cmgui_writer_par.WriteFilesUsingMesh(*p_distributed_mesh, false);  //"false == Don't preserve element ordering
         {
             FileFinder parallel(output_dir + "/par_efficient_cube_2mm_12_elements_cmgui.exnode");
             FileFinder sequential(output_dir + "/seq_cube_2mm_12_elements_cmgui.exnode");
             FileComparison comparer(parallel,sequential);
             comparer.SetIgnoreLinesBeginningWith("Group name:");
             TS_ASSERT(comparer.CompareFiles());
-        }
-
-        ComparePermutedFiles(output_dir + "/seq_cube_2mm_12_elements.tetras", output_dir + "/par_efficient_cube_2mm_12_elements.tetras");
-        ComparePermutedFiles(output_dir + "/seq_cube_2mm_12_elements.tri", output_dir + "/par_efficient_cube_2mm_12_elements.tri");
-
-		// Master process sorts element and face file and the rest wait before comparing.
-        if (PetscTools::AmMaster())
-        {
-            //for the cmgui, we employ some grep trickery to sort the files. We create one file per element containing the element number and the nodes that make it.
-            for (unsigned elem_index = 1; elem_index<=sequential_mesh.GetNumAllElements(); elem_index++)
-            {
-                std::stringstream ss;
-                ss << elem_index;
-                std::string elem_string(ss.str());
-                system(("grep 'Element:\t" + elem_string + " 0 0' " + output_dir + "par_efficient_cube_2mm_12_elements_cmgui.exelem > " + output_dir + "element_" + elem_string + "_efficient ").c_str());
-                system(("grep 'Element:\t" + elem_string + " 0 0' " + output_dir + "seq_cube_2mm_12_elements_cmgui.exelem > " + output_dir + "element_" + elem_string + "_sequential ").c_str());
-            }
-        }
-        PetscTools::Barrier();
-
-        //compare the cmgui elements, one element file at a time.
-        for (unsigned elem_index = 1; elem_index<=sequential_mesh.GetNumAllElements(); elem_index++)
-        {
-            std::stringstream ss;
-            ss << elem_index;
-            std::string elem_string(ss.str());
-
-            FileFinder parallel(output_dir + "element_" + elem_string + "_efficient");
-            FileFinder sequential(output_dir + "element_" + elem_string + "_sequential");
-            FileComparison comparer(parallel,sequential);
-            TS_ASSERT(comparer.CompareFiles());
+            ComparePermutedFiles(output_dir + "/seq_cube_2mm_12_elements_cmgui.exelem", output_dir + "/par_efficient_cube_2mm_12_elements_cmgui.exelem");
         }
     }
 
