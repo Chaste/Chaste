@@ -662,6 +662,8 @@ public:
      *  Does nothing if the SNES solver is used.
      *
      *  See ticket #2304
+     *
+     *  @param takeFullFirstStep Whether to take a full first Newton step or not.
      */
     void SetTakeFullFirstNewtonStep(bool takeFullFirstStep = true)
     {
@@ -677,6 +679,7 @@ public:
 	 *  there is enough memory for it: the linear solve may be faster and 
 	 *  nonlinear convergence likely to be much better, as the linear solve is exact.
 	 *  
+	 *  @param usePetscDirectSolve Whether to use the Petsc direct solver or not
 	 */
     void SetUsePetscDirectSolve(bool usePetscDirectSolve = true)
     {
