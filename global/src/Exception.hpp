@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <cfloat>  // For DBL_MAX
 #include <climits> // For UINT_MAX & INT_MAX, necessary in gcc-4.3
-#include <cstdlib> // For system() etc., necessary in gcc-4.3
+#include <cstdlib> // Necessary in gcc-4.3 and later which don't include stdlib by default
 
 /** Use when initialising an unsigned variable that doesn't have a sensible default value. */
 const unsigned UNSIGNED_UNSET = UINT_MAX;

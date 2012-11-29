@@ -165,7 +165,8 @@ private:
         {
         	//The system calls below are not called by default and only exists to facilitate copying
         	//of test output into the trunk. Hence, they have not been replaced with the C++ equivalent
-        	//See #1002
+        	// DO NOT COPY THIS BLOCK
+        	// See #1002
             std::cout<<"cp "<<
                 OutputFileHandler::GetChasteTestOutputDirectory()
                 << dir <<"/"<<baseName<<"_bin.ortho " <<
@@ -207,6 +208,7 @@ private:
         {
         	//The system calls below are not called by default and only exists to facilitate copying
         	//of test output into the trunk. Hence, they have not been replaced with the C++ equivalent
+        	// DO NOT COPY THIS BLOCK EITHER
         	//See #1002
             std::cout<<"cp "<<
                 OutputFileHandler::GetChasteTestOutputDirectory()
