@@ -243,8 +243,9 @@ AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEM
       mpMesh(pMesh)
 {
     assert(pMesh);
-	// Default to 2nd order quadrature 
-    mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(UNSIGNED_UNSET, 2);
+	// Default to 2nd order quadrature
+    ///\todo #2232 Check quadrature order
+    mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2);
 }
 
 

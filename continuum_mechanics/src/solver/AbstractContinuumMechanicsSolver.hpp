@@ -413,8 +413,9 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
 
     AllocateMatrixMemory();
 
-    mpQuadratureRule = new GaussianQuadratureRule<DIM>(UNSIGNED_UNSET, 3);
-    mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(UNSIGNED_UNSET, 4); ///\todo #2232  Could a lower order quadrature rule be used here?
+    ///\todo #2232 Check quadrature order
+    mpQuadratureRule = new GaussianQuadratureRule<DIM>(3);
+    mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(4); ///\todo #2232  Could a lower order quadrature rule be used here?
 
     mCurrentSolution.resize(mNumDofs, 0.0);
 }

@@ -62,11 +62,10 @@ unsigned GaussianQuadratureRule<ELEMENT_DIM>::GetNumQuadPoints() const
 /**
  * Constructor specialization for 0d.
  *
- * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly (ignored in 0-d case)
  */
 template<>
-GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
+GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned quadratureOrder)
 {
     mNumQuadPoints = 1;
     mWeights.push_back(1);
@@ -76,11 +75,10 @@ GaussianQuadratureRule<0>::GaussianQuadratureRule(unsigned deprecated, unsigned 
 /**
  * Constructor specialization for 1d.
  *
- * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  */
 template<>
-GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
+GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned quadratureOrder)
 {
     switch (quadratureOrder)
     {
@@ -125,12 +123,11 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned deprecated, unsigned 
 /**
  * Constructor specialization for 2d.
  *
- * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  *
  */
 template<>
-GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
+GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned quadratureOrder)
 {
     double one_third = 1.0/3.0;
     double one_sixth = 1.0/6.0;
@@ -217,11 +214,10 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned deprecated, unsigned 
 /**
  * Constructor specialization for 3d.
  *
- * @param deprecated  deprecated
  * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
  */
 template<>
-GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned deprecated, unsigned quadratureOrder)
+GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned quadratureOrder)
 {
     switch (quadratureOrder)
     {
@@ -305,7 +301,7 @@ break;
 }
 
 template<unsigned ELEMENT_DIM>
-GaussianQuadratureRule<ELEMENT_DIM>::GaussianQuadratureRule(unsigned numPointsInEachDimension, unsigned quadratureOrder)
+GaussianQuadratureRule<ELEMENT_DIM>::GaussianQuadratureRule(unsigned quadratureOrder)
 {
     EXCEPTION("Gauss quadrature rule not available for this dimension.");
 }

@@ -306,7 +306,8 @@ public:
             EXCEPTION("Continuum mechanics assemblers require a quadratic mesh");
         }
 
-        mpQuadRule = new GaussianQuadratureRule<DIM>(UNSIGNED_UNSET, 3);
+        ///\todo #2232 Check quadrature order
+        mpQuadRule = new GaussianQuadratureRule<DIM>(3);
     }
 
 

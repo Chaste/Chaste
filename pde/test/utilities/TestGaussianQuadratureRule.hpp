@@ -51,18 +51,18 @@ public:
     void TestTheGaussianQuadratureRule()
     {
         // 0d
-        GaussianQuadratureRule<0> quad_rule1(1, 0);
+        GaussianQuadratureRule<0> quad_rule1(0);
         TS_ASSERT_EQUALS(quad_rule1.GetNumQuadPoints(),1U);
 
-        GaussianQuadratureRule<0> quad_rule2(2, 1);
+        GaussianQuadratureRule<0> quad_rule2(1);
         TS_ASSERT_EQUALS(quad_rule2.GetNumQuadPoints(),1U);
 
-        TS_ASSERT_DELTA(quad_rule1.GetWeight(0),1,1e-12);
+        TS_ASSERT_DELTA(quad_rule1.GetWeight(0), 1.0, DBL_EPSILON);
 
         // 1d
         for (unsigned order=0; order<3; order++)
         {
-            GaussianQuadratureRule<1> quad_rule(order + 1, order);
+            GaussianQuadratureRule<1> quad_rule(order);
 
             for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
             {
@@ -77,7 +77,7 @@ public:
         // 2d
         for (unsigned order=0; order<3; order++)
         {
-            GaussianQuadratureRule<2> quad_rule(UNSIGNED_UNSET, order);
+            GaussianQuadratureRule<2> quad_rule(order);
 
             for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
             {
@@ -94,7 +94,7 @@ public:
         // 3d
         for (unsigned order=0; order<4; order++)
         {
-            GaussianQuadratureRule<3> quad_rule(UNSIGNED_UNSET, order);
+            GaussianQuadratureRule<3> quad_rule(order);
 
             for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
             {
@@ -111,13 +111,13 @@ public:
         }
 
         // Exceptions (unsupported cases)
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<1> quad_rule(4, 6),
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<1> quad_rule(6),
         		"Gauss quadrature order not supported.");
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<2> quad_rule(4, 5),
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<2> quad_rule(5),
         		"Gauss quadrature order not supported.");
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<3> quad_rule(5, 4),
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<3> quad_rule(4),
         		"Gauss quadrature order not supported.");
-        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<4> quad_rule(1, UNSIGNED_UNSET),
+        TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<4> quad_rule(1),
         		"Gauss quadrature rule not available for this dimension.");
     }
 
@@ -129,7 +129,7 @@ public:
     {
         for (unsigned order=0; order<6; order++)
         {
-            GaussianQuadratureRule<1> quad_rule(order + 1, order);
+            GaussianQuadratureRule<1> quad_rule(order);
 
             //Test that the rule can be used to integrate the polynomials 0, x, x^2, x^3 ... on the interval [1,3]
             for (unsigned poly_degree=0; poly_degree<=order; poly_degree++)
@@ -189,7 +189,7 @@ public:
 
         for (unsigned order=0; order<5; order++)
         {
-            GaussianQuadratureRule<2> quad_rule(UNSIGNED_UNSET, order);
+            GaussianQuadratureRule<2> quad_rule(order);
 
             for (unsigned poly_degree_x=0; poly_degree_x<=order; poly_degree_x++)
             {
@@ -269,7 +269,7 @@ public:
         // Test up to order 3 in 3D
         for (unsigned order=0; order<4; order++)
         {
-            GaussianQuadratureRule<3> quad_rule(UNSIGNED_UNSET, order);
+            GaussianQuadratureRule<3> quad_rule(order);
 
             for (unsigned poly_degree_x=0;
                  poly_degree_x<=order;

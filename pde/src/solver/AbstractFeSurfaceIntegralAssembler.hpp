@@ -154,7 +154,8 @@ AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abstrac
     assert(pMesh);
     assert(pBoundaryConditions);
     // Default to 2nd order quadrature 
-    mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(UNSIGNED_UNSET, 2);
+    ///\todo #2232 Check quadrature order
+    mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(2);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
