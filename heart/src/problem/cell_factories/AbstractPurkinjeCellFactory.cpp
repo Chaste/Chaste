@@ -51,32 +51,44 @@ AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
 {
-	FileFinder junction_file(HeartConfig::Instance()->GetMeshName() + ".pvj", RelativeTo::AbsoluteOrCwd);
+    std::string pvj_file_name;
+    try
+    {
+        pvj_file_name = HeartConfig::Instance()->GetMeshName() + ".pvj";
+    }
+    catch(Exception& e)
+    {
+        //HeartConfig::Instance()->GetMeshName() will throw an exception if no mesh name is defined
+        //In this case we expect the user to specify PVJ programmatically, so return immediately.
+        return;
+    }
 
-	if (junction_file.Exists())
-	{
-		std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
+    FileFinder junction_file(pvj_file_name, RelativeTo::AbsoluteOrCwd);;
 
-		// Reads in file defining nodes and resistance (separated by space)
-		while(!junction_stream.eof())
-		{
-			unsigned node_id;
-			junction_stream >> node_id;
-			double resistance;
-			junction_stream >> resistance;
+    if (junction_file.Exists())
+    {
+        std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
 
-			if(mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
-			{
-				unsigned mapped_node_id = mpMixedDimensionMesh->rGetNodePermutation()[node_id];
+        // Reads in file defining nodes and resistance (separated by space)
+        while(!junction_stream.eof())
+        {
+            unsigned node_id;
+            junction_stream >> node_id;
+            double resistance;
+            junction_stream >> resistance;
 
-				mJunctionMap[mapped_node_id] = resistance;
-			}
-			else
-			{
-				mJunctionMap[node_id] = resistance;
-			}
-		}
-	}
+            if(mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
+            {
+                unsigned mapped_node_id = mpMixedDimensionMesh->rGetNodePermutation()[node_id];
+
+                mJunctionMap[mapped_node_id] = resistance;
+            }
+            else
+            {
+                mJunctionMap[node_id] = resistance;
+            }
+        }
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
