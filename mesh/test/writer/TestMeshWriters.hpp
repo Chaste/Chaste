@@ -899,36 +899,91 @@ public:
     void TestWritingNodeAttributesInTrianglesFormat() throw (Exception)
     {
         std::string source_mesh = "mesh/test/data/1D_0_to_1_10_elements_with_attributes";
-        std::string output_dir = "node_attrs";
+        std::string output_dir = "TestWritingAttrs";
+        std::string file_from_reader = "attr_from_reader";
         std::string file_from_mesh = "attr_from_mesh";
         std::string file_from_mesh_bin = "attr_from_mesh_binary";
 
-        ///\todo #1949 Write directly from a mesh reader, requires support for node attributes in the reader
-
-        // Next, write using a mesh object
+        TetrahedralMesh<1,1> mesh;
         {
             TrianglesMeshReader<1,1> mesh_reader(source_mesh);
-            TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
-            TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
-
-            TetrahedralMesh<1,1> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Add some node attributes to the mesh
-            double node_attribute = 11;
+            double node_attribute = 11.0;
             for(TetrahedralMesh<1,1>::NodeIterator iter = mesh.GetNodeIteratorBegin();
                 iter != mesh.GetNodeIteratorEnd();
                 ++iter)
             {
                 iter->AddNodeAttribute(node_attribute--);
-                iter->AddNodeAttribute(-node_attribute);
+                iter->AddNodeAttribute(-node_attribute - 0.5);
             }
 
-            TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh, false);
+            //Add some element attributes to the mesh
+            double element_attribute = 123.4;
+            for(TetrahedralMesh<1,1>::ElementIterator iter = mesh.GetElementIteratorBegin();
+                            iter != mesh.GetElementIteratorEnd();
+                            ++iter)
+            {
+            	iter->SetAttribute(element_attribute++);
+            }
+        }
+
+        {
+            //ASCII
+        	TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh, false);
+            mesh_writer.WriteFilesUsingMesh(mesh);
+        }
+        {
+            //Binary
+        	TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh_bin, false);
+        	mesh_writer.SetWriteFilesAsBinary();
             mesh_writer.WriteFilesUsingMesh(mesh);
         }
 
-        ///\todo #1949 Check the written meshes, requires support for node attributes in the reader
+        {
+        	TrianglesMeshReader<1,1> mesh_reader_ascii(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh);
+        	TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_reader, false);
+            mesh_writer.WriteFilesUsingMeshReader(mesh_reader_ascii);
+        }
+        {
+        	TetrahedralMesh<1,1> ascii_mesh;
+        	TrianglesMeshReader<1,1> mesh_reader_ascii(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh);
+        	ascii_mesh.ConstructFromMeshReader(mesh_reader_ascii);
+
+			TetrahedralMesh<1,1> bin_mesh;
+			TrianglesMeshReader<1,1> mesh_reader_bin(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh_bin);
+			bin_mesh.ConstructFromMeshReader(mesh_reader_bin);
+
+			TetrahedralMesh<1,1> reader_mesh;
+			TrianglesMeshReader<1,1> mesh_reader_reader(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_reader);
+			reader_mesh.ConstructFromMeshReader(mesh_reader_reader);
+
+
+        	for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+
+            	std::vector<double> orig_attr = mesh.GetNode(i)->rGetNodeAttributes();
+            	std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
+            	std::vector<double> bin_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
+            	std::vector<double> reader_attr = reader_mesh.GetNode(i)->rGetNodeAttributes();
+            	TS_ASSERT_EQUALS(orig_attr.size(), ascii_attr.size());
+            	TS_ASSERT_EQUALS(orig_attr.size(), bin_attr.size());
+                ///\todo #1949 Write directly from a mesh reader, requires support for node attributes in the reader
+            	//TS_ASSERT_EQUALS(orig_attr.size(), reader_attr.size());
+            	for (unsigned attr_index=0; attr_index<orig_attr.size(); attr_index++)
+            	{
+            		TS_ASSERT_DELTA(orig_attr[attr_index], ascii_attr[attr_index], 1e-15);
+            		TS_ASSERT_DELTA(orig_attr[attr_index], bin_attr[attr_index], 1e-15);
+                    ///\todo #1949 Write directly from a mesh reader, requires support for node attributes in the reader
+            		//TS_ASSERT_DELTA(orig_attr[attr_index], reader_attr[attr_index], 1e-15);
+            	}
+            }
+
+        }
+
+
+        ///\todo #2146 Check the element attributes in written meshes
     }
 
 
