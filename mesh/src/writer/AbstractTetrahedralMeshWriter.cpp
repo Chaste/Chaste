@@ -210,11 +210,10 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
             else
             {
                 //Master doesn't own this element.
-                // +1 to allow for attribute value too
-                unsigned raw_indices[mNodesPerElement+1];
+                unsigned raw_indices[mNodesPerElement];
                 MPI_Status status;
                 //Get it from elsewhere
-                MPI_Recv(raw_indices, mNodesPerElement+1, MPI_UNSIGNED, MPI_ANY_SOURCE,
+                MPI_Recv(raw_indices, mNodesPerElement, MPI_UNSIGNED, MPI_ANY_SOURCE,
                          this->mNumNodes + mElementCounterForParallelMesh,
                          PETSC_COMM_WORLD, &status);
                 // Convert to std::vector
@@ -222,9 +221,14 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 {
                     elem_data.NodeIndices[j] = raw_indices[j];
                 }
+                // Attribute value has the same tag (assume that it doesn't overtake the previous message)
+                double attribute;
+                MPI_Recv(&attribute, 1U, MPI_DOUBLE, MPI_ANY_SOURCE,
+                         this->mNumNodes + mElementCounterForParallelMesh,
+                         PETSC_COMM_WORLD, &status);
 
                 // Attribute value
-                elem_data.AttributeValue = raw_indices[mNodesPerElement];
+                elem_data.AttributeValue = attribute;
             }
             // increment element counter
             mElementCounterForParallelMesh++;
@@ -587,8 +591,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             }
 
             // Slaves concentrate the Elements for which they are owners
-            // +1 allows for attribute value
-            unsigned raw_indices[mNodesPerElement+1]; // Assuming that we don't have parallel quadratic elements
+            unsigned raw_indices[mNodesPerElement]; // Assuming that we don't have parallel quadratic elements
             typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElementIterType;
             for (ElementIterType it = mpMesh->GetElementIteratorBegin(); it != mpMesh->GetElementIteratorEnd(); ++it)
             {
@@ -599,12 +602,15 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     {
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
-                    // Attribute value
-                    raw_indices[mNodesPerElement] = it->GetUnsignedAttribute();
 
-                    MPI_Send(raw_indices, mNodesPerElement+1, MPI_UNSIGNED, 0,
+                    MPI_Send(raw_indices, mNodesPerElement, MPI_UNSIGNED, 0,
                              this->mNumNodes + index, //Elements sent with tags offset
                              PETSC_COMM_WORLD);
+                    // Attribute value has the same tag (assume that it doesn't overtake the previous message)
+                    double attribute = it->GetAttribute();
+                    MPI_Send(&attribute, 1, MPI_DOUBLE, 0,
+							this->mNumNodes + index, //Elements sent with tags offset
+						    PETSC_COMM_WORLD);
                 }
             }
 

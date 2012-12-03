@@ -131,7 +131,6 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
     // Write the element header
     unsigned num_elements = this->GetNumElements();
-    ///\todo #1949
     num_attr = 1u; // We have a single region code
 
     // The condition below allows the writer to cope with a NodesOnlyMesh
