@@ -937,6 +937,57 @@ public:
         TS_ASSERT_EQUALS( mesh.GetNumBoundaryElements(), 3u);
     }
 
+    /**
+     * This test constructs a simple cuboid mesh and divides
+     * between two processes
+     */
+    void TestGeometricPartition() throw(Exception)
+    {
+        unsigned num_procs = PetscTools::GetNumProcs();
+        unsigned rank = PetscTools::GetMyRank();
+
+        TetrahedralMesh<3,3> test_mesh;
+        test_mesh.ConstructCuboid(num_procs-1,num_procs-1,num_procs-1);
+
+        TrianglesMeshWriter<3,3> mesh_writer("TestGeometricPartition", "TestMesh", false);
+        mesh_writer.WriteFilesUsingMesh(test_mesh);
+
+
+        std::string output_dir = mesh_writer.GetOutputDirectory();
+        TrianglesMeshReader<3,3> mesh_reader(output_dir+"TestMesh");
+
+        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
+
+        TS_ASSERT_THROWS_THIS(mesh.GetProcessRegion(), "Trying to get unset mpSpaceRegion");
+        if (PetscTools::IsParallel())   // Won't throw in serial.
+        {
+            TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "Using GEOMETRIC partition for DistributedTetrahedralMesh with local regions not set. Call SetProcessRegion(ChasteCuboid)");
+        }
+
+        ChastePoint<3> lower(-0.5, -0.5, ((double)rank-0.5));
+        ChastePoint<3> upper((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank)+0.5));
+
+        ChasteCuboid<3> cuboid(lower, upper);
+
+        mesh.SetProcessRegion(&cuboid);
+        ChasteCuboid<3>* test_cuboid = mesh.GetProcessRegion();
+        TS_ASSERT_EQUALS(test_cuboid, &cuboid);
+
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check construction is correct.
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_procs*num_procs*num_procs);
+        TS_ASSERT_EQUALS(mesh.GetNumLocalNodes(), num_procs*num_procs);
+
+        for (AbstractMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+               node_iter != mesh.GetNodeIteratorEnd();
+               ++node_iter)
+        {
+           TS_ASSERT_LESS_THAN(node_iter->rGetLocation()[2], (double)rank+0.5);
+           TS_ASSERT_LESS_THAN((double)rank-0.5, node_iter->rGetLocation()[2]);
+        }
+    }
+
 
     void TestArchiving() throw(Exception)
     {

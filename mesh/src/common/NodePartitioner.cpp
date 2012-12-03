@@ -436,6 +436,82 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
         Timer::PrintAndReset("PETSc-ParMETIS output manipulation");
     }
 }
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
+                                    std::vector<unsigned>& rNodesPermutation,
+                                    std::set<unsigned>& rNodesOwned,
+                                    std::vector<unsigned>& rProcessorsOffset,
+                                    ChasteCuboid<SPACE_DIM>* pRegion)
+{
+    PetscTools::Barrier();
+
+    unsigned num_nodes =  rMeshReader.GetNumNodes();
+
+    // Work out where each node should lie.
+    std::vector<unsigned> node_ownership(num_nodes, 0);
+    std::vector<unsigned> node_index_ownership(num_nodes, UNSIGNED_UNSET);
+
+    for (unsigned node=0; node < num_nodes; node++)
+    {
+        std::vector<double> location = rMeshReader.GetNextNode();
+
+        // Make sure it is the correct size
+        assert(location.size() == SPACE_DIM);
+
+        // Establish whether it lies in the domain. ChasteCuboid::DoesContain is
+        // insufficient for this as it treats all boundaries as open.
+        ChastePoint<SPACE_DIM> lower = pRegion->rGetLowerCorner();
+        ChastePoint<SPACE_DIM> upper = pRegion->rGetUpperCorner();
+
+        bool does_contain = true;
+
+        for (unsigned d=0; d<SPACE_DIM; d++)
+        {
+            bool boundary_check;
+            boundary_check = ((location[d] > lower[d]) || sqrt((location[d]-lower[d])*(location[d]-lower[d])) < DBL_EPSILON);
+            boundary_check *= (location[d] < upper[d]);
+            does_contain *= boundary_check;
+        }
+
+        if(does_contain)
+        {
+            node_ownership[node] = 1;
+            rNodesOwned.insert(node);
+            node_index_ownership[node] = PetscTools::GetMyRank();
+        }
+    }
+
+    // Make sure each node will be owned by exactly on process
+    std::vector<unsigned> global_ownership(num_nodes, 0);
+    std::vector<unsigned> global_index_ownership(num_nodes, UNSIGNED_UNSET);
+
+    MPI_Allreduce(&node_ownership[0], &global_ownership[0], num_nodes, MPI_UNSIGNED, MPI_LXOR, PETSC_COMM_WORLD);
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        if (global_ownership[i] == 0)
+        {
+            EXCEPTION("A node is either not in geometric region, or the regions are not disjoint.");
+        }
+    }
+
+    // Create the permutation and offset vectors.
+    MPI_Allreduce(&node_index_ownership[0], &global_index_ownership[0], num_nodes, MPI_UNSIGNED, MPI_MIN, PETSC_COMM_WORLD);
+
+    for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
+    {
+        rProcessorsOffset.push_back(rNodesPermutation.size());
+        for (unsigned node=0; node<num_nodes; node++)
+        {
+            if (global_index_ownership[node] == proc)
+            {
+                rNodesPermutation.push_back(node);
+            }
+        }
+
+    }
+    assert(rNodesPermutation.size() == num_nodes);
+}
 ////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

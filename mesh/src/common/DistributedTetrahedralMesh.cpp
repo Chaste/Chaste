@@ -64,6 +64,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
       mTotalNumElements(0u),
       mTotalNumBoundaryElements(0u),
       mTotalNumNodes(0u),
+      mpSpaceRegion(NULL),
       mMetisPartitioning(partitioningMethod)
 {
     if (ELEMENT_DIM == 1)
@@ -119,6 +120,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
             NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset);
+        }
+        else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::GEOMETRIC && PetscTools::IsParallel())
+        {
+            if (!mpSpaceRegion)
+            {
+                EXCEPTION("Using GEOMETRIC partition for DistributedTetrahedralMesh with local regions not set. Call SetProcessRegion(ChasteCuboid)");
+            }
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset, mpSpaceRegion);
         }
         else
         {
@@ -501,10 +510,26 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std:
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ChasteCuboid<SPACE_DIM>*  DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetProcessRegion()
+{
+    if (mpSpaceRegion == NULL)
+    {
+        EXCEPTION("Trying to get unset mpSpaceRegion");
+    }
+    return mpSpaceRegion;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 {
     // All the local elements are owned by the processor (obviously...)
     //Does nothing - unlike the non-distributed version
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetProcessRegion(ChasteCuboid<SPACE_DIM>* p_region)
+{
+    mpSpaceRegion = p_region;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

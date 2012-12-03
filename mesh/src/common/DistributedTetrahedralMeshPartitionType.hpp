@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * "PARMETIS_LIBRARY" is a call to the parallel parMETIS library
  * "METIS_LIBRARY" is a call to the sequential METIS library
  * "PETSC_MAT_PARTITION" is a call to parMETIS (or whatever) via PETSc functionality
+ * "GEOMETRIC" requires user to define which region of space is owned by each process.
  */
 struct DistributedTetrahedralMeshPartitionType
 {
@@ -50,7 +51,8 @@ struct DistributedTetrahedralMeshPartitionType
         DUMB=0,
         PARMETIS_LIBRARY=1,
         METIS_LIBRARY=2,
-        PETSC_MAT_PARTITION=3
+        PETSC_MAT_PARTITION=3,
+        GEOMETRIC=4
     } type;
 };
 

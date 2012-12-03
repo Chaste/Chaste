@@ -89,6 +89,9 @@ private:
     /** A map from boundary element global index to local index used by this process. */
     std::map<unsigned, unsigned> mBoundaryElementsMapping;
 
+    /** The region of space owned by this process, if using geometric partition. */
+    ChasteCuboid<SPACE_DIM>* mpSpaceRegion;
+
     /** Partitioning method. */
     DistributedTetrahedralMeshPartitionType::type mMetisPartitioning;
 
@@ -202,6 +205,19 @@ public:
      */
     void GetHaloNodeIndices(std::vector<unsigned>& rHaloIndices) const;
 
+    /**
+     * Set the local region of space to be owned by this process
+     *
+     * @param region The region, defined by a ChasteCuboid.
+     */
+    void SetProcessRegion(ChasteCuboid<SPACE_DIM>* p_region);
+
+    /**
+     * Get the local region of space owned by this process
+     *
+     * @return mSpaceRegion
+     */
+    ChasteCuboid<SPACE_DIM>* GetProcessRegion();
 
     /**
      * Determine whether or not the current process owns node 0 of this element (tie breaker to determine which process writes
