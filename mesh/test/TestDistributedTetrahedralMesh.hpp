@@ -964,16 +964,20 @@ public:
             TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "Using GEOMETRIC partition for DistributedTetrahedralMesh with local regions not set. Call SetProcessRegion(ChasteCuboid)");
         }
 
-        ChastePoint<3> lower_wrong(0.5, -0.5, ((double)rank-0.5));
-        ChastePoint<3> upper_wrong((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank)+0.5));
+        // Test throwing an exception if a node doesn't lie in the union of the regions, or regions are not disjoint.
+        if (PetscTools::IsParallel())
+        {
+            ChastePoint<3> lower_wrong(-0.5, -0.5, ((double)rank+0.5));
+            ChastePoint<3> upper_wrong((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank+1)+0.5));
 
-        ChasteCuboid<3> cuboid_wrong(lower_wrong, upper_wrong);
+            ChasteCuboid<3> cuboid_wrong(lower_wrong, upper_wrong);
 
-        mesh.SetProcessRegion(&cuboid_wrong);
-        ChasteCuboid<3>* test_cuboid = mesh.GetProcessRegion();
-        TS_ASSERT_EQUALS(test_cuboid, &cuboid_wrong);
+            mesh.SetProcessRegion(&cuboid_wrong);
+            ChasteCuboid<3>* test_cuboid = mesh.GetProcessRegion();
+            TS_ASSERT_EQUALS(test_cuboid, &cuboid_wrong);
 
-        TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "A node is either not in geometric region, or the regions are not disjoint.");
+            TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "A node is either not in geometric region, or the regions are not disjoint.");
+        }
 
         ChastePoint<3> lower(-0.5, -0.5, ((double)rank-0.5));
         ChastePoint<3> upper((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank)+0.5));
@@ -981,6 +985,11 @@ public:
         ChasteCuboid<3> cuboid(lower, upper);
 
         mesh.SetProcessRegion(&cuboid);
+
+        // Make a new mesh reader
+        TrianglesMeshReader<3,3> mesh_reader2(output_dir+"TestMesh");
+
+        mesh.ConstructFromMeshReader(mesh_reader2);
 
         // Check construction is correct.
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_procs*num_procs*num_procs);

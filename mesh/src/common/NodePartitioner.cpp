@@ -491,7 +491,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
     {
         if (global_ownership[i] == 0)
         {
+#define COVERAGE_IGNORE //Cannot cover in serial.
             EXCEPTION("A node is either not in geometric region, or the regions are not disjoint.");
+#undef COVERAGE_IGNORE
         }
     }
 
