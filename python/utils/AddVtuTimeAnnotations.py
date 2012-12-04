@@ -61,8 +61,11 @@ def QueryVtuFile(inputFileName, nameTimePair):
        match = nameTimePair.search(line)
        if (match):
          time_step = int(match.group(2))
+         # Either 
+         #  all the data for a time_step comes together so time goes 0 0 0 1 1 1 2 2 2 ...
+         #  all the data for VarA comes together 0 1 2 3 ... then VarB etc.
          if ( time_step != last_time ):
-             assert( time_step == last_time + 1)
+             assert( time_step == last_time + 1 or time_step == 0)
              last_time = time_step
     return time_step
 
