@@ -964,16 +964,23 @@ public:
             TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "Using GEOMETRIC partition for DistributedTetrahedralMesh with local regions not set. Call SetProcessRegion(ChasteCuboid)");
         }
 
+        ChastePoint<3> lower_wrong(0.5, -0.5, ((double)rank-0.5));
+        ChastePoint<3> upper_wrong((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank)+0.5));
+
+        ChasteCuboid<3> cuboid_wrong(lower_wrong, upper_wrong);
+
+        mesh.SetProcessRegion(&cuboid_wrong);
+        ChasteCuboid<3>* test_cuboid = mesh.GetProcessRegion();
+        TS_ASSERT_EQUALS(test_cuboid, &cuboid_wrong);
+
+        TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "A node is either not in geometric region, or the regions are not disjoint.");
+
         ChastePoint<3> lower(-0.5, -0.5, ((double)rank-0.5));
         ChastePoint<3> upper((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank)+0.5));
 
         ChasteCuboid<3> cuboid(lower, upper);
 
         mesh.SetProcessRegion(&cuboid);
-        ChasteCuboid<3>* test_cuboid = mesh.GetProcessRegion();
-        TS_ASSERT_EQUALS(test_cuboid, &cuboid);
-
-        mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check construction is correct.
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_procs*num_procs*num_procs);

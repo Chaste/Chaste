@@ -91,7 +91,7 @@ public:
     /**
      * Specialised method to compute the partition of a mesh based on geometric partitioning
      *
-     * @param rMesh is the original mesh (so that we can set the DistributedVectorFactory up
+     * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
      * @param rNodesPermutation is the vector to be filled with node permutation information.
      * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
      * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
