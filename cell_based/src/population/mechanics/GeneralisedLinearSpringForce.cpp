@@ -214,13 +214,13 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
         {
             //log(x+1) is undefined for x<=-1
             assert(overlap > -rest_length_final);
-            c_vector<double, SPACE_DIM> temp = spring_stiffness * unit_difference * rest_length_final* log(1.0 + overlap/rest_length_final);
+            c_vector<double, SPACE_DIM> temp = multiplication_factor*spring_stiffness * unit_difference * rest_length_final* log(1.0 + overlap/rest_length_final);
             return temp;
         }
         else
         {
             double alpha = 5.0;
-            c_vector<double, SPACE_DIM> temp = spring_stiffness * unit_difference * overlap * exp(-alpha * overlap/rest_length_final);
+            c_vector<double, SPACE_DIM> temp = multiplication_factor*spring_stiffness * unit_difference * overlap * exp(-alpha * overlap/rest_length_final);
             return temp;
         }
     }
