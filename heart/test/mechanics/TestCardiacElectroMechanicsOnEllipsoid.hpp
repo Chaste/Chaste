@@ -46,27 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshWriter.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-
-// a helper method for computing the average edge length (in cm) of a given mesh
-template<unsigned DIM>
-double ComputeAverageEdgeLength(TetrahedralMesh<DIM,DIM>& rMesh)
-{
-    unsigned num_edges = 0;
-    double average_edge_length = 0.0;
-    for(TetrahedralMesh<3,3>::EdgeIterator iter = rMesh.EdgesBegin();
-        iter != rMesh.EdgesEnd();
-        ++iter)
-    {
-        double edge_length = norm_2(iter.GetNodeA()->rGetLocation() - iter.GetNodeB()->rGetLocation());
-        average_edge_length += edge_length;
-        num_edges++;
-    }
-    average_edge_length /= num_edges;
-    return average_edge_length;
-}
-
-
-
 class ApexStimulusCellFactory : public AbstractCardiacCellFactory<3>
 {
 private:
@@ -96,7 +75,7 @@ public:
 };
 
 
-// Obviously only run this test with build=GccOpt_ndebug.
+// Obviously only run this test with an optimised build such as build=GccOpt_ndebug.
 //
 // To watch progress, run from the command line with -mech_very_verbose -mesh_pair_verbose
 
@@ -130,10 +109,11 @@ public:
             mechanics_mesh.ConstructFromMeshReader(reader2);
         }
 
-        double average_edge_length_electrics = ComputeAverageEdgeLength<3>(electrics_mesh);
-        double average_edge_length_mechanics = ComputeAverageEdgeLength<3>(mechanics_mesh);
-        std::cout << "Average edge length of electrics and mechanics meshes are, respectively: "
-                  << average_edge_length_electrics << " " << average_edge_length_mechanics << "\n";
+        c_vector<double, 2> edge_length_electrics = electrics_mesh.CalculateMinMaxEdgeLengths();
+        c_vector<double, 2> edge_length_mechanics = mechanics_mesh.CalculateMinMaxEdgeLengths();
+        std::cout << "Typical edge length of electrics and mechanics meshes are, respectively: "
+                  << (edge_length_electrics[0] + edge_length_electrics[1])/2.0 << " " << 
+                     (edge_length_mechanics[0] + edge_length_mechanics[1])/2.0<< "\n";
 
 
         ////////////////////////////////////////////////////////////////

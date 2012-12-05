@@ -208,9 +208,9 @@ public:
     /**
      * Set the local region of space to be owned by this process
      *
-     * @param region The region, defined by a ChasteCuboid.
+     * @param pRegion The region, defined by a ChasteCuboid.
      */
-    void SetProcessRegion(ChasteCuboid<SPACE_DIM>* p_region);
+    void SetProcessRegion(ChasteCuboid<SPACE_DIM>* pRegion);
 
     /**
      * Get the local region of space owned by this process

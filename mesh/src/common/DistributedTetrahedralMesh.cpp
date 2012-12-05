@@ -527,9 +527,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetProcessRegion(ChasteCuboid<SPACE_DIM>* p_region)
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetProcessRegion(ChasteCuboid<SPACE_DIM>* pRegion)
 {
-    mpSpaceRegion = p_region;
+    mpSpaceRegion = pRegion;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
