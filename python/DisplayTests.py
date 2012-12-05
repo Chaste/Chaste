@@ -562,12 +562,13 @@ def _profileHistory(req, n=20, buildTypes=None):
             k = (row['revision'], row['build_type'])
             if not k in builds:
                 builds[k] = set()
-            builds[k].add(row['machine'])
+            machine = _canonical_machine_name(row['machine'])
+            builds[k].add(machine)
             # The run_times dictionary
             if row['suite_name'] not in inf_test_names:
                 if not row['suite_name'] in run_times:
                     run_times[row['suite_name']] = {}
-                k = (row['revision'], row['build_type'], row['machine'])
+                k = (row['revision'], row['build_type'], machine)
                 run_times[row['suite_name']][k] = (row['run_time'], row['suite_status'])
         for k in builds:
             builds[k] = list(builds[k])
@@ -577,6 +578,7 @@ def _profileHistory(req, n=20, buildTypes=None):
             rev_dir = os.path.join(tests_dir, str(revision))
             for machine_and_build_type in os.listdir(rev_dir):
                 machine, build_type = _extractDotSeparatedPair(machine_and_build_type)
+                machine = _canonical_machine_name(machine)
                 if build_type in buildTypes:
                     k = (revision, build_type)
                     if not builds.has_key(k):
@@ -587,6 +589,7 @@ def _profileHistory(req, n=20, buildTypes=None):
         for revision in revisions:
             for build_type in buildTypes:
                 for machine in builds.get((revision, build_type), []):
+                    machine = _canonical_machine_name(machine)
                     k = (revision, build_type, machine)
                     d = _testResultsDir('nightly', revision, machine, build_type)
                     statuses, _, _, runtimes, _ = _getTestStatus(d, build)
@@ -672,6 +675,17 @@ def _profileHistory(req, n=20, buildTypes=None):
     
     return ''.join(output)
 
+def _canonical_machine_name(machine):
+    """Handle the .comlab -> .cs DNS change, mapping old results to the new names."""
+    return machine.replace('.comlab.ox.ac.uk', '.cs.ox.ac.uk')
+
+def _machine_name_aliases(machine):
+    """Handle the .comlab -> .cs DNS change, returning a tuple of possible names for the given machine."""
+    names = [machine]
+    if machine.endswith('.cs.ox.ac.uk'):
+        names.append(machine.replace('.cs.ox.ac.uk', '.comlab.ox.ac.uk'))
+    return tuple(names)
+
 def _handle_renamed_test_suites(runTimes, graphs={}):
     """Cope with the test result naming convention change in #2195.
     
@@ -715,9 +729,11 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
         db.FastUpdate()
         aliases = _test_suite_name_aliases(testSuite)
         suite_test = 'suite_name in (%s)' % ','.join(['?'] * len(aliases))
-        cur = db.conn.execute('select revision, run_time from details where build_type=? and machine=? and '
-                              + suite_test + ' order by revision desc limit ?',
-                              (buildType, machine) + aliases + (n,))
+        machines = _machine_name_aliases(machine)
+        machine_test = 'machine in (%s)' % ','.join(['?'] * len(machines))
+        cur = db.conn.execute('select revision, run_time from details where build_type=? and ' + machine_test
+                              + ' and ' + suite_test + ' order by revision desc limit ?',
+                              (buildType,) + machines + aliases + (n,))
         run_times = [(row['revision'], row['run_time']) for row in cur]
         run_times.reverse()
     else:
@@ -831,11 +847,14 @@ def _extractDotSeparatedPair(string):
     return string[:i], string[i+1:]
 
 def _testResultsDir(type, revision, machine, buildType):
+    """Get the full path to a test results folder.
+    This can cope with build machine renamings, using _machine_name_aliases.
     """
-    Return the directory in which test results are stored for this
-    test type, code revision, build machine and build type.
-    """
-    return os.path.join(_tests_dir, type, str(revision), machine+'.'+buildType)
+    for machine in reversed(_machine_name_aliases(machine)):
+        results_path = os.path.join(_tests_dir, type, str(revision), machine+'.'+buildType)
+        if os.path.isdir(results_path):
+            break
+    return results_path
 
 _testSummaryRegexp = re.compile(r' *Overall status: <span style="color: (\w+);">(.*)</span>')
 def _getTestSummary(test_set_dir, build):
