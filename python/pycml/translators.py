@@ -53,7 +53,7 @@ import optimize
 import processors
 import validator
 
-__version__ = "$Revision: 17001 $"[11:-2]
+__version__ = "$Revision$"[11:-2]
 
 def version_comment(note_time=True):
     """Generate a version comment, with optional time info."""
@@ -662,7 +662,7 @@ class CellMLTranslator(object):
         decrement operations.
         """
         n = self.eval_number(expr)
-        num = "%.12g" % n
+        num = "%.17g" % n
         if num[0] == '-':
             num = ' ' + num
         if not '.' in num and not 'e' in num:
@@ -3275,7 +3275,7 @@ class CellMLToMapleTranslator(CellMLTranslator):
         decrement operations.
         """
         n = self.eval_number(expr)
-        num = "%.12g" % n
+        num = "%.17g" % n
         if num[0] == '-':
             num = ' ' + num
         self.write(num)
@@ -3644,7 +3644,7 @@ class CellMLToHaskellTranslator(CellMLTranslator):
         We do need to bracket negative numbers.
         """
         n = self.eval_number(expr)
-        num = "%.12g" % n
+        num = "%.17g" % n
         if num[0] == '-':
             num = "(" + num + ")"
         tc = ['Num', 'Number'][as_value]
@@ -3912,7 +3912,7 @@ class CellMLToMatlabTranslator(CellMLTranslator):
         decrement operations.
         """
         n = self.eval_number(expr)
-        num = "%.12g" % n
+        num = "%.17g" % n
         if num[0] == '-':
             num = ' ' + num
         self.write(num)

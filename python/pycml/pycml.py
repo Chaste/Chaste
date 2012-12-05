@@ -4087,7 +4087,7 @@ class mathml_constructor(mathml):
             # Add a new <units> element to the document if needed
             attrs = self._ensure_units_exist()
             new_elt = self.xml_create_element(u'cn', NSS[u'm'],
-                                              content=unicode("%.12g" % value),
+                                              content=unicode("%.17g" % value),
                                               attributes=attrs)
         return new_elt
 
@@ -4266,7 +4266,7 @@ class mathml_ci(mathml, mathml_units_mixin_tokens):
             value = self.evaluate()
             attrs = {(u'cml:units', NSS[u'cml']): self.variable.units}
             cn = self.xml_create_element(u'cn', NSS[u'm'],
-                                         content=unicode("%.12g" % value),
+                                         content=unicode("%.17g" % value),
                                          attributes=attrs)
             DEBUG('partial-evaluator', "  value =", unicode(cn))
             self._xfer_complexity(cn)
