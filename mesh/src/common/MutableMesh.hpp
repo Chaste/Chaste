@@ -66,12 +66,15 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
     {
         archive & boost::serialization::base_object<TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
 
-        // Do a remesh after archiving has finished to get right number of boundary nodes etc.
+        // If ELEMENT_DIM=SPACEDIM Do a remesh after archiving has finished to get right number of boundary nodes etc.
         // (strictly only relevant for load - but doesn't take long in the scheme of things.)
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
-        NodeMap map(this->GetNumNodes());
-        this->ReMesh(map);
-        assert(map.IsIdentityMap()); // Otherwise the mesh will get VERY confused.
+        if(ELEMENT_DIM==SPACE_DIM)
+        {
+        	NodeMap map(this->GetNumNodes());
+        	this->ReMesh(map);
+        	assert(map.IsIdentityMap()); // Otherwise the mesh will get VERY confused.
+        }
     }
 
 protected:
