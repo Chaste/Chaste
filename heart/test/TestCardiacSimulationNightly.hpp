@@ -54,7 +54,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "base_bidomain_results", false,
-                   foldername, "SimulationResults", true));
+                                                 foldername, "SimulationResults", true, 1e-9));
     }
 
     void TestCardiacSimulationBasicMonodomain() throw(Exception)
@@ -65,7 +65,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "base_monodomain_results", false,
-                   foldername, "SimulationResults", true));
+                                                 foldername, "SimulationResults", true, 1e-9));
     }
 
     void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
@@ -76,7 +76,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "postprocess_monodomain_results", false,
-                   foldername, "SimulationResults", true));
+                                                 foldername, "SimulationResults", true, 1e-9));
     }
 
     void TestCardiacSimulationSaveBidomain() throw(Exception)
@@ -87,7 +87,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_bidomain_results", false,
-                   foldername, "SimulationResults", true));
+                                                 foldername, "SimulationResults", true, 1e-9));
 
         FileFinder file(foldername + "_checkpoints/10ms/" + foldername + "_10ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);

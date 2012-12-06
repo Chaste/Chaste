@@ -1,4 +1,4 @@
-Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
+Warning: These have been filtered by  /home/chaste/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
 This means that all floating point numbers have been rounded to  8  decimal places.
 0
 0
@@ -48961,7 +48961,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 5e-08
 3e-08
 2e-08
-8e-09
+1e-08
 -0.0
 -2e-08
 -4e-08
@@ -49161,7 +49161,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -7e-08
 -6e-08
 -6e-08
-8e-09
+1e-08
 1e-08
 1e-08
 2e-08
@@ -379701,4 +379701,4 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 8.85922
 8.85922
 8.85922
-# Created by Chaste version 3.1.17358 (with uncommitted modifications) on Thu, 15 Nov 2012 15:31:30 +0000.  Chaste was built on Wed, 14 Nov 2012 14:54:46 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, no Chaste libraries.  Checked-out project versions: jmpf=17163:17174; papers=exported.
+# Created by Chaste version 3.1.17574 on Thu, 06 Dec 2012 15:12:33 +0000.  Chaste was built on Thu, 06 Dec 2012 14:57:13 +0000 by machine (uname) 'Linux userpc58.cs.ox.ac.uk 2.6.32-43-generic #97-Ubuntu SMP Wed Sep 5 16:42:26 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: FunctionalCuration=17565; SimpleSensitivity=17567:17572; VascularTumour=15738.
