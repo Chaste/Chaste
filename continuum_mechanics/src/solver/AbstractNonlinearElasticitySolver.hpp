@@ -275,7 +275,7 @@ protected:
     bool mTakeFullFirstNewtonStep;
     
     /**
-     *  Get Petsc to do a direct solve
+     *  Get Petsc to do a (almost) direct solve
      */
     bool mPetscDirectSolve;
 
@@ -673,9 +673,11 @@ public:
 	/**
 	 *  Get Petsc to do a direct solve on the linear system (instead of using
 	 *  an iterative solve). This is equivalent to passing in command line
-	 *  arguments -ksp_type pre_only -pc_type lu through to Petsc, but also
-	 *  makes sure the preconditioner is equal to the Jacobian in the incompressible
-	 *  case. Using a direct solve can lead to huge computation time savings if
+	 *  arguments -ksp_type pre_only -pc_type lu through to Petsc, but in the incompressible
+	 *  case the preconditioner is set equal to the Jacobian with a mass matrix in the
+	 *  pressure-pressure block (to avoid zeros on the diagonal. Hence a few linear solve
+	 *  iterations are required for this case. Using a direct solve can lead to huge
+	 *  computation time savings if
 	 *  there is enough memory for it: the linear solve may be faster and 
 	 *  nonlinear convergence likely to be much better, as the linear solve is exact.
 	 *  
@@ -1525,7 +1527,10 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
 
     if (mPetscDirectSolve)
     {
-        KSPSetType(solver,KSPPREONLY);
+        if(this->mCompressibilityType==COMPRESSIBLE)
+        {
+            KSPSetType(solver,KSPPREONLY);
+        }
         PCSetType(pc, PCLU);
     }
     else
@@ -1617,9 +1622,8 @@ template<unsigned DIM>
 double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
 {
     double norm;
-///\todo Change to NORM_1 and remove the division by mNumDofs...    
-    VecNorm(this->mResidualVector, NORM_2, &norm);
-    return norm/this->mNumDofs;
+    VecNorm(this->mResidualVector, NORM_1, &norm);
+    return norm;
 }
 
 template<unsigned DIM>
