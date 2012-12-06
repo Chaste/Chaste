@@ -116,7 +116,7 @@ void DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::ComputeDistanceMap(
         bool termination = WorkOnLocalQueue(rNodeDistances);
 
         // Sanity - check that we aren't doing this very many times
-        if (mRoundCounter++ > 3 * PetscTools::GetNumProcs())
+        if (mRoundCounter++ > 10 * PetscTools::GetNumProcs())
         {
             // This line will be hit if there's a parallel distributed mesh with a really bad partition
             NEVER_REACHED;
