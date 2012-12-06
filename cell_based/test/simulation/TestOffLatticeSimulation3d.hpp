@@ -311,6 +311,10 @@ public:
         simulator2.AddForce(p_linear_force);
 
         simulator2.Solve();
+
+        // For coverage check that mUpdateCellPopulation is archived
+        simulator2.SetUpdateCellPopulationRule(false);
+
         CellBasedSimulationArchiver<3, OffLatticeSimulation<3> >::Save(&simulator2);
 
         // To check consistency with for test below
@@ -344,6 +348,7 @@ public:
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
             CellPtr p_cell = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23u);
             TS_ASSERT_DELTA(p_simulator->rGetCellPopulation().GetNode(23)->rGetLocation()[2], mLocationWithoutGhosts, 1e-6);
+            TS_ASSERT(!p_simulator->GetUpdateCellPopulationRule());
 
             delete p_simulator;
         }

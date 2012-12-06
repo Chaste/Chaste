@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * of all the various AbstractCellBasedSimulation objects. It has no explicit constructor
  * (just uses a default one) and no member variables.
  */
-template<unsigned DIM, class SIM>
+template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class CellBasedSimulationArchiver
 {
 public:
@@ -83,9 +83,8 @@ public:
     static void Save(SIM* pSim);
 };
 
-
-template<unsigned DIM, class SIM>
-SIM* CellBasedSimulationArchiver<DIM, SIM>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
+template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
+SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
 {
     /**
      * Find the right archive (and mesh) to load.  The files are contained within
@@ -112,8 +111,8 @@ SIM* CellBasedSimulationArchiver<DIM, SIM>::Load(const std::string& rArchiveDire
     return p_sim;
 }
 
-template<unsigned DIM, class SIM>
-void CellBasedSimulationArchiver<DIM, SIM>::Save(SIM* pSim)
+template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
+void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
 {
     // Get the simulation time as a string
     const SimulationTime* p_sim_time = SimulationTime::Instance();

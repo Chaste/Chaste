@@ -358,6 +358,13 @@ public:
     void SetUpdateCellPopulationRule(bool updateCellPopulation);
 
     /**
+     * Return whether to update the topology of the cell population at each time step.
+     *
+     * @return whether to update the cell population each time step
+     */
+    bool GetUpdateCellPopulationRule();
+
+    /**
      * Add a cell killer to be used in this simulation.
      *
      * @param pCellKiller pointer to a cell killer

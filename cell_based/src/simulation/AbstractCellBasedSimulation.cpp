@@ -244,6 +244,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetUpdateCellPopulation
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetUpdateCellPopulationRule()
+{
+    return mUpdateCellPopulation;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetNoBirth(bool noBirth)
 {
     mNoBirth = noBirth;
