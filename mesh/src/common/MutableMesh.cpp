@@ -793,39 +793,50 @@ std::vector<c_vector<Node<SPACE_DIM>*, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>:
     
     while(long_edge_exists)
     {
-        bool loop_over_elements_and_nodes = true;
+        bool is_iterator_valid = true;
 
         // Loop over elements to check for Long edges
-	for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
-	     elem_iter != this->GetElementIteratorEnd() && loop_over_elements_and_nodes;
-	     ++elem_iter)
-	{
-	    unsigned num_nodes = ELEMENT_DIM+1;
-	    
-	    // Loop over element vertices
-	    for (unsigned local_index=0; local_index<num_nodes && loop_over_elements_and_nodes; local_index++)
-	    {
-	        // Find locations of current node (node a) and anticlockwise node (node b)
-	        Node<SPACE_DIM>* p_node_a = elem_iter->GetNode(local_index);
-		unsigned local_index_plus_one = (local_index+1)%num_nodes; /// \todo use iterators to tidy this up
-		Node<SPACE_DIM>* p_node_b = elem_iter->GetNode(local_index_plus_one);
-		
-		// Find distance between nodes
-		double distance_between_nodes = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
-		
-		if (distance_between_nodes > cutoffLength)
-		{
-		    SplitEdge(p_node_a, p_node_b);
-		    
-		    // Reset the element and node loops to avoid messing with the itterator
-		    loop_over_elements_and_nodes = false;
-		}
-	    }
-	}
-	if (loop_over_elements_and_nodes)
-	{
-	    long_edge_exists = false;
-	}
+        for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
+             elem_iter != this->GetElementIteratorEnd();
+             ++elem_iter)
+        {
+            unsigned num_nodes = ELEMENT_DIM+1;
+
+            // Loop over element vertices
+            for (unsigned local_index=0; local_index<num_nodes; local_index++)
+            {
+                // Find locations of current node (node a) and anticlockwise node (node b)
+                Node<SPACE_DIM>* p_node_a = elem_iter->GetNode(local_index);
+                unsigned local_index_plus_one = (local_index+1)%num_nodes; /// \todo use iterators to tidy this up
+                Node<SPACE_DIM>* p_node_b = elem_iter->GetNode(local_index_plus_one);
+
+                // Find distance between nodes
+                double distance_between_nodes = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
+
+                if (distance_between_nodes > cutoffLength)
+                {
+                    SplitEdge(p_node_a, p_node_b);
+
+                    is_iterator_valid = false;
+                    break;
+                }
+            }
+
+            /*
+             *  SplitEdge is likely to have invalidated elem_iter (if it has triggered a reallocation of mElements when pushing back).
+             *  If that's the case, calling ++elem_iter or checking the loop guard has undefined behaviour. Break the loop instead.
+             */
+            if (!is_iterator_valid)
+            {
+            	break;
+            }
+        }
+
+        // No call to SplitEdge has happened. No long edges have been found.
+        if (is_iterator_valid)
+        {
+            long_edge_exists = false;
+        }
     }
 
     return history;
@@ -839,8 +850,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Nod
 
     std::set<unsigned> intersection_elements;
     std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
-			  elements_of_node_b.begin(), elements_of_node_b.end(),
-			  std::inserter(intersection_elements, intersection_elements.begin()));
+                          elements_of_node_b.begin(), elements_of_node_b.end(),
+                          std::inserter(intersection_elements, intersection_elements.begin()));
     
     // Create the new node
     c_vector<double, SPACE_DIM> new_node_location = pNodeA->rGetLocation() + 0.5*this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
@@ -857,18 +868,18 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Nod
 
         Element<ELEMENT_DIM,SPACE_DIM>* p_original_element = this->GetElement(elementIndex);
 
-	// First, make a copy of the current element and assign an unused index
+        // First, make a copy of the current element and assign an unused index
         Element<ELEMENT_DIM,SPACE_DIM>* p_new_element = new Element<ELEMENT_DIM,SPACE_DIM>(*p_original_element, UINT_MAX);
 
-        // Secon, add the new element to the set of existing elements. This method will assign a proper index to the element.
+        // Second, add the new element to the set of existing elements. This method will assign a proper index to the element.
         AddElement(p_new_element);
 
         // Third, update node a in the element with the new one
-	p_new_element->ReplaceNode(pNodeA, this->mNodes[new_node_index]);
+        p_new_element->ReplaceNode(pNodeA, this->mNodes[new_node_index]);
 
         // Last, update node b in the original element with the new one
         p_original_element->ReplaceNode(pNodeB, this->mNodes[new_node_index]);
-	
+
     }
 }
 
