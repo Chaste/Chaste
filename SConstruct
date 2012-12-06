@@ -68,6 +68,7 @@ import glob
 import socket
 import time
 
+
 import SCons
 
 sys.path[0:0] = ['python/infra', 'python/hostconfig', 'python']
@@ -131,7 +132,7 @@ compile_only = int(ARGUMENTS.get('compile_only', ARGUMENTS.get('co', 0)))
 Export('compile_only')
 
 # Special offline mode which doesn't run tests, but writes a script to run them separately
-offline_mode = int(ARGUMENTS.get('offline_mode', 0))
+offline_mode = int(ARGUMENTS.get('offline_mode', ARGUMENTS.get('om', 0)))
 Export('offline_mode')
 if offline_mode:
     compile_only = 1
@@ -561,16 +562,20 @@ if not BUILD_TARGETS:
     BUILD_TARGETS.extend(DEFAULT_TARGETS)
 
 
-# Temporary work towards #136
 if offline_mode:
     ld_lib_paths = other_libpaths
     if use_chaste_libs and not static_libs:
         ld_lib_paths[0:0] = [Dir('lib').abspath]
-    handle = open('run-tests.sh', 'w')
-    handle.write('#!/bin/bash\n\n')
-    print >> handle, "LD_LIBRARY_PATH=" + ':'.join(ld_lib_paths)
-    print >> handle, "PATH=" + env['ENV']['PATH']
+    # \todo #136: Make the template file an argument 
+    Execute(Copy('run-tests.sh','python/infra/offline_template.sh'))
+    handle = open('run-tests.sh', 'a')
+    print >> handle, ""
+    print >> handle, "export LD_LIBRARY_PATH=" + ':'.join(ld_lib_paths)
+    print >> handle, "export PATH=" + env['ENV']['PATH']
+    print >> handle, ""
+    #print >> handle, "export MPI_LAUNCH_COMMAND="
     for runner in offline_test_runners:
-        print >> handle, runner[0]
+        print >> handle, "$MPI_LAUNCH_COMMAND", runner[0]
+    print >> handle, ""
     handle.close()
     os.chmod('run-tests.sh', 0740)
