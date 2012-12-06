@@ -686,7 +686,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
 
 
-        std::vector<c_vector<Node<3>*, 3> > changeHistory;
+        std::vector<c_vector<unsigned, 3> > changeHistory;
 
         // Split central edge
         changeHistory = mesh.SplitLongEdges(1.1);
@@ -716,7 +716,12 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
         TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 3u);
 
-        // todo check and output change History
+        // Check changeHistory
+        TS_ASSERT_EQUALS(changeHistory.size(), 1u);
+        TS_ASSERT_EQUALS(changeHistory[0][0], 4u);
+        TS_ASSERT_EQUALS(changeHistory[0][1], 2u);
+        TS_ASSERT_EQUALS(changeHistory[0][2], 0u);
+
 
         // Split 4 sides
         changeHistory = mesh.SplitLongEdges(0.9);
@@ -771,7 +776,24 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(1), 4u);
         TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(2), 8u);
 
-        // todo check and output change History
+        // Check changeHistory
+        TS_ASSERT_EQUALS(changeHistory.size(), 4u);
+
+        TS_ASSERT_EQUALS(changeHistory[0][0], 5u);
+        TS_ASSERT_EQUALS(changeHistory[0][1], 1u);
+        TS_ASSERT_EQUALS(changeHistory[0][2], 2u);
+
+        TS_ASSERT_EQUALS(changeHistory[1][0], 6u);
+        TS_ASSERT_EQUALS(changeHistory[1][1], 2u);
+        TS_ASSERT_EQUALS(changeHistory[1][2], 3u);
+
+        TS_ASSERT_EQUALS(changeHistory[2][0], 7u);
+        TS_ASSERT_EQUALS(changeHistory[2][1], 0u);
+        TS_ASSERT_EQUALS(changeHistory[2][2], 1u);
+
+        TS_ASSERT_EQUALS(changeHistory[3][0], 8u);
+        TS_ASSERT_EQUALS(changeHistory[3][1], 3u);
+        TS_ASSERT_EQUALS(changeHistory[3][2], 0u);
     }
 };
 

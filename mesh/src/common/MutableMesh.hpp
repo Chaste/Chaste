@@ -278,7 +278,7 @@ public:
      * @param cutoffLength cutoff length for edge splitting
      * @return returns a vector of triples with pointers to the new node followed by pointers to the nodes defining the bisected edge.
      */
-    std::vector<c_vector<Node<SPACE_DIM>*, 3> > SplitLongEdges(double cutoffLength);
+    std::vector<c_vector<unsigned, 3> > SplitLongEdges(double cutoffLength);
 #undef COVERAGE_IGNORE
 
     /**
@@ -286,8 +286,9 @@ public:
      *
      * @param pNodeA first point defining the edge
      * @param pNodeB second point defining the edge
+     * @return the index of the new node
      */
-    void SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+    unsigned SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
 #define COVERAGE_IGNORE
     /**

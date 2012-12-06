@@ -781,12 +781,12 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<c_vector<Node<SPACE_DIM>*, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
+std::vector<c_vector<unsigned, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
     assert(ELEMENT_DIM == 2);
     assert(SPACE_DIM == 3);
 
-    std::vector<c_vector<Node<SPACE_DIM>*, 3> > history;
+    std::vector<c_vector<unsigned, 3> > history;
     
     
     bool long_edge_exists = true;
@@ -815,7 +815,14 @@ std::vector<c_vector<Node<SPACE_DIM>*, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>:
 
                 if (distance_between_nodes > cutoffLength)
                 {
-                    SplitEdge(p_node_a, p_node_b);
+                    unsigned new_node_index = SplitEdge(p_node_a, p_node_b);
+
+                    c_vector<unsigned, 3> node_set;
+                    node_set(0) = new_node_index;
+                    node_set(1) = p_node_a->GetIndex();
+                    node_set(2) = p_node_b->GetIndex();
+
+                    history.push_back(node_set);
 
                     is_iterator_valid = false;
                     break;
@@ -843,7 +850,7 @@ std::vector<c_vector<Node<SPACE_DIM>*, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>:
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
     std::set<unsigned> elements_of_node_a = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> elements_of_node_b = pNodeB->rGetContainingElementIndices();
@@ -881,6 +888,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Nod
         p_original_element->ReplaceNode(pNodeB, this->mNodes[new_node_index]);
 
     }
+
+    return new_node_index;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
