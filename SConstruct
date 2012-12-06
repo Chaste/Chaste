@@ -563,6 +563,7 @@ if not BUILD_TARGETS:
 
 
 if offline_mode:
+    import UserList
     ld_lib_paths = other_libpaths
     if use_chaste_libs and not static_libs:
         ld_lib_paths[0:0] = [Dir('lib').abspath]
@@ -573,9 +574,13 @@ if offline_mode:
     print >> handle, "export LD_LIBRARY_PATH=" + ':'.join(ld_lib_paths)
     print >> handle, "export PATH=" + env['ENV']['PATH']
     print >> handle, ""
-    #print >> handle, "export MPI_LAUNCH_COMMAND="
     for runner in offline_test_runners:
-        print >> handle, "$MPI_LAUNCH_COMMAND", runner[0]
+        if isinstance(runner, (list, UserList.UserList)):
+            # For chaste_libs=1
+            print >> handle, "$MPI_LAUNCH_COMMAND", runner[0]
+        else:
+            # For chaste_libs=-
+            print >> handle, "$MPI_LAUNCH_COMMAND", runner
     print >> handle, ""
     handle.close()
     os.chmod('run-tests.sh', 0740)
