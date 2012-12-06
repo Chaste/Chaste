@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Kerchoffs2003ContractionModel.hpp"
 #include "NonPhysiologicalContractionModel.hpp"
 #include "FakeBathContractionModel.hpp"
+#include "ConstantActiveTension.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
@@ -68,6 +69,11 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
             //tissue node
             switch(contractionModelName)
             {
+                case CONSTANT:
+                {
+                    p_contraction_model = new ConstantActiveTension;
+                    break;
+                }
                 case NONPHYSIOL1:
                 case NONPHYSIOL2:
                 case NONPHYSIOL3:

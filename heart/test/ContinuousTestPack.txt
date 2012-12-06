@@ -25,6 +25,7 @@ mechanics/TestCardiacElectroMechanicsProblem.hpp
 mechanics/TestCardiacElectroMechanicsFurtherFunctionality.hpp
 mechanics/TestContractionModels.hpp
 mechanics/TestElectroMechanicsProblemDefinition.hpp
+mechanics/TestElectroMechanicsExactSolution.hpp
 mechanics/TestImplicitCardiacMechanicsSolver.hpp
 mechanics/TestExplicitCardiacMechanicsSolver.hpp
 mechanics/TestNhsModelWithBackwardSolver.hpp

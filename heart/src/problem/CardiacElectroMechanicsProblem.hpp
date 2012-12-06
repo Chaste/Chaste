@@ -98,6 +98,7 @@ class CardiacElectroMechanicsProblem
 
 friend class TestCardiacElectroMechanicsProblem;
 friend class TestCardiacElectroMechanicsFurtherFunctionality;
+friend class TestElectroMechanicsExactSolution;
 
 protected :
     /** Either COMPRESSIBLE or INCOMPRESSIBLE */

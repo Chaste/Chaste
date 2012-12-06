@@ -399,6 +399,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         // NOTE: if adding to this, do below as well for compressible option.
         switch(mpProblemDefinition->GetContractionModel())
         {
+            case CONSTANT:
             case NASH2004:
                 // Create an EXPLICIT, INCOMPRESSIBLE solver
                 mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>,DIM>(
@@ -421,6 +422,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         // this class.
         switch(mpProblemDefinition->GetContractionModel())
         {
+            case CONSTANT:
             case NASH2004:
                 // Create an EXPLICIT, COMPRESSIBLE solver
                 mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>,DIM>(
