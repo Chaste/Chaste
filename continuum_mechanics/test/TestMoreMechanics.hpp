@@ -279,7 +279,7 @@ public:
         output_dir.str("");
         output_dir << base << "h_" << h;
         num_iters = SolvePressureOnUnderside(mesh2, output_dir.str(), solution2, true, true);
-        TS_ASSERT_EQUALS(num_iters, 3u);
+        TS_ASSERT_EQUALS(num_iters, 2u);
 
         ///////////////////////////////////////
         // Could continue onto finer meshes..
