@@ -387,6 +387,46 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_population.rGetCells().back()), old_num_nodes);
     }
 
+    void TestDivideLongSprings()
+	{
+		// Create a simple mesh
+    	TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
+		MutableMesh<2,3> mesh;
+		mesh.ConstructFromMeshReader(mesh_reader);
+
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+		// Create a cell population, with no ghost nodes at the moment
+		MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+		cell_population.CalculateRestLengths();
+
+		TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
+
+		// Check rest lengths
+		TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(1,2), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(2,3), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(0,3), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(0,2), sqrt(2), 1e-6);
+
+		cell_population.DivideLongSprings(1.0);
+
+		TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 5u);
+
+		// Check rest lengths
+		TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(1,2), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(2,3), 1.0, 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(0,3), 1.0, 1e-6);
+		TS_ASSERT_THROWS_THIS(cell_population.GetRestLength(0,2),"Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+		TS_ASSERT_DELTA(cell_population.GetRestLength(0,4), 0.5*sqrt(2), 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(1,4), 0.5*sqrt(2), 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(2,4), 0.5*sqrt(2), 1e-6);
+		TS_ASSERT_DELTA(cell_population.GetRestLength(3,4), 0.5*sqrt(2), 1e-6);
+	}
+
     void TestRemoveDeadCellsAndUpdate()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -943,6 +983,9 @@ public:
         TS_ASSERT_EQUALS(keys[0], "added variable");
         TS_ASSERT_EQUALS(keys[1], "variable");
     }
+
+
+
 
     // This test checks that the cells and nodes are correctly archived.
     void TestArchivingMeshBasedCellPopulation() throw (Exception)

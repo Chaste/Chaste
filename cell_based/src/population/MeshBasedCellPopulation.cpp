@@ -339,6 +339,139 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
     }
 }
 
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double springDivisionThreshold)
+{
+	// Only implemented for 2D elements
+	assert(ELEMENT_DIM==2);
+
+	std::vector<c_vector<unsigned, 3> > new_nodes;
+	new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
+
+	// Add new cells onto new nodes
+	for (unsigned index=0; index<new_nodes.size(); index++)
+	{
+		// Copy the cell attached to one of the neighbouring nodes onto the new node
+		unsigned new_node_index = new_nodes[index][0];
+		unsigned node_a_index, node_b_index;
+
+		if (new_nodes[index][1] < new_nodes[index][2])
+		{
+			node_a_index = new_nodes[index][1];
+			node_b_index = new_nodes[index][2];
+		}
+		else
+		{
+			node_a_index = new_nodes[index][2];
+		    node_b_index = new_nodes[index][1];
+		}
+		assert(node_a_index<node_b_index);
+
+
+     	CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
+
+
+	    CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
+	      		                    p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
+	      		                    false,
+	      		                    p_neighbour_cell->rGetCellPropertyCollection()));
+
+	    // Add new cell to cell population
+	    this->mCells.push_back(p_new_cell);
+	    this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
+
+	    // Update rest lengths
+
+	    // remove old node pair // note node_a_index < node_b_index
+	    std::pair<unsigned,unsigned> node_pair (node_a_index, node_b_index);
+
+	    double old_rest_length  = mSpringRestLengths[node_pair];
+
+	    std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
+
+	    mSpringRestLengths.erase(iter);
+
+        //Add new pairs
+	    if (new_node_index<node_a_index)
+    	{
+    		node_pair.first = new_node_index;
+    		node_pair.second  = node_a_index;
+    	}
+    	else
+    	{
+    		node_pair.first = node_a_index;
+    	    node_pair.second  = new_node_index;
+    	}
+    	mSpringRestLengths[node_pair]= old_rest_length/2;
+
+	    if (new_node_index<node_b_index)
+		{
+			node_pair.first = new_node_index;
+			node_pair.second  = node_b_index;
+		}
+		else
+		{
+			node_pair.first = node_b_index;
+			node_pair.second  = new_node_index;
+		}
+	    mSpringRestLengths[node_pair]= old_rest_length/2;
+
+	    // If necesary add other new spring rest lengths
+	    std::set<unsigned> elements_of_node_a = rGetMesh().GetNode(node_a_index)->rGetContainingElementIndices();
+	    std::set<unsigned> elements_of_new_node = rGetMesh().GetNode(new_node_index)->rGetContainingElementIndices();
+
+	    std::set<unsigned> intersection_elements;
+	    std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
+	    		              elements_of_new_node.begin(), elements_of_new_node.end(),
+	                          std::inserter(intersection_elements, intersection_elements.begin()));
+
+	    for (std::set<unsigned>::const_iterator it = intersection_elements.begin(); it != intersection_elements.end(); ++it)
+	    {
+	    	Element<ELEMENT_DIM,SPACE_DIM>* p_element = rGetMesh().GetElement(*it);
+	    	// find node which is not the new one or a or b.
+	    	assert(p_element->GetNumNodes() == 3);
+	    	unsigned other_node_index = UNSIGNED_UNSET;
+
+	    	if ( (p_element->GetNodeGlobalIndex(0) != new_node_index) &&
+	    		 (p_element->GetNodeGlobalIndex(0) != node_a_index) )
+			{
+	    		other_node_index = p_element->GetNodeGlobalIndex(0);
+			}
+	    	else if ( (p_element->GetNodeGlobalIndex(1) != new_node_index) &&
+	    		      (p_element->GetNodeGlobalIndex(1) != node_a_index) )
+			{
+				other_node_index = p_element->GetNodeGlobalIndex(1);
+			}
+	    	else if ( (p_element->GetNodeGlobalIndex(2) != new_node_index) &&
+	    		      (p_element->GetNodeGlobalIndex(2) != node_a_index) )
+			{
+				other_node_index = p_element->GetNodeGlobalIndex(2);
+			}
+	    	else
+	    	{
+	    		NEVER_REACHED;
+	    	}
+
+	    	assert(other_node_index != UNSIGNED_UNSET);
+
+	    	if (new_node_index<other_node_index)
+	    	{
+	    		node_pair.first = new_node_index;
+	    		node_pair.second  = other_node_index;
+	    	}
+	    	else
+	    	{
+	    		node_pair.first = other_node_index;
+	    	    node_pair.second  = new_node_index;
+	    	}
+
+	    	mSpringRestLengths[node_pair]=  norm_2(rGetMesh().GetVectorFromAtoB(rGetMesh().GetNode(new_node_index)->rGetLocation(),
+        		                                                              rGetMesh().GetNode(other_node_index)->rGetLocation()));
+	    }
+	}
+}
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetNode(unsigned index)
 {
@@ -1272,7 +1405,17 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CalculateRestLengths()
 
        double separation = norm_2(rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location));
 
-       std::pair<unsigned,unsigned> node_pair (nodeA_global_index, nodeB_global_index) ;
+       std::pair<unsigned,unsigned> node_pair;
+       if (nodeA_global_index<nodeB_global_index)
+       {
+	        node_pair.first = nodeA_global_index;
+			node_pair.second  = nodeB_global_index;
+	   }
+	   else
+	   {
+			node_pair.first = nodeB_global_index;
+			node_pair.second  = nodeA_global_index;
+       }
 
        mSpringRestLengths[node_pair]= separation;
     }
@@ -1284,9 +1427,17 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
 {
     if (mHasVariableRestLength)
     {
-        std::pair<unsigned,unsigned> node_pair (indexA, indexB) ;
+    	if(indexA>indexB)
+    	{
+    		unsigned temp = indexA;
+    		indexA = indexB;
+    		indexB = temp;
+    	}
+
+        std::pair<unsigned,unsigned> node_pair (indexA, indexB);
 
         std::map<std::pair<unsigned,unsigned>, double>::const_iterator  iter = mSpringRestLengths.find(node_pair);
+
 
         if (iter != mSpringRestLengths.end() )
         {
@@ -1295,9 +1446,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
         }
         else
         {
-            NEVER_REACHED;
-            ///\todo #2110 This code is not covered by any tests
-            //EXCEPTION("Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+            EXCEPTION("Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
         }
     }
     else

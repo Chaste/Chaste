@@ -323,12 +323,17 @@ public:
      */
     virtual void Update(bool hasHadBirthsOrDeaths=true);
 
-       /**
+    /**
      *  Tessellates when required
      *  If areas or volumes are needed for mUseAreaBasedDampingConstant or mOutputCellPopulationVolumes or mOutputCellVolumes
      *  If Voronoi data is to be output
      */
     void TessellateIfNeeded();
+
+    /**
+	 *  Divides springs longer than the given threshold
+	 */
+	void DivideLongSprings(double springDivisionThreshold);
 
     /**
      * Overridden GetNode() method.
