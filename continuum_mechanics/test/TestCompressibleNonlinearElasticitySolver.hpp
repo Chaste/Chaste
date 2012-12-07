@@ -769,7 +769,7 @@ public:
 
         solver.Solve();
 
-        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 5u);
+        TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 4u);
 
         // check node 5 is (1,0)
         assert( fabs(mesh.GetNode(5)->rGetLocation()[0] - 1.0) < 1e-8 );
@@ -778,8 +778,8 @@ public:
 
         std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
-        TS_ASSERT_DELTA(r_solution[5](0), 1.0609, 1e-4);
-        TS_ASSERT_DELTA(r_solution[5](1), 0.0048, 1e-4);
+        TS_ASSERT_DELTA(r_solution[5](0), 1.0360, 1e-4);
+        TS_ASSERT_DELTA(r_solution[5](1), 0.0021, 1e-4);
     }
 
     /**

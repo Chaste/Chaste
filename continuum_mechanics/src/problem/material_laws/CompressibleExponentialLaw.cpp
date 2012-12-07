@@ -107,7 +107,7 @@ void CompressibleExponentialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<
         }
     }
     assert(QQ < 10.0);///\todo #2193 This line is to trap for large deformations which lead to blow up in the exponential Uysk model
-    double multiplier = mA*exp(QQ)/2;
+    double multiplier = mA*exp(QQ);
     rDTdE.Zero();
 
     double J = sqrt(Determinant(rC));

@@ -180,15 +180,14 @@ public:
         // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
         // different systems give the same result.
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0, 1e-15);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6073, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.5753, 1e-4);
         //Node 0 is on the righthand side, initially at x=0.5 y=0.0
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5536, 1e-4);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0536, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5376, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0376, 1e-4);
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
     }
-
 
 
     void TestStaticExpansionAndElectroMechanics() throw (Exception)
@@ -292,11 +291,11 @@ public:
         // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
         // different systems give the same result.
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0, 1e-16);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.6021, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.5753, 1e-4);
         //Node 0 is on the righthand side, initially at x=0.5 y=0.0
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5508, 1e-4);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0524, 1e-4);
-        
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5376, 1e-4);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0376, 1e-4);
+
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
     }

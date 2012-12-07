@@ -1130,10 +1130,10 @@ public:
         double e01 = 0.5*C(0,1);
         double e11 = 0.5*(C(1,1)-1);
         double Q = bff*e00*e00 + 2*bfs*e01*e01 + bss*e11*e11;
-        TS_ASSERT_DELTA(T_base(0,0), a*exp(Q)*bff*e00/2 + 2*w3*I3*invC(0,0), 1e-9);
-        TS_ASSERT_DELTA(T_base(0,1), a*exp(Q)*bfs*e01/2 + 2*w3*I3*invC(0,1), 1e-9);
-        TS_ASSERT_DELTA(T_base(1,0), a*exp(Q)*bsf*e01/2 + 2*w3*I3*invC(1,0), 1e-9);
-        TS_ASSERT_DELTA(T_base(1,1), a*exp(Q)*bss*e11/2 + 2*w3*I3*invC(1,1), 1e-9);
+        TS_ASSERT_DELTA(T_base(0,0), a*exp(Q)*bff*e00 + 2*w3*I3*invC(0,0), 1e-9);
+        TS_ASSERT_DELTA(T_base(0,1), a*exp(Q)*bfs*e01 + 2*w3*I3*invC(0,1), 1e-9);
+        TS_ASSERT_DELTA(T_base(1,0), a*exp(Q)*bsf*e01 + 2*w3*I3*invC(1,0), 1e-9);
+        TS_ASSERT_DELTA(T_base(1,1), a*exp(Q)*bss*e11 + 2*w3*I3*invC(1,1), 1e-9);
 
         CheckDTdEComputation<2>(&law);
     }
@@ -1190,14 +1190,14 @@ public:
         double e12 = 0.5*C(1,2);
         double e02 = 0.5*C(0,2);
         double Q = bff*e00*e00 + bss*e11*e11 + bnn*e22*e22 + 2*bfs*e01*e01 + 2*bfn*e02*e02 + 2*bsn*e12*e12;
-        TS_ASSERT_DELTA(T_base(0,0), a*exp(Q)*bff*e00/2 + 2*w3*I3*invC(0,0), 1e-9);
-        TS_ASSERT_DELTA(T_base(0,1), a*exp(Q)*bfs*e01/2 + 2*w3*I3*invC(0,1), 1e-9);
-        TS_ASSERT_DELTA(T_base(1,0), a*exp(Q)*bsf*e01/2 + 2*w3*I3*invC(1,0), 1e-9);
-        TS_ASSERT_DELTA(T_base(1,1), a*exp(Q)*bss*e11/2 + 2*w3*I3*invC(1,1), 1e-9);
+        TS_ASSERT_DELTA(T_base(0,0), a*exp(Q)*bff*e00 + 2*w3*I3*invC(0,0), 1e-9);
+        TS_ASSERT_DELTA(T_base(0,1), a*exp(Q)*bfs*e01 + 2*w3*I3*invC(0,1), 1e-9);
+        TS_ASSERT_DELTA(T_base(1,0), a*exp(Q)*bsf*e01 + 2*w3*I3*invC(1,0), 1e-9);
+        TS_ASSERT_DELTA(T_base(1,1), a*exp(Q)*bss*e11 + 2*w3*I3*invC(1,1), 1e-9);
 
-        TS_ASSERT_DELTA(T_base(0,2), a*exp(Q)*bfs*e02/2 + 2*w3*I3*invC(0,2), 1e-9);
-        TS_ASSERT_DELTA(T_base(1,2), a*exp(Q)*bsf*e12/2 + 2*w3*I3*invC(1,2), 1e-9);
-        TS_ASSERT_DELTA(T_base(2,2), a*exp(Q)*bss*e22/2 + 2*w3*I3*invC(2,2), 1e-9);
+        TS_ASSERT_DELTA(T_base(0,2), a*exp(Q)*bfs*e02 + 2*w3*I3*invC(0,2), 1e-9);
+        TS_ASSERT_DELTA(T_base(1,2), a*exp(Q)*bsf*e12 + 2*w3*I3*invC(1,2), 1e-9);
+        TS_ASSERT_DELTA(T_base(2,2), a*exp(Q)*bss*e22 + 2*w3*I3*invC(2,2), 1e-9);
     }
 };
 

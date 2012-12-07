@@ -362,12 +362,12 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
-                                                  MONODOMAIN,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacEmHomogeneousEverythingIncompressible");
+                                                    MONODOMAIN,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacEmHomogeneousEverythingIncompressible");
 
         problem.Solve();
 
@@ -469,12 +469,12 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
-                                                  BIDOMAIN_WITH_BATH,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacEmWithBath");
+                                                    BIDOMAIN_WITH_BATH,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacEmWithBath");
 
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
@@ -556,12 +556,12 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         CardiacElectroMechanicsProblem<2,2> problem(INCOMPRESSIBLE,
-                                                  BIDOMAIN_WITH_BATH,
-                                                  &electrics_mesh,
-                                                  &mechanics_mesh,
-                                                  &cell_factory,
-                                                  &problem_defn,
-                                                  "TestCardiacEmWithBath");
+                                                    BIDOMAIN_WITH_BATH,
+                                                    &electrics_mesh,
+                                                    &mechanics_mesh,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestCardiacEmWithBath");
 
         problem.Solve();
         std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
@@ -748,7 +748,7 @@ public:
         // The results of this test can be visually compared with the results of the
         // equivalent incompressible simulation in TestWithKerchoffs.
 
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[1](0), 0.0465, 0.0002);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[1](0), 0.0472, 0.0002);
         TS_ASSERT_DELTA(problem.rGetDeformedPosition()[1](1),-0.0012, 0.0002);
 
         // create and initialise an incompressible NASH2004 problem, just for coverage..
