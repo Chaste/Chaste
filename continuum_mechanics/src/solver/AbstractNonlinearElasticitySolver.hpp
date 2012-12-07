@@ -720,6 +720,8 @@ public:
      */
     void WriteCurrentDeformationGradients(std::string fileName, int counterToAppend = -1);
 
+    void WriteCurrentDeformationTensors(std::string fileName, int counterToAppend = -1);
+
     /**
      * The user may request that the stress for each element (averaged over quadrature point stresses)
      * are saved during the Solve(), by calling this.
@@ -896,6 +898,52 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentDeformationGradients(st
     p_file->close();
 }
 
+
+template<unsigned DIM>
+void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentDeformationTensors(std::string fileName, int counterToAppend)
+{
+    if (!this->mWriteOutput)
+    {
+        return;
+    }
+
+    this->mTensorVtkData.clear();
+
+
+    std::stringstream file_name;
+    file_name << fileName;
+    if (counterToAppend >= 0)
+    {
+        file_name << "_" << counterToAppend;
+    }
+    file_name << ".strain";
+
+    out_stream p_file = this->mpOutputFileHandler->OpenOutputFile(file_name.str());
+
+    c_matrix<double,DIM,DIM> deformation_gradient;
+
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+         iter != this->mrQuadMesh.GetElementIteratorEnd();
+         ++iter)
+    {
+        GetElementCentroidDeformationGradient(*iter, deformation_gradient);
+        c_matrix<double,DIM,DIM> C = prod(trans(deformation_gradient), deformation_gradient);
+
+        for(unsigned i=0; i<DIM; i++)
+        {
+            for(unsigned j=0; j<DIM; j++)
+            {
+                *p_file << C(i,j) << " ";
+            }
+        }
+
+        this->mTensorVtkData.push_back(C);
+
+
+        *p_file << "\n";
+    }
+    p_file->close();
+}
 
 template<unsigned DIM>
 void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentAverageElementStresses(std::string fileName, int counterToAppend)
@@ -1622,8 +1670,10 @@ template<unsigned DIM>
 double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
 {
     double norm;
-    VecNorm(this->mResidualVector, NORM_1, &norm);
-    return norm;
+
+    //\todo Change to NORM_1 and remove the division by mNumDofs...
+    VecNorm(this->mResidualVector, NORM_2, &norm);
+    return norm/this->mNumDofs;
 }
 
 template<unsigned DIM>
