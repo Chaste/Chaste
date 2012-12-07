@@ -59,8 +59,8 @@ double MATERIAL_PARAM = 2.0;
 double ACTIVE_TENSION = 1.5;
 double ALPHA = 0.2;
 
-// Body force (when active tension is constant) corresponding to the deformation
-// x = X+0.5*alpha*X^2, y=Y/(1+alpha*X), with p=2c
+// Body force (when active tension is constant and fibres in X-direction)
+// corresponding to the deformation x = X+0.5*alpha*X^2, y=Y/(1+alpha*X), with p=2c
 c_vector<double,2> MyBodyForce(c_vector<double,2>& rX, double t)
 {
     assert(rX(0)>=0 && rX(0)<=1 && rX(1)>=0 && rX(1)<=1);
@@ -78,8 +78,8 @@ c_vector<double,2> MyBodyForce(c_vector<double,2>& rX, double t)
     return body_force;
 }
 
-// Surface traction  (when active tension is constant) on three sides of a cube, corresponding to
-// x = X+0.5*alpha*X^2, y=Y/(1+alpha*X), with p=2c
+// Surface traction (when active tension is constant and fibres in X-direction)
+// on three sides of a cube, corresponding to x = X+0.5*alpha*X^2, y=Y/(1+alpha*X), with p=2c
 c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
 {
     c_vector<double,2> traction = zero_vector<double>(2);
@@ -207,6 +207,11 @@ public:
         }
 
 
+        //////////////////////////////////////////////////////////////////
+        //
+        //  Solve and test
+        //
+        /////////////////////////////////////////////////////////////////
         problem.Solve();
 
         std::vector<c_vector<double,2> >& r_solution = problem.rGetDeformedPosition();

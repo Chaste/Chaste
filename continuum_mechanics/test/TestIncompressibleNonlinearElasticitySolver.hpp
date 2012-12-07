@@ -719,6 +719,8 @@ public:
      *  solution. Since a non-zero body force is used here and a known solution, this is the MOST
      *  IMPORTANT TEST.
      *
+     *  See equations and finite element implementations document for more info.
+     *
      *  Choose x=X+0.5*alpha*X*X, y=Y/(1+alpha*X), p=2c, then F has determinant 1, and S can be shown to
      *  be, where lam = 1 +alpha X (ie dx/dX)
      *    S = 2c[lam-1/lam,   -Y*alpha*lam^{-2}; -Y*alpha*lam^{-2}, 1/lam - lam]
@@ -730,7 +732,7 @@ public:
      *  s = 2c[Y*alpha/lam^2, 1/lam - lam]  on Y=1
      *
      */
-    void TestWithFunctionalData() throw(Exception)
+    void TestAgainstExactSolution() throw(Exception)
     {
         for(unsigned run=0; run<2; run++)
         {
