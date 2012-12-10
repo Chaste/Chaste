@@ -210,6 +210,35 @@ public:
         CommandLineArguments::Instance()->p_argc = p_real_argc;
         CommandLineArguments::Instance()->p_argv = p_real_argv;
     }
+
+//    void TestPretendCommandLineArguments() throw(Exception)
+//    {
+//        // Save the real args to be restored at the end
+//        int* p_real_argc = CommandLineArguments::Instance()->p_argc;
+//        char*** p_real_argv = CommandLineArguments::Instance()->p_argv;
+//
+//        CommandLineArguments::Instance()->AddArguments("--option1 choice1 --option2 2 --option3 1.0 2.0 3.0");
+//
+//        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option1"));
+//        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option2"));
+//        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option3"));
+//
+//        std::vector<double> some_doubles = CommandLineArguments::Instance()->GetDoublesCorrespondingToOption("--option3");
+//        TS_ASSERT_EQUALS(some_doubles.size(), 3u);
+//        TS_ASSERT_DELTA(some_doubles[0], 1.0, 1e-12);
+//        TS_ASSERT_DELTA(some_doubles[1], 2.0, 1e-12);
+//        TS_ASSERT_DELTA(some_doubles[2], 3.0, 1e-12);
+//
+//        unsigned a_number = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("--option2");
+//        TS_ASSERT_EQUALS(a_number, 2u);
+//
+//        std::string a_string = CommandLineArguments::Instance()->GetStringCorrespondingToOption("--option1");
+//        TS_ASSERT_EQUALS(a_string,"choice1");
+//
+//        // Restore the real args
+//        CommandLineArguments::Instance()->p_argc = p_real_argc;
+//        CommandLineArguments::Instance()->p_argv = p_real_argv;
+//    }
 };
 
 #endif /*TESTCOMMANDLINEARGUMENTS_HPP_*/
