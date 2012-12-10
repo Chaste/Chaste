@@ -107,7 +107,7 @@ public:
 
     /**
      *  Set the constant active tension
-     *  @param the active tension
+     *  @param activeTension the active tension
      */
     void SetActiveTensionValue(double activeTension)
     {

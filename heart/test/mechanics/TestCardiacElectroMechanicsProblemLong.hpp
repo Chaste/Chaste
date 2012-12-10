@@ -283,8 +283,8 @@ public:
         // The results of this test can be visually compared with the results of the
         // equivalent incompressible simulation in TestWithKerchoffs.
 
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[20](0), 0.0429, 0.0002);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[20](1),-0.0038, 0.0002);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[20](0), 0.0438, 0.0002);
+        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[20](1),-0.0032, 0.0002);
     }
 
     // runs 5 different 3d tests with fibres read to be in various directions, and
@@ -410,8 +410,8 @@ public:
         TS_ASSERT_LESS_THAN(tissue_initial_size, r_deformed_position_fibres_alongX[7](2));
 
         // hardcoded test to check nothing changes
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongX[7](0), 0.0484, 1e-4);
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongX[7](1), 0.0508, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongX[7](0), 0.0487, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongX[7](1), 0.0506, 1e-4);
 
         ////////////////////////////////////////////////////////////////////
         // Solve with fibres read: fibres in Y-direction, sheet in YX plane
@@ -473,8 +473,8 @@ public:
         TS_ASSERT_LESS_THAN(tissue_initial_size, r_deformed_position_fibres_alongY1[7](2));
 
         // hardcoded test to check nothing changes
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0484, 1e-4);
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0509, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](1), 0.0487, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[7](0), 0.0506, 1e-4);
 
 
         //////////////////////////////////////////////////////////////////
@@ -505,8 +505,8 @@ public:
         TS_ASSERT_LESS_THAN(r_deformed_position_fibres_alongZ[7](2), tissue_initial_size);
 
         // hardcoded test to check nothing changes
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongZ[7](2), 0.0456, 1e-4);
-        TS_ASSERT_DELTA(r_deformed_position_fibres_alongZ[7](0), 0.0503, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongZ[7](2), 0.0466, 1e-4);
+        TS_ASSERT_DELTA(r_deformed_position_fibres_alongZ[7](0), 0.0504, 1e-4);
     }
 
 
