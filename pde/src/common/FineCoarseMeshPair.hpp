@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FINECOARSEMESHPAIR_HPP_
 
 #include "TetrahedralMesh.hpp"
-#include "QuadraticMesh.hpp"
 #include "BoxCollection.hpp"
 #include "QuadraturePointsGroup.hpp"
 #include "GaussianQuadratureRule.hpp"
@@ -54,46 +53,45 @@ template<unsigned DIM>
 struct ElementAndWeights
 {
     unsigned ElementNum; /**< Which element*/
-    c_vector<double,DIM+1> Weights; /**<Gauss weights for this element*/
+    c_vector<double, DIM+1> Weights; /**<Gauss weights for this element*/
 };
 
 /**
  * Class for a pair of meshes, one fine, one coarse, which should cover the same domain (or very nearly match).
  * This class is used to set up interpolation information from one mesh to the other.
  *
- * At the moment the functionality is very much based on the four information-transfers required in
+ * The functionality is based on the four information-transfers required in
  * cardiac electro-mechanics problems
  *
- * (i)   Calcium (or voltage) to induce deformation:
+ * -# Calcium (or voltage) to induce deformation:
  *          FINE(electrics) MESH NODEs  --->  COARSE(mechanics) MESH QUADRATURE POINTS
- * (ii)  Deformation gradient (assume constant in any coarse element) for altering conductivities:
+ * -#  Deformation gradient (assume constant in any coarse element) for altering conductivities:
  *          COARSE ELEMENTS  --->  FINE ELEMENTS
- * (iii) Deformation gradient/fibre-stretch (assume constant in any coarse element) for cell-model
+ * -# Deformation gradient/fibre-stretch (assume constant in any coarse element) for cell-model
  *       stretch activated channels
  *           COARSE ELEMENTS  --->  FINE NODES
- * (iv)  Voltage visualisation on coarse mesh
+ * -#  Voltage visualisation on coarse mesh
  *          FINE NODES ---> COARSE NODES
  *
  * The usage of this class for each of these tasks is:
  *
- * (i) FINE NODEs  --->  COARSE QUADRATURE POINTS
+ * -# FINE NODEs  --->  COARSE QUADRATURE POINTS
  *          FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
  *          mesh_pair.SetUpBoxesOnFineMesh();
  *          mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, false);
  *          mesh_pair.rGetElementsAndWeights();
- * (ii) COARSE ELEMENTS  --->  FINE ELEMENTS
+ * -# COARSE ELEMENTS  --->  FINE ELEMENTS
  *          FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
  *          mesh_pair.SetUpBoxesOnCoarseMesh();
  *          mesh_pair.ComputeCoarseElementsForFineElementCentroids();
  *          mesh_pair.rGetCoarseElementsForFineElementCentroids();
- * (iii) COARSE ELEMENTS  --->  FINE NODES
+ * -# COARSE ELEMENTS  --->  FINE NODES
  *          FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
  *          mesh_pair.SetUpBoxesOnCoarseMesh();
  *          mesh_pair.ComputeCoarseElementsForFineNodes();
  *          mesh_pair.rGetCoarseElementsForFineNodes();
- *
- * Note the following should not be done at the same time as (i), as the results are stored in the same place
- * (iv)  FINE NODES ---> COARSE NODES
+ * -#  FINE NODES ---> COARSE NODES
+ * Note the this should not be done at the same time as (1), because the results are stored in the same place
  *          FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
  *          mesh_pair.SetUpBoxesOnFineMesh();
  *          mesh_pair.ComputeFineElementsAndWeightsForCoarseNodes(false);
@@ -114,12 +112,12 @@ private:
     /** Fine mesh. */
     TetrahedralMesh<DIM,DIM>& mrFineMesh;
 
-    /** Coarse mesh (often be a quadratic mesh). */
+    /** Coarse mesh (often this will be a quadratic mesh). */
     TetrahedralMesh<DIM,DIM>& mrCoarseMesh;
 
     /**
      * Boxes on the fine mesh domain, for easier determination of
-     * containingelement for a given point. */
+     * containing element for a given point. */
     BoxCollection<DIM>* mpFineMeshBoxCollection;
 
     /**
@@ -403,13 +401,13 @@ public:
      * Access the fine mesh of this mesh pair
      * @return the fine mesh
      */
-    const TetrahedralMesh<DIM,DIM>& GetFineMesh() const;
+    const TetrahedralMesh<DIM, DIM>& GetFineMesh() const;
 
     /**
      * Access the coarse mesh of this mesh pair
      * @return the coarse mesh
      */
-    const TetrahedralMesh<DIM,DIM>& GetCoarseMesh() const;
+    const TetrahedralMesh<DIM, DIM>& GetCoarseMesh() const;
 
 };
 

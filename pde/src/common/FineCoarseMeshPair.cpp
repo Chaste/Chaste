@@ -38,10 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 FineCoarseMeshPair<DIM>::FineCoarseMeshPair(TetrahedralMesh<DIM,DIM>& rFineMesh, TetrahedralMesh<DIM,DIM>& rCoarseMesh)
     : mrFineMesh(rFineMesh),
-      mrCoarseMesh(rCoarseMesh)
+      mrCoarseMesh(rCoarseMesh),
+      mpFineMeshBoxCollection(NULL),
+      mpCoarseMeshBoxCollection(NULL)
 {
-    mpFineMeshBoxCollection = NULL;
-    mpCoarseMeshBoxCollection = NULL;
     ResetStatisticsVariables();
 }
 
@@ -101,7 +101,7 @@ void FineCoarseMeshPair<DIM>::SetUpBoxesOnCoarseMesh(double boxWidth)
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::SetUpBoxes(TetrahedralMesh<DIM,DIM>& rMesh,
+void FineCoarseMeshPair<DIM>::SetUpBoxes(TetrahedralMesh<DIM, DIM>& rMesh,
                                          double boxWidth,
                                          BoxCollection<DIM>*& rpBoxCollection)
 {
@@ -223,7 +223,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
         #define COVERAGE_IGNORE
         if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
-            std::cout << "\r " << i << " of " << quad_point_posns.Size() << std::flush;
+            std::cout << "\t" << i << " of " << quad_point_posns.Size() << std::flush;
         }
         #undef COVERAGE_IGNORE
 
@@ -267,7 +267,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
         #define COVERAGE_IGNORE
         if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
-            std::cout << "\r " << i << " of " << mrCoarseMesh.GetNumNodes() << std::flush;
+            std::cout << "\t" << i << " of " << mrCoarseMesh.GetNumNodes() << std::flush;
         }
         #undef COVERAGE_IGNORE
 
@@ -410,7 +410,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
         #define COVERAGE_IGNORE
         if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
-            std::cout << "\r " << i << " of " << mCoarseElementsForFineNodes.size() << std::flush;
+            std::cout << "\t" << i << " of " << mCoarseElementsForFineNodes.size() << std::flush;
         }
         #undef COVERAGE_IGNORE
 
@@ -446,7 +446,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
         #define COVERAGE_IGNORE
         if(CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
         {
-            std::cout << "\r " << i << " of " << mrFineMesh.GetNumElements() << std::flush;
+            std::cout << "\t" << i << " of " << mrFineMesh.GetNumElements() << std::flush;
         }
         #undef COVERAGE_IGNORE
 

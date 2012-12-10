@@ -60,7 +60,7 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/Bidomain3d_after_annotations.vtu'))
         
-    def TestAddingVtuAnnotationsAireway(self):
+    def TestAddingVtuAnnotationsAirway(self):
         original_vtu = 'python/test/data/ThreeBifurcations_before_annotations.vtu'
         output_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'ThreeBifurcationsAddingAnnotationsTest.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)

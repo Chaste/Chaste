@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "FineCoarseMeshPair.hpp"
 #include "QuadraturePointsGroup.hpp"
+#include "TetrahedralMesh.hpp"
+#include "QuadraticMesh.hpp"
 
 class TestFineCoarseMeshPair : public CxxTest::TestSuite
 {
@@ -47,34 +49,29 @@ public:
     // Simple test where the whole of the coarse mesh is in one fine element
     void TestComputeFineElemsAndWeightsForQuadPointsSimple() throw(Exception)
     {
-        // The following checks this hasn't been accidentally committed
-        #ifdef FINECOARSEMESHPAIR_VERBOSE
-        TS_FAIL("#define FINECOARSEMESHPAIR_VERBOSE has been uncommented");
-        #endif
-
         TetrahedralMesh<2,2> fine_mesh;
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         fine_mesh.ConstructFromMeshReader(mesh_reader);
 
         QuadraticMesh<2> coarse_mesh(0.1, 0.1, 0.1);
-        coarse_mesh.Translate(0.5,0.0); // whole of the coarse mesh in now in fine element with index 1
+        coarse_mesh.Translate(0.5, 0.0); // whole of the coarse mesh in now in fine element with index 1
 
-        FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
-
-        mesh_pair.SetUpBoxesOnFineMesh();
-        GaussianQuadratureRule<2> quad_rule(4);
-        mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
+        FineCoarseMeshPair<2> mesh_pair(fine_mesh, coarse_mesh);
 
         //test get methods
         TS_ASSERT_EQUALS(mesh_pair.GetFineMesh().GetNumAllElements(), 4u);
         TS_ASSERT_EQUALS(mesh_pair.GetCoarseMesh().GetNumAllElements(), 2u);
+
+        mesh_pair.SetUpBoxesOnFineMesh();
+        GaussianQuadratureRule<2> quad_rule(3);
+        mesh_pair.ComputeFineElementsAndWeightsForCoarseQuadPoints(quad_rule, true);
 
         // All coarse quadrature points should have been found in the fine mesh
         TS_ASSERT_EQUALS(mesh_pair.mNotInMesh.size(), 0u);
         TS_ASSERT_EQUALS(mesh_pair.mNotInMeshNearestElementWeights.size(), 0u);
 
         // Check the elements and weights have been set up correctly
-        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 18u);
+        TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 12u);
 
         for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
         {
@@ -98,7 +95,7 @@ public:
             }
         }
 
-        TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[0], 18u);
+        TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[0], 12u);
         TS_ASSERT_EQUALS(mesh_pair.mStatisticsCounters[1], 0u);
     }
 
@@ -373,7 +370,7 @@ public:
         fine_mesh.Rotate(rotation_mat);
         coarse_mesh.Rotate(rotation_mat);
 
-        GaussianQuadratureRule<2> quad_rule(4);
+        GaussianQuadratureRule<2> quad_rule(3);
 
         FineCoarseMeshPair<2> mesh_pair(fine_mesh,coarse_mesh);
         mesh_pair.SetUpBoxesOnFineMesh();
