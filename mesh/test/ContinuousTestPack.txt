@@ -16,6 +16,7 @@ reader/TestMemfemMeshReader.hpp
 reader/TestTrianglesMeshReader.hpp
 reader/TestVtkMeshReader.hpp
 utilities/TestBoxCollection.hpp
+utilities/TestDistributedBoxCollection.hpp
 utilities/TestDistanceMapCalculator.hpp
 utilities/TestPerElementWriter.hpp
 vertex/TestCylindrical2dVertexMesh.hpp
