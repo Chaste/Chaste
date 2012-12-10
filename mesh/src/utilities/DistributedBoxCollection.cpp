@@ -90,7 +90,7 @@ std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
 
 
 template<unsigned DIM>
-DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, unsigned localRows)
+DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
     : mDomainSize(domainSize),
       mBoxWidth(boxWidth),
       mIsPeriodicInX(isPeriodicInX),
@@ -546,8 +546,7 @@ double DistributedBoxCollection<DIM>::GetBoxWidth() const
 template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::GetNumRowsOfBoxes() const
 {
-    return 0;
-    //return mpDistributedBoxStacks->GetHigh() - mpDistributedBoxStacks->GetLow();
+    return mpDistributedBoxStacks->GetHigh() - mpDistributedBoxStacks->GetLow();
 }
 
 template<unsigned DIM>

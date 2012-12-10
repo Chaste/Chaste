@@ -35,13 +35,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DISTRIBUTEDBOXCOLLECTION_HPP_
 #define DISTRIBUTEDBOXCOLLECTION_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/vector.hpp>
+
 #include "Node.hpp"
 #include "Element.hpp"
 #include "PetscTools.hpp"
 #include "DistributedVectorFactory.hpp"
 #include <map>
+#include <vector>
 
-#include "ChasteSerialization.hpp"
+
 
 /**
  * A small class for a nD 'box' defined by its min/max x/y/z values which
@@ -213,7 +217,7 @@ public:
      * @param isPeriodicInX whether the domain is peiodic in the x direction
      * @param localRows the number of local rows in a parallel DistributedBoxCollection.
      */
-    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, unsigned localRows = PETSC_DECIDE);
+    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, int localRows = PETSC_DECIDE);
 
 
     /**
@@ -390,16 +394,16 @@ inline void save_construct_data(
     // Save the number of rows that each process owns, so that on loading we can resume with
     // good load balance
     unsigned rank = PetscTools::GetMyRank();
-    unsigned num_local_rows = t->GetNumRowsOfBoxes();
+    int num_local_rows = (int)(t->GetNumRowsOfBoxes());
 
-    MPI_Send(&num_local_rows,1, MPI_UNSIGNED, 0, rank, PETSC_COMM_WORLD);
+    MPI_Send(&num_local_rows,1, MPI_INT, 0, rank, PETSC_COMM_WORLD);
     if (PetscTools::AmMaster())
     {
-        std::vector<unsigned> num_rows(PetscTools::GetNumProcs(), 0u);
+        std::vector<int> num_rows(PetscTools::GetNumProcs(), 0);
         MPI_Status status[PetscTools::GetNumProcs()];
         for (unsigned proc = 0; proc < PetscTools::GetNumProcs(); proc++)
         {
-            MPI_Recv(&num_rows[proc], 1, MPI_UNSIGNED, proc, proc, PETSC_COMM_WORLD, &status[proc]);
+            MPI_Recv(&num_rows[proc], 1, MPI_INT, proc, proc, PETSC_COMM_WORLD, &status[proc]);
         }
 
         bool are_boxes_set = t->GetAreLocalBoxesSet();
@@ -418,7 +422,8 @@ inline void save_construct_data(
         unsigned num_procs = PetscTools::GetNumProcs();
         ar << num_procs;
 
-        ar << num_rows;
+        std::vector<int> const p_num_rows = num_rows; 
+        ar << p_num_rows;
     }
 }
 /**
@@ -436,7 +441,7 @@ inline void load_construct_data(
     for (unsigned i=0; i<2*DIM; i++)
     {
         double coordinate;
-        ar & coordinate;//resume coordinates one by one
+        ar & coordinate; //resume coordinates one by one
         domain_size[i] = coordinate;
     }
 
@@ -446,19 +451,20 @@ inline void load_construct_data(
     unsigned num_original_procs;
     ar >> num_original_procs;
 
-    unsigned num_rows = PETSC_DECIDE;
-    std::vector<unsigned> original_rows(num_original_procs, PETSC_DECIDE);
+    int num_rows = PETSC_DECIDE;
+    std::vector<int> original_rows(num_original_procs, PETSC_DECIDE);
     ar >> original_rows;
     if (num_original_procs == PetscTools::GetNumProcs())
     {
         num_rows = original_rows[PetscTools::GetMyRank()];
     }
-    // Invoke inplace constructor to initialise instance
-    ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, num_rows);
+
+    // Invoke inplace constructor to initialise instance. Assume non-periodic
+    ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, false, num_rows);
 
     if(are_boxes_set)
     {
-        //t->SetupHaloBoxes();
+        t->SetupHaloBoxes();
         t->SetupLocalBoxesHalfOnly();
     }
 }
