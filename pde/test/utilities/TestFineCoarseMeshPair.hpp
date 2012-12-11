@@ -38,9 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "FineCoarseMeshPair.hpp"
-#include "QuadraturePointsGroup.hpp"
 #include "TetrahedralMesh.hpp"
+//#include "DistributedTetrahedralMesh.hpp"
 #include "QuadraticMesh.hpp"
+//#include "PetscSetupAndFinalize.hpp"
 
 class TestFineCoarseMeshPair : public CxxTest::TestSuite
 {
@@ -219,7 +220,7 @@ public:
         QuadraturePointsGroup<3> quad_point_posns(coarse_mesh, quad_rule);
         for (unsigned i=0; i<mesh_pair.mNotInMesh.size(); i++)
         {
-            double x = quad_point_posns.Get(mesh_pair.mNotInMesh[i])(0);
+            double x = quad_point_posns.rGet(mesh_pair.mNotInMesh[i])(0);
             TS_ASSERT_LESS_THAN(1.0, x);
         }
 
@@ -337,7 +338,7 @@ public:
         QuadraturePointsGroup<3> quad_point_posns(coarse_mesh, quad_rule);
         for (unsigned i=0; i<mesh_pair.mNotInMesh.size(); i++)
         {
-            double x = quad_point_posns.Get(mesh_pair.mNotInMesh[i])(0);
+            double x = quad_point_posns.rGet(mesh_pair.mNotInMesh[i])(0);
             TS_ASSERT_LESS_THAN(1.0, x);
         }
 

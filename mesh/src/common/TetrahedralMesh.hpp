@@ -237,24 +237,6 @@ public:
     void PermuteNodes(const std::vector<unsigned>& perm);
 
     /**
-     * Return the element index for the first element that contains a test point
-     *
-     * @param rTestPoint reference to the point
-     * @param strict  Should the element returned contain the point in the interior and
-     *      not on an edge/face/vertex (default = not strict)
-     * @param testElements  a set of guesses for the element (a set of element indices), to be checked
-     *      first for potential efficiency improvements. (default = empty set)
-     * @param onlyTryWithTestElements Do not continue with other elements after trying the with testElements
-     *      (for cases where you know the testPoint must be in the set of test elements or maybe outside
-     *      the mesh).
-     */
-    unsigned GetContainingElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint,
-                                       bool strict=false,
-                                       std::set<unsigned> testElements=std::set<unsigned>(),
-                                       bool onlyTryWithTestElements = false);
-
-
-    /**
      * Return the element index for the first element that contains a test point. Like GetContainingElementIndex
      * but uses the user given element (M say) as the first element checked, and then checks M+1,M+2,..,Ne,0,1..
      *
@@ -274,14 +256,6 @@ public:
      * @param rTestPoint reference to the point
      */
     unsigned GetNearestElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint);
-
-    /** As with GetNearestElementIndex() except only searches in the given set of elements.
-     *  @param rTestPoint reference to the point
-     *  @param testElements a set of elements (element indices) to look in
-     */
-    unsigned GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
-                                                    std::set<unsigned> testElements);
-
 
     /**
      * Return all element indices for elements that are known to contain a test point.

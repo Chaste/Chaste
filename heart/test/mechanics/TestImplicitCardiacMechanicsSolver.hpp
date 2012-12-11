@@ -255,7 +255,7 @@ public:
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
         for(unsigned i=0; i<calcium_conc.size(); i++)
         {
-            double Y = quad_points.Get(i)(1);
+            double Y = quad_points.rGet(i)(1);
             // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
             // value in one of the Lr91 TestIonicModel tests
             calcium_conc[i] = 0.0002 + 0.001*Y;
@@ -322,7 +322,7 @@ public:
         // Was quad point 34 = 3*9 + 7 (quad 7 in element 3) when there were 9 quads per element
         // Investigate quad point 21 = 3*6 + 3 (quad 3 in element 3)
 
-        TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(quad_points.Get(21)), 3u);
+        TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(quad_points.rGet(21)), 3u);
 
         std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
         if(iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
@@ -400,7 +400,7 @@ public:
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
             for(unsigned i=0; i<calcium_conc.size(); i++)
             {
-                double X = quad_points.Get(i)(0);
+                double X = quad_points.rGet(i)(0);
                 // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
                 // value in one of the Lr91 TestIonicModel tests
                 calcium_conc[i] = 0.0002 + 0.001*X;
@@ -622,7 +622,7 @@ public:
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
         for(unsigned i=0; i<calcium_conc.size(); i++)
         {
-            double X = quad_points.Get(i)(0);
+            double X = quad_points.rGet(i)(0);
             // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
             // value in one of the Lr91 TestIonicModel tests
             calcium_conc[i] = 0.0002 + 0.001*X;
@@ -715,7 +715,7 @@ public:
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
             for(unsigned j=0; j<calcium_conc.size(); j++)
             {
-                double X = quad_points.Get(j)(0);
+                double X = quad_points.rGet(j)(0);
                 // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
                 // value in one of the Lr91 TestIonicModel tests
                 calcium_conc[j] = 0.0005 + 0.001*X;

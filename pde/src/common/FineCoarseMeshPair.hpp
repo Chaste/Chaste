@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FINECOARSEMESHPAIR_HPP_
 #define FINECOARSEMESHPAIR_HPP_
 
-#include "TetrahedralMesh.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "BoxCollection.hpp"
 #include "QuadraturePointsGroup.hpp"
 #include "GaussianQuadratureRule.hpp"
@@ -110,10 +110,10 @@ friend class TestFineCoarseMeshPair;
 private:
 
     /** Fine mesh. */
-    TetrahedralMesh<DIM,DIM>& mrFineMesh;
+    AbstractTetrahedralMesh<DIM,DIM>& mrFineMesh;
 
     /** Coarse mesh (often this will be a quadratic mesh). */
-    TetrahedralMesh<DIM,DIM>& mrCoarseMesh;
+    AbstractTetrahedralMesh<DIM,DIM>& mrCoarseMesh;
 
     /**
      * Boxes on the fine mesh domain, for easier determination of
@@ -202,7 +202,7 @@ private:
      * @param boxWidth box width (see SetUpBoxesOnCoarseMesh() dox)
      * @param rpBoxCollection reference to either mpFineBoxCollection or mpCoarseBoxCollection
      */
-    void SetUpBoxes(TetrahedralMesh<DIM,DIM>& rMesh,
+    void SetUpBoxes(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
                     double boxWidth,
                     BoxCollection<DIM>*& rpBoxCollection);
 
@@ -247,7 +247,7 @@ public:
      * @param rFineMesh Fine mesh (reference)
      * @param rCoarseMesh Coarse mesh (reference)
      */
-    FineCoarseMeshPair(TetrahedralMesh<DIM,DIM>& rFineMesh, TetrahedralMesh<DIM,DIM>& rCoarseMesh);
+    FineCoarseMeshPair(AbstractTetrahedralMesh<DIM,DIM>& rFineMesh, AbstractTetrahedralMesh<DIM,DIM>& rCoarseMesh);
 
     /**
      * Destructor just deletes the box collection.
@@ -401,13 +401,13 @@ public:
      * Access the fine mesh of this mesh pair
      * @return the fine mesh
      */
-    const TetrahedralMesh<DIM, DIM>& GetFineMesh() const;
+    const AbstractTetrahedralMesh<DIM, DIM>& GetFineMesh() const;
 
     /**
      * Access the coarse mesh of this mesh pair
      * @return the coarse mesh
      */
-    const TetrahedralMesh<DIM, DIM>& GetCoarseMesh() const;
+    const AbstractTetrahedralMesh<DIM, DIM>& GetCoarseMesh() const;
 
 };
 

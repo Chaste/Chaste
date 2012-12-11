@@ -858,6 +858,84 @@ c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMi
 }
 
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint,
+                                                                            bool strict,
+                                                                            std::set<unsigned> testElements,
+                                                                            bool onlyTryWithTestElements)
+{
+    for (std::set<unsigned>::iterator iter=testElements.begin(); iter!=testElements.end(); iter++)
+    {
+        assert(*iter<this->GetNumElements());
+        if (this->mElements[*iter]->IncludesPoint(rTestPoint, strict))
+        {
+            assert(!this->mElements[*iter]->IsDeleted());
+            return *iter;
+        }
+    }
+
+    if (!onlyTryWithTestElements)
+    {
+        for (unsigned i=0; i<this->mElements.size(); i++)
+        {
+            if (this->mElements[i]->IncludesPoint(rTestPoint, strict))
+            {
+                assert(!this->mElements[i]->IsDeleted());
+                return i;
+            }
+        }
+    }
+
+    // If it's in none of the elements, then throw
+    std::stringstream ss;
+    ss << "Point [";
+    for (unsigned j=0; (int)j<(int)SPACE_DIM-1; j++)
+    {
+        ss << rTestPoint[j] << ",";
+    }
+    ss << rTestPoint[SPACE_DIM-1] << "] is not in ";
+    if (!onlyTryWithTestElements)
+    {
+        ss << "mesh - all elements tested";
+    }
+    else
+    {
+        ss << "set of elements given";
+    }
+    EXCEPTION(ss.str());
+}
+
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
+                                                                                         std::set<unsigned> testElements)
+{
+    assert(testElements.size() > 0);
+
+    double max_min_weight = -INFINITY;
+    unsigned closest_index = 0;
+    for (std::set<unsigned>::iterator iter = testElements.begin();
+        iter != testElements.end();
+        iter++)
+    {
+        c_vector<double, ELEMENT_DIM+1> weight=this->mElements[*iter]->CalculateInterpolationWeights(rTestPoint);
+        double neg_weight_sum=0.0;
+        for (unsigned j=0; j<=ELEMENT_DIM; j++)
+        {
+            if (weight[j] < 0.0)
+            {
+                neg_weight_sum += weight[j];
+            }
+        }
+        if (neg_weight_sum > max_min_weight)
+        {
+            max_min_weight = neg_weight_sum;
+            closest_index = *iter;
+        }
+    }
+    assert(!this->mElements[closest_index]->IsDeleted());
+    return closest_index;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

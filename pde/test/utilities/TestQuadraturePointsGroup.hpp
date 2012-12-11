@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QuadraturePointsGroup.hpp"
 #include "TrianglesMeshReader.hpp"
+#include "TetrahedralMesh.hpp"
 
 class TestQuadraturePointsGroup : public CxxTest::TestSuite
 {
@@ -62,20 +63,20 @@ public:
         ChastePoint<1> local_quad_point_0 = quad_rule.rGetQuadPoint(0);
         ChastePoint<1> local_quad_point_1 = quad_rule.rGetQuadPoint(1);
 
-        c_vector<double,2> X = group.Get(0,0);
-        TS_ASSERT_DELTA(X(0), local_quad_point_0[0]/10, 1e-9);
+        c_vector<double,2> quad_point = group.rGet(0, 0);
+        TS_ASSERT_DELTA(quad_point(0), local_quad_point_0[0]/10, 1e-9);
 
-        X = group.Get(0,1);
-        TS_ASSERT_DELTA(X(0), local_quad_point_1[0]/10, 1e-9);
+        quad_point = group.rGet(0, 1);
+        TS_ASSERT_DELTA(quad_point(0), local_quad_point_1[0]/10, 1e-9);
 
-        X = group.Get(8,0);
-        TS_ASSERT_DELTA(X(0), 0.8+local_quad_point_0[0]/10, 1e-9);
+        quad_point = group.rGet(8, 0);
+        TS_ASSERT_DELTA(quad_point(0), 0.8+local_quad_point_0[0]/10, 1e-9);
 
-        X = group.Get(8,1);
-        TS_ASSERT_DELTA(X(0), 0.8+local_quad_point_1[0]/10, 1e-9);
+        quad_point = group.rGet(8, 1);
+        TS_ASSERT_DELTA(quad_point(0), 0.8+local_quad_point_1[0]/10, 1e-9);
 
-        X = group.Get(17);
-        TS_ASSERT_DELTA(X(0), 0.8+local_quad_point_1[0]/10, 1e-9);
+        quad_point = group.rGet(17);
+        TS_ASSERT_DELTA(quad_point(0), 0.8+local_quad_point_1[0]/10, 1e-9);
     }
 
     void TestGetQuadPointLocations2d() throw(Exception)
@@ -93,18 +94,18 @@ public:
         TS_ASSERT_EQUALS(group.GetNumQuadPointsPerElement(), 3u);
         for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
         {
-            c_vector<double,2> X = group.Get(0, quad_index);
+            c_vector<double,2> X = group.rGet(0, quad_index);
             TS_ASSERT_LESS_THAN(X(0)+X(1), 1.0); // quad point in elem 0, so x+y<1
 
-            X = group.Get(1, quad_index);
+            X = group.rGet(1, quad_index);
             TS_ASSERT_LESS_THAN(1.0, X(0)+X(1)); // quad point in elem 0, so x+y>1
         }
 
         TS_ASSERT_EQUALS(group.Size(), 6u);
         for (unsigned index=0; index<group.Size(); index++)
         {
-            TS_ASSERT_LESS_THAN_EQUALS(group.Get(index)[0], 5.0/6.0);
-            TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, group.Get(index)[0]);
+            TS_ASSERT_LESS_THAN_EQUALS(group.rGet(index)[0], 5.0/6.0);
+            TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, group.rGet(index)[0]);
         }
     }
 };

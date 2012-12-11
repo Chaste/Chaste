@@ -408,7 +408,7 @@ public:
         *p_file2 << quad_points.Size() << "\n";
         for(unsigned i=0; i<quad_points.Size(); i++)
         {
-            double X = quad_points.Get(i)(0);
+            double X = quad_points.rGet(i)(0);
             double theta = M_PI/3 - 10*X*2*M_PI/3;
             *p_file2 <<  "0 " << cos(theta)  << " " << sin(theta)
                      << " 0 " << -sin(theta) << " " << cos(theta)

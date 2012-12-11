@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraturePointsGroup.hpp"
 
 template<unsigned DIM>
-QuadraturePointsGroup<DIM>::QuadraturePointsGroup(TetrahedralMesh<DIM,DIM>& rMesh,
-                          GaussianQuadratureRule<DIM>& rQuadRule)
+QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+                                                  GaussianQuadratureRule<DIM>& rQuadRule)
 {
     mNumElements = rMesh.GetNumElements();
     mNumQuadPointsPerElement = rQuadRule.GetNumQuadPoints();
@@ -71,7 +71,7 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(TetrahedralMesh<DIM,DIM>& rMes
 }
 
 template<unsigned DIM>
-c_vector<double,DIM>& QuadraturePointsGroup<DIM>::Get(unsigned elementIndex, unsigned quadIndex)
+c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(unsigned elementIndex, unsigned quadIndex)
 {
     assert(elementIndex<mNumElements);
     assert(quadIndex<mNumQuadPointsPerElement);
@@ -79,7 +79,7 @@ c_vector<double,DIM>& QuadraturePointsGroup<DIM>::Get(unsigned elementIndex, uns
 }
 
 template<unsigned DIM>
-c_vector<double,DIM>& QuadraturePointsGroup<DIM>::Get(unsigned i)
+c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(unsigned i)
 {
     assert(i < mNumElements*mNumQuadPointsPerElement);
     return data[i];

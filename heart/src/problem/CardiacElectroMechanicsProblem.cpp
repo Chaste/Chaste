@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 #include "AbstractDynamicLinearPdeSolver.hpp"
 #include "TimeStepper.hpp"
-#include "QuadraturePointsGroup.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "Hdf5ToCmguiConverter.hpp"

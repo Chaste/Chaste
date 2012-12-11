@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FineCoarseMeshPair.hpp"
 
 template<unsigned DIM>
-FineCoarseMeshPair<DIM>::FineCoarseMeshPair(TetrahedralMesh<DIM,DIM>& rFineMesh, TetrahedralMesh<DIM,DIM>& rCoarseMesh)
+FineCoarseMeshPair<DIM>::FineCoarseMeshPair(AbstractTetrahedralMesh<DIM,DIM>& rFineMesh, AbstractTetrahedralMesh<DIM,DIM>& rCoarseMesh)
     : mrFineMesh(rFineMesh),
       mrCoarseMesh(rCoarseMesh),
       mpFineMeshBoxCollection(NULL),
@@ -46,13 +46,13 @@ FineCoarseMeshPair<DIM>::FineCoarseMeshPair(TetrahedralMesh<DIM,DIM>& rFineMesh,
 }
 
 template<unsigned DIM>
-const TetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetFineMesh() const
+const AbstractTetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetFineMesh() const
 {
     return  mrFineMesh;
 }
 
 template<unsigned DIM>
-const TetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetCoarseMesh() const
+const AbstractTetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetCoarseMesh() const
 {
     return  mrCoarseMesh;
 }
@@ -101,7 +101,7 @@ void FineCoarseMeshPair<DIM>::SetUpBoxesOnCoarseMesh(double boxWidth)
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::SetUpBoxes(TetrahedralMesh<DIM, DIM>& rMesh,
+void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMesh,
                                          double boxWidth,
                                          BoxCollection<DIM>*& rpBoxCollection)
 {
@@ -139,25 +139,11 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(TetrahedralMesh<DIM, DIM>& rMesh,
         boxWidth = (extended_min_and_max(1) - extended_min_and_max(0))/19.000000001;
 
         // Determine the maximum edge length
-        double max_edge_length = -1;
+        c_vector<double, 2> min_max_edge_length = rMesh.CalculateMinMaxEdgeLengths();
 
-        for (typename TetrahedralMesh<DIM,DIM>::EdgeIterator edge_iterator = rMesh.EdgesBegin();
-             edge_iterator!=rMesh.EdgesEnd();
-             ++edge_iterator)
+        if (boxWidth < min_max_edge_length[1])
         {
-            c_vector<double, 3> location1 = edge_iterator.GetNodeA()->rGetLocation();
-            c_vector<double, 3> location2 = edge_iterator.GetNodeB()->rGetLocation();
-            double edge_length = norm_2(location1-location2);
-
-            if (edge_length>max_edge_length)
-            {
-                max_edge_length = edge_length;
-            }
-        }
-
-        if (boxWidth < max_edge_length)
-        {
-            boxWidth = 1.1*max_edge_length;
+            boxWidth = 1.1*min_max_edge_length[1];
         }
     }
 
@@ -228,10 +214,10 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
         #undef COVERAGE_IGNORE
 
         // Get the box this point is in
-        unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( quad_point_posns.Get(i) );
+        unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( quad_point_posns.rGet(i) );
 
         // A chaste point version of the c-vector is needed for the GetContainingElement call.
-        ChastePoint<DIM> point(quad_point_posns.Get(i));
+        ChastePoint<DIM> point(quad_point_posns.rGet(i));
 
         ComputeFineElementAndWeightForGivenPoint(point, safeMode, box_for_this_point, i);
     }

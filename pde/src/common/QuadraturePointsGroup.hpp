@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define QUADRATUREPOINTSGROUP_HPP_
 
 #include "UblasCustomFunctions.hpp"
-#include "TetrahedralMesh.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "LinearBasisFunction.hpp"
 #include <vector>
@@ -70,27 +70,23 @@ public:
      * @param rMesh
      * @param rQuadRule
      */
-    QuadraturePointsGroup(TetrahedralMesh<DIM,DIM>& rMesh,
+    QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
                           GaussianQuadratureRule<DIM>& rQuadRule);
 
     /**
      * Access the stored quadrature point by element index and quad index in the element.
      *
-     * \todo this method should be renamed rGet() as it returns a reference
-     *
      * @param elementIndex
      * @param quadIndex
      */
-    c_vector<double,DIM>& Get(unsigned elementIndex, unsigned quadIndex);
+    c_vector<double,DIM>& rGet(unsigned elementIndex, unsigned quadIndex);
 
     /**
      * Get the i-th stored quadrature point.
      *
-     * \todo this method should be renamed rGet() as it returns a reference
-     *
      * @param i
      */
-    c_vector<double,DIM>& Get(unsigned i);
+    c_vector<double,DIM>& rGet(unsigned i);
 
     /** Number of elements in the mesh that was given in the constructor */
     unsigned GetNumElements() const;
@@ -98,7 +94,7 @@ public:
     /** Number of quad points per element in the rule that was given in the constructor */
     unsigned GetNumQuadPointsPerElement() const;
 
-    /** Total size, ie total number of quad points, ie num_elem times num_quad_points_per_elem */
+    /** Total size, ie total number of quad points, i.e. num_elem times num_quad_points_per_elem */
     unsigned Size() const;
 };
 

@@ -571,7 +571,33 @@ public:
       */
      virtual c_vector<double, 2> CalculateMinMaxEdgeLengths();
 
-     //////////////////////////////////////////////////////////////////////
+     /**
+      * Return the element index for the first element that contains a test point
+      *
+      * @param rTestPoint reference to the point
+      * @param strict  Should the element returned contain the point in the interior and
+      *      not on an edge/face/vertex (default = not strict)
+      * @param testElements  a set of guesses for the element (a set of element indices), to be checked
+      *      first for potential efficiency improvements. (default = empty set)
+      * @param onlyTryWithTestElements Do not continue with other elements after trying the with testElements
+      *      (for cases where you know the testPoint must be in the set of test elements or maybe outside
+      *      the mesh).
+      */
+     unsigned GetContainingElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint,
+                                        bool strict=false,
+                                        std::set<unsigned> testElements=std::set<unsigned>(),
+                                        bool onlyTryWithTestElements = false);
+
+     /** As with GetNearestElementIndex() except only searches in the given set of elements.
+      *  @param rTestPoint reference to the point
+      *  @param testElements a set of elements (element indices) to look in
+      */
+     unsigned GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
+                                                     std::set<unsigned> testElements);
+
+
+
+    //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////
 
