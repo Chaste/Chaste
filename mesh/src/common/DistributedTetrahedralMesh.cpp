@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 #include "Timer.hpp"
+#include "TetrahedralMesh.hpp"
 
 #include "petscao.h"
 
@@ -67,7 +68,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
       mpSpaceRegion(NULL),
       mMetisPartitioning(partitioningMethod)
 {
-    if (ELEMENT_DIM == 1)
+    if (ELEMENT_DIM == 1 && (partitioningMethod != DistributedTetrahedralMeshPartitionType::GEOMETRIC))
     {
         //No METIS partition is possible - revert to DUMB
         mMetisPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
@@ -685,81 +686,110 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     {
         EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
     }
-    //Use dumb partition so that archiving doesn't permute anything
-    mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
-    mTotalNumNodes=width+1;
-    mTotalNumBoundaryElements=2u;
-    mTotalNumElements=width;
 
-    //Use DistributedVectorFactory to make a dumb partition of the nodes
-    assert(!this->mpDistributedVectorFactory);
-    this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
-    if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
+    // Hook to pick up when we are using a geometric partition.
+    if(mMetisPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
     {
-        //It's a short mesh and this process owns no nodes
-        return;
-    }
-
-    /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
-     * higher numbered process may have dropped out of this construction altogether
-     * (because is has no local ownership)
-     */
-    bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
-
-    unsigned lo_node=this->mpDistributedVectorFactory->GetLow();
-    unsigned hi_node=this->mpDistributedVectorFactory->GetHigh();
-    if (!PetscTools::AmMaster())
-    {
-        //Allow for a halo node
-        lo_node--;
-    }
-    if (!am_top_most)
-    {
-        //Allow for a halo node
-        hi_node++;
-    }
-    Node<SPACE_DIM>* p_old_node=NULL;
-    for (unsigned node_index=lo_node; node_index<hi_node; node_index++)
-    {
-        // create node or halo-node
-        Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, node_index==0 || node_index==width, node_index);
-        if (node_index<this->mpDistributedVectorFactory->GetLow() ||
-            node_index==this->mpDistributedVectorFactory->GetHigh() )
+        if (!mpSpaceRegion)
         {
-            //Beyond left or right it's a halo node
-            RegisterHaloNode(node_index);
-            mHaloNodes.push_back(p_node);
+            EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
         }
-        else
-        {
-            RegisterNode(node_index);
-            this->mNodes.push_back(p_node); // create node
 
-            //A boundary face has to be wholely owned by the process
-            //Since, when ELEMENT_DIM>1 we have *at least* boundary node as a non-halo
-            if (node_index==0) // create left boundary node and boundary element
-            {
-                this->mBoundaryNodes.push_back(p_node);
-                RegisterBoundaryElement(0);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(0, p_node) );
-            }
-            if (node_index==width) // create right boundary node and boundary element
-            {
-                this->mBoundaryNodes.push_back(p_node);
-                RegisterBoundaryElement(1);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(1, p_node) );
-            }
-            }
-        if (node_index>lo_node) // create element
+        // Write a serial file, the load on distributed processors.
+        ///\todo probably faster to make mesh from scratch.
         {
-            std::vector<Node<SPACE_DIM>*> nodes;
-            nodes.push_back(p_old_node);
-            nodes.push_back(p_node);
-            RegisterElement(node_index-1);
-            this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(node_index-1, nodes) );
+            TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_linear_mesh");
+            TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+            base_mesh.ConstructLinearMesh(width);
+            mesh_writer.WriteFilesUsingMesh(base_mesh);
         }
-        //Keep track of the node which we've just created
-        p_old_node=p_node;
+        PetscTools::Barrier();
+
+        OutputFileHandler output_handler("", false);
+
+        std::string output_dir = output_handler.GetOutputDirectoryFullPath();
+        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_linear_mesh");
+
+        this->ConstructFromMeshReader(mesh_reader);
+    }
+    else    // use a DUMB partition.
+    {
+        //Use dumb partition so that archiving doesn't permute anything
+        mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+        mTotalNumNodes=width+1;
+        mTotalNumBoundaryElements=2u;
+        mTotalNumElements=width;
+
+        //Use DistributedVectorFactory to make a dumb partition of the nodes
+        assert(!this->mpDistributedVectorFactory);
+        this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
+        if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
+        {
+            //It's a short mesh and this process owns no nodes
+            return;
+        }
+
+        /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
+         * higher numbered process may have dropped out of this construction altogether
+         * (because is has no local ownership)
+         */
+        bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
+
+        unsigned lo_node=this->mpDistributedVectorFactory->GetLow();
+        unsigned hi_node=this->mpDistributedVectorFactory->GetHigh();
+        if (!PetscTools::AmMaster())
+        {
+            //Allow for a halo node
+            lo_node--;
+        }
+        if (!am_top_most)
+        {
+            //Allow for a halo node
+            hi_node++;
+        }
+        Node<SPACE_DIM>* p_old_node=NULL;
+        for (unsigned node_index=lo_node; node_index<hi_node; node_index++)
+        {
+            // create node or halo-node
+            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, node_index==0 || node_index==width, node_index);
+            if (node_index<this->mpDistributedVectorFactory->GetLow() ||
+                node_index==this->mpDistributedVectorFactory->GetHigh() )
+            {
+                //Beyond left or right it's a halo node
+                RegisterHaloNode(node_index);
+                mHaloNodes.push_back(p_node);
+            }
+            else
+            {
+                RegisterNode(node_index);
+                this->mNodes.push_back(p_node); // create node
+
+                //A boundary face has to be wholely owned by the process
+                //Since, when ELEMENT_DIM>1 we have *at least* boundary node as a non-halo
+                if (node_index==0) // create left boundary node and boundary element
+                {
+                    this->mBoundaryNodes.push_back(p_node);
+                    RegisterBoundaryElement(0);
+                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(0, p_node) );
+                }
+                if (node_index==width) // create right boundary node and boundary element
+                {
+                    this->mBoundaryNodes.push_back(p_node);
+                    RegisterBoundaryElement(1);
+                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(1, p_node) );
+                }
+                }
+            if (node_index>lo_node) // create element
+            {
+                std::vector<Node<SPACE_DIM>*> nodes;
+                nodes.push_back(p_old_node);
+                nodes.push_back(p_node);
+                RegisterElement(node_index-1);
+                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(node_index-1, nodes) );
+            }
+            //Keep track of the node which we've just created
+            p_old_node=p_node;
+        }
     }
 }
 
