@@ -712,7 +712,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 
         this->ConstructFromMeshReader(mesh_reader);
     }
-    else    // use a DUMB partition.
+    else    // use a default partition.
     {
         //Use dumb partition so that archiving doesn't permute anything
         mMetisPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
