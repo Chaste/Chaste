@@ -1816,7 +1816,9 @@ public:
                  ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
                  boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-                 (*p_arch) << p_box_collection;
+                 // Make a const pointer
+                 DistributedBoxCollection<3>* const p_const_box_collection = p_box_collection;
+                 (*p_arch) << p_const_box_collection;
              }
 
              // Tidy up
