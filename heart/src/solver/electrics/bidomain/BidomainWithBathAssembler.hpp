@@ -85,7 +85,7 @@ public:
     /**
      * Destructor.
      */
-    ~BidomainWithBathAssembler()
+    virtual ~BidomainWithBathAssembler()
     {
     }
 };

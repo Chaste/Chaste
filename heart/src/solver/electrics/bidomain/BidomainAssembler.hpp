@@ -108,7 +108,7 @@ public:
     /**
      * Destructor.
      */
-    ~BidomainAssembler()
+    virtual ~BidomainAssembler()
     {
     }
 };

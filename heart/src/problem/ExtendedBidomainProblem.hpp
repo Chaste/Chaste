@@ -408,7 +408,7 @@ public:
     /**
      * Destructor
      */
-    ~ExtendedBidomainProblem();
+    virtual ~ExtendedBidomainProblem();
 
     /**
      *  Set the nodes at which phi_e (the extracellular potential) is fixed to

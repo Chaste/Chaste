@@ -235,7 +235,7 @@ public:
     /**
      *  Destructor
      */
-    ~AbstractCardiacMechanicsSolver();
+    virtual ~AbstractCardiacMechanicsSolver();
 
     /**
      * Sets the fine-coarse mesh pair object so that the solver knows about electrics too.

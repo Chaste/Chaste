@@ -101,7 +101,7 @@ public:
     /**
      * Destructor.
      */
-    ~ExtendedBidomainMassMatrixAssembler()
+    virtual ~ExtendedBidomainMassMatrixAssembler()
     {
     }
 };

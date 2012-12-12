@@ -108,7 +108,7 @@ public:
     /**
      * Over-written destructor to delete pointer to BoxCollection
      */
-    ~NodesOnlyMesh();
+    virtual ~NodesOnlyMesh();
 
     /**
      * Construct the mesh using only nodes. No mesh is created, but the nodes are stored.

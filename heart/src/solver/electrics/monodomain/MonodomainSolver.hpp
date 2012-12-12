@@ -140,7 +140,7 @@ public:
     /**
      *  Destructor
      */
-    ~MonodomainSolver();
+    virtual ~MonodomainSolver();
 };
 
 

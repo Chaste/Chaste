@@ -117,7 +117,7 @@ public:
     /**
      * Destructor.
      */
-    ~LinearSpringWithVariableSpringConstantsForce();
+    virtual ~LinearSpringWithVariableSpringConstantsForce();
 
     /**
      * Set whether to use an edge-based spring constant.

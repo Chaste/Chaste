@@ -125,7 +125,7 @@ public:
     ElectroMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh);
 
     /** Destructor */
-    ~ElectroMechanicsProblemDefinition();
+    virtual ~ElectroMechanicsProblemDefinition();
 
     /**
      * Set the contraction model to be used (throughout the tissue).

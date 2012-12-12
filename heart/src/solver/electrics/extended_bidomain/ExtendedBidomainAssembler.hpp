@@ -117,7 +117,7 @@ public:
     /**
      * Destructor.
      */
-    ~ExtendedBidomainAssembler();
+    virtual ~ExtendedBidomainAssembler();
 
 };
 

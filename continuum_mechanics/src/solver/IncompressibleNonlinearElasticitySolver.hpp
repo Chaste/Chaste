@@ -152,7 +152,7 @@ public:
 
 
     /** Destructor. */
-    ~IncompressibleNonlinearElasticitySolver()
+    virtual ~IncompressibleNonlinearElasticitySolver()
     {
     }
 };

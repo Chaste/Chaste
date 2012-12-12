@@ -101,7 +101,7 @@ public:
     /**
      * Destructor.
      */
-    ~NagaiHondaDifferentialAdhesionForce();
+    virtual ~NagaiHondaDifferentialAdhesionForce();
 
     /**
      * Overridden GetAdhesionParameter() method.

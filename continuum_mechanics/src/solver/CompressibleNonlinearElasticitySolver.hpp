@@ -136,7 +136,7 @@ public:
                                           std::string outputDirectory);
 
     /** Destructor. */
-    ~CompressibleNonlinearElasticitySolver();
+    virtual ~CompressibleNonlinearElasticitySolver();
 };
 
 #endif /*COMPRESSIBLENONLINEARELASTICITYSOLVER_HPP_*/

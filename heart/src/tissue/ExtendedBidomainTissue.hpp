@@ -229,7 +229,7 @@ public:
     /**
      * Destructor
      */
-    ~ExtendedBidomainTissue();
+    virtual ~ExtendedBidomainTissue();
 
     /**
      * Sets the value of the conductivities for the second cell.

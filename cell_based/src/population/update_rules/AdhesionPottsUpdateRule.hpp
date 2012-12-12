@@ -89,7 +89,7 @@ public:
     /**
      * Destructor.
      */
-    ~AdhesionPottsUpdateRule();
+    virtual ~AdhesionPottsUpdateRule();
 
     /**
      * Overridden EvaluateHamiltonianContribution() method

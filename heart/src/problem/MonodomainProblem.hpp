@@ -95,7 +95,7 @@ public:
     /**
      * Destructor
      */
-    ~MonodomainProblem();
+    virtual ~MonodomainProblem();
 
     /** Get the monodomain PDE */
     MonodomainTissue<ELEMENT_DIM,SPACE_DIM> * GetMonodomainTissue();

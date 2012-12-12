@@ -97,7 +97,7 @@ public:
     /**
      * Destructor.
      */
-    ~DifferentialAdhesionPottsUpdateRule();
+    virtual ~DifferentialAdhesionPottsUpdateRule();
 
     /**
      * Overridden GetCellCellAdhesionEnergy method to implement differential adhesion.

@@ -220,8 +220,7 @@ public:
          * @param index  the index of the item to point at
          * @param pReader  the mesh reader to iterate over
          */
-        explicit ElementIterator(unsigned index,
-                                 AbstractMeshReader* pReader)
+        ElementIterator(unsigned index, AbstractMeshReader* pReader)
             : mIndex(index),
               mpIndices(NULL),
               mpReader(pReader)
@@ -358,8 +357,7 @@ public:
          * @param index  the index of the item to point at
          * @param pReader  the mesh reader to iterate over
          */
-        explicit NodeIterator(unsigned index,
-                                 AbstractMeshReader* pReader)
+        NodeIterator(unsigned index, AbstractMeshReader* pReader)
             : mIndex(index),
               mpIndices(NULL),
               mpReader(pReader)

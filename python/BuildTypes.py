@@ -931,8 +931,10 @@ class Intel(BuildType):
         self._compiler_type = 'intel'
         # Turn off some warnings, and report warnings as errors
         #self._cc_flags = ['-wr470', '-wr186', '-pc64'] #Emulates a 64-bit (not 80-bit) FPU
-        self._cc_flags = ['-Werror']
-        self._link_flags = ['-static-libcxa']
+        self._cc_flags = ['-Werror', '-Wall',
+                          '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter',
+                          '-wr2304']
+        self._link_flags = [] # Newer Intel doesn't support '-static-libcxa'
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
