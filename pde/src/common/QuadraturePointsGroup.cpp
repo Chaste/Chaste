@@ -40,7 +40,11 @@ template<unsigned DIM>
 QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
                                                   GaussianQuadratureRule<DIM>& rQuadRule)
 {
-    c_vector<double, DIM> unset(vector<double>(DIM, DOUBLE_UNSET));
+    c_vector<double, DIM> unset;
+    for (unsigned i=0; i<DIM; i++)
+    {
+        unset(i)=DOUBLE_UNSET;
+    }
 	mNumElements = rMesh.GetNumElements();
     mNumQuadPointsPerElement = rQuadRule.GetNumQuadPoints();
     data.resize(mNumElements*mNumQuadPointsPerElement, unset);
