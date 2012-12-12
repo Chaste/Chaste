@@ -34,19 +34,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "QuadraturePointsGroup.hpp"
+#include "Exception.hpp"
 
 template<unsigned DIM>
 QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
                                                   GaussianQuadratureRule<DIM>& rQuadRule)
 {
-    mNumElements = rMesh.GetNumElements();
+    c_vector<double, DIM> unset(vector<double>(DIM, DOUBLE_UNSET));
+	mNumElements = rMesh.GetNumElements();
     mNumQuadPointsPerElement = rQuadRule.GetNumQuadPoints();
-    data.resize(mNumElements*mNumQuadPointsPerElement, zero_vector<double>(DIM));
+    data.resize(mNumElements*mNumQuadPointsPerElement, unset);
 
     // Loop over elements
-    for (unsigned elem_index=0; elem_index<rMesh.GetNumElements(); elem_index++)
+    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = rMesh.GetElementIteratorBegin();
+                  iter != rMesh.GetElementIteratorEnd();
+                  ++iter)
     {
-        Element<DIM,DIM>& r_elem = *(rMesh.GetElement(elem_index));
+//        Element<DIM,DIM>& r_elem = *(rMesh.GetElement(elem_index));
+        unsigned elem_index = iter->GetIndex();
 
         c_vector<double, DIM+1> linear_phi;
         for (unsigned quad_index=0; quad_index<rQuadRule.GetNumQuadPoints(); quad_index++)
@@ -56,16 +61,16 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DI
             LinearBasisFunction<DIM>::ComputeBasisFunctions(quadrature_point, linear_phi);
 
             // Interpolate to calculate quadrature point
-            c_vector<double,DIM> X = zero_vector<double>(DIM);
+            c_vector<double,DIM> physical_quad_point = zero_vector<double>(DIM);
             for (unsigned node_index=0; node_index<DIM+1; node_index++)
             {
-                X += linear_phi(node_index)*rMesh.GetNode( r_elem.GetNodeGlobalIndex(node_index) )->rGetLocation();
+            	physical_quad_point += linear_phi(node_index)*(iter->GetNode(node_index))->rGetLocation();
             }
 
             // Save the quadrature point
             assert(elem_index<mNumElements);
             assert(quad_index<mNumQuadPointsPerElement);
-            data[ elem_index*mNumQuadPointsPerElement + quad_index ] = X;
+            data[ elem_index*mNumQuadPointsPerElement + quad_index ] = physical_quad_point;
         }
     }
 }

@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraturePointsGroup.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
+#include "DistributedTetrahedralMesh.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestQuadraturePointsGroup : public CxxTest::TestSuite
 {
@@ -92,13 +94,18 @@ public:
         TS_ASSERT_EQUALS(quad_rule.GetNumQuadPoints(), 3u);
         TS_ASSERT_EQUALS(group.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(group.GetNumQuadPointsPerElement(), 3u);
+
+        // Element 0
         for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
         {
-            c_vector<double,2> X = group.rGet(0, quad_index);
-            TS_ASSERT_LESS_THAN(X(0)+X(1), 1.0); // quad point in elem 0, so x+y<1
-
-            X = group.rGet(1, quad_index);
-            TS_ASSERT_LESS_THAN(1.0, X(0)+X(1)); // quad point in elem 0, so x+y>1
+            c_vector<double,2> quad_point = group.rGet(0, quad_index);
+            TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
+        }
+        // Element 1
+        for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+        {
+            c_vector<double,2> quad_point = group.rGet(1, quad_index);
+            TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
         }
 
         TS_ASSERT_EQUALS(group.Size(), 6u);
@@ -108,6 +115,78 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, group.rGet(index)[0]);
         }
     }
+
+    void TestGetQuadPointLocations2dDistributed() throw(Exception)
+    {
+    	TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
+		DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+
+		mesh.ConstructFromMeshReader(reader);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
+
+        GaussianQuadratureRule<2> quad_rule(2);
+        TS_ASSERT_EQUALS(quad_rule.GetNumQuadPoints(), 3u);
+
+        QuadraturePointsGroup<2> group(mesh, quad_rule);
+        TS_ASSERT_EQUALS(group.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(group.GetNumQuadPointsPerElement(), 3u);
+
+        // Element 0
+        try
+        {
+			mesh.GetElement(0); //Throws if not owned
+        	for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+			{
+				c_vector<double,2> quad_point = group.rGet(0, quad_index);
+				TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
+			}
+        }
+        catch (Exception& e)
+        {
+			//If not, then we know nothing about these quad points
+        	for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+			{
+				c_vector<double,2> quad_point = group.rGet(0, quad_index);
+				TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
+				TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
+			}
+
+        }
+        // Element 1
+        try
+        {
+			mesh.GetElement(0); //Throws if not owned
+			for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+			{
+				c_vector<double,2> quad_point = group.rGet(1, quad_index);
+				TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
+			}
+        }
+        catch (Exception& e)
+		{
+			//If not, then we know nothing about these quad points
+			for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+			{
+				c_vector<double,2> quad_point = group.rGet(0, quad_index);
+				TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
+				TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
+			}
+		}
+
+        TS_ASSERT_EQUALS(group.Size(), 6u);
+        for (unsigned index=0; index<group.Size(); index++)
+        {
+            double quad_x = group.rGet(index)[0];
+            if (quad_x != DOUBLE_UNSET)
+			{
+            	TS_ASSERT_LESS_THAN_EQUALS(quad_x, 5.0/6.0);
+            	TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, quad_x);
+			}
+        }
+    }
+
+
 };
 
 #endif /*TESTQUADRATUREPOINTSGROUP_HPP_*/

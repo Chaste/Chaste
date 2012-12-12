@@ -44,8 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A simple class which takes in a mesh and a quadrature rule, and collects
- * are the quadrature points (in physical space ie several for each element)
+ * all the quadrature points in physical space (rather than in natural element coordinates)
  * together in one data structure, for access.
+ *
+ * In a distributed mesh, a set of quad points can still be accessed for a given
+ * element but then any missing data is marked with DOUBLE_UNSET
  */
 template<unsigned DIM>
 class QuadraturePointsGroup
