@@ -86,7 +86,7 @@ public:
     /**
      * Destructor.
      */
-    ~AbstractPeriodicTwoBodyInteractionForce();
+    virtual ~AbstractPeriodicTwoBodyInteractionForce();
 
     /**
      * Calculates the force between two nodes.
