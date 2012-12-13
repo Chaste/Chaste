@@ -385,7 +385,7 @@ namespace boost
 namespace serialization
 {
 /**
- * De-serialize constructor parameters and initialize a DistributedBoxCollection.
+ * Save information needed to reconstruct a box collection on load.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
@@ -393,19 +393,16 @@ inline void save_construct_data(
 {
     // Save the number of rows that each process owns, so that on loading we can resume with
     // good load balance
-    unsigned rank = PetscTools::GetMyRank();
     int num_local_rows = (int)(t->GetNumRowsOfBoxes());
-
-    MPI_Send(&num_local_rows,1, MPI_INT, 0, rank, PETSC_COMM_WORLD);
+    std::vector<int> num_rows;
     if (PetscTools::AmMaster())
     {
-        std::vector<int> num_rows(PetscTools::GetNumProcs(), 0);
-        MPI_Status status[PetscTools::GetNumProcs()];
-        for (unsigned proc = 0; proc < PetscTools::GetNumProcs(); proc++)
-        {
-            MPI_Recv(&num_rows[proc], 1, MPI_INT, proc, proc, PETSC_COMM_WORLD, &status[proc]);
-        }
-
+        num_rows.resize(PetscTools::GetNumProcs());
+    }
+    MPI_Gather(&num_local_rows, 1, MPI_INT, &num_rows[0], num_rows.size(), MPI_INT, 0, PETSC_COMM_WORLD);
+    
+    if (PetscTools::AmMaster())
+    {
         bool are_boxes_set = t->GetAreLocalBoxesSet();
         ar << are_boxes_set;
 
@@ -462,7 +459,7 @@ inline void load_construct_data(
     // Invoke inplace constructor to initialise instance. Assume non-periodic
     ::new(t)DistributedBoxCollection<DIM>(cut_off, domain_size, false, num_rows);
 
-    if(are_boxes_set)
+    if (are_boxes_set)
     {
         t->SetupHaloBoxes();
         t->SetupLocalBoxesHalfOnly();
