@@ -523,7 +523,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
     OutputFileHandler output_file_handler(this->mSimulationOutputDirectory + "/", false);
 
     // Output machine information
-    ExecutableSupport::WriteMachineInfoFile(this->mSimulationOutputDirectory + "/system_info");
+    ExecutableSupport::SetOutputDirectory(output_file_handler.GetOutputDirectoryFullPath());
+    ExecutableSupport::WriteMachineInfoFile("system_info");
 
     // Output Chaste provenance information
     out_stream build_info_file = output_file_handler.OpenOutputFile("build.info");
