@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/trim_all.hpp>
 #include <cstring>
 
 #include "CommandLineArguments.hpp"
@@ -45,8 +44,6 @@ CommandLineArgumentsMocker::CommandLineArgumentsMocker(std::string newArguments)
     // Save the location of the real arguments to be restored later...
     mpNumOldArgs = CommandLineArguments::Instance()->p_argc;
     mpOldArgs = CommandLineArguments::Instance()->p_argv;
-
-    boost::trim_all(newArguments); // Remove spaces/tabs at beginning and end, and any in the middle to just one space.
 
     std::vector<std::string> strings;
     boost::split(strings, newArguments, boost::is_any_of("\t "));
