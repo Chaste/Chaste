@@ -245,7 +245,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
 // Similar to above but uses a compressible material
 //
 // Comments: with CompressibleMooneyRivlinLaw<3> law(1.0,0.0) this fails even with tiny deformation (tiny pressure/gravity),
-//   and using SetTakeFullFirstNewtonStep() makes things worse - need to check Jacobian derivs..
+//   and using SetTakeFullFirstNewtonStep() makes things worse - need to check Jacobian derivs.. (#2304)
 unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::string outputDirectory,
                                               std::vector<double>& rSolution,
                                               bool useSolutionAsGuess,
