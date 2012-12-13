@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <cassert>
 #include "CommandLineArguments.hpp"
+#include "CommandLineArgumentsMocker.hpp"
 
 /* HOW_TO_TAG General
  * Read and use parameters from the command line
@@ -59,7 +60,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are due to Petsc thinking the parameter must have been for it.
  *
  */
-
 class TestCommandLineArguments : public CxxTest::TestSuite
 {
 public:
@@ -211,34 +211,38 @@ public:
         CommandLineArguments::Instance()->p_argv = p_real_argv;
     }
 
-//    void TestPretendCommandLineArguments() throw(Exception)
-//    {
-//        // Save the real args to be restored at the end
-//        int* p_real_argc = CommandLineArguments::Instance()->p_argc;
-//        char*** p_real_argv = CommandLineArguments::Instance()->p_argv;
-//
-//        CommandLineArguments::Instance()->AddArguments("--option1 choice1 --option2 2 --option3 1.0 2.0 3.0");
-//
-//        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option1"));
-//        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option2"));
-//        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option3"));
-//
-//        std::vector<double> some_doubles = CommandLineArguments::Instance()->GetDoublesCorrespondingToOption("--option3");
-//        TS_ASSERT_EQUALS(some_doubles.size(), 3u);
-//        TS_ASSERT_DELTA(some_doubles[0], 1.0, 1e-12);
-//        TS_ASSERT_DELTA(some_doubles[1], 2.0, 1e-12);
-//        TS_ASSERT_DELTA(some_doubles[2], 3.0, 1e-12);
-//
-//        unsigned a_number = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("--option2");
-//        TS_ASSERT_EQUALS(a_number, 2u);
-//
-//        std::string a_string = CommandLineArguments::Instance()->GetStringCorrespondingToOption("--option1");
-//        TS_ASSERT_EQUALS(a_string,"choice1");
-//
-//        // Restore the real args
-//        CommandLineArguments::Instance()->p_argc = p_real_argc;
-//        CommandLineArguments::Instance()->p_argv = p_real_argv;
-//    }
+    void TestCommandLineArgumentsMocker() throw(Exception)
+    {
+        {
+            /* HOW_TO_TAG General
+             * Use mock/pretend command line arguments
+             */
+            CommandLineArgumentsMocker wrapper("--option1 choice1  --option2   2 --option3 1.0 2.0 3.0");
+
+            TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option1"));
+            TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option2"));
+            TS_ASSERT(CommandLineArguments::Instance()->OptionExists("--option3"));
+
+            std::vector<double> some_doubles = CommandLineArguments::Instance()->GetDoublesCorrespondingToOption("--option3");
+            TS_ASSERT_EQUALS(some_doubles.size(), 3u);
+            TS_ASSERT_DELTA(some_doubles[0], 1.0, 1e-12);
+            TS_ASSERT_DELTA(some_doubles[1], 2.0, 1e-12);
+            TS_ASSERT_DELTA(some_doubles[2], 3.0, 1e-12);
+
+            unsigned a_number = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("--option2");
+            TS_ASSERT_EQUALS(a_number, 2u);
+
+            std::string a_string = CommandLineArguments::Instance()->GetStringCorrespondingToOption("--option1");
+            TS_ASSERT_EQUALS(a_string,"choice1");
+        }
+
+        // Check the original arguments are still working...
+        char** argv = *(CommandLineArguments::Instance()->p_argv);
+        assert(argv != NULL);
+        std::string arg_as_string(argv[0]);
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner",final_part_of_string);
+    }
 };
 
 #endif /*TESTCOMMANDLINEARGUMENTS_HPP_*/
