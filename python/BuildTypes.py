@@ -947,7 +947,10 @@ class Intel(BuildType):
     def GetCompilerVersion(self):
         """Get the major version number of the compiler being used."""
         version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
-        return int(version_str.split('.')[0])
+        try:
+            return int(version_str.split('.')[0])
+        except:
+            return 0
 
     def SetReporting(self, vec=1):
         """Set the reporting level.
