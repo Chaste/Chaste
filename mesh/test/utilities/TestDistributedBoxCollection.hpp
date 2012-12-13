@@ -52,7 +52,7 @@ class TestDistributedBoxCollection : public CxxTest::TestSuite
 private:
 
     template<unsigned DIM>
-    void TestUpdateHaloBoxes(unsigned numProcs)
+    void DoUpdateHaloBoxes(unsigned numProcs)
     {
         if (3 < numProcs)
         {
@@ -118,7 +118,7 @@ private:
     }
 
     template<unsigned DIM>
-    void TestSetupHaloBoxes(unsigned numProcs)
+    void DoSetupHaloBoxes(unsigned numProcs)
     {
         if (3 < numProcs)
         {
@@ -236,6 +236,7 @@ private:
 
         // Tidy up
         delete p_dist_vector;
+        PetscTools::Destroy(petsc_vec);
     }
 
 public:
@@ -316,7 +317,8 @@ public:
         Vec petsc_vec = PetscTools::CreateVec(rows_vector.size());
         int lo, hi;
         VecGetOwnershipRange(petsc_vec, &lo, &hi);
-
+        PetscTools::Destroy(petsc_vec);
+        
         unsigned local_rows = (unsigned)(hi-lo);
 
         TS_ASSERT_EQUALS(box_collection.GetNumLocalBoxes(), local_rows);
@@ -687,17 +689,17 @@ public:
     void TestSetupHaloBoxes1d2d3d() throw (Exception)
     {
         unsigned num_procs = PetscTools::GetNumProcs();
-        TestSetupHaloBoxes<1>(num_procs);
-        TestSetupHaloBoxes<2>(num_procs);
-        TestSetupHaloBoxes<3>(num_procs);
+        DoSetupHaloBoxes<1>(num_procs);
+        DoSetupHaloBoxes<2>(num_procs);
+        DoSetupHaloBoxes<3>(num_procs);
     }
 
     void TestUpdateHaloBoxes1d2d3d() throw (Exception)
     {
         unsigned num_procs = PetscTools::GetNumProcs();
-        TestUpdateHaloBoxes<1>(num_procs);
-        TestUpdateHaloBoxes<2>(num_procs);
-        TestUpdateHaloBoxes<3>(num_procs);
+        DoUpdateHaloBoxes<1>(num_procs);
+        DoUpdateHaloBoxes<2>(num_procs);
+        DoUpdateHaloBoxes<3>(num_procs);
     }
 
     /////////////////////////////////////////////////////////////////////////////////

@@ -240,6 +240,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     MPI_Allreduce(&local_boxes,&total_boxes,1,MPI_UNSIGNED,MPI_SUM,PETSC_COMM_WORLD);
 
     mNumBoxes=total_boxes;
+    PetscTools::Destroy(petsc_vec);
 }
 
 template<unsigned DIM>

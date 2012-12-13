@@ -449,7 +449,7 @@ inline void load_construct_data(
     ar >> num_original_procs;
 
     int num_rows = PETSC_DECIDE;
-    std::vector<int> original_rows(num_original_procs, PETSC_DECIDE);
+    std::vector<int> original_rows;
     ar >> original_rows;
     if (num_original_procs == PetscTools::GetNumProcs())
     {
