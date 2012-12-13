@@ -781,12 +781,12 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<c_vector<unsigned, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
+std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
     assert(ELEMENT_DIM == 2);
     assert(SPACE_DIM == 3);
 
-    std::vector<c_vector<unsigned, 3> > history;
+    std::vector<c_vector<unsigned, 5> > history;
     
     
     bool long_edge_exists = true;
@@ -815,13 +815,14 @@ std::vector<c_vector<unsigned, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
 
                 if (distance_between_nodes > cutoffLength)
                 {
-                    unsigned new_node_index = SplitEdge(p_node_a, p_node_b);
+                	c_vector<unsigned, 3> new_node_index = SplitEdge(p_node_a, p_node_b);
 
-                    c_vector<unsigned, 3> node_set;
-                    node_set(0) = new_node_index;
+                    c_vector<unsigned, 5> node_set;
+                    node_set(0) = new_node_index[0];
                     node_set(1) = p_node_a->GetIndex();
                     node_set(2) = p_node_b->GetIndex();
-
+                    node_set(3) = new_node_index[1];
+                    node_set(4) = new_node_index[2];
                     history.push_back(node_set);
 
                     is_iterator_valid = false;
@@ -850,9 +851,11 @@ std::vector<c_vector<unsigned, 3> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
-    std::set<unsigned> elements_of_node_a = pNodeA->rGetContainingElementIndices();
+	c_vector<unsigned, 3> new_node_index_vector;
+
+	std::set<unsigned> elements_of_node_a = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> elements_of_node_b = pNodeB->rGetContainingElementIndices();
 
     std::set<unsigned> intersection_elements;
@@ -869,6 +872,10 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA,
     
     unsigned new_node_index = this->AddNode(p_new_node);
     
+    new_node_index_vector[0] = new_node_index;
+
+    unsigned counter = 1;
+
     for (std::set<unsigned>::const_iterator it = intersection_elements.begin(); it != intersection_elements.end(); ++it)
     {
         unsigned elementIndex = *it;
@@ -887,9 +894,41 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA,
         // Last, update node b in the original element with the new one
         p_original_element->ReplaceNode(pNodeB, this->mNodes[new_node_index]);
 
+        //Add node in both of these elements to new_node_index_vector (this enables us to add a new spring in the MeshBasedCellPopulation
+        unsigned other_node_index = UNSIGNED_UNSET;
+
+		if ( (p_original_element->GetNodeGlobalIndex(0) != new_node_index) &&
+			 (p_original_element->GetNodeGlobalIndex(0) != pNodeA->GetIndex() ) )
+		{
+			other_node_index = p_original_element->GetNodeGlobalIndex(0);
+		}
+		else if ( (p_original_element->GetNodeGlobalIndex(1) != new_node_index) &&
+				  (p_original_element->GetNodeGlobalIndex(1) != pNodeA->GetIndex() ) )
+		{
+			other_node_index = p_original_element->GetNodeGlobalIndex(1);
+		}
+		else if ( (p_original_element->GetNodeGlobalIndex(2) != new_node_index) &&
+				  (p_original_element->GetNodeGlobalIndex(2) != pNodeA->GetIndex() ) )
+		{
+			other_node_index = p_original_element->GetNodeGlobalIndex(2);
+		}
+		else
+		{
+			NEVER_REACHED;
+		}
+		new_node_index_vector[counter] = other_node_index;
+		counter++;
+	}
+
+    assert(counter<4);
+    assert(counter>1);// need to be in at least one element
+
+    if (counter == 2) // only one new element
+    {
+    	new_node_index_vector[2] = UNSIGNED_UNSET;
     }
 
-    return new_node_index;
+    return new_node_index_vector;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

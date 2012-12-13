@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                                       std::vector<CellPtr>& rCells,
@@ -346,7 +347,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
 	// Only implemented for 2D elements
 	assert(ELEMENT_DIM==2);
 
-	std::vector<c_vector<unsigned, 3> > new_nodes;
+	std::vector<c_vector<unsigned, 5> > new_nodes;
 	new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 
 	// Add new cells onto new nodes
@@ -354,20 +355,8 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
 	{
 		// Copy the cell attached to one of the neighbouring nodes onto the new node
 		unsigned new_node_index = new_nodes[index][0];
-		unsigned node_a_index, node_b_index;
-
-		if (new_nodes[index][1] < new_nodes[index][2])
-		{
-			node_a_index = new_nodes[index][1];
-			node_b_index = new_nodes[index][2];
-		}
-		else
-		{
-			node_a_index = new_nodes[index][2];
-		    node_b_index = new_nodes[index][1];
-		}
-		assert(node_a_index<node_b_index);
-
+		unsigned node_a_index = new_nodes[index][1];
+		unsigned node_b_index = new_nodes[index][2];
 
      	CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
 
@@ -384,91 +373,33 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
 	    // Update rest lengths
 
 	    // remove old node pair // note node_a_index < node_b_index
-	    std::pair<unsigned,unsigned> node_pair (node_a_index, node_b_index);
-
+	    std::pair<unsigned,unsigned> node_pair = CreateOrderedPair(node_a_index, node_b_index);
 	    double old_rest_length  = mSpringRestLengths[node_pair];
 
 	    std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
-
 	    mSpringRestLengths.erase(iter);
 
         //Add new pairs
-	    if (new_node_index<node_a_index)
-    	{
-    		node_pair.first = new_node_index;
-    		node_pair.second  = node_a_index;
-    	}
-    	else
-    	{
-    		node_pair.first = node_a_index;
-    	    node_pair.second  = new_node_index;
-    	}
+	    node_pair = CreateOrderedPair(node_a_index, new_node_index);
     	mSpringRestLengths[node_pair]= old_rest_length/2;
 
-	    if (new_node_index<node_b_index)
-		{
-			node_pair.first = new_node_index;
-			node_pair.second  = node_b_index;
-		}
-		else
-		{
-			node_pair.first = node_b_index;
-			node_pair.second  = new_node_index;
-		}
+	    node_pair = CreateOrderedPair(node_b_index, new_node_index);
 	    mSpringRestLengths[node_pair]= old_rest_length/2;
+	    // If necessary add other new spring rest lengths
+		for (unsigned pair_index = 3; pair_index < 5; pair_index++)
+		{
+			unsigned other_node_index = new_nodes[index][pair_index];
 
-	    // If necesary add other new spring rest lengths
-	    std::set<unsigned> elements_of_node_a = rGetMesh().GetNode(node_a_index)->rGetContainingElementIndices();
-	    std::set<unsigned> elements_of_new_node = rGetMesh().GetNode(new_node_index)->rGetContainingElementIndices();
-
-	    std::set<unsigned> intersection_elements;
-	    std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
-	    		              elements_of_new_node.begin(), elements_of_new_node.end(),
-	                          std::inserter(intersection_elements, intersection_elements.begin()));
-
-	    for (std::set<unsigned>::const_iterator it = intersection_elements.begin(); it != intersection_elements.end(); ++it)
-	    {
-	    	Element<ELEMENT_DIM,SPACE_DIM>* p_element = rGetMesh().GetElement(*it);
-	    	// find node which is not the new one or a or b.
-	    	assert(p_element->GetNumNodes() == 3);
-	    	unsigned other_node_index = UNSIGNED_UNSET;
-
-	    	if ( (p_element->GetNodeGlobalIndex(0) != new_node_index) &&
-	    		 (p_element->GetNodeGlobalIndex(0) != node_a_index) )
+			if (other_node_index != UNSIGNED_UNSET)
 			{
-	    		other_node_index = p_element->GetNodeGlobalIndex(0);
-			}
-	    	else if ( (p_element->GetNodeGlobalIndex(1) != new_node_index) &&
-	    		      (p_element->GetNodeGlobalIndex(1) != node_a_index) )
-			{
-				other_node_index = p_element->GetNodeGlobalIndex(1);
-			}
-	    	else if ( (p_element->GetNodeGlobalIndex(2) != new_node_index) &&
-	    		      (p_element->GetNodeGlobalIndex(2) != node_a_index) )
-			{
-				other_node_index = p_element->GetNodeGlobalIndex(2);
-			}
-	    	else
-	    	{
-	    		NEVER_REACHED;
-	    	}
+				node_pair = CreateOrderedPair(other_node_index, new_node_index);
+				double new_rest_length = norm_2(rGetMesh().GetVectorFromAtoB(rGetMesh().GetNode(new_node_index)->rGetLocation(),
+													rGetMesh().GetNode(other_node_index)->rGetLocation()));
 
-	    	assert(other_node_index != UNSIGNED_UNSET);
+				mSpringRestLengths[node_pair] = new_rest_length;
+			}
 
-	    	if (new_node_index<other_node_index)
-	    	{
-	    		node_pair.first = new_node_index;
-	    		node_pair.second  = other_node_index;
-	    	}
-	    	else
-	    	{
-	    		node_pair.first = other_node_index;
-	    	    node_pair.second  = new_node_index;
-	    	}
-
-	    	mSpringRestLengths[node_pair]=  norm_2(rGetMesh().GetVectorFromAtoB(rGetMesh().GetNode(new_node_index)->rGetLocation(),
-        		                                                              rGetMesh().GetNode(other_node_index)->rGetLocation()));
-	    }
+		}
 	}
 }
 
@@ -1425,7 +1356,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CalculateRestLengths()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned indexA, unsigned indexB)
 {
-    if (mHasVariableRestLength)
+	if (mHasVariableRestLength)
     {
     	if(indexA>indexB)
     	{
@@ -1453,6 +1384,26 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
     {
         return 1.0;
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::pair<unsigned,unsigned>  MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOrderedPair(unsigned index1, unsigned index2)
+{
+	assert(index1 != index2);
+
+	std::pair<unsigned,unsigned> ordered_pair;
+
+    if (index1<index2)
+    {
+    	ordered_pair.first = index1;
+	    ordered_pair.second  = index2;
+    }
+	else
+	{
+		ordered_pair.first = index2;
+		ordered_pair.second  = index1;
+    }
+	return ordered_pair;
 }
 
 /////////////////////////////////////////////////////////////////////////////
