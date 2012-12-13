@@ -929,15 +929,25 @@ class Intel(BuildType):
     def __init__(self, *args, **kwargs):
         BuildType.__init__(self, *args, **kwargs)
         self._compiler_type = 'intel'
-        # Turn off some warnings, and report warnings as errors
-        #self._cc_flags = ['-wr470', '-wr186', '-pc64'] #Emulates a 64-bit (not 80-bit) FPU
-        self._cc_flags = ['-Werror', '-Wall',
-                          '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter',
-                          '-wr2304']
-        self._link_flags = [] # Newer Intel doesn't support '-static-libcxa'
+        # Turn off some warnings, and report warnings as errors.
+        # The flags to use depend on compiler version, alas.
+        self._cc_flags = ['-Werror']
+        version = self.GetCompilerVersion()
+        if version >= 12:
+            # 2304 = non-explicit constructor with single argument
+            self._cc_flags.extend(['-Werror', '-Wall',
+                                   '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
+                                   '-wr2304'])
+        # 10.0 produces extra warnings: {181: 'argument is incompatible with corresponding format string conversion', 1572: 'floating-point equality and inequality comparisons are unreliable', 869: 'parameter "version" was never referenced', 424: 'extra ";" ignored', 1418: 'external function definition with no prior declaration', 1419: 'external declaration in primary source file', 111: 'statement is unreachable', 304: 'access control not specified ("public" by default)', 177: 'handler parameter "e" was declared but never referenced', 82: 'storage class is not first', 981: 'operands are evaluated in unspecified order', 271: 'trailing comma is nonstandard', 280: 'selector expression is constant', 185: 'dynamic initialization in unreachable code', 1599: 'declaration hides variable "random_direction" (declared at line 79)', 444: 'destructor for base class "boost::noncopyable_::noncopyable" (declared at line 21 of "/usr/include/boost/noncopyable.hpp") is not virtual', 810: 'conversion from "double" to "PetscInt={int}" may lose significant bits', 383: 'value copied to temporary, reference to temporary used'}
+        self._link_flags = [] # Newer Intel (12.0) doesn't support '-static-libcxa'; not sure why we need it anyway
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
+    
+    def GetCompilerVersion(self):
+        """Get the major version number of the compiler being used."""
+        version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
+        return int(version_str.split('.')[0])
 
     def SetReporting(self, vec=1):
         """Set the reporting level.
