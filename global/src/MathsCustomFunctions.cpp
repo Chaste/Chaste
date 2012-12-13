@@ -113,6 +113,8 @@ bool CompareDoubles::IsNearZero(double number, double tolerance)
  * @param number  the number to be divided
  * @param divisor  the number to divide by
  */
+double SafeDivide(double number, double divisor);
+
 double SafeDivide(double number, double divisor)
 {
     // Avoid overflow

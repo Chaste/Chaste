@@ -51,9 +51,9 @@ public:
         {
             EXCEPTION(msg);
         }
-        catch (Exception& e)
+        catch (Exception& exc)
         {
-            std::string e_msg = e.GetMessage();
+            std::string e_msg = exc.GetMessage();
             std::string::size_type e_len = e_msg.length();
             std::string::size_type len = msg.length();
             TS_ASSERT_EQUALS(e_msg.substr(e_len - len), msg);
@@ -77,9 +77,9 @@ public:
         {
             EXCEPTION("This is a rule "<<rule<<" exception");
         }
-        catch (const Exception& e)
+        catch (const Exception& exc)
         {
-            TS_ASSERT_EQUALS(e.CheckShortMessage("This is a rule 42 exception"), "");
+            TS_ASSERT_EQUALS(exc.CheckShortMessage("This is a rule 42 exception"), "");
         }
     }
 

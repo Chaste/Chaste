@@ -468,10 +468,10 @@ public:
         TS_ASSERT_THROWS_THIS(node_var_id = mpTestWriter->DefineVariable("Node", "dimensionless"), "Variable name: Node already in use as fixed dimension");
         TS_ASSERT_THROWS_NOTHING(ica_var_id = mpTestWriter->DefineVariable("I_Ca", "milliamperes"));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->EndDefineMode());
-        int i = 12;
+        int twelve = 12;
 
-        mpTestWriter->PutVariable(ina_var_id, (double) i,0);
-        mpTestWriter->PutVariable(ina_var_id, (double) -i,1);
+        mpTestWriter->PutVariable(ina_var_id, (double) twelve, 0);
+        mpTestWriter->PutVariable(ina_var_id, (double) -twelve, 1);
         mpTestWriter->PutVariable(ica_var_id, -33.124,3);
         mpTestWriter->PutVariable(ik_var_id, 7124.12355553,3);
         mpTestWriter->AdvanceAlongUnlimitedDimension();
@@ -518,12 +518,10 @@ public:
         TS_ASSERT_THROWS_NOTHING(ica_var_id = mpTestWriter->DefineVariable("I_Ca", "milliamperes"));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->EndDefineMode());
 
-        int i = 12;
-
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(time_var_id, 0.1));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(node_var_id, 0, 0));
-        TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(ina_var_id, (double) i,0));
-        TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(ina_var_id, (double) i,1));
+        TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(ina_var_id, 12.0, 0));
+        TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(ina_var_id, 12.0, 1));
         // Last column
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(ica_var_id, 1.1e130, 0));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->PutVariable(ica_var_id, -1.1e130, 1));

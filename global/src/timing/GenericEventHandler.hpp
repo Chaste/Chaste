@@ -377,7 +377,7 @@ private:
             if (PetscTools::IsParallel())
             {
                 // Report the process number at the beginning of the line
-                printf("%3i: ", PetscTools::GetMyRank()); //5 chars
+                printf("%3u: ", PetscTools::GetMyRank()); //5 chars
             }
             for (unsigned event=0; event<NUM_EVENTS; event++)
             {

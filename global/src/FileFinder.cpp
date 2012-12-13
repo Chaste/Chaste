@@ -270,6 +270,8 @@ std::string FileFinder::GetRelativePath(const FileFinder& rBasePath) const
  * @param rFromPath
  * @param rToPath
  */
+void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath);
+
 void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
 {
     fs::path dest = rToPath;
@@ -330,6 +332,8 @@ FileFinder FileFinder::CopyTo(const FileFinder& rDest) const
  * Helper function for FileFinder::Remove - recursively remove the given path.
  * @param rPath
  */
+void RemoveAll(const fs::path& rPath);
+
 void RemoveAll(const fs::path& rPath)
 {
     // First recursively remove any children

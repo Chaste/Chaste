@@ -118,7 +118,7 @@ AbstractHdf5Access::AbstractHdf5Access(const FileFinder& rDirectory,
 
 AbstractHdf5Access::~AbstractHdf5Access()
 {
-};
+}
 
 
 bool AbstractHdf5Access::IsDataComplete()

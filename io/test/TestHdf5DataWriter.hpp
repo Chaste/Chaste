@@ -1262,7 +1262,7 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReader("hdf5", "hdf5_test_full_format", true,
                                                 "io/test/data", "hdf5_test_full_format_extended", false, 1e-10, "Postprocessing"));
 
-        TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "hdf5", "hdf5_test_full_format_striped_incomplete", false, true),
+        TS_ASSERT_THROWS_THIS(Hdf5DataWriter another_writer(factory, "hdf5", "hdf5_test_full_format_striped_incomplete", false, true),
                               "Unable to extend an incomplete data file at present.");
     }
 

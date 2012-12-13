@@ -197,8 +197,8 @@ namespace CxxTest
 #       define _TSM_LAST_CATCH(f,l,m) _TS_LAST_CATCH( { (CxxTest::tracker()).failedTest(f,l,m); } )
 #       ifdef _CXXTEST_HAVE_STD
 #           define ___TSM_CATCH(f,l,m) \
-                    catch(const std::exception &e) { (CxxTest::tracker()).failedTest(f,l,e.what()); } \
-                    catch(Exception &e) { (CxxTest::tracker()).failedTest(f,l,e.GetMessage().c_str()); } \
+                    catch(const std::exception &_e) { (CxxTest::tracker()).failedTest(f,l,_e.what()); } \
+                    catch(Exception &_e) { (CxxTest::tracker()).failedTest(f,l,_e.GetMessage().c_str()); } \
                     _TSM_LAST_CATCH(f,l,m)
 #       else // !_CXXTEST_HAVE_STD
 #           define ___TSM_CATCH(f,l,m) _TSM_LAST_CATCH(f,l,m)
@@ -420,7 +420,7 @@ namespace CxxTest
 #    define CHASTE_ASSERT_EXCEPTION_MESSAGE(f,l,e,method,y) { \
         bool _ts_threw_expected = false, _ts_threw_else = false; \
             _TS_TRY { e; } \
-            _TS_CATCH_TYPE( (const Exception& err), { TSM_ASSERT(err.method(y), err.method(y) == ""); _ts_threw_expected = true; } ) \
+            _TS_CATCH_TYPE( (const Exception& _err), { TSM_ASSERT(_err.method(y), _err.method(y) == ""); _ts_threw_expected = true; } ) \
             _TS_CATCH_ABORT( { throw; } ) \
             _TS_LAST_CATCH( { _ts_threw_else = true; } ) \
             if ( !_ts_threw_expected ) { CxxTest::doFailAssertThrows( (f), (l), #e, "const Exception& err", _ts_threw_else, 0 ); } }

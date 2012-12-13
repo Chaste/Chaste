@@ -54,7 +54,9 @@ const std::string OutputFileHandler::SIG_FILE_NAME(".chaste_deletable_folder");
  * @param rPath  path to the directory to clean
  * @param isTop  whether this is the top level directory
  */
-void CleanFolder(const fs::path& rPath, bool isTop=true)
+void CleanFolder(const fs::path& rPath, bool isTop=true);
+
+void CleanFolder(const fs::path& rPath, bool isTop)
 {
     assert(fs::is_directory(rPath));
     fs::directory_iterator end_iter;

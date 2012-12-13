@@ -93,8 +93,8 @@ c_vector<double, 1> CryptSimulation1d::CalculateCellDivisionVector(CellPtr pPare
         proposed_new_daughter_coords = parent_coords + 2.0*random_vector;
         while (proposed_new_daughter_coords(0) < 0.0)
         {
-            double random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
-            random_vector(0) = 0.5*separation*random_direction;
+            double fresh_random_direction = -1.0 + 2.0*(RandomNumberGenerator::Instance()->ranf() < 0.5);
+            random_vector(0) = 0.5*separation*fresh_random_direction;
             proposed_new_daughter_coords = parent_coords + random_vector;
         }
         daughter_coords = proposed_new_daughter_coords;

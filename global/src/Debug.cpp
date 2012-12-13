@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 std::string FormDebugHead()
 {
-    std::string ret;
     if (PetscTools::IsSequential())
     {
         std::string ret("DEBUG: ");

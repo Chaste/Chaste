@@ -929,20 +929,46 @@ class Intel(BuildType):
     def __init__(self, *args, **kwargs):
         BuildType.__init__(self, *args, **kwargs)
         self._compiler_type = 'intel'
-        # Turn off some warnings, and report warnings as errors.
-        # The flags to use depend on compiler version, alas.
-        self._cc_flags = ['-Werror']
-        version = self.GetCompilerVersion()
-        if version >= 12:
-            # 2304 = non-explicit constructor with single argument
-            self._cc_flags.extend(['-Werror', '-Wall',
-                                   '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
-                                   '-wr2304'])
-        # 10.0 produces extra warnings: {181: 'argument is incompatible with corresponding format string conversion', 1572: 'floating-point equality and inequality comparisons are unreliable', 869: 'parameter "version" was never referenced', 424: 'extra ";" ignored', 1418: 'external function definition with no prior declaration', 1419: 'external declaration in primary source file', 111: 'statement is unreachable', 304: 'access control not specified ("public" by default)', 177: 'handler parameter "e" was declared but never referenced', 82: 'storage class is not first', 981: 'operands are evaluated in unspecified order', 271: 'trailing comma is nonstandard', 280: 'selector expression is constant', 185: 'dynamic initialization in unreachable code', 1599: 'declaration hides variable "random_direction" (declared at line 79)', 444: 'destructor for base class "boost::noncopyable_::noncopyable" (declared at line 21 of "/usr/include/boost/noncopyable.hpp") is not virtual', 810: 'conversion from "double" to "PetscInt={int}" may lose significant bits', 383: 'value copied to temporary, reference to temporary used'}
+        self._checked_version = False
         self._link_flags = [] # Newer Intel (12.0) doesn't support '-static-libcxa'; not sure why we need it anyway
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
+    
+    def CcFlags(self):
+        if not self._checked_version:
+            # Turn off some warnings, and report warnings as errors.
+            # The flags to use depend on compiler version, alas.
+            self._cc_flags = ['-Werror']
+            version = self.GetCompilerVersion()
+            assert version > 0
+            if version >= 12:
+                # 2304 = non-explicit constructor with single argument
+                self._cc_flags.extend(['-Wall',
+                                       '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
+                                       '-wr2304'])
+            elif version == 1000: # \todo #1360 Working through version 10 issues on userpc60
+                #\todo #1360 What about version 11?
+                #\todo #1360 Justify or fix the supressions given below
+                self._cc_flags.extend(['-Wall',
+                                       '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
+                                       '-wd177', #177: handler parameter "..." was declared but never referenced
+                                       '-wd185', #185: dynamic initialization in unreachable code (DUE TO INSTANTIATED TEMPLATES)
+                                       '-wd280', #280: selector expression is constant
+                                       '-wd304', #304: access control not specified ("public" by default)
+                                       '-wd383', #383: value copied to temporary, reference to temporary used
+                                       '-wd444', #444: destructor for base class "boost::noncopyable_::noncopyable" ... is not virtual
+                                       '-wd869', #869: parameter "version" was never referenced
+                                       '-wd981', #981: operands are evaluated in unspecified order
+                                       '-wd1418', #1418: external function definition with no prior declaration
+                                       '-wd1419', #1419: external declaration in primary source file
+                                       '-wd1572', #1572: floating-point equality and inequality comparisons are unreliable
+                                       ])
+            # 10.0 produces extra warnings: {181: 'argument is incompatible with corresponding format string conversion', 424: 'extra ";" ignored',   
+            #    82: 'storage class is not first',  271: 'trailing comma is nonstandard', 1599: 'declaration hides variable "random_direction" (declared at line 79)', 
+            #    810: 'conversion from "double" to "PetscInt={int}" may lose significant bits'}
+            self._checked_version = True
+        return super(Intel, self).CcFlags()
     
     def GetCompilerVersion(self):
         """Get the major version number of the compiler being used."""

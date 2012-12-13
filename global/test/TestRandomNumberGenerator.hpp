@@ -160,8 +160,8 @@ public:
 
             // Make sure saving it twice gets the same instance
             {
-                SerializableSingleton<RandomNumberGenerator>* const p_wrapper = p_gen->GetSerializationWrapper();
-                output_arch << p_wrapper;
+                SerializableSingleton<RandomNumberGenerator>* const p_wrapper_copy = p_gen->GetSerializationWrapper();
+                output_arch << p_wrapper_copy;
             }
 
             // Generator saved here - record the next 10 numbers
@@ -172,7 +172,7 @@ public:
             }
 
             /*
-             * Rcord some numbers from the normal distribution too.
+             * Record some numbers from the normal distribution too.
              * We generate quite a few for coverage of the three cases
              * in RandomNumberGenerator::StandardNormalRandomDeviate().
              */
