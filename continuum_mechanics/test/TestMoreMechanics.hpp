@@ -242,6 +242,94 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
 }
 
 
+// Similar to above but uses a compressible material
+//
+// Comments: with CompressibleMooneyRivlinLaw<3> law(1.0,0.0) this fails even with tiny deformation (tiny pressure/gravity),
+//   and using SetTakeFullFirstNewtonStep() makes things worse - need to check Jacobian derivs..
+unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::string outputDirectory,
+                                              std::vector<double>& rSolution,
+                                              bool useSolutionAsGuess,
+                                              double scaleFactor = 1.0)
+{
+    CompressibleExponentialLaw<3> law;
+    std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<3>::GetNodesByComponentValue(rMesh, 0, 0.0);
+
+    std::vector<BoundaryElement<2,3>*> boundary_elems;
+
+    double pressure = 0.001;
+
+    for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+           = rMesh.GetBoundaryElementIteratorBegin();
+         iter != rMesh.GetBoundaryElementIteratorEnd();
+         ++iter)
+    {
+        BoundaryElement<2,3>* p_element = *iter;
+        double Z = p_element->CalculateCentroid()[2];
+        if(fabs(Z)<1e-6)
+        {
+            boundary_elems.push_back(p_element);
+        }
+    }
+
+    SolidMechanicsProblemDefinition<3> problem_defn(rMesh);
+    problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
+    problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+
+    problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure*scaleFactor);
+//    c_vector<double,3> gravity = zero_vector<double>(3);
+//    gravity(2) = -0.00001;
+//    problem_defn.SetBodyForce(gravity);
+
+
+    problem_defn.SetVerboseDuringSolve();
+
+    CompressibleNonlinearElasticitySolver<3> solver(rMesh,problem_defn,outputDirectory);
+    solver.SetWriteOutputEachNewtonIteration();
+
+    // cover the SetTakeFullFirstNewtonStep() method, and the SetUsePetscDirectSolve() method
+    solver.SetTakeFullFirstNewtonStep();
+    solver.SetUsePetscDirectSolve();
+
+    if(useSolutionAsGuess)
+    {
+        if(solver.rGetCurrentSolution().size()!=rSolution.size())
+        {
+            EXCEPTION("Badly-sized input");
+        }
+        for(unsigned i=0; i<rSolution.size(); i++)
+        {
+            solver.rGetCurrentSolution()[i] = rSolution[i];
+        }
+    }
+
+    if(scaleFactor < 1.0)
+    {
+        try
+        {
+            solver.Solve();
+        }
+        catch (Exception& e)
+        {
+            // not final Solve, so don't quit
+            WARNING(e.GetMessage());
+        }
+    }
+    else
+    {
+        solver.Solve();
+        solver.CreateCmguiOutput();
+    }
+
+    rSolution.clear();
+    rSolution.resize(solver.rGetCurrentSolution().size());
+    for(unsigned i=0; i<rSolution.size(); i++)
+    {
+        rSolution[i] = solver.rGetCurrentSolution()[i];
+    }
+
+    return solver.GetNumNewtonIterations();
+}
+
 
 
 class TestMoreMechanics : public CxxTest::TestSuite
@@ -284,6 +372,27 @@ public:
         ///////////////////////////////////////
         // Could continue onto finer meshes..
         ///////////////////////////////////////
+    }
+
+
+
+    void TestBarPressureOnUndersideCompressible() throw(Exception)
+    {
+        EXIT_IF_PARALLEL; // petsc's direct solve only runs one 1 proc - MUMPS may be the answer for direct solves in parallel
+
+        std::string base = "BarPressureOnUndersideCompressible";
+        std::stringstream output_dir;
+
+        /////////////////////////////////////
+        // Solve on coarse mesh..
+        /////////////////////////////////////
+        QuadraticMesh<3> mesh;
+        double h = 1.0;
+        mesh.ConstructRegularSlabMesh(h, 10.0, 1.0, 1.0);
+        output_dir << base << "h_" << h;
+        std::vector<double> solution;
+        unsigned num_iters = SolvePressureOnUndersideCompressible(mesh, output_dir.str(), solution, false, true);
+        TS_ASSERT_EQUALS(num_iters, 5u);
     }
 };
 
