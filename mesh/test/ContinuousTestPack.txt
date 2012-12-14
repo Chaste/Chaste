@@ -12,6 +12,7 @@ TestQuadraticMesh.hpp
 TestTetrahedralMesh.hpp
 TestTransformations.hpp
 reader/TestFemlabMeshReader.hpp
+reader/TestGmshMeshReader.hpp
 reader/TestMemfemMeshReader.hpp
 reader/TestTrianglesMeshReader.hpp
 reader/TestVtkMeshReader.hpp
