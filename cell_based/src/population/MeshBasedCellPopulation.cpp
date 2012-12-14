@@ -360,11 +360,16 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
 
      	CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
 
+        // Create copy of cell property collection to modify for daughter cell
+        CellPropertyCollection daughter_property_collection = p_neighbour_cell->rGetCellPropertyCollection();
 
-	    CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
+        // Remove the CellId from the daughter cell a new one will be assigned in the constructor
+        daughter_property_collection.RemoveProperty<CellId>();
+
+        CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
 	      		                    p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
 	      		                    false,
-	      		                    p_neighbour_cell->rGetCellPropertyCollection()));
+	      		                    daughter_property_collection));
 
 	    // Add new cell to cell population
 	    this->mCells.push_back(p_new_cell);

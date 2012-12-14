@@ -414,6 +414,12 @@ public:
 		cell_population.DivideLongSprings(1.0);
 
 		TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 5u);
+		TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(0u)->GetCellId(), 452u);
+		TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(1u)->GetCellId(), 453u);
+		TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(2u)->GetCellId(), 454u);
+		TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(3u)->GetCellId(), 455u);
+		TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(4u)->GetCellId(), 456u);
+
 
 		// Check rest lengths
 		TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
