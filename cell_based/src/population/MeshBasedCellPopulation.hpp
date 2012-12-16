@@ -332,6 +332,8 @@ public:
 
     /**
 	 *  Divides springs longer than the given threshold
+	 *
+	 *  @param springDivisionThreshold  a given threshold
 	 */
 	void DivideLongSprings(double springDivisionThreshold);
 
@@ -609,8 +611,8 @@ public:
      * Helper method that returns a pair of indices ordered by node index.
      * Used by the rest length routines.
      *
-     * @param pCell1 an index
-     * @param pCell2 an index
+     * @param index1 a node index
+     * @param index2 a node index
      */
     std::pair<unsigned,unsigned> CreateOrderedPair(unsigned index1, unsigned index2);
 
