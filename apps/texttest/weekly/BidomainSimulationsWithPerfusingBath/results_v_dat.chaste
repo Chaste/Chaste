@@ -45152,7 +45152,7 @@
 0
 0
 8.52274
-0.0980007
+0.0980006
 -32.4672
 -61.7807
 -72.1842
@@ -1105219,4 +1105219,4 @@
 0
 0
 0
-# Created by Chaste version 2.1.11119 on Wed, 15 Dec 2010 11:58:13 +0000.  Chaste was built on Wed, 15 Dec 2010 11:37:35 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-27-server #1 SMP Fri Mar 12 01:23:09 UTC 2010 x86_64' using settings: GccOpt, shared libraries.
+# Created by Chaste version 3.1.17664 on Mon, 17 Dec 2012 09:14:42 +0000.  Chaste was built on Sun, 16 Dec 2012 21:40:24 +0000 by machine (uname) 'Linux userpc58.cs.ox.ac.uk 2.6.32-45-generic #100-Ubuntu SMP Wed Nov 14 10:47:49 UTC 2012 x86_64' using settings: GccOptNative, shared libraries.  Checked-out project versions: FunctionalCuration=17565; SimpleSensitivity=17567:17572; VascularTumour=15738.
