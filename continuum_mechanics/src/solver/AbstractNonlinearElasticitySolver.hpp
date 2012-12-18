@@ -1531,8 +1531,12 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
         if(this->mCompressibilityType==COMPRESSIBLE)
         {
             KSPSetType(solver,KSPPREONLY);
+
         }
         PCSetType(pc, PCLU);
+
+        // See #2057
+        // PCFactorSetMatSolverPackage(pc,"mumps");
     }
     else
     {
