@@ -86,6 +86,16 @@ class ExampleFunctionalTwo : public AbstractFunctionalCalculator<2,2,2>
         return rX[0]*rU[0] + rX[1]*rU[1] + 0.5*(rGradU(0,0)+rGradU(0,1)+rGradU(1,0)+rGradU(1,1));
     }
 };
+// Check higher order polynomial are integrated correctly
+class ExampleFunctionalThree : public AbstractFunctionalCalculator<2,2,2>
+{
+    double GetIntegrand(ChastePoint<2>& rX,
+                        c_vector<double,2>& rU,
+                        c_matrix<double,2,2>& rGradU)
+    {
+        return  rX[0]*rX[1]*rU[1];
+    }
+};
 
 class TestAbstractFunctionalCalculator : public CxxTest::TestSuite
 {
@@ -142,7 +152,7 @@ public:
         vec1.Restore();
 
         double result = calculator.Calculate(mesh, petsc_vec);
-        TS_ASSERT_DELTA(result, 4.0/3.0, 1e-6);
+        TS_ASSERT_DELTA(result, 4.0/3.0, 1e-14);
 
         // Test interpolation of grad_u
         // Integrate x^2 + y^2 + 1 over the unit square
@@ -163,8 +173,12 @@ public:
         vec2.Restore();
 
         result = other_calculator.Calculate(mesh, petsc_vec);
-        TS_ASSERT_DELTA(result, 1 + 2.0/3.0, 1e-6);
+        TS_ASSERT_DELTA(result, 1 + 2.0/3.0, 1e-14);
 
+        // Test cubic integration
+        // Integrate x*y^2 over unit square = 1/6
+        ExampleFunctionalThree higher_order_calculator;
+        TS_ASSERT_DELTA(higher_order_calculator.Calculate(mesh, petsc_vec), 1.0/6.0, 1e-14);
         PetscTools::Destroy(petsc_vec);
     }
 
@@ -195,7 +209,7 @@ public:
         vec1.Restore();
 
         double result = calculator.Calculate(mesh, petsc_vec);
-        TS_ASSERT_DELTA(result, 4.0/3.0, 1e-6);
+        TS_ASSERT_DELTA(result, 4.0/3.0, 1e-14);
 
         // Test interpolation of grad_u
         // Integrate x^2 + y^2 + 1 over the unit square
@@ -216,7 +230,7 @@ public:
         vec2.Restore();
 
         result = other_calculator.Calculate(mesh, petsc_vec);
-        TS_ASSERT_DELTA(result, 1 + 2.0/3.0, 1e-6);
+        TS_ASSERT_DELTA(result, 1 + 2.0/3.0, 1e-14);
 
         PetscTools::Destroy(petsc_vec);
     }

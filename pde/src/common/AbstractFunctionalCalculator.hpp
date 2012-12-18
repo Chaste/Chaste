@@ -50,8 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * which PROBLEM_DIM>1), grad_u the gradient of u and f the integrand as
  * defined in the concrete class.
  *
- * Note linear basis functions and 2 quad points per dimension are currently
- * hardcoded.
+ * Note linear basis functions are the default, but that the functional may be
+ * non-polynomial.  The order of integration used is the highest degree available
+ * (3rd order Gaussian quadrature)
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 class AbstractFunctionalCalculator
@@ -118,7 +119,8 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 {
     double result_on_element = 0;
 
-    GaussianQuadratureRule<ELEMENT_DIM> quad_rule(2); ///\todo #2232 Check that a 2nd order quadrature rule is appropriate here
+    // Third order quadrature.  Note that the functional may be non-polynomial (see documentation of class).
+    GaussianQuadratureRule<ELEMENT_DIM> quad_rule(3);
 
     /// NOTE: This assumes that the Jacobian is constant on an element, ie
     /// no curvilinear bases were used for position
