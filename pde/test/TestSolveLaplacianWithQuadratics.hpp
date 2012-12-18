@@ -245,7 +245,7 @@ public:
         unsigned preallocation=mpQuadMesh->CalculateMaximumNodeConnectivityPerProcess(); //The midpoint, as given above
 
         mpLinearSystem = new LinearSystem(mpQuadMesh->GetNumNodes(), preallocation);
-        ///\todo #2232 Check quadrature order
+
         mpQuadRule = new GaussianQuadratureRule<DIM>(2);
 
         mCoeffOfU = 0.0;

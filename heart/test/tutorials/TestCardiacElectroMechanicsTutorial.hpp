@@ -400,8 +400,7 @@ public:
          * fibre file, which we name similarly to the above but change the extension. */
         out_stream p_file2 = handler.OpenOutputFile("5by5by5_fibres.orthoquad");
 
-        ///\todo #2232 Check quadrature order
-        ///\todo Check if a third order rule is appropriate or whether a lower order rule could be used.
+        // Mechanics deformation solvers use 3rd order quadrature rules
         GaussianQuadratureRule<3> quad_rule(3);
         QuadraturePointsGroup<3> quad_points(mechanics_mesh, quad_rule);
 

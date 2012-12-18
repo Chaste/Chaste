@@ -243,8 +243,9 @@ AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEM
       mpMesh(pMesh)
 {
     assert(pMesh);
-	// Default to 2nd order quadrature
-    ///\todo #2232 Check quadrature order
+    // Default to 2nd order quadrature.  Our default basis functions are piecewise linear
+    // which means that we are integrating functions which in the worst case (mass matrix)
+    // are quadratic.
     mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2);
 }
 

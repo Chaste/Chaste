@@ -220,8 +220,9 @@ AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMB
 {
     assert(pMesh);
     assert(CAN_ASSEMBLE_VECTOR || CAN_ASSEMBLE_MATRIX);
-    // Default to 2nd order quadrature 
-    ///\todo #2232 Check quadrature order
+    // Default to 2nd order quadrature.  Our default basis functions are piecewise linear
+    // which means that we are integrating functions which in the worst case (mass matrix)
+    // are quadratic.
     mpCableQuadRule = new GaussianQuadratureRule<CABLE_ELEMENT_DIM>(2);
 
     // Not supporting this yet - if a nonlinear assembler on cable elements is required, uncomment code
