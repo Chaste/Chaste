@@ -133,7 +133,7 @@ private:
             archive & rPermutation;
         }
 
-        if (!this->IsMeshOnDisk())
+        if (!this->IsMeshOnDisk() || this->mMeshChangesDuringSimulation)
         {
             mesh_writer.WriteFilesUsingMesh(*(const_cast<AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>*>(this)));
         }
