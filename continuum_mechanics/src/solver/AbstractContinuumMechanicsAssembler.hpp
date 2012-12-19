@@ -306,7 +306,8 @@ public:
             EXCEPTION("Continuum mechanics assemblers require a quadratic mesh");
         }
 
-        ///\todo #2232 Check quadrature order
+        // In general the Jacobian for a mechanics problem is non-polynomial.
+        // We therefore use the highest order integration rule available
         mpQuadRule = new GaussianQuadratureRule<DIM>(3);
     }
 

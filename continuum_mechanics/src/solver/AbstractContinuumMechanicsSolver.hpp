@@ -413,9 +413,12 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
 
     AllocateMatrixMemory();
 
-    ///\todo #2232 Check quadrature order
+    // In general the Jacobian for a mechanics problem is non-polynomial.
+    // We therefore use the highest order integration rule available.
     mpQuadratureRule = new GaussianQuadratureRule<DIM>(3);
-    mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(4); ///\todo #2232  Could a lower order quadrature rule be used here?
+    // The boundary forcing terms (or tractions) are also non-polynomial in general.
+    // Again, we use the highest order integration rule available.
+    mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(3);
 
     mCurrentSolution.resize(mNumDofs, 0.0);
 }

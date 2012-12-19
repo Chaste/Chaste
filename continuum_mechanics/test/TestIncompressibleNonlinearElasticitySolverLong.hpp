@@ -259,7 +259,7 @@ public:
 
         TS_ASSERT_LESS_THAN(l2_errors[0], 0.0005)
         TS_ASSERT_LESS_THAN(l2_errors[1], 5e-5);
-        TS_ASSERT_LESS_THAN(l2_errors[2], 2e-6);
+        TS_ASSERT_LESS_THAN(l2_errors[2], 2.1e-6);
         TS_ASSERT_LESS_THAN(l2_errors[3], 4e-7);
     }
 

@@ -136,8 +136,9 @@ public:
         {
             EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
         }
-
-        mpQuadRule = new GaussianQuadratureRule<DIM-1>(2); // #2232 Is a second order Gauss quadrature rule appropriate here?
+        // In general a mechanics problem is non-polynomial.
+        // We therefore use the highest order integration rule available.
+        mpQuadRule = new GaussianQuadratureRule<DIM-1>(3);
     }
 
 
