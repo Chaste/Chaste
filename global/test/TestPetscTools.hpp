@@ -212,14 +212,15 @@ public:
     void TestProcessIsolation() throw (Exception)
     {
         PetscTools::IsolateProcesses();
-        TS_ASSERT(PetscTools::AmMaster());
+        TS_ASSERT(PetscTools::AmMaster()); // All processes are masters
         // Note: this will deadlock in parallel if IsolateProcesses doesn't work
         if (PetscTools::AmTopMost())
         {
+            // Only the top process does this
             PetscTools::Barrier("TestProcessIsolation");
         }
         bool am_top = PetscTools::AmTopMost();
-        bool any_is_top = PetscTools::ReplicateBool(am_top);
+        bool any_is_top = PetscTools::ReplicateBool(am_top); // Replication is a no-op
         TS_ASSERT_EQUALS(am_top, any_is_top);
         if (PetscTools::AmTopMost())
         {
@@ -229,6 +230,7 @@ public:
         {
             TS_ASSERT_THROWS_NOTHING(PetscTools::ReplicateException(false));
         }
+        TS_ASSERT(PetscTools::IsSequential()); // IsParallel() will tell the truth, however
         PetscTools::IsolateProcesses(false);
     }
 

@@ -81,7 +81,7 @@ void PetscTools::ResetCache()
 bool PetscTools::IsSequential()
 {
     CheckCache();
-    return (mNumProcessors == 1);
+    return (mIsolateProcesses || mNumProcessors == 1);
 }
 
 bool PetscTools::IsParallel()
