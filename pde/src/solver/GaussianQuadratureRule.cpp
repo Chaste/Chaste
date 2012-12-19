@@ -182,28 +182,6 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned quadratureOrder)
                 mPoints.push_back(ChastePoint<2>(c, b));
             }
             break;
-        case 4: // 2d, 4th order
-                // 9-point rule derived from scaled cude
-            mWeights.push_back(0.06846437766975);
-            mWeights.push_back(0.10954300427160);
-            mWeights.push_back(0.06846437766975);
-            mWeights.push_back(0.06172839506173);
-            mWeights.push_back(0.09876543209877);
-            mWeights.push_back(0.06172839506173);
-            mWeights.push_back(0.00869611615741);
-            mWeights.push_back(0.01391378585185);
-            mWeights.push_back(0.00869611615741);
-
-            mPoints.push_back(ChastePoint<2>(0.10000000001607,0.11270166540000));
-            mPoints.push_back(ChastePoint<2>(0.44364916730000,0.11270166540000));
-            mPoints.push_back(ChastePoint<2>(0.78729833458393,0.11270166540000));
-            mPoints.push_back(ChastePoint<2>(0.05635083270000,0.50000000000000));
-            mPoints.push_back(ChastePoint<2>(0.25000000000000,0.50000000000000));
-            mPoints.push_back(ChastePoint<2>(0.44364916730000,0.50000000000000));
-            mPoints.push_back(ChastePoint<2>(0.01270166538393,0.88729833460000));
-            mPoints.push_back(ChastePoint<2>(0.05635083270000,0.88729833460000));
-            mPoints.push_back(ChastePoint<2>(0.10000000001607,0.88729833460000));
-            break;
         default:
             EXCEPTION("Gauss quadrature order not supported.");
     }

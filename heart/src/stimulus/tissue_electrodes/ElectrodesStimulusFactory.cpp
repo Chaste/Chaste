@@ -184,8 +184,6 @@ boost::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::Crea
 template<unsigned DIM>
 double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteRegion<DIM>* pRegion, double stimulusMagnitude)
 {
-        //assume 2nd order
-        ///\todo #2232 Check quadrature order
         GaussianQuadratureRule<DIM>* pQuadRule = new GaussianQuadratureRule<DIM>(2);
 
         //the basis functions

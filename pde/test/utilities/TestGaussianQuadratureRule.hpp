@@ -164,7 +164,7 @@ public:
                 //
                 // \int_0^3 x^p dx = [(1/(p+1))*x^(p+1)]_1^3
                 //
-                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-12);
+                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-12); // Largest integral is about 100
                 
                 delete nodes2[0];
                 delete nodes2[1];
@@ -187,7 +187,7 @@ public:
                                   {1.0/20, 1.0/120, 0,      0, 0},
                                   {1.0/30, 0.0, 0.0, 0.0, 0.0} };
 
-        for (unsigned order=0; order<5; order++)
+        for (unsigned order=0; order<4; order++)
         {
             GaussianQuadratureRule<2> quad_rule(order);
 
@@ -211,7 +211,7 @@ public:
 
                     TS_ASSERT_DELTA(integral,
                                     expected[poly_degree_x][poly_degree_y],
-                                    1e-11);
+                                    1e-15);
                 }
             }
         }
