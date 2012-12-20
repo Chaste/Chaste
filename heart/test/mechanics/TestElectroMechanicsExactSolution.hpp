@@ -224,14 +224,14 @@ public:
             double exact_x = X + 0.5*ALPHA*X*X;
             double exact_y = Y/(1+ALPHA*X);
 
-            TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-4);
-            TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-4);
+            TS_ASSERT_DELTA(r_solution[i](0), exact_x, 1e-3);
+            TS_ASSERT_DELTA(r_solution[i](1), exact_y, 1e-3);
         }
 
         std::vector<double>& r_pressures = p_solver->rGetPressures();
         for (unsigned i=0; i<r_pressures.size(); i++)
         {
-            TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 1e-3);
+            TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 5e-3);
         }
 
         MechanicsEventHandler::Headings();
