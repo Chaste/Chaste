@@ -280,6 +280,10 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
     conf.petsc_3_0_path = getattr(conf, 'petsc_3_0_path', None)
     conf.petsc_path = getattr(conf, 'petsc_path', None)
     requested_version = version
+    if version == '3.3' and (conf.petsc_path is None or
+                             not os.path.isdir(conf.petsc_path)):
+        # Use 3.2 instead
+        version = '3.2'
     if version == '3.2' and (conf.petsc_path is None or
                              not os.path.isdir(conf.petsc_path)):
         # Use 3.1 instead
@@ -335,7 +339,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
             libpath = os.path.join(petsc_base, 'lib', build_name)
             if os.path.isdir(libpath): break
         incpaths.append(os.path.join(petsc_base, 'bmake', build_name))
-    elif version in ['3.0', '3.1', '3.2']:
+    elif version in ['3.0', '3.1', '3.2', '3.3']:
         if version == '3.0':
             petsc_base = os.path.abspath(conf.petsc_3_0_path)
         else:
@@ -363,7 +367,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
         if not os.path.isdir(libpath):
             ConfigError('PETSc libraries directory %s not found.' % libpath)
         libpaths.append(libpath)
-        if version in ['3.1', '3.2']:
+        if version in ['3.1', '3.2', '3.3']:
             libraries.append('petsc')
         else:
             libraries.extend(['petscts', 'petscsnes', 'petscksp', 'petscdm', 

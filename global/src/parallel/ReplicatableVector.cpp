@@ -137,8 +137,13 @@ void ReplicatableVector::Replicate(unsigned lo, unsigned hi)
 {
     // Create a PetSC vector with the array containing the distributed data
     Vec distributed_vec;
-    VecCreateMPIWithArray(PETSC_COMM_WORLD, hi-lo, this->GetSize(), &mpData[lo], &distributed_vec);
 
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+    //Extra argument is block size
+    VecCreateMPIWithArray(PETSC_COMM_WORLD, 1, hi-lo, this->GetSize(), &mpData[lo], &distributed_vec);
+#else
+    VecCreateMPIWithArray(PETSC_COMM_WORLD, hi-lo, this->GetSize(), &mpData[lo], &distributed_vec);
+#endif
     // Now do the real replication
     ReplicatePetscVector(distributed_vec);
 
