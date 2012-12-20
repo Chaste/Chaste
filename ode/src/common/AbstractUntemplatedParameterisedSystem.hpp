@@ -146,6 +146,11 @@ public:
      */
     std::string GetStateVariableUnits(unsigned index) const;
 
+    /**
+     * Reset the system's state variables to the default initial conditions.
+     */
+    virtual void ResetToInitialConditions()=0;
+
     //
     // Parameter methods
     //
