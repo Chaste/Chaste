@@ -184,72 +184,72 @@ boost::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::Crea
 template<unsigned DIM>
 double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteRegion<DIM>* pRegion, double stimulusMagnitude)
 {
-        GaussianQuadratureRule<DIM>* pQuadRule = new GaussianQuadratureRule<DIM>(2);
+    GaussianQuadratureRule<DIM>* pQuadRule = new GaussianQuadratureRule<DIM>(2);
 
-        //the basis functions
-        c_vector<double, DIM+1> phi;
+    //the basis functions
+    c_vector<double, DIM+1> phi;
 
-        double total_electrode_flux = 0.0;
-        double ret;
+    double total_electrode_flux = 0.0;
+    double ret;
 
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
-             iter != this->mpMesh->GetNodeIteratorEnd();
-             ++iter)
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
+         iter != this->mpMesh->GetNodeIteratorEnd();
+         ++iter)
+    {
+        if ( pRegion->DoesContain( (*iter).GetPoint() ) )
         {
-            if ( pRegion->DoesContain( (*iter).GetPoint() ) )
+            unsigned node_index =     iter->GetIndex();
+            assert(node_index < this->mpMesh->GetNumNodes());
+            double contribution_of_this_node = 0.0;
+            //loop over the elements where this node is contained
+            for(std::set<unsigned>::iterator iter = this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().begin();
+                iter != this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().end();
+                ++iter)
             {
-                unsigned node_index =     iter->GetIndex();
-                assert(node_index < this->mpMesh->GetNumNodes());
-                double contribution_of_this_node = 0.0;
-                //loop over the elements where this node is contained
-                for(std::set<unsigned>::iterator iter = this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().begin();
-                    iter != this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().end();
-                    ++iter)
+                Element<DIM,DIM>* p_element = this->mpMesh->GetElement(*iter);
+
+                /*Determine jacobian for this element*/
+                c_matrix<double, DIM, DIM> jacobian;
+                c_matrix<double, DIM, DIM> inverse_jacobian;//unused here, but needed for the function below
+                double jacobian_determinant;
+                this->mpMesh->GetInverseJacobianForElement(p_element->GetIndex(), jacobian, jacobian_determinant, inverse_jacobian);
+
+                double contribution_of_this_element = 0.0;//...to this node
+                 // loop over Gauss points
+                for (unsigned quad_index=0; quad_index < pQuadRule->GetNumQuadPoints(); quad_index++)
                 {
-                    Element<DIM,DIM>* p_element = this->mpMesh->GetElement(*iter);
+                    const ChastePoint<DIM>& quad_point = pQuadRule->rGetQuadPoint(quad_index);
+                    BasisFunction::ComputeBasisFunctions(quad_point, phi);
 
-                    /*Determine jacobian for this element*/
-                    c_matrix<double, DIM, DIM> jacobian;
-                    c_matrix<double, DIM, DIM> inverse_jacobian;//unused here, but needed for the function below
-                    double jacobian_determinant;
-                    this->mpMesh->GetInverseJacobianForElement(p_element->GetIndex(), jacobian, jacobian_determinant, inverse_jacobian);
-
-                    double contribution_of_this_element = 0.0;//...to this node
-                     // loop over Gauss points
-                    for (unsigned quad_index=0; quad_index < pQuadRule->GetNumQuadPoints(); quad_index++)
+                    double interpolated_stimulus = 0.0;
+                    //loop over nodes in this element
+                    for (unsigned node_index_in_element = 0; node_index_in_element < p_element->GetNumNodes(); node_index_in_element++)
                     {
-                        const ChastePoint<DIM>& quad_point = pQuadRule->rGetQuadPoint(quad_index);
-                        BasisFunction::ComputeBasisFunctions(quad_point, phi);
+                        //const Node<DIM>* p_node = p_element->GetNode(node_index_in_element);
+                        assert(p_element->GetNumNodes() == DIM+1);
+                        interpolated_stimulus += stimulusMagnitude*phi(node_index_in_element);
+                        contribution_of_this_element += interpolated_stimulus * phi(node_index_in_element) * jacobian_determinant * pQuadRule->GetWeight(quad_index);
+                    }
 
-                        double interpolated_stimulus = 0.0;
-                        //loop over nodes in this element
-                        for (unsigned node_index_in_element = 0; node_index_in_element < p_element->GetNumNodes(); node_index_in_element++)
-                        {
-                            //const Node<DIM>* p_node = p_element->GetNode(node_index_in_element);
-                            assert(p_element->GetNumNodes() == DIM+1);
-                            interpolated_stimulus += stimulusMagnitude*phi(node_index_in_element);
-                            contribution_of_this_element += interpolated_stimulus * phi(node_index_in_element) * jacobian_determinant * pQuadRule->GetWeight(quad_index);
-                        }
+                }/*end of loop over gauss points*/
+                contribution_of_this_node += contribution_of_this_element;
 
-                    }/*end of loop over gauss points*/
-                    contribution_of_this_node += contribution_of_this_element;
-
-                }/*end of loop over elements where the node is contained*/
-                total_electrode_flux += contribution_of_this_node;
-            }/* end of if that checks if node is in the electrode*/
-        }/* end of loop over nodes in the mesh*/
+            }/*end of loop over elements where the node is contained*/
+            total_electrode_flux += contribution_of_this_node;
+        }/* end of if that checks if node is in the electrode*/
+    }/* end of loop over nodes in the mesh*/
 #ifndef NDEBUG
-        int mpi_ret = MPI_Allreduce(&total_electrode_flux, &ret, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-        assert(mpi_ret == MPI_SUCCESS);
+    int mpi_ret = MPI_Allreduce(&total_electrode_flux, &ret, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    assert(mpi_ret == MPI_SUCCESS);
 #else
-        MPI_Allreduce(&total_electrode_flux, &ret, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    MPI_Allreduce(&total_electrode_flux, &ret, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
 #endif
 
-        //clear up memory
-        delete pQuadRule;
+    //clear up memory
+    delete pQuadRule;
 
-        assert(ret < DBL_MAX);
-        return ret;
+    assert(ret < DBL_MAX);
+    return ret;
 }
 
 /////////////////////////////////////////////////////////////////////
