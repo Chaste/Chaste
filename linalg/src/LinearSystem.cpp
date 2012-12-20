@@ -853,8 +853,13 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
             // Set Chebyshev solver and max/min eigenvalues
             assert(mKspType == "chebychev");
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+            KSPSetType(mKspSolver, "chebyshev"); ///\todo #2130 Check the new spelling works
+            KSPChebyshevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
+#else
             KSPSetType(mKspSolver, mKspType.c_str());
             KSPChebychevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
+#endif
             KSPSetComputeEigenvalues(mKspSolver, PETSC_FALSE);
             if (mUseAbsoluteTolerance)
             {
@@ -1085,7 +1090,11 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
                 assert(mKspType == "chebychev");
                 KSPSetType(mKspSolver, mKspType.c_str());
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+                KSPChebyshevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
+#else
                 KSPChebychevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
+#endif
                 KSPSetComputeEigenvalues(mKspSolver, PETSC_FALSE);
             }
 

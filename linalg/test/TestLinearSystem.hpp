@@ -958,7 +958,7 @@ public:
             PetscViewerBinaryOpen(PETSC_COMM_WORLD, archive_filename_rhs.c_str(), type, &vec_viewer);
             Vec new_vec;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             VecCreate(PETSC_COMM_WORLD, &new_vec);
             VecSetType(new_vec, PETSC_NULL);
             VecLoad(new_vec, vec_viewer);
@@ -988,7 +988,7 @@ public:
             PetscViewerBinaryOpen(PETSC_COMM_WORLD, archive_filename_lhs.c_str(), type, &mat_viewer);
             Mat new_mat;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 2)
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             MatCreate(PETSC_COMM_WORLD, &new_mat);
             MatSetType(new_mat, PETSC_NULL);
             MatLoad(new_mat, mat_viewer);
