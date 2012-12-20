@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PurkinjeVentricularJunctionStimulus.hpp"
 #include "MultiStimulus.hpp"
 #include "HeartConfig.hpp"
+#include "Warnings.hpp"
 
 
 
@@ -52,41 +53,66 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
 {
     std::string pvj_file_name;
+    bool file_specified = true;
+
     try
     {
+        // HeartConfig::Instance()->GetMeshName() will throw an exception if no mesh name is defined
         pvj_file_name = HeartConfig::Instance()->GetMeshName() + ".pvj";
     }
     catch(Exception& e)
     {
-        //HeartConfig::Instance()->GetMeshName() will throw an exception if no mesh name is defined
-        //In this case we expect the user to specify PVJ programmatically, so return immediately.
+        file_specified = false;
+    }
+
+    FileFinder junction_file(pvj_file_name, RelativeTo::AbsoluteOrCwd);
+    if (!file_specified || !junction_file.Exists() )
+    {
+        // In this case we expect the user to specify PVJ programmatically, so return immediately.
+        WARNING("No Purkinje-Ventricular junction (.pvj) file found. Junctions must be specified manually.");
         return;
     }
 
-    FileFinder junction_file(pvj_file_name, RelativeTo::AbsoluteOrCwd);;
+    std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
 
-    if (junction_file.Exists())
+    if(!junction_stream.good())
+    {   // file couldn't be opened
+        EXCEPTION("Couldn't open data file: " << junction_file.GetAbsolutePath());
+    }
+
+    // Reads in file defining nodes and resistance (separated by space)
+    while(junction_stream.good())
     {
-        std::ifstream junction_stream(junction_file.GetAbsolutePath().c_str());
+        std::string this_line;
+        getline(junction_stream, this_line);
 
-        // Reads in file defining nodes and resistance (separated by space)
-        while(!junction_stream.eof())
+        if (this_line=="" || this_line=="\r")
         {
-            unsigned node_id;
-            junction_stream >> node_id;
-            double resistance;
-            junction_stream >> resistance;
-
-            if(mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
-            {
-                unsigned mapped_node_id = mpMixedDimensionMesh->rGetNodePermutation()[node_id];
-
-                mJunctionMap[mapped_node_id] = resistance;
+            if (junction_stream.eof())
+            {   // If the blank line is the last line carry on OK.
+                break;
             }
             else
             {
-                mJunctionMap[node_id] = resistance;
+                EXCEPTION("No data found on line in file: " << junction_file.GetAbsolutePath());
             }
+        }
+        std::stringstream line(this_line);
+
+        unsigned node_id;
+        line >> node_id;
+        double resistance;
+        line >> resistance;
+
+        if(mpMixedDimensionMesh->rGetNodePermutation().size() != 0) //Do we have a permuted mesh?
+        {
+            unsigned mapped_node_id = mpMixedDimensionMesh->rGetNodePermutation()[node_id];
+
+            mJunctionMap[mapped_node_id] = resistance;
+        }
+        else
+        {
+            mJunctionMap[node_id] = resistance;
         }
     }
 }
