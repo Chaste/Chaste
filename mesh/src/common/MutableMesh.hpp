@@ -210,7 +210,6 @@ public:
     virtual void DeleteNode(unsigned index);
 #undef COVERAGE_IGNORE
 
-#define COVERAGE_IGNORE
     /**
      * Mark a node as deleted. Note that this method DOES NOT deal with the
      * associated elements and therefore should only be called immediately prior
@@ -220,7 +219,6 @@ public:
      * @param index The index of the node to delete
      */
     void DeleteNodePriorToReMesh(unsigned index);
-#undef COVERAGE_IGNORE
 
     /**
      * Refine an element at a given point.
@@ -254,23 +252,19 @@ public:
     void ReIndex(NodeMap& map);
 #undef COVERAGE_IGNORE
 
-#define COVERAGE_IGNORE
     /**
      * Re-mesh a mesh using triangle (via library calls) or tetgen
      * @param map is a NodeMap which associates the indices of nodes in the old mesh
      * with indices of nodes in the new mesh.  This should be created with the correct size (NumAllNodes)
      */
     virtual void ReMesh(NodeMap& map);
-#undef COVERAGE_IGNORE
 
-
-#define COVERAGE_IGNORE
     /**
-     * Alternative version of remesh which takes no parameters does not require a NodeMap. Note: inherited
-     * classes should overload ReMesh(NodeMap&)
+     * Alternative version of remesh which takes no parameters, i.e. does not require a NodeMap.
+     * It will create one and call the other ReMesh method.
+     * Note: inherited classes should overload ReMesh(NodeMap&)
      */
     void ReMesh();
-#undef COVERAGE_IGNORE
 
 #define COVERAGE_IGNORE
     /**
@@ -281,6 +275,7 @@ public:
     std::vector<c_vector<unsigned, 5> > SplitLongEdges(double cutoffLength);
 #undef COVERAGE_IGNORE
 
+#define COVERAGE_IGNORE
     /**
      * Splits an edge in two and create all the relevant new elements and nodes
      *
@@ -289,6 +284,7 @@ public:
      * @return the index of the new node
      */
     c_vector<unsigned, 3> SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+#undef COVERAGE_IGNORE
 
 #define COVERAGE_IGNORE
     /**

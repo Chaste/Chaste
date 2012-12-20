@@ -109,10 +109,11 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(Element<ELEMENT_DIM,SPA
     }
     else
     {
-        new_elt_index = mDeletedElementIndices.back();
-        mDeletedElementIndices.pop_back();
-        delete this->mElements[new_elt_index];
-        this->mElements[new_elt_index] = pNewElement;
+        NEVER_REACHED;
+//        new_elt_index = mDeletedElementIndices.back();
+//        mDeletedElementIndices.pop_back();
+//        delete this->mElements[new_elt_index];
+//        this->mElements[new_elt_index] = pNewElement;
     }
 
     pNewElement->ResetIndex(new_elt_index);

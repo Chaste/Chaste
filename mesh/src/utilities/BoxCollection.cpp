@@ -35,53 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
 
-/////////////////////////////////////////////////////////////////////////////
-// Box methods
-/////////////////////////////////////////////////////////////////////////////
-
-
-template<unsigned DIM>
-Box<DIM>::Box(c_vector<double, 2*DIM>& rMinAndMaxValues)
-{
-    mMinAndMaxValues = rMinAndMaxValues;
-}
-
-template<unsigned DIM>
-c_vector<double, 2*DIM>& Box<DIM>::rGetMinAndMaxValues()
-{
-    return mMinAndMaxValues;
-}
-
-template<unsigned DIM>
-void Box<DIM>::AddNode(Node<DIM>* pNode)
-{
-    mNodesContained.insert(pNode);
-}
-
-template<unsigned DIM>
-void Box<DIM>::RemoveNode(Node<DIM>* pNode)
-{
-    mNodesContained.erase(pNode);
-}
-
-template<unsigned DIM>
-std::set< Node<DIM>* >& Box<DIM>::rGetNodesContained()
-{
-    return mNodesContained;
-}
-
-template<unsigned DIM>
-void Box<DIM>::AddElement(Element<DIM,DIM>* pElement)
-{
-    mElementsContained.insert(pElement);
-}
-
-template<unsigned DIM>
-std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
-{
-    return mElementsContained;
-}
-
 
 /////////////////////////////////////////////////////////////////////////////
 // BoxCollection methods
@@ -796,9 +749,6 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class Box<1>;
-template class Box<2>;
-template class Box<3>;
 template class BoxCollection<1>;
 template class BoxCollection<2>;
 template class BoxCollection<3>;

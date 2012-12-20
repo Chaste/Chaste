@@ -40,77 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Node.hpp"
 #include "Element.hpp"
+#include "Box.hpp"
 #include "PetscTools.hpp"
 #include "DistributedVectorFactory.hpp"
 #include <map>
 #include <vector>
-
-
-
-/**
- * A small class for a nD 'box' defined by its min/max x/y/z values which
- * can contains a list of nodes and elements located in that box
- */
-template<unsigned DIM>
-class Box
-{
-private:
-
-    /** Coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
-    c_vector<double, 2*DIM> mMinAndMaxValues;
-
-    /** Nodes contained in this box. */
-    std::set< Node<DIM>* > mNodesContained;
-
-    /** Elements contained in this box. */
-    std::set< Element<DIM,DIM>* > mElementsContained;
-
-public:
-
-    /**
-     * Constructor just takes in the extremal values of the box.
-     *
-     * @param rMinAndMaxValues the extremal values. Of the from (for 2D, etc): xmin, xmax, ymin, ymax
-     */
-    Box(c_vector<double, 2*DIM>& rMinAndMaxValues);
-
-    /**
-     * Get the coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc).
-     * @return the list bounding box for this box.
-     *
-     **/
-    c_vector<double, 2*DIM>& rGetMinAndMaxValues();
-
-    /**
-     * Add a node to this box.
-     * @param pNode address of the node to be added
-     */
-    void AddNode(Node<DIM>* pNode);
-
-    /**
-     * Remove a node from this box.
-     * @param pNode address of the node to be removed
-     */
-    void RemoveNode(Node<DIM>* pNode);
-
-    /**
-     * An element to this box.
-     * @param pElement address of the element to be added
-     */
-    void AddElement(Element<DIM,DIM>* pElement);
-
-    /**
-     * Get all the nodes in this box.
-     * @return the nodes contained in this box.
-     **/
-    std::set< Node<DIM>* >& rGetNodesContained();
-
-    /**
-     * Get all the elements in this box.
-     * @return the elements contained in this box.
-     **/
-    std::set< Element<DIM,DIM>* >& rGetElementsContained();
-};
 
 
 /**

@@ -802,6 +802,10 @@ public:
 
 		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 0.75, 0.01);
 
+		// Cover exception
+		TS_ASSERT_THROWS_CONTAINS(pde_handler.GetPdeSolutionAtPoint(point, "not_a_var"),
+		                          "There is no PDE with that variable.");
+
 		// Random point
 		point(0) = 0.5;
 		point(1) = 0.5;
@@ -1066,6 +1070,10 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(value0_at_cell, max0 + DBL_EPSILON);
             TS_ASSERT_LESS_THAN_EQUALS(min1, value1_at_cell + DBL_EPSILON);
             TS_ASSERT_LESS_THAN_EQUALS(value1_at_cell, max1 + DBL_EPSILON);
+
+            // Now check the GetPdeSolutionAtPoint method matches
+            TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location, "quantity 1"), value0_at_cell, 1e-6);
+            TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location, "quantity 2"), value1_at_cell, 1e-6);
         }
     }
 
