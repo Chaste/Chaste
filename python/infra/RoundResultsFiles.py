@@ -54,7 +54,7 @@ def Replace(matchobj):
     """Given a match, round the number to the tolerance."""
     return str(round(float(matchobj.group(0)), tolerance))
 
-number = re.compile(r'((\+|-)?[0-9]+\.[-+0-9e]+)')
+number = re.compile(r'((\+|-)?[0-9]+[\.]?[-+0-9e]+)')
 
 for line in sys.stdin:
     print re.sub(number, Replace, line),
