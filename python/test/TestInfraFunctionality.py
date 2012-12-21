@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 """Copyright (c) 2005-2012, University of Oxford.
 All rights reserved.
@@ -32,34 +31,22 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-"""
-This script is used as a filter on acceptance test results files, to
-round any floating point numbers to a given number of (decimal) digits.
-This allows us to ignore any variations below a tolerance level.
-
-The script takes a single argument (the tolerance), reads from stdin,
-and writes to stdout.
-"""
-
-import re
+import os
+import unittest
 import sys
+import filecmp
 
-if len(sys.argv) != 2:
-    print >> sys.stderr, "Usage:", sys.argv[0], " <tolerance>"
-    sys.exit(1)
-tolerance = int(sys.argv[1])
-print 'Warning: These have been filtered by ',sys.argv[0],'.'
-print 'This means that all floating point numbers have been rounded to ', tolerance, ' decimal places.'
-def Replace(matchobj):
-    """Given a match, round the number to the tolerance."""
-    return str(round(float(matchobj.group(0)), tolerance))
-
-#Number must either have a decimal point (and no "e") or match scientific notation
-decimal = '(\+|-)?\d+\.\d+'
-scientific = '(\+|-)?\d*(\.)?\d*e(\+|-)?\d+'
-
-#Match scientific first
-number = re.compile('(' + scientific +'|' + decimal + ')')
-
-for line in sys.stdin:
-    print re.sub(number, Replace, line),
+class TestInfraFunctionality(unittest.TestCase):
+    
+    def TestRoundResultsFiles(self):
+        original = 'python/test/data/rounding_input.txt'
+        output = os.path.join(CHASTE_TEST_OUTPUT, 'rounding_output.txt')
+        # 8 decimal places
+        rc = os.system('python/infra/RoundResultsFiles.py 8 <' + original + ' > '+ output)
+        self.assertEqual(rc, 0)
+        self.assertTrue(filecmp.cmp(output,'python/test/data/rounding_output8.txt'))
+        # 6 decimal places
+        rc = os.system('python/infra/RoundResultsFiles.py 6 <' + original + ' > '+ output)
+        self.assertEqual(rc, 0)
+        self.assertTrue(filecmp.cmp(output,'python/test/data/rounding_output6.txt'))
+        

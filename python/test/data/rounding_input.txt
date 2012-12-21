@@ -1,0 +1,27 @@
+This is a test file for rounding 
+#A bit of HDF5
+   DATASET "Data" {
+      DATATYPE  H5T_IEEE_F64LE
+      DATASPACE  SIMPLE { ( 1, 10, 3 ) / ( 1, 10, 3 ) }
+      DATA {
+      (0,0,0): 3, 103, 1003,
+      (0,1,0): 4, 104, 1004,
+#Some smallish numbers 
+6.12345e-05
+0.000000123
+6.12345e-05 0.000000123
+6.12345e-05, 0.000000123
+6.12345e-05,0.000000123
+1.4e-8
+# Some numbers which are all the same magnitude
+8e-9
+8.e-9
+.8e-8
+0.8e-8
+-8e-9
+-8.e-9
+-.8e-8
+-0.8e-8
+#Some tricky ones which shouldn't be rounded
+-2,-3
+24-28-

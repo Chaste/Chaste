@@ -1,0 +1,29 @@
+Warning: These have been filtered by  python/infra/RoundResultsFiles.py .
+This means that all floating point numbers have been rounded to  6  decimal places.
+This is a test file for rounding 
+#A bit of HDF5
+   DATASET "Data" {
+      DATATYPE  H5T_IEEE_F64LE
+      DATASPACE  SIMPLE { ( 1, 10, 3 ) / ( 1, 10, 3 ) }
+      DATA {
+      (0,0,0): 3, 103, 1003,
+      (0,1,0): 4, 104, 1004,
+#Some smallish numbers 
+6.1e-05
+0.0
+6.1e-05 0.0
+6.1e-05, 0.0
+6.1e-05,0.0
+0.0
+# Some numbers which are all the same magnitude
+0.0
+0.0
+0.0
+0.0
+-0.0
+-0.0
+-0.0
+-0.0
+#Some tricky ones which shouldn't be rounded
+-2,-3
+24-28-
