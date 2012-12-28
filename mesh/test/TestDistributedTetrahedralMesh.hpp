@@ -1680,58 +1680,60 @@ public:
         // Basic check that we have the same number of nodes.
         TS_ASSERT_EQUALS(constructed_mesh_1d.GetNumLocalNodes(),read_mesh_1d.GetNumLocalNodes());
 
-//        // 2D
-//        width = 2;
-//        unsigned height = 4*PetscTools::GetNumProcs()-1;
-//        ChastePoint<2> lower_2d(0.0, (double)PetscTools::GetMyRank()*(1+height/(double)PetscTools::GetNumProcs()));
-//        ChastePoint<2> upper_2d(1+width, (double)(1+PetscTools::GetMyRank())*(1+height/(double)PetscTools::GetNumProcs()));
-//        ChasteCuboid<2> cuboid_2d(lower_2d, upper_2d);
-//
-//        TetrahedralMesh<2,2> base_mesh_2d;
-//        base_mesh_2d.ConstructRectangularMesh(width, height);
-//        TrianglesMeshWriter<2,2> mesh_writer_2d("", "rectangular_geometric");
-//        mesh_writer_2d.WriteFilesUsingMesh(base_mesh_2d);
-//        PetscTools::Barrier();
-//        std::string output_dir_2d = mesh_writer_2d.GetOutputDirectory();
-//        TrianglesMeshReader<2,2> mesh_reader_2d(output_dir_2d+"rectangular_geometric");
-//        DistributedTetrahedralMesh<2,2> read_mesh_2d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
-//        read_mesh_2d.SetProcessRegion(&cuboid_2d);
-//        read_mesh_2d.ConstructFromMeshReader(mesh_reader_2d);
-//
-//        DistributedTetrahedralMesh<2,2> constructed_mesh_2d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
-//        constructed_mesh_2d.SetProcessRegion(&cuboid_2d);
-//
-//        constructed_mesh_2d.ConstructRectangularMesh(width, height);
-//
-//        // Basic check that we have the same number of nodes.
-//        TS_ASSERT_EQUALS(constructed_mesh_2d.GetNumLocalNodes(),read_mesh_2d.GetNumLocalNodes());
-//
-//
-//        // 3D
-//        height = 3;
-//        unsigned depth = 4*PetscTools::GetNumProcs()-1;
-//        ChastePoint<3> lower_3d(0.0, 0.0, (double)PetscTools::GetMyRank()*(1+depth/(double)PetscTools::GetNumProcs()));
-//        ChastePoint<3> upper_3d(1+width, 1+height, (double)(1+PetscTools::GetMyRank())*(1+depth/(double)PetscTools::GetNumProcs()));
-//        ChasteCuboid<3> cuboid_3d(lower_3d, upper_3d);
-//
-//        TetrahedralMesh<3,3> base_mesh_3d;
-//        base_mesh_3d.ConstructCuboid(width, height, depth);
-//        TrianglesMeshWriter<3,3> mesh_writer_3d("", "cuboid_geometric");
-//        mesh_writer_3d.WriteFilesUsingMesh(base_mesh_3d);
-//        PetscTools::Barrier();
-//        std::string output_dir_3d = mesh_writer_3d.GetOutputDirectory();
-//        TrianglesMeshReader<3,3> mesh_reader_3d(output_dir_3d+"cuboid_geometric");
-//        DistributedTetrahedralMesh<3,3> read_mesh_3d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
-//        read_mesh_3d.SetProcessRegion(&cuboid_3d);
-//        read_mesh_3d.ConstructFromMeshReader(mesh_reader_3d);
-//
-//        DistributedTetrahedralMesh<3,3> constructed_mesh_3d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
-//        constructed_mesh_3d.SetProcessRegion(&cuboid_3d);
-//
-//        constructed_mesh_3d.ConstructCuboid(width, height, depth);
-//
-//        // Basic check that we have the same number of nodes.
-//        TS_ASSERT_EQUALS(constructed_mesh_3d.GetNumLocalNodes(),read_mesh_3d.GetNumLocalNodes());
+        // 2D
+        width = 2;
+        unsigned height = 4*PetscTools::GetNumProcs()-1;
+        ChastePoint<2> lower_2d(0.0, (double)PetscTools::GetMyRank()*(1+height/(double)PetscTools::GetNumProcs()));
+        ChastePoint<2> upper_2d(1+width, (double)(1+PetscTools::GetMyRank())*(1+height/(double)PetscTools::GetNumProcs()));
+        ChasteCuboid<2> cuboid_2d(lower_2d, upper_2d);
+
+        TetrahedralMesh<2,2> base_mesh_2d;
+        base_mesh_2d.ConstructRectangularMesh(width, height);
+        TrianglesMeshWriter<2,2> mesh_writer_2d("", "rectangular_geometric");
+        mesh_writer_2d.WriteFilesUsingMesh(base_mesh_2d);
+        PetscTools::Barrier();
+        std::string output_dir_2d = mesh_writer_2d.GetOutputDirectory();
+        TrianglesMeshReader<2,2> mesh_reader_2d(output_dir_2d+"rectangular_geometric");
+        DistributedTetrahedralMesh<2,2> read_mesh_2d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
+        read_mesh_2d.SetProcessRegion(&cuboid_2d);
+        read_mesh_2d.ConstructFromMeshReader(mesh_reader_2d);
+
+        DistributedTetrahedralMesh<2,2> constructed_mesh_2d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
+	TS_ASSERT_THROWS_THIS(constructed_mesh_2d.ConstructRectangularMesh(width, height), "Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+        constructed_mesh_2d.SetProcessRegion(&cuboid_2d);
+
+        constructed_mesh_2d.ConstructRectangularMesh(width, height);
+
+        // Basic check that we have the same number of nodes.
+        TS_ASSERT_EQUALS(constructed_mesh_2d.GetNumLocalNodes(),read_mesh_2d.GetNumLocalNodes());
+
+
+        // 3D
+        height = 3;
+        unsigned depth = 4*PetscTools::GetNumProcs()-1;
+        ChastePoint<3> lower_3d(0.0, 0.0, (double)PetscTools::GetMyRank()*(1+depth/(double)PetscTools::GetNumProcs()));
+        ChastePoint<3> upper_3d(1+width, 1+height, (double)(1+PetscTools::GetMyRank())*(1+depth/(double)PetscTools::GetNumProcs()));
+        ChasteCuboid<3> cuboid_3d(lower_3d, upper_3d);
+
+        TetrahedralMesh<3,3> base_mesh_3d;
+        base_mesh_3d.ConstructCuboid(width, height, depth);
+        TrianglesMeshWriter<3,3> mesh_writer_3d("", "cuboid_geometric");
+        mesh_writer_3d.WriteFilesUsingMesh(base_mesh_3d);
+        PetscTools::Barrier();
+        std::string output_dir_3d = mesh_writer_3d.GetOutputDirectory();
+        TrianglesMeshReader<3,3> mesh_reader_3d(output_dir_3d+"cuboid_geometric");
+        DistributedTetrahedralMesh<3,3> read_mesh_3d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
+        read_mesh_3d.SetProcessRegion(&cuboid_3d);
+        read_mesh_3d.ConstructFromMeshReader(mesh_reader_3d);
+
+        DistributedTetrahedralMesh<3,3> constructed_mesh_3d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
+	TS_ASSERT_THROWS_THIS(constructed_mesh_3d.ConstructCuboid(width, height, depth), "Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+        constructed_mesh_3d.SetProcessRegion(&cuboid_3d);
+
+        constructed_mesh_3d.ConstructCuboid(width, height, depth);
+
+        // Basic check that we have the same number of nodes.
+        TS_ASSERT_EQUALS(constructed_mesh_3d.GetNumLocalNodes(),read_mesh_3d.GetNumLocalNodes());
     }
 
     void TestConstructLinearMeshSmallest()
