@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/map.hpp>
 #include "BoxCollection.hpp"
 #include "MutableMesh.hpp"
 
@@ -63,7 +64,7 @@ private:
      * Each radius is set to 0.5 by default in the method
      * ConstructNodesWithoutMesh()
      */
-    std::vector<double> mCellRadii;
+    std::map<unsigned, double> mCellRadii;
 
     /**
      * The maximum interaction distance for two nodes. Defines the maximum

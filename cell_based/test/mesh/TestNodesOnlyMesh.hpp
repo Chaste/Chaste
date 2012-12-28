@@ -233,6 +233,7 @@ public:
         // Coverage
         p_mesh->SetMaximumInteractionDistance(1.0);
 
+        TS_ASSERT_THROWS_THIS(p_mesh->GetCellRadius(100), "Requested radius of a node which is not set. Either does not lie on this process as a node or halo node, or has not been set.");
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.0, 1e-6);
 
@@ -305,7 +306,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(6), 7.0, 1e-4);
         p_mesh->DeleteNode(6);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 7u);
-        TS_ASSERT_EQUALS(p_mesh->GetCellRadius(6), DOUBLE_UNSET);
+        TS_ASSERT_THROWS_THIS(p_mesh->GetCellRadius(6), "Requested radius of a node which is not set. Either does not lie on this process as a node or halo node, or has not been set.");
 
         // Delete from edge
         p_mesh->DeleteNode(1);

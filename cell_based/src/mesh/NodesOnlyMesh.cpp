@@ -64,7 +64,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location);
         this->mNodes.push_back(p_node_copy);
 
-        mCellRadii.push_back(0.5);
+        mCellRadii[i] = 0.5;
     }
 }
 
@@ -87,14 +87,30 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 template<unsigned SPACE_DIM>
 double NodesOnlyMesh<SPACE_DIM>::GetCellRadius(unsigned index)
 {
-    assert(index < mCellRadii.size());
-    return mCellRadii[index];
+    std::map<unsigned, double>::iterator local =  mCellRadii.find(index);
+
+    if(local != mCellRadii.end())
+    {
+        return local->second;
+    }
+    else
+    {
+        EXCEPTION( "Requested radius of a node which is not set. Either does not lie on this process as a node or halo node, or has not been set.");
+    }
 }
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
 {
-    assert(index < mCellRadii.size());
+//    // Make sure that we own the node
+//    if(mNodesMapping.find(index) == mNodesMapping.end())
+//    {
+//        #define COVERAGE_IGNORE
+//        EXCEPTION("Trying to set the radius of node which does not lie on this process");
+//        #undef COVERAGE_IGNORE
+//    }
+
+    // Set the radius
     mCellRadii[index] = radius;
 }
 
@@ -174,7 +190,10 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
     this->Clear();
 
     // Replace radius data
-    mCellRadii = old_cell_radii;
+    for (unsigned i=0; i<old_cell_radii.size(); i++)
+    {
+        mCellRadii[i] = old_cell_radii[i];
+    }
 
     // Construct the nodes
     for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
@@ -191,10 +210,6 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
     unsigned new_node_index = MutableMesh<SPACE_DIM, SPACE_DIM>::AddNode(pNewNode);
 
     // Then update mCellRadii
-    if (new_node_index >= mCellRadii.size())
-    {
-        mCellRadii.resize(new_node_index+1);
-    }
     SetCellRadius(new_node_index, 0.5);
 
     return new_node_index;
@@ -216,7 +231,7 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
      * node index is ever re-used when a new node is added, mCellRadii
      * will be updated correctly.
      */
-    mCellRadii[index] = DOUBLE_UNSET;
+    mCellRadii.erase(index);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
