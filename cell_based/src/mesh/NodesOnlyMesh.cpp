@@ -39,7 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
         : MutableMesh<SPACE_DIM, SPACE_DIM>(),
-          mpBoxCollection(NULL)
+          mpBoxCollection(NULL),
+          mIndexCounter(0u)
 {
 }
 
@@ -65,6 +66,8 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         this->mNodes.push_back(p_node_copy);
 
         mCellRadii[i] = 0.5;
+
+        mIndexCounter++;
     }
 }
 
@@ -72,6 +75,23 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes);
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
+{
+//    if(!this->mDeletedGlobalNodeIndices.empty())
+//    {
+//        unsigned index = this->mDeletedGlobalNodeIndices.back();
+//        this->mDeletedGlobalNodeIndices.pop_back();
+//        return index;
+//    }
+//    else
+    {
+        unsigned counter = mIndexCounter;
+        mIndexCounter++;
+        return counter * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
+    }
 }
 
 template<unsigned SPACE_DIM>
@@ -88,10 +108,15 @@ template<unsigned SPACE_DIM>
 double NodesOnlyMesh<SPACE_DIM>::GetCellRadius(unsigned index)
 {
     std::map<unsigned, double>::iterator local =  mCellRadii.find(index);
+    std::map<unsigned, double>::const_iterator halo = mHaloCellRadii.find(index);
 
     if(local != mCellRadii.end())
     {
         return local->second;
+    }
+    else if(halo != mHaloCellRadii.end())
+    {
+        return halo->second;
     }
     else
     {

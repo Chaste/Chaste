@@ -59,6 +59,9 @@ protected:
 
 private:
 
+    /** Vector of pointer to halo nodes used by this process. */
+    std::vector<Node<SPACE_DIM>* > mHaloNodes;
+
     /**
      * Vector of radii of cells corresponding to nodes.
      * Each radius is set to 0.5 by default in the method
@@ -67,11 +70,24 @@ private:
     std::map<unsigned, double> mCellRadii;
 
     /**
+     * Vector of radii of cells corresponding to halo nodes.
+     */
+    std::map<unsigned, double> mHaloCellRadii;
+
+    /**
      * The maximum interaction distance for two nodes. Defines the maximum
      * distance between two `neighbouring` nodes.
      */
     double mMaximumInteractionDistance;
 
+    /** A map from node global index to local index used by this process. */
+    std::map<unsigned, unsigned> mNodesMapping;
+
+    /** A map from halo node global index to local index used by this process. */
+    std::map<unsigned, unsigned> mHaloNodesMapping;
+
+    /** A counter of the number of fresh indices used on this process. */
+    unsigned mIndexCounter;
 
     friend class TestNodesOnlyMesh;
 
@@ -98,6 +114,28 @@ private:
          */
         archive & mCellRadii;
     }
+
+    /**
+     * Calculate the next unique global index available on this
+     * process. Uses a hashing function to ensure that a unqiue
+     * index is given to every node.
+     *
+     * For example for 3 process they will have access to the following
+     * integers:
+     *
+     * Proc 0:  0   3   6   9   12  ...
+     *
+     * Proc 1:  1   4   7   10   13  ...
+     *
+     * Proc 2:  2   5   8   11   14  ...
+     *
+     * Deleted node indices can be locally re-used.
+     *
+     * Deleted node inidces of nodes that have *moved* process cannot be re-used.
+     *
+     * @return the next available index.
+     */
+    unsigned GetNextAvailableIndex();
 
 public:
 

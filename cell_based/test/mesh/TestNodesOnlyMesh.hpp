@@ -134,6 +134,79 @@ public:
         delete p_mesh;
     }
 
+    void TestGetNextAvailableIndex()
+    {
+        // Construct a simple 2D mesh.
+        ChastePoint<2> point1(0.0, 0.0);
+        ChastePoint<2> point2(2.9, 2.9);
+        ChasteCuboid<2> cuboid(point1, point2);
+
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.5, 0.5));
+        nodes.push_back(new Node<2>(1, false, 1.5, 1.5));
+        nodes.push_back(new Node<2>(2, false, 2.5, 2.5));
+        nodes.push_back(new Node<2>(3, false, 1.5, 2.5));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes);
+
+        if(PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 4u);
+        }
+        else if(PetscTools::GetNumProcs() == 2)
+        {
+            if(PetscTools::GetMyRank() == 0)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 4u);
+            }
+            else if(PetscTools::GetMyRank() == 1)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 5u);
+            }
+        }
+        else if(PetscTools::GetNumProcs() == 3)
+        {
+            if(PetscTools::GetMyRank() == 0)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 0u);
+            }
+            else if(PetscTools::GetMyRank() == 1)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 7u);
+            }
+            else if(PetscTools::GetMyRank() == 2)
+            {
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 8u);
+            }
+        }
+
+//        // Delete some nodes and make sure that their global indices become available.
+//        if(mesh.GetNodeOwnership(0))
+//        {
+//            mesh.DeleteNode(0);
+//            TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 0u);
+//        }
+//        else // Covers an exception
+//        {
+//            TS_ASSERT_THROWS_CONTAINS(mesh.GetNode(0), "Requested node 0 does not belong to processor ");
+//        }
+//
+//        if(mesh.GetNodeOwnership(1))
+//        {
+//            mesh.DeleteNode(1);
+//            unsigned next_index = mesh.GetNextAvailableIndex();
+//            TS_ASSERT((next_index == 0u) || ( next_index == 1u) );
+//        }
+//
+//        // Delete a node as if it moves off this process, and make sure its global index is not available
+//        if(mesh.GetNodeOwnership(2))
+//        {
+//            mesh.DeleteMovedNode(2);
+//            TS_ASSERT(mesh.GetNextAvailableIndex() != 1u);
+//        }
+    }
+
     void TestWriteNodesWithoutMeshUsingVtk()
     {
  #ifdef CHASTE_VTK
