@@ -205,6 +205,12 @@ public:
 //            mesh.DeleteMovedNode(2);
 //            TS_ASSERT(mesh.GetNextAvailableIndex() != 1u);
 //        }
+
+        //Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestWriteNodesWithoutMeshUsingVtk()
