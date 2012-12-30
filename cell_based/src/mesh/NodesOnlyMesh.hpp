@@ -59,6 +59,9 @@ protected:
 
 private:
 
+    /** The global number of nodes in the mesh. */
+    unsigned mTotalNumNodes;
+
     /** Vector of pointer to halo nodes used by this process. */
     std::vector<Node<SPACE_DIM>* > mHaloNodes;
 
@@ -177,6 +180,17 @@ public:
      * Clears mCellRadii in addition to calling Clear() on the parent class.
      */
     void Clear();
+
+    /**
+     * Get the local number of nodes that are actually in use.
+     * Does not include halo nodes.
+     */
+    unsigned GetNumNodes() const;
+
+    /**
+     * Get the global number of nodes.
+     */
+    unsigned GetGlobalNumNodes() const;
 
     /**
      * Get the cell radius associated with a given node index.

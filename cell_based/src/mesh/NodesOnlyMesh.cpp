@@ -40,6 +40,7 @@ template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
         : MutableMesh<SPACE_DIM, SPACE_DIM>(),
           mpBoxCollection(NULL),
+          mTotalNumNodes(0u),
           mIndexCounter(0u)
 {
 }
@@ -69,6 +70,8 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 
         mIndexCounter++;
     }
+
+    mTotalNumNodes = rNodes.size();
 }
 
 template<unsigned SPACE_DIM>
@@ -102,6 +105,21 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 
     // Clear the cell radii
     mCellRadii.clear();
+
+    // Set the global number of nodes to zero.
+    mTotalNumNodes = 0u;
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
+{
+    return this->mNodes.size() - this->mDeletedNodeIndices.size();
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::GetGlobalNumNodes() const
+{
+    return mTotalNumNodes;
 }
 
 template<unsigned SPACE_DIM>
@@ -226,6 +244,9 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
         Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
         this->mNodes.push_back(p_node);
     }
+
+    // Update the global number of nodes
+    mTotalNumNodes = this->mNodes.size();
 }
 
 template<unsigned SPACE_DIM>
@@ -236,6 +257,9 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 
     // Then update mCellRadii
     SetCellRadius(new_node_index, 0.5);
+
+    // Increase the counter for the number of nodes.
+    mTotalNumNodes += 1;
 
     return new_node_index;
 }
@@ -257,6 +281,9 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
      * will be updated correctly.
      */
     mCellRadii.erase(index);
+
+    // Decrease the counter for the number of nodes.
+    mTotalNumNodes -= 1;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -68,6 +68,7 @@ public:
         p_mesh->ConstructNodesWithoutMesh(nodes);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(p_mesh->GetGlobalNumNodes(), 8u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), 8u);
