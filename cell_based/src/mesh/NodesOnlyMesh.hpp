@@ -161,8 +161,9 @@ public:
      * elements and boundary elements are always unused.
      *
      * @param rNodes a vector of pointers to nodes
+     * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes);
+    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double domainPadding = 2.0);
 
     /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
@@ -172,8 +173,9 @@ public:
      * elements and boundary elements are always unused.
      *
      * @param rGeneratingMesh any mesh with nodes, used to generate the NodesOnlyMesh
+     * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh);
+    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double domainPadding = 2.0);
 
     /**
      * Overridden Clear() method for NodesOnlyMesh.

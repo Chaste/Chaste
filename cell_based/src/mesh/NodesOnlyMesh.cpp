@@ -53,10 +53,35 @@ NodesOnlyMesh<SPACE_DIM>::~NodesOnlyMesh()
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double domainPadding)
 {
     this->Clear();
     mpBoxCollection = NULL;
+
+    // Work out a bounding box for the nodes.
+    c_vector<double, 2*SPACE_DIM> min_max_location;
+    for (unsigned d=0; d<SPACE_DIM; d++)
+    {
+        min_max_location[2*d] = DBL_MAX;
+        min_max_location[2*d+1] = -DBL_MAX;
+    }
+
+    for (unsigned i=0; i<rNodes.size(); i++)
+    {
+        c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
+        for (unsigned d=0; d<SPACE_DIM; d++)
+        {
+           min_max_location[2*d] = (location[d] < min_max_location[2*d]) ? location[d] : min_max_location[2*d];
+           min_max_location[2*d+1] = (location[d] > min_max_location[2*d+1]) ? location[d] : min_max_location[2*d+1];
+        }
+    }
+
+    // Add domain padding to allow for node movement.
+    for (unsigned d=0; d<SPACE_DIM; d++)
+    {
+        min_max_location[2*d] -= domainPadding;
+        min_max_location[2*d+1] += domainPadding;
+    }
 
     for (unsigned i=0; i<rNodes.size(); i++)
     {
@@ -75,7 +100,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double domainPadding)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes);
 }
