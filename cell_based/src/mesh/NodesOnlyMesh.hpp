@@ -161,9 +161,10 @@ public:
      * elements and boundary elements are always unused.
      *
      * @param rNodes a vector of pointers to nodes
+     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
      * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double domainPadding = 2.0);
+    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance = 1.5, double domainPadding = 2.0);
 
     /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
@@ -173,9 +174,10 @@ public:
      * elements and boundary elements are always unused.
      *
      * @param rGeneratingMesh any mesh with nodes, used to generate the NodesOnlyMesh
+     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
      * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double domainPadding = 2.0);
+    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance = 1.5, double domainPadding = 2.0);
 
     /**
      * Overridden Clear() method for NodesOnlyMesh.
@@ -228,13 +230,6 @@ public:
      * @param domainSize the size of the domain containing the nodes.
      */
     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
-
-    /**
-     * Set the maximum interaction distance between nodes
-     *
-     * @param maximumInteractionDistance the maximum distance between two neighbouring nodes
-     */
-    void SetMaximumInteractionDistance(double maximumInteractionDistance);
 
     /**
      * Calculate pairs of nodes using the BoxCollection

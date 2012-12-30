@@ -310,9 +310,6 @@ public:
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 2.0);
 
-        // Coverage
-        p_mesh->SetMaximumInteractionDistance(1.0);
-
         TS_ASSERT_THROWS_THIS(p_mesh->GetCellRadius(100), "Requested radius of a node which is not set. Either does not lie on this process as a node or halo node, or has not been set.");
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.0, 1e-6);

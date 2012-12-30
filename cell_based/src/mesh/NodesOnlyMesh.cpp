@@ -53,10 +53,12 @@ NodesOnlyMesh<SPACE_DIM>::~NodesOnlyMesh()
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double domainPadding)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance, double domainPadding)
 {
     this->Clear();
     mpBoxCollection = NULL;
+
+    mMaximumInteractionDistance = maxInteractionDistance;
 
     // Work out a bounding box for the nodes.
     c_vector<double, 2*SPACE_DIM> min_max_location;
@@ -75,6 +77,18 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
            min_max_location[2*d+1] = (location[d] > min_max_location[2*d+1]) ? location[d] : min_max_location[2*d+1];
         }
     }
+
+    // Make sure there is enough domain space for all processes. If we have a growing population this allows to use more processes.
+//    double width = (min_max_locations[2*SPACE_DIM-1] - min_max_locations[2*SPACE_DIM-2]);
+//    unsigned num_procs = PetscTools::GetNumProcs();
+//
+//    double min_width = (double)num_procs*maxInteractionDistance;
+//
+//    if (width < min_width)
+//    {
+//        min_max_locations[2*SPACE_DIM-1] += (min_width - width + 0.1)/2.0; // 0.1 padding to make sure we have space for all processes.
+//        min_max_locations[2*SPACE_DIM-2] -= (min_width - width + 0.1)/2.0;
+//    }
 
     // Add domain padding to allow for node movement.
     for (unsigned d=0; d<SPACE_DIM; d++)
@@ -100,7 +114,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double domainPadding)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance, double domainPadding)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes);
 }
@@ -212,12 +226,6 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<
         unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
         mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
     }
-}
-
-template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetMaximumInteractionDistance(double maximumInteractionDistance)
-{
-    mMaximumInteractionDistance = maximumInteractionDistance;
 }
 
 template<unsigned SPACE_DIM>
