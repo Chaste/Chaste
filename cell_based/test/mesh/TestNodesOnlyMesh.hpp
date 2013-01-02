@@ -73,6 +73,15 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), 8u);
 
+        // Check that the nodes mapping is set up correctly
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            TS_ASSERT(!(p_mesh->mNodesMapping.find(i) == p_mesh->mNodesMapping.end()));
+            TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(i), p_mesh->mNodesMapping[i]);
+        }
+
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8), " does not belong to processes ")
+
         // Avoid memory leak
         delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
@@ -339,6 +348,9 @@ public:
         unsigned num_nodes = 3;
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 0.5, 1e-4);
+
+        // Cover an exception.
+        TS_ASSERT_THROWS_THIS(p_mesh->SetCellRadius(3,1.0), "Trying to set the radius of node which does not lie on this process");
 
         // Avoid memory leak
         delete p_mesh;

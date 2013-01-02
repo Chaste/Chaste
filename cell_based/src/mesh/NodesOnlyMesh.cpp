@@ -105,7 +105,10 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location);
         this->mNodes.push_back(p_node_copy);
 
-        mCellRadii[i] = 0.5;
+		// Update the node map
+		mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
+
+		mCellRadii[i] = 0.5;
 
         mIndexCounter++;
     }
@@ -117,6 +120,19 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance, double domainPadding)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes);
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::SolveNodeMapping(unsigned index) const
+{
+    std::map<unsigned, unsigned>::const_iterator node_position = mNodesMapping.find(index);
+
+    if (node_position == mNodesMapping.end())
+    {
+        EXCEPTION("Requested node " << index << " does not belong to processes " << PetscTools::GetMyRank());
+    }
+
+    return node_position->second;
 }
 
 template<unsigned SPACE_DIM>
@@ -144,6 +160,9 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 
     // Clear the cell radii
     mCellRadii.clear();
+
+    // Clear the nodes mapping
+    mNodesMapping.clear();
 
     // Set the global number of nodes to zero.
     mTotalNumNodes = 0u;
@@ -184,13 +203,11 @@ double NodesOnlyMesh<SPACE_DIM>::GetCellRadius(unsigned index)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
 {
-//    // Make sure that we own the node
-//    if(mNodesMapping.find(index) == mNodesMapping.end())
-//    {
-//        #define COVERAGE_IGNORE
-//        EXCEPTION("Trying to set the radius of node which does not lie on this process");
-//        #undef COVERAGE_IGNORE
-//    }
+    // Make sure that we own the node
+    if(mNodesMapping.find(index) == mNodesMapping.end())
+    {
+        EXCEPTION("Trying to set the radius of node which does not lie on this process");
+    }
 
     // Set the radius
     mCellRadii[index] = radius;
@@ -276,6 +293,8 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
     {
         Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
         this->mNodes.push_back(p_node);
+
+        mNodesMapping[p_node->GetIndex()] = this->mNodes.size()-1;
     }
 
     // Update the global number of nodes
@@ -287,6 +306,9 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
     // Call method on parent class
     unsigned new_node_index = MutableMesh<SPACE_DIM, SPACE_DIM>::AddNode(pNewNode);
+
+    // update mNodesMapping
+    mNodesMapping[pNewNode->GetIndex()] = new_node_index;
 
     // Then update mCellRadii
     SetCellRadius(new_node_index, 0.5);
@@ -307,6 +329,8 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
 
     this->mNodes[index]->MarkAsDeleted();
     this->mDeletedNodeIndices.push_back(index);
+//    mDeletedGlobalNodeIndices.push_back(index);
+    mNodesMapping.erase(index);
 
     /**
      * Note: we may not need to update mCellRadii here, since if the

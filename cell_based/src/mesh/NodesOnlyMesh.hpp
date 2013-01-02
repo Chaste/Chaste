@@ -92,10 +92,14 @@ private:
     /** A counter of the number of fresh indices used on this process. */
     unsigned mIndexCounter;
 
+	/** A vector of the global indices that have been freed on the process from deleting a node */
+	//std::vector<unsigned> mDeletedGlobalNodeIndices;
+
     friend class TestNodesOnlyMesh;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+
     /**
      * Archives the member variables of the object which have to be preserved
      * during its lifetime.
@@ -184,6 +188,15 @@ public:
      * Clears mCellRadii in addition to calling Clear() on the parent class.
      */
     void Clear();
+
+    /**
+     * Overridden solve node mapping method
+     *
+     * @param index the global index of the node
+     *
+     * @return the local index of the node.
+     */
+    unsigned SolveNodeMapping(unsigned index) const;
 
     /**
      * Get the local number of nodes that are actually in use.
