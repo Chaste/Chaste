@@ -4,7 +4,7 @@
 Based on TestBidomainDistributedMesh.hpp::TestBidomainProblemWithDistributedMeshFromMemfem3DParMetis() rev=8772
 But run for a little longer
  URL
- https://chaste.comlab.ox.ac.uk/cgi-bin/trac.cgi/browser/trunk/heart/test/bidomain/TestBidomainDistributedMesh.hpp?rev=8772
+ https://chaste.cs.ox.ac.uk/trac/browser/trunk/heart/test/bidomain/TestBidomainDistributedMesh.hpp?rev=8772
 -->
 	<Simulation>       
 		<!-- 

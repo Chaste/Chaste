@@ -120,7 +120,7 @@ def Configure(prefs, build):
     use_vtk = int(prefs.get('use-vtk', True))
     
     # VTK is required for adaptivity to work, so if vtk is turned off, turn off adaptivity too.
-    # See also https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/InstallAdaptivityLibrary
+    # See also https://chaste.cs.ox.ac.uk/trac/wiki/InstallAdaptivityLibrary
     use_adaptivity = int(prefs.get('use-adaptivity', False)) and use_vtk
     if use_adaptivity:
         other_includepaths.append(chaste_libs_path+'libadaptivity/include')

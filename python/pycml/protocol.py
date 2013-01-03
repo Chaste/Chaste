@@ -49,7 +49,7 @@ class Protocol(processors.ModelModifier):
     """A class representing part of a simulation protocol for the functional curation system.
 
     PyCml is responsible for implementing the 'model interface' section of protocols.
-    See https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/SimulationProtocolNotes#Modelinterface
+    See https://chaste.cs.ox.ac.uk/trac/wiki/SimulationProtocolNotes#Modelinterface
     for further details.  The main user-facing methods here implement the XML elements defined
     there:
      - specify_input_variable

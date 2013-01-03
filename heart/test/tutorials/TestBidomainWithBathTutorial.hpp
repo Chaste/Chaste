@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * using Backward Euler is trivial: just change the .hpp included as follows, and the class name as below.
  *
  * If you want to use Backward Euler your own cellml file, there is an intermediate step - see
- * https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/CodeGenerationFromCellML#GeneratingBackwardEulercellmodels
+ * https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#GeneratingBackwardEulercellmodels
  * (note: requires Maple). (This step creates the .out files that are already present in heart/src/odes/cellml)
  *
  */

@@ -10,7 +10,7 @@ Since PyCml generates C++ source code, the source code release of Chaste is
 required to make use of CellML models.
 
 Full documentation can be found on the developers' wiki at
-https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/CodeGenerationFromCellML
+https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML
 For a guest login, use the username "anonymous", and your email address as
 the password.
 

@@ -55,8 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * available.
  *
  * For higher-level documentation, including
- * <a href="https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/DeveloperInstallGuide">installation guides</a>,
- * <a href="https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/UserTutorials">tutorials</a> and more,
+ * <a href="https://chaste.cs.ox.ac.uk/trac/wiki/DeveloperInstallGuide">installation guides</a>,
+ * <a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials">tutorials</a> and more,
  * see the main Chaste website at
  * <a href="http://www.cs.ox.ac.uk/chaste/documentation.html">http://www.cs.ox.ac.uk/chaste/documentation.html</a>.
  */

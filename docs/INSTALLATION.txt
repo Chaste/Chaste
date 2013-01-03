@@ -3,7 +3,7 @@ CHASTE DEVELOPER INSTALLATION GUIDE (for SOURCE-CODE users only, NOT STANDALONE 
 
 This guide walks you through a "standard" installation of Chaste and all its
 dependencies.  Other guides can be found on the developer wiki at
-https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/DeveloperInstallGuide
+https://chaste.cs.ox.ac.uk/trac/wiki/DeveloperInstallGuide
 For a guest login, use the username "anonymous", and your email address as
 the password.
 Anyone can register an account with the Chaste wiki to view and comment on public tickets.
@@ -399,7 +399,7 @@ scons chaste_libs=1 core
 
 
 Further details on build options can be found on the Chaste developers' wiki at
-https://chaste.cs.ox.ac.uk/cgi-bin/trac.cgi/wiki/ChasteGuides/BuildGuide.
+https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/BuildGuide.
 For a guest login, use the username "anonymous", and your email address as
 the password.
 
