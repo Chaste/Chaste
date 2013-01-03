@@ -37,15 +37,15 @@ import re
 import sys
 
 
-deprecated_notice = re.compile(r"""Copyright \(c\) 2005-2012, University of Oxford.
+deprecated_notice = re.compile(r"""Copyright \(c\) 2005-\d{4}, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
 University of Oxford, having an administrative office at Wellington
 Square, Oxford OX1 2JD, UK.
-
+((
 This file is part of Chaste.
-
+)?)
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
  \* Redistributions of source code must retain the above copyright notice,
@@ -101,16 +101,15 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-#py_deprecated_notice=''
-#for line in deprecated_notice.splitlines():#
-#	py_deprecated_notice+=''.join(['# ',line,'\n'])
-#py_current_notice=''
-#for line in current_notice.splitlines():
-#	py_current_notice+=''.join(['# ',line,'\n'])
-
-py_current_notice='\"\"\"'+current_notice+'\"\"\"\n'
+py_current_notice='"""'+current_notice+'"""\n'
 cpp_current_notice='/*\n\n'+current_notice+'\n*/'
+cpp_notice_to_add = cpp_current_notice + "\n\n"
 
+# This is used when replacing a deprecated notice with the latest version,
+# to account for the optional text.
+replacement_notice = current_notice.replace("\nThis file is part of Chaste.\n", r"\1")
+
+output_notice=current_notice.replace("\nThis file is part of Chaste.\n", "")
 pycml_notice=" Processed by pycml - CellML Tools in Python"
 xsd2_notice="// Copyright (C) 2005-2007 Code Synthesis Tools CC"
 xsd3_notice="// Copyright (C) 2005-2008 Code Synthesis Tools CC"
@@ -220,7 +219,8 @@ def InspectFile(fileName):
         return True
     valid_notice = False
     if (CheckForCopyrightNotice(cpp_current_notice, file_in) or
-        CheckForCopyrightNotice(py_current_notice, file_in)):
+        CheckForCopyrightNotice(py_current_notice, file_in) or
+        CheckForCopyrightNotice(output_notice, file_in)):
         #print 'Found current notice in '+file_name
         valid_notice=True
     if (CheckForCopyrightNotice(pycml_notice, file_in) or
@@ -241,10 +241,10 @@ def InspectFile(fileName):
     if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
-            ReplaceStringInFile(deprecated_notice, current_notice, fileName)
+            ReplaceStringInFile(deprecated_notice, replacement_notice, fileName)
             return True
         else:
-            print 'Fix this by doing: python/infra/CheckForCopyrights.py -update'
+            print 'Fix this by doing:',sys.argv[0],'-update'
             return False
     
     print 'Found no copyright notice for', fileName
@@ -253,16 +253,23 @@ def InspectFile(fileName):
             print 'Not implemented for .py files'
             return False
         else:
-            HeadAppendStringInFile(cpp_current_notice+"\n\n", fileName)
+            HeadAppendStringInFile(cpp_notice_to_add, fileName)
         return True
     else:
-        print 'Fix this by doing: python/infra/CheckForCopyrights.py -new'
+        print 'Fix this by doing:',sys.argv[0],'-new'
         return False
 
 
 if __name__ == '__main__':
     # Check, apply or modify the copyright notices.
-    exts = ['.cpp', '.hpp', '.py', '.java', '.in']
+    # .cpp, .hpp., .py, .java are C++, Python and Java code.
+    exts = ['.cpp', '.hpp', '.py', '.java']
+
+    # SCons files		
+    # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice) 
+    # Version.cpp.in is the provenance file
+    named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
+	
     dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects']
     startchar_ignores = ['_', '.']
     exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
@@ -288,7 +295,7 @@ if __name__ == '__main__':
         for file in files:
             relative_path = os.path.join(relative_root, file)
             name, ext = os.path.splitext(file)
-            if ((ext in exts or file=='SConscript' or file=='SConstruct') and
+            if ((ext in exts or file in named_files) and
                 relative_path not in exclusions):
                 file_name = os.path.join(root, file)
                 if InspectFile(file_name) == False:
