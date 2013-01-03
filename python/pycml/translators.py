@@ -1379,6 +1379,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln_hpp('#include "' + self.base_class_name + '.hpp"')
             if not self.doc._cml_rush_larsen:
                 self.writeln('#include "Warnings.hpp"')
+        elif self.options.grl1:
+            self.base_class_name = 'AbstractGeneralizedRushLarsenCardiacCell'
+            self.writeln_hpp('#include "' + self.base_class_name + '.hpp"')
+        elif self.options.grl2: #1992 TODO: merge with above case
+            self.base_class_name = 'AbstractGeneralizedRushLarsenCardiacCell'
+            self.writeln_hpp('#include "' + self.base_class_name + '.hpp"')
         elif base_class:
             self.base_class_name = base_class
             self.writeln_hpp('#include "' + self.base_class_name + '.hpp"')
@@ -1693,7 +1699,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Start output
         self.output_includes()
         
-        if self.use_backward_euler or self.options.rush_larsen:
+        if self.use_backward_euler or self.options.rush_larsen or self.options.grl1 or self.options.grl2:
             # Keep the same signature as forward cell models, but note that the solver isn't used
             solver1 = 'boost::shared_ptr<AbstractIvpOdeSolver> /* unused; should be empty */'
             solver2 = ''
@@ -2281,6 +2287,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
          * EvaluateEquations  evaluate the model derivatives and alpha/beta terms
          * ComputeOneStepExceptVoltage  does a Rush-Larsen update for eligible variables,
            and a forward Euler step for other non-V state variables
+        Generalised Rush-Larsen methods also have specialised handling; see the
+        individual methods for details.
 
         For other solvers, only 2 methods are needed:
          * EvaluateYDerivatives computes the RHS of the ODE system
@@ -2294,6 +2302,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_rush_larsen_mathematics()
         elif self.use_backward_euler:
             self.output_backward_euler_mathematics()
+        elif self.options.grl1:
+            self.output_grl1_mathematics()
+        elif self.options.grl2:
+            self.output_grl2_mathematics()        
         else:
             self.output_evaluate_y_derivatives()
         self.output_derived_quantities()
@@ -2641,6 +2653,317 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 # Forward Euler update
                 self.writeln('rY[', i, '] += mDt * rDY[', i, '];')
         self.close_block()
+    
+    #Megan E. Marsh, Raymond J. Spiteri 
+    #Numerical Simulation Laboratory 
+    #University of Saskatchewan 
+    #December 2011 
+    #Partial support provided by research grants from 
+    #the National Science and Engineering Research 
+    #Council (NSERC) of Canada and the MITACS/Mprime 
+    #Canadian Network of Centres of Excellence.
+    def output_derivative_calculations_grl(self, var, assign_rY=False, extra_nodes=set(),
+                                           extra_table_nodes=set()):
+        """
+        This is used by self.output_grl1_mathematics to get equations for each variable separately.
+        """
+        state_vars=self.state_vars
+        # Work out what equations are needed to compute the derivatives
+        derivs = set(map(lambda v: (v, self.free_vars[0]), state_vars))
+        if var in state_vars:
+            dvardt = (var, self.free_vars[0])
+            derivs.remove(dvardt)
+        if self.use_chaste_stimulus:
+            i_stim = [self.doc._cml_config.i_stim_var]
+        else:
+            i_stim = []
+        nonvar_nodeset = self.calculate_extended_dependencies(derivs|extra_nodes)
+        if dvardt:
+            var_nodeset = self.calculate_extended_dependencies([dvardt])
+        else:    
+            var_nodeset = set()
+        ## State variable inputs
+        all_nodes = nonvar_nodeset|var_nodeset
+        self.output_state_assignments(nodeset=var_nodeset, assign_rY=assign_rY)
+        self.writeln()
+        self.output_comment('Mathematics')
+        self.output_equations(var_nodeset) 
+
+    #Megan E. Marsh, Raymond J. Spiteri 
+    #Numerical Simulation Laboratory 
+    #University of Saskatchewan 
+    #December 2011 
+    #Partial support provided by research grants from 
+    #the National Science and Engineering Research 
+    #Council (NSERC) of Canada and the MITACS/Mprime 
+    #Canadian Network of Centres of Excellence.
+    def output_grl1_mathematics(self):
+        """Output the special methods needed for GRL1 style cell models.
+        
+        We generate:
+         * Update TransmembranePotential update V_m
+         * ComputeOneStepExceptVoltage  does a GRL1 update for variables except voltage
+         * EvaluateYDerivativeI for each variable I
+        """
+        ########################################################UpdateTransmembranePotential
+        self.output_method_start('UpdateTransmembranePotential',
+                                 [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                  'const std::vector<double> &rDY'],
+                                 'void', access='public')
+        self.open_block()
+        self.writeln('std::vector<double>& rY = rGetStateVariables();')
+        self.writeln('unsigned v_index = GetVoltageIndex();')
+        self.writeln('double delta=1e-8;')
+        self.writeln('double V_m_save = rY[v_index];')
+        self.writeln('double partialF, evalF, temp;')
+        self.writeln('')    
+        #Update all variables
+        self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
+        self.output_derivative_calculations_grl(self.v_variable)       
+        self.writeln('')
+        self.writeln('evalF='+self.code_name(self.v_variable, ode=True),self.STMT_END)
+        self.writeln('rY[v_index]+=delta;')
+        self.writeln(self.code_name(self.v_variable, ode=True)+'=rY[v_index];')
+        #Update all variables
+        self.writeln('temp=EvaluateYDerivative'+str(self.v_index)+'('+self.code_name(self.free_vars[0])+', rY);')
+        self.writeln('partialF=(temp-evalF)/delta;')
+        self.writeln('rY[v_index]=V_m_save;')
+        self.writeln('if (fabs(partialF)<delta)')
+        self.open_block()
+        self.writeln('rGetStateVariables()[v_index]=V_m_save+evalF*mDt;')
+        self.close_block()
+        self.writeln('else')
+        self.open_block()
+        self.writeln('rGetStateVariables()[v_index]=V_m_save+(evalF/partialF)*(exp(partialF*mDt)-1);')
+        self.close_block()
+        self.close_block()
+
+        #########################################################ComputeOneStepExceptVoltage
+        self.output_method_start('ComputeOneStepExceptVoltage',
+                      [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                      'const std::vector<double> &rDY'],
+                      'void', access='public')
+        self.open_block()
+        #Set up variables
+        self.writeln('std::vector<double>& rY = rGetStateVariables();')
+        self.writeln('double delta=1e-8;')
+        self.writeln('unsigned size = GetNumberOfStateVariables();')
+        self.writeln('std::vector<double> yinit = rY;')
+        self.writeln('double y_save, temp, var_num;')
+        self.writeln('std::vector<double> partialF(size);')
+        self.writeln('std::vector<double> evalF(size);')
+        self.writeln('')
+        
+        ##Evaluate RHS of equations
+        self.output_derivative_calculations(self.state_vars)
+        for i, var in enumerate(self.state_vars):
+            self.writeln(self.vector_index('evalF', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
+            self.writeln('')
+        for i, var in enumerate(self.state_vars):
+            if var is not self.v_variable:
+                self.writeln('')
+                self.writeln('var_num='+str(i)+';')
+                self.writeln('y_save = rY[var_num];')
+                self.writeln('rY[var_num]+=delta;')
+                self.writeln('')
+                #Evaluate RHS again
+                self.writeln('temp=EvaluateYDerivative'+str(i)+'('+self.code_name(self.free_vars[0])+', rY);')
+                self.writeln('partialF[var_num]=(temp-evalF[var_num])/delta;')
+                self.writeln('rY[var_num]=y_save;')
+
+        ##Update all variables
+        #1992 TODO assumes V is index 0
+        self.writeln('for (unsigned var=1; var<size; var++)')
+        self.open_block()
+        self.writeln('if(fabs(partialF[var])<delta)')
+        self.open_block()
+        self.writeln('rY[var]=yinit[var]+mDt*evalF[var];')
+        self.close_block()
+        self.writeln('else')
+        self.open_block()
+        self.writeln('rY[var]=yinit[var]+(evalF[var]/partialF[var])*(exp(partialF[var]*mDt)-1);')
+        self.close_block()
+        self.close_block()       
+        self.writeln('')   
+        self.close_block()
+
+        #########################################################Evaluate each equation
+        for i, var in enumerate(self.state_vars):
+            self.output_method_start('EvaluateYDerivative'+str(i),
+                        [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                        'std::vector<double>& rY'],
+                        'double', access='public')
+            self.open_block()
+            if var is self.v_variable:
+                self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
+            self.output_derivative_calculations_grl(var)       
+            self.writeln()
+            self.writeln('return '+self.code_name(var, True)+';') 
+            self.close_block()                    
+
+    #Megan E. Marsh, Raymond J. Spiteri 
+    #Numerical Simulation Laboratory 
+    #University of Saskatchewan 
+    #December 2011 
+    #Partial support provided by research grants from 
+    #the National Science and Engineering Research 
+    #Council (NSERC) of Canada and the MITACS/Mprime 
+    #Canadian Network of Centres of Excellence.     
+    def output_grl2_mathematics(self):
+        """Output the special methods needed for GRL2 style cell models.
+        
+        We generate:
+         * Update TransmembranePotential update V_m
+         * ComputeOneStepExceptVoltage  does a GRL2 update for variables except voltage
+         * EvaluateYDerivativeI for each variable I  
+        """
+        ########################################################UpdateTransmembranePotential
+        self.output_method_start('UpdateTransmembranePotential',
+                  [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                  'const std::vector<double> &rDY'],
+                  'void', access='public')
+        self.open_block()
+        self.writeln('std::vector<double>& rY = rGetStateVariables();')
+        self.writeln('unsigned v_index = GetVoltageIndex();')
+        self.writeln('double delta=1e-8;')
+        self.writeln('double yinit = rY[v_index];')
+        self.writeln('double V_m_save = rY[v_index];')
+        self.writeln('double partialF, evalF, temp;')
+        self.writeln('')    
+    
+        #Update all variables
+        self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)    
+        self.output_derivative_calculations_grl(self.v_variable)       
+        self.writeln('')
+        self.writeln('evalF='+self.code_name(self.v_variable, ode=True),self.STMT_END)
+        self.writeln('rY[v_index]+=delta;')
+        self.writeln(self.code_name(self.v_variable, ode=True)+'=rY[v_index];')
+        #Update all variables
+        self.writeln('temp=EvaluateYDerivative'+str(self.v_index)+'('+self.code_name(self.free_vars[0])+', rY);')
+        self.writeln('partialF=(temp-evalF)/delta;')
+        self.writeln('rY[v_index]=V_m_save;')
+        self.writeln('if (fabs(partialF)<delta)')
+        self.open_block()
+        self.writeln('rGetStateVariables()[v_index]=V_m_save+0.5*evalF*mDt;')
+        self.close_block()
+        self.writeln('else')
+        self.open_block()
+        self.writeln('rGetStateVariables()[v_index]=V_m_save+(evalF/partialF)*(exp(partialF*0.5*mDt)-1);')
+        self.close_block()
+    
+        #Update all variables
+        self.writeln('V_m_save=rY[v_index];')
+        self.writeln('rY[v_index]=yinit;')
+        self.writeln('evalF=EvaluateYDerivative'+str(self.v_index)+'('+self.code_name(self.free_vars[0])+', rY);')
+        self.writeln('')
+        self.writeln('rY[v_index]+=delta;')
+        self.writeln(self.code_name(self.v_variable, ode=True)+'=rY[v_index];')
+        #Update all variables
+        self.writeln('temp=EvaluateYDerivative'+str(self.v_index)+'('+self.code_name(self.free_vars[0])+', rY);')
+        self.writeln('partialF=(temp-evalF)/delta;')
+        self.writeln('rY[v_index]=V_m_save;')
+        self.writeln('if (fabs(partialF)<delta)')
+        self.open_block()
+        self.writeln('rGetStateVariables()[v_index]=yinit+evalF*mDt;')
+        self.close_block()
+        self.writeln('else')
+        self.open_block()
+        self.writeln('rGetStateVariables()[v_index]=yinit+(evalF/partialF)*(exp(partialF*mDt)-1);')
+        self.close_block()
+        self.close_block()
+
+        #########################################################ComputeOneStepExceptVoltage
+        self.output_method_start('ComputeOneStepExceptVoltage',
+                      [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                      'const std::vector<double> &rDY'],
+                      'void', access='public')
+        self.open_block()
+        #Set up variables
+        self.writeln('std::vector<double>& rY = rGetStateVariables();')
+        self.writeln('double delta=1e-8;')
+        self.writeln('unsigned size = GetNumberOfStateVariables();')
+        self.writeln('std::vector<double> yinit = rY;')
+        self.writeln('double y_save, temp, var_num;')
+        self.writeln('std::vector<double> partialF(size);')
+        self.writeln('std::vector<double> evalF(size);')
+        self.writeln('')
+    
+        ##Evaluate RHS of equations
+        self.output_derivative_calculations(self.state_vars)
+        for i, var in enumerate(self.state_vars):
+            self.writeln(self.vector_index('evalF', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
+            self.writeln('')
+        for i, var in enumerate(self.state_vars):
+            if var is not self.v_variable:
+                self.writeln('')
+                self.writeln('var_num='+str(i)+';')
+                self.writeln('y_save = rY[var_num];')
+                self.writeln('rY[var_num]+=delta;')
+                self.writeln('')
+                #Evaluate RHS again
+                self.writeln('temp=EvaluateYDerivative'+str(i)+'('+self.code_name(self.free_vars[0])+', rY);')
+                self.writeln('partialF[var_num]=(temp-evalF[var_num])/delta;')
+                self.writeln('rY[var_num]=y_save;')
+        
+        ##Update all variables
+        #1992 TODO assumes V is index 0
+        self.writeln('for (unsigned var=1; var<size; var++)')
+        self.open_block()
+        self.writeln('if(fabs(partialF[var])<delta)')
+        self.open_block()
+        self.writeln('rY[var]=yinit[var]+0.5*mDt*evalF[var];')
+        self.close_block()
+        self.writeln('else')
+        self.open_block()
+        self.writeln('rY[var]=yinit[var]+(evalF[var]/partialF[var])*(exp(partialF[var]*0.5*mDt)-1);')
+        self.close_block()
+        self.close_block()       
+        self.writeln('')   
+
+        ##Evaluate RHS of equations
+        for i, var in enumerate(self.state_vars):
+            if var is not self.v_variable:
+                self.writeln('')
+                self.writeln('var_num='+str(i)+';')
+                self.writeln('y_save=rY[var_num];')
+                self.writeln('rY[var_num]=yinit[var_num];')
+                self.writeln('evalF[var_num]=EvaluateYDerivative'+str(i)+'('+self.code_name(self.free_vars[0])+', rY);')
+                self.writeln('rY[var_num]+=delta;')
+                self.writeln('')
+                #Evaluate RHS again
+                self.writeln('temp=EvaluateYDerivative'+str(i)+'('+self.code_name(self.free_vars[0])+', rY);')
+                self.writeln('partialF[var_num]=(temp-evalF[var_num])/delta;')
+                self.writeln('rY[var_num]=y_save;')
+        
+        ##Update all variables
+        self.writeln('for (unsigned var=1; var<size; var++)')
+        self.open_block()
+        self.writeln('if(fabs(partialF[var])<delta)')
+        self.open_block()
+        self.writeln('rY[var]=yinit[var]+mDt*evalF[var];')
+        self.close_block()
+        self.writeln('else')
+        self.open_block()
+        self.writeln('rY[var]=yinit[var]+(evalF[var]/partialF[var])*(exp(partialF[var]*mDt)-1);')
+        self.close_block()
+        self.close_block()       
+        self.writeln('')  
+        self.close_block()
+    
+        #########################################################Evaluate each equation
+        for i, var in enumerate(self.state_vars):
+          self.output_method_start('EvaluateYDerivative'+str(i),
+                                   [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                   'std::vector<double>& rY'],
+                                   'double', access='public')
+          self.open_block()
+          if var is self.v_variable:
+              self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
+          self.output_derivative_calculations_grl(var)       
+          self.writeln()
+          self.writeln('return '+self.code_name(var, True)+';') 
+          self.close_block()
+
     
     def output_model_attributes(self):
         """Output any named model attributes defined in metadata.
@@ -5217,6 +5540,16 @@ def get_options(args, default_options=None):
                       action='store_true', default=False,
                       help="use the Rush-Larsen method to solve Hodgkin-Huxley style gating variable"
                       " equations.  Not compatible with --backward-euler.  Implies -t Chaste.")
+    parser.add_option('--grl1',
+                      action='store_true', default=False,
+                      help="use the GRL1 method to solve Hodgkin-Huxley style gating variable"
+                      " equations.  Not compatible with the backward Euler transformation."
+                      " Implies -t Chaste.")
+    parser.add_option('--grl2',
+                      action='store_true', default=False,
+                      help="use the GRL2 method to solve Hodgkin-Huxley style gating variable"
+                      " equations.  Not compatible with the backward Euler transformation."
+                      " Implies -t Chaste.")        
     # Settings tweaking the generated code
     parser.add_option('-c', '--class-name', default=None,
                       help="explicitly set the name of the generated class")
@@ -5355,7 +5688,9 @@ def get_options(args, default_options=None):
         if not options.maple_output:
             parser.error("Backward Euler code generation requires maple output (-j)")
         options.rush_larsen = False
-    if options.rush_larsen or options.backward_euler:
+        options.grl1 = False
+        options.grl2 = False
+    if options.rush_larsen or options.backward_euler or options.grl1 or options.grl2:
         options.translate_type = 'Chaste'
 
     return options, args[0]

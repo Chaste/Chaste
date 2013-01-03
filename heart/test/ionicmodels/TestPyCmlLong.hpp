@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCellInterface.hpp"
 #include "AbstractCvodeCell.hpp"
 #include "AbstractRushLarsenCardiacCell.hpp"
+#include "AbstractGeneralizedRushLarsenCardiacCell.hpp"
 
 #include "DynamicLoadingHelperFunctions.hpp"
 
@@ -418,6 +419,33 @@ public:
         std::vector<std::string> models;
         AddAllModels(models);
         RunTests(dirname, models, args, true, -1000, false);
+    }
+
+    void TestGeneralizedRushLarsen1Cells() throw (Exception)
+    {
+        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--grl1");
+        std::vector<std::string> models;
+        AddAllModels(models);
+        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+        // Winslow model needs a smaller timestep
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, models, args, false, 0, false);
+    }
+
+    void TestGeneralizedRushLarsen2Cells() throw (Exception)
+    {
+        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--grl2");
+        std::vector<std::string> models;
+        AddAllModels(models);
+        // Winslow model needs a smaller timestep
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, models, args, false, 0, false);
     }
 };
 

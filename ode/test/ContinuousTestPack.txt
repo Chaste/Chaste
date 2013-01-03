@@ -5,6 +5,8 @@ TestAbstractAnalyticJacobian.hpp
 TestBackwardEulerIvpOdeSolver.hpp
 TestCombinedOdeSystem.hpp
 TestCvodeAdaptor.hpp
+TestGRL1IvpOdeSolver.hpp
+TestGRL2IvpOdeSolver.hpp
 TestMockEulerIvpOdeSolver.hpp
 TestRungeKuttaFehlbergIvpOdeSolver.hpp
 TestSolvingStiffOdeSystems.hpp

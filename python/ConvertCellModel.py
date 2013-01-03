@@ -98,6 +98,12 @@ parser.add_option('--backward-euler', action='store_true', default=False,
 parser.add_option('--rush-larsen', action='store_true', default=False,
                   help="generate a version of the cell model that can be"
                   " solved using the Rush-Larsen method.")
+parser.add_option('--grl1', action='store_true', default=False,
+                  help="generate a version of the cell model that can be"
+                  " solved using the GRL1 method.")     
+parser.add_option('--grl2', action='store_true', default=False,
+                  help="generate a version of the cell model that can be"
+                  " solved using the GRL2 method.")           
 parser.add_option('--output-dir', action='store',
                   help="directory to place output files in")
 parser.add_option('--show-outputs', action='store_true', default=False,
@@ -121,7 +127,7 @@ parser.add_option('--assume-valid',
                   help="skip some of the model validation checks")
 options, args = parser.parse_args()
 
-option_names = ['opt', 'normal', 'cvode', 'backward_euler', 'rush_larsen']
+option_names = ['opt', 'normal', 'cvode', 'backward_euler', 'rush_larsen', 'grl1', 'grl2']
 def arg2name(arg):
     return str(arg)[2:].replace('-', '_')
 
@@ -340,20 +346,21 @@ def convert(model, output_dir):
                                     model_base, 'BackwardEuler')
         do_cmd(cmd, outputs)
     
-    if options.rush_larsen:
-        opts = ['--rush-larsen']
-        if not dyn_opt:
-            cmd, outputs = add_out_opts(command_base + opts, output_dir,
-                                        class_name + 'RushLarsen', model_base, 'RushLarsen')
-            do_cmd(cmd, outputs)
-            
-        if options.opt:
-            opts.extend(['-p', '-l'])
-            cmd, outputs = add_out_opts(command_base + opts, output_dir,
-                                        class_name + 'RushLarsenOpt',
-                                        model_base, 'RushLarsenOpt')
-            do_cmd(cmd, outputs)
-
+    rush_larsen_variants = {'--rush-larsen': 'RushLarsen', '--grl1': 'GRL1', '--grl2': 'GRL2'}
+    for rl_opt, rl_name in rush_larsen_variants.iteritems():
+        if getattr(options, arg2name(rl_opt), False):
+            opts = [rl_opt]
+            if not dyn_opt:
+                cmd, outputs = add_out_opts(command_base + opts, output_dir,
+                                            class_name + rl_name, model_base, rl_name)
+                do_cmd(cmd, outputs)
+                
+            if options.opt:
+                opts.extend(['-p', '-l'])
+                cmd, outputs = add_out_opts(command_base + opts, output_dir,
+                                            class_name + rl_name + 'Opt',
+                                            model_base, rl_name + 'Opt')
+                do_cmd(cmd, outputs)
 
 
 for model in models:
