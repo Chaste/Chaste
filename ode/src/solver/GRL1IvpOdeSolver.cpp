@@ -42,6 +42,7 @@ Partial support provided by research grants from the National
 Science and Engineering Research Council (NSERC) of Canada 
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
+#include <cmath>
 #include "GRL1IvpOdeSolver.hpp"
 
 void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,

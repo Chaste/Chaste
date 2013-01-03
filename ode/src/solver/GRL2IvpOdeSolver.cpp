@@ -43,8 +43,10 @@ Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
-#include "GRL2IvpOdeSolver.hpp"
 #include <cstdio>
+#include <cmath>
+
+#include "GRL2IvpOdeSolver.hpp"
 void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
                                                   double timeStep,
                                                   double time,
