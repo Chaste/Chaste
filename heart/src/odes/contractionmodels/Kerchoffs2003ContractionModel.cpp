@@ -121,9 +121,9 @@ double Kerchoffs2003ContractionModel::GetActiveTension(double lc)
 
         if(t_a < t_max)
         {
-        	double tr = this->GetParameter("tr");
-        	double td = this->GetParameter("td");
-        	f_twitch = pow( tanh(t_a/tr)*tanh((t_max-t_a)/td), 2);
+            double tr = this->GetParameter("tr");
+            double td = this->GetParameter("td");
+            f_twitch = pow( tanh(t_a/tr)*tanh((t_max-t_a)/td), 2);
         }
         else if(mElectricallyUnactivated)
         {

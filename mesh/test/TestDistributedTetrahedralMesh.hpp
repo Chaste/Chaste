@@ -97,7 +97,7 @@ private:
 
         // Do both files contain the same lines (up to permutations)?
         TS_ASSERT(lines_from_file_1 == lines_from_file_2);
-	}
+    }
 
     template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
     void CompareMeshes( DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh1,
@@ -1699,7 +1699,7 @@ public:
         read_mesh_2d.ConstructFromMeshReader(mesh_reader_2d);
 
         DistributedTetrahedralMesh<2,2> constructed_mesh_2d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
-	TS_ASSERT_THROWS_THIS(constructed_mesh_2d.ConstructRectangularMesh(width, height), "Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+    TS_ASSERT_THROWS_THIS(constructed_mesh_2d.ConstructRectangularMesh(width, height), "Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
         constructed_mesh_2d.SetProcessRegion(&cuboid_2d);
 
         constructed_mesh_2d.ConstructRectangularMesh(width, height);
@@ -1727,7 +1727,7 @@ public:
         read_mesh_3d.ConstructFromMeshReader(mesh_reader_3d);
 
         DistributedTetrahedralMesh<3,3> constructed_mesh_3d(DistributedTetrahedralMeshPartitionType::GEOMETRIC);
-	TS_ASSERT_THROWS_THIS(constructed_mesh_3d.ConstructCuboid(width, height, depth), "Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+    TS_ASSERT_THROWS_THIS(constructed_mesh_3d.ConstructCuboid(width, height, depth), "Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
         constructed_mesh_3d.SetProcessRegion(&cuboid_3d);
 
         constructed_mesh_3d.ConstructCuboid(width, height, depth);

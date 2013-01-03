@@ -194,7 +194,7 @@ public:
         OdeThirdOrder ode_system1, ode_system2;
 
         double h_value1 = 0.0025;
-	double h_value2 = 0.00125;
+        double h_value2 = 0.00125;
 
         //GRL2 solver solution worked out
         GRL2IvpOdeSolver solver1, solver2;
@@ -203,8 +203,8 @@ public:
         std::vector<double> state_variables1 = ode_system1.GetInitialConditions();
         solutions1 = solver1.Solve(&ode_system1, state_variables1, 0.0, 2.0, h_value1, h_value1);
         unsigned last1 = solutions1.GetNumberOfTimeSteps();
-	
-	std::vector<double> state_variables2 = ode_system2.GetInitialConditions();
+
+        std::vector<double> state_variables2 = ode_system2.GetInitialConditions();
         solutions2 = solver2.Solve(&ode_system2, state_variables2, 0.0, 2.0, h_value2, h_value1);
         unsigned last2 = solutions2.GetNumberOfTimeSteps();
 
@@ -212,8 +212,8 @@ public:
         testvalue1[0] = solutions1.rGetSolutions()[last1][0];
         testvalue1[1] = solutions1.rGetSolutions()[last1][1];
         testvalue1[2] = solutions1.rGetSolutions()[last1][2];
-	
-	testvalue2[0] = solutions2.rGetSolutions()[last2][0];
+
+        testvalue2[0] = solutions2.rGetSolutions()[last2][0];
         testvalue2[1] = solutions2.rGetSolutions()[last2][1];
         testvalue2[2] = solutions2.rGetSolutions()[last2][2];
 
@@ -224,18 +224,18 @@ public:
         exact_solution[1] = sin(2)+cos(2);
         exact_solution[2] = 2*sin(2);
 
-	double order = 2;
-	
-	//Test that the error is going down by a factor of 2^order
+        double order = 2;
+
+        //Test that the error is going down by a factor of 2^order
         double error1 = testvalue1[0] - exact_solution[0];
         double error2 = testvalue2[0] - exact_solution[0];
-	
+
         TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
-	error1 = testvalue1[1] - exact_solution[1];
+        error1 = testvalue1[1] - exact_solution[1];
         error2 = testvalue2[1] - exact_solution[1];
         TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
-	
-	error1 = testvalue1[2] - exact_solution[2];
+
+        error1 = testvalue1[2] - exact_solution[2];
         error2 = testvalue2[2] - exact_solution[2];
         TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
     }

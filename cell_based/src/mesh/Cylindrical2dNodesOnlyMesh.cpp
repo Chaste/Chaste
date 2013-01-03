@@ -49,8 +49,8 @@ Cylindrical2dNodesOnlyMesh::~Cylindrical2dNodesOnlyMesh()
 
 void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize)
 {
-	///\todo #2229 #2230 This method is never called.  Is it calling the method in the base class in error?
-	NEVER_REACHED;
+    ///\todo #2229 #2230 This method is never called.  Is it calling the method in the base class in error?
+    NEVER_REACHED;
 //    this->mpBoxCollection = new BoxCollection<2>(cutOffLength, domainSize, true); // Only difference is that this "true" makes the boxes periodic.
 //    this->mpBoxCollection->SetupLocalBoxesHalfOnly();
 //

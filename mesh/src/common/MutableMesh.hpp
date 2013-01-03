@@ -71,9 +71,9 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
         if(ELEMENT_DIM==SPACE_DIM)
         {
-        	NodeMap map(this->GetNumNodes());
-        	this->ReMesh(map);
-        	assert(map.IsIdentityMap()); // Otherwise the mesh will get VERY confused.
+            NodeMap map(this->GetNumNodes());
+            this->ReMesh(map);
+            assert(map.IsIdentityMap()); // Otherwise the mesh will get VERY confused.
         }
     }
 

@@ -97,11 +97,11 @@ public:
     void TestPrintWarnings()
     {
 
-    	WARNING("This warning is printed inside TestPrintWarnings().");
-    	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-    	Warnings::PrintWarnings();
-    	TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-    	Warnings::QuietDestroy();
+        WARNING("This warning is printed inside TestPrintWarnings().");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        Warnings::PrintWarnings();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        Warnings::QuietDestroy();
     }
 
     void TestWarningOnlyOnceReset()

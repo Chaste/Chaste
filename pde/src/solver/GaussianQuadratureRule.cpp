@@ -82,7 +82,7 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned quadratureOrder)
 {
     switch (quadratureOrder)
     {
-		case 0:
+        case 0:
         case 1: // 1d, 1st order
                 // 1 point rule
             mWeights.push_back(1);
@@ -94,9 +94,9 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned quadratureOrder)
             mWeights.push_back(0.5);
             mWeights.push_back(0.5);
             {
-            	double sqrt_one_third = sqrt(1.0/3.0);
-            	mPoints.push_back(ChastePoint<1>((-sqrt_one_third+1.0)/2.0));
-            	mPoints.push_back(ChastePoint<1>((sqrt_one_third+1.0)/2.0));
+                double sqrt_one_third = sqrt(1.0/3.0);
+                mPoints.push_back(ChastePoint<1>((-sqrt_one_third+1.0)/2.0));
+                mPoints.push_back(ChastePoint<1>((sqrt_one_third+1.0)/2.0));
             }
             break;
         case 4:
@@ -107,10 +107,10 @@ GaussianQuadratureRule<1>::GaussianQuadratureRule(unsigned quadratureOrder)
             mWeights.push_back(5.0/18.0);
 
             {
-				double sqrt_three_fifths = sqrt(3.0/5.0);
-				mPoints.push_back(ChastePoint<1>((-sqrt_three_fifths+1.0)/2.0));
-				mPoints.push_back(ChastePoint<1>(0.5));
-				mPoints.push_back(ChastePoint<1>((sqrt_three_fifths+1.0)/2.0));
+                double sqrt_three_fifths = sqrt(3.0/5.0);
+                mPoints.push_back(ChastePoint<1>((-sqrt_three_fifths+1.0)/2.0));
+                mPoints.push_back(ChastePoint<1>(0.5));
+                mPoints.push_back(ChastePoint<1>((sqrt_three_fifths+1.0)/2.0));
             }
             break;
          default:
@@ -227,48 +227,48 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned quadratureOrder)
             break;
         
         case 3: // 3d, 3rd order
-        	// 8 point rule
-        	/* The main options were
-        	 *  5-point rule.  Commonly published rule has four symmetric points and
-        	 *                 a negative weight in the centre.  We would like to avoid
-        	 *                 negative weight (certainly for interpolation.
-        	 *  8-point rule.  Uses two sets of symmetric points (as 4 point rule with a,b and then with c,d).
-        	 *                 This one is hard to derive a closed form solution to.
-        	 */
-        	{
-        		double root_seventeen = sqrt(17);
-        		double root_term = sqrt(1022.0-134.0*root_seventeen);
-        		double b = (55.0 - 3.0*root_seventeen + root_term)/196; //b = 0.328055
+            // 8 point rule
+            /* The main options were
+             *  5-point rule.  Commonly published rule has four symmetric points and
+             *                 a negative weight in the centre.  We would like to avoid
+             *                 negative weight (certainly for interpolation.
+             *  8-point rule.  Uses two sets of symmetric points (as 4 point rule with a,b and then with c,d).
+             *                 This one is hard to derive a closed form solution to.
+             */
+            {
+                double root_seventeen = sqrt(17);
+                double root_term = sqrt(1022.0-134.0*root_seventeen);
+                double b = (55.0 - 3.0*root_seventeen + root_term)/196; //b = 0.328055
                 double d = (55.0 - 3.0*root_seventeen - root_term)/196; //d = 0.106952
 
-        		double a = 1.0 - 3.0*b; // a = 0.0158359
-        		double c = 1.0 - 3.0*d; // c = 0.679143
+                double a = 1.0 - 3.0*b; // a = 0.0158359
+                double c = 1.0 - 3.0*d; // c = 0.679143
 
-        		// w1 = 0.023088 (= 0.138528/6)
-        		double w1 = (20.0*d*d - 10.0*d + 1.0)/(240.0*(2.0*d*d - d - 2.0*b*b + b)); // w1 = 0.0362942
-        		double w2 = 1.0/24.0 - w1; // w2 = 0.0185787 (=0.111472/6)
+                // w1 = 0.023088 (= 0.138528/6)
+                double w1 = (20.0*d*d - 10.0*d + 1.0)/(240.0*(2.0*d*d - d - 2.0*b*b + b)); // w1 = 0.0362942
+                double w2 = 1.0/24.0 - w1; // w2 = 0.0185787 (=0.111472/6)
 
-        		mWeights.push_back(w1);
-				mWeights.push_back(w1);
-				mWeights.push_back(w1);
-				mWeights.push_back(w1);
+                mWeights.push_back(w1);
+                mWeights.push_back(w1);
+                mWeights.push_back(w1);
+                mWeights.push_back(w1);
 
-				mWeights.push_back(w2);
-				mWeights.push_back(w2);
-				mWeights.push_back(w2);
-				mWeights.push_back(w2);
+                mWeights.push_back(w2);
+                mWeights.push_back(w2);
+                mWeights.push_back(w2);
+                mWeights.push_back(w2);
 
-				mPoints.push_back(ChastePoint<3>(a, b, b));
-				mPoints.push_back(ChastePoint<3>(b, a, b));
-				mPoints.push_back(ChastePoint<3>(b, b, a));
-				mPoints.push_back(ChastePoint<3>(b, b, b));
+                mPoints.push_back(ChastePoint<3>(a, b, b));
+                mPoints.push_back(ChastePoint<3>(b, a, b));
+                mPoints.push_back(ChastePoint<3>(b, b, a));
+                mPoints.push_back(ChastePoint<3>(b, b, b));
 
-				mPoints.push_back(ChastePoint<3>(c, d, d));
-				mPoints.push_back(ChastePoint<3>(d, c, d));
-				mPoints.push_back(ChastePoint<3>(d, d, c));
-				mPoints.push_back(ChastePoint<3>(d, d, d));
+                mPoints.push_back(ChastePoint<3>(c, d, d));
+                mPoints.push_back(ChastePoint<3>(d, c, d));
+                mPoints.push_back(ChastePoint<3>(d, d, c));
+                mPoints.push_back(ChastePoint<3>(d, d, d));
 
-        	}
+            }
 break;
 
         default:

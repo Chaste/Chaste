@@ -234,13 +234,13 @@ public:
     virtual void SolvePdeAndWriteResultsToFile(unsigned samplingTimestepMultiple);
 
     /**
-	 * Find the solution of one of the PDEs at a point in space
-	 *
-	 * @param Point the position in space
-	 * @param variable the dependent variable of the PDE whose solution you want to find
-	 *
-	 * @return the solution of the required PDE at the given point.
-	 */
+     * Find the solution of one of the PDEs at a point in space
+     *
+     * @param Point the position in space
+     * @param variable the dependent variable of the PDE whose solution you want to find
+     *
+     * @return the solution of the required PDE at the given point.
+     */
     double GetPdeSolutionAtPoint(c_vector<double,DIM> Point, std::string variable);
 
     /**

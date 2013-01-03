@@ -609,8 +609,8 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     // Attribute value has the same tag (assume that it doesn't overtake the previous message)
                     double attribute = it->GetAttribute();
                     MPI_Send(&attribute, 1, MPI_DOUBLE, 0,
-							this->mNumNodes + index, //Elements sent with tags offset
-						    PETSC_COMM_WORLD);
+                            this->mNumNodes + index, //Elements sent with tags offset
+                            PETSC_COMM_WORLD);
                 }
             }
 

@@ -926,68 +926,68 @@ public:
                             iter != mesh.GetElementIteratorEnd();
                             ++iter)
             {
-            	iter->SetAttribute(element_attribute++);
+                iter->SetAttribute(element_attribute++);
             }
         }
 
         {
             //ASCII
-        	TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh, false);
+            TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh, false);
             mesh_writer.WriteFilesUsingMesh(mesh);
         }
         {
             //Binary
-        	TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh_bin, false);
-        	mesh_writer.SetWriteFilesAsBinary();
+            TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh_bin, false);
+            mesh_writer.SetWriteFilesAsBinary();
             mesh_writer.WriteFilesUsingMesh(mesh);
         }
 
         {
-        	TrianglesMeshReader<1,1> mesh_reader_ascii(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh);
-        	TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_reader, false);
+            TrianglesMeshReader<1,1> mesh_reader_ascii(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh);
+            TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_reader, false);
             mesh_writer.WriteFilesUsingMeshReader(mesh_reader_ascii);
         }
         {
-        	TetrahedralMesh<1,1> ascii_mesh;
-        	TrianglesMeshReader<1,1> mesh_reader_ascii(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh);
-        	ascii_mesh.ConstructFromMeshReader(mesh_reader_ascii);
+            TetrahedralMesh<1,1> ascii_mesh;
+            TrianglesMeshReader<1,1> mesh_reader_ascii(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh);
+            ascii_mesh.ConstructFromMeshReader(mesh_reader_ascii);
 
-			TetrahedralMesh<1,1> bin_mesh;
-			TrianglesMeshReader<1,1> mesh_reader_bin(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh_bin);
-			bin_mesh.ConstructFromMeshReader(mesh_reader_bin);
+            TetrahedralMesh<1,1> bin_mesh;
+            TrianglesMeshReader<1,1> mesh_reader_bin(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_mesh_bin);
+            bin_mesh.ConstructFromMeshReader(mesh_reader_bin);
 
-			TetrahedralMesh<1,1> reader_mesh;
-			TrianglesMeshReader<1,1> mesh_reader_reader(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_reader);
-			reader_mesh.ConstructFromMeshReader(mesh_reader_reader);
+            TetrahedralMesh<1,1> reader_mesh;
+            TrianglesMeshReader<1,1> mesh_reader_reader(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/" + file_from_reader);
+            reader_mesh.ConstructFromMeshReader(mesh_reader_reader);
 
 
-        	for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for(unsigned i=0; i<mesh.GetNumNodes(); i++)
             {
-            	std::vector<double> orig_attr = mesh.GetNode(i)->rGetNodeAttributes();
-            	std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
-            	std::vector<double> bin_attr = bin_mesh.GetNode(i)->rGetNodeAttributes();
-            	std::vector<double> reader_attr = reader_mesh.GetNode(i)->rGetNodeAttributes();
+                std::vector<double> orig_attr = mesh.GetNode(i)->rGetNodeAttributes();
+                std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
+                std::vector<double> bin_attr = bin_mesh.GetNode(i)->rGetNodeAttributes();
+                std::vector<double> reader_attr = reader_mesh.GetNode(i)->rGetNodeAttributes();
 
-            	TS_ASSERT_EQUALS(orig_attr.size(), ascii_attr.size());
+                TS_ASSERT_EQUALS(orig_attr.size(), ascii_attr.size());
                 ///\todo #1949 Binary attributes are not correctly written
-            	//TS_ASSERT_EQUALS(orig_attr.size(), bin_attr.size());
+                //TS_ASSERT_EQUALS(orig_attr.size(), bin_attr.size());
                 ///\todo #1949 Write directly from a mesh reader, requires support for node attributes in the reader
-            	//TS_ASSERT_EQUALS(orig_attr.size(), reader_attr.size());
-            	for (unsigned attr_index=0; attr_index<orig_attr.size(); attr_index++)
-            	{
-            		TS_ASSERT_DELTA(orig_attr[attr_index], ascii_attr[attr_index], 1e-15);
-            		//TS_ASSERT_DELTA(orig_attr[attr_index], bin_attr[attr_index], 1e-15);
+                //TS_ASSERT_EQUALS(orig_attr.size(), reader_attr.size());
+                for (unsigned attr_index=0; attr_index<orig_attr.size(); attr_index++)
+                {
+                    TS_ASSERT_DELTA(orig_attr[attr_index], ascii_attr[attr_index], 1e-15);
+                    //TS_ASSERT_DELTA(orig_attr[attr_index], bin_attr[attr_index], 1e-15);
                     ///\todo #1949 Write directly from a mesh reader, requires support for node attributes in the reader
-            		//TS_ASSERT_DELTA(orig_attr[attr_index], reader_attr[attr_index], 1e-15);
-            	}
+                    //TS_ASSERT_DELTA(orig_attr[attr_index], reader_attr[attr_index], 1e-15);
+                }
             }
-        	for(unsigned i=0; i<mesh.GetNumElements(); i++)
+            for(unsigned i=0; i<mesh.GetNumElements(); i++)
             {
                 ///\todo #2146 Check the element attributes in other written meshes
-        	    ///\todo #2146 Element attributes are sometimes written/read as unsigned
-        	    TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), ascii_mesh.GetElement(i)->GetAttribute(), 0.4);
+                ///\todo #2146 Element attributes are sometimes written/read as unsigned
+                TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), ascii_mesh.GetElement(i)->GetAttribute(), 0.4);
 //                TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), bin_mesh.GetElement(i)->GetAttribute(), 1e-15);
-//        	      TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), reader_mesh.GetElement(i)->GetAttribute(), 1e-15);
+//                  TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), reader_mesh.GetElement(i)->GetAttribute(), 1e-15);
             }
         }
     }

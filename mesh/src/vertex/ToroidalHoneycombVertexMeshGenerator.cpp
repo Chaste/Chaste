@@ -59,15 +59,15 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
     // Create the nodes
     for (unsigned j=0; j<2*numElementsUp; j++)
     {
-    	for (unsigned i=0; i<numElementsAcross; i++)
-		{
-			double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
-			double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
+        for (unsigned i=0; i<numElementsAcross; i++)
+        {
+            double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
+            double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
 
             Node<2>* p_node = new Node<2>(node_index, false , x_coord, y_coord);
-			nodes.push_back(p_node);
-			node_index++;
-		}
+            nodes.push_back(p_node);
+            node_index++;
+        }
     }
 
     /*

@@ -483,19 +483,19 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u); // initial guess was solution
 
 
-		// test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
-		// applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
-		assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
-		for (unsigned i=0; i<mesh.GetNumElements(); i++)
-		{
-			if (mesh.CalculateDesignatedOwnershipOfElement(i))
-			{
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), traction(0)/alpha, 1e-8);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
-			}
-		}
+        // test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
+        // applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
+        assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            if (mesh.CalculateDesignatedOwnershipOfElement(i))
+            {
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), traction(0)/alpha, 1e-8);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
+            }
+        }
 
 
 
@@ -525,38 +525,38 @@ public:
         }
 
 
-		// check the stresses (averaged over each quad point). The alpha below is for converting
-		// from 1st PK stress (for which we have SN=s => S(0,0) = traction_value) to 2nd PK stress,
-		// using T = SF^{-T}
-		assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
-		for (unsigned i=0; i<mesh.GetNumElements(); i++)
-		{
-			//if (mesh.CalculateDesignatedOwnershipOfElement(i)) ///\todo #2223 This is correct for a distributed mesh
-			if (mesh.GetElement(i)->GetOwnership()) // For a shared mesh (not distributed) this is a larger set than the commented line above
-			{
-				TS_ASSERT_DELTA((solver.GetAverageStressPerElement(i)(0,0)*alpha - traction_value)/traction_value, 0.0, 5e-4);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
-			}
-			else
-			{
-				//The element was ignored by the assembler and thus the stress is unchanged from its initial value
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), 0.0, 5e-4);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
-				TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
-			}
-		}
+        // check the stresses (averaged over each quad point). The alpha below is for converting
+        // from 1st PK stress (for which we have SN=s => S(0,0) = traction_value) to 2nd PK stress,
+        // using T = SF^{-T}
+        assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            //if (mesh.CalculateDesignatedOwnershipOfElement(i)) ///\todo #2223 This is correct for a distributed mesh
+            if (mesh.GetElement(i)->GetOwnership()) // For a shared mesh (not distributed) this is a larger set than the commented line above
+            {
+                TS_ASSERT_DELTA((solver.GetAverageStressPerElement(i)(0,0)*alpha - traction_value)/traction_value, 0.0, 5e-4);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+            }
+            else
+            {
+                //The element was ignored by the assembler and thus the stress is unchanged from its initial value
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), 0.0, 5e-4);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 5e-4);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+                TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 5e-4);
+            }
+        }
 
 
         // write the stresses
-		solver.WriteCurrentAverageElementStresses("solution");
+        solver.WriteCurrentAverageElementStresses("solution");
 
-		// check the written stresses
-		std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-		NumericFileComparison comparison(test_output_directory + "/comp_nonlin_compMR_simple/solution.stress", "continuum_mechanics/test/data/nonlin_comp.stress");
-		TS_ASSERT(comparison.CompareFiles(2e-4));
+        // check the written stresses
+        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
+        NumericFileComparison comparison(test_output_directory + "/comp_nonlin_compMR_simple/solution.stress", "continuum_mechanics/test/data/nonlin_comp.stress");
+        TS_ASSERT(comparison.CompareFiles(2e-4));
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();
@@ -722,15 +722,15 @@ public:
 
         for(unsigned i=0; i<N; i++)
         {
-			PetscVecTools::SetElement(test_vec, i, 1.0);
+            PetscVecTools::SetElement(test_vec, i, 1.0);
 
-			MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
-			double vT_J_v = 0.0;
-			VecDot(product_vec, test_vec, &vT_J_v);
-			// vT_J_v is the i-th term on the diagonal of the Jacobian matrix (and should be positive)
-			TS_ASSERT_LESS_THAN(0.0, vT_J_v);
+            MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
+            double vT_J_v = 0.0;
+            VecDot(product_vec, test_vec, &vT_J_v);
+            // vT_J_v is the i-th term on the diagonal of the Jacobian matrix (and should be positive)
+            TS_ASSERT_LESS_THAN(0.0, vT_J_v);
 
-			PetscVecTools::SetElement(test_vec, i, 0.0);
+            PetscVecTools::SetElement(test_vec, i, 0.0);
         }
 
         PetscTools::Destroy(test_vec);

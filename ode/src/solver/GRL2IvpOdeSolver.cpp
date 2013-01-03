@@ -64,13 +64,13 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     std::vector<double> partialF(num_equations);
     std::vector<double> temp(num_equations);
     std::vector<double> yinit(num_equations);
-    
+
     rNextYValues = rCurrentYValues;
     double ysave;
-    
+
     yinit = rNextYValues;
     pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, evalF);
-    
+
     for (unsigned i=0; i<num_equations; i++)
     {
       rNextYValues[i]=rNextYValues[i]+delta;
@@ -83,11 +83,11 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     {
       if(fabs(partialF[i])<delta)
       {
-	rNextYValues[i]=rNextYValues[i]+0.5*evalF[i]*timeStep;
+          rNextYValues[i]=rNextYValues[i]+0.5*evalF[i]*timeStep;
       }
       else
       {
-	rNextYValues[i]=rNextYValues[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*0.5*timeStep)-1);
+          rNextYValues[i]=rNextYValues[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*0.5*timeStep)-1);
       }
     }
     //Second half of the method
@@ -97,23 +97,23 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
       rNextYValues[i]=yinit[i];
       pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, temp);
       evalF[i]=temp[i];
-      
+
       rNextYValues[i]=rNextYValues[i]+delta;
       pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, temp);
       partialF[i]=(temp[i]-evalF[i])/delta;
       rNextYValues[i]=ysave;
     }
-    
+
     //Final step update
     for (unsigned i=0; i<num_equations; i++)
     {
       if(fabs(partialF[i])<delta)
       {
-	rNextYValues[i]=yinit[i]+evalF[i]*timeStep;
+          rNextYValues[i]=yinit[i]+evalF[i]*timeStep;
       }
       else
       {
-	rNextYValues[i]=yinit[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*timeStep)-1);
+          rNextYValues[i]=yinit[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*timeStep)-1);
       }
     }
 }

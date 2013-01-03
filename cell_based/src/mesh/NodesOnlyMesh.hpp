@@ -92,8 +92,8 @@ private:
     /** A counter of the number of fresh indices used on this process. */
     unsigned mIndexCounter;
 
-	/** A vector of the global indices that have been freed on the process from deleting a node */
-	//std::vector<unsigned> mDeletedGlobalNodeIndices;
+    /** A vector of the global indices that have been freed on the process from deleting a node */
+    //std::vector<unsigned> mDeletedGlobalNodeIndices;
 
     friend class TestNodesOnlyMesh;
 

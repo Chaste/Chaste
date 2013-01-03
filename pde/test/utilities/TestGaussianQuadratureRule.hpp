@@ -112,13 +112,13 @@ public:
 
         // Exceptions (unsupported cases)
         TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<1> quad_rule(6),
-        		"Gauss quadrature order not supported.");
+                "Gauss quadrature order not supported.");
         TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<2> quad_rule(5),
-        		"Gauss quadrature order not supported.");
+                "Gauss quadrature order not supported.");
         TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<3> quad_rule(4),
-        		"Gauss quadrature order not supported.");
+                "Gauss quadrature order not supported.");
         TS_ASSERT_THROWS_THIS(GaussianQuadratureRule<4> quad_rule(1),
-        		"Gauss quadrature rule not available for this dimension.");
+                "Gauss quadrature rule not available for this dimension.");
     }
 
     /**

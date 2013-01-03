@@ -430,9 +430,9 @@ public:
             }
 
             if (PetscTools::AmMaster())
-			{
-            	std::cout << "Time to solve = " << MPI_Wtime()-time_before << " seconds\n";
-			}
+            {
+                std::cout << "Time to solve = " << MPI_Wtime()-time_before << " seconds\n";
+            }
 
             OutputFileHandler results_handler("Convergence"+nameOfTest, false);
             Hdf5DataReader results_reader = cardiac_problem.GetDataReader();
@@ -633,9 +633,9 @@ public:
     {
         if (!PetscTools::AmMaster())
         {
-        	return; //Only master displays this
+            return; //Only master displays this
         }
-    	unsigned num_ele_across = (unsigned) SmallPow(2, this->MeshNum+2);// number of elements in each dimension
+        unsigned num_ele_across = (unsigned) SmallPow(2, this->MeshNum+2);// number of elements in each dimension
         double scaling = mMeshWidth/(double) num_ele_across;
 
         std::cout<<"================================================================================"<<std::endl;

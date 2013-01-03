@@ -553,7 +553,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             // set equal to  [ A  B1^T ]
             //               [ B2  M   ]
             // The reason for the mass matrix is to avoid zeros on the diagonal
-	        rAElemPrecond = rAElemPrecond + rAElem;
+            rAElemPrecond = rAElemPrecond + rAElem;
         }
         else
         {

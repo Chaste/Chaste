@@ -62,9 +62,9 @@ public:
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      */
     ToroidalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
-										 unsigned numElementsUp,
-										 double cellRearrangementThreshold=0.01,
-										 double t2Threshold=0.001);
+                                         unsigned numElementsUp,
+                                         double cellRearrangementThreshold=0.01,
+                                         double t2Threshold=0.001);
     /**
      * @return a 2D honeycomb mesh
      */

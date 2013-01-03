@@ -133,7 +133,7 @@ public:
 
     void TestStimulatePlanein1D() throw(Exception)
     {
-    	ConvergeInVarious(PLANE);
+        ConvergeInVarious(PLANE);
     }
 
     void TestStimulateRegionin1D() throw(Exception)

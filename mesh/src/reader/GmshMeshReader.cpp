@@ -42,14 +42,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GmshMeshReader(std::string pathBaseName) : mFileName(pathBaseName)
 {
-	// Open mesh file
-	mFile.open(mFileName.c_str());
-	if (!mFile.is_open())
-	{
-		EXCEPTION("Could not open data file: " + mFileName);
-	}
+    // Open mesh file
+    mFile.open(mFileName.c_str());
+    if (!mFile.is_open())
+    {
+        EXCEPTION("Could not open data file: " + mFileName);
+    }
 
-	ReadHeader();
+    ReadHeader();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -74,40 +74,40 @@ void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeader()
 
     if(mVersionNumber != 2.2)
     {
-    	EXCEPTION("We can only read Gmsh version 2.2 files.");
+        EXCEPTION("We can only read Gmsh version 2.2 files.");
     }
     assert(mFileType == 0);
 
     //Check mesh format close string
-	mFile >> actual_line;
-	assert(actual_line == "$EndMeshFormat");
+    mFile >> actual_line;
+    assert(actual_line == "$EndMeshFormat");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumElements;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumNodes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumFaces;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumCableElements;
 }
 
@@ -115,21 +115,21 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumElementAttributes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaceAttributes() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumFaceAttributes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElementAttributes() const
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNumCableElementAttributes;
 }
 
@@ -137,57 +137,57 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElementAttributes() 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::Reset()
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeAttributes()
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
     //return mNodeAttributes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextCableElementData()
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned index)
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementData(unsigned index)
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned index)
 {
-	NEVER_REACHED;
+    NEVER_REACHED;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

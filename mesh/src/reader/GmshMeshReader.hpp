@@ -135,8 +135,8 @@ private:
     std::string mFileName;     /**< The name of the mesh file. */
     std::ifstream mFile;       /**< The file for the mesh. */
     double mVersionNumber;     /**< The version number of the file. */
-    unsigned mFileType;  	   /**< The type of the mesh file being read (should always be 0) */
-    unsigned mDataSize;		   /**< The number of floating point numbers in the file */
+    unsigned mFileType;        /**< The type of the mesh file being read (should always be 0) */
+    unsigned mDataSize;        /**< The number of floating point numbers in the file */
 
 };
 

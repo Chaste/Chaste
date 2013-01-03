@@ -66,7 +66,7 @@ protected:
     std::set<unsigned> mLocalPurkinjeNodes;
 
     /** A map between junction node ids and resistances */
-	std::map<unsigned, double> mJunctionMap;
+    std::map<unsigned, double> mJunctionMap;
 
     /**
      * Must be overridden by subclasses to return a Purkinje cell object for the given node.
@@ -100,8 +100,8 @@ protected:
      * @param pCardiacCell  the ventricular cell
      */
     void CreateJunctionFromFile(const Node<SPACE_DIM>* pNode,
-								AbstractCardiacCellInterface* pPurkinjeCell,
-								AbstractCardiacCellInterface* pCardiacCell);
+                                AbstractCardiacCellInterface* pPurkinjeCell,
+                                AbstractCardiacCellInterface* pCardiacCell);
 
 
 public:

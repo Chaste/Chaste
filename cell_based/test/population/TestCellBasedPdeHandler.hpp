@@ -780,43 +780,43 @@ public:
 
         // Now check the GetPdeSolutionAtPoint method
 
-		// First loop over nodes and check it works
-		// Check the correct solution was obtained
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-			double cell_data_solution(cell_iter->GetCellData()->GetItem("variable"));
-			c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+        // First loop over nodes and check it works
+        // Check the correct solution was obtained
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double cell_data_solution(cell_iter->GetCellData()->GetItem("variable"));
+            c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
 
-			TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location,"variable"), cell_data_solution, 1e-6);
-		}
+            TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location,"variable"), cell_data_solution, 1e-6);
+        }
 
 
-		// Now choose some other points
+        // Now choose some other points
 
-		// Centre
-		c_vector<double,2> point;
-		point(0) = 0.0;
-		point(1) = 0.0;
+        // Centre
+        c_vector<double,2> point;
+        point(0) = 0.0;
+        point(1) = 0.0;
 
-		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 0.75, 0.01);
+        TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 0.75, 0.01);
 
-		// Cover exception
-		TS_ASSERT_THROWS_CONTAINS(pde_handler.GetPdeSolutionAtPoint(point, "not_a_var"),
-		                          "There is no PDE with that variable.");
+        // Cover exception
+        TS_ASSERT_THROWS_CONTAINS(pde_handler.GetPdeSolutionAtPoint(point, "not_a_var"),
+                                  "There is no PDE with that variable.");
 
-		// Random point
-		point(0) = 0.5;
-		point(1) = 0.5;
+        // Random point
+        point(0) = 0.5;
+        point(1) = 0.5;
 
-		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0 - (1.0-2.0*0.5*0.5)/4.0, 0.01);
+        TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0 - (1.0-2.0*0.5*0.5)/4.0, 0.01);
 
-		// Point on the boundary
-		point(0) = 1.0;
-		point(1) = 0.0;
+        // Point on the boundary
+        point(0) = 1.0;
+        point(1) = 0.0;
 
-		TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0, 1e-6);
+        TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0, 1e-6);
 
     }
 

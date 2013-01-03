@@ -402,7 +402,7 @@ public:
             to_directory2.Remove();
             TS_ASSERT_EQUALS(to_directory1.Exists(), false);
             TS_ASSERT_EQUALS(to_directory2.Exists(), false);
-	        from_directory1.CopyTo(to_directory1);
+            from_directory1.CopyTo(to_directory1);
             from_directory2.CopyTo(to_directory2);
         );
 

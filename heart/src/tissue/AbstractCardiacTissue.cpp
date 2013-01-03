@@ -75,7 +75,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     {
 #define COVERAGE_IGNORE
         // This process owns no nodes.
-    	// This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
+        // This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
         WARNING("No cells were assigned to process " << PetscTools::GetMyRank() << " in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
         // Make sure this warning is printed to screen even when the simulation crashes
         Warnings::PrintWarnings();

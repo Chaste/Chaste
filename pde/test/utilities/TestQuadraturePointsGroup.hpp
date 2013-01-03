@@ -118,12 +118,12 @@ public:
 
     void TestGetQuadPointLocations2dDistributed() throw(Exception)
     {
-    	TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
-		DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
+        DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
 
-		mesh.ConstructFromMeshReader(reader);
+        mesh.ConstructFromMeshReader(reader);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
-		TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
 
         GaussianQuadratureRule<2> quad_rule(2);
         TS_ASSERT_EQUALS(quad_rule.GetNumQuadPoints(), 3u);
@@ -135,54 +135,54 @@ public:
         // Element 0
         try
         {
-			mesh.GetElement(0); //Throws if not owned
-        	for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
-			{
-				c_vector<double,2> quad_point = group.rGet(0, quad_index);
-				TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
-			}
+            mesh.GetElement(0); //Throws if not owned
+            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            {
+                c_vector<double,2> quad_point = group.rGet(0, quad_index);
+                TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
+            }
         }
         catch (Exception& e)
         {
-			//If not, then we know nothing about these quad points
-        	for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
-			{
-				c_vector<double,2> quad_point = group.rGet(0, quad_index);
-				TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
-				TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
-			}
+            //If not, then we know nothing about these quad points
+            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            {
+                c_vector<double,2> quad_point = group.rGet(0, quad_index);
+                TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
+                TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
+            }
 
         }
         // Element 1
         try
         {
-			mesh.GetElement(0); //Throws if not owned
-			for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
-			{
-				c_vector<double,2> quad_point = group.rGet(1, quad_index);
-				TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
-			}
+            mesh.GetElement(0); //Throws if not owned
+            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            {
+                c_vector<double,2> quad_point = group.rGet(1, quad_index);
+                TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
+            }
         }
         catch (Exception& e)
-		{
-			//If not, then we know nothing about these quad points
-			for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
-			{
-				c_vector<double,2> quad_point = group.rGet(0, quad_index);
-				TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
-				TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
-			}
-		}
+        {
+            //If not, then we know nothing about these quad points
+            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            {
+                c_vector<double,2> quad_point = group.rGet(0, quad_index);
+                TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
+                TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
+            }
+        }
 
         TS_ASSERT_EQUALS(group.Size(), 6u);
         for (unsigned index=0; index<group.Size(); index++)
         {
             double quad_x = group.rGet(index)[0];
             if (quad_x != DOUBLE_UNSET)
-			{
-            	TS_ASSERT_LESS_THAN_EQUALS(quad_x, 5.0/6.0);
-            	TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, quad_x);
-			}
+            {
+                TS_ASSERT_LESS_THAN_EQUALS(quad_x, 5.0/6.0);
+                TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, quad_x);
+            }
         }
     }
 

@@ -107,8 +107,8 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         if(this->mpMesh && !this->mFilesAreBinary && num_attr!=0) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
         {
 
-        	///\todo #1949 Will deadlock on GetNode(global ID) in parallel since this code is run on the master process
-        	WriteItem(p_node_file, item_num, this->GetNextNode(), this->mpMesh->GetNode(item_num)->rGetNodeAttributes());
+            ///\todo #1949 Will deadlock on GetNode(global ID) in parallel since this code is run on the master process
+            WriteItem(p_node_file, item_num, this->GetNextNode(), this->mpMesh->GetNode(item_num)->rGetNodeAttributes());
         }
         else
         {

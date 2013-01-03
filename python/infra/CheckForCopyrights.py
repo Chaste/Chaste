@@ -265,18 +265,18 @@ if __name__ == '__main__':
     # .cpp, .hpp., .py, .java are C++, Python and Java code.
     exts = ['.cpp', '.hpp', '.py', '.java']
 
-    # SCons files		
+    # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice) 
     # Version.cpp.in is the provenance file
     named_files = ['SConscript', 'SConstruct', 'output.chaste', 'Version.cpp.in']
-	
+
     dir_ignores = ['build', 'cxxtest', 'testoutput', 'doc', 'projects']
     startchar_ignores = ['_', '.']
     exclusions = ['python/pycml/enum.py', 'python/pycml/pyparsing.py', 'python/pycml/schematron.py']
-    
+
     apply_update = '-update' in sys.argv
     apply_new = '-new' in sys.argv
-    
+
     chaste_dir = '.'
     if '-dir' in sys.argv: 
         i = sys.argv.index('-dir')
@@ -302,13 +302,13 @@ if __name__ == '__main__':
                     num_no_copyrights += 1
                 else:
                     num_copyrights += 1
-    
+
     # Let the test summary script know
     if chaste_dir == ".":
         dir = os.getcwd()
     else:
         dir = chaste_dir
-        
+
     print "Copyright test run over ",dir," (",num_no_copyrights+num_copyrights,") files"
     if num_no_copyrights > 0:
         print

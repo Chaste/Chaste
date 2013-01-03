@@ -331,11 +331,11 @@ public:
     void TessellateIfNeeded();
 
     /**
-	 *  Divides springs longer than the given threshold
-	 *
-	 *  @param springDivisionThreshold  a given threshold
-	 */
-	void DivideLongSprings(double springDivisionThreshold);
+     *  Divides springs longer than the given threshold
+     *
+     *  @param springDivisionThreshold  a given threshold
+     */
+    void DivideLongSprings(double springDivisionThreshold);
 
     /**
      * Overridden GetNode() method.

@@ -198,7 +198,7 @@ private:
         }
         if (copyOutput)
         {
-        	// This code is not called by default and only exists to copy test output into the trunk.
+            // This code is not called by default and only exists to copy test output into the trunk.
             FileFinder file_finder_test_folder(fullPath, RelativeTo::ChasteSourceRoot);
             file_finder_bin.CopyTo(file_finder_test_folder);
         }

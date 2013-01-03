@@ -76,7 +76,7 @@ ColumnDataReader::ColumnDataReader(const std::string& rDirectory,
         }
         else
         {
-        	directory = rDirectory;
+            directory = rDirectory;
         }
     }
     CheckFiles(directory, rBaseName);

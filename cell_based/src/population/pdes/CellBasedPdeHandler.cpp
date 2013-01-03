@@ -173,17 +173,17 @@ void CellBasedPdeHandler<DIM>::UpdateCellPdeElementMap()
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 {
-	//if appropriate make a coarse mesh which overlays (exactly) the lattice sites of a PottsMesh (used for all OnLattice simulations)
-	if((dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
-	{
-		assert(DIM ==2);
-		ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
+    //if appropriate make a coarse mesh which overlays (exactly) the lattice sites of a PottsMesh (used for all OnLattice simulations)
+    if((dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
+    {
+        assert(DIM ==2);
+        ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
 
-		// Currently only works with square meshes
-		assert(cuboid.GetWidth(0) == cuboid.GetWidth(1));
+        // Currently only works with square meshes
+        assert(cuboid.GetWidth(0) == cuboid.GetWidth(1));
 
-		UseCoarsePdeMesh(1, cuboid, false);
-	}
+        UseCoarsePdeMesh(1, cuboid, false);
+    }
 
 
     // If using a NodeBasedCellPopulation a VertexBasedCellPopulation, a MultipleCABasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
@@ -514,7 +514,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
     SimulationTime* p_time = SimulationTime::Instance();
     if ((p_time->GetTimeStepsElapsed())%samplingTimestepMultiple == 0)
     {
-    	WritePdeSolution(p_time->GetTime());
+        WritePdeSolution(p_time->GetTime());
     }
 #define COVERAGE_IGNORE
     ///\todo enable this in the case where a coarse PDE mesh is used
@@ -579,29 +579,29 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
             {
                 PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
-				#ifdef CHASTE_VTK
+                #ifdef CHASTE_VTK
                 if (p_pde_and_bc->GetSolution())
-				{
-                	if (DIM>1)
-                	{
-						ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
-						std::vector<double> pde_solution;
-						for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
-							{
-							pde_solution.push_back(solution_repl[i]);
-							}
-						std::ostringstream time_string;
-						time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
+                {
+                    if (DIM>1)
+                    {
+                        ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
+                        std::vector<double> pde_solution;
+                        for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
+                            {
+                            pde_solution.push_back(solution_repl[i]);
+                            }
+                        std::ostringstream time_string;
+                        time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
 
-						std::string results_file = "pde_results_"+time_string.str();
-						VtkMeshWriter<DIM,DIM> vtk_mesh_writer(mDirPath,results_file,false);
-						vtk_mesh_writer.AddPointData("Pde Solution",pde_solution);
+                        std::string results_file = "pde_results_"+time_string.str();
+                        VtkMeshWriter<DIM,DIM> vtk_mesh_writer(mDirPath,results_file,false);
+                        vtk_mesh_writer.AddPointData("Pde Solution",pde_solution);
 
-						vtk_mesh_writer.WriteFilesUsingMesh(*mpCoarsePdeMesh);
-                	}
-				}
+                        vtk_mesh_writer.WriteFilesUsingMesh(*mpCoarsePdeMesh);
+                    }
+                }
 
-				#endif //CHASTE_VTK
+                #endif //CHASTE_VTK
 
                 for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
                 {
@@ -619,8 +619,8 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                     }
                     else
                     {
-                    	// should only come into this method AFTER solving the PDE
-                    	NEVER_REACHED;
+                        // should only come into this method AFTER solving the PDE
+                        NEVER_REACHED;
                     }
                 }
             }
@@ -723,61 +723,61 @@ void CellBasedPdeHandler<DIM>::WriteAverageRadialPdeSolution(double time)
 template<unsigned DIM>
 double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> point, std::string variable)
 {
-	double solution_at_point = 0.0;
+    double solution_at_point = 0.0;
 
-	unsigned pde_index = UINT_MAX;
+    unsigned pde_index = UINT_MAX;
 
-	// Loop over elements of mPdeAndBcCollection to find correct PDE
-	for (unsigned i=0; i<mPdeAndBcCollection.size(); i++)
-	{
-		if (mPdeAndBcCollection[i]->rGetDependentVariableName() == variable)
-		{
-			pde_index = i;
-			break;
-		}
-	}
-	if (pde_index == UINT_MAX)
-	{
-		EXCEPTION("Tried to get the solution of a variable name: " + variable + ". There is no PDE with that variable.");
-	}
-	PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
+    // Loop over elements of mPdeAndBcCollection to find correct PDE
+    for (unsigned i=0; i<mPdeAndBcCollection.size(); i++)
+    {
+        if (mPdeAndBcCollection[i]->rGetDependentVariableName() == variable)
+        {
+            pde_index = i;
+            break;
+        }
+    }
+    if (pde_index == UINT_MAX)
+    {
+        EXCEPTION("Tried to get the solution of a variable name: " + variable + ". There is no PDE with that variable.");
+    }
+    PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
 
-	Element<DIM,DIM>* p_containing_element;
+    Element<DIM,DIM>* p_containing_element;
 
-	if (mpCoarsePdeMesh != NULL)
-	{
-		// find PDE element containing point
-		unsigned elem_index = mpCoarsePdeMesh->GetContainingElementIndex(ChastePoint<DIM>(point));
-		p_containing_element = mpCoarsePdeMesh->GetElement(elem_index);
-	}
-	else // Tetrahedral mesh
-	{
+    if (mpCoarsePdeMesh != NULL)
+    {
+        // find PDE element containing point
+        unsigned elem_index = mpCoarsePdeMesh->GetContainingElementIndex(ChastePoint<DIM>(point));
+        p_containing_element = mpCoarsePdeMesh->GetElement(elem_index);
+    }
+    else // Tetrahedral mesh
+    {
         // If not using a coarse PDE mesh, we must be using a MeshBasedCellPopulation
         TetrahedralMesh<DIM,DIM>* p_tetrahedral_mesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(mpCellPopulation)->rGetMesh());
 
-		unsigned elem_index = p_tetrahedral_mesh->GetContainingElementIndex(ChastePoint<DIM>(point));
-		p_containing_element = p_tetrahedral_mesh->GetElement(elem_index);
-	}
+        unsigned elem_index = p_tetrahedral_mesh->GetContainingElementIndex(ChastePoint<DIM>(point));
+        p_containing_element = p_tetrahedral_mesh->GetElement(elem_index);
+    }
 
-	// Interpolate solution
-	if (p_pde_and_bc->GetSolution())
-	{
-		ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
-		c_vector<double,DIM+1> weights = p_containing_element->CalculateInterpolationWeights(point);
-		for (unsigned i=0; i<DIM+1; i++)
-		{
-			double nodal_value = solution_repl[p_containing_element->GetNodeGlobalIndex(i)];
-			solution_at_point += nodal_value * weights(i);
-		}
-	}
-	else
-	{
-    	// should only come into this method AFTER solving the PDE
-    	NEVER_REACHED;
-	}
+    // Interpolate solution
+    if (p_pde_and_bc->GetSolution())
+    {
+        ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
+        c_vector<double,DIM+1> weights = p_containing_element->CalculateInterpolationWeights(point);
+        for (unsigned i=0; i<DIM+1; i++)
+        {
+            double nodal_value = solution_repl[p_containing_element->GetNodeGlobalIndex(i)];
+            solution_at_point += nodal_value * weights(i);
+        }
+    }
+    else
+    {
+        // should only come into this method AFTER solving the PDE
+        NEVER_REACHED;
+    }
 
-	return solution_at_point;
+    return solution_at_point;
 }
 
 template<unsigned DIM>
@@ -821,9 +821,9 @@ template<unsigned DIM>
 bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 {
     return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-    		|| (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-    		|| (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-    		|| (dynamic_cast<VertexBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
+            || (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
+            || (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
+            || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
 }
 
 // Serialization for Boost >= 1.36

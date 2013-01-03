@@ -99,7 +99,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
             mpGeneralizedRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
         }
     }
-        
+
     void GenerateCells2() throw (Exception)
     {
         // Do the conversions preserving generated sources
@@ -122,7 +122,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
             converter.CreateOptionsFile(handler, model, args);
             DynamicCellModelLoaderPtr p_loader = converter.Convert(copied_file);
             mpGeneralizedRushLarsenCell = dynamic_cast<AbstractCardiacCell*>(p_loader->CreateCell(p_solver, p_stimulus));
-        }        
+        }
     }
 
 public:
@@ -182,7 +182,7 @@ public:
         boost::shared_ptr<GRL1IvpOdeSolver> p_grl1_solver(new GRL1IvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model_grl1(p_grl1_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
 
-	
+
         // Compare with general GRL1 method
         reference_model_grl1.ResetToInitialConditions();
         reference_model_grl1.SetStimulusFunction(p_stimulus_zero);
@@ -197,7 +197,7 @@ public:
         }
 
         // Test order of convergence (first-order method)
-	
+
         // Get two solutions with halved stepsize
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         reference_model_grl1.SetStimulusFunction(p_stimulus_zero);
@@ -273,7 +273,7 @@ public:
             TS_ASSERT_DELTA(solutions_GRL2.rGetSolutions().back()[i],
                             solutions_ref.rGetSolutions().back()[i], 1e-2);
         }
-        
+
         //Compare LuoRudy solution with general GRL2 solver solution (should match)
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         boost::shared_ptr<ZeroStimulus> p_stimulus_zero(new ZeroStimulus());
@@ -286,7 +286,6 @@ public:
         boost::shared_ptr<GRL2IvpOdeSolver> p_grl2_solver(new GRL2IvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model_grl2(p_grl2_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
 
-	
         // Compare with general GRL2 method
         reference_model_grl2.ResetToInitialConditions();
         reference_model_grl2.SetStimulusFunction(p_stimulus_zero);
@@ -299,13 +298,11 @@ public:
             double error1 = solutions_GRL2_stimulated_cell_order2.rGetSolutions().back()[i] - ref_solution_grl2.rGetSolutions().back()[i];
             TS_ASSERT_DELTA(fabs(error1),0,5e-7);
         }
-        
+
         // Free memory
         delete mpGeneralizedRushLarsenCell;
 //        delete mpGeneralizedRushLarsenCellOpt;
     }
-    
-
 };
 
 #endif // TESTGENERALIZEDRUSHLARSEN_HPP_

@@ -550,7 +550,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     unsigned number_of_cells_at_site[num_sites];
     for (unsigned i=0; i<num_sites; i++)
     {
-    	number_of_cells_at_site[i] = 0;
+        number_of_cells_at_site[i] = 0;
     }
 
     for (std::list<CellPtr>::iterator iter = this->mCells.begin();
@@ -565,33 +565,33 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         number_of_cells_at_site[location_index]++;
         assert(number_of_cells_at_site[location_index]<=mLatticeCarryingCapacity);
 
-		c_vector<double, DIM> coords = this->mrMesh.GetNode(location_index)->rGetLocation();
+        c_vector<double, DIM> coords = this->mrMesh.GetNode(location_index)->rGetLocation();
 
         // Move the coordinate slightly so that we can visualise all cells in a lattice site if there is more than one per site
         if (mLatticeCarryingCapacity > 1)
         {
-        	c_vector<double, DIM> offset;
+            c_vector<double, DIM> offset;
 
-        	if (DIM == 2)
-        	{
-        		double angle = (double)number_of_cells_at_site[location_index]*2.0*M_PI/(double)mLatticeCarryingCapacity;
-        		offset[0] = 0.2*sin(angle);
-        		offset[1] = 0.2*cos(angle);
-        	}
-        	else
-        	{
+            if (DIM == 2)
+            {
+                double angle = (double)number_of_cells_at_site[location_index]*2.0*M_PI/(double)mLatticeCarryingCapacity;
+                offset[0] = 0.2*sin(angle);
+                offset[1] = 0.2*cos(angle);
+            }
+            else
+            {
                 RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-        		for (unsigned i=0; i<DIM; i++)
-				{
-					offset[i] = p_gen->ranf(); // This assumes that all sites are 1 apart
-				}
-        	}
+                for (unsigned i=0; i<DIM; i++)
+                {
+                    offset[i] = p_gen->ranf(); // This assumes that all sites are 1 apart
+                }
+            }
 
-    		for (unsigned i=0; i<DIM; i++)
-			{
-				coords[i] += offset[i];
-			}
+            for (unsigned i=0; i<DIM; i++)
+            {
+                coords[i] += offset[i];
+            }
 
         }
 

@@ -45,7 +45,7 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DI
     {
         unset(i)=DOUBLE_UNSET;
     }
-	mNumElements = rMesh.GetNumElements();
+    mNumElements = rMesh.GetNumElements();
     mNumQuadPointsPerElement = rQuadRule.GetNumQuadPoints();
     data.resize(mNumElements*mNumQuadPointsPerElement, unset);
 
@@ -68,7 +68,7 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DI
             c_vector<double,DIM> physical_quad_point = zero_vector<double>(DIM);
             for (unsigned node_index=0; node_index<DIM+1; node_index++)
             {
-            	physical_quad_point += linear_phi(node_index)*(iter->GetNode(node_index))->rGetLocation();
+                physical_quad_point += linear_phi(node_index)*(iter->GetNode(node_index))->rGetLocation();
             }
 
             // Save the quadrature point

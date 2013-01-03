@@ -63,28 +63,27 @@ void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     std::vector<double> partialF(num_equations);
     std::vector<double> temp(num_equations);
     double tempY;
-    
+
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, evalF);
     for (unsigned i=0; i<num_equations; i++)
     {
-      tempY= rCurrentYValues[i];
-      rCurrentYValues[i]=tempY+delta;
-      pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, temp);
-      partialF[i]=(temp[i]-evalF[i])/delta;
-      rCurrentYValues[i]=tempY;
+        tempY= rCurrentYValues[i];
+        rCurrentYValues[i]=tempY+delta;
+        pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, temp);
+        partialF[i]=(temp[i]-evalF[i])/delta;
+        rCurrentYValues[i]=tempY;
     }
     // New solution
-    
     for (unsigned i=0; i<num_equations; i++)
     {
      // std::cout<<"Partial F"<< partialF[i]<<std::endl;
       if(fabs(partialF[i])<delta)
       {
-	rNextYValues[i]=rCurrentYValues[i]+evalF[i]*timeStep;
+          rNextYValues[i]=rCurrentYValues[i]+evalF[i]*timeStep;
       }
       else
       {
-	rNextYValues[i]=rCurrentYValues[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*timeStep)-1);
+          rNextYValues[i]=rCurrentYValues[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*timeStep)-1);
       }
 
     }

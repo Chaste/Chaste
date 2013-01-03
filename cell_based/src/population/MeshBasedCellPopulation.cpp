@@ -344,21 +344,21 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double springDivisionThreshold)
 {
-	// Only implemented for 2D elements
-	assert(ELEMENT_DIM==2);
+    // Only implemented for 2D elements
+    assert(ELEMENT_DIM==2);
 
-	std::vector<c_vector<unsigned, 5> > new_nodes;
-	new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
+    std::vector<c_vector<unsigned, 5> > new_nodes;
+    new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 
-	// Add new cells onto new nodes
-	for (unsigned index=0; index<new_nodes.size(); index++)
-	{
-		// Copy the cell attached to one of the neighbouring nodes onto the new node
-		unsigned new_node_index = new_nodes[index][0];
-		unsigned node_a_index = new_nodes[index][1];
-		unsigned node_b_index = new_nodes[index][2];
+    // Add new cells onto new nodes
+    for (unsigned index=0; index<new_nodes.size(); index++)
+    {
+        // Copy the cell attached to one of the neighbouring nodes onto the new node
+        unsigned new_node_index = new_nodes[index][0];
+        unsigned node_a_index = new_nodes[index][1];
+        unsigned node_b_index = new_nodes[index][2];
 
-     	CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
+         CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
 
         // Create copy of cell property collection to modify for daughter cell
         CellPropertyCollection daughter_property_collection = p_neighbour_cell->rGetCellPropertyCollection();
@@ -367,45 +367,45 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double sp
         daughter_property_collection.RemoveProperty<CellId>();
 
         CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
-	      		                    p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
-	      		                    false,
-	      		                    daughter_property_collection));
+                                      p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
+                                      false,
+                                      daughter_property_collection));
 
-	    // Add new cell to cell population
-	    this->mCells.push_back(p_new_cell);
-	    this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
+        // Add new cell to cell population
+        this->mCells.push_back(p_new_cell);
+        this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
 
-	    // Update rest lengths
+        // Update rest lengths
 
-	    // remove old node pair // note node_a_index < node_b_index
-	    std::pair<unsigned,unsigned> node_pair = CreateOrderedPair(node_a_index, node_b_index);
-	    double old_rest_length  = mSpringRestLengths[node_pair];
+        // remove old node pair // note node_a_index < node_b_index
+        std::pair<unsigned,unsigned> node_pair = CreateOrderedPair(node_a_index, node_b_index);
+        double old_rest_length  = mSpringRestLengths[node_pair];
 
-	    std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
-	    mSpringRestLengths.erase(iter);
+        std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
+        mSpringRestLengths.erase(iter);
 
         //Add new pairs
-	    node_pair = CreateOrderedPair(node_a_index, new_node_index);
-    	mSpringRestLengths[node_pair]= old_rest_length/2;
+        node_pair = CreateOrderedPair(node_a_index, new_node_index);
+        mSpringRestLengths[node_pair]= old_rest_length/2;
 
-	    node_pair = CreateOrderedPair(node_b_index, new_node_index);
-	    mSpringRestLengths[node_pair]= old_rest_length/2;
-	    // If necessary add other new spring rest lengths
-		for (unsigned pair_index = 3; pair_index < 5; pair_index++)
-		{
-			unsigned other_node_index = new_nodes[index][pair_index];
+        node_pair = CreateOrderedPair(node_b_index, new_node_index);
+        mSpringRestLengths[node_pair]= old_rest_length/2;
+        // If necessary add other new spring rest lengths
+        for (unsigned pair_index = 3; pair_index < 5; pair_index++)
+        {
+            unsigned other_node_index = new_nodes[index][pair_index];
 
-			if (other_node_index != UNSIGNED_UNSET)
-			{
-				node_pair = CreateOrderedPair(other_node_index, new_node_index);
-				double new_rest_length = norm_2(rGetMesh().GetVectorFromAtoB(rGetMesh().GetNode(new_node_index)->rGetLocation(),
-													rGetMesh().GetNode(other_node_index)->rGetLocation()));
+            if (other_node_index != UNSIGNED_UNSET)
+            {
+                node_pair = CreateOrderedPair(other_node_index, new_node_index);
+                double new_rest_length = norm_2(rGetMesh().GetVectorFromAtoB(rGetMesh().GetNode(new_node_index)->rGetLocation(),
+                                                    rGetMesh().GetNode(other_node_index)->rGetLocation()));
 
-				mSpringRestLengths[node_pair] = new_rest_length;
-			}
+                mSpringRestLengths[node_pair] = new_rest_length;
+            }
 
-		}
-	}
+        }
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -577,13 +577,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
     if (mOutputMeshInVtk)
     {
-		VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "mesh_"+time.str(), false);
-		mesh_writer.WriteFilesUsingMesh(rGetMesh());
+        VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "mesh_"+time.str(), false);
+        mesh_writer.WriteFilesUsingMesh(rGetMesh());
     }
 
     if (mWriteVtkAsPoints)
     {
-    	VtkMeshWriter<SPACE_DIM,SPACE_DIM> cells_writer(this->mDirPath, "results_"+time.str(), false);
+        VtkMeshWriter<SPACE_DIM,SPACE_DIM> cells_writer(this->mDirPath, "results_"+time.str(), false);
 
         // Loop over cells
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
@@ -932,7 +932,7 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetWriteVtkAsPoints()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputMeshInVtk(bool outputMeshInVtk)
 {
-	mOutputMeshInVtk = outputMeshInVtk;
+    mOutputMeshInVtk = outputMeshInVtk;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1344,13 +1344,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CalculateRestLengths()
        std::pair<unsigned,unsigned> node_pair;
        if (nodeA_global_index<nodeB_global_index)
        {
-	        node_pair.first = nodeA_global_index;
-			node_pair.second  = nodeB_global_index;
-	   }
-	   else
-	   {
-			node_pair.first = nodeB_global_index;
-			node_pair.second  = nodeA_global_index;
+            node_pair.first = nodeA_global_index;
+            node_pair.second  = nodeB_global_index;
+       }
+       else
+       {
+            node_pair.first = nodeB_global_index;
+            node_pair.second  = nodeA_global_index;
        }
 
        mSpringRestLengths[node_pair]= separation;
@@ -1361,14 +1361,14 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CalculateRestLengths()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned indexA, unsigned indexB)
 {
-	if (mHasVariableRestLength)
+    if (mHasVariableRestLength)
     {
-    	if(indexA>indexB)
-    	{
-    		unsigned temp = indexA;
-    		indexA = indexB;
-    		indexB = temp;
-    	}
+        if(indexA>indexB)
+        {
+            unsigned temp = indexA;
+            indexA = indexB;
+            indexB = temp;
+        }
 
         std::pair<unsigned,unsigned> node_pair (indexA, indexB);
 
@@ -1394,21 +1394,21 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::pair<unsigned,unsigned>  MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOrderedPair(unsigned index1, unsigned index2)
 {
-	assert(index1 != index2);
+    assert(index1 != index2);
 
-	std::pair<unsigned,unsigned> ordered_pair;
+    std::pair<unsigned,unsigned> ordered_pair;
 
     if (index1<index2)
     {
-    	ordered_pair.first = index1;
-	    ordered_pair.second  = index2;
+        ordered_pair.first = index1;
+        ordered_pair.second  = index2;
     }
-	else
-	{
-		ordered_pair.first = index2;
-		ordered_pair.second  = index1;
+    else
+    {
+        ordered_pair.first = index2;
+        ordered_pair.second  = index1;
     }
-	return ordered_pair;
+    return ordered_pair;
 }
 
 /////////////////////////////////////////////////////////////////////////////

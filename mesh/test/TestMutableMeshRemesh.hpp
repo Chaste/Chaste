@@ -670,247 +670,247 @@ public:
 
     void TestSplitLongEdges()
     {
-    	{
-//			TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
-//			MutableMesh<2,3> mesh;
-//			mesh.ConstructFromMeshReader(mesh_reader);
+        {
+//            TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
+//            MutableMesh<2,3> mesh;
+//            mesh.ConstructFromMeshReader(mesh_reader);
 //
-//			// Check position of nodes
-//			TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
+//            // Check position of nodes
+//            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[0], 0.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
 //
-//			TS_ASSERT_DELTA(mesh.GetNode(1)->rGetLocation()[0], 1.0, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(1)->rGetLocation()[0], 1.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
 //
-//			TS_ASSERT_DELTA(mesh.GetNode(2)->rGetLocation()[0], 1.0, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(2)->rGetLocation()[1], 1.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(2)->rGetLocation()[0], 1.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(2)->rGetLocation()[1], 1.0, 1e-6);
 //
-//			TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[0], 0.0, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
-//
-//
-//			std::vector<c_vector<unsigned, 5> > changeHistory;
-//
-//			// Split central edge
-//			changeHistory = mesh.SplitLongEdges(1.1);
-//
-//			TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
-//			TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
-//
-//			// Check position of new node
-//			TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-6);
-//
-//			// Check Elements
-//			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 2u);
-//
-//			TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 2u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 3u);
-//
-//			TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 0u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 1u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 4u);
-//
-//			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 0u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 3u);
-//
-//			// Check changeHistory
-//			TS_ASSERT_EQUALS(changeHistory.size(), 1u);
-//			TS_ASSERT_EQUALS(changeHistory[0][0], 4u);
-//			TS_ASSERT_EQUALS(changeHistory[0][1], 2u);
-//			TS_ASSERT_EQUALS(changeHistory[0][2], 0u);
+//            TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[0], 0.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[1], 1.0, 1e-6);
 //
 //
-//			// Split 4 sides
-//			changeHistory = mesh.SplitLongEdges(0.9);
+//            std::vector<c_vector<unsigned, 5> > changeHistory;
 //
-//			TS_ASSERT_EQUALS(mesh.GetNumElements(), 8u);
-//			TS_ASSERT_EQUALS(mesh.GetNumNodes(), 9u);
-//			TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u); // todo should be 8
+//            // Split central edge
+//            changeHistory = mesh.SplitLongEdges(1.1);
 //
-//			// Check position of new nodes
-//			TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[0], 1.0, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-6);
+//            TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+//            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
 //
-//			TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.5, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 1.0, 1e-6);
+//            // Check position of new node
+//            TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-6);
 //
-//			TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[0], 0.5, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 0.0, 1e-6);
+//            // Check Elements
+//            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 2u);
 //
-//			TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-6);
-//			TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-6);
+//            TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 2u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 3u);
 //
-//			// Check Elements
-//			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 5u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 0u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 1u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 4u);
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 2u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 0u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 3u);
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 0u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 7u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 4u);
+//            // Check changeHistory
+//            TS_ASSERT_EQUALS(changeHistory.size(), 1u);
+//            TS_ASSERT_EQUALS(changeHistory[0][0], 4u);
+//            TS_ASSERT_EQUALS(changeHistory[0][1], 2u);
+//            TS_ASSERT_EQUALS(changeHistory[0][2], 0u);
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 8u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 3u);
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(0), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(1), 5u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(2), 2u);
+//            // Split 4 sides
+//            changeHistory = mesh.SplitLongEdges(0.9);
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(5)->GetNodeGlobalIndex(0), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(5)->GetNodeGlobalIndex(1), 6u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(5)->GetNodeGlobalIndex(2), 3u);
+//            TS_ASSERT_EQUALS(mesh.GetNumElements(), 8u);
+//            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 9u);
+//            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u); // todo should be 8
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(6)->GetNodeGlobalIndex(0), 7u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(6)->GetNodeGlobalIndex(1), 1u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(6)->GetNodeGlobalIndex(2), 4u);
+//            // Check position of new nodes
+//            TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[0], 1.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-6);
 //
-//			TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(0), 0u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(1), 4u);
-//			TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(2), 8u);
+//            TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.5, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 1.0, 1e-6);
 //
-//			// Check changeHistory
-//			TS_ASSERT_EQUALS(changeHistory.size(), 4u);
+//            TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[0], 0.5, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 0.0, 1e-6);
 //
-//			TS_ASSERT_EQUALS(changeHistory[0][0], 5u);
-//			TS_ASSERT_EQUALS(changeHistory[0][1], 1u);
-//			TS_ASSERT_EQUALS(changeHistory[0][2], 2u);
+//            TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-6);
+//            TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-6);
 //
-//			TS_ASSERT_EQUALS(changeHistory[1][0], 6u);
-//			TS_ASSERT_EQUALS(changeHistory[1][1], 2u);
-//			TS_ASSERT_EQUALS(changeHistory[1][2], 3u);
+//            // Check Elements
+//            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 1u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 5u);
 //
-//			TS_ASSERT_EQUALS(changeHistory[2][0], 7u);
-//			TS_ASSERT_EQUALS(changeHistory[2][1], 0u);
-//			TS_ASSERT_EQUALS(changeHistory[2][2], 1u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(0), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(1), 2u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(2), 6u);
 //
-//			TS_ASSERT_EQUALS(changeHistory[3][0], 8u);
-//			TS_ASSERT_EQUALS(changeHistory[3][1], 3u);
-//			TS_ASSERT_EQUALS(changeHistory[3][2], 0u);
-    	}
-    	{
-    		// Here we split all sides at once and because of this we get a different resulting mesh
+//            TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(0), 0u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(1), 7u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(2)->GetNodeGlobalIndex(2), 4u);
+//
+//            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 8u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 3u);
+//
+//            TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(0), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(1), 5u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNodeGlobalIndex(2), 2u);
+//
+//            TS_ASSERT_EQUALS(mesh.GetElement(5)->GetNodeGlobalIndex(0), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(5)->GetNodeGlobalIndex(1), 6u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(5)->GetNodeGlobalIndex(2), 3u);
+//
+//            TS_ASSERT_EQUALS(mesh.GetElement(6)->GetNodeGlobalIndex(0), 7u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(6)->GetNodeGlobalIndex(1), 1u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(6)->GetNodeGlobalIndex(2), 4u);
+//
+//            TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(0), 0u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(1), 4u);
+//            TS_ASSERT_EQUALS(mesh.GetElement(7)->GetNodeGlobalIndex(2), 8u);
+//
+//            // Check changeHistory
+//            TS_ASSERT_EQUALS(changeHistory.size(), 4u);
+//
+//            TS_ASSERT_EQUALS(changeHistory[0][0], 5u);
+//            TS_ASSERT_EQUALS(changeHistory[0][1], 1u);
+//            TS_ASSERT_EQUALS(changeHistory[0][2], 2u);
+//
+//            TS_ASSERT_EQUALS(changeHistory[1][0], 6u);
+//            TS_ASSERT_EQUALS(changeHistory[1][1], 2u);
+//            TS_ASSERT_EQUALS(changeHistory[1][2], 3u);
+//
+//            TS_ASSERT_EQUALS(changeHistory[2][0], 7u);
+//            TS_ASSERT_EQUALS(changeHistory[2][1], 0u);
+//            TS_ASSERT_EQUALS(changeHistory[2][2], 1u);
+//
+//            TS_ASSERT_EQUALS(changeHistory[3][0], 8u);
+//            TS_ASSERT_EQUALS(changeHistory[3][1], 3u);
+//            TS_ASSERT_EQUALS(changeHistory[3][2], 0u);
+        }
+        {
+            // Here we split all sides at once and because of this we get a different resulting mesh
 
-			TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
-			MutableMesh<2,3> mesh;
-			mesh.ConstructFromMeshReader(mesh_reader);
+            TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
+            MutableMesh<2,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
 
-			std::vector<c_vector<unsigned, 5> > changeHistory;
+            std::vector<c_vector<unsigned, 5> > changeHistory;
 
-			// Split ALL sides
-			changeHistory = mesh.SplitLongEdges(0.9);
+            // Split ALL sides
+            changeHistory = mesh.SplitLongEdges(0.9);
 
-			TS_ASSERT_EQUALS(mesh.GetNumElements(), 14u);
-			TS_ASSERT_EQUALS(mesh.GetNumNodes(), 12u);
-			TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u); // todo should be 8
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), 14u);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 12u);
+            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u); // todo should be 8
 
-			// Check position of new nodes
+            // Check position of new nodes
 
-			TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.0, 1e-6);
 
-			TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[0], 0.75, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[0], 0.75, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-6);
 
-			TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.375, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.25, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[0], 0.375, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(6)->rGetLocation()[1], 0.25, 1e-6);
 
-			TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[0], 0.5, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[0], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(7)->rGetLocation()[1], 0.5, 1e-6);
 
-			TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(8)->rGetLocation()[1], 0.5, 1e-6);
 
-			TS_ASSERT_DELTA(mesh.GetNode(9)->rGetLocation()[0], 0.6875, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(9)->rGetLocation()[1], 0.625, 1e-6);
-
-
-			TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[0], 1.0, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(9)->rGetLocation()[0], 0.6875, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(9)->rGetLocation()[1], 0.625, 1e-6);
 
 
-			TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 0.5, 1e-6);
-			TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[1], 1.0, 1e-6);
-
-			// Check some Elements
-			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 6u);
-			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 4u);
-			TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 5u);
+            TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[0], 1.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(10)->rGetLocation()[1], 0.5, 1e-6);
 
 
-			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 9u);
-			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 5u);
-			TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 2u);
+            TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[1], 1.0, 1e-6);
+
+            // Check some Elements
+            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 6u);
+            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 4u);
+            TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 5u);
 
 
-			TS_ASSERT_EQUALS(mesh.GetElement(8)->GetNodeGlobalIndex(0), 7u);
-			TS_ASSERT_EQUALS(mesh.GetElement(8)->GetNodeGlobalIndex(1), 9u);
-			TS_ASSERT_EQUALS(mesh.GetElement(8)->GetNodeGlobalIndex(2), 2u);
+            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(0), 9u);
+            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(1), 5u);
+            TS_ASSERT_EQUALS(mesh.GetElement(3)->GetNodeGlobalIndex(2), 2u);
 
-    		TS_ASSERT_EQUALS(mesh.GetElement(13)->GetNodeGlobalIndex(0), 7u);
-			TS_ASSERT_EQUALS(mesh.GetElement(13)->GetNodeGlobalIndex(1), 11u);
-			TS_ASSERT_EQUALS(mesh.GetElement(13)->GetNodeGlobalIndex(2), 3u);
 
-			// Check changeHistory
-			TS_ASSERT_EQUALS(changeHistory.size(), 8u);
+            TS_ASSERT_EQUALS(mesh.GetElement(8)->GetNodeGlobalIndex(0), 7u);
+            TS_ASSERT_EQUALS(mesh.GetElement(8)->GetNodeGlobalIndex(1), 9u);
+            TS_ASSERT_EQUALS(mesh.GetElement(8)->GetNodeGlobalIndex(2), 2u);
 
-			TS_ASSERT_EQUALS(changeHistory[0][0], 4u);
-			TS_ASSERT_EQUALS(changeHistory[0][1], 0u);
-			TS_ASSERT_EQUALS(changeHistory[0][2], 1u);
-			TS_ASSERT_EQUALS(changeHistory[0][3], 2u);
-		    TS_ASSERT_EQUALS(changeHistory[0][4], UNSIGNED_UNSET);
+            TS_ASSERT_EQUALS(mesh.GetElement(13)->GetNodeGlobalIndex(0), 7u);
+            TS_ASSERT_EQUALS(mesh.GetElement(13)->GetNodeGlobalIndex(1), 11u);
+            TS_ASSERT_EQUALS(mesh.GetElement(13)->GetNodeGlobalIndex(2), 3u);
 
-			TS_ASSERT_EQUALS(changeHistory[1][0], 5u);
-			TS_ASSERT_EQUALS(changeHistory[1][1], 4u);
-			TS_ASSERT_EQUALS(changeHistory[1][2], 2u);
-			TS_ASSERT_EQUALS(changeHistory[1][3], 0u);
-    		TS_ASSERT_EQUALS(changeHistory[1][4], 1u);
+            // Check changeHistory
+            TS_ASSERT_EQUALS(changeHistory.size(), 8u);
 
-			TS_ASSERT_EQUALS(changeHistory[2][0], 6u);
-			TS_ASSERT_EQUALS(changeHistory[2][1], 5u);
-			TS_ASSERT_EQUALS(changeHistory[2][2], 0u);
-			TS_ASSERT_EQUALS(changeHistory[2][3], 4u);
-    		TS_ASSERT_EQUALS(changeHistory[2][4], 2u);
+            TS_ASSERT_EQUALS(changeHistory[0][0], 4u);
+            TS_ASSERT_EQUALS(changeHistory[0][1], 0u);
+            TS_ASSERT_EQUALS(changeHistory[0][2], 1u);
+            TS_ASSERT_EQUALS(changeHistory[0][3], 2u);
+            TS_ASSERT_EQUALS(changeHistory[0][4], UNSIGNED_UNSET);
 
-    		TS_ASSERT_EQUALS(changeHistory[3][0], 7u);
-			TS_ASSERT_EQUALS(changeHistory[3][1], 0u);
-			TS_ASSERT_EQUALS(changeHistory[3][2], 2u);
-			TS_ASSERT_EQUALS(changeHistory[3][3], 3u);
-    		TS_ASSERT_EQUALS(changeHistory[3][4], 6u);
+            TS_ASSERT_EQUALS(changeHistory[1][0], 5u);
+            TS_ASSERT_EQUALS(changeHistory[1][1], 4u);
+            TS_ASSERT_EQUALS(changeHistory[1][2], 2u);
+            TS_ASSERT_EQUALS(changeHistory[1][3], 0u);
+            TS_ASSERT_EQUALS(changeHistory[1][4], 1u);
 
-    		TS_ASSERT_EQUALS(changeHistory[4][0], 8u);
-			TS_ASSERT_EQUALS(changeHistory[4][1], 3u);
-			TS_ASSERT_EQUALS(changeHistory[4][2], 0u);
-			TS_ASSERT_EQUALS(changeHistory[4][3], 7u);
-    		TS_ASSERT_EQUALS(changeHistory[4][4], UNSIGNED_UNSET);
+            TS_ASSERT_EQUALS(changeHistory[2][0], 6u);
+            TS_ASSERT_EQUALS(changeHistory[2][1], 5u);
+            TS_ASSERT_EQUALS(changeHistory[2][2], 0u);
+            TS_ASSERT_EQUALS(changeHistory[2][3], 4u);
+            TS_ASSERT_EQUALS(changeHistory[2][4], 2u);
 
-			TS_ASSERT_EQUALS(changeHistory[5][0], 9u);
-			TS_ASSERT_EQUALS(changeHistory[5][1], 2u);
-			TS_ASSERT_EQUALS(changeHistory[5][2], 6u);
-			TS_ASSERT_EQUALS(changeHistory[5][3], 5u);
-    		TS_ASSERT_EQUALS(changeHistory[5][4], 7u);
+            TS_ASSERT_EQUALS(changeHistory[3][0], 7u);
+            TS_ASSERT_EQUALS(changeHistory[3][1], 0u);
+            TS_ASSERT_EQUALS(changeHistory[3][2], 2u);
+            TS_ASSERT_EQUALS(changeHistory[3][3], 3u);
+            TS_ASSERT_EQUALS(changeHistory[3][4], 6u);
 
-			TS_ASSERT_EQUALS(changeHistory[6][0], 10u);
-			TS_ASSERT_EQUALS(changeHistory[6][1], 1u);
-			TS_ASSERT_EQUALS(changeHistory[6][2], 2u);
-			TS_ASSERT_EQUALS(changeHistory[6][3], 5u);
-    		TS_ASSERT_EQUALS(changeHistory[6][4], UNSIGNED_UNSET);
+            TS_ASSERT_EQUALS(changeHistory[4][0], 8u);
+            TS_ASSERT_EQUALS(changeHistory[4][1], 3u);
+            TS_ASSERT_EQUALS(changeHistory[4][2], 0u);
+            TS_ASSERT_EQUALS(changeHistory[4][3], 7u);
+            TS_ASSERT_EQUALS(changeHistory[4][4], UNSIGNED_UNSET);
 
-    		TS_ASSERT_EQUALS(changeHistory[7][0], 11u);
-    		TS_ASSERT_EQUALS(changeHistory[7][1], 2u);
-			TS_ASSERT_EQUALS(changeHistory[7][2], 3u);
-			TS_ASSERT_EQUALS(changeHistory[7][3], 7u);
-			TS_ASSERT_EQUALS(changeHistory[7][4], UNSIGNED_UNSET);
+            TS_ASSERT_EQUALS(changeHistory[5][0], 9u);
+            TS_ASSERT_EQUALS(changeHistory[5][1], 2u);
+            TS_ASSERT_EQUALS(changeHistory[5][2], 6u);
+            TS_ASSERT_EQUALS(changeHistory[5][3], 5u);
+            TS_ASSERT_EQUALS(changeHistory[5][4], 7u);
+
+            TS_ASSERT_EQUALS(changeHistory[6][0], 10u);
+            TS_ASSERT_EQUALS(changeHistory[6][1], 1u);
+            TS_ASSERT_EQUALS(changeHistory[6][2], 2u);
+            TS_ASSERT_EQUALS(changeHistory[6][3], 5u);
+            TS_ASSERT_EQUALS(changeHistory[6][4], UNSIGNED_UNSET);
+
+            TS_ASSERT_EQUALS(changeHistory[7][0], 11u);
+            TS_ASSERT_EQUALS(changeHistory[7][1], 2u);
+            TS_ASSERT_EQUALS(changeHistory[7][2], 3u);
+            TS_ASSERT_EQUALS(changeHistory[7][3], 7u);
+            TS_ASSERT_EQUALS(changeHistory[7][4], UNSIGNED_UNSET);
 }
     }
 };

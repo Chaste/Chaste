@@ -83,9 +83,9 @@ libs_for_petsc = ['petsccontrib', 'X11',
 #Fixes (possibly temporary) for Natty
 if ubuntu_ver >= [11,04]:
     libs_for_petsc.append(['HYPRE_utilities', 
-		'HYPRE_struct_mv', 'HYPRE_struct_ls',  
-		'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
-		'HYPRE_IJ_mv', 'HYPRE_parcsr_ls', 'dmumps'])
+        'HYPRE_struct_mv', 'HYPRE_struct_ls',  
+        'HYPRE_sstruct_mv', 'HYPRE_sstruct_ls', 
+        'HYPRE_IJ_mv', 'HYPRE_parcsr_ls', 'dmumps'])
 if petsc_ver >= 3:
     libs_for_petsc.append('scotch')
 else:
@@ -133,8 +133,8 @@ def Configure(prefs, build):
         # Note: 10.10 uses VTK 5.4, 10.04 uses 5.2, and early use 5.0
         other_includepaths.extend(vtk_include_path)
         other_libraries.extend(['vtkIO', 'vtkCommon', 'vtkGraphics', 'z'])
-	if ubuntu_ver >= [11,10]: # 11.10 uses VTK 5.6
-		other_libraries.extend(['vtkFiltering'])
+    if ubuntu_ver >= [11,10]: # 11.10 uses VTK 5.6
+        other_libraries.extend(['vtkFiltering'])
 
     # Is CVODE installed?
     use_cvode = int(prefs.get('use-cvode', True))

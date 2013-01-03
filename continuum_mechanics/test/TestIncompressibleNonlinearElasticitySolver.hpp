@@ -637,19 +637,19 @@ public:
 
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u); // initial guess was solution
 
-		// test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
-		// applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
-		assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements()); //Will fail when we move to DistributedQuadraticMesh
-		for (unsigned i=0; i<mesh.GetNumElements(); i++)
-		{
-			if (mesh.CalculateDesignatedOwnershipOfElement(i))
-			{
+        // test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
+        // applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
+        assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements()); //Will fail when we move to DistributedQuadraticMesh
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            if (mesh.CalculateDesignatedOwnershipOfElement(i))
+            {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), lambda*traction(0), 1e-8);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-8);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-8);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,1), 0.0, 1e-8);
-			}
-		}
+            }
+        }
 
 
 
@@ -663,8 +663,8 @@ public:
 
         solver.Solve();
 
-		// write the stresses
-		solver.WriteCurrentAverageElementStresses("solution");
+        // write the stresses
+        solver.WriteCurrentAverageElementStresses("solution");
 
 
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 3u); // 'hardcoded' answer, protects against Jacobian getting messed up
@@ -694,10 +694,10 @@ public:
             TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 1e-5);
         }
 
-		for (unsigned i=0; i<mesh.GetNumElements(); i++)
-		{
-			if (mesh.CalculateDesignatedOwnershipOfElement(i))
-			{
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            if (mesh.CalculateDesignatedOwnershipOfElement(i))
+            {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,0), lambda*traction(0), 1e-3);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(1,0), 0.0, 1e-3);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(i)(0,1), 0.0, 1e-3);
@@ -705,10 +705,10 @@ public:
             }
         }
 
-		// check the written stresses
-		std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-		NumericFileComparison comparison(test_output_directory + "/nonlin_elas_non_zero_bcs/solution.stress", "continuum_mechanics/test/data/exact.stress");
-		TS_ASSERT(comparison.CompareFiles(2e-4));
+        // check the written stresses
+        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
+        NumericFileComparison comparison(test_output_directory + "/nonlin_elas_non_zero_bcs/solution.stress", "continuum_mechanics/test/data/exact.stress");
+        TS_ASSERT(comparison.CompareFiles(2e-4));
 
         MechanicsEventHandler::Headings();
         MechanicsEventHandler::Report();

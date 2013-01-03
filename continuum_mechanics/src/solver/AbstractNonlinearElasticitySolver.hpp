@@ -263,9 +263,9 @@ protected:
      */
     double mLastDampingValue;
 
-	/** 
-	 *  Whether this is the first Newton iteration or not
-	 */
+    /** 
+     *  Whether this is the first Newton iteration or not
+     */
     bool mFirstStep;
     
     /**
@@ -670,19 +670,19 @@ public:
         mTakeFullFirstNewtonStep = takeFullFirstStep;
     }
 
-	/**
-	 *  Get Petsc to do a direct solve on the linear system (instead of using
-	 *  an iterative solve). This is equivalent to passing in command line
-	 *  arguments -ksp_type pre_only -pc_type lu through to Petsc, but in the incompressible
-	 *  case the preconditioner is set equal to the Jacobian with a mass matrix in the
-	 *  pressure-pressure block (to avoid zeros on the diagonal. Hence a few linear solve
-	 *  iterations are required for this case. Using a direct solve can lead to huge
-	 *  computation time savings if
-	 *  there is enough memory for it: the linear solve may be faster and 
-	 *  nonlinear convergence likely to be much better, as the linear solve is exact.
-	 *  
-	 *  @param usePetscDirectSolve Whether to use the Petsc direct solver or not
-	 */
+    /**
+     *  Get Petsc to do a direct solve on the linear system (instead of using
+     *  an iterative solve). This is equivalent to passing in command line
+     *  arguments -ksp_type pre_only -pc_type lu through to Petsc, but in the incompressible
+     *  case the preconditioner is set equal to the Jacobian with a mass matrix in the
+     *  pressure-pressure block (to avoid zeros on the diagonal. Hence a few linear solve
+     *  iterations are required for this case. Using a direct solve can lead to huge
+     *  computation time savings if
+     *  there is enough memory for it: the linear solve may be faster and 
+     *  nonlinear convergence likely to be much better, as the linear solve is exact.
+     *  
+     *  @param usePetscDirectSolve Whether to use the Petsc direct solver or not
+     */
     void SetUsePetscDirectSolve(bool usePetscDirectSolve = true)
     {
         mPetscDirectSolve = usePetscDirectSolve;
@@ -1917,7 +1917,7 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
         #undef COVERAGE_IGNORE
     }
 
-	// See documentation for SetTakeFullFirstNewtonStep()
+    // See documentation for SetTakeFullFirstNewtonStep()
     if(full_first_step)
     {
         if(this->mVerbose)

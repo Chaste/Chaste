@@ -212,14 +212,14 @@ MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_D
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunctionFromFile(const Node<SPACE_DIM>* pNode,
-																				AbstractCardiacCellInterface* pPurkinjeCell,
-																				AbstractCardiacCellInterface* pCardiacCell)
+                                                                                AbstractCardiacCellInterface* pPurkinjeCell,
+                                                                                AbstractCardiacCellInterface* pCardiacCell)
 {
-	std::map<unsigned, double>::iterator iter = mJunctionMap.find(pNode->GetIndex());
-	if(iter != mJunctionMap.end())
-	{
-		CreateJunction(pNode, pPurkinjeCell, pCardiacCell, iter->second);
-	}
+    std::map<unsigned, double>::iterator iter = mJunctionMap.find(pNode->GetIndex());
+    if(iter != mJunctionMap.end())
+    {
+        CreateJunction(pNode, pPurkinjeCell, pCardiacCell, iter->second);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////

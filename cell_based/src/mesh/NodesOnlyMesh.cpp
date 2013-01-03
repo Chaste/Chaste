@@ -105,10 +105,10 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location);
         this->mNodes.push_back(p_node_copy);
 
-		// Update the node map
-		mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
+        // Update the node map
+        mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
 
-		mCellRadii[i] = 0.5;
+        mCellRadii[i] = 0.5;
 
         mIndexCounter++;
     }
