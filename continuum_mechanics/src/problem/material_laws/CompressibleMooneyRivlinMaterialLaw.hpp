@@ -216,6 +216,7 @@ public:
     CompressibleMooneyRivlinMaterialLaw(double c1, double c3)
     {
         assert(c1 > 0.0);
+        assert(c3 > 0.0);
         mC1 = c1;
         mC3 = c3;
     }
