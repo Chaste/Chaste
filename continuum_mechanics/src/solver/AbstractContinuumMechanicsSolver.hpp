@@ -65,8 +65,9 @@ typedef enum _ApplyDirichletBcsType
     NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING,
 } ApplyDirichletBcsType;
 
-//forward declaration
+//forward declarations
 template<unsigned DIM> class StressRecoveror;
+template<unsigned DIM> class VtkNonlinearElasticitySolutionWriter;
 
 /**
  *  General base class for continuum mechanics solvers. Deals with memory allocation,
@@ -86,6 +87,7 @@ template<unsigned DIM>
 class AbstractContinuumMechanicsSolver
 {
     friend class StressRecoveror<DIM>;
+    friend class VtkNonlinearElasticitySolutionWriter<DIM>;
 
 protected:
     /**

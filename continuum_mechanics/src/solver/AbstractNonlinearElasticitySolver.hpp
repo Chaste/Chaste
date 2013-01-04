@@ -163,6 +163,9 @@ template<unsigned DIM>
 class AbstractNonlinearElasticitySolver : public AbstractContinuumMechanicsSolver<DIM>
 {
     friend class StressRecoveror<DIM>;
+    friend class VtkNonlinearElasticitySolutionWriter<DIM>;
+
+
 protected:
 
     /** Number of vertices per element. */

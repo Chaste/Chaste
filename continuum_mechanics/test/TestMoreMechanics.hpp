@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-#ifndef _TESTEMVERIFICATION_HPP_
-#define _TESTEMVERIFICATION_HPP_
+#ifndef _TESTMOREMECHANICS_HPP_
+#define _TESTMOREMECHANICS_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include <boost/shared_ptr.hpp>
@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompressibleExponentialLaw.hpp"
 #include "NonlinearElasticityTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "VtkNonlinearElasticitySolutionWriter.hpp"
 
 
 // This test tests some some useful but developmental mechanics code
@@ -229,6 +230,10 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
     {
         solver.Solve();
         solver.CreateCmguiOutput();
+
+        VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
+        vtk_writer.SetWriteElementWiseStrains(DEFORMATION_TENSOR_C);
+        vtk_writer.Write();
     }
 
     rSolution.clear();
@@ -318,6 +323,10 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
     {
         solver.Solve();
         solver.CreateCmguiOutput();
+        
+        VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
+        vtk_writer.SetWriteElementWiseStrains(DEFORMATION_TENSOR_C);
+        vtk_writer.Write();        
     }
 
     rSolution.clear();
