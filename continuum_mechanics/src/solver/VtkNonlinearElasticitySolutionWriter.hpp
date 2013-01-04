@@ -1,6 +1,3 @@
-#ifndef VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
-#define VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
-
 /*
 
 Copyright (c) 2005-2013, University of Oxford.
@@ -35,6 +32,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#ifndef VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
+#define VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
 
 #include "AbstractNonlinearElasticitySolver.hpp"
 #include "VtkMeshWriter.hpp"
@@ -120,6 +120,7 @@ public:
 
         VtkMeshWriter<DIM, DIM> mesh_writer(mpSolver->mOutputDirectory + "/vtk", "solution", true);
 
+        // write the displacement
         std::vector<c_vector<double,DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
         std::vector<c_vector<double,DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
         for(unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
@@ -131,12 +132,13 @@ public:
         }
         mesh_writer.AddPointData("Displacement", displacement);
 
+        // write pressures
         if (mpSolver->mCompressibilityType==INCOMPRESSIBLE)
         {
             mesh_writer.AddPointData("Pressure", mpSolver->rGetPressures());
         }
 
-        //Output the element attribute as cell data.
+        // write the element attribute as cell data.
         std::vector<double> element_attribute;
         for(typename QuadraticMesh<DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
             iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
@@ -146,6 +148,7 @@ public:
         }
         mesh_writer.AddCellData("Attribute", element_attribute);
 
+        // write strains if requested
         if (mWriteElementWiseStrains)
         {
             mTensorData.clear();
@@ -208,6 +211,8 @@ public:
 //            // use recoverer
 //            mesh_writer.AddTensorCellData("Stress_NAME_ME", tensor_data);
 //        }
+
+        // final write
         mesh_writer.WriteFilesUsingMesh(mpSolver->mrQuadMesh);
     }
 };
