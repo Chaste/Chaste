@@ -96,6 +96,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExponentialMaterialLaw.hpp"
 /* This is a useful helper class */
 #include "NonlinearElasticityTools.hpp"
+/* For visualising results in Paraview */
+#include "VtkNonlinearElasticitySolutionWriter.hpp"
 /* As before: !PetscSetupAndFinalize.hpp must be included in every test that uses PETSc. Note that it
  * cannot be included in the source code. */
 #include "PetscSetupAndFinalize.hpp"
@@ -217,13 +219,26 @@ public:
         std::cout << "New position: " << r_deformed_positions[node_index](0) << " " << r_deformed_positions[node_index](1) << "\n";
         std::cout << "Pressure: " << r_pressures[node_index] << "\n";
 
+        /* HOW_TO_TAG Continuum mechanics
+         * Visualise nonlinear elasticity problems solutions, including visualisng strains
+         */
 
-        /* The recommended visualiser is Cmgui. This method can be used to convert all the output files to Cmgui format.
+        /* One visualiser is Cmgui. This method can be used to convert all the output files to Cmgui format.
          * They are placed in `[OUTPUT_DIRECTORY]/cmgui`. A script is created to easily load the data: in a
          * terminal cd to this directory and call `cmgui LoadSolutions.com`. (In this directory, the initial position is given by
          * solution_0.exnode, the deformed by solution_1.exnode).
          */
         solver.CreateCmguiOutput();
+
+        /* The recommended visualiser is Paraview, for which Chaste must be installed with VTK. With paraview, strains (and in the future
+         * stresses) can be visualised on the undeformed/deformed geometry). We can create VTK output using
+         * the `VtkNonlinearElasticitySolutionWriter` class. The undeformed geometry, solution displacement, and pressure (if incompressible
+         * problem) are written to file, and below we also choose to write the deformation tensor C for each element.
+         */
+        VtkNonlinearElasticitySolutionWriter<2> vtk_writer(solver);
+        vtk_writer.SetWriteElementWiseStrains(DEFORMATION_TENSOR_C); // other options are DEFORMATION_GRADIENT_F and LAGRANGE_STRAIN_E
+        vtk_writer.Write();
+
 
         /* These are just to check that nothing has been accidentally changed in this test.
          * Newton's method (with damping) was used to solve the nonlinear problem, and we check that
@@ -316,7 +331,10 @@ public:
         /* Call `Solve()` */
         solver.Solve();
 
-        /* Write the final deformation gradients to file. The i-th line of this file provides the deformation gradient F,
+        /* If VTK output is written (discussed above) strains can be visualised. Alternatively, we can create text files
+         * for strains and stresses by doing the following.
+         *
+         * Write the final deformation gradients to file. The i-th line of this file provides the deformation gradient F,
          * written as 'F(0,0) F(0,1) F(1,0) F(1,1)', evaluated at the centroid of the i-th element. The first variable
          * can also be DEFORMATION_TENSOR_C or LAGRANGE_STRAIN_E to write C or E. The second parameter is the file name.
          */

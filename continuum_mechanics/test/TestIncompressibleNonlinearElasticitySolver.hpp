@@ -1380,9 +1380,7 @@ public:
 //        MechanicsEventHandler::Report();
     }
 
-    /* HOW_TO_TAG Continuum mechanics
-     * Write VTK output (for Paraview visualiser)
-     */
+
     // This is purely to ensure coverage of vtk output in 3d
     void TestVtkCoverage3d() throw(Exception)
     {
