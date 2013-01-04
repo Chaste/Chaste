@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
 
 #include "AbstractNonlinearElasticitySolver.hpp"
-#include "VtkMeshWriter.hpp"
-
 
 
 
@@ -90,95 +88,7 @@ public:
     }
 
     /** Write the .vtu file */
-    void Write()
-    {
-        if (mpSolver->mOutputDirectory=="")
-        {
-            EXCEPTION("No output directory was given to the mechanics solver");
-        }
-
-#ifdef CHASTE_VTK
-        VtkMeshWriter<DIM, DIM> mesh_writer(mpSolver->mOutputDirectory + "/vtk", "solution", true);
-
-        // write the displacement
-        std::vector<c_vector<double,DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
-        std::vector<c_vector<double,DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
-        for(unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
-        {
-            for(unsigned j=0; j<DIM; j++)
-            {
-                displacement[i](j) = r_spatial_solution[i](j)- mpSolver->mrQuadMesh.GetNode(i)->rGetLocation()[j];
-            }
-        }
-        mesh_writer.AddPointData("Displacement", displacement);
-
-        // write pressures
-        if (mpSolver->mCompressibilityType==INCOMPRESSIBLE)
-        {
-            mesh_writer.AddPointData("Pressure", mpSolver->rGetPressures());
-        }
-
-        // write the element attribute as cell data.
-        std::vector<double> element_attribute;
-        for(typename QuadraticMesh<DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
-            iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
-            ++iter)
-        {
-            element_attribute.push_back(iter->GetAttribute());
-        }
-        mesh_writer.AddCellData("Attribute", element_attribute);
-
-        // write strains if requested
-        if (mWriteElementWiseStrains)
-        {
-            mTensorData.clear();
-            mTensorData.resize(mpSolver->mrQuadMesh.GetNumElements());
-
-            std::string name;
-            switch(mElementWiseStrainType)
-            {
-                case DEFORMATION_GRADIENT_F:
-                {
-                    name = "deformation_gradient_F";
-                    break;
-                }
-                case DEFORMATION_TENSOR_C:
-                {
-                    name = "deformation_tensor_C";
-                    break;
-                }
-                case LAGRANGE_STRAIN_E:
-                {
-                    name = "Lagrange_strain_E";
-                    break;
-                }
-                default:
-                {
-                    NEVER_REACHED;
-                }
-            }
-
-            for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
-                 iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
-                 ++iter)
-            {
-                mpSolver->GetElementCentroidStrain(mElementWiseStrainType, *iter, mTensorData[iter->GetIndex()]);
-            }
-
-            mesh_writer.AddTensorCellData(name, mTensorData);
-        }
-//// Future..
-//        if (mWriteNodeWiseStresses)
-//        {
-//            std::vector<c_matrix<double,DIM,DIM> > tensor_data;
-//            // use recoverer
-//            mesh_writer.AddTensorCellData("Stress_NAME_ME", tensor_data);
-//        }
-
-        // final write
-        mesh_writer.WriteFilesUsingMesh(mpSolver->mrQuadMesh);
-#endif // CHASTE_VTK
-    }
+    void Write();
 };
 
 
