@@ -1681,7 +1681,7 @@ double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
 {
     double norm;
 
-    //\todo Change to NORM_2 and remove the division by mNumDofs...
+    //\todo Change to NORM_1 and remove the division by mNumDofs...
     VecNorm(this->mResidualVector, NORM_2, &norm);
     return norm/this->mNumDofs;
 }
