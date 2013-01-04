@@ -964,7 +964,7 @@ public:
                                                         "TestWritingStrain");
 
         c_matrix<double,2,2> F;
-        solver.GetElementCentroidDeformationGradient(*(mesh.GetElement(0)), F);
+        solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(0)), F);
 
         TS_ASSERT_DELTA(F(0,0), 1.0, 1e-8);
         TS_ASSERT_DELTA(F(0,1), 0.0, 1e-8);
@@ -983,21 +983,35 @@ public:
         solver.mCurrentSolution[12] = alpha/2.0;
         solver.mCurrentSolution[14] = alpha/2.0;
 
-        solver.GetElementCentroidDeformationGradient(*(mesh.GetElement(0)), F);
+        solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(0)), F);
 
         TS_ASSERT_DELTA(F(0,0), 1.0, 1e-8);
         TS_ASSERT_DELTA(F(0,1), alpha, 1e-8);
         TS_ASSERT_DELTA(F(1,0), 0.0, 1e-8);
         TS_ASSERT_DELTA(F(1,1), 1.0, 1e-8);
 
-        solver.GetElementCentroidDeformationGradient(*(mesh.GetElement(1)), F);
+        solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(1)), F);
 
         TS_ASSERT_DELTA(F(0,0), 1.0, 1e-8);
         TS_ASSERT_DELTA(F(0,1), alpha, 1e-8);
         TS_ASSERT_DELTA(F(1,0), 0.0, 1e-8);
         TS_ASSERT_DELTA(F(1,1), 1.0, 1e-8);
 
-        solver.WriteCurrentDeformationGradients("shear_2d",0);
+        c_matrix<double,2,2> C;
+        solver.GetElementCentroidStrain(DEFORMATION_TENSOR_C,*(mesh.GetElement(1)), C);
+        TS_ASSERT_DELTA(C(0,0), 1.0, 1e-8);
+        TS_ASSERT_DELTA(C(0,1), alpha, 1e-8);
+        TS_ASSERT_DELTA(C(1,0), alpha, 1e-8);
+        TS_ASSERT_DELTA(C(1,1), 1.0+alpha*alpha, 1e-8);
+
+        c_matrix<double,2,2> E;
+        solver.GetElementCentroidStrain(LAGRANGE_STRAIN_E,*(mesh.GetElement(1)), E);
+        TS_ASSERT_DELTA(E(0,0), 0.0, 1e-8);
+        TS_ASSERT_DELTA(E(0,1), alpha/2, 1e-8);
+        TS_ASSERT_DELTA(E(1,0), alpha/2, 1e-8);
+        TS_ASSERT_DELTA(E(1,1), alpha*alpha/2, 1e-8);
+
+        solver.WriteCurrentStrains(DEFORMATION_GRADIENT_F,"shear_2d",0);
 
         FileFinder generated_file("TestWritingStrain/shear_2d_0.strain", RelativeTo::ChasteTestOutput);
         FileFinder reference_file("continuum_mechanics/test/data/shear_2d_0.strain", RelativeTo::ChasteSourceRoot);
@@ -1046,7 +1060,7 @@ public:
 
         for(unsigned i=0; i<1 /*mesh.GetNumElements()*/; i++)
         {
-            solver.GetElementCentroidDeformationGradient(*(mesh.GetElement(i)), F);
+            solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(i)), F);
 
             TS_ASSERT_DELTA(F(0,0), alpha, 1e-8);
             TS_ASSERT_DELTA(F(0,1), 0.0, 1e-8);
@@ -1059,8 +1073,8 @@ public:
             TS_ASSERT_DELTA(F(2,2), gamma, 1e-8);
         }
 
-        // no output directory given, cover a return statement in WriteCurrentDeformationGradients()
-        solver.WriteCurrentDeformationGradients("wont_be_written",0);
+        // no output directory given, cover a return statement in WriteCurrentStrains()
+        solver.WriteCurrentStrains(DEFORMATION_GRADIENT_F,"wont_be_written",0);
     }
 
 

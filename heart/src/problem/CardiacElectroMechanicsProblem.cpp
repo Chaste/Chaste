@@ -650,7 +650,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
         if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET)
         {
-            mpMechanicsSolver->WriteCurrentDeformationGradients("deformation_gradient",mech_writer_counter);
+            mpMechanicsSolver->WriteCurrentStrains(DEFORMATION_GRADIENT_F,"deformation_gradient",mech_writer_counter);
             mpMechanicsSolver->WriteCurrentAverageElementStresses("second_PK",mech_writer_counter);
         }
     }
@@ -894,7 +894,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             if(mNumTimestepsToOutputDeformationGradientsAndStress!=UNSIGNED_UNSET && counter%mNumTimestepsToOutputDeformationGradientsAndStress==0)
             {
-                mpMechanicsSolver->WriteCurrentDeformationGradients("deformation_gradient",mech_writer_counter);
+                mpMechanicsSolver->WriteCurrentStrains(DEFORMATION_GRADIENT_F,"deformation_gradient",mech_writer_counter);
                 mpMechanicsSolver->WriteCurrentAverageElementStresses("second_PK",mech_writer_counter);
             }
             mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(false);

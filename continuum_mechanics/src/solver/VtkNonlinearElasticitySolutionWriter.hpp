@@ -42,26 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_VTK
 
-/**
- *  Three options for which type of strain to write
- *  F = dx/dX, C = F^T F, E = 1/2 (C-I)
- */
-typedef enum StrainType_
-{
-    DEFORMATION_GRADIENT_F = 0,
-    DEFORMATION_TENSOR_C,
-    LAGRANGE_STRAIN_E
-} StrainType;
-
-
-// For future
-//typedef enum StressType_
-//{
-//    CAUCHY_STRESS_SIGMA = 0,
-//    FIRST_PK_STRESS_S,
-//    SECOND_PK_STRESS_T,
-//} StressType;
-
 
 /**
  *  Class for write mechanics solutions to .vtu file (for visualisation in Paraview), including
@@ -154,52 +134,35 @@ public:
             mTensorData.clear();
             mTensorData.resize(mpSolver->mrQuadMesh.GetNumElements());
 
-            c_matrix<double,DIM,DIM> F;
-            c_matrix<double,DIM,DIM> C;
-            c_matrix<double,DIM,DIM> E;
-
             std::string name;
+            switch(mElementWiseStrainType)
+            {
+                case DEFORMATION_GRADIENT_F:
+                {
+                    name = "deformation_gradient_F";
+                    break;
+                }
+                case DEFORMATION_TENSOR_C:
+                {
+                    name = "deformation_tensor_C";
+                    break;
+                }
+                case LAGRANGE_STRAIN_E:
+                {
+                    name = "Lagrange_strain_E";
+                    break;
+                }
+                default:
+                {
+                    NEVER_REACHED;
+                }
+            }
 
             for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
                  iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
                  ++iter)
             {
-                mpSolver->GetElementCentroidDeformationGradient(*iter, F);
-
-                switch(mElementWiseStrainType)
-                {
-                    case DEFORMATION_GRADIENT_F:
-                    {
-                        mTensorData[iter->GetIndex()] = F;
-                        name = "deformation_gradient_F";
-                        break;
-                    }
-                    case DEFORMATION_TENSOR_C:
-                    {
-                        C = prod(trans(F),F);
-                        mTensorData[iter->GetIndex()] = C;
-                        name = "deformation_tensor_C";
-                        break;
-                    }
-                    case LAGRANGE_STRAIN_E:
-                    {
-                        C = prod(trans(F),F);
-                        for (unsigned M=0; M<DIM; M++)
-                        {
-                            for (unsigned N=0; N<DIM; N++)
-                            {
-                                E(M,N) = 0.5* ( C(M,N)-(M==N?1:0) );
-                            }
-                        }
-                        mTensorData[iter->GetIndex()] = E;
-                        name = "Lagrange_strain_E";
-                        break;
-                    }
-                    default:
-                    {
-                        NEVER_REACHED;
-                    }
-                }
+                mpSolver->GetElementCentroidStrain(mElementWiseStrainType, *iter, mTensorData[iter->GetIndex()]);
             }
 
             mesh_writer.AddTensorCellData(name, mTensorData);

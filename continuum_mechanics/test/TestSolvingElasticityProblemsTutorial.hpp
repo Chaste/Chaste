@@ -317,9 +317,10 @@ public:
         solver.Solve();
 
         /* Write the final deformation gradients to file. The i-th line of this file provides the deformation gradient F,
-         * written as 'F(0,0) F(0,1) F(1,0) F(1,1)', evaluated at the centroid of the i-th element.
+         * written as 'F(0,0) F(0,1) F(1,0) F(1,1)', evaluated at the centroid of the i-th element. The first variable
+         * can also be DEFORMATION_TENSOR_C or LAGRANGE_STRAIN_E to write C or E. The second parameter is the file name.
          */
-        solver.WriteCurrentDeformationGradients("deformation_grad");
+        solver.WriteCurrentStrains(DEFORMATION_GRADIENT_F,"deformation_grad");
 
         /* Since we called `SetComputeAverageStressPerElementDuringSolve`, we can write the stresses to file too. However,
          * note that for each element this is not the stress evaluated at the centroid, but the mean average of the stresses

@@ -57,6 +57,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#define MECH_USE_HYPRE    // uses HYPRE to solve linear systems, requires PETSc to be installed with HYPRE
 
 
+/**
+ *  Three options for which type of strain to write
+ *  F = dx/dX, C = F^T F, E = 1/2 (C-I)
+ */
+typedef enum StrainType_
+{
+    DEFORMATION_GRADIENT_F = 0,
+    DEFORMATION_TENSOR_C,
+    LAGRANGE_STRAIN_E
+} StrainType;
+
+
 
 // Bizarrely PETSc 2.2 has this, but doesn't put it in the petscksp.h header...
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
@@ -359,13 +371,15 @@ protected:
     ////////////////////////////////////////////
 
     /**
-     * Compute the deformation gradient at the centroid at an element
+     * Compute the strain at the centroid at an element
+     * @param strainType Which strain to compute, should be one of: DEFORMATION_GRADIENT_F, DEFORMATION_TENSOR_C, or LAGRANGE_STRAIN_E
      * @param rElement The element
      * @param rDeformationGradient Reference to a matrix, which will be filled in
      * by this method.
      */
-    void GetElementCentroidDeformationGradient(Element<DIM,DIM>& rElement,
-                                               c_matrix<double,DIM,DIM>& rDeformationGradient);
+    void GetElementCentroidStrain(StrainType strainType,
+                                  Element<DIM,DIM>& rElement,
+                                  c_matrix<double,DIM,DIM>& rDeformationGradient);
 
     /**
      * Add on the active component to the stress (and maybe also to the stress-derivative).
@@ -711,17 +725,19 @@ public:
 
 
     /**
-     * Write the deformation gradients for each element (evaluated at the centroids of each element)
+     * Write the strain for each element (evaluated at the centroids of each element). Which strain
+     * to compute is determined by the first input parameter, and will be either F, C or E.
      * Each line of the output file corresponds to one element: the DIM*DIM matrix will be written
-     * as one line, using the ordering:
+     * as one line, using the following ordering (assuming F is written).
      * F00 F01 F02 F10 F11 F12 F20 F21 F22.
      *
+     * @param strainType Which strain to write, should be one of: DEFORMATION_GRADIENT_F, DEFORMATION_TENSOR_C, or LAGRANGE_STRAIN_E
      * @param fileName The file name stem
      * @param counterToAppend (Optional) number to append in the filename.
      *
      * The final file is [fileName]_[counterToAppend].strain
      */
-    void WriteCurrentDeformationGradients(std::string fileName, int counterToAppend = -1);
+    void WriteCurrentStrains(StrainType strainType, std::string fileName, int counterToAppend = -1);
 
     /**
      * The user may request that the stress for each element (averaged over quadrature point stresses)
@@ -863,7 +879,7 @@ std::vector<c_vector<double,DIM> >& AbstractNonlinearElasticitySolver<DIM>::rGet
 
 
 template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentDeformationGradients(std::string fileName, int counterToAppend)
+void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentStrains(StrainType strainType, std::string fileName, int counterToAppend)
 {
     if (!this->mWriteOutput)
     {
@@ -880,18 +896,18 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentDeformationGradients(st
 
     out_stream p_file = this->mpOutputFileHandler->OpenOutputFile(file_name.str());
 
-    c_matrix<double,DIM,DIM> deformation_gradient;
+    c_matrix<double,DIM,DIM> strain;
 
     for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-        GetElementCentroidDeformationGradient(*iter, deformation_gradient);
+        GetElementCentroidStrain(strainType, *iter, strain);
         for(unsigned i=0; i<DIM; i++)
         {
             for(unsigned j=0; j<DIM; j++)
             {
-                *p_file << deformation_gradient(i,j) << " ";
+                *p_file << strain(i,j) << " ";
             }
         }
         *p_file << "\n";
@@ -1035,8 +1051,9 @@ c_matrix<double,DIM,DIM> AbstractNonlinearElasticitySolver<DIM>::GetAverageStres
 ///////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradient(Element<DIM,DIM>& rElement,
-                                                                                   c_matrix<double,DIM,DIM>& rDeformationGradient)
+void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidStrain(StrainType strainType,
+                                                                      Element<DIM,DIM>& rElement,
+                                                                      c_matrix<double,DIM,DIM>& rStrain)
 {
     static c_matrix<double,DIM,DIM> jacobian;
     static c_matrix<double,DIM,DIM> inverse_jacobian;
@@ -1089,11 +1106,44 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidDeformationGradie
         }
     }
 
+    c_matrix<double,DIM,DIM> deformation_gradient;
+
     for (unsigned i=0; i<DIM; i++)
     {
         for (unsigned M=0; M<DIM; M++)
         {
-            rDeformationGradient(i,M) = (i==M?1:0) + grad_u(i,M);
+            deformation_gradient(i,M) = (i==M?1:0) + grad_u(i,M);
+        }
+    }
+
+    switch(strainType)
+    {
+        case DEFORMATION_GRADIENT_F:
+        {
+            rStrain = deformation_gradient;
+            break;
+        }
+        case DEFORMATION_TENSOR_C:
+        {
+            rStrain = prod(trans(deformation_gradient),deformation_gradient);
+            break;
+        }
+        case LAGRANGE_STRAIN_E:
+        {
+            c_matrix<double,DIM,DIM> C = prod(trans(deformation_gradient),deformation_gradient);
+            for (unsigned M=0; M<DIM; M++)
+            {
+                for (unsigned N=0; N<DIM; N++)
+                {
+                    rStrain(M,N) = 0.5* ( C(M,N)-(M==N?1:0) );
+                }
+            }
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+            break;
         }
     }
 }
@@ -1631,7 +1681,7 @@ double AbstractNonlinearElasticitySolver<DIM>::CalculateResidualNorm()
 {
     double norm;
 
-    //\todo Change to NORM_1 and remove the division by mNumDofs...
+    //\todo Change to NORM_2 and remove the division by mNumDofs...
     VecNorm(this->mResidualVector, NORM_2, &norm);
     return norm/this->mNumDofs;
 }
