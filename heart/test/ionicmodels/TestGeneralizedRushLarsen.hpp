@@ -55,13 +55,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DynamicCellModelLoader.hpp"
 #include "Warnings.hpp"
 
-/* 
-Megan E. Marsh, Raymond J. Spiteri 
-Numerical Simulation Laboratory 
-University of Saskatchewan 
-December 2011 
-Partial support provided by research grants from the National 
-Science and Engineering Research Council (NSERC) of Canada 
+/*
+Megan E. Marsh, Raymond J. Spiteri
+Numerical Simulation Laboratory
+University of Saskatchewan
+December 2011
+Partial support provided by research grants from the National
+Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
@@ -128,6 +128,7 @@ class TestGeneralizedRushLarsen : public CxxTest::TestSuite
 public:
     void TestLuoRudyGeneralizedRushLarsenMethod()
     {
+        EXIT_IF_PARALLEL;
         HeartConfig::Instance()->SetOdeTimeStep(0.01);
         GenerateCells();
 
@@ -233,6 +234,7 @@ public:
 
     void TestLuoRudyGeneralizedRushLarsenMethod2()
     {
+        EXIT_IF_PARALLEL;
         HeartConfig::Instance()->SetOdeTimeStep(0.01);
         GenerateCells2();
 
