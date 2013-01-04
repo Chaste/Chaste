@@ -159,7 +159,7 @@ def coverage_ignore(src_file):
                 code = False
             elif line.find('#undef COVERAGE_IGNORE') != -1:
                 code = True
-        if code and (line.startswith('template') or line.startswith('class ')):
+            if code and (line.startswith('template') or line.startswith('class ')):
                 ignore = False
                 break
         fp.close()

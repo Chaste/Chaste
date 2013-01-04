@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Look at  testoutput/$HOSTNAME.BUILD_TYPE/Semaphores...
 # 
 # There are 16 semaphores open, owned by 1 users:
-#    chaste (16)
+#	chaste (16)
 # etc.
 # On the relevant machine and with the relevant user:
 # ~/mpi/sbin/cleanipcs
@@ -69,7 +69,7 @@ for entry in semaphore_data:
 # Let the test summary script know
 print "There are", total_open,"semaphores open, owned by",len(semaphore_data), "users:"
 for name in names:
-    print "    ", name
+    print "\t", name
 print "The next line is for the benefit of the test summary scripts."
 if total_open > semaphore_limit:
     print "Failed",total_open,"of",total_open,"tests"
