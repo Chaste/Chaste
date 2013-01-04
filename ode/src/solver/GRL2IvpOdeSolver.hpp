@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* 
-Megan E. Marsh, Raymond J. Spiteri 
-Numerical Simulation Laboratory 
-University of Saskatchewan 
-December 2011 
-Partial support provided by research grants from the National 
-Science and Engineering Research Council (NSERC) of Canada 
+/*
+Megan E. Marsh, Raymond J. Spiteri
+Numerical Simulation Laboratory
+University of Saskatchewan
+December 2011
+Partial support provided by research grants from the National
+Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
@@ -52,8 +52,8 @@ and the MITACS/Mprime Canadian Network of Centres of Excellence.
 
 /**
  * A concrete one step ODE solver class that employs the GRL2 second-order solver.
- * Method is described in J. Sundnes, R. Artebrant, O. Skavhaug, and A. Tveito. 
- * A second-order algorithm for solving dynamic cell membrane equations. 
+ * Method is described in J. Sundnes, R. Artebrant, O. Skavhaug, and A. Tveito.
+ * A second-order algorithm for solving dynamic cell membrane equations.
  * IEEE Trans. Biomed. Eng., 56(10):2546-2548, 2009.
  */
 class GRL2IvpOdeSolver : public AbstractOneStepIvpOdeSolver
@@ -74,8 +74,6 @@ private:
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<AbstractOneStepIvpOdeSolver>(*this);
     }
-    
-    static const double delta=1.0E-8;
 
 protected:
 

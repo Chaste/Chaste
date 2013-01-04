@@ -42,19 +42,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCell.hpp"
 #include "PetscTools.hpp"
 
-/* 
-Megan E. Marsh, Raymond J. Spiteri 
-Numerical Simulation Laboratory 
-University of Saskatchewan 
-December 2011 
-Partial support provided by research grants from the National 
-Science and Engineering Research Council (NSERC) of Canada 
+/*
+Megan E. Marsh, Raymond J. Spiteri
+Numerical Simulation Laboratory
+University of Saskatchewan
+December 2011
+Partial support provided by research grants from the National
+Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
 /**
  * This is the base class for cardiac cells solved using the GRL methods (GRL1 and GRL2).
- * Modified from AbstractRushLarsenCardiacCell.hpp 
+ * Modified from AbstractRushLarsenCardiacCell.hpp
  */
 class AbstractGeneralizedRushLarsenCardiacCell : public AbstractCardiacCell
 {
@@ -89,16 +89,16 @@ public:
      *      to revisit this design decision at a later date.
      */
     AbstractGeneralizedRushLarsenCardiacCell(
-        unsigned numberOfStateVariables,
-        unsigned voltageIndex,
-        boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+            unsigned numberOfStateVariables,
+            unsigned voltageIndex,
+            boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /** Virtual destructor */
     virtual ~AbstractGeneralizedRushLarsenCardiacCell();
 
     /**
      * Simulates this cell's behaviour between the time interval [tStart, tEnd],
-     * with timestep #mDt. 
+     * with timestep #mDt.
      *
      * The length of the time interval must be a multiple of the timestep.
      *
@@ -139,7 +139,7 @@ private:
      * @param rY
      * @param rDY
      */
-    void EvaluateYDerivatives(double time, const std::vector<double> &rY, std::vector<double> &rDY)
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY)
     {
         NEVER_REACHED;
     }
@@ -147,20 +147,20 @@ private:
 
 protected:
     /**
-     * Update the values of all variables using a GRL method.
+     * Update the values of all variables except the transmembrane potential using a GRL method.
      *
-     * \note This method must be provided by subclasses.
-     *
-     * @param rDY  vector containing dy/dt values
+     * @param time  the current simulation time
+     * @param rDY  unused vector containing dy/dt values
      */
-    virtual void ComputeOneStepExceptVoltage(double var_chaste_interface__environment__time, const std::vector<double> &rDY)=0;
+    virtual void ComputeOneStepExceptVoltage(double time, const std::vector<double>& rDY)=0;
 
     /**
      * Perform a forward Euler step to update the transmembrane potential.
      *
-     * @param rDY  vector containing dy/dt values
+     * @param time  the current simulation time
+     * @param rDY  unused vector containing dy/dt values
      */
-    virtual void UpdateTransmembranePotential(double var_chaste_interface__environment__time,const std::vector<double> &rDY)=0;
+    virtual void UpdateTransmembranePotential(double time, const std::vector<double>& rDY)=0;
 };
 
 CLASS_IS_ABSTRACT(AbstractGeneralizedRushLarsenCardiacCell)

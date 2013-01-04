@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* 
-Megan E. Marsh, Raymond J. Spiteri 
-Numerical Simulation Laboratory 
-University of Saskatchewan 
-December 2011 
-Partial support provided by research grants from the National 
-Science and Engineering Research Council (NSERC) of Canada 
+/*
+Megan E. Marsh, Raymond J. Spiteri
+Numerical Simulation Laboratory
+University of Saskatchewan
+December 2011
+Partial support provided by research grants from the National
+Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 
@@ -58,9 +58,10 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
      * Calculates a vector containing the next Y value from the current one for each
      * equation in the system.
      */
+    const double delta = 1.0e-8; // The step for numerical jacobian calculation
 
     const unsigned num_equations = pAbstractOdeSystem->GetNumberOfStateVariables();
-    std::vector<double> evalF(num_equations);
+    std::vector<double> evalF(num_equations); ///\todo #1992 make members for efficiency?
     std::vector<double> partialF(num_equations);
     std::vector<double> temp(num_equations);
     std::vector<double> yinit(num_equations);
@@ -81,7 +82,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     // Midpoint
     for (unsigned i=0; i<num_equations; i++)
     {
-      if(fabs(partialF[i])<delta)
+      if (fabs(partialF[i])<delta)
       {
           rNextYValues[i]=rNextYValues[i]+0.5*evalF[i]*timeStep;
       }
@@ -91,7 +92,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
       }
     }
     //Second half of the method
-    for(unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; i++)
     {
       ysave = rNextYValues[i];
       rNextYValues[i]=yinit[i];
@@ -107,7 +108,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     //Final step update
     for (unsigned i=0; i<num_equations; i++)
     {
-      if(fabs(partialF[i])<delta)
+      if (fabs(partialF[i])<delta)
       {
           rNextYValues[i]=yinit[i]+evalF[i]*timeStep;
       }

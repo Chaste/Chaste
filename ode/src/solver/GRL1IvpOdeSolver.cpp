@@ -33,33 +33,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* 
-Megan E. Marsh, Raymond J. Spiteri 
-Numerical Simulation Laboratory 
-University of Saskatchewan 
-December 2011 
-Partial support provided by research grants from the National 
-Science and Engineering Research Council (NSERC) of Canada 
+/*
+Megan E. Marsh, Raymond J. Spiteri
+Numerical Simulation Laboratory
+University of Saskatchewan
+December 2011
+Partial support provided by research grants from the National
+Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 #include <cmath>
 #include "GRL1IvpOdeSolver.hpp"
 
 void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem,
-                                                  double timeStep,
-                                                  double time,
-                                                  std::vector<double>& rCurrentYValues,
-                                                  std::vector<double>& rNextYValues)
+                                           double timeStep,
+                                           double time,
+                                           std::vector<double>& rCurrentYValues,
+                                           std::vector<double>& rNextYValues)
 {
     /*
      * Apply GRL1 first-order method for each time step in AbstractOneStepIvpSolver.
      * Calculates a vector containing the next Y value from the current one for each
      * equation in the system.
      */
+    const double delta = 1.0e-8; // The step for numerical jacobian calculation
 
     const unsigned num_equations = pAbstractOdeSystem->GetNumberOfStateVariables();
 
-    std::vector<double> evalF(num_equations);
+    std::vector<double> evalF(num_equations); ///\todo #1992 make members for efficiency?
     std::vector<double> partialF(num_equations);
     std::vector<double> temp(num_equations);
     double tempY;
