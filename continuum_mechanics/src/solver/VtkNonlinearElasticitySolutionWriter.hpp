@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshWriter.hpp"
 
 
-#ifdef CHASTE_VTK
 
 
 /**
@@ -98,6 +97,7 @@ public:
             EXCEPTION("No output directory was given to the mechanics solver");
         }
 
+#ifdef CHASTE_VTK
         VtkMeshWriter<DIM, DIM> mesh_writer(mpSolver->mOutputDirectory + "/vtk", "solution", true);
 
         // write the displacement
@@ -177,11 +177,11 @@ public:
 
         // final write
         mesh_writer.WriteFilesUsingMesh(mpSolver->mrQuadMesh);
+#endif // CHASTE_VTK
     }
 };
 
 
-#endif // CHASTE_VTK
 
 #endif // VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
 

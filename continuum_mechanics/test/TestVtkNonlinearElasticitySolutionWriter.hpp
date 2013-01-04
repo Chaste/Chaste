@@ -56,6 +56,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestVtkNonlinearElasticitySolutionWriter : public CxxTest::TestSuite
 {
 public:
+    void TestException()
+    {
+        QuadraticMesh<3> mesh(1.0, 1.0, 1.0, 1.0);
+
+        // set up a solver object
+        MooneyRivlinMaterialLaw<3> law(1.0, 0.0);
+        std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<3>::GetNodesByComponentValue(mesh, 0, 0.0);
+        SolidMechanicsProblemDefinition<3> problem_defn(mesh);
+        problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        IncompressibleNonlinearElasticitySolver<3> solver(mesh,problem_defn,"");
+
+        VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
+        TS_ASSERT_THROWS_THIS(vtk_writer.Write(),"No output directory was given to the mechanics solver");
+    }
+
     void TestVtuFile() throw(Exception)
     {
         for(unsigned run=0; run<3; run++)

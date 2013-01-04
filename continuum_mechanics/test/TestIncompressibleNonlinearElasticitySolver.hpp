@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
 #include "NumericFileComparison.hpp"
+#include "VtkNonlinearElasticitySolutionWriter.hpp"
 
 double MATERIAL_PARAM = 1.0;
 double ALPHA = 0.2;
@@ -798,8 +799,9 @@ public:
             // check CreateCmguiOutput() - call and check output files were written.
             solver.CreateCmguiOutput();
 
-            // check CreateVtkOutput() - call and later check that output files were written
-            solver.CreateVtkOutput("Displacement");
+            // Create .vtu file
+            VtkNonlinearElasticitySolutionWriter<2> vtk_writer(solver);
+            vtk_writer.Write();
 
             std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
@@ -1400,12 +1402,15 @@ public:
                                                          problem_defn,
                                                          "TestIncompressibleNonlinearElasticitySolver");
        solver.Solve();
-       solver.CreateVtkOutput("Displacement");
+
+       // Create .vtu file
+       VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
+       vtk_writer.Write();
 
 #ifdef CHASTE_VTK
-        //Check the VTK file exists
-        FileFinder vtk_file("nonlin_elas_functional_data/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
-        TS_ASSERT(vtk_file.Exists());
+       //Check the VTK file exists
+       FileFinder vtk_file("nonlin_elas_functional_data/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
+       TS_ASSERT(vtk_file.Exists());
 #endif
     }
 

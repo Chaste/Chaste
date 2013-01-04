@@ -340,6 +340,9 @@ public:
     /**
      * Convert the output to vtk format (placed in a folder called vtk in the output directory).
      * @param spatialSolutionName is used to identify the spatial solution as a velocity, displacement...
+     *
+     * ** TO BE DEPRECATED - see #2321 **
+     *
      */
     void CreateVtkOutput(std::string spatialSolutionName="Spatial solution");
 
@@ -532,6 +535,8 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
     }
     PetscTools::Barrier("WritePressure");
 }
+
+
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
 {
@@ -542,6 +547,7 @@ void AbstractContinuumMechanicsSolver<DIM>::SetWriteOutput(bool writeOutput)
     mWriteOutput = writeOutput;
 }
 
+// ** TO BE DEPRECATED - see #2321 **
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialSolutionName)
 {
