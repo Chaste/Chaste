@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "NodeBasedCellPopulation.hpp"
 #include "VtkMeshWriter.hpp"
+#include "MathsCustomFunctions.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -212,7 +213,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     for (unsigned i=0; i<DIM; i++)
     {
         domain_size(2*i) = mMinSpatialPositions(i);
-        domain_size(2*i+1) = mMaxSpatialPositions(i);
+        domain_size(2*i+1) = mMaxSpatialPositions(i) + 1e-14;   // Add fudge because boxes are open at max end.
     }
 
     if (mMechanicsCutOffLength == DBL_MAX)
@@ -228,6 +229,15 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      * and putting nodes into boxes.
      */
 
+    // Make the domain_size divisible by the cut off length.
+    for (unsigned i=0; i<DIM; i++)
+    {
+        double difference = mMechanicsCutOffLength * (ceil((domain_size(2*i+1) - domain_size(2*i))/mMechanicsCutOffLength) - (domain_size(2*i+1) - domain_size(2*i))/mMechanicsCutOffLength);
+        domain_size(2*i) -= difference / 2.0;
+        domain_size(2*i+1) += difference / 2.0;
+
+        assert(Divides(mMechanicsCutOffLength, domain_size(2*i+1) - domain_size(2*i)));
+    }
     mpNodesOnlyMesh->SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
 
     mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
@@ -293,7 +303,7 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 }
 
 template<unsigned DIM>
-BoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
+DistributedBoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
 {
     return mpNodesOnlyMesh->GetBoxCollection();
 }

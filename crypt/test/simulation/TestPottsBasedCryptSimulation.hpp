@@ -68,6 +68,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestPottsBasedCryptSimulation : public AbstractCellBasedTestSuite
 {
 private:

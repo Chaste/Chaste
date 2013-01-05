@@ -87,6 +87,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 /* The next header file defines a boundary condition to be used in the third test.*/
 #include "SphereGeometryBoundaryCondition.hpp"
+/* This header sets up Petsc, used in `NodeBasedCellPopulation`. */
+#include "PetscSetupAndFinalize.hpp"
 /* Next, we define the test class. This time we inherit from {{{AbstractCellBasedTestSuite}}} rather than {{{CxxTest::TestSuite}}}.
  * When using this class the singleton objects are set up and destroyed for us:
  * {{{SimulationTime}}} is initialised to zero at the beginning of the test and destroyed at the end of the test;

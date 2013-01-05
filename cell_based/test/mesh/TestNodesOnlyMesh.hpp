@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshWriter.hpp"
 #include "ArchiveOpener.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestNodesOnlyMesh : public CxxTest::TestSuite
 {
 public:

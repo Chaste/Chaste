@@ -75,6 +75,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestVolumeTrackedOffLatticeSimulation : public AbstractCellBasedTestSuite
 {
 public:

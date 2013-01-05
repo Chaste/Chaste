@@ -59,6 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestNodeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -149,8 +151,8 @@ public:
         c_vector<double, 4> domainSize;
         for (unsigned i=0; i< 2 ;i++)
         {
-            domainSize[2*i] = -10.0;
-            domainSize[2*i+1] = 10.0;
+            domainSize[2*i] = -10.2;
+            domainSize[2*i+1] = 10.2;
         }
         node_based_cell_population.SplitUpIntoBoxes(1.2, domainSize);
 

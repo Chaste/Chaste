@@ -87,7 +87,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "TransitCellProliferativeType.hpp"
-
+/* This header sets up Petsc, used in `NodeBasedCellPopulation`. */
+#include "PetscSetupAndFinalize.hpp"
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods.
