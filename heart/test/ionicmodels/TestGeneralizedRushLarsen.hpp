@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include "CheckpointArchiveTypes.hpp" // Needed to avoid memory error on Boost 1.34
+
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991Opt.hpp"
 #include "AbstractGeneralizedRushLarsenCardiacCell.hpp" // Needed for chaste_libs=0 build

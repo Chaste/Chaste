@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <sstream>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
+
 #include "HeunIvpOdeSolver.hpp"
 #include "Ode1.hpp"
 #include "Ode2.hpp"
@@ -52,10 +52,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSecondOrderWithEvents.hpp"
 #include "OdeThirdOrder.hpp"
 #include "ParameterisedOde.hpp"
-#include "PetscTools.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "OutputFileHandler.hpp"
 #include "ArchiveLocationInfo.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestHeun2IvpOdeSolver : public CxxTest::TestSuite
 {
