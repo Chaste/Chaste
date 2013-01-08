@@ -160,6 +160,7 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes);
 
+        // These resuls will change when the nodes are distributed.
         if(PetscTools::IsSequential())
         {
             TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 4u);
@@ -179,15 +180,15 @@ public:
         {
             if(PetscTools::GetMyRank() == 0)
             {
-                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 0u);
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 12u);
             }
             else if(PetscTools::GetMyRank() == 1)
             {
-                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 7u);
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 13u);
             }
             else if(PetscTools::GetMyRank() == 2)
             {
-                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 8u);
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 14u);
             }
         }
 
