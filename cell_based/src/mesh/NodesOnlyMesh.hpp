@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
-#include "DistributedBoxCollection.hpp"
+#include "BoxCollection.hpp"
 #include "MutableMesh.hpp"
 
 /**
@@ -55,7 +55,7 @@ protected:
      * A pointer to a box collection. Used to calculate neighbourhood information
      * for nodes in the mesh.
      */
-    DistributedBoxCollection<SPACE_DIM>* mpBoxCollection;
+    BoxCollection<SPACE_DIM>* mpBoxCollection;
 
 private:
 
@@ -229,7 +229,7 @@ public:
      *
      * @return mpBoxCollection
      */
-    DistributedBoxCollection<SPACE_DIM>* GetBoxCollection();
+    BoxCollection<SPACE_DIM>* GetBoxCollection();
 
     /**
      * Clear the BoxCollection

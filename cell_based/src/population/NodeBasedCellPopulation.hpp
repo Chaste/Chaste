@@ -247,7 +247,7 @@ public:
     /**
      * @return pointer to a node box collection.
      */
-    DistributedBoxCollection<DIM>* GetBoxCollection();
+    BoxCollection<DIM>* GetBoxCollection();
 
     /**
      * Overridden rGetNodePairs method

@@ -101,10 +101,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "DeltaNotchOffLatticeSimulation.hpp"
 
-
-/* This header sets up Petsc, used in `NodeBasedCellPopulation`. */
-#include "PetscSetupAndFinalize.hpp"
-
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
 class TestRunningDeltaNotchSimulationsTutorial : public AbstractCellBasedTestSuite

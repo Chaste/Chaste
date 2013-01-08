@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include "NodesOnlyMesh.hpp"
-#include "MathsCustomFunctions.hpp"
 
 template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
@@ -91,23 +90,12 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 //        min_max_locations[2*SPACE_DIM-2] -= (min_width - width + 0.1)/2.0;
 //    }
 
-    // Add domain padding to allow for node movement, and ensure domain width is divisible by box width.
+    // Add domain padding to allow for node movement.
     for (unsigned d=0; d<SPACE_DIM; d++)
     {
         min_max_location[2*d] -= domainPadding;
         min_max_location[2*d+1] += domainPadding;
-
-        double width = min_max_location[2*d+1] - min_max_location[2*d];
-        if (!Divides(mMaximumInteractionDistance, width))
-        {
-            double difference = mMaximumInteractionDistance*(ceil(width/mMaximumInteractionDistance) - (width/mMaximumInteractionDistance));
-            min_max_location[2*d] -= difference/2.0;
-            min_max_location[2*d+1] += difference/2.0;
-        }
     }
-
-    // Set up initial box collection
-    mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(mMaximumInteractionDistance, min_max_location);
 
     for (unsigned i=0; i<rNodes.size(); i++)
     {
@@ -226,7 +214,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
 }
 
 template<unsigned SPACE_DIM>
-DistributedBoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
+BoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
 {
     return mpBoxCollection;
 }
@@ -244,7 +232,7 @@ void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
 {
-    mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize);
+    mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
     mpBoxCollection->SetupLocalBoxesHalfOnly();
 
     //Put the nodes in the boxes.

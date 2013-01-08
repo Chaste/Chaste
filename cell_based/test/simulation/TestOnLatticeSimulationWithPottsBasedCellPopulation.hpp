@@ -61,8 +61,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
-
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:

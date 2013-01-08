@@ -78,10 +78,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The next header defines a base class for cell properties. Our new
  * cell property will inherit from this abstract class. */
 #include "AbstractCellProperty.hpp"
-
-/* This header sets up Petsc, used in `NodeBasedCellPopulation`. */
-#include "PetscSetupAndFinalize.hpp"
-
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based
  * Chaste tutorials. */

@@ -54,8 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
-
 class TestOffLatticeSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
 private:

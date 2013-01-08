@@ -49,8 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
-
 
 class TestVertexCryptBoundaryForce : public AbstractCellBasedTestSuite
 {

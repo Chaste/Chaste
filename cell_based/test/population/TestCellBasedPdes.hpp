@@ -55,7 +55,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
 /**
  * This test suite covers any PDE classes defined in cell_based/src/population/pdes.
  */

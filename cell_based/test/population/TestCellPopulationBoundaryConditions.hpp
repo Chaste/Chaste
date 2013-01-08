@@ -59,8 +59,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveLocationInfo.hpp"
 #include "FileComparison.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
-
 /**
  * This class contains tests for methods on classes inheriting from AbstractCellPopulationBoundaryCondition.
  */

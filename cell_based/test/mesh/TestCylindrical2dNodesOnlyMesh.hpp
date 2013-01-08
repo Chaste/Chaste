@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dNodesOnlyMesh.hpp"
 #include "ArchiveOpener.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
-
 class TestCylindrical2dNodesOnlyMesh : public CxxTest::TestSuite
 {
 public:
