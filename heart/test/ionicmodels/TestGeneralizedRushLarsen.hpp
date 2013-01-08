@@ -176,17 +176,24 @@ public:
         //Compare LuoRudy solution with general GRL1 solver solution (should match)
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         boost::shared_ptr<ZeroStimulus> p_stimulus_zero(new ZeroStimulus());
-        mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         mpGeneralizedRushLarsenCell->SetStimulusFunction(p_stimulus_zero);
         mpGeneralizedRushLarsenCell->SetTimestep(1e-3);
         mpGeneralizedRushLarsenCell->SetVoltage(-30);
         OdeSolution solutions_GRL1_stimulated_cell_order1 = mpGeneralizedRushLarsenCell->Compute(0.0, 1e-3);
 
-        boost::shared_ptr<GRL1IvpOdeSolver> p_grl1_solver(new GRL1IvpOdeSolver());
-        CellLuoRudy1991FromCellML reference_model_grl1(p_grl1_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
-
+        // Compare with SolveAndUpdateState for coverage
+        mpGeneralizedRushLarsenCell->ResetToInitialConditions();
+        mpGeneralizedRushLarsenCell->SetVoltage(-30);
+        mpGeneralizedRushLarsenCell->SolveAndUpdateState(0.0, 1e-3);
+        for (unsigned i=0; i<mpGeneralizedRushLarsenCell->GetNumberOfStateVariables(); i++)
+        {
+            TS_ASSERT_DELTA(mpGeneralizedRushLarsenCell->rGetStateVariables()[i],
+                            solutions_GRL1_stimulated_cell_order1.rGetSolutions().back()[i], 1e-12);
+        }
 
         // Compare with general GRL1 method
+        boost::shared_ptr<GRL1IvpOdeSolver> p_grl1_solver(new GRL1IvpOdeSolver());
+        CellLuoRudy1991FromCellML reference_model_grl1(p_grl1_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());
         reference_model_grl1.ResetToInitialConditions();
         reference_model_grl1.SetStimulusFunction(p_stimulus_zero);
         reference_model_grl1.SetTimestep(1e-3);
