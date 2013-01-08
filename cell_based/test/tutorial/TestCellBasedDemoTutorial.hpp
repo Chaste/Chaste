@@ -98,6 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TysonNovakCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
+#include "PetscSetupAndFinalize.hpp"
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods. We are using {{{AbstractCellBasedTestSuite}}} instead of {{{CxxTest::TestSuite}}} as this
