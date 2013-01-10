@@ -160,8 +160,11 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
     {
         directory_root.SetPath(chaste_test_output, RelativeTo::AbsoluteOrCwd);
     }
-
-    return directory_root.GetAbsolutePath();
+    // Note that FileFinder::GetAbsolutePath adds a trailing slash, but only
+    // if the directory exists at the time of the call 
+    std::string chaste_test_output_directory = directory_root.GetAbsolutePath();
+    AddTrailingSlash(chaste_test_output_directory);
+    return chaste_test_output_directory;
 }
 
 std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& rDirectory) const

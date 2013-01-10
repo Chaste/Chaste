@@ -121,7 +121,10 @@ void ExecutableSupport::ShowParallelLaunching()
 
 void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 {
-    if (!mOutputDirectory.IsPathSet()) mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    if (!mOutputDirectory.IsPathSet())
+    {
+        mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     std::stringstream file_name;
     file_name << fileBaseName << "_" << PetscTools::GetMyRank() << ".txt";
@@ -169,7 +172,10 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 
 void ExecutableSupport::WriteProvenanceInfoFile()
 {
-    if (!mOutputDirectory.IsPathSet()) mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    if (!mOutputDirectory.IsPathSet())
+    {
+        mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("provenance_info_", PetscTools::GetMyRank(), ".txt");
 
@@ -275,7 +281,10 @@ void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
     }
 
     // Write the error message to file
-    if (!mOutputDirectory.IsPathSet()) mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    if (!mOutputDirectory.IsPathSet())
+    {
+        mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+    }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("chaste_errors_", PetscTools::GetMyRank(), ".txt", std::ios::out | std::ios::app);
     *out_file << rMessage << std::endl;

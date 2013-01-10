@@ -131,6 +131,7 @@ public:
             // Check this folder is not present
             FileFinder test_folder("testoutput/whatever", RelativeTo::ChasteSourceRoot);
             TS_ASSERT(!test_folder.Exists());
+            
             PetscTools::Barrier("TestOutputFileHandler-2");
 
             // Make a folder and erase it - NB only master can erase files and check it is successful!
@@ -142,7 +143,15 @@ public:
                 test_folder.Remove();
             }
         }
-
+        
+        {
+            setenv("CHASTE_TEST_OUTPUT", "config__cyborg__T800__cooper", 1/*Overwrite*/);
+            // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
+            // a class object is instantiated and when the directory does not exist
+            const std::string no_handler_test_path(OutputFileHandler::GetChasteTestOutputDirectory());
+            TS_ASSERT_EQUALS( *(no_handler_test_path.end()-1), '/');
+        }
+        
         {
             // Check this folder is not present
             std::string test_folder("somewhere_without_trailing_forward_slash");
