@@ -148,8 +148,8 @@ public:
             setenv("CHASTE_TEST_OUTPUT", "config__cyborg__T800__cooper", 1/*Overwrite*/);
             // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
             // a class object is instantiated and when the directory does not exist
-            const std::string no_handler_test_path(OutputFileHandler::GetChasteTestOutputDirectory());
-            TS_ASSERT_EQUALS( *(no_handler_test_path.end()-1), '/');
+            const std::string nonexistent_test_path(OutputFileHandler::GetChasteTestOutputDirectory());
+            TS_ASSERT_EQUALS( *(nonexistent_test_path.end()-1), '/');
         }
         
         {
