@@ -55,11 +55,21 @@ public:
 
     void TestHandler() throw(Exception)
     {
+
+        // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
+        // a class object is instantiated
+        // Fails when the directory does not exist
+        const std::string no_handler_test_path(OutputFileHandler::GetChasteTestOutputDirectory());
+        TS_ASSERT_EQUALS( *(no_handler_test_path.end()-1), '/');
+
         // Make a handler that points straight to the CHASTE_TEST_OUTPUT directory.
         OutputFileHandler handler("");
         const std::string handler_path(handler.GetOutputDirectoryFullPath());
         TS_ASSERT(handler_path.length() > 0);
         TS_ASSERT_EQUALS(handler_path, handler.GetChasteTestOutputDirectory());
+        
+        // Test that CHASTE_TEST_OUTPUT always has a trailing slash
+        TS_ASSERT_EQUALS( *(handler_path.end()-1), '/');
 
         // Make a handler that points to a sub-directory.
         std::string dir = "testhandler";
