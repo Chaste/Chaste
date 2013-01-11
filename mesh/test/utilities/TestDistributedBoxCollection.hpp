@@ -166,8 +166,8 @@ private:
 
         DistributedVector* p_dist_vector = new DistributedVector(petsc_vec, &factory);
 
-        unsigned min_row_index = (*p_dist_vector)[lo];
-        unsigned max_row_index = (*p_dist_vector)[hi-1];
+        unsigned min_row_index = (unsigned)(*p_dist_vector)[lo];
+        unsigned max_row_index = (unsigned)(*p_dist_vector)[hi-1];
 
         // Work out how many halos there should be. # boundary processes * 3^(DIM-1)
         unsigned num_boundary_processes = 2-(unsigned)(PetscTools::AmMaster()) - (unsigned)(PetscTools::AmTopMost());
@@ -1798,7 +1798,6 @@ public:
          FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
          std::string archive_file = "box_collection.arch";
          unsigned num_boxes = 0;
-         c_vector<double, 2*3> domain_size;
 
          {
              double cut_off_length = 1.6;

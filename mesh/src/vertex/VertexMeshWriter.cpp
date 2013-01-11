@@ -169,7 +169,7 @@ VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFa
     }
 
     // Set attribute
-    elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
+    elem_data.AttributeValue = (unsigned)(*(mpIters->pElemIter))->GetAttribute();
     ++(*(mpIters->pElemIter));
 
     return elem_data;

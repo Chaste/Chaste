@@ -968,11 +968,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
     std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
 
     // Form the set union
-    std::set<unsigned> all_indices, temp_set;
+    std::set<unsigned> all_indices, temp_union_set;
     std::set_union(nodeA_elem_indices.begin(), nodeA_elem_indices.end(),
                    nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
-                   std::inserter(temp_set, temp_set.begin()));
-    all_indices.swap(temp_set); // temp_set will be deleted
+                   std::inserter(temp_union_set, temp_union_set.begin()));
+    all_indices.swap(temp_union_set); // temp_set will be deleted
 
     if ((nodeA_elem_indices.size()>3) || (nodeB_elem_indices.size()>3))
     {
@@ -2484,4 +2484,4 @@ template class MutableVertexMesh<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(MutableVertexMesh);
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(MutableVertexMesh)

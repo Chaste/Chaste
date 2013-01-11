@@ -876,7 +876,7 @@ void VertexMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshRead
         if (rMeshReader.GetNumElementAttributes() > 0)
         {
             assert(rMeshReader.GetNumElementAttributes() == 1);
-            unsigned attribute_value = element_data.AttributeValue;
+            unsigned attribute_value = (unsigned) element_data.AttributeValue;
             p_element->SetAttribute(attribute_value);
         }
     }
@@ -942,7 +942,7 @@ void VertexMesh<3,3>::ConstructFromMeshReader(AbstractMeshReader<3,3>& rMeshRead
             ElementData face_data = element_data.Faces[i];
 
             // Get the face index
-            unsigned face_index = face_data.AttributeValue;
+            unsigned face_index = (unsigned) face_data.AttributeValue;
 
             // Get the nodes owned by this face
             std::vector<Node<3>*> nodes_in_face;

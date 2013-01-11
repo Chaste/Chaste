@@ -79,7 +79,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
 
     for (unsigned i=0; i<DIM; i++)
     {
-        mNumBoxesEachDirection(i) = floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge);
+        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge);
         num_boxes *= mNumBoxesEachDirection(i);
         coefficients.push_back(coefficients[i]*mNumBoxesEachDirection(i));
     }
@@ -144,9 +144,9 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
                 box_coords[2*d+1] = (double)domainSize[2*d]+mBoxWidth*(1+counters[d]);
                 box_indices[d] = counters[d];
             }
-            box_coords[2*DIM-2]=(double)domainSize[2*DIM-2]+mBoxWidth*(*mpDistributedBoxStacks)[stack_index];
-            box_coords[2*DIM-1]=(double)domainSize[2*DIM-2]+mBoxWidth*((*mpDistributedBoxStacks)[stack_index]+1);
-            box_indices[DIM-1] = (*mpDistributedBoxStacks)[stack_index];
+            box_coords[2*DIM-2]=domainSize[2*DIM-2]+mBoxWidth*(*mpDistributedBoxStacks)[stack_index];
+            box_coords[2*DIM-1]=domainSize[2*DIM-2]+mBoxWidth*((*mpDistributedBoxStacks)[stack_index]+1);
+            box_indices[DIM-1] = (unsigned)(*mpDistributedBoxStacks)[stack_index];
 
             Box<DIM> new_box(box_coords);
             mBoxes.push_back(new_box);

@@ -1007,7 +1007,7 @@ public:
 
     void TestArchiving() throw(Exception)
     {
-        FileFinder archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
+        FileFinder main_archive_dir("distributed_tetrahedral_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "distributed_tetrahedral_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("distributed_tetrahedral_mesh");
 
@@ -1028,7 +1028,7 @@ public:
 
             halo_nodes = p_mesh->mHaloNodes;
 
-            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(main_archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             AbstractTetrahedralMesh<2,2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2,2>* >(p_mesh);
@@ -1042,7 +1042,7 @@ public:
             AbstractTetrahedralMesh<2,2>* p_mesh_abstract2;
 
             // Create an input archive
-            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(main_archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // restore from the archive

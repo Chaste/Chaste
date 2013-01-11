@@ -66,7 +66,7 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
 
     for (unsigned i=0; i<DIM; i++)
     {
-        mNumBoxesEachDirection(i) = floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge) + 1;
+        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge) + 1;
         num_boxes *= mNumBoxesEachDirection(i);
         coefficients.push_back(coefficients[i]*mNumBoxesEachDirection(i));
     }

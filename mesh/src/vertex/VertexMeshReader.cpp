@@ -209,9 +209,9 @@ VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWi
     buffer_stream >> num_nodes_in_element;
 
     // Store node indices owned by this element
-    unsigned node_index;
     for (unsigned i=0; i<num_nodes_in_element; i++)
     {
+        unsigned node_index;
         buffer_stream >> node_index;
         element_data.NodeIndices.push_back(node_index - offset);
     }
@@ -236,11 +236,11 @@ VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWi
         buffer_stream >> num_nodes_in_face;
 
         // Store node indices owned by this face
-        unsigned node_index;
         for (unsigned i=0; i<num_nodes_in_face; i++)
         {
-            buffer_stream >> node_index;
-            face_data.NodeIndices.push_back(node_index - offset);
+            unsigned node_index_face;
+            buffer_stream >> node_index_face;
+            face_data.NodeIndices.push_back(node_index_face - offset);
         }
 
         ///\todo Store face orientations? (#1076/#1377)

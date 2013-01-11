@@ -232,11 +232,11 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
 
     // Iterate through nodes
     /// \todo #1322 use a const version of NodeIterator here
-    for (unsigned i=0; i<mNodes.size(); i++)
+    for (unsigned index=0; index<mNodes.size(); index++)
     {
-        if (!mNodes[i]->IsDeleted())
+        if (!mNodes[index]->IsDeleted())
         {
-            c_vector<double, SPACE_DIM> position  = mNodes[i]->rGetLocation();
+            c_vector<double, SPACE_DIM> position  = mNodes[index]->rGetLocation();
 
             // Update max/min
             for (unsigned i=0; i<SPACE_DIM; i++)

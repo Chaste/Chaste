@@ -95,7 +95,6 @@ AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralElement(u
     {
         //This is not a full-dimensional element
         c_vector<double, SPACE_DIM> weighted_direction;
-        double det;
         CalculateWeightedDirection(weighted_direction, det);
     }
 

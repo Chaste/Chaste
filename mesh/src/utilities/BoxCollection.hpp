@@ -67,7 +67,7 @@ private:
     std::vector< std::set<unsigned> > mLocalBoxes;
 
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
-    const static double mFudge = 5e-14;
+    static const double mFudge = 5e-14;
 
     /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
     bool mIsPeriodicInX;

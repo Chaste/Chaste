@@ -412,7 +412,7 @@ public:
     void TestArchiving() throw(Exception)
     {
         OutputFileHandler archive_dir_("mixed_mesh_archive"); // Clear folder
-        FileFinder archive_dir("mixed_mesh_archive", RelativeTo::ChasteTestOutput);
+        FileFinder main_archive_dir("mixed_mesh_archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mixed_dimension_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("mixed_dimension_mesh");
 
@@ -433,14 +433,14 @@ public:
             num_cable_elements = p_mesh->GetNumCableElements();
             num_local_cable_elements = p_mesh->GetNumLocalCableElements();
 
-            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(main_archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             AbstractTetrahedralMesh<2,2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2,2>* >(p_mesh);
             (*p_arch) << p_mesh_abstract;
         }
 
-        FileFinder ncl_file("mixed_dimension_mesh.ncl", archive_dir);
+        FileFinder ncl_file("mixed_dimension_mesh.ncl", main_archive_dir);
         TS_ASSERT(ncl_file.Exists());
 
         // restore
@@ -450,7 +450,7 @@ public:
             AbstractTetrahedralMesh<2,2>* p_mesh_abstract2;
 
             // Create an input archive
-            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(main_archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // restore from the archive

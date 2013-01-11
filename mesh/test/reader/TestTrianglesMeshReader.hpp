@@ -101,11 +101,11 @@ public:
 
         TS_ASSERT_EQUALS( mesh_reader.GetNumElements(), 984u);
 
-        ElementData data = mesh_reader.GetNextElementData();
-        TS_ASSERT_EQUALS(data.NodeIndices.size(), 3u);
-        TS_ASSERT_EQUALS(data.NodeIndices[0], 309u);
-        TS_ASSERT_EQUALS(data.NodeIndices[1], 144u);
-        TS_ASSERT_EQUALS(data.NodeIndices[2], 310u);
+        ElementData data1 = mesh_reader.GetNextElementData();
+        TS_ASSERT_EQUALS(data1.NodeIndices.size(), 3u);
+        TS_ASSERT_EQUALS(data1.NodeIndices[0], 309u);
+        TS_ASSERT_EQUALS(data1.NodeIndices[1], 144u);
+        TS_ASSERT_EQUALS(data1.NodeIndices[2], 310u);
         TS_ASSERT_EQUALS( mesh_reader.GetNumElementAttributes(), 0u);
 
         for (unsigned i=1; i<mesh_reader.GetNumElements(); i++)

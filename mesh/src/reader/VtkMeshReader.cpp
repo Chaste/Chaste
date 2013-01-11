@@ -157,8 +157,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         if (mNumCableElements > 0)
         {
             //The boundary face filter includes the cable elements - get rid of them
-            unsigned num_cells = mNumFaces;
-            for (unsigned i=0; i<num_cells; i++)
+            unsigned num_all_cells = mNumFaces;
+            for (unsigned i=0; i<num_all_cells; i++)
             {
                if (mpVtkGeometryFilter->GetOutput()->GetCellType(i) == VTK_LINE)
                {

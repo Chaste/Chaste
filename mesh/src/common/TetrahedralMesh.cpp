@@ -85,10 +85,10 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
 
     // Add nodes
     std::vector<double> coords;
-    for (unsigned i=0; i < num_nodes; i++)
+    for (unsigned node_index=0; node_index < num_nodes; node_index++)
     {
         coords = rMeshReader.GetNextNode();
-        Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(i, coords, false);
+        Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, coords, false);
 
         for (unsigned i=0; i<rMeshReader.GetNodeAttributes().size(); i++)
         {

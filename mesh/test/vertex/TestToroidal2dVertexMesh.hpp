@@ -494,9 +494,9 @@ public:
                 VertexElement<2,2>* p_elt = p_mesh->GetElement(i);
                 VertexElement<2,2>* p_elt2 = p_mesh2->GetElement(i);
                 TS_ASSERT_EQUALS(p_elt->GetNumNodes(), p_elt2->GetNumNodes());
-                for (unsigned i=0; i<p_elt->GetNumNodes(); i++)
+                for (unsigned j=0; j<p_elt->GetNumNodes(); j++)
                 {
-                    TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(i), p_elt2->GetNodeGlobalIndex(i));
+                    TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
                 }
             }
 

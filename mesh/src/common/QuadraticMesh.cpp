@@ -149,14 +149,14 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             if (stagger==false || parity==1) //Default when no stagger
             {
                 //backslash
-                std::pair<unsigned,unsigned> edge(left_index+1, left_index+(numElemX+1) ) ;
-                edge_to_internal_map[edge] = node_index;
+                std::pair<unsigned,unsigned> back_edge(left_index+1, left_index+(numElemX+1) ) ;
+                edge_to_internal_map[back_edge] = node_index;
             }
             else
             {
                 //foward slash
-                std::pair<unsigned,unsigned> edge(left_index, left_index+(numElemX+1)+1 ) ;
-                edge_to_internal_map[edge] = node_index;
+                std::pair<unsigned,unsigned> forward_edge(left_index, left_index+(numElemX+1)+1 ) ;
+                edge_to_internal_map[forward_edge] = node_index;
             }
             node_pos[0] = i+0.5;
             MakeNewInternalNode(node_index, node_pos, top);
@@ -176,9 +176,9 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             unsigned local_index2 = (local_index1+1)%(DIM+1);
             unsigned global_index1 =  iter->GetNodeGlobalIndex(local_index1);
             unsigned global_index2 =  iter->GetNodeGlobalIndex(local_index2);
-            unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
-            iter->AddNode(this->mNodes[node_index]);
-            this->mNodes[node_index]->AddElement(iter->GetIndex());
+            unsigned new_node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
+            iter->AddNode(this->mNodes[new_node_index]);
+            this->mNodes[new_node_index]->AddElement(iter->GetIndex());
         }        
     }
 
@@ -188,9 +188,9 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     {
         unsigned global_index1 =  (*iter)->GetNodeGlobalIndex(0);
         unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(1);
-        unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
-        (*iter)->AddNode(this->mNodes[node_index]);
-        this->mNodes[node_index]->AddBoundaryElement((*iter)->GetIndex());
+        unsigned new_node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
+        (*iter)->AddNode(this->mNodes[new_node_index]);
+        this->mNodes[new_node_index]->AddBoundaryElement((*iter)->GetIndex());
     }
     
     this->RefreshMesh();
@@ -397,9 +397,9 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             unsigned local_index2 = (local_index1+1)%(DIM);
             unsigned global_index1 =  (*iter)->GetNodeGlobalIndex(local_index1);
             unsigned global_index2 =  (*iter)->GetNodeGlobalIndex(local_index2);
-            unsigned node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
-            (*iter)->AddNode(this->mNodes[node_index]);
-            this->mNodes[node_index]->AddBoundaryElement((*iter)->GetIndex());
+            unsigned new_node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
+            (*iter)->AddNode(this->mNodes[new_node_index]);
+            this->mNodes[new_node_index]->AddBoundaryElement((*iter)->GetIndex());
         }
         
     }

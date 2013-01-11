@@ -1302,18 +1302,18 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      *  Work out initial element distribution
      */
     idxtype element_distribution[num_procs+1];
-    idxtype element_count[num_procs];
+    idxtype element_counts[num_procs];
 
     element_distribution[0]=0;
 
     for (unsigned proc_index=1; proc_index<num_procs; proc_index++)
     {
         element_distribution[proc_index] = element_distribution[proc_index-1] + num_elements/num_procs;
-        element_count[proc_index-1] = element_distribution[proc_index] - element_distribution[proc_index-1];
+        element_counts[proc_index-1] = element_distribution[proc_index] - element_distribution[proc_index-1];
     }
 
     element_distribution[num_procs] = num_elements;
-    element_count[num_procs-1] = element_distribution[num_procs] - element_distribution[num_procs-1];
+    element_counts[num_procs-1] = element_distribution[num_procs] - element_distribution[num_procs-1];
 
     /*
      *  Create distributed mesh data structure
@@ -1417,7 +1417,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     idxtype* global_element_partition = new idxtype[num_elements];
 
     MPI_Allgatherv(local_partition, num_local_elements, MPI_INT,
-                   global_element_partition, element_count, element_distribution, MPI_INT, PETSC_COMM_WORLD);
+                   global_element_partition, element_counts, element_distribution, MPI_INT, PETSC_COMM_WORLD);
 
     delete[] local_partition;
 

@@ -108,7 +108,7 @@ private:
     unsigned mMaxBoxIndex;
 
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
-    const static double mFudge = 5e-14;
+    static const double mFudge = 5e-14;
 
     /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
     bool mIsPeriodicInX;
@@ -122,7 +122,7 @@ private:
     /** The rank of the process to the right */
     unsigned mProcLeft;
 
-    /** A distributed vector that govens ownership of rows of boxes */
+    /** A distributed vector that governs ownership of rows of boxes */
     DistributedVector* mpDistributedBoxStacks;
 
     /** Needed for serialization **/
