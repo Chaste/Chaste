@@ -266,8 +266,8 @@ public:
         // test the rest
         for (unsigned i=1; i<r_pressures.size(); i++)
         {
-            double x = mesh.GetNode(i)->rGetLocation()[0];
-              double exact_pressure = 2*(1-x) + constant;
+            x = mesh.GetNode(i)->rGetLocation()[0];
+            double exact_pressure = 2*(1-x) + constant;
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
             TS_ASSERT_DELTA(r_pressures[i], exact_pressure, 1e-8);

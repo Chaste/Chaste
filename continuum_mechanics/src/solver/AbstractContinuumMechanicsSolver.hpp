@@ -62,7 +62,7 @@ typedef enum _ApplyDirichletBcsType
 {
     LINEAR_PROBLEM,
     NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY,
-    NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING,
+    NONLINEAR_PROBLEM_APPLY_TO_EVERYTHING
 } ApplyDirichletBcsType;
 
 //forward declarations

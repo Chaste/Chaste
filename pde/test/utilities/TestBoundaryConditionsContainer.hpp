@@ -60,28 +60,30 @@ public:
 
         TS_ASSERT(!bcc1.HasDirichletBoundaryConditions());
 
-        Node<1>* nodes[num_nodes];
-        for (int i=0; i<num_nodes; i++)
         {
-            nodes[i] = new Node<1>(i,true,0);
-            ConstBoundaryCondition<1>* p_boundary_condition =
-                new ConstBoundaryCondition<1>((double)i);
-            bcc1.AddDirichletBoundaryCondition(nodes[i], p_boundary_condition);
-        }
-        bcc1.ResetDirichletCommunication();
-        TS_ASSERT(bcc1.HasDirichletBoundaryConditions());
+            Node<1>* nodes[num_nodes];
 
-        for (int i=0; i<num_nodes; i++)
-        {
-            double value = bcc1.GetDirichletBCValue(nodes[i]);
-            TS_ASSERT_DELTA( value, i, 1e-12 );
-        }
+            for (int i=0; i<num_nodes; i++)
+            {
+                nodes[i] = new Node<1>(i,true,0);
+                ConstBoundaryCondition<1>* p_boundary_condition =
+                    new ConstBoundaryCondition<1>((double)i);
+                bcc1.AddDirichletBoundaryCondition(nodes[i], p_boundary_condition);
+            }
+            bcc1.ResetDirichletCommunication();
+            TS_ASSERT(bcc1.HasDirichletBoundaryConditions());
 
-        for (int i=0; i<num_nodes; i++)
-        {
-            delete nodes[i];
-        }
+            for (int i=0; i<num_nodes; i++)
+            {
+                double value = bcc1.GetDirichletBCValue(nodes[i]);
+                TS_ASSERT_DELTA( value, i, 1e-12 );
+            }
 
+            for (int i=0; i<num_nodes; i++)
+            {
+                delete nodes[i];
+            }
+        }
         int num_elem = 10;
         std::vector<BoundaryElement<0,1> > elements;
         for (unsigned element_index=0; element_index< (unsigned) num_elem; element_index++)

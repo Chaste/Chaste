@@ -65,7 +65,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(ParameterisedCvode);
+CHASTE_CLASS_EXPORT(ParameterisedCvode)
 
 #endif // CHASTE_CVODE
 

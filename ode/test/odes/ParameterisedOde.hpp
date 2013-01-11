@@ -66,6 +66,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-CHASTE_CLASS_EXPORT(ParameterisedOde);
+CHASTE_CLASS_EXPORT(ParameterisedOde)
 
 #endif /*PARAMETERISEDODE_HPP_*/

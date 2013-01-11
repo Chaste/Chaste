@@ -246,6 +246,6 @@ void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::As
         ///\todo #1321 Improve efficiency of Neumann BC implementation
         noalias(rBSurfElem) += ComputeVectorSurfaceTerm(rSurfaceElement, phi, x) * wJ;
     }
-};
+}
 
 #endif // ABSTRACTFESURFACENTEGRALASSEMBLER_HPP_

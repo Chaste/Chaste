@@ -234,11 +234,11 @@ private:
         invC = Inverse(C);
 
         // Change of basis matrix
-        c_matrix<double,2,2> P;
-        P(0,0) = P(1,1) = 0.0;
-        P(1,0) = P(0,1) = 1.0;
+        c_matrix<double,2,2> P_basis;
+        P_basis(0,0) = P_basis(1,1) = 0.0;
+        P_basis(1,0) = P_basis(0,1) = 1.0;
 
-        pLaw->SetChangeOfBasisMatrix(P);
+        pLaw->SetChangeOfBasisMatrix(P_basis);
         pLaw->ComputeStressAndStressDerivative(C,invC,p,T_Yfibres,dTdE_Yfibres,true);
 
         TS_ASSERT_DELTA(T_Xfibres(0,0), T_Yfibres(1,1), 1e-8);
@@ -468,8 +468,8 @@ public:
     // bits in that method.
     void TestQuadraticPolynomialLaw()
     {
-        unsigned N = 2;
-        std::vector< std::vector<double> > alpha = PolynomialMaterialLaw3d::GetZeroedAlpha(N);
+        unsigned param_n = 2;
+        std::vector< std::vector<double> > alpha = PolynomialMaterialLaw3d::GetZeroedAlpha(param_n);
 
         double c20 = 3.0;
         double c11 = 4.0;
@@ -479,7 +479,7 @@ public:
         alpha[1][1] = c11;
         alpha[0][2] = c02;
 
-        PolynomialMaterialLaw3d poly_law(N,alpha);
+        PolynomialMaterialLaw3d poly_law(param_n, alpha);
 
         c_matrix<double,3,3> C;
         C(0,0) = 3.0;
@@ -536,19 +536,21 @@ public:
                 {
                     for (unsigned Q=0;Q<3;Q++)
                     {
-                        double dI1_dC_MN = (M==N);
+                        //see above
+                        dI1_dC_MN = (M==N);
                         double dI1_dC_PQ = (P==Q);
 
                         double d2I1_dC2  = 0;
 
-                        double dI2_dC_MN = I1*(M==N)-C(M,N);
+                        //see above
+                        dI2_dC_MN = I1*(M==N)-C(M,N);
                         double dI2_dC_PQ = I1*(P==Q)-C(P,Q);
 
                         double d2I2_dC2  = (M==N)*(P==Q)-(M==P)*(N==Q);
 
                         double d_invC_dC = -invC(M,P)*invC(Q,N);
 
-                        double true_val =    4 * true_d2WdI1 * dI1_dC_MN * dI1_dC_PQ
+                        true_val =    4 * true_d2WdI1 * dI1_dC_MN * dI1_dC_PQ
                                              + 4 * true_dWdI1  * d2I1_dC2
                                              + 4 * true_d2WdI2 * dI2_dC_MN * dI2_dC_PQ
                                              + 4 * true_dWdI2  * d2I2_dC2

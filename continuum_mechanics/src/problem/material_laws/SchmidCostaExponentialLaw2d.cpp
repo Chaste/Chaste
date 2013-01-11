@@ -85,16 +85,16 @@ void SchmidCostaExponentialLaw2d::ComputeStressAndStressDerivative(c_matrix<doub
 
     c_matrix<double,2,2> E = 0.5*(C_transformed - mIdentity);
 
-    double Q = 0;
+    double QQ = 0;
     for (unsigned M=0; M<2; M++)
     {
         for (unsigned N=0; N<2; N++)
         {
-            Q += mB[M][N]*E(M,N)*E(M,N);
+            QQ += mB[M][N]*E(M,N)*E(M,N);
         }
     }
 
-    double multiplier = mA*exp(Q)/2;
+    double multiplier = mA*exp(QQ)/2;
     rDTdE.Zero();
 
     for (unsigned M=0; M<2; M++)

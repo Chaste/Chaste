@@ -68,7 +68,7 @@ std::vector<double> ParameterisedOde::ComputeDerivedQuantities(double time,
 
 
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(ParameterisedOde);
+CHASTE_CLASS_EXPORT(ParameterisedOde)
 
 
 template<>

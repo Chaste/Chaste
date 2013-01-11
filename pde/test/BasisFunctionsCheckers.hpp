@@ -59,8 +59,6 @@ public:
 
         assert(size==ELEMENT_DIM+1);
 
-        std::vector<double> basis_function_vector; // store results of evalutation
-
         double expected_evaluation;
 
         for (unsigned point_index=0; point_index<size; point_index++)
@@ -92,8 +90,6 @@ public:
         unsigned size = evaluationPoints.size(); // number of evalutation points and basis functions too
 
         assert(size==(ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2);
-
-        std::vector<double> basis_function_vector; // store results of evalutation
 
         double expected_evaluation;
 
