@@ -85,7 +85,10 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
+#define COVERAGE_IGNORE
+        //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+#undef COVERAGE_IGNORE
     }
 }
 
@@ -123,7 +126,10 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
 {
     if (!mOutputDirectory.IsPathSet())
     {
+#define COVERAGE_IGNORE
+        //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+#undef COVERAGE_IGNORE
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     std::stringstream file_name;
@@ -174,7 +180,10 @@ void ExecutableSupport::WriteProvenanceInfoFile()
 {
     if (!mOutputDirectory.IsPathSet())
     {
+#define COVERAGE_IGNORE
+        //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+#undef COVERAGE_IGNORE
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("provenance_info_", PetscTools::GetMyRank(), ".txt");
@@ -283,7 +292,10 @@ void ExecutableSupport::PrintError(const std::string& rMessage, bool masterOnly)
     // Write the error message to file
     if (!mOutputDirectory.IsPathSet())
     {
+#define COVERAGE_IGNORE
+        //depends on order of calls.  Extract to method?
         mOutputDirectory.SetPath("", RelativeTo::ChasteTestOutput);
+#undef COVERAGE_IGNORE
     }
     OutputFileHandler out_file_handler(mOutputDirectory, false);
     out_stream out_file = out_file_handler.OpenOutputFile("chaste_errors_", PetscTools::GetMyRank(), ".txt", std::ios::out | std::ios::app);
