@@ -146,7 +146,7 @@ if offline_mode:
 # Also allow test .hpp files to be given as normal targets.
 requested_tests = filter(None, ARGUMENTS.get('test_suite', ARGUMENTS.get('ts', '')).split(','))
 for target in COMMAND_LINE_TARGETS[:]:
-    if target.endswith('.hpp'):
+    if target.endswith('.hpp') or target.endswith('.py'):
         requested_tests.append(target)
         COMMAND_LINE_TARGETS.remove(target)
         BUILD_TARGETS.remove(target)
