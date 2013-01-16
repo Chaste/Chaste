@@ -42,14 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GmshMeshReader(std::string pathBaseName) : mFileName(pathBaseName)
 {
-    // Open mesh file
-    mFile.open(mFileName.c_str());
-    if (!mFile.is_open())
-    {
-        EXCEPTION("Could not open data file: " + mFileName);
-    }
+	// Open mesh file
+	mNodeFile.open(mFileName.c_str());
+	mElementFile.open(mFileName.c_str());
+	mFaceFile.open(mFileName.c_str());
+	if (!mNodeFile.is_open() || !mElementFile.is_open() || !mFaceFile.is_open() )
+	{
+		EXCEPTION("Could not open data file: " + mFileName);
+	}
 
-    ReadHeader();
+	ReadHeaders();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -59,49 +61,156 @@ GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::~GmshMeshReader()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeader()
+void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
 {
     /*
      * Read mesh format information from the file header
      */
-    std::string actual_line;
+    std::string this_line;
+    getline(mNodeFile, this_line);
 
-    mFile >> actual_line;
-    assert(actual_line == "$MeshFormat");
+    assert(this_line == "$MeshFormat");
 
     //Read the version no.
-    mFile >> mVersionNumber >> mFileType >> mDataSize;
+    getline(mNodeFile, this_line);
+    std::stringstream line(this_line);
+
+    line >> mVersionNumber >> mFileType >> mDataSize;
 
     if(mVersionNumber != 2.2)
     {
-        EXCEPTION("We can only read Gmsh version 2.2 files.");
+    	EXCEPTION("Only .msh version 2.2 files are supported.");
     }
     assert(mFileType == 0);
 
     //Check mesh format close string
-    mFile >> actual_line;
-    assert(actual_line == "$EndMeshFormat");
+    getline(mNodeFile, this_line);
+	assert(this_line == "$EndMeshFormat");
+
+	ReadNodeHeader();
+	ReadElementHeader();
+    ReadFaceHeader();
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadNodeHeader()
+{
+    //search for the start of the node section
+    std::string this_line;
+    std::stringstream line(this_line);
+
+    while(this_line != "$Nodes")
+    {
+        getline(mNodeFile, this_line);
+    }
+    getline(mNodeFile, this_line);
+
+    line.clear();
+    line.str(this_line);
+    line >> mNumNodes; //mNodesFile should now be pointing at the start of the node lines in the file.
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadElementHeader()
+{
+    //Search for the start of the elements section
+    std::string this_line;
+    std::stringstream line(this_line);
+
+    getline(mElementFile, this_line);
+    while(this_line != "$Elements")
+    {
+        getline(mElementFile, this_line);
+    }
+    getline(mElementFile, this_line); //Throw away the number of elements specified in the file
+    int ele_start = mElementFile.tellg(); //Pointer to the start of the element block.
+
+    mNumElements = 0u;
+    getline(mElementFile, this_line);
+
+    while(this_line != "$EndElements")
+    {
+        line.clear();
+        line.str(this_line);
+
+        unsigned ele_index;
+        unsigned ele_type;
+        line >> ele_index >> ele_type;
+
+        if(ELEMENT_DIM == 2 && (ele_type == GmshTypes::TRIANGLE || ele_type == GmshTypes::QUADRATIC_TRIANGLE))
+        {
+            mNumElements++;
+        }
+        else if(ELEMENT_DIM == 3 && (ele_type == GmshTypes::TETRAHEDRON || ele_type == GmshTypes::QUADRATIC_TETRAHEDRON))
+        {
+            mNumElements++;
+        }
+
+        getline(mElementFile, this_line);
+    }
+
+    mElementFile.seekg(ele_start); //mElementFile should now be pointing at the start of the node lines in the file.
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadFaceHeader()
+{
+    //Search for the start of the elements section
+    std::string this_line;
+    std::stringstream line(this_line);
+
+    getline(mFaceFile, this_line);
+    while(this_line != "$Elements")
+    {
+        getline(mFaceFile, this_line);
+    }
+    getline(mFaceFile, this_line); //Throw away the number of elements specified in the file
+    int face_start = mFaceFile.tellg(); //Pointer to the start of the element block.
+
+    mNumFaces = 0u;
+    getline(mFaceFile, this_line);
+
+    while(this_line != "$EndElements")
+    {
+        line.clear();
+        line.str(this_line);
+
+        unsigned ele_index;
+        unsigned ele_type;
+        line >> ele_index >> ele_type;
+
+        if(ELEMENT_DIM == 2 && (ele_type == GmshTypes::LINE || ele_type == GmshTypes::QUADRATIC_LINE))
+        {
+            mNumFaces++;
+        }
+        else if(ELEMENT_DIM == 3 && (ele_type == GmshTypes::TRIANGLE || ele_type == GmshTypes::QUADRATIC_TRIANGLE))
+        {
+            mNumFaces++;
+        }
+
+        getline(mFaceFile, this_line);
+    }
+
+    mFaceFile.seekg(face_start); //mFacesFile should now be pointing at the start of the node lines in the file.
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 {
-    NEVER_REACHED;
-    //return mNumElements;
+    return mNumElements;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {
-    NEVER_REACHED;
-    //return mNumNodes;
+    return mNumNodes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
-    NEVER_REACHED;
-    //return mNumFaces;
+    return mNumFaces;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

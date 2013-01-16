@@ -47,21 +47,50 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 
 typedef GmshMeshReader<2,2> READER_2D;
+typedef GmshMeshReader<3,3> READER_3D;
 
 class TestGmshMeshReader : public CxxTest::TestSuite
 {
 public:
     void TestFilesOpen(void) throw(Exception)
     {
-        TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements.msh"));
+        TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements_gmsh.msh"));
         TS_ASSERT_THROWS_ANYTHING(READER_2D("mesh/test/data/no_file.msh"));
     }
 
     void TestCorrectVersion(void) throw(Exception)
-       {
-           TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements.msh"));
-           TS_ASSERT_THROWS_ANYTHING(READER_2D("mesh/test/data/square_4_elements_bad_version.msh"));
-       }
+    {
+       TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements_gmsh.msh"));
+       TS_ASSERT_THROWS_ANYTHING(READER_2D("mesh/test/data/square_4_elements_bad_version.msh"));
+    }
+
+    void TestReadHeaders(void) throw(Exception)
+    {
+        //Linear meshes
+        READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
+        TS_ASSERT_EQUALS(reader.GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(reader.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(reader.GetNumFaces(), 4u);
+
+        READER_3D reader_3d("mesh/test/data/simple_cube_gmsh.msh");
+        TS_ASSERT_EQUALS(reader_3d.GetNumNodes(), 14u);
+        TS_ASSERT_EQUALS(reader_3d.GetNumElements(), 24u);
+        TS_ASSERT_EQUALS(reader_3d.GetNumFaces(), 24u);
+
+        //Quad meshes
+        READER_2D quad_reader("mesh/test/data/quad_square_4_elements_gmsh.msh");
+        TS_ASSERT_EQUALS(quad_reader.GetNumNodes(), 13u);
+        TS_ASSERT_EQUALS(quad_reader.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(quad_reader.GetNumFaces(), 4u);
+
+        READER_3D quad_reader_3d("mesh/test/data/quad_cube_gmsh.msh");
+        TS_ASSERT_EQUALS(quad_reader_3d.GetNumNodes(), 63u);
+        TS_ASSERT_EQUALS(quad_reader_3d.GetNumElements(), 24u);
+        TS_ASSERT_EQUALS(quad_reader_3d.GetNumFaces(), 24u);
+
+
+        ///\todo Check in when the above is complete
+    }
 
 };
 

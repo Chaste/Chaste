@@ -43,6 +43,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractMeshReader.hpp"
 
 /**
+ * Structure encapsulating the enumeration of
+ */
+struct GmshTypes
+{
+    /**
+     * What things a path can be relative to.
+     */
+    enum Value
+    {
+        LINE = 1u,
+        QUADRATIC_LINE = 8u,
+        TRIANGLE = 2u,
+        QUADRATIC_TRIANGLE = 9u,
+        TETRAHEDRON = 4u,
+        QUADRATIC_TETRAHEDRON = 11u,
+    };
+};
+
+/**
  * Class to enable reading of Gmsh format mesh files (see #2312).
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -128,16 +147,30 @@ public:
      */
     ElementData GetFaceData(unsigned index);
 
-    /** Read the header from the mesh file. */
-    void ReadHeader();
-
 private:
+    /** Read all the header information from the mesh file. */
+    void ReadHeaders();
+
+    /** Read the node header from the mesh file. */
+    void ReadNodeHeader();
+
+    /** Read the element header from the mesh file. */
+    void ReadElementHeader();
+
+    /** Read the face header from the mesh file. */
+    void ReadFaceHeader();
+
     std::string mFileName;     /**< The name of the mesh file. */
-    std::ifstream mFile;       /**< The file for the mesh. */
+    std::ifstream mNodeFile;   /**< A file stream used to read the node (and header) part of the file. */
+    std::ifstream mElementFile;/**< A file stream used to read the volume elements of the file. */
+    std::ifstream mFaceFile;   /**< A file stream used to read the boundary elements of the file. */
     double mVersionNumber;     /**< The version number of the file. */
     unsigned mFileType;        /**< The type of the mesh file being read (should always be 0) */
     unsigned mDataSize;        /**< The number of floating point numbers in the file */
 
+    unsigned mNumNodes;             /**< Number of nodes in the mesh. */
+    unsigned mNumElements;          /**< Number of elements in the mesh. */
+    unsigned mNumFaces;             /**< Number of faces in the mesh. */
 };
 
 #endif //_GMSHMESHREADER_HPP_
