@@ -52,6 +52,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
+//#include "VtkMeshReader.hpp" //Needed for commented out test, see #1660
+
+
 class TestPostProcessingWriter : public CxxTest::TestSuite
 {
     /**
@@ -318,6 +321,47 @@ public:
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
+
+// Test fails as VTK post processing output not yet implemented - See #1660
+//    void xxxTestVtkOutput() throw (Exception)
+//    {
+//#ifdef CHASTE_VTK
+//        HeartConfig::Instance()->Reset();
+//
+//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+//        DistributedTetrahedralMesh<2,2> mesh;
+//        mesh.ConstructFromMeshReader(mesh_reader);
+//
+//        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+//        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
+//        HeartConfig::Instance()->SetCapacitance(1.0);
+//        HeartConfig::Instance()->SetSimulationDuration(2); //ms
+//        HeartConfig::Instance()->SetVisualizeWithVtk();
+//        HeartConfig::Instance()->SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
+//
+//        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
+//        BidomainProblem<2> problem( &cell_factory );
+//        problem.SetMesh(&mesh);
+//
+//        problem.Initialise();
+//        problem.Solve();
+//
+//        OutputFileHandler handler("TestPostProcessingWriter_VtkOutput", false);
+//        FileFinder output_dir = handler.FindFile("vtk_output");
+//
+//        PostProcessingWriter<2,2> writer(mesh, handler.GetOutputDirectoryFullPath(), HeartConfig::Instance()->GetOutputFilenamePrefix(), false);
+//
+//        writer.WriteApdMapFile(60.0, -30.0);
+//
+//        //Read VTK file & check data.
+//        VtkMeshReader<2,2> vtk_reader(output_dir.GetAbsolutePath() + "/SimulationResults.vtu");
+//
+//        std::vector<double> apd_data;
+//
+//        //This will currently fail as the APD map data is not yet written to the VTK file.
+//        vtk_reader.GetPointData("ApdMap", apd_data);
+//#endif
+//    }
 };
 
 
