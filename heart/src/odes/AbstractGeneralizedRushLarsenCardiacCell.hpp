@@ -150,17 +150,24 @@ protected:
      * Update the values of all variables except the transmembrane potential using a GRL method.
      *
      * @param time  the current simulation time
-     * @param rDY  unused vector containing dy/dt values
      */
-    virtual void ComputeOneStepExceptVoltage(double time, const std::vector<double>& rDY)=0;
+    virtual void ComputeOneStepExceptVoltage(double time)=0;
 
     /**
      * Perform a forward Euler step to update the transmembrane potential.
      *
      * @param time  the current simulation time
-     * @param rDY  unused vector containing dy/dt values
      */
-    virtual void UpdateTransmembranePotential(double time, const std::vector<double>& rDY)=0;
+    virtual void UpdateTransmembranePotential(double time)=0;
+
+    /** The diagonal of the Jacobian, working memory for use by subclasses. */
+    std::vector<double> mPartialF;
+
+    /** The derivatives, working memory for use by subclasses. */
+    std::vector<double> mEvalF;
+
+    /** The state at the beginning of the current step, working memory for use by subclasses. */
+    std::vector<double> mYInit;
 };
 
 CLASS_IS_ABSTRACT(AbstractGeneralizedRushLarsenCardiacCell)

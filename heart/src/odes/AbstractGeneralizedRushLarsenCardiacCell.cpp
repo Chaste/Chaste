@@ -57,7 +57,11 @@ AbstractGeneralizedRushLarsenCardiacCell::AbstractGeneralizedRushLarsenCardiacCe
                           numberOfStateVariables,
                           voltageIndex,
                           pIntracellularStimulus)
-{}
+{
+    mPartialF.resize(numberOfStateVariables);
+    mEvalF.resize(numberOfStateVariables);
+    mYInit.resize(numberOfStateVariables);
+}
 
 AbstractGeneralizedRushLarsenCardiacCell::~AbstractGeneralizedRushLarsenCardiacCell()
 {}
@@ -81,8 +85,6 @@ OdeSolution AbstractGeneralizedRushLarsenCardiacCell::Compute(double tStart, dou
     solutions.rGetTimes().push_back(tStart);
     solutions.SetOdeSystemInformation(this->mpSystemInfo);
 
-    std::vector<double> dy(mNumberOfStateVariables, 0);
-
     // Loop over time
     for (unsigned i=0; i<n_steps; i++)
     {
@@ -91,8 +93,8 @@ OdeSolution AbstractGeneralizedRushLarsenCardiacCell::Compute(double tStart, dou
         {
             curr_time = tStart + i*tSamp + j*mDt;
            // EvaluateEquations(curr_time, dy);
-            UpdateTransmembranePotential(curr_time,dy);
-            ComputeOneStepExceptVoltage(curr_time, dy);
+            UpdateTransmembranePotential(curr_time);
+            ComputeOneStepExceptVoltage(curr_time);
             VerifyStateVariables();
         }
 
@@ -109,11 +111,9 @@ void AbstractGeneralizedRushLarsenCardiacCell::ComputeExceptVoltage(double tStar
     SetVoltageDerivativeToZero(true);
     TimeStepper stepper(tStart, tEnd, mDt);
 
-    std::vector<double> dy(mNumberOfStateVariables, 0);
-
     while (!stepper.IsTimeAtEnd())
     {
-        ComputeOneStepExceptVoltage(stepper.GetTime(), dy);
+        ComputeOneStepExceptVoltage(stepper.GetTime());
 
 #ifndef NDEBUG
         // Check gating variables are still in range
@@ -129,12 +129,10 @@ void AbstractGeneralizedRushLarsenCardiacCell::SolveAndUpdateState(double tStart
 {
     TimeStepper stepper(tStart, tEnd, mDt);
 
-    std::vector<double> dy(mNumberOfStateVariables, 0);
-
     while (!stepper.IsTimeAtEnd())
     {
-        UpdateTransmembranePotential(stepper.GetTime(),dy);
-        ComputeOneStepExceptVoltage(stepper.GetTime(),dy);
+        UpdateTransmembranePotential(stepper.GetTime());
+        ComputeOneStepExceptVoltage(stepper.GetTime());
         VerifyStateVariables();
 
         stepper.AdvanceOneTimeStep();
