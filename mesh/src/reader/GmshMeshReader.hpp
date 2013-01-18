@@ -74,8 +74,13 @@ public:
      *
      * @param pathBaseName  the base name of the files from which to read the mesh data
      *    (either absolute, or relative to the current directory)
+     * @param orderOfElements  the order of each element: 1 for linear, 2 for quadratic (defaults to 1)
+     * @param orderOfBoundaryElements the order of each boundary element: 1 for linear, 2 for quadratic (defaults to 1. May
+     *  or may not be different to orderOfElements
      */
-    GmshMeshReader(std::string pathBaseName);
+    GmshMeshReader(std::string pathBaseName,
+                   unsigned orderOfElements = 1,
+                   unsigned orderOfBoundaryElements = 1);
 
     /**
      * Destructor
@@ -160,17 +165,28 @@ private:
     /** Read the face header from the mesh file. */
     void ReadFaceHeader();
 
-    std::string mFileName;     /**< The name of the mesh file. */
-    std::ifstream mNodeFile;   /**< A file stream used to read the node (and header) part of the file. */
-    std::ifstream mElementFile;/**< A file stream used to read the volume elements of the file. */
-    std::ifstream mFaceFile;   /**< A file stream used to read the boundary elements of the file. */
-    double mVersionNumber;     /**< The version number of the file. */
-    unsigned mFileType;        /**< The type of the mesh file being read (should always be 0) */
-    unsigned mDataSize;        /**< The number of floating point numbers in the file */
+    /** Opens the .msh file descriptors */
+    void OpenFiles();
 
-    unsigned mNumNodes;             /**< Number of nodes in the mesh. */
-    unsigned mNumElements;          /**< Number of elements in the mesh. */
-    unsigned mNumFaces;             /**< Number of faces in the mesh. */
+    /** Closes the .msh file descriptors */
+    void CloseFiles();
+
+    std::string mFileName; /**< The name of the mesh file. */
+    std::ifstream mNodeFile; /**< A file stream used to read the node (and header) part of the file. */
+    std::ifstream mElementFile; /**< A file stream used to read the volume elements of the file. */
+    std::ifstream mFaceFile; /**< A file stream used to read the boundary elements of the file. */
+    double mVersionNumber; /**< The version number of the file. */
+    unsigned mFileType; /**< The type of the mesh file being read (should always be 0) */
+    unsigned mDataSize; /**< The number of floating point numbers in the file */
+    unsigned mNumNodes; /**< Number of nodes in the mesh. */
+    unsigned mNumElements; /**< Number of elements in the mesh. */
+    unsigned mNumFaces; /**< Number of faces in the mesh. */
+    unsigned mNumElementAttributes; /**< Is the number of attributes stored for each element. */
+    unsigned mNumFaceAttributes; /**< Is the number of attributes stored for each face. */
+    unsigned mOrderOfElements; /**< The order of each element (1 for linear, 2 for quadratic). */
+    unsigned mOrderOfBoundaryElements; /**< The order of each element (1 for linear, 2 for quadratic). */
+    unsigned mNodesPerElement; /**< The number of nodes contained in each element. */
+    unsigned mNodesPerBoundaryElement;
 };
 
 #endif //_GMSHMESHREADER_HPP_

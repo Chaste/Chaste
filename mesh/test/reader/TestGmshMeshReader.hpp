@@ -43,8 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "GenericMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "UblasVectorInclude.hpp"
+#include "QuadraticMesh.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 typedef GmshMeshReader<2,2> READER_2D;
 typedef GmshMeshReader<3,3> READER_3D;
@@ -87,11 +89,121 @@ public:
         TS_ASSERT_EQUALS(quad_reader_3d.GetNumNodes(), 63u);
         TS_ASSERT_EQUALS(quad_reader_3d.GetNumElements(), 24u);
         TS_ASSERT_EQUALS(quad_reader_3d.GetNumFaces(), 24u);
-
-
-        ///\todo Check in when the above is complete
     }
 
+    void TestGetNextMethods(void) throw(Exception)
+    {
+
+        READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
+
+        //2D nodes
+        std::vector<double> expected_coords(2);
+        expected_coords[0] = 0.0; expected_coords[1] = 0.0;
+        TS_ASSERT_EQUALS(reader.GetNextNode(), expected_coords);
+        expected_coords[0] = 1.0; expected_coords[1] = 0.0;
+        TS_ASSERT_EQUALS(reader.GetNextNode(), expected_coords);
+        expected_coords[0] = 1.0; expected_coords[1] = 1.0;
+        TS_ASSERT_EQUALS(reader.GetNextNode(), expected_coords);
+        expected_coords[0] = 0.0; expected_coords[1] = 1.0;
+        TS_ASSERT_EQUALS(reader.GetNextNode(), expected_coords);
+        expected_coords[0] = 0.5; expected_coords[1] = 0.5;
+        TS_ASSERT_EQUALS(reader.GetNextNode(), expected_coords);
+
+        //2D elements
+        std::vector<unsigned> expected_node_indices(3);
+
+        expected_node_indices[0] = 0; expected_node_indices[1] = 1; expected_node_indices[2] = 4;
+        ElementData data = reader.GetNextElementData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 1u);
+
+        expected_node_indices[0] = 1; expected_node_indices[1] = 2; expected_node_indices[2] = 4;
+        data = reader.GetNextElementData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 1u);
+
+        //2D faces
+        expected_node_indices.resize(2);
+        expected_node_indices[0] = 0; expected_node_indices[1] = 1;
+        data = reader.GetNextFaceData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 2u);
+
+        expected_node_indices[0] = 1; expected_node_indices[1] = 2;
+        data = reader.GetNextFaceData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 2u);
+
+
+        READER_3D reader_3d("mesh/test/data/simple_cube_gmsh.msh");
+
+        //3D nodes
+        expected_coords.resize(3);
+        expected_coords[0] = 0.0; expected_coords[1] = 0.0; expected_coords[2] = 0.0;
+        TS_ASSERT_EQUALS(reader_3d.GetNextNode(), expected_coords);
+        expected_coords[0] = 1.0; expected_coords[1] = 0.0; expected_coords[2] = 0.0;
+        TS_ASSERT_EQUALS(reader_3d.GetNextNode(), expected_coords);
+        expected_coords[0] = 1.0; expected_coords[1] = 1.0; expected_coords[2] = 0.0;
+        TS_ASSERT_EQUALS(reader_3d.GetNextNode(), expected_coords);
+        expected_coords[0] = 0.0; expected_coords[1] = 1.0; expected_coords[2] = 0.0;
+        TS_ASSERT_EQUALS(reader_3d.GetNextNode(), expected_coords);
+        expected_coords[0] = 0.0; expected_coords[1] = 0.0; expected_coords[2] = 1.0;
+        TS_ASSERT_EQUALS(reader_3d.GetNextNode(), expected_coords);
+
+        //3D elements
+        expected_node_indices.resize(4);
+
+        expected_node_indices[0] = 13; expected_node_indices[1] = 10; expected_node_indices[2] = 7; expected_node_indices[3] = 3;
+        data = reader_3d.GetNextElementData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 1u);
+
+        expected_node_indices[0] = 8; expected_node_indices[1] = 0; expected_node_indices[2] = 10; expected_node_indices[3] = 3;
+        data = reader_3d.GetNextElementData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 1u);
+
+        //3D faces
+        expected_node_indices.resize(3);
+        expected_node_indices[0] = 0; expected_node_indices[1] = 1; expected_node_indices[2] = 8;
+        data = reader_3d.GetNextFaceData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 2u);
+
+        expected_node_indices[0] = 0; expected_node_indices[1] = 8; expected_node_indices[2] = 3;
+        data = reader_3d.GetNextFaceData();
+        TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
+        TS_ASSERT_EQUALS(data.AttributeValue, 2u);
+    }
+
+    void TestReadMeshes(void) throw(Exception)
+    {
+        {
+            READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
+            TetrahedralMesh<2,2> mesh;
+            mesh.ConstructFromMeshReader(reader);
+        }
+
+        {
+            READER_3D reader("mesh/test/data/simple_cube_gmsh.msh");
+            TetrahedralMesh<3,3> mesh;
+            mesh.ConstructFromMeshReader(reader);
+        }
+
+//These currently fail because QuadraticMesh only expects to be able to read a quadratic file from a TrianglesMeshReader. This
+// should be refactored by moving the GetOrderOfElements() method up to AbstractMeshReader. See #2013.
+//        {
+//           READER_2D reader("mesh/test/data/quad_square_4_elements_gmsh.msh",2,2);
+//           QuadraticMesh<2> mesh;
+//           mesh.ConstructFromMeshReader(reader);
+//        }
+//
+//        {
+//           READER_3D reader("mesh/test/data/quad_cube_gmsh.msh",2,2);
+//           QuadraticMesh<3> mesh;
+//           mesh.ConstructFromMeshReader(reader);
+//        }
+    }
 };
 
 #endif /*TESTGMSHMESHREADER_*/

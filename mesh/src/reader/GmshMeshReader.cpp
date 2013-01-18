@@ -40,25 +40,67 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GmshMeshReader(std::string pathBaseName) : mFileName(pathBaseName)
+GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GmshMeshReader(std::string pathBaseName,
+                                                       unsigned orderOfElements,
+                                                       unsigned orderOfBoundaryElements) :
+       mFileName(pathBaseName),
+       mOrderOfElements(orderOfElements),
+       mOrderOfBoundaryElements(orderOfBoundaryElements)
 {
-	// Open mesh file
-	mNodeFile.open(mFileName.c_str());
-	mElementFile.open(mFileName.c_str());
-	mFaceFile.open(mFileName.c_str());
-	if (!mNodeFile.is_open() || !mElementFile.is_open() || !mFaceFile.is_open() )
-	{
-		EXCEPTION("Could not open data file: " + mFileName);
-	}
+    assert(SPACE_DIM==ELEMENT_DIM); //There is no fundamental reason for this, but full testing of SPACE_DIM != ELEMENT_DIM would be required.
 
+    // Only linear and quadratic elements
+    assert(mOrderOfElements==1 || mOrderOfElements==2);
+
+    if (mOrderOfElements==1)
+    {
+        mNodesPerElement = ELEMENT_DIM+1;
+    }
+    else
+    {
+        mNodesPerElement = (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2;
+    }
+
+    if (mOrderOfBoundaryElements==1)
+    {
+        mNodesPerBoundaryElement = ELEMENT_DIM;
+    }
+    else
+    {
+        mNodesPerBoundaryElement = ELEMENT_DIM*(ELEMENT_DIM+1)/2;
+    }
+
+    OpenFiles();
 	ReadHeaders();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::~GmshMeshReader()
 {
-
+    CloseFiles();
 }
+
+template<unsigned  ELEMENT_DIM, unsigned  SPACE_DIM>
+void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenFiles()
+{
+    // Open mesh file
+    mNodeFile.open(mFileName.c_str());
+    mElementFile.open(mFileName.c_str());
+    mFaceFile.open(mFileName.c_str());
+    if (!mNodeFile.is_open() || !mElementFile.is_open() || !mFaceFile.is_open() )
+    {
+        EXCEPTION("Could not open data file: " + mFileName);
+    }
+}
+
+template<unsigned  ELEMENT_DIM, unsigned  SPACE_DIM>
+void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::CloseFiles()
+{
+    mNodeFile.close();
+    mElementFile.close();
+    mFaceFile.close();
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
@@ -224,15 +266,13 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes() const
 {
-    NEVER_REACHED;
-    //return mNumElementAttributes;
+    return mNumElementAttributes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaceAttributes() const
 {
-    NEVER_REACHED;
-    //return mNumFaceAttributes;
+    return mNumFaceAttributes;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -246,27 +286,91 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElementAttributes() 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::Reset()
 {
-    NEVER_REACHED;
-    //
+    CloseFiles();
+
+    OpenFiles();
+    ReadHeaders();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
 {
-    NEVER_REACHED;
+    std::vector<double> ret_coords(SPACE_DIM);
+
+    std::string this_line;
+    getline(mNodeFile, this_line);
+
+    std::stringstream line(this_line);
+
+    unsigned node_index;
+    line >> node_index >> ret_coords[0] >> ret_coords[1];
+
+    if(ELEMENT_DIM == 3)
+    {
+        line >> ret_coords[2];
+    }
+
+    return ret_coords;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNodeAttributes()
 {
-    NEVER_REACHED;
-    //return mNodeAttributes;
+    return std::vector<double>(0);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 {
-    NEVER_REACHED;
+    ElementData element_data;
+    element_data.NodeIndices.resize(mNodesPerElement);
+    element_data.AttributeValue = 0.0; // If an attribute is not read this stays as zero, otherwise overwritten.
+
+    std::string this_line;
+    std::stringstream line(this_line);
+
+    unsigned ele_index;
+    unsigned ele_type;
+    unsigned ele_attributes;
+    bool volume_element_found = false;
+
+    while(!volume_element_found)
+    {
+        getline(mElementFile, this_line);
+        line.clear();
+        line.str(this_line);
+
+        line >> ele_index >> ele_type >> ele_attributes;
+
+        if((ELEMENT_DIM == 2 && (ele_type == GmshTypes::TRIANGLE || ele_type == GmshTypes::QUADRATIC_TRIANGLE) ) ||
+           (ELEMENT_DIM == 3 && (ele_type == GmshTypes::TETRAHEDRON || ele_type == GmshTypes::QUADRATIC_TETRAHEDRON)))
+        {
+            volume_element_found = true;
+        }
+    }
+
+    //Gmsh can have arbitrary numbers of element attributes, but Chaste only handles one. We pick the first attribute and throw
+    //away the remainder.
+    if(ele_attributes > 0)
+    {
+        mNumElementAttributes = 1u;
+        line >> element_data.AttributeValue;
+    }
+    unsigned unused_attr;
+    for(unsigned attr_index = 0; attr_index < (ele_attributes-1); ++attr_index)
+    {
+        line >> unused_attr;
+    }
+
+    //Read the node indices
+    for(unsigned node_index = 0; node_index < mNodesPerElement; ++node_index)
+    {
+        line >> element_data.NodeIndices[node_index];
+
+        element_data.NodeIndices[node_index]--; //Gmsh *always* indexes from 1, we index from 0
+    }
+
+    return element_data;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -278,7 +382,55 @@ ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextCableElementData()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 {
-    NEVER_REACHED;
+    ElementData face_data;
+    face_data.NodeIndices.resize(mNodesPerBoundaryElement);
+    face_data.AttributeValue = 0.0; // If an attribute is not read this stays as zero, otherwise overwritten.
+
+    std::string this_line;
+    std::stringstream line(this_line);
+
+    unsigned face_index;
+    unsigned face_type;
+    unsigned face_attributes;
+    bool surface_element_found = false;
+
+    while(!surface_element_found)
+    {
+        getline(mFaceFile, this_line);
+        line.clear();
+        line.str(this_line);
+
+        line >> face_index >> face_type >> face_attributes;
+
+        if((ELEMENT_DIM == 2 && (face_type == GmshTypes::LINE || face_type == GmshTypes::QUADRATIC_LINE) ) ||
+           (ELEMENT_DIM == 3 && (face_type == GmshTypes::TRIANGLE || face_type == GmshTypes::QUADRATIC_TRIANGLE)))
+        {
+            surface_element_found = true;
+        }
+    }
+
+    //Gmsh can have arbitrary numbers of element attributes, but Chaste only handles one. We pick the first attribute and throw
+    //away the remainder.
+    if(face_attributes > 0)
+    {
+        mNumFaceAttributes = 1u;
+        line >> face_data.AttributeValue;
+    }
+    unsigned unused_attr;
+    for(unsigned attr_index = 0; attr_index < (face_attributes-1); ++attr_index)
+    {
+        line >> unused_attr;
+    }
+
+    //Read the node indices
+    for(unsigned node_index = 0; node_index < mNodesPerBoundaryElement; ++node_index)
+    {
+        line >> face_data.NodeIndices[node_index];
+
+        face_data.NodeIndices[node_index]--; //Gmsh *always* indexes from 1, we index from 0
+    }
+
+    return face_data;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
