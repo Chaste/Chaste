@@ -161,8 +161,8 @@ public:
 #ifdef CHASTE_VTK
         //Output to VTK.
         VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "downsampled_fibres", false);
-        FileFinder file("heart/test/data/fibre_tests/downsampled.ortho", RelativeTo::ChasteSourceRoot);
-        FibreReader<3> fibre_reader(file, ORTHO);
+        FileFinder filename("heart/test/data/fibre_tests/downsampled.ortho", RelativeTo::ChasteSourceRoot);
+        FibreReader<3> fibre_reader(filename, ORTHO);
         std::vector< c_vector<double, 3> > fibres;
         std::vector< c_vector<double, 3> > second;
         std::vector< c_vector<double, 3> > third;

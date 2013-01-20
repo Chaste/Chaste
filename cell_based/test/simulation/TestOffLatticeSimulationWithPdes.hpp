@@ -102,12 +102,12 @@ private:
     double mLastStartTime;
     void setUp()
     {
-        mLastStartTime = std::clock();
+        mLastStartTime = (double) std::clock();
         AbstractCellBasedTestSuite::setUp();
     }
     void tearDown()
     {
-        double time = std::clock();
+        double time = (double) std::clock();
         double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
         std::cout << "Elapsed time: " << elapsed_time << std::endl;
         AbstractCellBasedTestSuite::tearDown();
@@ -1577,7 +1577,7 @@ public:
         CellBasedPdeHandler<1> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
 
-        unsigned num_nodes = pow(2,3);
+        unsigned num_nodes = 8; //pow(2,3);
         double mesh_size = 2.0/(double)(num_nodes-1);
         ChastePoint<1> lower(0.0);
         ChastePoint<1> upper(2.0);

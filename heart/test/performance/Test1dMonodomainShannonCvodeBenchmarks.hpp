@@ -249,9 +249,9 @@ public:
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
-            double start_time = std::clock();
+            double start_time = (double) std::clock();
             monodomain_problem.Solve();
-            double end_time = std::clock();
+            double end_time = (double) std::clock();
             double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
             std::cout << "1. Forward Euler elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
 
@@ -305,11 +305,11 @@ public:
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
-            double start_time = std::clock();
+            double start_time = (double) std::clock();
             //std::cout << "Start clock\n";
             monodomain_problem.Solve();
             //std::cout << "Stop clock\n";
-            double end_time = std::clock();
+            double end_time = (double) std::clock();
             double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
             std::cout << "2. CVODE adaptor elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
 
@@ -332,11 +332,11 @@ public:
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
-            double start_time = std::clock();
+            double start_time = (double) std::clock();
             //std::cout << "Start clock\n";
             monodomain_problem.Solve();
             //std::cout << "Stop clock\n";
-            double end_time = std::clock();
+            double end_time = (double) std::clock();
             double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
             std::cout << "3. CVODE native elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
 

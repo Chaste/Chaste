@@ -166,7 +166,7 @@ public:
         location_indices.push_back(1);
         location_indices.push_back(2);
 
-        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells_copy, location_indices),
+        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulation<2> another_node_based_cell_population(*p_mesh, cells_copy, location_indices),
                               "There is not a one-one correspondence between cells and location indices");
 
         // Avoid memory leak

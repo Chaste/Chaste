@@ -57,7 +57,7 @@ struct GmshTypes
         TRIANGLE = 2u,
         QUADRATIC_TRIANGLE = 9u,
         TETRAHEDRON = 4u,
-        QUADRATIC_TETRAHEDRON = 11u,
+        QUADRATIC_TETRAHEDRON = 11u
     };
 };
 

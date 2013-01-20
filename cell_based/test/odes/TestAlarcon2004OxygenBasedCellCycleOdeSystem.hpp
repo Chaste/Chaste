@@ -166,9 +166,9 @@ public:
         double h_value = 1e-4; // maximum tolerance
 
         // Solve the ODE system using a Runge Kutta fourth order solver
-        start_time = std::clock();
+        start_time = (double) std::clock();
         solutions = rk4_solver.Solve(&alarcon_system, initial_conditions, 0.0, 10.0, h_value, h_value);
-        end_time = std::clock();
+        end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "1. Runge-Kutta Elapsed time = " << elapsed_time << "\n";
 
@@ -177,9 +177,9 @@ public:
 
         // Solve the ODE system using a Runge Kutta Fehlber solver
         initial_conditions = alarcon_system.GetInitialConditions();
-        start_time = std::clock();
+        start_time = (double) std::clock();
         solutions = rkf_solver.Solve(&alarcon_system, initial_conditions, 0.0, 10.0, h_value, 1e-4);
-        end_time = std::clock();
+        end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "2. Runge-Kutta-Fehlberg Elapsed time = " << elapsed_time << "\n";
 

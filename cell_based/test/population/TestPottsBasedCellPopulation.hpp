@@ -160,13 +160,13 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
-        CellPtr p_cell(new Cell(p_state, p_model));
-        p_cell->SetCellProliferativeType(p_stem_type);
+        CellPtr p_cell1(new Cell(p_state, p_model));
+        p_cell1->SetCellProliferativeType(p_stem_type);
 
         double birth_time = 0.0 - p_mesh->GetNumElements()-1;
-        p_cell->SetBirthTime(birth_time);
+        p_cell1->SetBirthTime(birth_time);
 
-        cells.push_back(p_cell);
+        cells.push_back(p_cell1);
         cell_location_indices.push_back(p_mesh->GetNumElements()-1);
 
         // This should pass as the number of cells equals the number of elements

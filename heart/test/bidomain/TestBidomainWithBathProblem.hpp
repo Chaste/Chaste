@@ -733,14 +733,14 @@ public:
                 double y = r_mesh.GetElement(i)->CalculateCentroid()[1];
                 if ( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
                 {
-                    TS_ASSERT(HeartRegionCode::IsRegionBath(r_mesh.GetElement(i)->GetAttribute()));
+                    TS_ASSERT(HeartRegionCode::IsRegionBath(r_mesh.GetElement(i)->GetUnsignedAttribute()));
                 }
                 else
                 {
-                    TS_ASSERT(HeartRegionCode::IsRegionTissue(r_mesh.GetElement(i)->GetAttribute()));
+                    TS_ASSERT(HeartRegionCode::IsRegionTissue(r_mesh.GetElement(i)->GetUnsignedAttribute()));
                 }
                 // Compare mesh before & after
-                TS_ASSERT_EQUALS(r_mesh.GetElement(i)->GetAttribute(), p_mesh->GetElement(i)->GetAttribute());
+                TS_ASSERT_EQUALS(r_mesh.GetElement(i)->GetUnsignedAttribute(), p_mesh->GetElement(i)->GetUnsignedAttribute());
                 TS_ASSERT_DELTA(x, p_mesh->GetElement(i)->CalculateCentroid()[0], 1e-12);
                 TS_ASSERT_DELTA(y, p_mesh->GetElement(i)->CalculateCentroid()[1], 1e-12);
             }
@@ -907,12 +907,12 @@ public:
             {
                 if ( expected_element_regions[iter->GetIndex()] == 'T')
                 {
-                     TS_ASSERT(HeartRegionCode::IsRegionTissue( iter->GetAttribute() ));
+                     TS_ASSERT(HeartRegionCode::IsRegionTissue( iter->GetUnsignedAttribute() ));
                 }
                 else
                 {
                      TS_ASSERT_EQUALS( expected_element_regions[iter->GetIndex()], 'B')
-                     TS_ASSERT(HeartRegionCode::IsRegionBath( iter->GetAttribute() ));
+                     TS_ASSERT(HeartRegionCode::IsRegionBath( iter->GetUnsignedAttribute() ));
                 }
             }
             // so the middle 5 nodes should be heart nodes

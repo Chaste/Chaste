@@ -277,7 +277,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
         }
         else
         {
-            output_item.push_back(upstroke_velocities.size());
+            output_item.push_back((double)upstroke_velocities.size());
         }
         //... and the number of above threshold depolarisations
         output_item.push_back((double) total_number_of_above_threshold_depolarisations);

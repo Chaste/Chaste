@@ -72,9 +72,9 @@ public:
         TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
 
-        double start_time = std::clock();
+        double start_time = (double) std::clock();
         solutions = cvode_solver.Solve(&ode_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        double end_time = std::clock();
+        double end_time = (double) std::clock();
         double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout <<  "1. Cvode Elapsed time = " << elapsed_time << " secs for 100 hours\n";
 

@@ -79,6 +79,6 @@ unsigned S1S2Stimulus::GetNumS2FrequencyValues()
 
 
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(S1S2Stimulus);
+CHASTE_CLASS_EXPORT(S1S2Stimulus)
 
 

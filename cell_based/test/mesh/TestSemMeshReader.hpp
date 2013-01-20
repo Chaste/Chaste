@@ -87,13 +87,13 @@ public:
        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 25u);
 
        // Read element 0 from file
-       ElementData data = mesh_reader.GetNextElementData();
+       ElementData data1 = mesh_reader.GetNextElementData();
 
-       TS_ASSERT_EQUALS(data.NodeIndices.size(), 100u);
-       TS_ASSERT_EQUALS(data.NodeIndices[0], 0u);
-       TS_ASSERT_EQUALS(data.NodeIndices[1], 1u);
-       TS_ASSERT_EQUALS(data.NodeIndices[2], 2u);
-       TS_ASSERT_EQUALS(data.NodeIndices[3], 3u);
+       TS_ASSERT_EQUALS(data1.NodeIndices.size(), 100u);
+       TS_ASSERT_EQUALS(data1.NodeIndices[0], 0u);
+       TS_ASSERT_EQUALS(data1.NodeIndices[1], 1u);
+       TS_ASSERT_EQUALS(data1.NodeIndices[2], 2u);
+       TS_ASSERT_EQUALS(data1.NodeIndices[3], 3u);
 
        // Read element 1 from file
        ElementData data2 = mesh_reader.GetNextElementData();

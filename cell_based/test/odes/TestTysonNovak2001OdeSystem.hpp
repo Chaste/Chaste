@@ -105,9 +105,9 @@ public:
 
         state_variables = tyson_novak_system.GetInitialConditions();
 
-        start_time = std::clock();
+        start_time = (double) std::clock();
         solutions = backward_euler_solver.Solve(&tyson_novak_system, state_variables, 0.0, 75.8350/60.0, dt, dt);
-        end_time = std::clock();
+        end_time = (double) std::clock();
 
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "1. Elapsed time = " << elapsed_time << "\n";

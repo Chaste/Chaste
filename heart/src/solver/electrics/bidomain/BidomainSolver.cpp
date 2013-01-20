@@ -127,8 +127,6 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     }
     else
     {
-        DistributedVector::Stripe dist_vec_matrix_based_phie(dist_vec_matrix_based, 1);
-
         for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
              index!= dist_vec_matrix_based.End();
              ++index)

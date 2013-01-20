@@ -370,8 +370,8 @@ public:
             TS_ASSERT_DELTA(p_wnt->GetCryptProjectionParameterA(), 3.3, 1e-12);
             TS_ASSERT_DELTA(p_wnt->GetCryptProjectionParameterB(), 4.4, 1e-12);
 
-            AbstractCellPopulation<2>& cell_population = p_wnt->rGetCellPopulation();
-            delete (&cell_population);
+            AbstractCellPopulation<2>& arch_cell_population = p_wnt->rGetCellPopulation();
+            delete (&arch_cell_population);
         }
 
         WntConcentration<2>::Destroy();

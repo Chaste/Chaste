@@ -947,7 +947,7 @@ class Intel(BuildType):
                 self._cc_flags.extend(['-Wall',
                                        '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
                                        '-wr2304'])
-            elif version == 1000: # \todo #1360 Working through version 10 issues on userpc60
+            elif version == 10: # \todo #1360 Working through version 10 issues on userpc60
                 #\todo #1360 What about version 11?
                 #\todo #1360 Justify or fix the supressions given below
                 self._cc_flags.extend(['-Wall',

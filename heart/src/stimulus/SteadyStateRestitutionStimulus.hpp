@@ -90,6 +90,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(SteadyStateRestitutionStimulus);
+CHASTE_CLASS_EXPORT(SteadyStateRestitutionStimulus)
 
 #endif /*STEADYSTATERESTITUTIONSTIMULUS_HPP_*/

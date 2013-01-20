@@ -320,20 +320,20 @@ public:
         }
 
         {
-            AbstractCellProperty* p_property;
+            AbstractCellProperty* p_arch_property;
 
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> p_property;
+            input_arch >> p_arch_property;
 
-            TS_ASSERT_EQUALS(p_property->GetCellCount(), 1u);
+            TS_ASSERT_EQUALS(p_arch_property->GetCellCount(), 1u);
 
-            MotileCellProperty* p_real_property = dynamic_cast<MotileCellProperty*>(p_property);
+            MotileCellProperty* p_real_property = dynamic_cast<MotileCellProperty*>(p_arch_property);
             TS_ASSERT(p_real_property != NULL);
             TS_ASSERT_EQUALS(p_real_property->GetColour(), 7u);
 
-            delete p_property;
+            delete p_arch_property;
         }
     }
 

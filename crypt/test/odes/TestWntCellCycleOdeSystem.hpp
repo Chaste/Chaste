@@ -205,18 +205,18 @@ public:
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
 
         double start_time, end_time, elapsed_time = 0.0;
-        start_time = std::clock();
+        start_time = (double) std::clock();
         solutions_rk4 = rk4_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value_rk4, h_value_rk4);
-        end_time = std::clock();
+        end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "1. Runge-Kutta Elapsed time = " << elapsed_time << "\n";
 
         double h_value_rkf = 0.1;
 
         initial_conditions = wnt_system.GetInitialConditions();
-        start_time = std::clock();
+        start_time = (double) std::clock();
         solutions_rkf = rkf_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value_rkf, 1e-4);
-        end_time = std::clock();
+        end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "2. Runge-Kutta-Fehlberg Elapsed time = " << elapsed_time << "\n";
 

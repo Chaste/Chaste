@@ -88,7 +88,7 @@ public:
         unsigned nodes_across = 12;  // Corresponds to x axis
         unsigned nodes_depth = 12;   // Corresponds to y axis
         unsigned nodes_up = 12;        // Corresponds to z axis
-        double ghosts = 2.0;        // Layers of ghost nodes
+        unsigned ghosts = 2;        // Layers of ghost nodes
 
         /*
          *    *     *     *     *

@@ -56,7 +56,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
 
     unsigned num_nodes = numNodesAcross*numNodesUp*numNodesDeep;
 
-    unsigned node_index = 0;
+    unsigned next_node_index = 0;
     unsigned node_indices[elementWidth*elementHeight*elementDepth];
     unsigned element_index;
 
@@ -93,9 +93,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 {
                     is_boundary_node = (j==0 || j==numNodesUp-1 || (i==0 && !isPeriodicInX) || (i==numNodesAcross-1 && !isPeriodicInX) || k==0 || k==numNodesDeep-1) ? true : false;
                 }
-                Node<DIM>* p_node = new Node<DIM>(node_index, is_boundary_node, i, j, k);
+                Node<DIM>* p_node = new Node<DIM>(next_node_index, is_boundary_node, i, j, k);
                 nodes.push_back(p_node);
-                node_index++;
+                next_node_index++;
             }
         }
     }

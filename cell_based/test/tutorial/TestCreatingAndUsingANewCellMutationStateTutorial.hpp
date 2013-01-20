@@ -220,20 +220,20 @@ public:
         }
 
         {
-            AbstractCellProperty* p_state;
+            AbstractCellProperty* p_arch_state;
 
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> p_state;
+            input_arch >> p_arch_state;
 
-            TS_ASSERT_EQUALS(p_state->GetCellCount(), 1u);
+            TS_ASSERT_EQUALS(p_arch_state->GetCellCount(), 1u);
 
-            P53GainOfFunctionCellMutationState* p_real_state = dynamic_cast<P53GainOfFunctionCellMutationState*>(p_state);
+            P53GainOfFunctionCellMutationState* p_real_state = dynamic_cast<P53GainOfFunctionCellMutationState*>(p_arch_state);
             TS_ASSERT(p_real_state != NULL);
             TS_ASSERT_EQUALS(p_real_state->GetColour(), 5u);
 
-            delete p_state;
+            delete p_arch_state;
         }
     }
 

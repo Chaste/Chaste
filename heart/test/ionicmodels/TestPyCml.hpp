@@ -287,10 +287,10 @@ public:
         CheckParameter(cvode_opt);
 
         // Derived variables
-        N_Vector inits = cvode_cell.GetInitialConditions();
-        CheckDerivedQuantities(cvode_cell, inits);
-        CheckDerivedQuantities(cvode_opt, inits);
-        DeleteVector(inits);
+        N_Vector vec_inits = cvode_cell.GetInitialConditions();
+        CheckDerivedQuantities(cvode_cell, vec_inits);
+        CheckDerivedQuantities(cvode_opt, vec_inits);
+        DeleteVector(vec_inits);
 
         // Attributes
         CheckAttributes(cvode_cell);

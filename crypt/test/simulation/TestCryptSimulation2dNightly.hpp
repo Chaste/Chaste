@@ -63,13 +63,13 @@ private:
     void setUp()
     {
         CellBasedEventHandler::Disable(); // these tests fail with event-handling on
-        mLastStartTime = std::clock();
+        mLastStartTime = (double) std::clock();
         AbstractCellBasedTestSuite::setUp();
     }
 
     void tearDown()
     {
-        double time = std::clock();
+        double time = (double) std::clock();
         double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
         std::cout << "Elapsed time: " << elapsed_time << std::endl;
         AbstractCellBasedTestSuite::tearDown();

@@ -69,9 +69,9 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
 
         // Calculate the change in the norm of the state variables
         double temp = 0;
-        for (unsigned i=0; i<old_state_vars.size(); i++)
+        for (unsigned j=0; j<old_state_vars.size(); j++)
         {
-            temp += fabs(new_state_vars[i] - old_state_vars[i]);
+            temp += fabs(new_state_vars[j] - old_state_vars[j]);
         }
 
         if (rough_solution && temp < 1e-4)

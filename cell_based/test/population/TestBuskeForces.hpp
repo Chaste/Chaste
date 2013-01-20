@@ -106,10 +106,10 @@ public:
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
 
-        for (unsigned i=0; i<40; i++)
+        for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)i/10.0;
+            double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
@@ -189,10 +189,10 @@ public:
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
 
-        for (unsigned i=0; i<40; i++)
+        for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)i/10.0;
+            double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
@@ -267,10 +267,10 @@ public:
         node_elastic_force.reserve(cell_population.GetNumNodes());
         node_compression_force.reserve(cell_population.GetNumNodes());
 
-        for (unsigned i=0; i<40; i++)
+        for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)i/10.0;
+            double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
@@ -338,10 +338,10 @@ public:
         std::vector<c_vector<double, 2> > node_forces;
         node_forces.reserve(cell_population.GetNumNodes());
 
-        for (unsigned i=0; i<40; i++)
+        for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)i/10.0;
+            double separation = 4.0 - (double)step/10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces

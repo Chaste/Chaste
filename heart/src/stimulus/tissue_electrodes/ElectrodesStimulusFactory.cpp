@@ -192,13 +192,13 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
     double total_electrode_flux = 0.0;
     double ret;
 
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
-         iter != this->mpMesh->GetNodeIteratorEnd();
-         ++iter)
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator node_iter=this->mpMesh->GetNodeIteratorBegin();
+         node_iter != this->mpMesh->GetNodeIteratorEnd();
+         ++node_iter)
     {
-        if ( pRegion->DoesContain( (*iter).GetPoint() ) )
+        if ( pRegion->DoesContain( (*node_iter).GetPoint() ) )
         {
-            unsigned node_index =     iter->GetIndex();
+            unsigned node_index = node_iter->GetIndex();
             assert(node_index < this->mpMesh->GetNumNodes());
             double contribution_of_this_node = 0.0;
             //loop over the elements where this node is contained

@@ -129,6 +129,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-CHASTE_CLASS_EXPORT(S1S2Stimulus);
+CHASTE_CLASS_EXPORT(S1S2Stimulus)
 
 #endif /*S1S2STIMULUS_HPP_*/

@@ -253,8 +253,8 @@ private:
  */
 #define EXPECT0(cmd, arg) {      \
     std::string _arg(arg);       \
-    int ret = cmd(_arg.c_str()); \
-    if (ret != 0) {              \
+    int retcode = cmd(_arg.c_str()); \
+    if (retcode != 0) {              \
         EXCEPTION("Error executing command: " #cmd "(" + _arg + ")"); \
     } }
 

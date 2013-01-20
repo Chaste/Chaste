@@ -300,7 +300,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
         // Find a random available neighbouring node to overwrite current site
         std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
         std::vector<double> neighbouring_node_propensities;
-        std::vector<double> neighbouring_node_indices_vector;
+        std::vector<unsigned> neighbouring_node_indices_vector;
 
         if (!neighbouring_node_indices.empty())
         {
