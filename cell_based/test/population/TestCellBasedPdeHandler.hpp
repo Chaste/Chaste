@@ -844,10 +844,12 @@ public:
         CellBasedPdeHandler<2> pde_handler(&cell_population);
 
         // Create a single PDE and pass to the handler
+        // Note SimplePdeForTesting wouldnt work as theres no solution with Neuman conditions.
+        // Also note that when using Neuman conditions the only solution that works is u=0
         CellwiseSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(0.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
-
+        pde_and_bc.SetDependentVariableName("variable");
 
         // For coverage, provide an initial guess for the solution
         std::vector<double> data(mesh.GetNumNodes()+1);
@@ -877,11 +879,11 @@ public:
              ++cell_iter)
         {
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem(""), 0.0, 0.02);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), 0.0, 0.02);
         }
     }
 
-    void TestSolvePdeAndWriteResultsToFileCoarsePdeMeshBoundaryConditions() throw(Exception)
+    void TestSolvePdeAndWriteResultsToFileCoarsePdeMeshDirichlet() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -950,6 +952,76 @@ public:
             }
         }
     }
+
+    void TestSolvePdeAndWriteResultsToFileCoarsePdeMeshNeumann() throw(Exception)
+	{
+		EXIT_IF_PARALLEL;
+
+		// Set up SimulationTime
+		SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.05, 6);
+
+		// Create a cigar-shaped mesh
+		TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+		MutableMesh<2,2> mesh;
+		mesh.ConstructFromMeshReader(mesh_reader);
+		mesh.Scale(5.0, 1.0);
+
+		// Create a cell population
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+		MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+		// Create a PDE handler object using this cell population
+		CellBasedPdeHandler<2> pde_handler(&cell_population);
+
+		// Set up PDE and pass to handler
+		AveragedSourcePde<2> pde(cell_population, -0.01);
+		ConstBoundaryCondition<2> bc(0.0);
+		PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Last boolean specifies Neuman conditions
+		pde_and_bc.SetDependentVariableName("variable");
+
+		pde_handler.AddPdeAndBc(&pde_and_bc);
+
+		// Solve PDEs on a coarse mesh
+		ChastePoint<2> lower(0.0, 0.0);
+		ChastePoint<2> upper(50.0, 50.0);
+		ChasteCuboid<2> cuboid(lower, upper);
+		pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
+		pde_handler.SetImposeBcsOnCoarseBoundary(false);
+
+		// For coverage, provide an initial guess for the solution
+		std::vector<double> data(pde_handler.mpCoarsePdeMesh->GetNumNodes());
+		for (unsigned i=0; i<pde_handler.mpCoarsePdeMesh->GetNumNodes(); i++)
+		{
+			data[i] = 1.0;
+		}
+
+		Vec vector = PetscTools::CreateVec(data);
+		pde_and_bc.SetSolution(vector);
+
+		// Open result file ourselves
+		OutputFileHandler output_file_handler("TestWritePdeSolution", false);
+		pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+
+		// Solve PDE (set sampling timestep multiple to be large doesn't do anything as always output on 1st timestep)
+		pde_handler.SolvePdeAndWriteResultsToFile(10);
+
+		// Close result file ourselves
+		pde_handler.mpVizPdeSolutionResultsFile->close();
+
+		// Test that boundary cells experience the right boundary condition
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter)
+		{
+			if (cell_population.GetNodeCorrespondingToCell(*cell_iter)->IsBoundaryNode())
+			{
+				TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), 0.0, 1e-1);
+			}
+		}
+	}
 
     void TestSolvePdeAndWriteResultsToFileWithCoarsePdeMesh() throw(Exception)
     {
@@ -1075,52 +1147,6 @@ public:
             TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location, "quantity 1"), value0_at_cell, 1e-6);
             TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location, "quantity 2"), value1_at_cell, 1e-6);
         }
-    }
-
-    void TestCoarseSourceMeshWithNeumannIsNotImplemented() throw(Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Set up SimulationTime
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.05, 6);
-
-        // Create a cell population
-        HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a PDE handler object using this cell population
-        CellBasedPdeHandler<2> pde_handler(&cell_population);
-
-        // Set up PDE and pass to handler
-        AveragedSourcePde<2> pde(cell_population, -0.1);
-        ConstBoundaryCondition<2> bc(0.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
-        pde_and_bc.SetDependentVariableName("first variable");
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-
-        // Set up second PDE and pass to handler
-        AveragedSourcePde<2> pde2(cell_population, -0.5);
-        ConstBoundaryCondition<2> bc2(0.0);
-        PdeAndBoundaryConditions<2> pde_and_bc2(&pde2, &bc2, true);
-        pde_and_bc2.SetDependentVariableName("second variable");
-        pde_handler.AddPdeAndBc(&pde_and_bc2);
-
-        // Solve PDEs on a coarse mesh
-        ChastePoint<2> lower(0.0, 0.0);
-        ChastePoint<2> upper(50.0, 50.0);
-        ChasteCuboid<2> cuboid(lower, upper);
-        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(false);
-
-        // Test that the correct exception is thrown
-        TS_ASSERT_THROWS_THIS(pde_handler.SolvePdeAndWriteResultsToFile(1),
-            "Neumann BCs not yet implemented when using a coarse PDE mesh");
     }
 };
 

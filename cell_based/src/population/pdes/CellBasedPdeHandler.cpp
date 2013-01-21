@@ -347,22 +347,15 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
 
         if (p_pde_and_bc->IsNeumannBoundaryCondition()) // this BC is of Neumann type
         {
-            if (using_coarse_pde_mesh)
-            {
-                ///\todo enable this (#1891)
-                EXCEPTION("Neumann BCs not yet implemented when using a coarse PDE mesh");
-            }
-            else
-            {
-                for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = p_mesh->GetBoundaryElementIteratorBegin();
-                     elem_iter != p_mesh->GetBoundaryElementIteratorEnd();
-                     ++elem_iter)
-                {
-                    bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
-                }
-            }
+			// Note p_mesh is the coarse mesh or the natural mesh as appropriate
+			for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = p_mesh->GetBoundaryElementIteratorBegin();
+				 elem_iter != p_mesh->GetBoundaryElementIteratorEnd();
+				 ++elem_iter)
+			{
+				bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
+			}
         }
-        else // assume that if the BC is of Neumann type, then it is Dirichlet
+        else // assume that if the BC is not of Neumann type, then it is Dirichlet
         {
             if (using_coarse_pde_mesh && !mSetBcsOnCoarseBoundary)
             {

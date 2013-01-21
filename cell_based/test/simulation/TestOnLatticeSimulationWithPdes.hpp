@@ -285,15 +285,22 @@ public:
         simulator.SetEndTime(1);
 
 
-        // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
-        AveragedSourcePde<2> pde(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-        pde_and_bc.SetDependentVariableName("nutrient");
+        // Set up 2 PDEs (one with dirichlet and one with Neumann BCS) and pass to simulation via handler (zero uptake to check analytic solution)
+        // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
+        AveragedSourcePde<2> pde_1(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc_1(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
+        pde_and_bc_1.SetDependentVariableName("nutrient_dirichlet");
+
+        AveragedSourcePde<2> pde_2(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc_2(0.0);
+        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
+        pde_and_bc_2.SetDependentVariableName("nutrient_neumann");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
+        pde_handler.AddPdeAndBc(&pde_and_bc_1);
+        pde_handler.AddPdeAndBc(&pde_and_bc_2);
+        pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
@@ -313,7 +320,8 @@ public:
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
-            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_dirichlet"), analytic_solution, 1e-2);
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.0, 1e-2);
         }
 
         //Test coarse mesh has the same nodes as the PottsMesh
