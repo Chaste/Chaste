@@ -192,7 +192,7 @@ private:
     unsigned mOrderOfElements; /**< The order of each element (1 for linear, 2 for quadratic). */
     unsigned mOrderOfBoundaryElements; /**< The order of each element (1 for linear, 2 for quadratic). */
     unsigned mNodesPerElement; /**< The number of nodes contained in each element. */
-    unsigned mNodesPerBoundaryElement;
+    unsigned mNodesPerBoundaryElement; /**< The number of nodes contained in each boundary element. */
 };
 
 #endif //_GMSHMESHREADER_HPP_
