@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulation.hpp"
 #include "PdeAndBoundaryConditions.hpp"
+#include "BoundaryConditionsContainer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "ChasteCuboid.hpp"
 #include "Identifiable.hpp"
@@ -232,6 +233,16 @@ public:
      *     at which results are written to file.
      */
     virtual void SolvePdeAndWriteResultsToFile(unsigned samplingTimestepMultiple);
+
+    /**
+     * Helper method to construct the boundary conditions container for the PDE
+     *
+     * @param pPdeAndBc a pointer to the pde and bcs
+     * @param pMesh the mesh to solve the PDE On
+     * return The full boundary conditions container
+     *
+     */
+    BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Find the solution of one of the PDEs at a point in space

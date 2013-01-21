@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MultipleCaBasedCellPopulation.hpp"
-#include "BoundaryConditionsContainer.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 #include "CellBasedPdeSolver.hpp"
 #include "Exception.hpp"
@@ -342,65 +341,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
         // Set up boundary conditions
-        AbstractBoundaryCondition<DIM>* p_bc = p_pde_and_bc->GetBoundaryCondition();
-        BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
-
-        if (p_pde_and_bc->IsNeumannBoundaryCondition()) // this BC is of Neumann type
-        {
-			// Note p_mesh is the coarse mesh or the natural mesh as appropriate
-			for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = p_mesh->GetBoundaryElementIteratorBegin();
-				 elem_iter != p_mesh->GetBoundaryElementIteratorEnd();
-				 ++elem_iter)
-			{
-				bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
-			}
-        }
-        else // assume that if the BC is not of Neumann type, then it is Dirichlet
-        {
-            if (using_coarse_pde_mesh && !mSetBcsOnCoarseBoundary)
-            {
-                // Get the set of coarse element indices that contain cells
-                std::set<unsigned> coarse_element_indices_in_map;
-                for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
-                     cell_iter != mpCellPopulation->End();
-                     ++cell_iter)
-                {
-                    coarse_element_indices_in_map.insert(mCellPdeElementMap[*cell_iter]);
-                }
-
-                // Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map
-                std::set<unsigned> coarse_mesh_boundary_node_indices;
-                for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
-                {
-                    if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
-                    {
-                        Element<DIM,DIM>* p_element = p_mesh->GetElement(i);
-                        for (unsigned j=0; j<DIM+1; j++)
-                        {
-                            unsigned node_index = p_element->GetNodeGlobalIndex(j);
-                            coarse_mesh_boundary_node_indices.insert(node_index);
-                        }
-                    }
-                }
-
-                // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
-                for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
-                     iter != coarse_mesh_boundary_node_indices.end();
-                     ++iter)
-                {
-                    bcc.AddDirichletBoundaryCondition(p_mesh->GetNode(*iter), p_bc, 0, false);
-                }
-            }
-            else // apply BC at boundary nodes of (population-level or coarse) mesh
-            {
-                for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = p_mesh->GetBoundaryNodeIteratorBegin();
-                     node_iter != p_mesh->GetBoundaryNodeIteratorEnd();
-                     ++node_iter)
-                {
-                    bcc.AddDirichletBoundaryCondition(*node_iter, p_bc);
-                }
-            }
-        }
+        BoundaryConditionsContainer<DIM,DIM,1> bcc = ConstructBoundaryConditionsContiner(p_pde_and_bc, p_mesh);
 
         // If the solution at the previous timestep exists...
         PetscInt previous_solution_size = 0;
@@ -525,6 +466,78 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         }
     }
 #undef COVERAGE_IGNORE
+}
+
+template<unsigned DIM>
+BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
+{
+	BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
+
+	AbstractBoundaryCondition<DIM>* p_bc = pPdeAndBc->GetBoundaryCondition();
+
+	if (pPdeAndBc->IsNeumannBoundaryCondition()) // this BC is of Neumann type
+	{
+		// Note p_mesh is the coarse mesh or the natural mesh as appropriate
+		for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = pMesh->GetBoundaryElementIteratorBegin();
+			 elem_iter != pMesh->GetBoundaryElementIteratorEnd();
+			 ++elem_iter)
+		{
+			bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
+		}
+	}
+	else // assume that if the BC is not of Neumann type, then it is Dirichlet
+	{
+	    bool using_coarse_pde_mesh = (mpCoarsePdeMesh != NULL);
+
+		if (using_coarse_pde_mesh && !mSetBcsOnCoarseBoundary)
+		{
+			// Get the set of coarse element indices that contain cells
+			std::set<unsigned> coarse_element_indices_in_map;
+			for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mpCellPopulation->Begin();
+				 cell_iter != mpCellPopulation->End();
+				 ++cell_iter)
+			{
+				coarse_element_indices_in_map.insert(mCellPdeElementMap[*cell_iter]);
+			}
+
+			// Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map
+			std::set<unsigned> coarse_mesh_boundary_node_indices;
+			for (unsigned i=0; i<pMesh->GetNumElements(); i++)
+			{
+				if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
+				{
+					Element<DIM,DIM>* p_element = pMesh->GetElement(i);
+					for (unsigned j=0; j<DIM+1; j++)
+					{
+						unsigned node_index = p_element->GetNodeGlobalIndex(j);
+						coarse_mesh_boundary_node_indices.insert(node_index);
+					}
+				}
+			}
+
+			// Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
+			for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
+				 iter != coarse_mesh_boundary_node_indices.end();
+				 ++iter)
+			{
+				bcc.AddDirichletBoundaryCondition(pMesh->GetNode(*iter), p_bc, 0, false);
+			}
+		}
+		else // apply BC at boundary nodes of (population-level or coarse) mesh
+		{
+			for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = pMesh->GetBoundaryNodeIteratorBegin();
+				 node_iter != pMesh->GetBoundaryNodeIteratorEnd();
+				 ++node_iter)
+			{
+				bcc.AddDirichletBoundaryCondition(*node_iter, p_bc);
+			}
+		}
+	}
+
+
+
+
+	return bcc;
 }
 
 template<unsigned DIM>
