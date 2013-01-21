@@ -68,6 +68,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "CellBasedPdeHandlerOnCuboid.hpp"
+#include "CellBasedPdeHandler.hpp"
 #include "FileComparison.hpp"
 
 
@@ -194,12 +196,14 @@ public:
         pde_and_bc.SetDependentVariableName("nutrient");
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
+
+
         pde_handler.AddPdeAndBc(&pde_and_bc);
         ChastePoint<2> lower(0.0, 0.0);
         ChastePoint<2> upper(50.0, 50.0);
         ChasteCuboid<2> cuboid(lower, upper);
         pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-        pde_handler.SetImposeBcsOnCoarseBoundary(true);
+        pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
@@ -335,6 +339,77 @@ public:
         {
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0],p_mesh->GetNode(i)->rGetLocation()[0],1e-8);
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1],p_mesh->GetNode(i)->rGetLocation()[1],1e-8);
+        }
+    }
+
+
+    void TestMultipleCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 100);
+
+        std::vector<unsigned> location_indices;
+        for(unsigned i=0; i<100; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnCuboid");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1);
+
+        // Set up 2 PDEs (one with dirichlet and one with Neumann BCS) and pass to simulation via handler (zero uptake to check analytic solution)
+        // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
+        AveragedSourcePde<2> pde_1(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc_1(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
+        pde_and_bc_1.SetDependentVariableName("nutrient_dirichlet");
+
+        AveragedSourcePde<2> pde_2(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc_2(0.5);
+        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
+        pde_and_bc_2.SetDependentVariableName("nutrient_neumann");
+
+        CellBasedPdeHandlerOnCuboid<2> pde_handler(&cell_population);
+        pde_handler.AddPdeAndBc(&pde_and_bc_1);
+        pde_handler.AddPdeAndBc(&pde_and_bc_2);
+        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+
+        simulator.SetCellBasedPdeHandler(&pde_handler);
+
+        // Solve the system
+        simulator.Solve();
+
+        // Test that PDE solver is working correctly
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+        	c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+
+        	if (cell_location[1] < 1e-6 || cell_location[1] > 9 - 1e-6)
+        	{
+        		TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_dirichlet"),1.0, 1e-2);
+        		TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.5, 1e-2);
+        	}
+        	else
+        	{
+        		TS_ASSERT_LESS_THAN(1.0,cell_iter->GetCellData()->GetItem("nutrient_dirichlet"));
+        		TS_ASSERT_LESS_THAN(0.5,cell_iter->GetCellData()->GetItem("nutrient_neumann"));
+        	}
         }
     }
 

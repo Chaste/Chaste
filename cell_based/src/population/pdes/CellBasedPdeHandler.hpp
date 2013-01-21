@@ -242,7 +242,7 @@ public:
      * return The full boundary conditions container
      *
      */
-    BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
+    virtual BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Find the solution of one of the PDEs at a point in space
