@@ -559,6 +559,23 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 1"), analytic_solution, 1e-2);
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("quantity 2"), analytic_solution, 1e-2);
         }
+#ifdef CHASTE_VTK
+        //First file exists
+        FileFinder vtk_file("TestPottsBasedCellPopulationWithTwoPdes/results_from_time_0/pde_results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+        // Check that the second VTK file for the solution has the dependent quantities
+        OutputFileHandler handler("TestPottsBasedCellPopulationWithTwoPdes", false);
+        VtkMeshReader<3,3> vtk_reader(handler.GetOutputDirectoryFullPath()+"results_from_time_0/pde_results_2.vtu");
+        std::vector<double> data1;
+        //There is no Oxygen
+        TS_ASSERT_THROWS_CONTAINS(vtk_reader.GetPointData("Oxygen", data1), "No point data");
+        TS_ASSERT(data1.empty());
+        vtk_reader.GetPointData("quantity 1", data1);
+        TS_ASSERT_EQUALS(data1.size(), 6u*6u);
+        std::vector<double> data2;
+        vtk_reader.GetPointData("quantity 2", data2);
+        TS_ASSERT_EQUALS(data1.size(), data2.size());
+#endif //CHASTE_VTK
     }
 
     // Under construction: Test growth of a population of cells that consumes nutrient
