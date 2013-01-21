@@ -184,7 +184,6 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
         UseCoarsePdeMesh(1, cuboid, false);
     }
 
-
     // If using a NodeBasedCellPopulation a VertexBasedCellPopulation, a MultipleCABasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
     if (PdeSolveNeedsCoarseMesh() && mpCoarsePdeMesh==NULL)
     {
@@ -242,14 +241,14 @@ void CellBasedPdeHandler<DIM>::CloseResultsFiles()
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, ChasteCuboid<DIM> meshCuboid, bool centreOnCellPopulation)
 {
-    // If solving PDEs on a coarse mesh, each PDE must have an averaged source term
     if (mPdeAndBcCollection.empty())
     {
         EXCEPTION("mPdeAndBcCollection should be populated prior to calling UseCoarsePdeMesh().");
     }
+    // If solving PDEs on a coarse mesh, each PDE must have an averaged source term
     for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
     {
-        if (mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == false)
+        if (mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == false && !dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation))
         {
             EXCEPTION("UseCoarsePdeMesh() should only be called if averaged-source PDEs are specified.");
         }
@@ -316,7 +315,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
     for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
     {
         assert(mPdeAndBcCollection[pde_index]);
-        assert(mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == using_coarse_pde_mesh);
+        assert(mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == using_coarse_pde_mesh || dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation));
     }
 
     // Make sure the cell population is in a nice state
@@ -373,12 +372,13 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         }
 
         // Create a PDE solver and solve the PDE on the (population-level or coarse) mesh
-        if (using_coarse_pde_mesh)
+        if (p_pde_and_bc->HasAveragedSourcePde())
         {
             // When using a coarse PDE mesh, we must set up the source terms before solving the PDE.
             // pass in mCellPdeElementMap to speed up finding cells.
             this->UpdateCellPdeElementMap();
             p_pde_and_bc->SetUpSourceTermsForAveragedSourcePde(p_mesh, &mCellPdeElementMap);
+
 
             SimpleLinearEllipticSolver<DIM,DIM> solver(p_mesh, p_pde_and_bc->GetPde(), &bcc);
 

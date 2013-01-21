@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "MeshBasedCellPopulation.hpp"
+#include "AbstractCellPopulation.hpp"
 #include "AbstractLinearEllipticPde.hpp"
 
 /**
@@ -68,7 +68,7 @@ private:
     }
 
     /** The cell population member. */
-    MeshBasedCellPopulation<DIM>& mrCellPopulation;
+    AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
     /** Coefficient of consumption of nutrient by cells. */
     double mCoefficient;
@@ -81,12 +81,12 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
      */
-    CellwiseSourcePde(MeshBasedCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    CellwiseSourcePde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double coefficient=0.0);
 
     /**
      * @return const reference to the cell population (used in archiving).
      */
-    const MeshBasedCellPopulation<DIM>& rGetCellPopulation() const;
+    const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
      * @return mCoefficient (used in archiving).
@@ -147,7 +147,7 @@ inline void save_construct_data(
     Archive & ar, const CellwiseSourcePde<DIM>* t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
-    const MeshBasedCellPopulation<DIM>* p_cell_population = &(t->rGetCellPopulation());
+    const AbstractCellPopulation<DIM, DIM>* p_cell_population = &(t->rGetCellPopulation());
     ar & p_cell_population;
 }
 
@@ -159,7 +159,7 @@ inline void load_construct_data(
     Archive & ar, CellwiseSourcePde<DIM>* t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    MeshBasedCellPopulation<DIM>* p_cell_population;
+    AbstractCellPopulation<DIM, DIM>* p_cell_population;
     ar >> p_cell_population;
 
     // Invoke inplace constructor to initialise instance

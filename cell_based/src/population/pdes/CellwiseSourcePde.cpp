@@ -38,14 +38,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-CellwiseSourcePde<DIM>::CellwiseSourcePde(MeshBasedCellPopulation<DIM>& rCellPopulation, double coefficient)
+CellwiseSourcePde<DIM>::CellwiseSourcePde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double coefficient)
     : mrCellPopulation(rCellPopulation),
       mCoefficient(coefficient)
 {
 }
 
 template<unsigned DIM>
-const MeshBasedCellPopulation<DIM>& CellwiseSourcePde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM,DIM>& CellwiseSourcePde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }

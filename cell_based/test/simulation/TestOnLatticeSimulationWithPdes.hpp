@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "FunctionalBoundaryCondition.hpp"
 #include "AveragedSourcePde.hpp"
+#include "CellwiseSourcePde.hpp"
 #include "SmartPointers.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
@@ -342,6 +343,71 @@ public:
         }
     }
 
+    void TestMultipleCaBasedWithCellwiseSourcePde() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, 100);
+
+        std::vector<unsigned> location_indices;
+        for(unsigned i=0; i<100; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        // Create cell population
+        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnNaturalMesh");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1);
+
+        CellwiseSourcePde<2> pde(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
+
+        double pde_coefficient = 0.0;
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_mesh->GetNode(0)), pde_coefficient, 1e-3);
+
+        CellwiseSourcePde<2> non_trivial_pde(cell_population, 1.0);
+
+        double non_trivial_pde_coefficient = 1.0;
+        for (PottsMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
+        }
+
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
+        pde_handler.SetImposeBcsOnCoarseBoundary(false);
+
+        simulator.SetCellBasedPdeHandler(&pde_handler);
+
+        simulator.Solve();
+
+        // Test solution is constant
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double analytic_solution = 1.0;
+            // Test that PDE solver is working correctly
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
+        }
+    }
+
 
     void TestMultipleCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
     {
@@ -412,7 +478,6 @@ public:
         	}
         }
     }
-
 
     /*
      * This tests that a sensible error is thrown if the coarse mesh is too small/
