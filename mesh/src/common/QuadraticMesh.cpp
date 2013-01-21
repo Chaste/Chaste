@@ -468,16 +468,10 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rAbsMeshReader)
 {
-    TrianglesMeshReader<DIM, DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<DIM, DIM>*>(&rAbsMeshReader);
+    //Some mesh readers will let you read with non-linear elements
+    unsigned order_of_elements = rAbsMeshReader.GetOrderOfElements();
 
-    unsigned order_of_elements = 1;
-    if (p_mesh_reader)
-    {
-        //A triangles mesh reader will let you read with non-linear elements
-        order_of_elements = p_mesh_reader->GetOrderOfElements();
-    }
-
-    // If it is a linear TrianglesMeshReader or any other reader (which are all linear)
+    // If it is a linear mesh reader
     if (order_of_elements == 1)
     {
         WARNING("Reading a (linear) tetrahedral mesh and converting it to a QuadraticMesh.  This involves making an external library call to Triangle/Tetgen in order to compute internal nodes");
@@ -485,12 +479,12 @@ void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& r
         return;
     }
 
-    TetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(*p_mesh_reader);
+    TetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(rAbsMeshReader);
     assert(this->GetNumBoundaryElements() > 0);
 
-    QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);
+    QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, &rAbsMeshReader);
     CountVertices();
-    QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, p_mesh_reader);
+    QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, &rAbsMeshReader);
     QuadraticMeshHelper<DIM>::CheckBoundaryElements(this);
 }
 

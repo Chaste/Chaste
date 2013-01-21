@@ -108,6 +108,12 @@ public:
     /** Returns the number of cable element attributes in the mesh */
     unsigned GetNumCableElementAttributes() const;
 
+    /** * @return the expected order of the element file (1=linear, 2=quadratic) */
+    unsigned GetOrderOfElements();
+
+    /** @return the expected order of the element file (1=linear, 2=quadratic) */
+    unsigned GetOrderOfBoundaryElements();
+
     /** Resets pointers to beginning*/
     void Reset();
 

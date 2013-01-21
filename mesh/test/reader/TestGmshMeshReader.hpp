@@ -182,27 +182,37 @@ public:
             READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructFromMeshReader(reader);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
         }
 
         {
             READER_3D reader("mesh/test/data/simple_cube_gmsh.msh");
             TetrahedralMesh<3,3> mesh;
             mesh.ConstructFromMeshReader(reader);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 14u);
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
+            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
         }
 
-//These currently fail because QuadraticMesh only expects to be able to read a quadratic file from a TrianglesMeshReader. This
-// should be refactored by moving the GetOrderOfElements() method up to AbstractMeshReader. See #2013.
-//        {
-//           READER_2D reader("mesh/test/data/quad_square_4_elements_gmsh.msh",2,2);
-//           QuadraticMesh<2> mesh;
-//           mesh.ConstructFromMeshReader(reader);
-//        }
-//
-//        {
-//           READER_3D reader("mesh/test/data/quad_cube_gmsh.msh",2,2);
-//           QuadraticMesh<3> mesh;
-//           mesh.ConstructFromMeshReader(reader);
-//        }
+        {
+           READER_2D reader("mesh/test/data/quad_square_4_elements_gmsh.msh",2,2);
+           QuadraticMesh<2> mesh;
+           mesh.ConstructFromMeshReader(reader);
+           TS_ASSERT_EQUALS(mesh.GetNumNodes(), 13u);
+           TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+           TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
+        }
+
+        {
+           READER_3D reader("mesh/test/data/quad_cube_gmsh.msh",2,2);
+           QuadraticMesh<3> mesh;
+           mesh.ConstructFromMeshReader(reader);
+           TS_ASSERT_EQUALS(mesh.GetNumNodes(), 63u);
+           TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
+           TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
+        }
     }
 };
 

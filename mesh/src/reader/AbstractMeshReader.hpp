@@ -175,6 +175,22 @@ public:
     virtual std::string GetMeshFileBaseName();
 
     /**
+     * @return the expected order of the element file (1=linear, 2=quadratic)
+     */
+    virtual unsigned GetOrderOfElements();
+
+    /**
+     * @return the expected order of the boundary element file (1=linear, 2=quadratic)
+     */
+    virtual unsigned GetOrderOfBoundaryElements();
+
+    /**
+     * @return true if the boundary element file is linear, but contains information about neighbouring elements
+     */
+    bool GetReadContainingElementOfBoundaryElement();
+
+
+    /**
      * Returns true if reading binary files, false if reading ascii files.
      *
      * Note, this will always return false unless over-ridden by a derived class that is able to support binary file

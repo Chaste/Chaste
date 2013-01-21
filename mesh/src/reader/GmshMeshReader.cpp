@@ -262,6 +262,17 @@ unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
     //return mNumCableElements;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOrderOfElements()
+{
+    return mOrderOfElements;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOrderOfBoundaryElements()
+{
+    return mOrderOfBoundaryElements;
+}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes() const

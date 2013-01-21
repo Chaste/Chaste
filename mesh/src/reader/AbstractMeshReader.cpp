@@ -115,6 +115,24 @@ std::string AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMeshFileBaseName()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOrderOfElements()
+{
+    return 1u;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOrderOfBoundaryElements()
+{
+    return 1u;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::GetReadContainingElementOfBoundaryElement()
+{
+    return false;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::IsFileFormatBinary()
 {
     return false;

@@ -53,7 +53,7 @@ void SeekToBoundaryElement(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshRead
 
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                          TrianglesMeshReader<DIM,DIM>* pMeshReader)
+                                                          AbstractMeshReader<DIM,DIM>* pMeshReader)
 {
     assert(pMesh);
     assert(pMeshReader);
@@ -102,7 +102,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
 
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                                  TrianglesMeshReader<DIM,DIM>* pMeshReader)
+                                                                  AbstractMeshReader<DIM,DIM>* pMeshReader)
 {
     assert(pMesh);
     assert(pMeshReader);
@@ -126,7 +126,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
 
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                          TrianglesMeshReader<DIM,DIM>* pMeshReader)
+                                                          AbstractMeshReader<DIM,DIM>* pMeshReader)
  {
     // Loop over all boundary elements, find the equivalent face from all
     // the elements, and add the extra nodes to the boundary element

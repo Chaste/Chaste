@@ -57,7 +57,7 @@ public:
      * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data
      */
     static void AddInternalNodesToElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                           TrianglesMeshReader<DIM,DIM>* pMeshReader);
+                                           AbstractMeshReader<DIM,DIM>* pMeshReader);
 
     /**
      * Top level method for adding internal nodes to the mesh's boundary elements.
@@ -71,7 +71,7 @@ public:
      * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data
      */
     static void AddInternalNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                   TrianglesMeshReader<DIM,DIM>* pMeshReader);
+                                                   AbstractMeshReader<DIM,DIM>* pMeshReader);
 
 
     /**
@@ -85,7 +85,7 @@ public:
      * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data, if any; NULL otherwise
      */
     static void AddNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                           TrianglesMeshReader<DIM,DIM>* pMeshReader);
+                                            AbstractMeshReader<DIM,DIM>* pMeshReader);
 
     /**
      * Check whether all the boundary elements in the given mesh have the expected number of nodes.
