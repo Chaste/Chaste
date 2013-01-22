@@ -579,25 +579,26 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
     {
         (*mpVizPdeSolutionResultsFile) << time << "\t";
 
-		// Note that this mesh writer is only constructed and used if mpCoarsePdeMesh exists
+#ifdef CHASTE_VTK
+        // Note that this mesh writer is only constructed and used if mpCoarsePdeMesh exists
         VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = NULL;
         if (DIM>1 && mpCoarsePdeMesh != NULL )
         {
-        	std::ostringstream time_string;
-        	time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
-        	std::string results_file = "pde_results_"+time_string.str();
-        	// Note that this mesh writer is always constructed, but is only used if mpCoarsePdeMesh exists
-        	p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mDirPath, results_file, false);
+            std::ostringstream time_string;
+            time_string << SimulationTime::Instance()->GetTimeStepsElapsed()+1;
+            std::string results_file = "pde_results_"+time_string.str();
+            // Note that this mesh writer is always constructed, but is only used if mpCoarsePdeMesh exists
+            p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mDirPath, results_file, false);
         }
-
+#endif //CHASTE_VTK
         for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
         {
             if (mpCoarsePdeMesh != NULL)
             {
                 PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
-            	assert( p_pde_and_bc->rGetDependentVariableName()!="");
+                assert( p_pde_and_bc->rGetDependentVariableName()!="");
 
-                #ifdef CHASTE_VTK
+#ifdef CHASTE_VTK
                 if (p_pde_and_bc->GetSolution())
                 {
                     if (DIM>1)
@@ -613,7 +614,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
                     }
                 }
 
-                #endif //CHASTE_VTK
+#endif //CHASTE_VTK
 
                 for (unsigned i=0; i<mpCoarsePdeMesh->GetNumNodes(); i++)
                 {
@@ -655,11 +656,13 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
             }
         }
         (*mpVizPdeSolutionResultsFile) << "\n";
+#ifdef CHASTE_VTK
         if (p_vtk_mesh_writer != NULL)
         {
-        	p_vtk_mesh_writer->WriteFilesUsingMesh(*mpCoarsePdeMesh);
-        	delete p_vtk_mesh_writer;
+            p_vtk_mesh_writer->WriteFilesUsingMesh(*mpCoarsePdeMesh);
+            delete p_vtk_mesh_writer;
         }
+#endif //CHASTE_VTK
     }
 }
 
