@@ -391,7 +391,7 @@ void AdaptiveBidomainProblem::Solve()
         assert(mpi_ret == MPI_SUCCESS);
         mpi_ret = MPI_Allreduce(&local_max, &mNeumannStimulusUpperValue, 1, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
         assert(mpi_ret == MPI_SUCCESS);
-
+        UNUSED_OPT(mpi_ret);
         SetupNeumannBoundaryConditionOnMesh();
     }
     else
