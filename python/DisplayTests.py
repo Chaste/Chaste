@@ -762,8 +762,7 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
 ##                    Helper functions.                            ##
 #####################################################################
 
-def _importModuleFromSvn(module_name, module_filepath,
-                             revision=None):
+def _importModuleFromSvn(module_name, module_filepath, revision=None):
     """
     Use svn and imp to import the requested revision of the given
         module from the repository.
