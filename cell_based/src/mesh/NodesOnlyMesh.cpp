@@ -258,7 +258,6 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
     // Store the node locations
     std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
     std::vector<double> old_cell_radii;
-    bool copy_radii = !mCellRadii.empty();
 
     unsigned new_index = 0;
     for (unsigned i=0; i<this->GetNumAllNodes(); i++)
@@ -271,10 +270,7 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
         {
             map.SetNewIndex(i, new_index);
             old_node_locations.push_back(this->mNodes[i]->rGetLocation());
-            if (copy_radii)
-            {
-                old_cell_radii.push_back(mCellRadii[i]);
-            }
+            old_cell_radii.push_back(mCellRadii[i]);
 
             new_index++;
         }
@@ -337,7 +333,7 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
      * node index is ever re-used when a new node is added, mCellRadii
      * will be updated correctly.
      */
-    mCellRadii.erase(index);
+	mCellRadii.erase(index);
 
     // Decrease the counter for the number of nodes.
     mTotalNumNodes -= 1;

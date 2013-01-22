@@ -253,9 +253,11 @@ public:
     void CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
-     * Overridden ReMesh() method.
+     * Overridden ReMesh() method. Since only Nodes are stored, this method just cleans up mNodes by
+     * removing nodes marked as deleted and reallocating mNodes to 'fill the gaps'.
      *
-     * @param rMap a reference to a nodemap which should be created with the required number of nodes.
+     * @param rMap a reference to a NodeMap which associated the indices of the old mesh
+     * with the new mesh. It should have the same size as mNodes.
      */
     void ReMesh(NodeMap& rMap);
 
