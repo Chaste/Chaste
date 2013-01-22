@@ -187,7 +187,7 @@ public:
     /**
      * @return true if the boundary element file is linear, but contains information about neighbouring elements
      */
-    bool GetReadContainingElementOfBoundaryElement();
+    virtual bool GetReadContainingElementOfBoundaryElement();
 
 
     /**
