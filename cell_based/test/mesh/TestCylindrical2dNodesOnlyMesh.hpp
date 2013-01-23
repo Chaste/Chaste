@@ -58,7 +58,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds = p_mesh->CalculateBoundingBox();
@@ -90,7 +90,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         c_vector<double, 2> node10_location = p_mesh->GetNode(10)->rGetLocation();
         c_vector<double, 2> node11_location = p_mesh->GetNode(11)->rGetLocation();
@@ -132,7 +132,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Move one of the nodes to past the periodic boundary
         c_vector<double, 2> new_point_location;
@@ -170,7 +170,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Choose a node on the left boundary
         ChastePoint<2> point = p_mesh->GetNode(4)->GetPoint();
@@ -228,7 +228,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
 

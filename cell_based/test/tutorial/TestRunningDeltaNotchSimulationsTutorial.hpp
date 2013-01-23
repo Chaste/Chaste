@@ -209,7 +209,10 @@ public:
         HoneycombMeshGenerator generator(5, 5);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        /* The mechanics cut-off length (second argument) is used in this simulation to determine nearest
+         * neighbours for the purpose of the Delta/Notch intercellular signalling model.
+         */
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -227,10 +230,6 @@ public:
         }
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        /* The mechanics cut-off length is also used in this simulation to determine nearest
-         * neighbours for the purpose of the Delta/Notch intercellular signalling model.
-         */
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellMutationStates(true);

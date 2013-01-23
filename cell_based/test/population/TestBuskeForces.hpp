@@ -68,7 +68,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 1.0);
 
@@ -79,7 +79,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -151,7 +150,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 1.0);
 
@@ -162,7 +161,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -235,7 +233,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 1.0);
 
@@ -246,9 +244,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // This is because cells have radius 1.0.
-        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -308,7 +303,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 1.0);
 
@@ -319,7 +314,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force
@@ -383,7 +377,7 @@ public:
         nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 2.5);
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 1.0);
         p_mesh->SetCellRadius(2, 1.0);
@@ -395,7 +389,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(2.5);
         cell_population.Update();
 
         // Create force

@@ -1189,7 +1189,7 @@ public:
         temp_mesh.Scale(5.0,1.0);
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh);
+        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1210,7 +1210,6 @@ public:
 
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1250,7 +1249,7 @@ public:
         temp_mesh.Scale(20.0,20.0);
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh);
+        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1271,7 +1270,6 @@ public:
 
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1439,7 +1437,7 @@ public:
         temp_mesh.ConstructRegularSlabMesh(2.0,2,2);
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh);
+        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set some cell radius
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
@@ -1467,7 +1465,6 @@ public:
 
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
         c_vector<double,2> centre_of_mesh;
@@ -1542,7 +1539,7 @@ public:
         nodes.push_back(new Node<1>(0, true,  0.0));
 
         NodesOnlyMesh<1>* p_mesh = new NodesOnlyMesh<1>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Set up differentiated cells
         std::vector<CellPtr> cells;
@@ -1562,7 +1559,6 @@ public:
 
         // Set up cell population
         NodeBasedCellPopulation<1> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
@@ -1609,7 +1605,7 @@ public:
         temp_mesh.ConstructRectangularMesh(10,10);
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh);
+        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1631,7 +1627,6 @@ public:
 
         // Set up cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
         c_vector<double,2> centre_of_mesh;
@@ -1679,7 +1674,7 @@ public:
         temp_mesh.ConstructCuboid(5,5,5);
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh);
+        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1701,7 +1696,6 @@ public:
 
         // Set up cell population
         NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell data on the cell population
         c_vector<double,3> centre_of_mesh;

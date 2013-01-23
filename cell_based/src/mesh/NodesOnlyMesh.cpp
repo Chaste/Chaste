@@ -55,10 +55,11 @@ NodesOnlyMesh<SPACE_DIM>::~NodesOnlyMesh()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance, double domainPadding)
 {
+    assert(maxInteractionDistance > 0.0 && maxInteractionDistance < DBL_MAX);
+    mMaximumInteractionDistance = maxInteractionDistance;
+
     this->Clear();
     mpBoxCollection = NULL;
-
-    mMaximumInteractionDistance = maxInteractionDistance;
 
     // Work out a bounding box for the nodes.
     c_vector<double, 2*SPACE_DIM> min_max_location;
@@ -119,7 +120,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance, double domainPadding)
 {
-    ConstructNodesWithoutMesh(rGeneratingMesh.mNodes);
+    ConstructNodesWithoutMesh(rGeneratingMesh.mNodes, maxInteractionDistance, domainPadding);
 }
 
 template<unsigned SPACE_DIM>
@@ -211,6 +212,12 @@ void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
 
     // Set the radius
     mCellRadii[index] = radius;
+}
+
+template<unsigned SPACE_DIM>
+double NodesOnlyMesh<SPACE_DIM>::GetMaximumInteractionDistance()
+{
+    return mMaximumInteractionDistance;
 }
 
 template<unsigned SPACE_DIM>

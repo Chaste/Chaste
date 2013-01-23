@@ -66,7 +66,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -94,7 +94,6 @@ public:
 
         // Call method
         double time_step = 0.01;
-        cell_population.SetMechanicsCutOffLength(1.2);
         cell_population.Update();
 
 
@@ -148,7 +147,7 @@ public:
 
             // Convert this to a NodesOnlyMesh
             NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -166,8 +165,6 @@ public:
             {
                 cell_iter->ReadyToDivide();
             }
-
-            p_cell_population->SetMechanicsCutOffLength(1.5);
 
             // Create an output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);

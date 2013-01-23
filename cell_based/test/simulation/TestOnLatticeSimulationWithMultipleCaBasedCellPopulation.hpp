@@ -108,7 +108,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -117,7 +117,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         TS_ASSERT_THROWS_THIS(OnLatticeSimulation<2> simulator(node_based_cell_population),
             "OnLatticeSimulations require a subclass of AbstractOnLatticeCellPopulation.");

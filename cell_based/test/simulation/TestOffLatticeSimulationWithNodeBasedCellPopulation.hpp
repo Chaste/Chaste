@@ -89,7 +89,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -98,7 +98,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -144,7 +143,7 @@ public:
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
         nodes.push_back(new Node<2>(1,  false,  1.0, 0.0));
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);	// Large cut off as larger cells.
 
         // Modify the radii of the cells
         p_mesh->SetCellRadius(0,1.0);
@@ -158,7 +157,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(5.0); // Different as bigger cells
         node_based_cell_population.SetOutputCellVolumes(true);
         node_based_cell_population.Update();
 
@@ -204,7 +202,7 @@ public:
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
         nodes.push_back(new Node<2>(1,  false,  1.0, 0.0));
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);	// Larger cut off as bigger cells.
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -218,7 +216,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(5.0); // Different as bigger cells
         node_based_cell_population.SetUseVariableRadii(true);
         node_based_cell_population.SetOutputCellVolumes(true);
         node_based_cell_population.Update();
@@ -287,7 +284,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -296,7 +293,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -345,7 +341,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -354,7 +350,6 @@ public:
 
         // Create a node based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -398,7 +393,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -407,7 +402,6 @@ public:
 
         // Create a node based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -452,7 +446,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -461,7 +455,6 @@ public:
 
         // Create a node based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
@@ -533,7 +526,7 @@ public:
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.3));
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -542,7 +535,6 @@ public:
 
         // Create a node based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.SetAbsoluteMovementThreshold(1e-6);
 
         // Set up cell-based simulation

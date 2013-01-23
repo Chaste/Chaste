@@ -414,7 +414,7 @@ public:
         cells_generator.GenerateBasic(cells, p_generating_mesh->GetNumNodes());
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 

@@ -86,7 +86,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -109,7 +109,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 

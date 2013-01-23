@@ -74,7 +74,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -83,7 +83,6 @@ public:
 
         // Create cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Set up cell population boundary condition
         c_vector<double,2> point = zero_vector<double>(2);
@@ -235,7 +234,7 @@ public:
         generating_mesh_1d.ConstructFromMeshReader(mesh_reader_1d);
 
         NodesOnlyMesh<1>* p_mesh_1d = new NodesOnlyMesh<1>;
-        p_mesh_1d->ConstructNodesWithoutMesh(generating_mesh_1d);
+        p_mesh_1d->ConstructNodesWithoutMesh(generating_mesh_1d, 1.5);
 
         std::vector<CellPtr> cells_1d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator_1d;
@@ -270,7 +269,7 @@ public:
         generating_mesh_3d.ConstructFromMeshReader(mesh_reader_3d);
 
         NodesOnlyMesh<3>* p_mesh_3d = new NodesOnlyMesh<3>;
-        p_mesh_3d->ConstructNodesWithoutMesh(generating_mesh_3d);
+        p_mesh_3d->ConstructNodesWithoutMesh(generating_mesh_3d, 1.5);
 
         std::vector<CellPtr> cells_3d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator_3d;
@@ -367,7 +366,7 @@ public:
         ArchiveLocationInfo::SetMeshFilename("mesh");
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -446,7 +445,7 @@ public:
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;

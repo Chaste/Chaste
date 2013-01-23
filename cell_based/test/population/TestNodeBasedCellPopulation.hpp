@@ -73,7 +73,7 @@ private:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<DIM>* p_mesh = new NodesOnlyMesh<DIM>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -133,7 +133,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -182,7 +182,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -208,17 +208,15 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 5u);
 
-        // Throws exception as the cut-off length hasn't been set and has its default value of DBL_MAX
-        TS_ASSERT_THROWS_THIS(cell_population.Update(),
-                "NodeBasedCellPopulation cannot create boxes if the cut-off length has not been set - Call SetMechanicsCutOffLength on the CellPopulation ensuring it is larger than GetCutOffLength() on the force law");
-        // Set Cut off length
-        cell_population.SetMechanicsCutOffLength(1.2);
         cell_population.Update();
 
         std::set< std::pair<Node<2>*, Node<2>* > >& r_node_pairs = cell_population.rGetNodePairs();
         r_node_pairs.clear();
 
-        cell_population.SetMechanicsCutOffLength(1e-3);
+        // Set a new cut-off
+        p_mesh->Clear();
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1e-3);
+
         cell_population.Update();
         TS_ASSERT(cell_population.rGetNodePairs().empty());
 
@@ -245,7 +243,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         p_mesh->SetCellRadius(0, 0.1);
         p_mesh->SetCellRadius(1, 0.2);
@@ -309,7 +307,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -396,7 +394,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -417,7 +415,6 @@ public:
 
         unsigned num_removed = node_based_cell_population.RemoveDeadCells();
 
-        node_based_cell_population.SetMechanicsCutOffLength(1.2);
         node_based_cell_population.Update(true);
 
         // Test that one cell has been removed
@@ -441,7 +438,7 @@ public:
         delete p_mesh;
     }
 
-    void TestAddAndRemoveAndAddWithOutRemovingDeletedNodes()
+    void TestAddAndRemoveAndAddWithOutRemovingDeletedNodesSmallCutOff()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
@@ -453,7 +450,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1e-1);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             p_mesh->SetCellRadius(i, 0.1);
@@ -477,12 +474,43 @@ public:
         // Test GetNeighbouringNodeIndices() method
         TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
 
-        node_based_cell_population.SetMechanicsCutOffLength(1e-1);
         node_based_cell_population.Update();
 
-        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mMechanicsCutOffLength is smaller than twice the radius of cell 50 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(50), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell 50 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
 
-        node_based_cell_population.SetMechanicsCutOffLength(1.2);
+        // Avoid memory leak
+        delete p_mesh;
+    }
+
+    void TestAddAndRemoveAndAddWithOutRemovingDeletedNodes()
+    {
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
+
+        // Create a simple mesh of the domain [0,1]x[0,1]
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            p_mesh->SetCellRadius(i, 0.1);
+        }
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        // Make one cell start apoptosis
+        cells[27]->StartApoptosis();
+
+        // Create a cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
+
         node_based_cell_population.Update();
 
         std::set<unsigned> node_50_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(50);
@@ -523,7 +551,6 @@ public:
 
         // Test that the apoptotic cell has been removed
         unsigned num_removed = node_based_cell_population.RemoveDeadCells();
-        node_based_cell_population.SetMechanicsCutOffLength(1.2);
         node_based_cell_population.Update();
 
         TS_ASSERT_EQUALS(num_removed, 1u);
@@ -549,7 +576,6 @@ public:
         // Avoid memory leak
         delete p_mesh;
     }
-
     void TestGetNeighbouringNodeIndices()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -560,7 +586,7 @@ public:
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 0.1);
 
         for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
         {
@@ -585,17 +611,35 @@ public:
         // Test GetNeighbouringNodeIndices() method
         TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
 
-        node_based_cell_population.SetMechanicsCutOffLength(0.1);
         node_based_cell_population.Update();
 
-        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than twice the radius of cell 0 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell 0 (0.1) so interactions may be missed. Make the cut-off larger to avoid errors.");
 
-        node_based_cell_population.SetMechanicsCutOffLength(0.5);
+        p_mesh->Clear();
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 0.5);
+
+        // Re set the radii
+        for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
+        {
+            p_mesh->SetCellRadius(i, 0.55);
+        }
+
+        // Make cell 0 smaller
+        p_mesh->SetCellRadius(0, 0.1);
         node_based_cell_population.Update();
 
-        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mMechanicsCutOffLength is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
+        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
 
-        node_based_cell_population.SetMechanicsCutOffLength(1.2);
+        p_mesh->Clear();
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        // Re set the radii
+        for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
+        {
+            p_mesh->SetCellRadius(i, 0.55);
+        }
+
+        // Make cell 0 smaller
+        p_mesh->SetCellRadius(0, 0.1);
         node_based_cell_population.Update();
 
         //Test Corner Node should have no neighbours as small cell
@@ -638,7 +682,7 @@ public:
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -690,7 +734,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -740,7 +784,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -750,8 +794,6 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
 
-        // For coverage of GetVolumeOfCell() when cells are relaxed
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.Update(); // so cell neighbours are calculated
         for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
@@ -838,8 +880,7 @@ public:
         TS_ASSERT_EQUALS(cell_types[2], 1u);
         TS_ASSERT_EQUALS(cell_types[3], 0u);
 
-        // Test the Get and set MechanicsCutOfLengthMethods
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
+        // Test the Get MechanicsCutOfLengthMethods
         TS_ASSERT_DELTA(node_based_cell_population.GetMechanicsCutOffLength(),1.5, 1e-9);
 
         // For coverage
@@ -871,7 +912,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -880,7 +921,6 @@ public:
 
         // Create a cell population
         NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.Update(); // so cell neighbours are calculated when outputting volume
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulation-3");
@@ -930,7 +970,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -998,7 +1038,7 @@ public:
 
             // Convert this to a NodesOnlyMesh
             NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -1017,7 +1057,6 @@ public:
                 cell_iter->ReadyToDivide();
             }
 
-            p_cell_population->SetMechanicsCutOffLength(1.5);
             p_cell_population->SetUseVariableRadii(true);
 
             // Create an output archive

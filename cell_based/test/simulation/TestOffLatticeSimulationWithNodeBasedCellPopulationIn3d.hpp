@@ -84,7 +84,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -94,7 +94,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
 
         // Set up cell-based simulation
@@ -146,7 +145,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -156,7 +155,6 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
-        node_based_cell_population.SetMechanicsCutOffLength(1.5);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
 
         // Set up cell-based simulation

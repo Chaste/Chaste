@@ -686,14 +686,13 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(100.0);
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         RepulsionForce<2> repulsion_force;
@@ -1389,7 +1388,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -1433,7 +1432,7 @@ public:
         generating_mesh.ConstructLinearMesh(5);
 
         NodesOnlyMesh<1>* p_mesh = new NodesOnlyMesh<1>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1497,14 +1496,13 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(100.0);
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         // Create force law object
@@ -1565,14 +1563,13 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(100.0);
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         // Create force law object

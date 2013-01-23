@@ -78,8 +78,8 @@ private:
     std::map<unsigned, double> mHaloCellRadii;
 
     /**
-     * The maximum interaction distance for two nodes. Defines the maximum
-     * distance between two `neighbouring` nodes.
+     * Defines connectivity in NodesOnlyMesh. Two nodes are connected
+     * if their centres are less than mMaximumInteractionDistance apart.
      */
     double mMaximumInteractionDistance;
 
@@ -120,6 +120,7 @@ private:
          * then we want to wait for them to be re-numbered before archiving the radii.
          */
         archive & mCellRadii;
+        archive & mMaximumInteractionDistance;
     }
 
     /**
@@ -168,7 +169,7 @@ public:
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
      * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance = 1.5, double domainPadding = 2.0);
+    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance, double domainPadding = 2.0);
 
     /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
@@ -181,7 +182,7 @@ public:
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
      * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance = 1.5, double domainPadding = 2.0);
+    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance, double domainPadding = 2.0);
 
     /**
      * Overridden Clear() method for NodesOnlyMesh.
@@ -223,6 +224,11 @@ public:
      * @param radius the cell radius
      */
     void SetCellRadius(unsigned index, double radius);
+
+    /**
+     * @return mMaxInteractionDistance
+     */
+    double GetMaximumInteractionDistance();
 
     /**
      * Get mpBoxCollection

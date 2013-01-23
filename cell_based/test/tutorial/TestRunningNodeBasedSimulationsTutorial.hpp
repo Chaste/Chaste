@@ -123,7 +123,10 @@ public:
          * nodes, see  [class:NodesOnlyMesh NodesOnlyMesh] for details.
          */
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        /* To run node-based simulations you need to define a cut off length (second argument in
+         * ConstructNodesWithoutMesh, which defines the connectivity of the nodes by defining
+         * a radius of interaction. */
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CellsGenerator` helper class, which is templated over the type
@@ -143,9 +146,6 @@ public:
         * cell population called a {{{NodeBasedCellPopulation}}}.
         */
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        /* To run node-based simulations you need to define a cut off length, which
-         * defines the connectivity of the nodes by defining a radius of interaction. */
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple and end time. */
@@ -199,7 +199,10 @@ public:
         /* Finally a {{{NodesOnlyMesh}}} is created and the vector of nodes is passed to
          * the {{{ConstructNodesWithoutMesh}}} method. */
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        /* To run node-based simulations you need to define a cut off length (second argument in
+         * ConstructNodesWithoutMesh, which defines the connectivity of the nodes by defining
+         * a radius of interaction. */
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         /*
          * Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
@@ -213,7 +216,6 @@ public:
         /* We make a {{{NodeBasedCellPopulation}}} (this time with dimension 3) as before and define the cut off length.
          */
         NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * (this time with dimension 3) and set the output directory, output multiple and end time. */
@@ -268,7 +270,10 @@ public:
         nodes.push_back(new Node<3>(2u,  false,  0.0, 0.5, 0.0));
         nodes.push_back(new Node<3>(3u,  false,  0.0, -0.5, 0.0));
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        /* To run node-based simulations you need to define a cut off length (second argument in
+         * ConstructNodesWithoutMesh, which defines the connectivity of the nodes by defining
+         * a radius of interaction. */
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -276,7 +281,6 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("NodeBasedOnSphere");

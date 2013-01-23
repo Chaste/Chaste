@@ -44,7 +44,6 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       bool validate)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mMechanicsCutOffLength(DBL_MAX),
       mUseVariableRadii(false)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
@@ -58,7 +57,6 @@ template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mMechanicsCutOffLength(DBL_MAX), // will be set by serialize() method
       mUseVariableRadii(false) // will be set by serialize() method
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
@@ -215,20 +213,15 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         domain_size(2*i+1) = mMaxSpatialPositions(i);
     }
 
-    if (mMechanicsCutOffLength == DBL_MAX)
-    {
-        std::string error =  std::string("NodeBasedCellPopulation cannot create boxes if the cut-off length has not been set - ")
-                           + std::string("Call SetMechanicsCutOffLength on the CellPopulation ensuring it is larger than GetCutOffLength() on the force law");
-        EXCEPTION(error);
-    }
+    // This should be set when the mesh is constructed.
+    assert(mpNodesOnlyMesh->GetMaximumInteractionDistance() != DBL_MAX);
 
     /*
      * Add this parameter and suggest that mechanics systems set it.
      * Allocates memory for mpBoxCollection and does the splitting
      * and putting nodes into boxes.
      */
-
-    mpNodesOnlyMesh->SetUpBoxCollection(mMechanicsCutOffLength, domain_size);
+    mpNodesOnlyMesh->SetUpBoxCollection(mpNodesOnlyMesh->GetMaximumInteractionDistance(), domain_size);
 
     mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
 
@@ -311,7 +304,7 @@ std::set< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rG
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<MechanicsCutOffLength>" << mMechanicsCutOffLength << "</MechanicsCutOffLength>\n";
+    *rParamsFile << "\t\t<MechanicsCutOffLength>" << mpNodesOnlyMesh->GetMaximumInteractionDistance() << "</MechanicsCutOffLength>\n";
     *rParamsFile << "\t\t<UseVariableRadii>" << mUseVariableRadii <<
 "</UseVariableRadii>\n";
 
@@ -320,16 +313,9 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::SetMechanicsCutOffLength(double mechanicsCutOffLength)
-{
-    assert(mechanicsCutOffLength > 0.0);
-    mMechanicsCutOffLength = mechanicsCutOffLength;
-}
-
-template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetMechanicsCutOffLength()
 {
-    return mMechanicsCutOffLength;
+    return mpNodesOnlyMesh->GetMaximumInteractionDistance();
 }
 
 template<unsigned DIM>
@@ -372,9 +358,9 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     double radius_of_cell_i = mpNodesOnlyMesh->GetCellRadius(index);
 
     // Make sure that the max_interaction distance is smaller than the box collection size
-    if (!(radius_of_cell_i * 2.0 < mMechanicsCutOffLength))
+    if (!(radius_of_cell_i * 2.0 < mpNodesOnlyMesh->GetMaximumInteractionDistance()))
     {
-        EXCEPTION("mMechanicsCutOffLength is smaller than twice the radius of cell " << index << " (" << radius_of_cell_i << ") so interactions may be missed. Make the cut-off larger to avoid errors.");
+        EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell " << index << " (" << radius_of_cell_i << ") so interactions may be missed. Make the cut-off larger to avoid errors.");
     }
 
 
@@ -405,9 +391,9 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
 
             // Make sure that the max_interaction distance is smaller than the box collection size
-            if (!(max_interaction_distance < mMechanicsCutOffLength))
+            if (!(max_interaction_distance < mpNodesOnlyMesh->GetMaximumInteractionDistance()))
             {
-                EXCEPTION("mMechanicsCutOffLength is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
+                EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
             if (distance_between_nodes <= max_interaction_distance)// + DBL_EPSILSON) //Assumes that max_interaction_distance is of over 1
             {
@@ -450,7 +436,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         double neighbouring_cell_radius = mpNodesOnlyMesh->GetCellRadius( *iter);
 
         // If this throws then you may not be considering all cell interactions use a larger cut off length
-        assert(cell_radius+neighbouring_cell_radius<mMechanicsCutOffLength);
+        assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
         // Calculate the distance between the two nodes and add to cell radius
         double separation = norm_2(node_j_location - node_i_location);
@@ -470,7 +456,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     {
         averaged_cell_radius /= num_cells;
     }
-    assert(averaged_cell_radius < mMechanicsCutOffLength/2.0);
+    assert(averaged_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
 
     cell_radius = averaged_cell_radius;
 

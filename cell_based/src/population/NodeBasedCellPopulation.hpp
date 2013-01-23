@@ -74,12 +74,6 @@ private:
     bool mDeleteMesh;
 
     /**
-     * Mechanics cut off length.
-     * Used in order to calculate the BoxCollection.
-     */
-    double mMechanicsCutOffLength;
-
-    /**
      * Whether or not to have cell radii updated from CellData defaults to false.
      */
     bool mUseVariableRadii;
@@ -99,7 +93,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCentreBasedCellPopulation<DIM> >(*this);
-        archive & mMechanicsCutOffLength;
         archive & mUseVariableRadii;
 
         this->Validate();
@@ -267,16 +260,9 @@ public:
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
     /**
-     * @return mMechanicsCutOffLength
+     * @return the maximum interaction distance between cells, defined in NodesOnlyMesh.
      */
     double GetMechanicsCutOffLength();
-
-    /**
-     * Set mMechanicsCutOffLength.
-     *
-     * @param mechanicsCutOffLength  the new value of mMechanicsCutOffLength
-     */
-    void SetMechanicsCutOffLength(double mechanicsCutOffLength);
 
     /**
      * @return mUseVariableRadii

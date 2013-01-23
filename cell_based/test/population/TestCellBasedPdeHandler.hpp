@@ -113,7 +113,7 @@ public:
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -144,7 +144,7 @@ public:
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -215,7 +215,7 @@ public:
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -259,7 +259,7 @@ public:
             HoneycombMeshGenerator generator(2, 2, 0);
             MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
             NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+            p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
@@ -343,14 +343,13 @@ public:
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -406,14 +405,13 @@ public:
         nodes_1d.push_back(new Node<1>(0, true,  0.0));
 
         NodesOnlyMesh<1>* p_mesh_1d = new NodesOnlyMesh<1>;
-        p_mesh_1d->ConstructNodesWithoutMesh(nodes_1d);
+        p_mesh_1d->ConstructNodesWithoutMesh(nodes_1d, 1.5);
 
         std::vector<CellPtr> cells_1d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator_1d;
         cells_generator_1d.GenerateBasic(cells_1d, p_mesh_1d->GetNumNodes());
 
         NodeBasedCellPopulation<1> cell_population_1d(*p_mesh_1d, cells_1d);
-        cell_population_1d.SetMechanicsCutOffLength(1.5);
 
         CellBasedPdeHandler<1> pde_handler_1d(&cell_population_1d);
 
@@ -437,14 +435,13 @@ public:
         nodes_3d.push_back(new Node<3>(0, true,  0.0));
 
         NodesOnlyMesh<3>* p_mesh_3d = new NodesOnlyMesh<3>;
-        p_mesh_3d->ConstructNodesWithoutMesh(nodes_3d);
+        p_mesh_3d->ConstructNodesWithoutMesh(nodes_3d, 1.5);
 
         std::vector<CellPtr> cells_3d;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator_3d;
         cells_generator_3d.GenerateBasic(cells_3d, p_mesh_3d->GetNumNodes());
 
         NodeBasedCellPopulation<3> cell_population_3d(*p_mesh_3d, cells_3d);
-        cell_population_3d.SetMechanicsCutOffLength(1.5);
 
         CellBasedPdeHandler<3> pde_handler_3d(&cell_population_3d);
 
@@ -483,14 +480,13 @@ public:
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -533,14 +529,13 @@ public:
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Create a PDE handler object using this cell population
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -591,14 +586,13 @@ public:
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         cell_population.SetDataOnAllCells("variable", 1.0);
 

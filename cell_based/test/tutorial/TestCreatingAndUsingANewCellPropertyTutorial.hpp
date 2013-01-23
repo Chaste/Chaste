@@ -352,7 +352,10 @@ public:
         MutableMesh<2,2>* p_generating_mesh = generator.GetCircularMesh(5);
 
         NodesOnlyMesh<2>* p_mesh = new(NodesOnlyMesh<2>);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        /* We construct the mesh using the generating mesh and a cut-off 1.5 which defines the
+         * connectivity in the mesh.
+         */
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         /* We now create a shared pointer to our new property, as follows. */
         MAKE_PTR(MotileCellProperty, p_motile);
@@ -399,10 +402,6 @@ public:
         /* Now that we have defined the mesh and cells, we can define the cell population. The constructor
          * takes in the mesh and the cells vector. */
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        /* To run node based simulations you need to define a cut of length, which
-         * defines the connectivity of the nodes by defining a radius of interaction.
-         */
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);

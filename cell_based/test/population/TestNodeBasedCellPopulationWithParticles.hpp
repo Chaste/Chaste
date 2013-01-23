@@ -73,7 +73,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -129,7 +129,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -206,7 +206,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
@@ -220,7 +220,6 @@ public:
 
         // Create a cell population
         NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, cell_location_indices);
-        cell_population.SetMechanicsCutOffLength(1.2);
 
         // Iterate over cell population and check there is a single cell
         unsigned counter = 0;
@@ -268,7 +267,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
@@ -288,7 +287,6 @@ public:
 
         // Create a cell population, with some random particles
         NodeBasedCellPopulationWithParticles<2> cell_population_with_particles(*p_mesh, cells, cell_location_indices);
-        cell_population_with_particles.SetMechanicsCutOffLength(1.2);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 81u);
 
@@ -366,7 +364,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
@@ -386,7 +384,6 @@ public:
 
         // Create a cell population, with some random particles
         NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, cell_location_indices);
-        cell_population.SetMechanicsCutOffLength(1.2);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 70u);
@@ -439,7 +436,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -528,7 +525,6 @@ public:
         }
 
         NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, location_indices);
-        cell_population.SetMechanicsCutOffLength(2.0);
 
         // Make up some forces
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
@@ -606,7 +602,7 @@ public:
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<3>, p_mesh);
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<unsigned> location_indices;
         for (unsigned index=0; index<5; index++)
@@ -625,7 +621,6 @@ public:
 
         // Create cell population
         NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
-        cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.Update(); // so cell neighbours are calculated when outputting volume
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithParticles-3");
@@ -706,7 +701,7 @@ public:
 
             // Convert this to a NodesOnlyMesh
             NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -724,8 +719,6 @@ public:
             {
                 cell_iter->ReadyToDivide();
             }
-
-            p_cell_population->SetMechanicsCutOffLength(1.5);
 
             // Create an output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);

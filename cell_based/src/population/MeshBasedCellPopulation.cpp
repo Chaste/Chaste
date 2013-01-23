@@ -661,7 +661,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             }
 
             NodesOnlyMesh<SPACE_DIM> mesh;
-            mesh.ConstructNodesWithoutMesh(nodes);
+            mesh.ConstructNodesWithoutMesh(nodes, 1.5);	// Arbitrary cut off as connectivity not used.
             cells_writer.WriteFilesUsingMesh(mesh);
         }
 

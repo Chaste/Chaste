@@ -65,7 +65,7 @@ public:
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(p_mesh->GetGlobalNumNodes(), 8u);
@@ -103,7 +103,7 @@ public:
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
 
@@ -133,7 +133,7 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
@@ -158,7 +158,7 @@ public:
         nodes.push_back(new Node<2>(3, false, 1.5, 2.5));
 
         NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes);
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // These resuls will change when the nodes are distributed.
         if(PetscTools::IsSequential())
@@ -239,7 +239,7 @@ public:
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Note in my version of Paraview, you need data on points before you can view with Glyphs
         VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "just_nodes", false);
@@ -295,7 +295,7 @@ public:
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         TrianglesMeshWriter<3,3> writer("TestMeshWriter", "3dNodesOnlyMesh");
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(*p_mesh));
@@ -315,7 +315,7 @@ public:
         nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 2.0);
@@ -341,7 +341,7 @@ public:
         nodes.push_back(&node1);
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Test add node
         p_mesh->AddNode(new Node<2>(2, true, 0.0, 1.0));//This node pointer is added to the mesh and deleted by the destructor
@@ -370,7 +370,7 @@ public:
         nodes.push_back(new Node<2>(7, false, 0.0, 0.5));
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Test that there are never any boundary nodes
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryNodes(), 0u);
@@ -461,7 +461,7 @@ public:
 
             // Convert this to a NodesOnlyMesh
             NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh);
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
             p_mesh->SetCellRadius(0, 1.12);
             p_mesh->SetCellRadius(1, 2.34);

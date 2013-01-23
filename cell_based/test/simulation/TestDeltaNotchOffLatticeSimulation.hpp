@@ -84,7 +84,7 @@ public:
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
         std::vector<CellPtr> cells;
@@ -111,7 +111,6 @@ public:
 
         // Create cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetMechanicsCutOffLength(1.5);
         cell_population.SetCellAncestorsToLocationIndices();
 
         // Create and configure cell-based simulation
@@ -155,7 +154,7 @@ public:
         nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Establish a CCM for the cells and randomise the birth times
         std::vector<CellPtr> cells;
@@ -215,7 +214,6 @@ public:
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(0.75);
         simulator.AddForce(p_linear_force);
-        cell_population.SetMechanicsCutOffLength(1.5);
 
         // Run the simulation
         simulator.Solve();
@@ -252,7 +250,7 @@ public:
         nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes);
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Establish a CCM for the cells and randomise the birth times
         std::vector<CellPtr> cells;
@@ -313,7 +311,6 @@ public:
         p_linear_force->SetCutOffLength(0.75);
         simulator.AddForce(p_linear_force);
 
-        cell_population.SetMechanicsCutOffLength(1.5);
         simulator.Solve();
 
         // Acquire cell pointers
