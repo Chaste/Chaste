@@ -333,7 +333,7 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
      * node index is ever re-used when a new node is added, mCellRadii
      * will be updated correctly.
      */
-	mCellRadii.erase(index);
+    mCellRadii.erase(index);
 
     // Decrease the counter for the number of nodes.
     mTotalNumNodes -= 1;
