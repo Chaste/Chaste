@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <ctime>
+#include <boost/assign/list_of.hpp>
 #include <boost/foreach.hpp>
 
 #include "AbstractCardiacCell.hpp"
@@ -115,14 +117,24 @@ private:
             }
         }
 #ifdef CHASTE_CVODE
-        // Numerical or analytic J for CVODE?
-        if (!mUseCvodeJacobian && dynamic_cast<AbstractCvodeSystem*>(pCell.get()))
+        AbstractCvodeSystem* p_cvode_cell = dynamic_cast<AbstractCvodeSystem*>(pCell.get());
+        if (p_cvode_cell)
         {
-//            dynamic_cast<AbstractCvodeSystem*>(pCell.get())->ForceUseOfNumericalJacobian();
+            // Set a larger max internal time steps per sampling interval (CVODE's default is 500)
+            p_cvode_cell->SetMaxSteps(1000);
+            // Numerical or analytic J for CVODE?
+            if (!mUseCvodeJacobian)
+            {
+                p_cvode_cell->ForceUseOfNumericalJacobian();
+            }
         }
 #endif
         double sampling_interval = 2.0; // ms
+        double start_cpu_time = (double) std::clock();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
+        double end_cpu_time = (double) std::clock();
+        double elapsed_secs = (end_cpu_time - start_cpu_time)/(CLOCKS_PER_SEC);
+        std::cout << "Model " << rModelName << " writing to " << rOutputDirName << " took " << elapsed_secs << "s." << std::endl;
         const unsigned output_freq = 5; // Only output every N samples
         solution.WriteToFile(rOutputDirName, rModelName, "ms", output_freq, false);
         // Check an AP was produced
@@ -300,6 +312,7 @@ private:
         rModels.push_back("pandit_model_2001_epi");
         rModels.push_back("priebe_beuckelmann_model_1998");
         rModels.push_back("sakmann_model_2000_epi");
+        rModels.push_back("Shannon2004");
         rModels.push_back("stewart_zhang_model_2008_ss");
         rModels.push_back("ten_tusscher_model_2004_endo");
         rModels.push_back("ten_tusscher_model_2004_epi");
@@ -338,21 +351,40 @@ public:
     void TestCvodeCells() throw (Exception)
     {
 #ifdef CHASTE_CVODE
+        std::string dirname ("TestPyCmlNightlyCvodeNumericalJ");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--cvode");
         std::vector<std::string> models;
         AddAllModels(models);
 
-//        std::cout << "Analytical Jacobian" << std::endl;
-        mUseCvodeJacobian = true;
-        std::string dirname("TestPyCmlNightlyCvode");
+        mUseCvodeJacobian = false;
         RunTests(dirname, models, args);
+#endif
+    }
 
-//        std::cout << "Numerical Jacobian" << std::endl;
-//        mUseCvodeJacobian = false;
-//        dirname = "TestPyCmlNightlyCvodeNumericalJ";
-//        RunTests(dirname, models, args);
+    void TestAnalyticCvodeCells() throw (Exception)
+    {
+#ifdef CHASTE_CVODE
+        std::string dirname("TestPyCmlNightlyCvodeAnalyticJ");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--cvode");
+        std::vector<std::string> models;
+        AddAllModels(models);
+
+        // These have NaN in the jacobian due to massive exponentials
+        std::vector<std::string> bad_models = boost::assign::list_of
+                ("aslanidi_model_2009")
+                ("hund_rudy_2004_a")
+                ("livshitz_rudy_2007");
+        BOOST_FOREACH(std::string bad_model, bad_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), bad_model));
+        }
+
+        mUseCvodeJacobian = true;
+        RunTests(dirname, models, args);
 #endif
     }
 
@@ -378,7 +410,14 @@ public:
         {
             models.erase(std::find(models.begin(), models.end(), diff_model));
         }
-        models.erase(std::find(models.begin(), models.end(), "hund_rudy_2004_a"));
+
+        // These have NaN in the jacobian due to massive exponentials
+        std::vector<std::string> bad_models = boost::assign::list_of
+                ("hund_rudy_2004_a");
+        BOOST_FOREACH(std::string bad_model, bad_models)
+        {
+            models.erase(std::find(models.begin(), models.end(), bad_model));
+        }
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
         RunTests(dirname, models, args, true);
@@ -386,13 +425,6 @@ public:
         dirname = dirname + "-difficult";
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.1, 1.0);
         RunTests(dirname, diff_models, args, true);
-
-//        // Hund model is producing NANs, even with very small dt
-//        diff_models.clear();
-//        diff_models.push_back("hund_rudy_2004_a");
-//        dirname = dirname + "-crazy";
-//        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-//        RunTests(dirname, diff_models, args, true);
     }
 
     void TestRushLarsenCells() throw (Exception)

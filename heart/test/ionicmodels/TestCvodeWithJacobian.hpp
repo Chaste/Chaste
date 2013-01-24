@@ -41,10 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CvodeAdaptor.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "RegularStimulus.hpp"
-#include "HodgkinHuxley1952.hpp"
-#include "HodgkinHuxley1952Cvode.hpp"
-#include "HH1952WithJacobian.hpp"
-#include "HH1952WithJacobianCvode.hpp"
+#include "FoxModel2002.hpp"
+#include "FoxModel2002Cvode.hpp"
 
 class TestCvodeWithJacobian : public CxxTest::TestSuite
 {
@@ -59,10 +57,12 @@ public:
         boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new RegularStimulus(-25,5,1000,1));
         double simulation_duration = 10000;
 
-        boost::shared_ptr<AbstractCardiacCell> hh_1952_cvode_adaptor(new CellHodgkinHuxley1952FromCellML(p_cvode_adaptor,p_stimulus));
-        boost::shared_ptr<AbstractCvodeCell> hh_1952_cvode(new CellHodgkinHuxley1952FromCellMLCvode(p_solver,p_stimulus));
-        boost::shared_ptr<AbstractCardiacCell> hh_1952_cvode_adaptor_jacobian(new HH1952WithJacobian(p_cvode_adaptor_jacobian,p_stimulus));
-        boost::shared_ptr<AbstractCvodeCell> hh_1952_cvode_jacobian(new HH1952WithJacobianCvode(p_solver,p_stimulus));
+        boost::shared_ptr<AbstractCardiacCell> p_cell_cvode_adaptor(new CellFoxModel2002FromCellML(p_cvode_adaptor,p_stimulus));
+        boost::shared_ptr<AbstractCvodeCell> p_cell_cvode(new CellFoxModel2002FromCellMLCvode(p_solver,p_stimulus));
+        p_cell_cvode->ForceUseOfNumericalJacobian();
+        TS_ASSERT(!p_cell_cvode->GetUseAnalyticJacobian());
+        boost::shared_ptr<AbstractCvodeCell> p_cell_cvode_jacobian(new CellFoxModel2002FromCellMLCvode(p_solver,p_stimulus));
+        TS_ASSERT(p_cell_cvode_jacobian->GetUseAnalyticJacobian());
 
 
         double start_time, end_time, elapsed_time = 0.0;
@@ -70,32 +70,32 @@ public:
         // A standard CVODE adaptor solve
         p_cvode_adaptor->SetMaxSteps(0xffffffff);
         start_time = (double) std::clock();
-        hh_1952_cvode_adaptor->SolveAndUpdateState(0, simulation_duration);
+        p_cell_cvode_adaptor->SolveAndUpdateState(0, simulation_duration);
         end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "1. CVODE adaptor, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
 
         // A standard native CVODE solve
-        hh_1952_cvode->SetMaxSteps(0xffffffff);
+        p_cell_cvode->SetMaxSteps(0xffffffff);
         start_time = (double) std::clock();
-        hh_1952_cvode->SolveAndUpdateState(0, simulation_duration);
+        p_cell_cvode->SolveAndUpdateState(0, simulation_duration);
         end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "2. CVODE native, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
 
 /// \todo # Not yet implemented (it would work, but wouldn't use a Jacobian).
 //        // A jacobian CVODE adaptor solve
-//        p_cvode_adaptor_jacobian->SetMaxSteps(1e10);
+//        p_cvode_adaptor_jacobian->SetMaxSteps(0xffffffff);
 //        start_time = std::clock();
-//        hh_1952_cvode_adaptor_jacobian->SolveAndUpdateState(0, simulation_duration);
+//        p_cell_cvode_adaptor_jacobian->SolveAndUpdateState(0, simulation_duration);
 //        end_time = std::clock();
 //        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
 //        std::cout << "3. CVODE adaptor with Jacobian, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
 
         // A jacobian native CVODE solve
-        hh_1952_cvode_jacobian->SetMaxSteps(0xffffffff);
+        p_cell_cvode_jacobian->SetMaxSteps(0xffffffff);
         start_time = (double) std::clock();
-        hh_1952_cvode_jacobian->SolveAndUpdateState(0, simulation_duration);
+        p_cell_cvode_jacobian->SolveAndUpdateState(0, simulation_duration);
         end_time = (double) std::clock();
         elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
         std::cout << "4. CVODE native with Jacobian, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";

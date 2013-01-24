@@ -261,8 +261,8 @@ public:
         TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames().size(), 2u);
         TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames()[0], "membrane_voltage");
         TS_ASSERT_EQUALS(p_tables->GetKeyingVariableNames()[1], "cytosolic_calcium_concentration");
-        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("membrane_voltage"), 19u);
-        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("cytosolic_calcium_concentration"), 1u);
+        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("membrane_voltage"), 54u);
+        TS_ASSERT_EQUALS(p_tables->GetNumberOfTables("cytosolic_calcium_concentration"), 2u);
         TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
         TS_ASSERT_DELTA(min, -150.0001, 1e-12);

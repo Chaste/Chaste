@@ -531,6 +531,41 @@ protected:
 };
 
 
+// Debugging
+#ifndef NDEBUG
+#include "OutputFileHandler.hpp"
+#include <boost/foreach.hpp>
+template<unsigned SIZE>
+void DumpJacobianToFile(double time, const double rCurrentGuess[SIZE], double rJacobian[SIZE][SIZE],
+                        const std::vector<double>& rY)
+{
+    OutputFileHandler handler("DumpJacs", false);
+    out_stream p_file = handler.OpenOutputFile("J.txt", std::ios::app);
+    (*p_file) << "At " << time << " " << SIZE << std::endl;
+    (*p_file) << "rY";
+    BOOST_FOREACH(double y, rY)
+    {
+        (*p_file) << " " << y;
+    }
+    (*p_file) << std::endl;
+    (*p_file) << "rCurrentGuess";
+    for (unsigned i=0; i<SIZE; i++)
+    {
+        (*p_file) << " " << rCurrentGuess[i];
+    }
+    (*p_file) << std::endl;
+    (*p_file) << "rJacobian";
+    for (unsigned i=0; i<SIZE; i++)
+    {
+        for (unsigned j=0; j<SIZE; j++)
+        {
+            (*p_file) << " " << rJacobian[i][j];
+        }
+    }
+    (*p_file) << std::endl;
+}
+#endif
+
 
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractBackwardEulerCardiacCell)

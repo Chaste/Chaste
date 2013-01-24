@@ -2268,6 +2268,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.output_comment(assigned_var.units, indent=False, pad=True)
         else:
             super(CellMLToChasteTranslator, self).output_assignment(expr)
+#        if assigned_var:
+#            # Debug
+#            self.writeln('EXCEPT_IF_NOT(!std::isinf(', self.code_name(assigned_var), '));')
+#            self.writeln('EXCEPT_IF_NOT(!std::isnan(', self.code_name(assigned_var), '));')
         if clear_type:
             # Remove the instance attributes, thus reverting to the class members
             del self.TYPE_DOUBLE
@@ -2495,6 +2499,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 assert len(entry_content) == 1, "Malformed Jacobian matrix entry: " + entry.xml()
                 self.output_expr(entry_content[0], False)
                 self.writeln(self.STMT_END, indent=False)
+#            self.output_comment('Debugging')
+#            self.writeln('#ifndef NDEBUG', indent=False)
+#            self.writeln('for (unsigned i=0; i<', len(self.nonlinear_system_vars), '; i++)')
+#            self.writeln('for (unsigned j=0; j<', len(self.nonlinear_system_vars), '; j++)', indent_offset=1)
+#            self.writeln('EXCEPT_IF_NOT(!std::isnan(rJacobian[i][j]));', indent_offset=2)
+#            self.writeln('//DumpJacobianToFile(', self.code_name(self.free_vars[0]),
+#                         ', rCurrentGuess, rJacobian, rY);')
+#            self.writeln('#endif // NDEBUG', indent=False)
             self.close_block()
         # The other methods are protected
         self.writeln_hpp('protected:', indent_offset=-1)
@@ -3214,6 +3226,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Backward Euler code generation requires access to the time step
             model_dt = solver_info.create_dt(generator, t.component, t.get_units())
             config.dt_variable = generator.add_input(model_dt, ms)
+        elif doc.model.get_option('maple_output'): 
+            # CVODE Jacobians need to be able to scale for time too 
+            fake_dt = generator.add_variable(t.component, 'fake_dt', ms, initial_value='1.0')
+            fake_dt._set_type(VarTypes.Constant)
+            config.dt_variable = generator.add_input(fake_dt, t.get_units())
+            config.dt_variable.set_is_modifiable_parameter(False)
+            config.dt_variable.set_pe_keep(True)
         if config.options.use_chaste_stimulus and config.i_stim_var:
             # We need to make it a constant so add_input doesn't complain, then make it computed
             # again so that exposing metadata-annotated variables doesn't make it a parameter!
@@ -3292,6 +3311,8 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         
         self.include_serialization = not self.use_modifiers # TODO: Implement
         self.use_backward_euler = False
+        self.use_analytic_jacobian = (self.model.get_option('maple_output') and
+                                      hasattr(self.model.solver_info, u'jacobian'))
         self.output_includes(base_class='AbstractCvodeCell')
         # Separate class for lookup tables?
         if self.use_lookup_tables and self.separate_lut_class:
@@ -3324,7 +3345,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         """
         self.output_get_i_ionic()
         self.output_evaluate_y_derivatives(method_name='EvaluateYDerivatives')
-        if self.model.get_option('maple_output'):
+        if self.use_analytic_jacobian:
             self.output_jacobian()
         self.output_derived_quantities()
     
@@ -3337,7 +3358,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
     
     def output_extra_constructor_content(self):
         """Tell the base class if we have an analytic Jacobian."""
-        if self.model.get_option('maple_output'):
+        if self.use_analytic_jacobian:
             self.writeln('mUseAnalyticJacobian = true;')
     
     def _count_operators(self, exprs, result=None):
@@ -3361,7 +3382,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
                                  'void', access='public')
         self.open_block()
         # Mathematics that the Jacobian depends on
-        used_vars = set()
+        used_vars = set([self.config.dt_variable])
         for entry in self.model.solver_info.jacobian.entry:
             used_vars.update(self._vars_in(entry.math))
         nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
@@ -3386,19 +3407,30 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
                 entries.append((j, i, var_i is self.v_variable, entry))
         entries.sort()
         for j, i, is_V, entry in entries:
-            self.writeln('DENSE_ELEM(rJacobian, ', i, ', ', j, ') = ', nl=False)
+            self.writeln('DENSE_ELEM(rJacobian, ', i, ', ', j, ') = ', self.code_name(self.config.dt_variable), ' * (', nl=False)
             paren = False
             if is_V:
                 self.write('mSetVoltageDerivativeToZero ? 0.0 : ')
                 paren = True
             self.output_expr(entry, paren)
-            self.writeln(self.STMT_END, indent=False)
-        self.output_comment('Debugging!')
-        self.writeln('CheckAnalyticJacobian(', self.code_name(self.free_vars[0]),
-                     ', rY, rDY, rJacobian, rTmp1, rTmp2, rTmp3);')                                 
+            self.writeln(')', self.STMT_END, indent=False)
+#        self.output_comment('Debugging!')
+#        self.writeln('#ifndef NDEBUG', indent=False)
+#        self.writeln('for (long int j=0; j<N; j++)')
+#        self.open_block()
+#        self.writeln('for (long int i=0; i<N; i++)')
+#        self.open_block()
+#        self.writeln('if (std::isnan(DENSE_ELEM(rJacobian, i, j)))')
+#        self.open_block()
+#        self.writeln('std::cerr << "NAN at J(" << i << "," << j << ")" << DumpState("", rY);')
+#        self.close_block(blank_line=False)
+#        self.writeln('EXCEPT_IF_NOT(!std::isnan(DENSE_ELEM(rJacobian, i, j)));')
+#        self.close_block(blank_line=False)
+#        self.close_block(blank_line=False)
+#        self.writeln('//CheckAnalyticJacobian(', self.code_name(self.free_vars[0]),
+#                     ', rY, rDY, rJacobian, rTmp1, rTmp2, rTmp3);')
+#        self.writeln('#endif // NDEBUG', indent=False)
         self.close_block()
-#        print "DEBUG:", self.model.name, "Operators in model:", self._count_operators(self.model.get_assignments())
-#        print "DEBUG:", self.model.name, "Operators in Jacobian:", self._count_operators([e[-1] for e in entries])
 
 class CellMLToMapleTranslator(CellMLTranslator):
     """Translate a CellML model to Maple code."""
@@ -5787,9 +5819,8 @@ def run():
         doc.model._cml_jacobian = mp.parse(jacobian_file)
         doc.model._cml_jacobian_full = mp.JacobianWasFullSize
         jacobian_file.close()
-        if not options.backward_euler:
+        if not options.backward_euler and doc.model._cml_jacobian_full:
             # Add full jacobian to XML
-            assert doc.model._cml_jacobian_full, "Jacobian matrix is wrong size"
             solver_info.add_jacobian_matrix()
             solver_info.add_variable_links()
 
