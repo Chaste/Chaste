@@ -463,9 +463,11 @@ bool AbstractCvodeSystem::GetUseAnalyticJacobian()
 
 void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 {
-    if (useNumericalJacobian)
+    if (mUseAnalyticJacobian == useNumericalJacobian)
     {
-        mUseAnalyticJacobian = false;
+        mUseAnalyticJacobian = !useNumericalJacobian;
+        // We need to re-initialise the solver completely to change this.
+        this->FreeCvodeMemory();
     }
 }
 

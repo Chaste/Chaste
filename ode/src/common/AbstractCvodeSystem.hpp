@@ -453,10 +453,11 @@ public:
 
     /**
      * Force the use of a numerical Jacobian, even if an analytic form is provided.
+     * This is needed for a handful of troublesome models.
      *
-     * @param useNumericalJacobian  whether to approximate the Jacobian matrix
+     * bool useNumericalJacobian  Whether to use a numerical instead of the analytic Jacobian.
      */
-    void ForceUseOfNumericalJacobian(bool useNumericalJacobian=true);
+    void ForceUseOfNumericalJacobian(bool useNumericalJacobian = true);
 
 };
 

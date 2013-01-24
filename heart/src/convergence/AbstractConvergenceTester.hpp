@@ -335,6 +335,8 @@ public:
                     p_cell_factory = new RampedQuarterStimulusCellFactory<CELL, DIM>(constructor.GetWidth(), num_ele_across, this->AbsoluteStimulus/10.0);
                     break;
                 }
+                default:
+                    NEVER_REACHED;
             }
 
 
