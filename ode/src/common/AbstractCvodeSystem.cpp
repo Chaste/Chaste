@@ -434,7 +434,11 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg)
     free(p_flag_name);
     if (flag == CV_LSETUP_FAIL)
     {
+#if CHASTE_SUNDIALS_VERSION >= 20500
+        long int ls_flag;
+#else
         int ls_flag;
+#endif
         char* p_ls_flag_name;
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVDlsGetLastFlag(mpCvodeMem, &ls_flag);
