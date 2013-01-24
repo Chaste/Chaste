@@ -23,7 +23,7 @@
       <var type='config-name'>transmembrane_potential</var>
       <min>-100.0001</min>
       <max>99.9999</max>
-      <step>0.01</step>
+      <step>0.001</step>
     </lookup_table>
   </lookup_tables>
   <currents>

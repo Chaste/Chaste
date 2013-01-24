@@ -190,7 +190,7 @@ public:
         double min, max, step;
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
         TS_ASSERT_DELTA(min, -150.0001, 1e-12);
-        TS_ASSERT_DELTA(step, 0.01, 1e-12);
+        TS_ASSERT_DELTA(step, 0.001, 1e-12);
         TS_ASSERT_DELTA(max, 199.9999, 1e-12);
         p_tables->GetTableProperties("cytosolic_calcium_concentration", min, step, max);
         TS_ASSERT_DELTA(min, 0.00001, 1e-12);
@@ -266,7 +266,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_tables->GetNumberOfTables("non-var"), "Lookup table keying variable 'non-var' does not exist.");
         p_tables->GetTableProperties("membrane_voltage", min, step, max);
         TS_ASSERT_DELTA(min, -150.0001, 1e-12);
-        TS_ASSERT_DELTA(step, 0.01, 1e-12);
+        TS_ASSERT_DELTA(step, 0.001, 1e-12);
         TS_ASSERT_DELTA(max, 199.9999, 1e-12);
         p_tables->GetTableProperties("cytosolic_calcium_concentration", min, step, max);
         TS_ASSERT_DELTA(min, 0.00001, 1e-12);
