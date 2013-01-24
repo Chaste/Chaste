@@ -2176,15 +2176,25 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESSetFromOptions(snes);
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-    //int ierr =
-    SNESSolve(snes, initial_guess);
+    PetscErrorCode err = SNESSolve(snes, initial_guess);
 #else
-    SNESSolve(snes, PETSC_NULL, initial_guess);
+    PetscErrorCode err = SNESSolve(snes, PETSC_NULL, initial_guess);
 #endif
 
     SNESConvergedReason reason;
     SNESGetConvergedReason(snes,&reason);
+
 #define COVERAGE_IGNORE
+    if (err != 0)
+    {
+        std::stringstream err_stream;
+        err_stream << err;
+        PetscTools::Destroy(initial_guess);
+        PetscTools::Destroy(snes_residual_vec);
+        SNESDestroy(PETSC_DESTROY_PARAM(snes));
+        EXCEPTION("Nonlinear Solver failed. PETSc error code: "+err_stream.str()+" .");
+    }
+
     if (reason < 0)
     {
         std::stringstream reason_stream;
@@ -2192,7 +2202,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
         PetscTools::Destroy(initial_guess);
         PetscTools::Destroy(snes_residual_vec);
         SNESDestroy(PETSC_DESTROY_PARAM(snes));
-        EXCEPTION("Nonlinear Solver did not converge. PETSc reason code:"+reason_stream.str()+" .");
+        EXCEPTION("Nonlinear Solver did not converge. PETSc reason code: "+reason_stream.str()+" .");
     }
 #undef COVERAGE_IGNORE
 
