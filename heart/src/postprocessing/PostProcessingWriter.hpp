@@ -102,7 +102,7 @@ public:
      *
      * \todo This method ought to be private and called by the  WritePostProcessingFiles method if the user requests for it.
      *       This will be possible after modifying the schema and specifying Get and Set methods in HeartConfig
-     *       to check whetehr the user wants this file or not
+     *       to check whether the user wants this file or not
      *
      * @param  threshold - used to signify the upstroke (mV) AND to specify above which voltage value the depolarisations are counted
      */

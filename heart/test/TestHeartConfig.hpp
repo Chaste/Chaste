@@ -1602,13 +1602,13 @@ public:
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease2_1.xml");
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 
         // Check that release 2.1 xml can be loaded with latest schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease2_1.xml");
-        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 
         // Check that release 2.2 xml can be loaded with release 2.2 schema
         HeartConfig::Reset();

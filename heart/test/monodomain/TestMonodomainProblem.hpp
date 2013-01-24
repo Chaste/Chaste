@@ -739,7 +739,9 @@ public:
 
                 if (!result && (i == 3))
                 {
-                    FileComparison comparer2(file_1, file_2 + "_alt");
+                	// For "ChasteParameters.xml" there is an alternative file
+                	// This is because different version of XSD produce rounded/full precision floating point numbers
+                	FileComparison comparer2(file_1, file_2 + "_alt");
                     comparer2.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
                     TS_ASSERT(comparer2.CompareFiles());
                 }

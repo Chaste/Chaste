@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </KSPTolerances>
         <KSPSolver>cg</KSPSolver>
         <KSPPreconditioner>bjacobi</KSPPreconditioner>
-        <MeshPartitioning>metis</MeshPartitioning>
+        <MeshPartitioning>parmetis</MeshPartitioning>
         <UseStateVariableInterpolation>no</UseStateVariableInterpolation>
     </Numerical>
 </ChasteParameters>
@@ -133,7 +133,7 @@ boost::shared_ptr<cp::chaste_parameters_type> CreateDefaultParameters()
     tolerances.KSPAbsolute().set(2e-4);
     cp::ksp_solver_type ksp_solver("cg");
     cp::ksp_preconditioner_type ksp_precond("bjacobi");
-    cp::mesh_partitioning_type mesh_partitioning("metis");
+    cp::mesh_partitioning_type mesh_partitioning("parmetis");
     numerical_params.TimeSteps().set(timesteps);
     numerical_params.KSPTolerances().set(tolerances);
     numerical_params.KSPSolver().set(ksp_solver);

@@ -34,7 +34,7 @@
     </cp:KSPTolerances>
     <cp:KSPSolver>cg</cp:KSPSolver>
     <cp:KSPPreconditioner>bjacobi</cp:KSPPreconditioner>
-    <cp:MeshPartitioning>metis</cp:MeshPartitioning>
+    <cp:MeshPartitioning>parmetis</cp:MeshPartitioning>
     <cp:UseStateVariableInterpolation>no</cp:UseStateVariableInterpolation>
   </cp:Numerical>
 
