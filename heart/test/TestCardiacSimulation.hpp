@@ -531,7 +531,7 @@ public:
         std::string foldername = "ChasteResults_electrodes";
 
         TS_ASSERT( CompareFilesViaHdf5DataReaderGlobalNorm("heart/test/data/cardiac_simulations", "electrodes_results", false,
-                   foldername, "SimulationResults", true, 6e-5));
+                   foldername, "SimulationResults", true, 1e-4));
     }
 
     void TestExceptions() throw(Exception)
