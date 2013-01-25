@@ -448,6 +448,7 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg)
         p_ls_flag_name = CVDenseGetReturnFlagName(ls_flag);
 #endif
         err << " (LS flag=" << ls_flag << ":" << p_ls_flag_name << ")";
+        delete p_ls_flag_name;
     }
     FreeCvodeMemory();
     std::cerr << err.str() << std::endl << std::flush;

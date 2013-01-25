@@ -432,16 +432,17 @@ public:
     double GetLastStepSize();
 
 
-//    /**
-//     * An alternative approach to stopping events; currently only useful with CVODE.
-//     * CVODE can search for roots (zeros) of this function while solving the ODE system,
-//     * and home in on them to find sign transitions to high precision.
-//     *
-//     * The default implementation here fakes a root function using CalculateStoppingEvent.
-//     *
-//     * @param time  the current time
-//     * @param rY  the current values of the state variables
-//     */
+    /* NB This needs making into a doxygen comment if you bring the method back in.
+     *
+     * An alternative approach to stopping events; currently only useful with CVODE.
+     * CVODE can search for roots (zeros) of this function while solving the ODE system,
+     * and home in on them to find sign transitions to high precision.
+     *
+     * The default implementation here fakes a root function using CalculateStoppingEvent.
+     *
+     * @param time  the current time
+     * @param rY  the current values of the state variables
+     */
 //    virtual double CalculateRootFunction(double time, const std::vector<double>& rY);
 
     /**
