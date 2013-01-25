@@ -575,7 +575,7 @@
 330.827	
 310.509	
 267.34	
-201.516	
+201.517	
 200.054	
 0	
 0	
@@ -655,7 +655,7 @@
 223.094	
 221.749	
 216.466	
-201.516	
+201.517	
 212.845	
 181.677	
 161.865	
@@ -2690,7 +2690,7 @@
 309.63	
 309.633	
 309.643	
-309.777	
+309.776	
 310.758	
 315.627	
 328.822	
@@ -2730,7 +2730,7 @@
 0	
 309.607	
 309.716	
-309.777	
+309.776	
 309.82	
 309.99	
 311.057	
@@ -6705,7 +6705,7 @@
 311.054	
 316.129	
 329.342	
-317.444	
+317.445	
 270.985	
 227.832	
 231.537	
@@ -6785,7 +6785,7 @@
 317.463	
 317.92	
 317.854	
-317.444	
+317.445	
 315.941	
 310.439	
 290.428	
@@ -7672,7 +7672,7 @@
 310.233	
 290.071	
 238.567	
-209.271	
+209.272	
 187.796	
 181.566	
 0	
@@ -7692,7 +7692,7 @@
 270.94	
 269.571	
 258.424	
-209.271	
+209.272	
 171.117	
 162.721	
 150.172	
@@ -9259,4 +9259,4 @@
 0	
 0	
 0	
-# Created by Chaste version 3.1.17358 (with uncommitted modifications) on Thu, 15 Nov 2012 15:32:43 +0000.  Chaste was built on Wed, 14 Nov 2012 14:54:46 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, no Chaste libraries.  Checked-out project versions: jmpf=17163:17174; papers=exported.
+# Created by Chaste version 3.1.17957 on Fri, 25 Jan 2013 10:00:41 +0000.  Chaste was built on Fri, 25 Jan 2013 09:54:52 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=48:49; jink=17831M; jmpf=17163:17174; papers=exported.

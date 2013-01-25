@@ -28,7 +28,7 @@
 -49.8653	-49.8649	
 -42.8708	-42.8697	
 -30.7966	-30.7955	
--0.748319	-0.754928	
+-0.748318	-0.754927	
 30.2098	30.1961	
 41.0788	41.0601	
 44.7399	44.7153	
@@ -39,4 +39,4 @@
 45.1667	45.0719	
 44.498	44.3738	
 43.755	43.5948	
-# Created by Chaste version 3.1.17358 (with uncommitted modifications) on Thu, 15 Nov 2012 15:32:44 +0000.  Chaste was built on Wed, 14 Nov 2012 14:54:46 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, no Chaste libraries.  Checked-out project versions: jmpf=17163:17174; papers=exported.
+# Created by Chaste version 3.1.17957 on Fri, 25 Jan 2013 10:00:42 +0000.  Chaste was built on Fri, 25 Jan 2013 09:54:52 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=48:49; jink=17831M; jmpf=17163:17174; papers=exported.
