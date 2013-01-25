@@ -111,7 +111,7 @@ public:
     /**
      * Get all keys.
      * 
-     * These are sorted in lexicographical/alphabetic order (so that the order is independent of any map iteration mehod).
+     * These are sorted in lexicographical/alphabetic order (so that the order is independent of any map iteration method).
      */
     std::vector<std::string> GetKeys() const;
 };
