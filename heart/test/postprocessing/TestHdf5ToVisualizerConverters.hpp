@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "UblasCustomFunctions.hpp"
-#include "PetscSetupAndFinalize.hpp"
+
 #include "Hdf5ToMeshalyzerConverter.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
 #include "PetscTools.hpp"
@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)

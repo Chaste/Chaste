@@ -306,20 +306,6 @@ public:
     }
 
     /**
-     * Compare the calculated analytic jacobian to a numerical approximation, and throw if it looks silly.
-     *
-     * @param time  the current time
-     * @param y  the current state variables
-     * @param jacobian  the analytic jacobian matrix
-     * @param tmp1  working memory of the correct size provided by CVODE for temporary calculations
-     * @param tmp2  working memory of the correct size provided by CVODE for temporary calculations
-     * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
-     */
-    void CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
-                               CHASTE_CVODE_DENSE_MATRIX jacobian,
-                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-
-    /**
      * Set whether to automatically re-initialise CVODE on every call to Solve, or
      * whether to attempt to guess when re-initialisation is needed. For example
      * it will re-initialise if the time changes, or any state variables change.
@@ -459,6 +445,23 @@ public:
      * bool useNumericalJacobian  Whether to use a numerical instead of the analytic Jacobian.
      */
     void ForceUseOfNumericalJacobian(bool useNumericalJacobian = true);
+
+// The following method may be useful to identify problems with the Analytic Jacobians, if anything goes wrong,
+// but #1795 seems to have got these working OK, so commented out for now.
+
+//    /**
+//     * Compare the calculated analytic jacobian to a numerical approximation, and throw if it looks silly.
+//     *
+//     * @param time  the current time
+//     * @param y  the current state variables
+//     * @param jacobian  the analytic jacobian matrix
+//     * @param tmp1  working memory of the correct size provided by CVODE for temporary calculations
+//     * @param tmp2  working memory of the correct size provided by CVODE for temporary calculations
+//     * @param tmp3  working memory of the correct size provided by CVODE for temporary calculations
+//     */
+//    void CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
+//                               CHASTE_CVODE_DENSE_MATRIX jacobian,
+//                               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
 
 };
 

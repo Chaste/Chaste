@@ -473,55 +473,55 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 }
 
 
-#include "MathsCustomFunctions.hpp"
-#include <algorithm>
-void AbstractCvodeSystem::CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
-                                                CHASTE_CVODE_DENSE_MATRIX jacobian,
-                                                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
-{
-    N_Vector nudge_ydot = tmp1;
-    N_Vector numeric_jth_col = tmp2;
-    N_Vector ewt = tmp3;
-    const unsigned size = GetNumberOfStateVariables();
-    const double rel_tol = 1e-1;
-    const double abs_tol = 1e-6;
-    realtype* p_y = N_VGetArrayPointer(y);
-    realtype* p_numeric_jth_col = N_VGetArrayPointer(numeric_jth_col);
-
-    // CVODE internal data for computing the numeric J
-    realtype h;
-    CVodeGetLastStep(mpCvodeMem, &h);
-    CVodeGetErrWeights(mpCvodeMem, ewt);
-    realtype* p_ewt = N_VGetArrayPointer(ewt);
-    // Compute minimum nudge
-    realtype srur = sqrt(DBL_EPSILON);
-    realtype fnorm = N_VWrmsNorm(ydot, ewt);
-    realtype min_nudge = (fnorm != 0.0) ?
-            (1000.0 * fabs(h) * DBL_EPSILON * size * fnorm) : 1.0;
-
-    for (unsigned j=0; j<size; j++)
-    {
-        // Check the j'th column of the Jacobian
-        realtype yjsaved = p_y[j];
-        realtype nudge = std::max(srur*fabs(yjsaved), min_nudge/p_ewt[j]);
-        p_y[j] += nudge;
-        EvaluateYDerivatives(time, y, nudge_ydot);
-        p_y[j] = yjsaved;
-        realtype nudge_inv = 1.0 / nudge;
-        N_VLinearSum(nudge_inv, nudge_ydot, -nudge_inv, ydot, numeric_jth_col);
-        realtype* p_analytic_jth_col = DENSE_COL(jacobian, j);
-
-        for (unsigned i=0; i<size; i++)
-        {
-            if (!CompareDoubles::WithinAnyTolerance(p_numeric_jth_col[i], p_analytic_jth_col[i], rel_tol, abs_tol))
-            {
-                EXCEPTION("Analytic Jacobian appears dodgy at time " << time << " entry (" << i << "," << j << ").\n"
-                          << "Analytic=" << p_analytic_jth_col[i] << "; numeric=" << p_numeric_jth_col[i] << "."
-                          << DumpState("", y));
-            }
-        }
-    }
-}
+//#include "MathsCustomFunctions.hpp"
+//#include <algorithm>
+//void AbstractCvodeSystem::CheckAnalyticJacobian(realtype time, N_Vector y, N_Vector ydot,
+//                                                CHASTE_CVODE_DENSE_MATRIX jacobian,
+//                                                N_Vector tmp1, N_Vector tmp2, N_Vector tmp3)
+//{
+//    N_Vector nudge_ydot = tmp1;
+//    N_Vector numeric_jth_col = tmp2;
+//    N_Vector ewt = tmp3;
+//    const unsigned size = GetNumberOfStateVariables();
+//    const double rel_tol = 1e-1;
+//    const double abs_tol = 1e-6;
+//    realtype* p_y = N_VGetArrayPointer(y);
+//    realtype* p_numeric_jth_col = N_VGetArrayPointer(numeric_jth_col);
+//
+//    // CVODE internal data for computing the numeric J
+//    realtype h;
+//    CVodeGetLastStep(mpCvodeMem, &h);
+//    CVodeGetErrWeights(mpCvodeMem, ewt);
+//    realtype* p_ewt = N_VGetArrayPointer(ewt);
+//    // Compute minimum nudge
+//    realtype srur = sqrt(DBL_EPSILON);
+//    realtype fnorm = N_VWrmsNorm(ydot, ewt);
+//    realtype min_nudge = (fnorm != 0.0) ?
+//            (1000.0 * fabs(h) * DBL_EPSILON * size * fnorm) : 1.0;
+//
+//    for (unsigned j=0; j<size; j++)
+//    {
+//        // Check the j'th column of the Jacobian
+//        realtype yjsaved = p_y[j];
+//        realtype nudge = std::max(srur*fabs(yjsaved), min_nudge/p_ewt[j]);
+//        p_y[j] += nudge;
+//        EvaluateYDerivatives(time, y, nudge_ydot);
+//        p_y[j] = yjsaved;
+//        realtype nudge_inv = 1.0 / nudge;
+//        N_VLinearSum(nudge_inv, nudge_ydot, -nudge_inv, ydot, numeric_jth_col);
+//        realtype* p_analytic_jth_col = DENSE_COL(jacobian, j);
+//
+//        for (unsigned i=0; i<size; i++)
+//        {
+//            if (!CompareDoubles::WithinAnyTolerance(p_numeric_jth_col[i], p_analytic_jth_col[i], rel_tol, abs_tol))
+//            {
+//                EXCEPTION("Analytic Jacobian appears dodgy at time " << time << " entry (" << i << "," << j << ").\n"
+//                          << "Analytic=" << p_analytic_jth_col[i] << "; numeric=" << p_numeric_jth_col[i] << "."
+//                          << DumpState("", y));
+//            }
+//        }
+//    }
+//}
 
 
 #endif // CHASTE_CVODE
