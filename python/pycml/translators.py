@@ -3601,7 +3601,7 @@ class CellMLToMapleTranslator(CellMLTranslator):
         n = self.eval_number(expr)
         num = "%.17g" % n
         if num[0] == '-':
-            num = ' ' + num
+            num = '(' + num + ')'
         self.write(num)
 
     def output_root(self, expr, paren):
