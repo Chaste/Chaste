@@ -116,6 +116,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->mCellRadii.size(), 0u);
+        TS_ASSERT(!p_mesh->mpBoxCollection);
 
         // Avoid memory leak
         delete p_mesh;

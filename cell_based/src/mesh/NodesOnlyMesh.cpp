@@ -167,6 +167,9 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 
     // Set the global number of nodes to zero.
     mTotalNumNodes = 0u;
+
+    // Clear the box collection.
+    ClearBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
