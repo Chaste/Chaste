@@ -442,14 +442,14 @@ public:
      * Force the use of a numerical Jacobian, even if an analytic form is provided.
      * This is needed for a handful of troublesome models.
      *
-     * bool useNumericalJacobian  Whether to use a numerical instead of the analytic Jacobian.
+     * @param useNumericalJacobian  Whether to use a numerical instead of the analytic Jacobian.
      */
     void ForceUseOfNumericalJacobian(bool useNumericalJacobian = true);
 
 // The following method may be useful to identify problems with the Analytic Jacobians, if anything goes wrong,
 // but #1795 seems to have got these working OK, so commented out for now.
 
-//    /**
+//    /*
 //     * Compare the calculated analytic jacobian to a numerical approximation, and throw if it looks silly.
 //     *
 //     * @param time  the current time

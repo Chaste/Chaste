@@ -5483,7 +5483,7 @@ def get_options(args, default_options=None):
                       " to use the input filename with a different extension]")
     # Global adjustment settings
     parser.add_option('--config-file',
-                      action='append',
+                      action='append', default=[],
                       help="pathname of configuration file")
     parser.add_option('-A', '--fully-automatic',
                       action='store_true', default=False,
