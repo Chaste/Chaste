@@ -141,7 +141,7 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
 
                 if (difference_norm > tol)
                 {
-                    std::cout << "Vectors differ in NORM_2 by " << difference_norm << std::endl;
+                    std::cout << "Time " << times1[timestep] << ": vectors differ in NORM_2 by " << difference_norm << std::endl;
                     return false;
                 }
             }
