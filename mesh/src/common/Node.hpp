@@ -271,7 +271,7 @@ public:
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * Returs a vector containing the ndoe attributes.
+     * Returns a vector containing the node attributes.
      */
     std::vector<double>& rGetNodeAttributes();
 
