@@ -34,10 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _TESTQUADRATICMESH_HPP_
 #define _TESTQUADRATICMESH_HPP_
-extern "C" {
-extern void METIS_NodeND(int*, int*, int*, int*, int*, int*, int*);
-}
-#include <parmetis.h>
 
 #include <cxxtest/TestSuite.h>
 #include <boost/archive/text_oarchive.hpp>
@@ -1001,96 +997,6 @@ public:
     }
 
 
-
-    /*
-     * Permute nodes so that interior nodes are no longer at the end of the node vector
-     */
-    void TestPermuteNodes(void) throw (Exception)
-    {
-        // Quadratics mesh - with different ordering
-        QuadraticMesh<2> quad_mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
-        quad_mesh.ConstructFromMeshReader(mesh_reader);
-
-        std::vector<unsigned> upper_hist = CalculateMatrixFill(quad_mesh);
-
-        quad_mesh.PermuteNodes();
-
-        //Get some statistics about matrix fill
-        std::vector<unsigned> upper_hist_random = CalculateMatrixFill(quad_mesh);
-
-        // Try out metis fill-in reduction
-
-        Mat connectivity_matrix;
-        CalculateConnectivityMatrix(connectivity_matrix, quad_mesh);
-        PetscInt connectivity_matrix_lo;
-        PetscInt connectivity_matrix_hi;
-        MatGetOwnershipRange(connectivity_matrix, &connectivity_matrix_lo, &connectivity_matrix_hi);
-        PetscInt num_local_nodes = connectivity_matrix_hi - connectivity_matrix_lo;
-
-        MatInfo matrix_info;
-        MatGetInfo(connectivity_matrix, MAT_LOCAL, &matrix_info);
-        unsigned local_num_nz = (unsigned) matrix_info.nz_used;
-
-        idxtype *xadj=new idxtype[num_local_nodes+1];
-        idxtype* adjncy = new idxtype[local_num_nz];
-
-        PetscInt row_num_nz;
-        const PetscInt* column_indices;
-
-        xadj[0]=0;
-        for (PetscInt row_global_index=connectivity_matrix_lo; row_global_index<connectivity_matrix_hi; row_global_index++)
-        {
-            MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, PETSC_NULL);
-
-            unsigned row_local_index = row_global_index - connectivity_matrix_lo;
-            xadj[row_local_index+1] = xadj[row_local_index] + row_num_nz;
-            for (PetscInt col_index=0; col_index<row_num_nz; col_index++)
-            {
-               adjncy[xadj[row_local_index] + col_index] =  column_indices[col_index];
-            }
-
-            MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, PETSC_NULL);
-        }
-
-        PetscTools::Destroy(connectivity_matrix);
-
-        EXIT_IF_PARALLEL;
-//        idxtype vtxdist[2]; //PetscTools::GetNumProcs()
-//        vtxdist[0]=0;
-//        vtxdist[1]=connectivity_matrix_hi;
-        idxtype options[4];
-        options[0] = 0; // This is the first element of an array of up to 4 options, but 0 means take the defaults
-        options[3] = 0;
-        idxtype* order=new idxtype[num_local_nodes];
-        idxtype* sizes=new idxtype[PetscTools::GetNumProcs()*2];
-
-        int numflag = 0; // METIS speak for C-style numbering
-//        MPI_Comm communicator = PETSC_COMM_WORLD;
-//        ParMETIS_V3_NodeND(vtxdist, xadj, adjncy, &numflag, options, order, sizes, &communicator);
-
-        idxtype* perm=new idxtype[3*num_local_nodes];
-        idxtype* iperm=new idxtype[3*num_local_nodes];
-        METIS_NodeND(&num_local_nodes, xadj, adjncy, &numflag, options, perm, iperm);
-
-        std::vector<unsigned> permutation;
-        std::vector<unsigned> ipermutation;
-        for (int i=0; i<num_local_nodes; i++)
-        {
-            ipermutation.push_back(iperm[i]);
-        }
-
-        delete [] perm;
-        delete [] iperm;
-
-        delete [] order;
-        delete [] sizes;
-        delete [] xadj;
-        delete [] adjncy;
-
-        quad_mesh.PermuteNodes(ipermutation);
-        std::vector<unsigned> upper_hist_metis = CalculateMatrixFill(quad_mesh);
-    }
 
 
     void TestElementsContainedByNodes3d() throw (Exception)

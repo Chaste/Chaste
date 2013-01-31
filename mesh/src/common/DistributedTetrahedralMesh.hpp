@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define UNASSIGNED_NODE UINT_MAX
 
-#include <parmetis.h>
 
 /**
  * Parallel implementation of a mesh

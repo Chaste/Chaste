@@ -54,6 +54,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 
 #include "petscao.h"
+#include <parmetis.h>
+#if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above
+//Redefine the index type so that we can still use the old name "idxtype"
+#define idxtype idx_t
+#else
+//Old version of ParMETIS used "float" which may appear elsewhere in, for example, tetgen
+#define real_t float
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   IMPLEMENTATION
@@ -100,7 +108,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     std::vector<unsigned>& rProcessorsOffset)
 {
     ///\todo #1293 add a timing event for the partitioning
-
     if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
     {
         /*
@@ -1386,12 +1393,17 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     delete[] eptr;
 
     int weight_flag = 0; // unweighted graph
-    int n_constrains = 0; // number of weights that each vertex has (number of balance constrains)
+    int n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
     int n_subdomains = PetscTools::GetNumProcs();
     int options[3]; // extra options
     options[0] = 0; // ignore extra options
     int edgecut;
-
+    real_t* tpwgts=new real_t[n_subdomains];
+    real_t ubvec_value=1.05;
+    for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
+    {
+        tpwgts[proc]=1.0/((real_t)n_subdomains);
+    }
     idxtype* local_partition = new idxtype[num_local_elements];
 
 /*
@@ -1409,10 +1421,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     Timer::Reset();
     ParMETIS_V3_PartKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
-                         &n_constrains, &n_subdomains, NULL, NULL,
+                         &n_constraints, &n_subdomains, tpwgts, &ubvec_value,
                          options, &edgecut, local_partition, &communicator);
     //Timer::Print("ParMETIS PartKway");
-
+    delete [] tpwgts;
 
     idxtype* global_element_partition = new idxtype[num_elements];
 
