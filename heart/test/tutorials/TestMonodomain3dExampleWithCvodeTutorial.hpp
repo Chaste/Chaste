@@ -55,16 +55,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
-/* Chaste actually has two ways of using CVODE for solution of cardiac action potential model ODEs.
+/* Chaste actually has two ways of using CVODE for solution of cardiac action potential model ODEs:
  *
- *  1. via a `CvodeAdaptor` solver - this would work on the usual cell model that was included above.
- *  1. via an `AbstractCvodeCell` instead of an `AbstractCardiacCell` - this class uses native CVODE vectors.
+ *  1. via a `CvodeAdaptor` solver - this would work on the usual cell model as in the previous tutorial.
+ *
+ *  2. via an `AbstractCvodeCell` instead of an `AbstractCardiacCell` - this class uses native CVODE vectors.
  *
  * In order to generate CVODE cells please see [wiki:ChasteGuides/CodeGenerationFromCellML CodeGenerationFromCellML].
- * Note that recent improvements (becoming available from release 3.2) mean that
- * maple can be used to generate an '''analytic jacobian''' which is then made available in the
+ *
+ * '''NB:''' recent improvements (becoming available from release 3.2) mean that
+ * maple can be used to generate an ''analytic jacobian'' which is then made available to CVODE via the
  * native `AbstractCvodeCell`, and this will provide a speed up of between 5-30% (depending on the size of
- * the ODE system).
+ * the ODE system). But this is not compulsory to use CVODE, which will still work well.
  *
  * So here we do the `#include` to import the native CVODE version of the cell model.
  */
@@ -173,7 +175,7 @@ public:
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
 
         HeartConfig::Instance()->SetSimulationDuration(5); //ms
-        HeartConfig::Instance()->SetOutputDirectory("Monodomain3dExample");
+        HeartConfig::Instance()->SetOutputDirectory("Monodomain3dExampleWithCvode");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
         /*
@@ -230,7 +232,7 @@ public:
          * the `TS_ASSERT(false);` line.
          *
          * Since CVODE is still optional for Chaste we allow the test to pass without it,
-         * but note the test is not doing anything!
+         * but note that if this is the case, then the test is not doing anything!
          */
 #else
         std::cout << "CVODE is not installed, or CHASTE is not configured to use it, check your hostconfig settings." << std::endl;
