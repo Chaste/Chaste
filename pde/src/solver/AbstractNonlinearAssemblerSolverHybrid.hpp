@@ -334,6 +334,7 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
 
     // Amount to perturb each input element by
     double h = 1e-5;
+    double near_hsquared = 1e-9;
 
     PetscInt ilo, ihi;
     VecGetOwnershipRange(current_guess_copy, &ilo, &ihi);
@@ -352,11 +353,16 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
         PetscVecTools::Scale(result, 1.0/h);
 
         double* p_result;
+        ///\todo This loop is setting the column "global_index_outer" of
+        /// the Jacobian matrix to the result vector in a non-sparse way.
         PETSCEXCEPT( VecGetArray(result, &p_result) );
         for (unsigned global_index=lo; global_index < hi; global_index++)
         {
-            unsigned local_index = global_index - lo;
-            PetscMatTools::SetElement(*pJacobian, global_index, global_index_outer, p_result[local_index]);
+            double result_entry = p_result[ global_index - lo];
+            if (!CompareDoubles::IsNearZero(result_entry, near_hsquared))
+            {
+                PetscMatTools::SetElement(*pJacobian, global_index, global_index_outer, result_entry);
+            }
         }
         PETSCEXCEPT( VecRestoreArray(result, &p_result) );
 
