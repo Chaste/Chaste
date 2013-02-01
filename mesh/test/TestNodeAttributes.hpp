@@ -174,7 +174,9 @@ public:
             p_node_attributes->AddAttribute(6.3);
             p_node_attributes->AddAttribute(4.1);
 
-            output_arch << p_node_attributes;
+            NodeAttributes<3>* const p_const_node_attributes = p_node_attributes;
+
+            output_arch << p_const_node_attributes;
 
             delete p_node_attributes;
         }
@@ -213,7 +215,7 @@ public:
              std::ofstream ofs(archive_filename.c_str());
              boost::archive::text_oarchive output_arch(ofs);
 
-             NodeAttributes<3>* p_node_attributes = NULL;
+             NodeAttributes<3>* const p_node_attributes = NULL;
 
              TS_ASSERT(!p_node_attributes);
 
