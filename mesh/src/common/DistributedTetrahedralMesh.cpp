@@ -1402,7 +1402,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     real_t ubvec_value=1.05;
     for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
     {
-        tpwgts[proc]=1.0/((real_t)n_subdomains);
+        tpwgts[proc]=((real_t)1.0)/n_subdomains;
     }
     idxtype* local_partition = new idxtype[num_local_elements];
 
