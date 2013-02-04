@@ -177,20 +177,20 @@ public:
     /**
      * Just returns whether it is the master process or not.
      *
-     * If not running in parallel, always returns true.
+     * If not running in parallel, or if IsolateProcesses has been called, always returns true.
      */
     static bool AmMaster();
 
     /**
      * Just returns whether it is the right-most process or not.
      *
-     * If not running in parallel, always returns true.
+     * If not running in parallel, or if IsolateProcesses has been called, always returns true.
      */
     static bool AmTopMost();
 
     /**
      * If MPI is set up, perform a barrier synchronisation.
-     * If not, it's a noop.
+     * If not, or if IsolateProcesses has been called, it's a noop.
      *
      * @param callerId  only used in debug mode; printed before & after the barrier call
      */
@@ -210,8 +210,8 @@ public:
      * Where work can be split between isolated processes, it would be nice to be able to do
      * so easily without worrying about collective calls made inside classes such as OutputFileHandler
      * leading to deadlock.
-     * This method attempts to enable this behaviour.  If the flag is set then AmMaster always
-     * returns true, Barrier becomes a no-op, and ReplicateBool doesn't replicate.
+     * This method attempts to enable this behaviour.  If the flag is set then AmMaster and AmTopMost always
+     * return true, Barrier becomes a no-op, and ReplicateBool doesn't replicate.
      *
      * @param isolate  whether to consider processes as isolated
      */
@@ -263,7 +263,7 @@ public:
                          bool ignoreOffProcEntries=true);
 
     /**
-     * Boolean AND of a flags between processes
+     * Boolean AND of a flags between processes.
      *
      * @param flag is set to true on this process.
      * @return true if any process' flag is set to true.

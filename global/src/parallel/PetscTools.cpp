@@ -111,7 +111,7 @@ bool PetscTools::AmMaster()
 bool PetscTools::AmTopMost()
 {
     CheckCache();
-    return (mRank == mNumProcessors - 1);
+    return (mRank == mNumProcessors - 1 || mIsolateProcesses);
 }
 
 // Little utility methods
