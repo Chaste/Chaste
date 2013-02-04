@@ -142,7 +142,8 @@ public:
         Vec vec = PetscTools::CreateVec(mesh.GetNumNodes());
 
         Mat mat;
-        PetscTools::SetupMat(mat, mesh.GetNumNodes(), mesh.GetNumNodes(), 2);
+        //In a simple cable each node is connected to two others, so there are 3 non-zeros per row
+        PetscTools::SetupMat(mat, mesh.GetNumNodes(), mesh.GetNumNodes(), 3);
 
         double coefficient = 2.0;
         BasicCableAssembler<2> basic_cable_assembler(&mesh, coefficient);
