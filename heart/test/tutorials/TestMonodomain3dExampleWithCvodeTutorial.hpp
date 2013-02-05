@@ -76,6 +76,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /*
+ * Since CVODE is an optional extra dependency for Chaste - albeit now
+ * one that is highly recommended - see the [wiki:InstallGuides/InstallGuide InstallGuide].
+ *
+ * EMPTYLINE
+ *
+ * We guard any code that relies upon it with the following `#ifdef`.
+ * This CHASTE_CVODE flag is set automatically if your hostconfig file
+ * (in python/hostconfig) sets `use_cvode` and calls `DetermineCvodeVersion(<path to CVODE includes>)`.
+ * See the end of the file python/hostconfig/default.py for an example of this.
+ *
+ */
+#ifdef CHASTE_CVODE
+
+/*
  * The major changes required to run with CVODE cells are in the cell factory.
  */
 class BenchmarkCellFactory : public AbstractCardiacCellFactory<3> // <3> here
@@ -148,6 +162,8 @@ public:
     }
 };
 
+#endif // CHASTE_CVODE
+
 /*
  * The rest of the test is almost identical to the non-CVODE cell case,
  * - just note the #ifdef tag and the comment about ODE timesteps.
@@ -157,18 +173,6 @@ class TestMonodomain3dExample : public CxxTest::TestSuite
 public:
     void TestMonodomain3d() throw(Exception)
     {
-        /*
-         * Since CVODE is an optional extra dependency for Chaste - albeit now
-         * one that is highly recommended - see the [wiki:InstallGuides/InstallGuide InstallGuide].
-         *
-         * EMPTYLINE
-         *
-         * We guard any code that relies upon it with the following `#ifdef`.
-         * This CHASTE_CVODE flag is set automatically if your hostconfig file
-         * (in python/hostconfig) sets `use_cvode` and calls `DetermineCvodeVersion(<path to CVODE includes>)`.
-         * See the end of the file python/hostconfig/default.py for an example of this.
-         *
-         */
 #ifdef CHASTE_CVODE
         TetrahedralMesh<3,3> mesh;
         double h=0.02;
