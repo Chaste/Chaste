@@ -701,7 +701,7 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
     }
 
     for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
-        {
+    {
         // Get the box containing this node
         unsigned box_index = CalculateContainingBox(rNodes[node_index]);
 
