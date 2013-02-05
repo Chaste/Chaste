@@ -69,6 +69,11 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
     SNESSetJacobian(snes, jacobian, jacobian, pComputeJacobian, pContext);
     SNESSetType(snes,SNESLS);
     SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+    SNESLineSearch linesearch;
+    SNESGetSNESLineSearch(snes, &linesearch);
+    SNESLineSearchSetType(linesearch, "bt"); //Use backtracking search as default
+#endif
 
     // x is the iteration vector SNES uses when solving, set equal to initialGuess to start with
     Vec x;
