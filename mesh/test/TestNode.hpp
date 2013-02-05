@@ -108,7 +108,7 @@ public:
         TS_ASSERT_DELTA(node6.GetPoint()[2], location[2], 1e-12);
 
         // Test the node attributes
-        TS_ASSERT_EQUALS(node6.rGetNodeAttributes().size(),0u);
+        TS_ASSERT_THROWS_THIS(node6.rGetNodeAttributes(), "Node has no attributes associated with it. Construct attributes first");
         double attribute = 54.98;
         node6.AddNodeAttribute(attribute);
         TS_ASSERT_EQUALS(node6.rGetNodeAttributes().size(),1u);
@@ -230,6 +230,60 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNode(1)->IsFlagged(mesh), true);
         TS_ASSERT_EQUALS(mesh.GetNode(2)->IsFlagged(mesh), true);
         TS_ASSERT_EQUALS(mesh.GetNode(3)->IsFlagged(mesh), false);
+    }
+
+    void TestNodeWithAttributes() throw (Exception)
+    {
+        Node<3> node(0, false, 0.0, 1.0, 2.0);
+
+        TS_ASSERT(node.mpNodeAttributes == NULL);
+        TS_ASSERT_EQUALS(node.GetNumNodeAttributes(), 0u);
+
+        // Region should default to 0 if not attributes are set up.
+        TS_ASSERT_EQUALS(node.GetRegion(), 0u);
+
+        TS_ASSERT_THROWS_THIS(node.CheckForNodeAttributes(), "Node has no attributes associated with it. Construct attributes first");
+
+        node.ConstructNodeAttributes();
+        TS_ASSERT(node.mpNodeAttributes != NULL);
+
+        // Check defaults are all returned.
+        TS_ASSERT_EQUALS(node.rGetNodeAttributes().size(), 0u);
+        TS_ASSERT_EQUALS(node.GetRegion(), 0u);
+        TS_ASSERT_DELTA(node.GetRadius(), 0.0, 1e-4);
+
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[2], 0.0, 1e-4);
+
+        TS_ASSERT_EQUALS(node.IsParticle(), false);
+
+        // Check that we can correctly set each of the attributes.
+        node.AddNodeAttribute(1.0);
+        TS_ASSERT_EQUALS(node.GetNumNodeAttributes(), 1u);
+        TS_ASSERT_EQUALS(node.rGetNodeAttributes().size(), 1u);
+        TS_ASSERT_DELTA(node.rGetNodeAttributes()[0], 1.0, 1e-4);
+
+        node.SetRegion(1u);
+        TS_ASSERT_EQUALS(node.GetRegion(), 1u);
+
+        c_vector<double, 3> force_contribution = scalar_vector<double>(3, 1.0);
+        node.AddAppliedForceContribution(force_contribution);
+
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[0], 1.0, 1e-4);
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[1], 1.0, 1e-4);
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[2], 1.0, 1e-4);
+
+        node.ClearAppliedForce();
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(node.rGetAppliedForce()[2], 0.0, 1e-4);
+
+        node.SetIsParticle();
+        TS_ASSERT_EQUALS(node.IsParticle(), true);
+
+        node.SetRadius(1.6);
+        TS_ASSERT_DELTA(node.GetRadius(), 1.6, 1e-4);
     }
 
     void TestArchiveNode()

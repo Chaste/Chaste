@@ -86,7 +86,7 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNumNodeAttributes() const
     /* Note, this implementation assumes that all nodes have the same number of attributes
      * so that the first node in the container is indicative of the others.*/
     assert(mNodes.size() != 0u);
-    return mNodes[0]->rGetNodeAttributes().size();
+    return mNodes[0]->GetNumNodeAttributes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

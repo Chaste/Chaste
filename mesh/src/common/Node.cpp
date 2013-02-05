@@ -49,7 +49,7 @@ void Node<SPACE_DIM>::CommonConstructor(unsigned index, bool isBoundaryNode)
     mIsBoundaryNode = isBoundaryNode;
     mIsInternal = false;
     mIsDeleted = false;
-    mRegion = 0;
+    mpNodeAttributes = NULL;
 }
 
 template<unsigned SPACE_DIM>
@@ -90,6 +90,7 @@ Node<SPACE_DIM>::Node(unsigned index, bool isBoundaryNode, double v1, double v2,
     }
     CommonConstructor(index, isBoundaryNode);
 }
+
 template<unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, double *location, bool isBoundaryNode)
 {
@@ -98,8 +99,14 @@ Node<SPACE_DIM>::Node(unsigned index, double *location, bool isBoundaryNode)
         mLocation(i) = location[i];
     }
     CommonConstructor(index, isBoundaryNode);
-
 }
+
+template<unsigned SPACE_DIM>
+Node<SPACE_DIM>::~Node()
+{
+    delete mpNodeAttributes;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Methods dealing with node location
 //////////////////////////////////////////////////////////////////////////
@@ -155,17 +162,92 @@ bool Node<SPACE_DIM>::IsBoundaryNode() const
     return mIsBoundaryNode;
 }
 
-
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::AddNodeAttribute(double attribute)
 {
-    mNodeAttributes.push_back(attribute);
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->AddAttribute(attribute);
 }
 
 template<unsigned SPACE_DIM>
 std::vector<double>& Node<SPACE_DIM>::rGetNodeAttributes()
 {
-    return mNodeAttributes;
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->rGetAttributes();
+}
+
+template<unsigned SPACE_DIM>
+unsigned Node<SPACE_DIM>::GetNumNodeAttributes()
+{
+    unsigned num_attributes;
+    if (!mpNodeAttributes)
+    {
+        num_attributes = 0u;
+    }
+    else
+    {
+        num_attributes = mpNodeAttributes->rGetAttributes().size();
+    }
+
+    return num_attributes;
+}
+
+template<unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetAppliedForce()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->rGetAppliedForce();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::ClearAppliedForce()
+{
+    CheckForNodeAttributes();
+
+    mpNodeAttributes->ClearAppliedForce();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution)
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->AddAppliedForceContribution(forceContribution);
+}
+
+template<unsigned SPACE_DIM>
+bool Node<SPACE_DIM>::IsParticle()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->IsParticle();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::SetIsParticle()
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->SetIsParticle();
+}
+
+template<unsigned SPACE_DIM>
+double Node<SPACE_DIM>::GetRadius()
+{
+    CheckForNodeAttributes();
+
+    return mpNodeAttributes->GetRadius();
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::SetRadius(double radius)
+{
+    ConstructNodeAttributes();
+
+    mpNodeAttributes->SetRadius(radius);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -233,6 +315,24 @@ unsigned Node<SPACE_DIM>::GetNumBoundaryElements() const
 //////////////////////////////////////////////////////////////////////////
 
 template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::CheckForNodeAttributes() const
+{
+    if (mpNodeAttributes == NULL)
+    {
+        EXCEPTION("Node has no attributes associated with it. Construct attributes first");
+    }
+}
+
+template<unsigned SPACE_DIM>
+void Node<SPACE_DIM>::ConstructNodeAttributes()
+{
+    if (mpNodeAttributes == NULL)
+    {
+        mpNodeAttributes = new NodeAttributes<SPACE_DIM>();
+    }
+}
+
+template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::MarkAsDeleted()
 {
     mIsDeleted = true;
@@ -259,13 +359,21 @@ bool Node<SPACE_DIM>::IsInternal() const
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::SetRegion(unsigned region)
 {
-    mRegion = region;
+    ConstructNodeAttributes();
+    mpNodeAttributes->SetRegion(region);
 }
 
 template<unsigned SPACE_DIM>
 unsigned Node<SPACE_DIM>::GetRegion() const
 {
-    return mRegion;
+    unsigned region = 0;
+
+    if (mpNodeAttributes)
+    {
+        region = mpNodeAttributes->GetRegion();
+    }
+
+    return region;
 }
 
 

@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ChastePoint.hpp"
+#include "NodeAttributes.hpp"
 
 //#include <boost/serialization/vector.hpp>
 //#include <boost/serialization/set.hpp>
@@ -61,11 +62,11 @@ private:
     /** The index of this node within the mesh. */
     unsigned mIndex;
 
-    /** A region ID. */
-    unsigned mRegion;
-
     /** The location of this node within the mesh. */
     c_vector<double, SPACE_DIM> mLocation;
+
+    /** A pointer to a NodeAttributes class asscoiated with this node. */
+    NodeAttributes<SPACE_DIM>* mpNodeAttributes;
 
     /** Whether this node is a boundary node. */
     bool mIsBoundaryNode;
@@ -85,11 +86,9 @@ private:
     /** Set of indices of boundary elements containing this node as a vertex. */
     std::set<unsigned> mBoundaryElementIndices;
 
-    /** Set of node attributes*/
-    std::vector<double> mNodeAttributes;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
+    friend class TestNode;
     /**
      * Archive the member variables.
      *
@@ -101,13 +100,12 @@ private:
     {
         //archive & mLocation; //earlier versions of boost are unable to do this. See #1709
 //        archive & mIndex;
-        archive & mRegion;
+        archive & mpNodeAttributes;
 //        archive & mIsBoundaryNode;
 //        archive & mIsInternal;
 //        archive & mIsDeleted;
 //        archive & mElementIndices;
 //        archive & mBoundaryElementIndices;
-//        archive & mNodeAttributes;
     }
 
     /**
@@ -117,6 +115,16 @@ private:
      * @param isBoundaryNode  whether the node is a boundary node
      */
     void CommonConstructor(unsigned index, bool isBoundaryNode);
+
+    /**
+     * Construct an empty NodeAttributes container
+     */
+    void ConstructNodeAttributes();
+
+    /**
+     * Check that node attributes have been set up, and throw and exception if not.
+     */
+    void CheckForNodeAttributes() const;
 
 public:
 
@@ -172,6 +180,11 @@ public:
      * (other coordinates are assumed to be in contiguous memory)
      */
     Node(unsigned index,  double *location, bool isBoundaryNode=false);
+
+    /**
+     * Explicit destructor to free memory from mpNodeAttributes
+     */
+    ~Node();
 
     /**
      * Set the node's location.
@@ -276,6 +289,11 @@ public:
     std::vector<double>& rGetNodeAttributes();
 
     /**
+     * Reutrn the number of node attributes associated with this node.
+     */
+    unsigned GetNumNodeAttributes();
+
+    /**
      * Return a set of indices of boundary elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingBoundaryElementIndices();
@@ -289,6 +307,43 @@ public:
      * Get the number of boundary elements in the mesh that contain this node.
      */
     unsigned GetNumBoundaryElements() const;
+
+    /**
+     * Get the force applied to this node.
+     */
+    c_vector<double, SPACE_DIM>& rGetAppliedForce();
+
+    /**
+     * Clear the vector associated with the force.
+     */
+    void ClearAppliedForce();
+
+    /**
+     * Add a contribution to the force applied to this node.
+     */
+    void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution);
+
+    /**
+     * Identify whether this node is a particle or not
+     */
+    bool IsParticle();
+
+    /**
+     * Set this node to be a particle, for cell_based simulations.
+     */
+    void SetIsParticle();
+
+    /**
+     * Get the radius of this node.
+     */
+    double GetRadius();
+
+    /**
+     * Set the radius of the node.
+     *
+     * @param radius the value to assign to the radius property. Should be >= 0.0
+     */
+    void SetRadius(double radius);
 
     /**
      * Mark the node as having been removed from the mesh.
@@ -341,6 +396,7 @@ public:
 
     /**
      * Get the node's region ID.
+     * Defaults to 0 if no NodeAttributes have been setup.	
      */
     unsigned GetRegion() const;
 
