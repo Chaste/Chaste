@@ -217,8 +217,6 @@ public:
 
              NodeAttributes<3>* const p_node_attributes = NULL;
 
-             TS_ASSERT(!p_node_attributes);
-
              output_arch << p_node_attributes;
 
              delete p_node_attributes;
