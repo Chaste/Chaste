@@ -245,8 +245,8 @@ public:
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        p_mesh->SetCellRadius(0, 0.1);
-        p_mesh->SetCellRadius(1, 0.2);
+        p_mesh->GetNode(0)->SetRadius(0.1);
+        p_mesh->GetNode(1)->SetRadius(0.2);
 
         // Create two cells
         boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
@@ -288,9 +288,9 @@ public:
         node_based_cell_population.AddCell(p_cell2, cell2_location, p_cell0);
 
         // Check the radii of all the cells are correct (cell 0 divided into 0 and 2)
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 0.1, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 0.2, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 0.1, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 0.1, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 0.2, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.1, 1e-6);
 
         // Avoid memory leak
         delete p_mesh;
@@ -453,7 +453,7 @@ public:
         p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1e-1);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            p_mesh->SetCellRadius(i, 0.1);
+            p_mesh->GetNode(i)->SetRadius(0.1);
         }
 
         // Create cells
@@ -497,7 +497,7 @@ public:
         p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            p_mesh->SetCellRadius(i, 0.1);
+            p_mesh->GetNode(i)->SetRadius(0.1);
         }
 
         // Create cells
@@ -590,11 +590,11 @@ public:
 
         for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
         {
-            p_mesh->SetCellRadius(i, 0.55);
+            p_mesh->GetNode(i)->SetRadius(0.55);
         }
 
         // Make cell 0 smaller
-        p_mesh->SetCellRadius(0, 0.1);
+        p_mesh->GetNode(0)->SetRadius(0.1);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -621,11 +621,11 @@ public:
         // Re set the radii
         for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
         {
-            p_mesh->SetCellRadius(i, 0.55);
+            p_mesh->GetNode(i)->SetRadius(0.55);
         }
 
         // Make cell 0 smaller
-        p_mesh->SetCellRadius(0, 0.1);
+        p_mesh->GetNode(0)->SetRadius(0.1);
         node_based_cell_population.Update();
 
         TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell 0 (0.1) and cell 4 (0.55). Make the cut-off larger to avoid errors.");
@@ -635,11 +635,11 @@ public:
         // Re set the radii
         for (unsigned i=1; i<p_mesh->GetNumNodes(); i++)
         {
-            p_mesh->SetCellRadius(i, 0.55);
+            p_mesh->GetNode(i)->SetRadius(0.55);
         }
 
         // Make cell 0 smaller
-        p_mesh->SetCellRadius(0, 0.1);
+        p_mesh->GetNode(0)->SetRadius(0.1);
         node_based_cell_population.Update();
 
         //Test Corner Node should have no neighbours as small cell
@@ -820,7 +820,7 @@ public:
         node_based_cell_population.GetCellUsingLocationIndex(3)->SetMutationState(p_bcat1);
         node_based_cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_apoptotic_state);
 
-        node_based_cell_population.rGetMesh().SetCellRadius(0, 0.6); // Default is 0.5
+        node_based_cell_population.rGetMesh().GetNode(0)->SetRadius(0.6); // Default is 0.5
         node_based_cell_population.Update(); //  To recalculate cell neighbours
 
         TS_ASSERT_EQUALS(node_based_cell_population.GetOutputCellIdData(), false);

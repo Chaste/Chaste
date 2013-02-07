@@ -78,11 +78,13 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
         // Get index of node associated with cell
         unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
+        Node<DIM>* p_node_i = this->GetNode(node_index);
+
         // Get the location of this node
-        c_vector<double, DIM> node_i_location = this->GetNode(node_index)->rGetLocation();
+        c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
 
         // Get the radius of this cell
-        double radius_of_cell_i = this->rGetMesh().GetCellRadius(node_index);
+        double radius_of_cell_i = p_node_i->GetRadius();
 
         // Get damping constant for node
         double damping_const = this->GetDampingConstant(node_index);
@@ -101,8 +103,10 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
             // Calculate Aij
             double Aij = 0.0;
 
+            Node<DIM>* p_node_j = this->GetNode(neighbour_node_index);
+
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = this->GetNode(neighbour_node_index)->rGetLocation();
+            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
 
             // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
             c_vector<double, DIM> unit_vector = node_j_location - node_i_location;
@@ -113,7 +117,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
             unit_vector /= dij;
 
             // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = this->rGetMesh().GetCellRadius(neighbour_node_index);
+            double radius_of_cell_j = p_node_j->GetRadius();
 
             if (dij < radius_of_cell_i + radius_of_cell_j)
             {

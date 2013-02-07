@@ -1442,7 +1442,7 @@ public:
         // Set some cell radius
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            p_mesh->SetCellRadius(i, 0.9);
+            p_mesh->GetNode(i)->SetRadius( 0.9);
         }
 
         // Set up cells

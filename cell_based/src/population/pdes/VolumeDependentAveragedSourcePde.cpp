@@ -73,8 +73,10 @@ void VolumeDependentAveragedSourcePde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM
 
         unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
+        Node<DIM>* p_node = this->mrCellPopulation.GetNode(node_index);
+        double radius = p_node->GetRadius();
+
         // Uptake normalised to 1 for unit cell
-        double radius = mpStaticCastCellPopulation->rGetMesh().GetCellRadius(node_index);
         double cell_weight = radius*radius;
 
         bool cell_is_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();

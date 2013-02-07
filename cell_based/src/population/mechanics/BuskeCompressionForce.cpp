@@ -75,11 +75,13 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
         // Get the node index corresponding to this cell
         unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
+        Node<DIM>* p_node_i = rCellPopulation.GetNode(node_index);
+
         // Get the location of this node
-        c_vector<double, DIM> node_i_location = rCellPopulation.GetNode(node_index)->rGetLocation();
+        c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
 
         // Get the radius of this cell
-        double radius_of_cell_i = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_index);
+        double radius_of_cell_i = p_node_i->GetRadius();
 
         double delta_V_c = 0.0;
         c_vector<double, DIM> dVAdd_vector = zero_vector<double>(DIM);
@@ -92,8 +94,10 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
              iter != neighbouring_node_indices.end();
              ++iter)
         {
+            Node<DIM>* p_node_j = rCellPopulation.GetNode(*iter);
+
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = rCellPopulation.GetNode(*iter)->rGetLocation();
+            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
 
             // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
             unit_vector = node_j_location - node_i_location;
@@ -104,7 +108,7 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
             unit_vector /= dij;
 
             // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(*iter);
+            double radius_of_cell_j = p_node_j->GetRadius();
 
             // If the cells are close enough to exert a force on each other...
             if (dij < radius_of_cell_i + radius_of_cell_j)

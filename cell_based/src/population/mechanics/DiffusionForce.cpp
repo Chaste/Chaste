@@ -116,8 +116,10 @@ void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
     {
         // Get the radius, damping constant and node index associated with this cell
         unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
+
         double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
-        double cell_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_index);
+        double cell_radius = p_node->GetRadius();
 
         /*
          * Compute the diffusion coefficient D as D = k*T/(6*pi*eta*r), where

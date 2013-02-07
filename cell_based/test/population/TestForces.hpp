@@ -719,9 +719,9 @@ public:
         TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
 
         // Tests the calculation of the force with different cell radii
-        p_mesh->SetCellRadius(0, 10);
-        p_mesh->SetCellRadius(1, 10);
-        p_mesh->SetCellRadius(2, 10);
+        p_mesh->GetNode(0)->SetRadius(10);
+        p_mesh->GetNode(1)->SetRadius(10);
+        p_mesh->GetNode(2)->SetRadius(10);
 
         // Reset the vector of node forces
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
@@ -740,9 +740,9 @@ public:
         TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
 
         // Tests the calculation of the force with different cell radii
-        p_mesh->SetCellRadius(0, 0.2);
-        p_mesh->SetCellRadius(1, 0.2);
-        p_mesh->SetCellRadius(2, 0.2);
+        p_mesh->GetNode(0)->SetRadius(0.2);
+        p_mesh->GetNode(1)->SetRadius(0.2);
+        p_mesh->GetNode(2)->SetRadius(0.2);
 
         // Reset the vector of node forces
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
@@ -1532,7 +1532,7 @@ public:
         }
 
         double correct_diffusion_coefficient =
-                1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
+                1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.GetNode(0)->GetRadius() );
         unsigned dim = 2;
         variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance, 1.0, 1e-1)
@@ -1601,7 +1601,7 @@ public:
         }
 
         double correct_diffusion_coefficient =
-                        1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.rGetMesh().GetCellRadius(0) );
+                        1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.GetNode(0)->GetRadius() );
         unsigned dim = 3;
         variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
         TS_ASSERT_DELTA(variance, 1.0, 1e-1)

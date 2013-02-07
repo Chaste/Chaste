@@ -183,7 +183,7 @@ CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, con
 
     // Then set the new cell radius in the NodesOnlyMesh
     unsigned node_index = this->GetLocationIndexUsingCell(p_created_cell);
-    static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).SetCellRadius(node_index, 0.5);
+    this->GetNode(node_index)->SetRadius(0.5);
 
     // Update size of mIsParticle if necessary
     if (this->GetNumNodes() > this->mIsParticle.size())
@@ -274,6 +274,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
             ++node_iter)
        {
         unsigned node_index = node_iter->GetIndex();
+        Node<DIM>* p_node = this->GetNode(node_index);
 
         if (!this->IsParticle(node_index))
         {
@@ -305,7 +306,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellVolumes)
             {
-                double cell_radius = static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)).GetCellRadius(node_index);
+                double cell_radius = p_node->GetRadius();
                 cell_radii[node_index] = cell_radius;
             }
         }

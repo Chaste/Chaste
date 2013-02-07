@@ -425,7 +425,7 @@ public:
         coarse_mesh.ConstructRegularSlabMesh(100, 100, 100);
 
         // Set up PDE
-        double cell_weight=1.0/pow(cell_population.rGetMesh().GetCellRadius(1), 2);
+        double cell_weight=1.0/pow(cell_population.GetNode(1)->GetRadius(), 2);
         VolumeDependentAveragedSourcePde<2> pde(cell_population, -cell_weight);
         pde.SetupSourceTerms(coarse_mesh);
 

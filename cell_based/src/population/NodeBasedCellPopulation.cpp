@@ -236,7 +236,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         {
             double cell_radius = cell_iter->GetCellData()->GetItem("Radius");
             unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-            mpNodesOnlyMesh->SetCellRadius(node_index, cell_radius);
+            this->GetNode(node_index)->SetRadius(cell_radius);
         }
     }
 }
@@ -354,8 +354,9 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     std::set<unsigned> neighbouring_node_indices;
 
     // Get location and radius of node
-    c_vector<double, DIM> node_i_location = this->GetNode(index)->rGetLocation();
-    double radius_of_cell_i = mpNodesOnlyMesh->GetCellRadius(index);
+    Node<DIM>* p_node_i = this->GetNode(index);
+    c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+    double radius_of_cell_i = p_node_i->GetRadius();
 
     // Make sure that the max_interaction distance is smaller than the box collection size
     if (!(radius_of_cell_i * 2.0 < mpNodesOnlyMesh->GetMaximumInteractionDistance()))
@@ -375,8 +376,10 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
         // Be sure not to return the index itself.
         if ((*iter) != index)
         {
+            Node<DIM>* p_node_j = this->GetNode((*iter));
+
             // Get the location of this node
-            c_vector<double, DIM> node_j_location = this->GetNode((*iter))->rGetLocation();
+            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
 
             // Get the vector the two nodes (assuming no periodicities etc.)
             c_vector<double, DIM> node_to_node_vector = node_i_location - node_j_location;
@@ -385,7 +388,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             double distance_between_nodes = norm_2(node_to_node_vector);
 
             // Get the radius of the cell corresponding to this node
-            double radius_of_cell_j = mpNodesOnlyMesh->GetCellRadius((*iter));
+            double radius_of_cell_j = p_node_j->GetRadius();
 
             // If the cells are close enough to exert a force on each other...
             double max_interaction_distance = radius_of_cell_i + radius_of_cell_j;
@@ -411,9 +414,10 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Get node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+    Node<DIM>* p_node = this->GetNode(node_index);
 
     // Get cell radius
-    double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
+    double cell_radius = p_node->GetRadius();
 
     // Begin code to approximate cell volume
     double averaged_cell_radius = 0.0;
@@ -430,10 +434,12 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
          iter != neighbouring_node_indices.end();
          ++iter)
     {
-        // Get the location of the neighbouring node
-        c_vector<double, DIM> node_j_location = GetNode(*iter)->rGetLocation();
+        Node<DIM>* p_node_j = this->GetNode(*iter);
 
-        double neighbouring_cell_radius = mpNodesOnlyMesh->GetCellRadius( *iter);
+        // Get the location of the neighbouring node
+        c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+
+        double neighbouring_cell_radius = p_node_j->GetRadius();
 
         // If this throws then you may not be considering all cell interactions use a larger cut off length
         assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
@@ -551,6 +557,8 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         // Get the node index corresponding to this cell
         unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
+        Node<DIM>* p_node = this->GetNode(node_index);
+
         if (this->mOutputCellAncestors)
         {
             double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
@@ -588,7 +596,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         if (this->mOutputCellVolumes)
         {
-            double cell_radius = mpNodesOnlyMesh->GetCellRadius(node_index);
+            double cell_radius = p_node->GetRadius();
             cell_radii[node_index] = cell_radius;
         }
 
@@ -651,8 +659,12 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
 
     // Then set the new cell radius in the NodesOnlyMesh
     unsigned parent_node_index = this->GetLocationIndexUsingCell(pParentCell);
+    Node<DIM>* p_parent_node = this->GetNode(parent_node_index);
+
     unsigned new_node_index = this->GetLocationIndexUsingCell(p_created_cell);
-    mpNodesOnlyMesh->SetCellRadius(new_node_index, mpNodesOnlyMesh->GetCellRadius(parent_node_index));
+    Node<DIM>* p_new_node = this->GetNode(new_node_index);
+
+    p_new_node->SetRadius(p_parent_node->GetRadius());
 
     // Return pointer to new cell
     return p_created_cell;

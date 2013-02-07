@@ -146,8 +146,8 @@ public:
         p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);	// Large cut off as larger cells.
 
         // Modify the radii of the cells
-        p_mesh->SetCellRadius(0,1.0);
-        p_mesh->SetCellRadius(1,2.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(2.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -174,10 +174,10 @@ public:
         simulator.Solve();
 
         // Check that the radii of all the cells are correct (cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2)
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(3), 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 1.0, 1e-6);
 
         // Check the separation of some node pairs
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
@@ -234,10 +234,10 @@ public:
         simulator.Solve();
 
         // Check the Radii of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(3), 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 1.0, 1e-6);
 
         // Check the separation of some node pairs
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
@@ -258,7 +258,7 @@ public:
 
         for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA(p_mesh->GetCellRadius(i), 2.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(i)->GetRadius(), 2.0, 1e-6);
         }
 
         // Check the separation of some node pairs

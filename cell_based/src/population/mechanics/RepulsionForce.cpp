@@ -59,16 +59,16 @@ void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
     {
         std::pair<Node<DIM>*, Node<DIM>* > pair = *iter;
 
-        unsigned node_a_index = pair.first->GetIndex();
-        unsigned node_b_index = pair.second->GetIndex();
+        Node<DIM>* p_node_a = pair.first;
+        Node<DIM>* p_node_b = pair.second;
 
         // Get the node locations
-        c_vector<double, DIM> node_a_location = rCellPopulation.GetNode(node_a_index)->rGetLocation();
-        c_vector<double, DIM> node_b_location =  rCellPopulation.GetNode(node_b_index)->rGetLocation();
+        c_vector<double, DIM> node_a_location = p_node_a->rGetLocation();
+        c_vector<double, DIM> node_b_location =  p_node_b->rGetLocation();
 
         // Get the node radii
-        double node_a_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_a_index);
-        double node_b_radius = dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(node_b_index);
+        double node_a_radius = p_node_a->GetRadius();
+        double node_b_radius = p_node_b->GetRadius();
 
         // Get the unit vector parallel to the line joining the two nodes
         c_vector<double, DIM> unit_difference;
@@ -81,14 +81,14 @@ void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         if (norm_2(unit_difference) < rest_length)
         {
             // Calculate the force between nodes
-            c_vector<double, DIM> force = this->CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
+            c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
             for (unsigned j=0; j<DIM; j++)
             {
                 assert(!std::isnan(force[j]));
             }
             // Add the force contribution to each node
-            rForces[node_a_index] += force;
-            rForces[node_b_index] -= force;
+            rForces[p_node_a->GetIndex()] += force;
+            rForces[p_node_b->GetIndex()] -= force;
         }
     }
 }

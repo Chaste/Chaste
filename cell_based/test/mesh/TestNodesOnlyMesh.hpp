@@ -317,12 +317,11 @@ public:
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        p_mesh->SetCellRadius(0, 1.0);
-        p_mesh->SetCellRadius(1, 2.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(2.0);
 
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->GetCellRadius(100), " does not belong to process ");
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
 
         // Avoid memory leak
         delete p_mesh;
@@ -348,10 +347,10 @@ public:
 
         unsigned num_nodes = 3;
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 0.5, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.5, 1e-4);
 
         // Cover an exception.
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->SetCellRadius(3,1.0), " does not belong to process ");
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->GetNode(3)->SetRadius(1.0), " does not belong to process ");
 
         // Avoid memory leak
         delete p_mesh;
@@ -387,23 +386,22 @@ public:
         // Set radii of cells from 1 to 8
         for (unsigned i=0; i<nodes.size(); i++)
         {
-            p_mesh->SetCellRadius(i, i+1);
+            p_mesh->GetNode(i)->SetRadius(i+1);
         }
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
 
         // Delete from interior
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(6), 7.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(6)->GetRadius(), 7.0, 1e-4);
         p_mesh->DeleteNode(6);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 7u);
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->GetCellRadius(6), " does not belong to process ");
 
         // Delete from edge
         p_mesh->DeleteNode(1);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 6u);
 
         // Delete from corner
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(3), 4.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 4.0, 1e-4);
         p_mesh->DeleteNode(3);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u);
 
@@ -418,7 +416,7 @@ public:
         p_mesh->AddNode(new Node<2>(0, true, 6.0, 6.0)); //This node pointer is added to the mesh and deleted by the destructor
 
         // Check the most recently deleted node now has the correct cell radius
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(3), 0.5, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 0.5, 1e-4);
 
         // Now we have deleted/reused 3, and deleted 1 and 6.
         // The new nodes are:
@@ -437,12 +435,12 @@ public:
         TS_ASSERT(map.IsDeleted(6));
         TS_ASSERT_EQUALS(map.GetNewIndex(7), 5u);
 
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 3.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 0.5, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(3), 5.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(4), 6.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetCellRadius(5), 8.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 3.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.5, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 5.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(4)->GetRadius(), 6.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(5)->GetRadius(), 8.0, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -463,11 +461,11 @@ public:
             NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
             p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
-            p_mesh->SetCellRadius(0, 1.12);
-            p_mesh->SetCellRadius(1, 2.34);
+            p_mesh->GetNode(0)->SetRadius(1.12);
+            p_mesh->GetNode(1)->SetRadius(2.34);
 
-            TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.12, 1e-6);
-            TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.34, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.34, 1e-6);
 
             AbstractTetrahedralMesh<2,2>* const p_const_mesh = p_mesh;
 
@@ -509,8 +507,8 @@ public:
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[1], 0.0, 1e-6);
 
             // Check some cell radii
-            TS_ASSERT_DELTA(p_nodes_only_mesh->GetCellRadius(0), 1.12, 1e-6);
-            TS_ASSERT_DELTA(p_nodes_only_mesh->GetCellRadius(1), 2.34, 1e-6);
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
+            TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetRadius(), 2.34, 1e-6);
 
             // Tidy up
             delete p_mesh2;

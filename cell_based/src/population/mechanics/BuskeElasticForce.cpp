@@ -65,9 +65,12 @@ c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigne
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
+    Node<DIM>* p_node_a = rCellPopulation.GetNode(nodeAGlobalIndex);
+    Node<DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
+
     // Get the node locations
-    c_vector<double, DIM> node_a_location = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
-    c_vector<double, DIM> node_b_location = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
+    c_vector<double, DIM> node_a_location = p_node_a->rGetLocation();
+    c_vector<double, DIM> node_b_location = p_node_b->rGetLocation();
 
     // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
     c_vector<double, DIM> unit_vector = node_b_location - node_a_location;
@@ -92,9 +95,8 @@ c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigne
     unit_vector /= distance_between_nodes;
 
     // Get the cell radii
-    NodesOnlyMesh<DIM>& r_mesh = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh();
-    double radius_of_cell_one = r_mesh.GetCellRadius(nodeAGlobalIndex);
-    double radius_of_cell_two = r_mesh.GetCellRadius(nodeBGlobalIndex);
+    double radius_of_cell_one = p_node_a->GetRadius();
+    double radius_of_cell_two = p_node_b->GetRadius();
 
     // Compute the force vector
     c_vector<double, DIM> force_between_nodes = GetMagnitudeOfForce(distance_between_nodes,radius_of_cell_one,radius_of_cell_two) * unit_vector;

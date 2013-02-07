@@ -182,18 +182,6 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetGlobalNumNodes() const
 }
 
 template<unsigned SPACE_DIM>
-double NodesOnlyMesh<SPACE_DIM>::GetCellRadius(unsigned index)
-{
-    return this->GetNode(index)->GetRadius();
-}
-
-template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetCellRadius(unsigned index, double radius)
-{
-    this->GetNode(index)->SetRadius(radius);
-}
-
-template<unsigned SPACE_DIM>
 double NodesOnlyMesh<SPACE_DIM>::GetMaximumInteractionDistance()
 {
     return mMaximumInteractionDistance;
@@ -293,7 +281,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
     // update mNodesMapping
     mNodesMapping[pNewNode->GetIndex()] = new_node_index;
 
-    // Then update mCellRadii
+    // Then update cell radius to default.
     pNewNode->SetRadius(0.5);
 
     // Increase the counter for the number of nodes.

@@ -66,18 +66,6 @@ private:
     std::vector<Node<SPACE_DIM>* > mHaloNodes;
 
     /**
-     * Vector of radii of cells corresponding to nodes.
-     * Each radius is set to 0.5 by default in the method
-     * ConstructNodesWithoutMesh()
-     */
-    std::map<unsigned, double> mCellRadii;
-
-    /**
-     * Vector of radii of cells corresponding to halo nodes.
-     */
-    std::map<unsigned, double> mHaloCellRadii;
-
-    /**
      * Defines connectivity in NodesOnlyMesh. Two nodes are connected
      * if their centres are less than mMaximumInteractionDistance apart.
      */
@@ -115,11 +103,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
-        /*
-         * Note that the MutableMesh archiver does a remesh. If there are deleted nodes
-         * then we want to wait for them to be re-numbered before archiving the radii.
-         */
-        archive & mCellRadii;
         archive & mMaximumInteractionDistance;
     }
 
@@ -186,7 +169,6 @@ public:
 
     /**
      * Overridden Clear() method for NodesOnlyMesh.
-     * Clears mCellRadii in addition to calling Clear() on the parent class.
      */
     void Clear();
 
@@ -209,21 +191,6 @@ public:
      * Get the global number of nodes.
      */
     unsigned GetGlobalNumNodes() const;
-
-    /**
-     * Get the cell radius associated with a given node index.
-     *
-     * @param index the index of a node
-     */
-    double GetCellRadius(unsigned index);
-
-    /**
-     * Set the cell radius associated with a given node index.
-     *
-     * @param index the index of a node
-     * @param radius the cell radius
-     */
-    void SetCellRadius(unsigned index, double radius);
 
     /**
      * @return mMaxInteractionDistance

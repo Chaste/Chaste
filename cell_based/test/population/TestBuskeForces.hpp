@@ -69,8 +69,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
-        p_mesh->SetCellRadius(0, 1.0);
-        p_mesh->SetCellRadius(1, 1.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -151,8 +151,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
-        p_mesh->SetCellRadius(0, 1.0);
-        p_mesh->SetCellRadius(1, 1.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -234,8 +234,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
-        p_mesh->SetCellRadius(0, 1.0);
-        p_mesh->SetCellRadius(1, 1.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -304,8 +304,8 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.5);
-        p_mesh->SetCellRadius(0, 1.0);
-        p_mesh->SetCellRadius(1, 1.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -378,9 +378,9 @@ public:
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 2.5);
-        p_mesh->SetCellRadius(0, 1.0);
-        p_mesh->SetCellRadius(1, 1.0);
-        p_mesh->SetCellRadius(2, 1.0);
+        p_mesh->GetNode(0)->SetRadius(1.0);
+        p_mesh->GetNode(1)->SetRadius(1.0);
+        p_mesh->GetNode(2)->SetRadius(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;

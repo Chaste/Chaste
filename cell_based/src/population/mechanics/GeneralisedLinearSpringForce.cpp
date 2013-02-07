@@ -70,9 +70,12 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     // We should only ever calculate the force between two distinct nodes
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
+    Node<SPACE_DIM>* p_node_a = rCellPopulation.GetNode(nodeAGlobalIndex);
+    Node<SPACE_DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
+
     // Get the node locations
-    c_vector<double, SPACE_DIM> node_a_location = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
-    c_vector<double, SPACE_DIM> node_b_location = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
+    c_vector<double, SPACE_DIM> node_a_location = p_node_a->rGetLocation();
+    c_vector<double, SPACE_DIM> node_b_location = p_node_b->rGetLocation();
 
     // Get the node radii for a NodeBasedCellPopulation
     double node_a_radius=0.0;
@@ -80,8 +83,8 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
 
     if (dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation))
     {
-        node_a_radius = dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(nodeAGlobalIndex);
-        node_b_radius = dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)->rGetMesh().GetCellRadius(nodeBGlobalIndex);
+        node_a_radius = p_node_a->GetRadius();
+        node_b_radius = p_node_b->GetRadius();
     }
 
     // Get the unit vector parallel to the line joining the two nodes
