@@ -157,11 +157,11 @@ public:
         else
         {
             // Total number of nozeros that should be allocated is 36 (4*12 (12 = number of rows) in diagonal part,
-            // plus 0.5*4*12 in the off-diagonal part. These are then split between the number of processors. So, a
-            // processor that owns n rows should have 6*n nonzeros allocated.
+            // plus 4*12 in the off-diagonal part. These are then split between the number of processors. So, a
+            // processor that owns n rows should have 8*n nonzeros allocated.
             PetscInt lo, hi;
             MatGetOwnershipRange(mat2, &lo, &hi);
-            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(6*(hi-lo)) );
+            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(2*4*(hi-lo)) );
         }
 
         PetscTools::Destroy(mat2);
