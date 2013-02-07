@@ -905,10 +905,10 @@ Vec LinearSystem::Solve(Vec lhsGuess)
     }
     else
     {
-        #define COVERAGE_IGNORE
         if (mNonZerosUsed!=mat_info.nz_used)
         {
-            EXCEPTION("LinearSystem doesn't allow the non-zero pattern of a matrix to change. (I think you changed it).");
+            WARNING("LinearSystem doesn't like the non-zero pattern of a matrix to change. (I think you changed it).");
+            mNonZerosUsed = mat_info.nz_used;
         }
 //        PetscScalar norm;
 //        MatNorm(mLhsMatrix, NORM_FROBENIUS, &norm);
@@ -916,7 +916,6 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 //        {
 //            EXCEPTION("LinearSystem doesn't allow the matrix norm to change");
 //        }
-        #undef COVERAGE_IGNORE
     }
 
     HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);

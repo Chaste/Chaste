@@ -81,11 +81,12 @@ public:
                 ls.SetMatrixElement(row, col, (double) row*3+col+1);
             }
         }
-        ls.AssembleFinalLinearSystem();
-
+        
         ls.SetRhsVectorElement(0, 1400000.0);
         ls.SetRhsVectorElement(1, 3200000.0);
         ls.SetRhsVectorElement(2, 5000000.0);
+
+        ls.AssembleFinalLinearSystem();
 
         // For coverage
         ls.DisplayMatrix();
@@ -369,10 +370,10 @@ public:
 
         ls.AddToMatrixElement(0, 1, 1.0);
         ls.AddToMatrixElement(1, 1, 1.0);
-        ls.AssembleFinalLinearSystem();
 
         ls.AddToRhsVectorElement(0, 3.0);
         ls.AddToRhsVectorElement(1, 7.0);
+        ls.AssembleFinalLinearSystem();
 
         Vec solution_vector;
         solution_vector = ls.Solve();
@@ -467,11 +468,11 @@ public:
         {
             ls.SetMatrixElement(row, row, (double) row+1);
         }
-        ls.AssembleFinalLinearSystem();
 
         ls.SetRhsVectorElement(0, 1.0);
         ls.SetRhsVectorElement(1, 2.0);
         ls.SetRhsVectorElement(2, 3.0);
+        ls.AssembleFinalLinearSystem();
 
         std::vector<double> data(3,0.0);
         data[0] = 1.0;
@@ -589,17 +590,18 @@ public:
                 ls.SetMatrixElement(row, col, (double) row*3+col+1);
             }
         }
-        ls.AssembleFinalLinearSystem();
 
         ls.SetRhsVectorElement(0, 14.0);
         ls.SetRhsVectorElement(1, 32.0);
         ls.SetRhsVectorElement(2, 50.0);
+        ls.AssembleFinalLinearSystem();
 
         // Set the correct answer for the intial guess
         Vec good_guess=PetscTools::CreateVec(3);
         PetscVecTools::SetElement(good_guess, 0, 1.0);
         PetscVecTools::SetElement(good_guess, 1, 2.0);
         PetscVecTools::SetElement(good_guess, 2, 3.0);
+        PetscVecTools::Finalise(good_guess);
 
         Vec solution_vector;
         solution_vector = ls.Solve(good_guess);
@@ -702,12 +704,12 @@ public:
                 ls.SetMatrixElement(row, col, (double)(abs(row-col)));
             }
         }
-        ls.AssembleFinalLinearSystem();
 
         // arbitrary
         ls.SetRhsVectorElement(0, 14.0);
         ls.SetRhsVectorElement(1, 32.0);
         ls.SetRhsVectorElement(2, 50.0);
+        ls.AssembleFinalLinearSystem();
 
         Vec solution_vector;
         solution_vector = ls.Solve();
@@ -747,12 +749,12 @@ public:
                 ls.SetMatrixElement(row, col, (double)(10+row-col));
             }
         }
-        ls.AssembleFinalLinearSystem();
 
         // Arbitrary
         ls.SetRhsVectorElement(0, 14.0);
         ls.SetRhsVectorElement(1, 32.0);
         ls.SetRhsVectorElement(2, 50.0);
+        ls.AssembleFinalLinearSystem();
 
         // Solving should be fine
         Vec solution_vector;
@@ -920,12 +922,13 @@ public:
                 ls.SetMatrixElement(row, col, (double)(abs(row-col)));
             }
         }
-        ls.AssembleFinalLinearSystem();
 
         // Arbitrary
         ls.SetRhsVectorElement(0, 14.0);
         ls.SetRhsVectorElement(1, 32.0);
         ls.SetRhsVectorElement(2, 50.0);
+
+        ls.AssembleFinalLinearSystem();
 
         // SAVE
         {

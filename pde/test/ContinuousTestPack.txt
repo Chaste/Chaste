@@ -9,6 +9,7 @@ TestSimpleLinearEllipticSolver.hpp
 TestSimpleNonlinearEllipticSolver.hpp
 TestSolvingCoupledPdes.hpp
 TestSolveLaplacianWithQuadratics.hpp
+tutorials/TestSolvingNonlinearPdesTutorial.hpp
 tutorials/TestWritingPdeSolversTutorial.hpp
 tutorials/TestWritingPdeSolversTwoTutorial.hpp
 utilities/TestAbstractFeCableIntegralAssembler.hpp
