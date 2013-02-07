@@ -80,7 +80,7 @@ public:
             TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(i), p_mesh->mNodesMapping[i]);
         }
 
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8), " does not belong to processes ")
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8), " does not belong to process ")
 
         // Avoid memory leak
         delete p_mesh;
@@ -115,7 +115,6 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->mCellRadii.size(), 0u);
         TS_ASSERT(!p_mesh->mpBoxCollection);
 
         // Avoid memory leak
@@ -321,7 +320,7 @@ public:
         p_mesh->SetCellRadius(0, 1.0);
         p_mesh->SetCellRadius(1, 2.0);
 
-        TS_ASSERT_THROWS_THIS(p_mesh->GetCellRadius(100), "Requested radius of a node which is not set. Either does not lie on this process as a node or halo node, or has not been set.");
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->GetCellRadius(100), " does not belong to process ");
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.0, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.0, 1e-6);
 
@@ -352,7 +351,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(2), 0.5, 1e-4);
 
         // Cover an exception.
-        TS_ASSERT_THROWS_THIS(p_mesh->SetCellRadius(3,1.0), "Trying to set the radius of node which does not lie on this process");
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->SetCellRadius(3,1.0), " does not belong to process ");
 
         // Avoid memory leak
         delete p_mesh;
@@ -397,7 +396,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetCellRadius(6), 7.0, 1e-4);
         p_mesh->DeleteNode(6);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 7u);
-        TS_ASSERT_THROWS_THIS(p_mesh->GetCellRadius(6), "Requested radius of a node which is not set. Either does not lie on this process as a node or halo node, or has not been set.");
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->GetCellRadius(6), " does not belong to process ");
 
         // Delete from edge
         p_mesh->DeleteNode(1);
@@ -412,7 +411,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_mesh->DeleteNode(3),"Trying to delete a deleted node");
 
         /*
-         * Check that mCellRadii is updated correctly when a new cell
+         * Check that the cell radii are updated correctly when a new cell
          * is added using the most recently deleted index.
          * (Index 3 is at the back of the deleted nodes list and is thus the one to be reused.)
          */
@@ -467,7 +466,6 @@ public:
             p_mesh->SetCellRadius(0, 1.12);
             p_mesh->SetCellRadius(1, 2.34);
 
-            TS_ASSERT_EQUALS(p_mesh->mCellRadii.size(), 543u);
             TS_ASSERT_DELTA(p_mesh->GetCellRadius(0), 1.12, 1e-6);
             TS_ASSERT_DELTA(p_mesh->GetCellRadius(1), 2.34, 1e-6);
 
@@ -511,12 +509,62 @@ public:
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetNode(1)->GetPoint()[1], 0.0, 1e-6);
 
             // Check some cell radii
-            TS_ASSERT_EQUALS(p_nodes_only_mesh->mCellRadii.size(), 543u);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetCellRadius(0), 1.12, 1e-6);
             TS_ASSERT_DELTA(p_nodes_only_mesh->GetCellRadius(1), 2.34, 1e-6);
 
             // Tidy up
             delete p_mesh2;
+        }
+    }
+
+    void TestArchiveMutableMeshWithNodeAttributes() throw (Exception)
+    {
+        FileFinder archive_dir("archive_mutable_mesh", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "mutable_mesh_with_attributes.arch";
+
+        {
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            std::vector<Node<3> *> nodes;
+
+            nodes.push_back(new Node<3>(0, true,  0.0,  0.0,  0.0));
+            nodes.push_back(new Node<3>(1, true,  0.0,  1.0,  0.0));
+            nodes.push_back(new Node<3>(2, true,  0.0,  0.0,  1.0));
+            nodes.push_back(new Node<3>(3, true,  1.0,  0.0,  0.0));
+
+            NodesOnlyMesh<3> mesh;
+            mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+            for (unsigned i=0; i<4; i++)
+            {
+                mesh.GetNode(i)->SetRadius(1.2);
+                mesh.GetNode(i)->SetIsParticle();
+            }
+
+            AbstractTetrahedralMesh<3,3>* const p_mesh = &mesh;
+
+            (*p_arch) << p_mesh;
+        }
+
+        {
+            AbstractTetrahedralMesh<3,3>* p_mesh;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // restore from the archive
+            (*p_arch) >> p_mesh;
+
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 4u);
+
+            for (unsigned i=0; i<4; i++)
+            {
+                TS_ASSERT_DELTA(p_mesh->GetNode(i)->GetRadius(), 1.2, 1e-15);
+                TS_ASSERT(p_mesh->GetNode(i)->IsParticle());
+            }
         }
     }
 };

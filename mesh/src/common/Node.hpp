@@ -294,6 +294,11 @@ public:
     unsigned GetNumNodeAttributes();
 
     /**
+     * @return Whether mpNodeAttributes has been set. Used in archiving of attributes in a mesh.
+     */
+    bool HasNodeAttributes();
+
+    /**
      * Return a set of indices of boundary elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingBoundaryElementIndices();

@@ -195,6 +195,12 @@ unsigned Node<SPACE_DIM>::GetNumNodeAttributes()
 }
 
 template<unsigned SPACE_DIM>
+bool Node<SPACE_DIM>::HasNodeAttributes()
+{
+    return (mpNodeAttributes != NULL);
+}
+
+template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetAppliedForce()
 {
     CheckForNodeAttributes();

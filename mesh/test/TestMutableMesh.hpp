@@ -1088,7 +1088,6 @@ public:
 
     void TestConstructFromNodes() throw (Exception)
     {
-
         // Create mutable tetrahedral mesh which is Delaunay
         std::vector<Node<3> *> nodes;
 
@@ -1209,7 +1208,6 @@ public:
             delete p_mesh2;
         }
     }
-
 };
 
 #endif /*TESTMUTABLEMESH_HPP_*/

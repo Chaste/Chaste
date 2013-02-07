@@ -236,7 +236,7 @@ public:
     {
         Node<3> node(0, false, 0.0, 1.0, 2.0);
 
-        TS_ASSERT(node.mpNodeAttributes == NULL);
+        TS_ASSERT(!node.HasNodeAttributes());
         TS_ASSERT_EQUALS(node.GetNumNodeAttributes(), 0u);
 
         // Region should default to 0 if not attributes are set up.
@@ -245,7 +245,7 @@ public:
         TS_ASSERT_THROWS_THIS(node.CheckForNodeAttributes(), "Node has no attributes associated with it. Construct attributes first");
 
         node.ConstructNodeAttributes();
-        TS_ASSERT(node.mpNodeAttributes != NULL);
+        TS_ASSERT(node.HasNodeAttributes());
 
         // Check defaults are all returned.
         TS_ASSERT_EQUALS(node.rGetNodeAttributes().size(), 0u);
