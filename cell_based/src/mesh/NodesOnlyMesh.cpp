@@ -261,7 +261,7 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
         p_node->SetRadius(old_cell_radii[node_index]);
         if (old_is_particle[node_index])
         {
-            p_node->SetIsParticle();
+            p_node->SetIsParticle(true);
         }
         this->mNodes.push_back(p_node);
 

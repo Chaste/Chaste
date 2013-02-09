@@ -279,7 +279,8 @@ public:
         TS_ASSERT_DELTA(node.rGetAppliedForce()[1], 0.0, 1e-4);
         TS_ASSERT_DELTA(node.rGetAppliedForce()[2], 0.0, 1e-4);
 
-        node.SetIsParticle();
+        TS_ASSERT_EQUALS(node.IsParticle(), false);
+        node.SetIsParticle(true);
         TS_ASSERT_EQUALS(node.IsParticle(), true);
 
         node.SetRadius(1.6);

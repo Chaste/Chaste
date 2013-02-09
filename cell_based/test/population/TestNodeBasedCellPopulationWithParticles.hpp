@@ -164,10 +164,8 @@ public:
              it!=particle_indices.end();
              it++)
         {
-            is_particle[*it] = true;
+        	TS_ASSERT_EQUALS(cell_population.GetNode(*it)->IsParticle(), true)
         }
-
-        TS_ASSERT_EQUALS(cell_population.rGetParticles(), is_particle);
 
         // Test the GetParticleIndices method
         std::set<unsigned> particle_indices2 = cell_population.GetParticleIndices();
@@ -188,7 +186,6 @@ public:
 
         // Check counter = num_nodes - num_particles_nodes
         TS_ASSERT_EQUALS(counter + particle_indices.size(), p_mesh->GetNumNodes());
-        TS_ASSERT_EQUALS(cell_population.rGetParticles().size(), p_mesh->GetNumNodes());
 
         // Avoid memory leak
         delete p_mesh;
@@ -303,7 +300,6 @@ public:
 
         // Num real cells should be num_nodes (81) - num_particle (11) - 1 deleted node = 69
         TS_ASSERT_EQUALS(cell_population_with_particles.GetNumRealCells(), 69u);
-        TS_ASSERT_EQUALS(cell_population_with_particles.rGetParticles().size(), p_mesh->GetNumAllNodes());
 
         cell_population_with_particles.Update();
 
@@ -315,7 +311,6 @@ public:
         // Num real cells should be new_num_nodes (80) - num_particles (11)
         TS_ASSERT_EQUALS(cell_population_with_particles.GetNumRealCells(), 69u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh->GetNumAllNodes());
-        TS_ASSERT_EQUALS(cell_population_with_particles.rGetParticles().size(), p_mesh->GetNumNodes());
 
         // Nodes 0-9 should not been renumbered so are still particles.
         // the particle at node 80 is now at 79 as node 27 was deleted..

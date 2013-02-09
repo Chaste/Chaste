@@ -146,9 +146,9 @@ public:
     bool IsParticle();
 
     /**
-     * Set the flag mIsParticle to true.
+     * Set the flag mIsParticle.
      */
-    void SetIsParticle();
+    void SetIsParticle(bool isParticle);
 
     /**
      * Return the radius associated with the Node

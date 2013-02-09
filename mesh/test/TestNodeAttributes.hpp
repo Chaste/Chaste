@@ -136,9 +136,13 @@ public:
     {
         NodeAttributes<2> node_attributes;
 
-        node_attributes.SetIsParticle();
+        node_attributes.SetIsParticle(true);
 
         TS_ASSERT(node_attributes.IsParticle());
+
+        node_attributes.SetIsParticle(false);
+
+        TS_ASSERT(!node_attributes.IsParticle());
     }
 
     void TestRadius() throw (Exception)
@@ -169,7 +173,7 @@ public:
             c_vector<double, 3> force_contribution = scalar_vector<double>(3, 1.0);
             p_node_attributes->AddAppliedForceContribution(force_contribution);
 
-            p_node_attributes->SetIsParticle();
+            p_node_attributes->SetIsParticle(true);
 
             p_node_attributes->AddAttribute(6.3);
             p_node_attributes->AddAttribute(4.1);

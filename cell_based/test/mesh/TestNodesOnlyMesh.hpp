@@ -538,7 +538,7 @@ public:
             for (unsigned i=0; i<4; i++)
             {
                 mesh.GetNode(i)->SetRadius(1.2);
-                mesh.GetNode(i)->SetIsParticle();
+                mesh.GetNode(i)->SetIsParticle(true);
             }
 
             AbstractTetrahedralMesh<3,3>* const p_mesh = &mesh;

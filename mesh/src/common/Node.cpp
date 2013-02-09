@@ -233,11 +233,11 @@ bool Node<SPACE_DIM>::IsParticle()
 }
 
 template<unsigned SPACE_DIM>
-void Node<SPACE_DIM>::SetIsParticle()
+void Node<SPACE_DIM>::SetIsParticle(bool isParticle)
 {
     ConstructNodeAttributes();
 
-    mpNodeAttributes->SetIsParticle();
+    mpNodeAttributes->SetIsParticle(isParticle);
 }
 
 template<unsigned SPACE_DIM>

@@ -59,9 +59,6 @@ protected:
 
 private:
 
-    /** Records whether a node is a particle or not */
-    std::vector<bool> mIsParticle;
-
     /**
      * Set the particles by taking in a set of which nodes indices are particles.
      *
@@ -83,7 +80,6 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & mIsParticle;
         archive & boost::serialization::base_object<NodeBasedCellPopulation<DIM> >(*this);
     }
 
@@ -138,11 +134,6 @@ public:
      * @param dt  time step
      */
     void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
-
-    /**
-     * @return mIsParticle, a vector that stores which nodes are particles.
-     */
-    std::vector<bool>& rGetParticles();
 
     /**
      * IsParticle() method.

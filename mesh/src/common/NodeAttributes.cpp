@@ -101,9 +101,9 @@ bool NodeAttributes<SPACE_DIM>::IsParticle()
 }
 
 template<unsigned SPACE_DIM>
-void NodeAttributes<SPACE_DIM>::SetIsParticle()
+void NodeAttributes<SPACE_DIM>::SetIsParticle(bool isParticle)
 {
-    mIsParticle = true;
+    mIsParticle = isParticle;
 }
 
 template<unsigned SPACE_DIM>

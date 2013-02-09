@@ -335,9 +335,9 @@ public:
     bool IsParticle();
 
     /**
-     * Set this node to be a particle, for cell_based simulations.
+     * Set whether this node is a particle, for cell_based simulations.
      */
-    void SetIsParticle();
+    void SetIsParticle(bool isParticle);
 
     /**
      * Get the radius of this node.

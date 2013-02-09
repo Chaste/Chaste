@@ -111,7 +111,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
 
                 if (is_particle)
                 {
-                    this->mNodes[i]->SetIsParticle();
+                    this->mNodes[i]->SetIsParticle(true);
                 }
             }
         }
