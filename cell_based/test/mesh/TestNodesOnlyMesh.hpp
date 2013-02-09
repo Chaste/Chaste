@@ -515,7 +515,7 @@ public:
         }
     }
 
-    void TestArchiveMutableMeshWithNodeAttributes() throw (Exception)
+    void TestArchiveNodesOnlyMeshWithNodeAttributes() throw (Exception)
     {
         FileFinder archive_dir("archive_mutable_mesh", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mutable_mesh_with_attributes.arch";
@@ -544,6 +544,11 @@ public:
             AbstractTetrahedralMesh<3,3>* const p_mesh = &mesh;
 
             (*p_arch) << p_mesh;
+
+            for (unsigned i=0; i<nodes.size(); i++)
+            {
+            	delete nodes[i];
+            }
         }
 
         {
@@ -563,6 +568,8 @@ public:
                 TS_ASSERT_DELTA(p_mesh->GetNode(i)->GetRadius(), 1.2, 1e-15);
                 TS_ASSERT(p_mesh->GetNode(i)->IsParticle());
             }
+
+            delete p_mesh;
         }
     }
 };
