@@ -72,6 +72,7 @@ private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
+    friend class TestOffLatticeSimulationWithNodeBasedCellPopulation;
 
     /**
      * Save or restore the simulation.
@@ -114,9 +115,8 @@ protected:
      * calling the CellPopulation::UpdateNodeLocations() method then
      * applying any boundary conditions.
      *
-     * @param rNodeForces the forces on nodes
      */
-    virtual void UpdateNodePositions(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces);
+    virtual void UpdateNodePositions();
 
     /**
      * Overridden SetupSolve() method to setup the node velocities file.

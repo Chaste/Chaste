@@ -100,36 +100,28 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
     // Calculate forces
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::FORCE);
 
-    // Initialise a vector of forces on node
-    std::vector<c_vector<double, SPACE_DIM> > forces(this->mrCellPopulation.GetNumNodes(), zero_vector<double>(SPACE_DIM));
+    // Clear all forces
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+            node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        node_iter->ClearAppliedForce();
+    }
 
 /**\todo Is it faster to preallocate and have forces as a member variable? see #1890**/
-//    // First set all the forces to zero
-//    for (unsigned i=0; i<forces.size(); i++)
-//    {
-//         forces[i].clear();
-//    }
-//
-//    // Then resize the std::vector if the number of cells has increased or decreased
-//    // (note this should be done after the above zeroing)
-//    unsigned num_nodes = mrCellPopulation.GetNumNodes();
-//    if (num_nodes != forces.size())
-//    {
-//        forces.resize(num_nodes, zero_vector<double>(DIM));
-//    }
 
     // Now add force contributions from each AbstractForce
     for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mForceCollection.begin();
          iter != mForceCollection.end();
          ++iter)
     {
-        (*iter)->AddForceContribution(forces, this->mrCellPopulation);
+        (*iter)->AddForceContribution(this->mrCellPopulation);
     }
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::FORCE);
 
     // Update node positions
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
-    UpdateNodePositions(forces);
+    UpdateNodePositions();
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
 }
 
@@ -253,7 +245,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces)
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
 {
     unsigned num_nodes = this->mrCellPopulation.GetNumNodes();
 
@@ -271,7 +263,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std:
     }
 
     // Update node locations
-    static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->UpdateNodeLocations(rNodeForces, this->mDt);
+    static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->UpdateNodeLocations(this->mDt);
 
     // Apply any boundary conditions
     for (typename std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > >::iterator bcs_iter = mBoundaryConditions.begin();
@@ -334,7 +326,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions(const std:
                     {
                         const c_vector<double,SPACE_DIM>& position = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
                         double damping_constant = static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
-                        c_vector<double, SPACE_DIM> velocity = this->mDt * rNodeForces[node_index] / damping_constant;
+                        c_vector<double, SPACE_DIM> velocity = this->mDt * this->mrCellPopulation.GetNode(node_index)->rGetAppliedForce() / damping_constant;
 
                         *mpNodeVelocitiesFile << node_index  << " ";
                         for (unsigned i=0; i<SPACE_DIM; i++)

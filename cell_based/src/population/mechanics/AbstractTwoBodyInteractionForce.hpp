@@ -116,11 +116,9 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(std::vector<c_vector<double, SPACE_DIM> >& rForces,
-                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

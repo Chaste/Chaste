@@ -265,13 +265,13 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(Nod
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
 {
     // First update ghost positions first because they do not affect the real cells
     UpdateGhostPositions(dt);
 
     // Then call the base class method
-    AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(rNodeForces, dt);
+    AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(dt);
 }
 
 template<unsigned DIM>

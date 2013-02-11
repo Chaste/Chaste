@@ -110,11 +110,9 @@ public:
     /**
      * Update particle positions.
      *
-     * @param rNodeForces
      * @param dt
      */
-    void UpdateParticlePositions(const std::vector< c_vector<double, DIM> >& rNodeForces,
-                                   double dt);
+    void UpdateParticlePositions(double dt);
 
     /**
      * Update mIsParticle if required by a remesh.
@@ -130,10 +128,9 @@ public:
      * a two vectors of forces on cells and particles and a time step over which
      * to integrate the equations of motion.
      *
-     * @param rNodeForces  forces on cells
      * @param dt  time step
      */
-    void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
+    void UpdateNodeLocations(double dt);
 
     /**
      * IsParticle() method.

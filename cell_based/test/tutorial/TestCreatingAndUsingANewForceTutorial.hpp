@@ -136,12 +136,9 @@ public:
     }
 
     /* The second public method overrides {{{AddForceContribution()}}}.
-     * This method takes in two arguments: a reference to a vector of
-     * total forces on nodes in a cell population, which is update to by the
-     * force object; and a reference to the cell population itself.
+     * This method takes in one arguments, a reference to the cell population itself.
      */
-    void AddForceContribution(std::vector<c_vector<double, 2> >& rForces,
-                              AbstractCellPopulation<2>& rCellPopulation)
+    void AddForceContribution(AbstractCellPopulation<2>& rCellPopulation)
     {
         /* Inside the method, we loop over nodes, and add a constant vector to
          * each node, in the negative ''y''-direction and of magnitude {{{mStrength}}}.
@@ -149,9 +146,9 @@ public:
         c_vector<double, 2> force = zero_vector<double>(2);
         force(1) = -mStrength;
 
-        for (unsigned node_index=0; node_index<rForces.size(); node_index++)
+        for (unsigned node_index=0; node_index<rCellPopulation.GetNumNodes(); node_index++)
         {
-            rForces[node_index] += force;
+            rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
         }
     }
 
@@ -223,13 +220,10 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* The next step is to initialise a vector of node forces. */
-        std::vector<c_vector<double,2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
+        /* Initialise all node forces to zero */
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(2));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         /* We now create a force object of strength 5.0.
@@ -237,12 +231,12 @@ public:
         MyForce force(5.0);
 
         /* We test that the force calculation is correct. */
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
         {
-            TS_ASSERT_DELTA(node_forces[node_index][0], 0.0, 1e-4);
-            TS_ASSERT_DELTA(node_forces[node_index][1], -5.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[1], -5.0, 1e-4);
         }
 
         /* The last block of code provides an archiving test for the force class,

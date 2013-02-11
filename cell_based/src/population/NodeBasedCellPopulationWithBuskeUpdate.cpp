@@ -54,10 +54,10 @@ NodeBasedCellPopulationWithBuskeUpdate<DIM>::NodeBasedCellPopulationWithBuskeUpd
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
+void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
 {
     // Declare solver and give the size of the system and timestep
-    unsigned system_size = rNodeForces.size()*DIM;
+    unsigned system_size = this->GetNumNodes()*DIM;
 
     OdeLinearSystemSolver solver(system_size, dt);
 
@@ -143,7 +143,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(const std:
 
         // Add current positions to initial_conditions and RHS vector
         c_vector<double, DIM> current_location = this->GetNode(node_index)->rGetLocation();
-        c_vector<double, DIM> forces = rNodeForces[node_index];
+        c_vector<double, DIM> forces = this->GetNode(node_index)->rGetAppliedForce();
 
         for (unsigned i=0; i<DIM; i++)
         {

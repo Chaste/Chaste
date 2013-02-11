@@ -173,11 +173,9 @@ public:
     /**
      * Overridden AddForceContribution method.
      *
-     * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(std::vector<c_vector<double,2> >& rForces,
-                              AbstractCellPopulation<2>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<2>& rCellPopulation);
 
     /**
      * Outputs force parameters to file

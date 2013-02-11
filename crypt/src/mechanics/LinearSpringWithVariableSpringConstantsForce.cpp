@@ -208,8 +208,7 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
 }
 
 template<unsigned DIM>
-void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                                             AbstractCellPopulation<DIM>& rCellPopulation)
+void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a MeshBasedCellPopulation
     if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
@@ -227,9 +226,10 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(std
         unsigned nodeB_global_index = spring_iterator.GetNodeB()->GetIndex();
 
         c_vector<double, DIM> force = this->CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
+        c_vector<double, DIM> negative_force = -1.0*force;
 
-        rForces[nodeB_global_index] -= force;
-        rForces[nodeA_global_index] += force;
+        spring_iterator.GetNodeB()->AddAppliedForceContribution(negative_force);
+        spring_iterator.GetNodeA()->AddAppliedForceContribution(force);
     }
 }
 

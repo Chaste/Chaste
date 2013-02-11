@@ -64,8 +64,7 @@ double AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetCutOffLength()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContribution(std::vector<c_vector<double, SPACE_DIM> >& rForces,
-                                                                AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a subclass of AbstractCentreBasedCellPopulation
     if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation) == NULL)
@@ -90,8 +89,9 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
             c_vector<double, SPACE_DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
 
             // Add the force contribution to each node
-            rForces[nodeB_global_index] -= force;
-            rForces[nodeA_global_index] += force;
+            c_vector<double, SPACE_DIM> negative_force = -1.0*force;
+            spring_iterator.GetNodeB()->AddAppliedForceContribution(negative_force);
+            spring_iterator.GetNodeA()->AddAppliedForceContribution(force);
         }
     }
     else// This is a NodeBasedCellPopulation
@@ -118,8 +118,9 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
             }
 
             // Add the force contribution to each node
-            rForces[node_a_index] += force;
-            rForces[node_b_index] -= force;
+            c_vector<double, SPACE_DIM> negative_force = -1.0*force;
+            pair.first->AddAppliedForceContribution(force);
+            pair.second->AddAppliedForceContribution(negative_force);
         }
     }
 }

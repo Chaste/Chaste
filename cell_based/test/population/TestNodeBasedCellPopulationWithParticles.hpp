@@ -523,19 +523,23 @@ public:
 
         // Make up some forces
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        std::vector<c_vector<double, 2> > forces(cell_population.GetNumNodes());
+
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
+            c_vector<double, 2> force;
             old_posns[i][0] = cell_population.GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = cell_population.GetNode(i)->rGetLocation()[1];
 
-            forces[i][0] = i*0.01;
-            forces[i][1] = 2*i*0.01;
+            force[0] = i*0.01;
+            force[1] = 2*i*0.01;
+
+            cell_population.GetNode(i)->ClearAppliedForce();
+            cell_population.GetNode(i)->AddAppliedForceContribution(force);
         }
 
         // Call method
         double time_step = 0.01;
-        cell_population.UpdateNodeLocations(forces, time_step);
+        cell_population.UpdateNodeLocations(time_step);
 
         // Check that cells locations were correctly updated
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

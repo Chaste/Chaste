@@ -52,8 +52,7 @@ NagaiHondaForce<DIM>::~NagaiHondaForce()
 }
 
 template<unsigned DIM>
-void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                AbstractCellPopulation<DIM>& rCellPopulation)
+void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
@@ -164,7 +163,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM
                                               membrane_surface_tension_contribution +
                                               adhesion_contribution;
 
-        rForces[node_index] += force_on_node;
+        p_cell_population->GetNode(node_index)->AddAppliedForceContribution(force_on_node);
     }
 }
 

@@ -556,6 +556,45 @@ public:
         delete nodes[0];
         delete nodes[1];
     }
+
+    void TestUpdateCellLocationsAndTopologyWithNoForce()
+    {
+        // Creates nodes and mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
+        nodes.push_back(new Node<2>(0,  false,  0.0, 0.3));
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        // Create a node based cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
+        node_based_cell_population.SetAbsoluteMovementThreshold(1e-6);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(node_based_cell_population);
+        simulator.SetEndTime(0.1);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationUpdateCellLocationsAndTopologyWithNoForce");
+
+        simulator.UpdateCellLocationsAndTopology();
+
+        for (unsigned i=0; i<2; i++)
+        {
+            for (unsigned d=0; d<2; d++)
+            {
+                TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[d], 0.0, 1e-15);
+            }
+        }
+
+        // Avoid memory leak
+        delete p_mesh;
+        delete nodes[0];
+        delete nodes[1];
+    }
 };
 
 #endif /*TESTOFFLATTICESIMULATIONWITHNODEBASEDCELLPOPULATION_HPP_*/

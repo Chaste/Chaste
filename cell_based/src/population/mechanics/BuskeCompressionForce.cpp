@@ -56,8 +56,7 @@ void BuskeCompressionForce<DIM>::SetCompressionEnergyParameter(double compressio
 }
 
 template<unsigned DIM>
-void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                      AbstractCellPopulation<DIM>& rCellPopulation)
+void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // This force class is defined for NodeBasedCellPopulations only
     assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
@@ -135,7 +134,8 @@ void BuskeCompressionForce<DIM>::AddForceContribution(std::vector<c_vector<doubl
         double V_T = 5.0;
 
         // Note: the sign in force_magnitude is different from the one in equation (A3) in the Buske paper
-        rForces[node_index] += -mCompressionEnergyParameter/V_T*(V_T - V_A)*dVAdd_vector;
+        c_vector<double, DIM> applied_force = -mCompressionEnergyParameter/V_T*(V_T - V_A)*dVAdd_vector;
+        p_node_i->AddAppliedForceContribution(applied_force);
     }
 }
 

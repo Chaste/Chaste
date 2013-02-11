@@ -219,10 +219,9 @@ public:
     /**
      * Overridden UpdateNodeLocations() method.
      *
-     * @param rNodeForces a vector containing the force on each node in the cell population
      * @param dt the time step
      */
-    void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
+    void UpdateNodeLocations(double dt);
 
     /**
      * Overridden SetNode() method.

@@ -200,20 +200,15 @@ public:
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
 
         // Test force calculation for a particular node
-
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(2));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        crypt_projection_force.AddForceContribution(node_forces, cell_population);
+        crypt_projection_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(node_forces[0][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Test that in the case of a flat crypt surface (mA=mB=0), the results are the same as for Meineke2001SpringSystem
         WntConcentration<2>::Instance()->SetCryptProjectionParameterA(0.001);
@@ -295,38 +290,32 @@ public:
 
         crypt_projection_force.SetWntChemotaxis(false);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > old_node_forces;
-        old_node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             old_node_forces.push_back(zero_vector<double>(2));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Calculate node forces
-        crypt_projection_force.AddForceContribution(old_node_forces, cell_population);
+        crypt_projection_force.AddForceContribution(cell_population);
 
         // Store the force of a particular node without Wnt-chemotaxis
-        c_vector<double,2> old_force = old_node_forces[11];
+        c_vector<double,2> old_force;
+        old_force[0] = cell_population.GetNode(11)->rGetAppliedForce()[0];
+        old_force[1] = cell_population.GetNode(11)->rGetAppliedForce()[1];
 
         // Now turn on Wnt-chemotaxis
         crypt_projection_force.SetWntChemotaxis(true);
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > new_node_forces;
-        new_node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             new_node_forces.push_back(zero_vector<double>(2));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Calculate node forces
-        crypt_projection_force.AddForceContribution(new_node_forces, cell_population);
+        crypt_projection_force.AddForceContribution(cell_population);
 
         // Store the force of the same node, but now with Wnt-chemotaxis
-        c_vector<double,2> new_force = new_node_forces[11];
+        c_vector<double,2> new_force = cell_population.GetNode(11)->rGetAppliedForce();
 
         double wnt_chemotaxis_strength = crypt_projection_force.GetWntChemotaxisStrength();
         c_vector<double,2> wnt_component = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(cells[11]);
@@ -437,13 +426,9 @@ private:
     void DoTestZeroForces(MeshBasedCellPopulationWithGhostNodes<2>& rCellPopulation,
                           std::vector<AbstractForce<2>* >& rForces)
     {
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(rCellPopulation.GetNumNodes());
-
         for (unsigned i=0; i<rCellPopulation.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(2));
+             rCellPopulation.GetNode(i)->ClearAppliedForce();
         }
 
         // Add force contributions
@@ -451,7 +436,7 @@ private:
              iter != rForces.end();
              ++iter)
         {
-             (*iter)->AddForceContribution(node_forces, rCellPopulation);
+             (*iter)->AddForceContribution(rCellPopulation);
         }
 
         for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
@@ -460,8 +445,8 @@ private:
         {
             unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-            TS_ASSERT_DELTA(node_forces[node_index][0], 0.0, 1e-4);
-            TS_ASSERT_DELTA(node_forces[node_index][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(rCellPopulation.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(rCellPopulation.GetNode(node_index)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
     }
 
@@ -508,13 +493,9 @@ public:
         }
 
         {
-            // Initialise a vector of new node forces
-            std::vector<c_vector<double, 2> > new_node_forces;
-            new_node_forces.reserve(cell_population.GetNumNodes());
-
             for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
             {
-                 new_node_forces.push_back(zero_vector<double>(2));
+                 cell_population.GetNode(i)->ClearAppliedForce();
             }
 
             // Add force contributions
@@ -522,18 +503,18 @@ public:
                  iter != forces.end();
                  ++iter)
             {
-                 (*iter)->AddForceContribution(new_node_forces, cell_population);
+                 (*iter)->AddForceContribution(cell_population);
             }
 
             // Forces should be twice the forces found using Meineke alone (since a flat crypt is used)
-            TS_ASSERT_DELTA(new_node_forces[60][0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-            TS_ASSERT_DELTA(new_node_forces[60][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-            TS_ASSERT_DELTA(new_node_forces[59][0], 2*(-3+4.0/sqrt(7))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-            TS_ASSERT_DELTA(new_node_forces[59][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], 2*(-3+4.0/sqrt(7))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-            TS_ASSERT_DELTA(new_node_forces[58][0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-            TS_ASSERT_DELTA(new_node_forces[58][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 2*0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
         WntConcentration<2>::Destroy();
@@ -579,17 +560,14 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create a vector forces on nodes
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(num_nodes);
         for (unsigned i=0; i<num_nodes; i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Test that CryptProjectionForce throws the correct exception
         CryptProjectionForce proj_force;
-        TS_ASSERT_THROWS_THIS(proj_force.AddForceContribution(node_forces, cell_population),
+        TS_ASSERT_THROWS_THIS(proj_force.AddForceContribution(cell_population),
                 "CryptProjectionForce is to be used with a subclass of MeshBasedCellPopulation only");
 
         // Avoid memory leak

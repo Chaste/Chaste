@@ -200,12 +200,9 @@ public:
     }
 
     /* The second public method overrides {{{AddForceContribution()}}}.
-     * This method takes in two arguments: a reference to a vector of
-     * total forces on nodes in a cell population, which is update to by the
-     * force object; and a reference to the cell population itself.
+     * This method takes in one argument, a reference to the cell population itself.
      */
-    void AddForceContribution(std::vector<c_vector<double, 2> >& rForces,
-                              AbstractCellPopulation<2>& rCellPopulation)
+    void AddForceContribution(AbstractCellPopulation<2>& rCellPopulation)
     {
         /* Inside the method, we loop over cells, and add a vector to
          * each node associated with cells with the {{{MotileCellProperty}}}, which is proportional (with constant {{{mStrength}}}) to the negative of the position. Causing
@@ -221,7 +218,8 @@ public:
                 unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
                 c_vector<double, 2> location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
-                rForces[node_index] -= mStrength *  location;
+                c_vector<double, 2> force = -1.0 * mStrength * location;
+                rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
             }
         }
     }

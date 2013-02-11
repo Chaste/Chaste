@@ -101,33 +101,29 @@ public:
         // Create a force system
         VertexCryptBoundaryForce<2> force(100);
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         // Check forces are correct
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            TS_ASSERT_DELTA(node_forces[i][0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], 0.0, 1e-4);
 
             double y = cell_population.GetNode(i)->rGetLocation()[1];
             if (y >= 0.0)
             {
                 // If y > 0, the force contribution should be zero...
-                TS_ASSERT_DELTA(node_forces[i][1], 0.0, 1e-4);
+                TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], 0.0, 1e-4);
             }
             else
             {
                 // ...otherwise, the force contribution should be quadratic in y
                 double expected_force = force.GetForceStrength()*y*y;
-                TS_ASSERT_DELTA(node_forces[i][1], expected_force, 1e-4);
+                TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], expected_force, 1e-4);
             }
         }
     }
@@ -153,17 +149,14 @@ public:
 
         NodeBasedCellPopulation<2> non_vertex_cell_population(*p_mesh, cells);
 
-        // Create a vector forces on nodes
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(num_nodes);
         for (unsigned i=0; i<num_nodes; i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            non_vertex_cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Test that VertexCryptBoundaryForce throws the correct exception
         VertexCryptBoundaryForce<2> force(100);
-        TS_ASSERT_THROWS_THIS(force.AddForceContribution(node_forces, non_vertex_cell_population),
+        TS_ASSERT_THROWS_THIS(force.AddForceContribution(non_vertex_cell_population),
                 "VertexCryptBoundaryForce is to be used with VertexBasedCellPopulations only");
 
         // Avoid memory leak

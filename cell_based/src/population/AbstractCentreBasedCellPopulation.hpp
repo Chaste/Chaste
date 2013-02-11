@@ -181,10 +181,9 @@ public:
     /**
      * Overridden UpdateNodeLocations() method.
      *
-     * @param rNodeForces a vector containing the force on each node in the cell population
      * @param dt the time step
      */
-    virtual void UpdateNodeLocations(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces, double dt);
+    virtual void UpdateNodeLocations(double dt);
 
     /**
      * Overridden GetDampingConstant() method.

@@ -84,14 +84,12 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      *
      * Fc = chi(C,|gradC|) gradC/|gradC|  (if |gradC|>0, else Fc = 0)
      *
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                              AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

@@ -535,20 +535,24 @@ public:
 
         // Make up some forces
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
-        std::vector<c_vector<double, 2> > forces_on_nodes(cell_population.GetNumNodes());
 
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
+            c_vector<double, 2> force;
+
             old_posns[i][0] = cell_population.GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = cell_population.GetNode(i)->rGetLocation()[1];
 
-            forces_on_nodes[i][0] = i*0.01;
-            forces_on_nodes[i][1] = 2*i*0.01;
+            force[0] = i*0.01;
+            force[1] = 2*i*0.01;
+
+            cell_population.GetNode(i)->ClearAppliedForce();
+            cell_population.GetNode(i)->AddAppliedForceContribution(force);
         }
 
         // Call method
         double time_step = 0.01;
-        cell_population.UpdateNodeLocations(forces_on_nodes, time_step);
+        cell_population.UpdateNodeLocations(time_step);
 
         // Check that node locations were correctly updated
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)

@@ -247,8 +247,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     return projected_force_between_nodes_2d;
 }
 
-void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >& rForces,
-                                                AbstractCellPopulation<2>& rCellPopulation)
+void CryptProjectionForce::AddForceContribution(AbstractCellPopulation<2>& rCellPopulation)
 {
     // First work out the 3D location of each cell
     UpdateNode3dLocationMap(rCellPopulation);
@@ -269,9 +268,9 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
         unsigned nodeB_global_index = spring_iterator.GetNodeB()->GetIndex();
 
         c_vector<double, 2> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
-
-        rForces[nodeB_global_index] -= force;
-        rForces[nodeA_global_index] += force;
+        c_vector<double, 2> negative_force = -1.0 * force;
+        spring_iterator.GetNodeB()->AddAppliedForceContribution(negative_force);
+        spring_iterator.GetNodeA()->AddAppliedForceContribution(force);
     }
 
     if (mIncludeWntChemotaxis)
@@ -287,7 +286,7 @@ void CryptProjectionForce::AddForceContribution(std::vector<c_vector<double,2> >
                 c_vector<double, 2> wnt_chemotactic_force = mWntChemotaxisStrength*WntConcentration<2>::Instance()->GetWntGradient(*cell_iter);
                 unsigned index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-                rForces[index] += wnt_chemotactic_force;
+                rCellPopulation.GetNode(index)->AddAppliedForceContribution(wnt_chemotactic_force);
             }
         }
     }

@@ -211,7 +211,7 @@ c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetAppliedForce()
 template<unsigned SPACE_DIM>
 void Node<SPACE_DIM>::ClearAppliedForce()
 {
-    CheckForNodeAttributes();
+    ConstructNodeAttributes();
 
     mpNodeAttributes->ClearAppliedForce();
 }

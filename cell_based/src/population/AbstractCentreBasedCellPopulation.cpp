@@ -137,7 +137,7 @@ bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAssociated
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocations(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces, double dt)
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocations(double dt)
 {
     // Iterate over all nodes associated with real cells to update their positions
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
@@ -151,7 +151,7 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocati
         double damping_const = this->GetDampingConstant(node_index);
 
         // Get displacement
-        c_vector<double,SPACE_DIM> displacement=dt*rNodeForces[node_index]/damping_const;
+        c_vector<double,SPACE_DIM> displacement=dt*this->GetNode(node_index)->rGetAppliedForce()/damping_const;
 
         // Throws an exception if the cell movement goes beyond mAbsoluteMovementThreshold
         if (norm_2(displacement) > this->mAbsoluteMovementThreshold)

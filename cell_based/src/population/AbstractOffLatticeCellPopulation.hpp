@@ -138,10 +138,9 @@ public:
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
-     * @param rNodeForces  forces on nodes
      * @param dt time step
      */
-    virtual void UpdateNodeLocations(const std::vector< c_vector<double, SPACE_DIM> >& rNodeForces, double dt)=0;
+    virtual void UpdateNodeLocations(double dt)=0;
 
     /**
      * Get the damping constant for this node - ie d in drdt = F/d.

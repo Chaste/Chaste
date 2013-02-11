@@ -330,20 +330,24 @@ public:
         simulator.AddForce(p_linear_force);
 
         std::vector<c_vector<double, 2> > old_posns(p_mesh->GetNumNodes());
-        std::vector<c_vector<double, 2> > forces(p_mesh->GetNumNodes());
 
         // Make up some forces
         for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
         {
+            c_vector<double, 2> force;
+
             old_posns[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
 
-            forces[i][0] = i*0.01;
-            forces[i][1] = 2*i*0.01;
+            force[0] = i*0.01;
+            force[1] = 2*i*0.01;
+
+            p_mesh->GetNode(i)->ClearAppliedForce();
+            p_mesh->GetNode(i)->AddAppliedForceContribution(force);
         }
 
         simulator.SetDt(0.01);
-        simulator.UpdateNodePositions(forces);
+        simulator.UpdateNodePositions();
 
         // Create a set of node indices corresponding to ghost nodes
         std::set<unsigned> node_indices;

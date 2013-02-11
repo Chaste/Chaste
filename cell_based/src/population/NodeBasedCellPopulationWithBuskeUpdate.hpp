@@ -97,10 +97,9 @@ public:
     /**
      * Overridden UpdateNodeLocations() method. To use the update from Buske et al (2011) (doi:10.1371/journal.pcbi.1001045).
      *
-     * @param rNodeForces a vector containing the force on each node in the cell population
      * @param dt the time step
      */
-    virtual void UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt);
+    virtual void UpdateNodeLocations(double dt);
 
     /**
      * Outputs CellPopulation parameters to file

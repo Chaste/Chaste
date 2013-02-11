@@ -101,9 +101,6 @@ public:
 
         // Test node force calculation
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
 
         for (unsigned step=0; step<40; step++)
         {
@@ -112,13 +109,12 @@ public:
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            node_forces.clear();
             for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
             {
-                node_forces.push_back(zero_vector<double>(2));
+                cell_population.GetNode(i)->ClearAppliedForce();
             }
 
-            buske_adhesive_force.AddForceContribution(node_forces, cell_population);
+            buske_adhesive_force.AddForceContribution(cell_population);
 
             // Test forces on nodes
             double analytical_force_magnitude = 0.0;
@@ -127,11 +123,11 @@ public:
                 analytical_force_magnitude = 100.0*M_PI*separation;
             }
 
-            TS_ASSERT_DELTA(node_forces[0][0], analytical_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-            TS_ASSERT_DELTA(node_forces[1][0], -analytical_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
         // Avoid memory leak
@@ -182,11 +178,6 @@ public:
         buske_elastic_force.SetDeformationEnergyParameter(4.0/3.0);
 
         // Test node force calculation
-
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together
@@ -194,13 +185,12 @@ public:
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            node_forces.clear();
             for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
             {
-                node_forces.push_back(zero_vector<double>(2));
+                cell_population.GetNode(i)->ClearAppliedForce();
             }
 
-            buske_elastic_force.AddForceContribution(node_forces, cell_population);
+            buske_elastic_force.AddForceContribution(cell_population);
 
             // Test forces on nodes
             double analytical_force_magnitude = 0.0;//100.0*M_PI*separation;
@@ -210,11 +200,11 @@ public:
             }
 
             ///\todo test force calculation (#1764)
-            TS_ASSERT_DELTA(node_forces[0][0], analytical_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-            TS_ASSERT_DELTA(node_forces[1][0], -analytical_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
         // Avoid memory leak
@@ -269,19 +259,14 @@ public:
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            node_adhesive_force.clear();
-            node_elastic_force.clear();
-            node_compression_force.clear();
             for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
             {
-                node_adhesive_force.push_back(zero_vector<double>(2));
-                node_elastic_force.push_back(zero_vector<double>(2));
-                node_compression_force.push_back(zero_vector<double>(2));
+                cell_population.GetNode(i)->ClearAppliedForce();
             }
 
-            buske_adhesive_force.AddForceContribution(node_adhesive_force, cell_population);
-            buske_elastic_force.AddForceContribution(node_elastic_force, cell_population);
-            buske_compression_force.AddForceContribution(node_compression_force, cell_population);
+            buske_adhesive_force.AddForceContribution(cell_population);
+            buske_elastic_force.AddForceContribution(cell_population);
+            buske_compression_force.AddForceContribution(cell_population);
 
             // Test forces
             ///\todo test something!
@@ -327,11 +312,6 @@ public:
         buske_compression_force.SetCompressionEnergyParameter(1.0);
 
         // Test node force calculation
-
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together
@@ -339,13 +319,12 @@ public:
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
-            node_forces.clear();
             for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
             {
-                 node_forces.push_back(zero_vector<double>(2));
+                cell_population.GetNode(i)->ClearAppliedForce();
             }
 
-            buske_compression_force.AddForceContribution(node_forces, cell_population);
+            buske_compression_force.AddForceContribution(cell_population);
 
             // Test forces on nodes
             double analytical_force_magnitude = 0.0;
@@ -355,11 +334,11 @@ public:
                                                           *(3.0/4.0*pow(separation,2.0)-4.0*separation+5.0);
             }
 
-            TS_ASSERT_DELTA(node_forces[0][0], -analytical_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], -analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-            TS_ASSERT_DELTA(node_forces[1][0], analytical_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], analytical_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
         // Avoid memory leak
@@ -394,26 +373,22 @@ public:
         // Create force
         BuskeCompressionForce<2> buske_compression_force;
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        buske_compression_force.AddForceContribution(node_forces, cell_population);
+        buske_compression_force.AddForceContribution(cell_population);
 
         // Test forces on nodes
 
         // This node should only move in the x-direction
-        TS_ASSERT_DELTA(node_forces[0][0], -0.6514, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], 0.2894, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], -0.2894, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], 0.2894, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 0.2894, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], -0.6514, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 0.2894, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], -0.2894, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.2894, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.2894, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;

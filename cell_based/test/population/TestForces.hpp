@@ -117,15 +117,13 @@ public:
         linear_force.SetCutOffLength(DBL_MAX);
 
         // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(2));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Test node force calculation
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
         // Test forces on non-ghost nodes
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -134,8 +132,8 @@ public:
         {
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
 
-            TS_ASSERT_DELTA(node_forces[node_index][0], 0.0, 1e-4);
-            TS_ASSERT_DELTA(node_forces[node_index][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
@@ -146,24 +144,20 @@ public:
 
         p_mesh->SetNode(59, new_point, false);
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > new_node_forces;
-        new_node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             new_node_forces.push_back(zero_vector<double>(2));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
-        linear_force.AddForceContribution(new_node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(new_node_forces[60][0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(new_node_forces[60][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(new_node_forces[59][0], (-3+4.0/sqrt(7))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(new_node_forces[59][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], (-3+4.0/sqrt(7))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(new_node_forces[58][0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(new_node_forces[58][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Test spring force calculation
         c_vector<double,2> force_on_spring; // between nodes 59 and 60
@@ -218,22 +212,18 @@ public:
         // Create force law object
         GeneralisedLinearSpringForce<1> linear_force;
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 1> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(1));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Compute forces on nodes
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
         // Test that all springs are in equilibrium
         for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
         {
-            TS_ASSERT_DELTA(node_forces[node_index](0), 0.0, 1e-6);
+            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-6);
         }
 
         // Scale entire mesh and check that forces are correctly calculated
@@ -246,26 +236,28 @@ public:
             mesh.SetNode(node_index, new_point, false);
         }
 
-        // Recalculate node forces (we can re-use node_forces
-        // as previously each node had zero net force on it)
-        linear_force.AddForceContribution(node_forces, cell_population);
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        linear_force.AddForceContribution(cell_population);
 
         for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
         {
             if (node_index == 0)
             {
                 // The first node only experiences a force from its neighbour to the right
-                TS_ASSERT_DELTA(node_forces[node_index](0), linear_force.GetMeinekeSpringStiffness()*(scale_factor-1), 1e-6);
+                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], linear_force.GetMeinekeSpringStiffness()*(scale_factor-1), 1e-6);
             }
             else if (node_index == cell_population.GetNumNodes()-1)
             {
                 // The last node only experiences a force from its neighbour to the left
-                TS_ASSERT_DELTA(node_forces[node_index](0), -linear_force.GetMeinekeSpringStiffness()*(scale_factor-1), 1e-6);
+                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness()*(scale_factor-1), 1e-6);
             }
             else
             {
                 // The net force on each interior node should still be zero
-                TS_ASSERT_DELTA(node_forces[node_index](0), 0.0, 1e-6);
+                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-6);
             }
         }
 
@@ -287,18 +279,14 @@ public:
         c_vector<double,1> force_between_2_and_3 = linear_force2.CalculateForceBetweenNodes(2, 3, cell_population2);
         TS_ASSERT_DELTA(force_between_2_and_3[0], -linear_force.GetMeinekeSpringStiffness()*0.5, 1e-6);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double,1> > node_forces2;
-        node_forces2.reserve(cell_population2.GetNumNodes());
-
         for (unsigned i=0; i<cell_population2.GetNumNodes(); i++)
         {
-             node_forces2.push_back(zero_vector<double>(1));
+             cell_population2.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force2.AddForceContribution(node_forces2, cell_population2);
+        linear_force2.AddForceContribution(cell_population2);
 
-        TS_ASSERT_DELTA(node_forces2[2](0), -linear_force.GetMeinekeSpringStiffness(), 1e-6);
+        TS_ASSERT_DELTA(cell_population2.GetNode(2)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness(), 1e-6);
     }
 
     void TestGeneralisedLinearSpringForceCalculationIn3d() throw (Exception)
@@ -333,22 +321,18 @@ public:
             TS_ASSERT_DELTA(force[i], 0.0, 1e-6);
         }
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 3> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(3));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
         for (unsigned j=0; j<4; j++)
         {
             for (unsigned k=0; k<3; k++)
             {
-                TS_ASSERT_DELTA(node_forces[j](k), 0.0, 1e-6);
+                TS_ASSERT_DELTA(cell_population.GetNode(j)->rGetAppliedForce()[k], 0.0, 1e-6);
             }
         }
 
@@ -365,15 +349,17 @@ public:
             mesh.SetNode(i, new_point, false);
         }
 
-        // Recalculate node forces (we can just re-use node_forces,
-        // as previously each node had zero net force on it)
-        linear_force.AddForceContribution(node_forces, cell_population);
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        linear_force.AddForceContribution(cell_population);
 
         for (unsigned j=0; j<4; j++)
         {
             for (unsigned k=0; k<3; k++)
             {
-                TS_ASSERT_DELTA(fabs(node_forces[j](k)), linear_force.GetMeinekeSpringStiffness()*(scale_factor-1)*sqrt(2),1e-6);
+                TS_ASSERT_DELTA(fabs(cell_population.GetNode(j)->rGetAppliedForce()[k]), linear_force.GetMeinekeSpringStiffness()*(scale_factor-1)*sqrt(2),1e-6);
             }
         }
 
@@ -402,20 +388,16 @@ public:
             TS_ASSERT_DELTA(fabs(force2[i]),linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3)/(2*sqrt(2)))/sqrt(3.0),1e-6);
         }
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double,3> > node_forces2;
-        node_forces2.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces2.push_back(zero_vector<double>(3));
+            cell_population2.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force2.AddForceContribution(node_forces2, cell_population2);
+        linear_force2.AddForceContribution(cell_population2);
 
         for (unsigned i=0; i<3; i++)
         {
-            TS_ASSERT_DELTA(node_forces2[0](i),linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3)/(2*sqrt(2)))/sqrt(3.0),1e-6);
+            TS_ASSERT_DELTA(cell_population2.GetNode(0)->rGetAppliedForce()[i],linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3)/(2*sqrt(2)))/sqrt(3.0),1e-6);
         }
     }
 
@@ -614,15 +596,11 @@ public:
 
         ChemotacticForce<2> chemotactic_force;
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
-        chemotactic_force.AddForceContribution(node_forces, cell_population);
+        chemotactic_force.AddForceContribution(cell_population);
 
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -635,8 +613,8 @@ public:
             double force_magnitude = chemotactic_force.GetChemotacticForceMagnitude(c, norm_grad_c);
 
             // Fc = force_magnitude*(1,0), Fspring = 0
-            TS_ASSERT_DELTA(node_forces[index][0], force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[index][1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(index)->rGetAppliedForce()[0], force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(index)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
     }
 
@@ -697,26 +675,22 @@ public:
 
         RepulsionForce<2> repulsion_force;
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
-        repulsion_force.AddForceContribution(node_forces, cell_population);
+        repulsion_force.AddForceContribution(cell_population);
 
         /*
          * First two cells repel each other and second 2 cells are too far apart.
          * The radius of the cells is the default value, 0.5.
          */
-        TS_ASSERT_DELTA(node_forces[0][0], -34.5387, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], 34.5387, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], -34.5387, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 34.5387, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Tests the calculation of the force with different cell radii
         p_mesh->GetNode(0)->SetRadius(10);
@@ -726,18 +700,18 @@ public:
         // Reset the vector of node forces
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces[i]=zero_vector<double>(2);
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        repulsion_force.AddForceContribution(node_forces, cell_population);
+        repulsion_force.AddForceContribution(cell_population);
 
         // All cells repel each other
-        TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Tests the calculation of the force with different cell radii
         p_mesh->GetNode(0)->SetRadius(0.2);
@@ -747,21 +721,21 @@ public:
         // Reset the vector of node forces
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces[i] = zero_vector<double>(2);
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        repulsion_force.AddForceContribution(node_forces, cell_population);
+        repulsion_force.AddForceContribution(cell_population);
 
         /*
          * First two cells repel each other and second 2 cells are too far apart.
          * The overlap is -0.3 and the spring stiffness is the default value 15.0.
          */
-        TS_ASSERT_DELTA(node_forces[0][0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -871,25 +845,21 @@ public:
         force.SetNagaiHondaCellCellAdhesionEnergyParameter(1.0);
         force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0);
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         // The force on each node should be radially inward, with the same magnitude for all nodes
-        double force_magnitude = norm_2(node_forces[0]);
+        double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
 
         for (unsigned i=0; i<num_nodes; i++)
         {
-            TS_ASSERT_DELTA(norm_2(node_forces[i]), force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][0], -force_magnitude*cos(angles[i]), 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][1], -force_magnitude*sin(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -force_magnitude*sin(angles[i]), 1e-4);
         }
 
         double normal_target_area = force.GetTargetAreaOfCell(cell_population.GetCellUsingLocationIndex(0));
@@ -908,17 +878,17 @@ public:
         // Reset force vector
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces[i] = zero_vector<double>(2);
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         // The force on each node should not yet be affected by setting the cell to be apoptotic
         for (unsigned i=0; i<num_nodes; i++)
         {
-            TS_ASSERT_DELTA(norm_2(node_forces[i]), force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][0], -force_magnitude*cos(angles[i]), 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][1], -force_magnitude*sin(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -force_magnitude*sin(angles[i]), 1e-4);
         }
 
         // Increment time
@@ -932,19 +902,19 @@ public:
 
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces[i] = zero_vector<double>(2);
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         // Now the forces should be affected
-        double apoptotic_force_magnitude = norm_2(node_forces[0]);
+        double apoptotic_force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
         TS_ASSERT_LESS_THAN(force_magnitude, apoptotic_force_magnitude);
         for (unsigned i=0; i<num_nodes; i++)
         {
-            TS_ASSERT_DELTA(norm_2(node_forces[i]), apoptotic_force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][0], -apoptotic_force_magnitude*cos(angles[i]), 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][1], -apoptotic_force_magnitude*sin(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), apoptotic_force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -apoptotic_force_magnitude*cos(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -apoptotic_force_magnitude*sin(angles[i]), 1e-4);
         }
     }
 
@@ -1130,16 +1100,12 @@ public:
         force.SetNagaiHondaCellCellAdhesionEnergyParameter(6.4);
         force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         // Test the case where the nodes are shared by a cell on the boundary that is not labelled
         Node<2>* p_node_0 = p_mesh->GetElement(0)->GetNode(0);
@@ -1264,25 +1230,21 @@ public:
         force.SetWelikyOsterAreaParameter(1.0);
         force.SetWelikyOsterPerimeterParameter(1.0);
 
-        // Initialise a vector of new node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        force.AddForceContribution(node_forces, cell_population);
+        force.AddForceContribution(cell_population);
 
         // The force on each node should be radially inward, with the same magnitude for all nodes
-        double force_magnitude = norm_2(node_forces[0]);
+        double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
 
         for (unsigned i=0; i<num_nodes; i++)
         {
-            TS_ASSERT_DELTA(norm_2(node_forces[i]), force_magnitude, 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][0], -force_magnitude*cos(angles[i]), 1e-4);
-            TS_ASSERT_DELTA(node_forces[i][1], -force_magnitude*sin(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -force_magnitude*sin(angles[i]), 1e-4);
         }
     }
 
@@ -1355,22 +1317,14 @@ public:
         VertexBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.InitialiseCells();
 
-        // Create a vector forces on nodes
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(num_nodes);
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            node_forces.push_back(zero_vector<double>(2));
-        }
-
         // Test that a subclass of AbstractTwoBodyInteractionForce throws the correct exception
         GeneralisedLinearSpringForce<2> spring_force;
-        TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(node_forces, cell_population),
+        TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(cell_population),
                 "Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractCentreBasedCellPopulation only");
 
         // Test that RepulsionForce throws the correct exception
         RepulsionForce<2> repulsion_force;
-        TS_ASSERT_THROWS_THIS(repulsion_force.AddForceContribution(node_forces, cell_population),
+        TS_ASSERT_THROWS_THIS(repulsion_force.AddForceContribution(cell_population),
                  "RepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
@@ -1396,22 +1350,14 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create a vector forces on nodes
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(num_nodes);
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            node_forces.push_back(zero_vector<double>(2));
-        }
-
         // Test that NagaiHondaForce throws the correct exception
         NagaiHondaForce<2> nagai_honda_force;
-        TS_ASSERT_THROWS_THIS(nagai_honda_force.AddForceContribution(node_forces, cell_population),
+        TS_ASSERT_THROWS_THIS(nagai_honda_force.AddForceContribution(cell_population),
                 "NagaiHondaForce is to be used with a VertexBasedCellPopulation only");
 
         // Test that WelikyOsterForce throws the correct exception
         WelikyOsterForce<2> weliky_oster_force;
-        TS_ASSERT_THROWS_THIS(weliky_oster_force.AddForceContribution(node_forces, cell_population),
+        TS_ASSERT_THROWS_THIS(weliky_oster_force.AddForceContribution(cell_population),
                 "WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
 
         // Avoid memory leak
@@ -1447,17 +1393,13 @@ public:
         // Create force law object
         DiffusionForce<1> diffusion_force;
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 1> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(1));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Compute forces on nodes
-        diffusion_force.AddForceContribution(node_forces, cell_population);
+        diffusion_force.AddForceContribution(cell_population);
 
         // Test Set and Get methods for the diffusion force
         TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 10.0, 1e-10);
@@ -1508,12 +1450,9 @@ public:
         // Create force law object
         DiffusionForce<2> force;
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Loop over time iterations
@@ -1522,13 +1461,13 @@ public:
         for (unsigned i=0; i<num_iterations; i++)
         {
             // Re-initialize the force on node zero
-            node_forces[0] = zero_vector<double>(2);
+            cell_population.GetNode(0)->ClearAppliedForce();
 
             // Compute forces on nodes
-            force.AddForceContribution(node_forces, cell_population);
+            force.AddForceContribution(cell_population);
 
             // Calculate the variance
-            variance += pow(norm_2(node_forces[0]),2);
+            variance += pow(norm_2(cell_population.GetNode(0)->rGetAppliedForce()),2);
         }
 
         double correct_diffusion_coefficient =
@@ -1575,13 +1514,9 @@ public:
         // Create force law object
         DiffusionForce<3> force;
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 3> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(3));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         double variance = 0.0;
@@ -1591,13 +1526,13 @@ public:
         for (unsigned i=0; i<num_iterations; i++)
         {
             // Re-initialize the force on node zero
-            node_forces[0] = zero_vector<double>(3);
+            cell_population.GetNode(0)->ClearAppliedForce();
 
             // Compute forces on nodes
-            force.AddForceContribution(node_forces, cell_population);
+            force.AddForceContribution(cell_population);
 
             // Calculate the variance
-            variance += pow(norm_2(node_forces[0]),2);
+            variance += pow(norm_2(cell_population.GetNode(0)->rGetAppliedForce()),2);
         }
 
         double correct_diffusion_coefficient =

@@ -216,7 +216,7 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_vector<double, DIM> >& rNodeForces, double dt)
+void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(double dt)
 {
     // Iterate over all nodes associated with real cells to update their positions
     for (unsigned node_index=0; node_index<GetNumNodes(); node_index++)
@@ -225,7 +225,7 @@ void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(const std::vector< c_ve
         double damping_const = this->GetDampingConstant(node_index);
 
         // Compute the displacement of this node
-        c_vector<double, DIM> displacement = dt*rNodeForces[node_index]/damping_const;
+        c_vector<double, DIM> displacement = dt*this->GetNode(node_index)->rGetAppliedForce()/damping_const;
 
         /*
          * If the displacement of this node is greater than half the cell rearrangement threshold,

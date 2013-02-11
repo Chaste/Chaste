@@ -707,17 +707,14 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // Create a vector forces on nodes
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(num_nodes);
         for (unsigned i=0; i<num_nodes; i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         // Test that LinearSpringWithVariableSpringConstantsForce throws the correct exception
         LinearSpringWithVariableSpringConstantsForce<2> spring_force;
-        TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(node_forces, cell_population),
+        TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(cell_population),
                 "LinearSpringWithVariableSpringConstantsForce is to be used with a subclass of MeshBasedCellPopulation only");
 
         // Avoid memory leak

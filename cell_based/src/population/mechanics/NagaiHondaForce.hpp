@@ -115,10 +115,9 @@ public:
      * Calculates the force on each node in the vertex-based cell population based on the
      * Nagai Honda model.
      *
-     * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces, AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.

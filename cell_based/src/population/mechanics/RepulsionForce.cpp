@@ -42,8 +42,7 @@ RepulsionForce<DIM>::RepulsionForce()
 }
 
 template<unsigned DIM>
-void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                               AbstractCellPopulation<DIM>& rCellPopulation)
+void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a NodeBasedCellPopulation
     if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
@@ -82,13 +81,14 @@ void RepulsionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
         {
             // Calculate the force between nodes
             c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
+            c_vector<double, DIM> negative_force = -1.0 * force;
             for (unsigned j=0; j<DIM; j++)
             {
                 assert(!std::isnan(force[j]));
             }
             // Add the force contribution to each node
-            rForces[p_node_a->GetIndex()] += force;
-            rForces[p_node_b->GetIndex()] -= force;
+            p_node_a->AddAppliedForceContribution(force);
+            p_node_b->AddAppliedForceContribution(negative_force);
         }
     }
 }

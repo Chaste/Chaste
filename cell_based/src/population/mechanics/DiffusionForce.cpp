@@ -104,8 +104,7 @@ double DiffusionForce<DIM>::GetViscosity()
 }
 
 template<unsigned DIM>
-void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                          AbstractCellPopulation<DIM>& rCellPopulation)
+void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     double dt = SimulationTime::Instance()->GetTimeStep();
 
@@ -149,7 +148,7 @@ void DiffusionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM>
 
             force_contribution[i] = (nu*sqrt(2.0*diffusion_constant*dt)/dt)*xi;
         }
-        rForces[node_index] += force_contribution;
+        p_node->AddAppliedForceContribution(force_contribution);
     }
 }
 

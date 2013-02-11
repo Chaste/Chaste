@@ -141,20 +141,22 @@ public:
         CryptSimulation2d simulator(cell_population);
 
         std::vector<c_vector<double, 2> > old_node_locations(p_mesh->GetNumNodes());
-        std::vector<c_vector<double, 2> > forces(p_mesh->GetNumNodes());
 
         // Make up some forces
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
+            c_vector<double, 2> force;
             old_node_locations[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_node_locations[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
 
-            forces[i][0] = i*0.01;
-            forces[i][1] = 2*i*0.01;
+            force[0] = i*0.01;
+            force[1] = 2*i*0.01;
+            cell_population.GetNode(i)->ClearAppliedForce();
+            cell_population.GetNode(i)->AddAppliedForceContribution(force);
        }
 
         simulator.SetDt(0.01);
-        simulator.UpdateNodePositions(forces);
+        simulator.UpdateNodePositions();
 
         for (unsigned node_index=0; node_index<simulator.rGetCellPopulation().GetNumNodes(); node_index++)
         {

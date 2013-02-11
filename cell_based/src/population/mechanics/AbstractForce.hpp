@@ -78,11 +78,9 @@ public:
      *
      * This method must be overridden in concrete classes.
      *
-     * @param rForces reference to vector of forces on nodes
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(std::vector<c_vector<double, SPACE_DIM> >& rForces,
-                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)=0;
+    virtual void AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)=0;
 
     /**
      * Outputs force used in the simulation to file and then calls OutputForceParameters to output all relevant parameters.

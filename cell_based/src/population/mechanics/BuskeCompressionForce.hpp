@@ -98,11 +98,9 @@ public:
     /**
      * Overridden AddForceContribution() method.
      *
-     * @param rForces a vector of forces on notes
      * @param rCellPopulation a cell population object
      */
-    void AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                              AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputForceParameters() method.

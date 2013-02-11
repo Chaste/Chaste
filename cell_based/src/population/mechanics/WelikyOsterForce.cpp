@@ -49,8 +49,7 @@ WelikyOsterForce<DIM>::~WelikyOsterForce()
 }
 
 template<unsigned DIM>
-void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                 AbstractCellPopulation<DIM>& rCellPopulation)
+void WelikyOsterForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
     assert(DIM == 2); // this method only works in 2D at present
@@ -119,7 +118,7 @@ void WelikyOsterForce<DIM>::AddForceContribution(std::vector<c_vector<double, DI
 
             c_vector<double, DIM> force_on_node = deformation_contribution + membrane_surface_tension_contribution;
 
-            rForces[node_global_index] += force_on_node;
+            p_cell_population->GetNode(node_global_index)->AddAppliedForceContribution(force_on_node);
         }
     }
 }

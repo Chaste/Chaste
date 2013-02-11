@@ -51,8 +51,7 @@ VertexCryptBoundaryForce<DIM>::~VertexCryptBoundaryForce()
 }
 
 template<unsigned DIM>
-void VertexCryptBoundaryForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                         AbstractCellPopulation<DIM>& rCellPopulation)
+void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Helper variable that is a static cast of the cell population
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
@@ -70,13 +69,13 @@ void VertexCryptBoundaryForce<DIM>::AddForceContribution(std::vector<c_vector<do
     {
         double y = node_iter->rGetLocation()[1]; // y-coordinate of node
 
-        // If the node lies below the line y=0, then add the boundary force contribution to rForces
+        // If the node lies below the line y=0, then add the boundary force contribution to the node forces
         if (y < 0.0)
         {
             c_vector<double, DIM> boundary_force = zero_vector<double>(DIM);
             boundary_force[1] = mForceStrength*SmallPow(y, 2);
 
-            rForces[node_iter->GetIndex()] += boundary_force;
+            node_iter->AddAppliedForceContribution(boundary_force);
         }
     }
 }
