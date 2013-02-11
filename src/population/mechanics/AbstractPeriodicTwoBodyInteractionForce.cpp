@@ -52,8 +52,7 @@ AbstractPeriodicTwoBodyInteractionForce<DIM>::~AbstractPeriodicTwoBodyInteractio
 }
 
 template<unsigned DIM>
-void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vector<c_vector<double, DIM> >& rForces,
-                                                                        AbstractCellPopulation<DIM>& rCellPopulation)
+void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // If the width of the periodic domain has not been specified, use the initial width of the cell population
     if (mPeriodicDomainWidth == DOUBLE_UNSET)
@@ -130,12 +129,13 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
                 if (nodeA_global_index < num_cells)
                 {
                     unsigned real_node_index_A = mExtendedMeshNodeIndexMap[nodeA_global_index];
-                    rForces[real_node_index_A] += force;
+                    rCellPopulation.GetNode(real_node_index_A)->AddAppliedForceContribution(force);
                 }
                 if (nodeB_global_index < num_cells)
                 {
                     unsigned real_node_index_B = mExtendedMeshNodeIndexMap[nodeB_global_index];
-                    rForces[real_node_index_B] -= force;
+                    c_vector<double, DIM> negative_force = -1.0 * force;
+                    rCellPopulation.GetNode(real_node_index_B)->AddAppliedForceContribution(negative_force);
                 }
             }
 
@@ -236,12 +236,13 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(std::vec
                 if (nodeA_global_index < num_cells)
                 {
                     unsigned real_node_index_A = mExtendedMeshNodeIndexMap[nodeA_global_index];
-                    rForces[real_node_index_A] += force;
+                    rCellPopulation.GetNode(real_node_index_A)->AddAppliedForceContribution(force);
                 }
                 if (nodeB_global_index < num_cells)
                 {
                     unsigned real_node_index_B = mExtendedMeshNodeIndexMap[nodeB_global_index];
-                    rForces[real_node_index_B] -= force;
+                    c_vector<double, DIM> negative_force = -1.0 * force;
+                    rCellPopulation.GetNode(real_node_index_B)->AddAppliedForceContribution(negative_force);
                 }
             }
 

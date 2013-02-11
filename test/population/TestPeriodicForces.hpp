@@ -119,25 +119,21 @@ public:
         // Create force
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(node_forces[0][0], 7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[0][1], -2.00962, 1e-3);
-        TS_ASSERT_DELTA(node_forces[1][0], -7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[1][1], -2.88444e-15, 1e-3);
-        TS_ASSERT_DELTA(node_forces[2][0], 7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[2][1], 2.88444e-15, 1e-3);
-        TS_ASSERT_DELTA(node_forces[3][0], -7.5, 1e-3);
-        TS_ASSERT_DELTA(node_forces[3][1], 2.00962, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 7.5, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], -2.00962, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -7.5, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], -2.88444e-15, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 7.5, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 2.88444e-15, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], -7.5, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], 2.00962, 1e-3);
     }
 
     void TestPeriodicForceOnNonUniformMesh() throw(Exception)
@@ -168,32 +164,28 @@ public:
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
         linear_force.SetPeriodicDomainWidth(4.5);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
         // Close enough
-        TS_ASSERT_DELTA(node_forces[0][0], 60.7698, 1e-3);
-        TS_ASSERT_DELTA(node_forces[0][1], -4.74342, 1e-3);
-        TS_ASSERT_DELTA(node_forces[1][0], -80.7733, 1e-3);
-        TS_ASSERT_DELTA(node_forces[1][1], 3.82704, 1e-3);
-        TS_ASSERT_DELTA(node_forces[2][0], 17.6281, 1e-3);
-        TS_ASSERT_DELTA(node_forces[2][1], -10.4214, 1e-3);
-        TS_ASSERT_DELTA(node_forces[3][0], -24.4709, 1e-3);
-        TS_ASSERT_DELTA(node_forces[3][1], -0.0364322, 1e-3);
-        TS_ASSERT_DELTA(node_forces[4][0], 10.6066, 1e-3);
-        TS_ASSERT_DELTA(node_forces[4][1], 12.1902, 1e-3);
-        TS_ASSERT_DELTA(node_forces[5][0], 18.2577, 1e-3);
-        TS_ASSERT_DELTA(node_forces[5][1], -1.54716, 1e-3);
-        TS_ASSERT_DELTA(node_forces[6][0], -2.01801, 1e-3);
-        TS_ASSERT_DELTA(node_forces[6][1], 0.731214, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 60.7698, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], -4.74342, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -80.7733, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 3.82704, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 17.6281, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], -10.4214, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], -24.4709, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], -0.0364322, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[0], 10.6066, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[1], 12.1902, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 18.2577, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], -1.54716, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[0], -2.01801, 1e-3);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[1], 0.731214, 1e-3);
     }
 
     void TestPeriodicForceOnHoneycombMeshWithGhostNodes() throw (Exception)
@@ -217,25 +209,21 @@ public:
         GeneralisedPeriodicLinearSpringForce<2> linear_force;
         linear_force.SetPeriodicDomainWidth(2.0);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(node_forces[5][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[5][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[6][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[6][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[9][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[9][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[10][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[10][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(9)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(9)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(10)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(10)->rGetAppliedForce()[1], 0.0, 1e-4);
     }
 
     void TestSimpleNonZeroForces() throw(Exception)
@@ -264,25 +252,21 @@ public:
         linear_force.SetPeriodicDomainWidth(1.0);
         linear_force.SetCutOffLength(0.5);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(node_forces[0][0], 12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], -12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], 12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][0], -12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], 0.0, 1e-4);
     }
 
     void TestSimpleNonZeroForcesWithGhostNodes() throw(Exception)
@@ -319,25 +303,21 @@ public:
         linear_force.SetPeriodicDomainWidth(1.0);
         linear_force.SetCutOffLength(0.5);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 2> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-            node_forces.push_back(zero_vector<double>(2));
+            cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        linear_force.AddForceContribution(node_forces, cell_population);
+        linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(node_forces[0][0], 12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], -12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], 12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][0], -12.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], -12.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], 0.0, 1e-4);
     }
 
     void TestPeriodicSpringForces3d() throw(Exception)
@@ -355,84 +335,80 @@ public:
         // Test Save with a MeshBasedCellPopulationWithGhostNodes
         MeshBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
-    OffLatticeSimulation<3> simulator(cell_population);
+        OffLatticeSimulation<3> simulator(cell_population);
 
-    // Create periodic force law
-    MAKE_PTR(GeneralisedPeriodicLinearSpringForce<3>, p_periodic_force); // Variable spring strengths
+        // Create periodic force law
+        MAKE_PTR(GeneralisedPeriodicLinearSpringForce<3>, p_periodic_force); // Variable spring strengths
         p_periodic_force->SetPeriodicDomainWidth(3.0);
         simulator.AddForce(p_periodic_force);
 
-        // Initialise a vector of node forces
-        std::vector<c_vector<double, 3> > node_forces;
-        node_forces.reserve(cell_population.GetNumNodes());
-
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
-             node_forces.push_back(zero_vector<double>(3));
+             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.01, 1);
 
-        p_periodic_force->AddForceContribution(node_forces, cell_population);
+        p_periodic_force->AddForceContribution(cell_population);
 
         SimulationTime::Destroy();
 
-        TS_ASSERT_DELTA(node_forces[0][0], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][1], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[0][2], 36.5928, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][0], 25.8597, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[1][2], 25.8597, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][0], 15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][1], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[2][2], 19.5199, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][1], 25.8597, 1e-4);
-        TS_ASSERT_DELTA(node_forces[3][2], 25.8597, 1e-4);
-        TS_ASSERT_DELTA(node_forces[4][0], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[4][1], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[4][2], 15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[5][0], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[5][1], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[5][2], 15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[6][0], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[6][1], 15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[6][2], 19.5199, 1e-4);
-        TS_ASSERT_DELTA(node_forces[7][0], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[7][1], 10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[7][2], 15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[8][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[8][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[8][2], 8.7868, 1e-4);
-        TS_ASSERT_DELTA(node_forces[9][0], 4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[9][1], 4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[9][2], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[10][0], 4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[10][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[10][2], -4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[11][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[11][1], 4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[11][2], -4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[12][0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[12][1], 4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[12][2], -4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[13][0], -10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[13][1], -10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[13][2], -15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[14][0], -10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[14][1], -10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[14][2], -15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[15][0], 4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[15][1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(node_forces[15][2], -4.3934, 1e-4);
-        TS_ASSERT_DELTA(node_forces[16][0], -10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[16][1], -10.7331, 1e-4);
-        TS_ASSERT_DELTA(node_forces[16][2], -15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[17][0], -15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[17][1], -15.1265, 1e-4);
-        TS_ASSERT_DELTA(node_forces[17][2], -15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[2], 36.5928, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 25.8597, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[2], 25.8597, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[2], 19.5199, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], 25.8597, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[2], 25.8597, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[0], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[1], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[2], 15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[2], 15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[0], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[1], 15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(6)->rGetAppliedForce()[2], 19.5199, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(7)->rGetAppliedForce()[0], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(7)->rGetAppliedForce()[1], 10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(7)->rGetAppliedForce()[2], 15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(8)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(8)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(8)->rGetAppliedForce()[2], 8.7868, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(9)->rGetAppliedForce()[0], 4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(9)->rGetAppliedForce()[1], 4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(9)->rGetAppliedForce()[2], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(10)->rGetAppliedForce()[0], 4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(10)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(10)->rGetAppliedForce()[2], -4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(11)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(11)->rGetAppliedForce()[1], 4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(11)->rGetAppliedForce()[2], -4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(12)->rGetAppliedForce()[0], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(12)->rGetAppliedForce()[1], 4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(12)->rGetAppliedForce()[2], -4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(13)->rGetAppliedForce()[0], -10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(13)->rGetAppliedForce()[1], -10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(13)->rGetAppliedForce()[2], -15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(14)->rGetAppliedForce()[0], -10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(14)->rGetAppliedForce()[1], -10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(14)->rGetAppliedForce()[2], -15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(15)->rGetAppliedForce()[0], 4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(15)->rGetAppliedForce()[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(15)->rGetAppliedForce()[2], -4.3934, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(16)->rGetAppliedForce()[0], -10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(16)->rGetAppliedForce()[1], -10.7331, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(16)->rGetAppliedForce()[2], -15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(17)->rGetAppliedForce()[0], -15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(17)->rGetAppliedForce()[1], -15.1265, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(17)->rGetAppliedForce()[2], -15.1265, 1e-4);
 
         // Tidy up
         delete p_mesh;
