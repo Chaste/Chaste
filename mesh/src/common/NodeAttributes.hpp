@@ -147,6 +147,7 @@ public:
 
     /**
      * Set the flag mIsParticle.
+     * @param isParticle whether this node is particle or not.
      */
     void SetIsParticle(bool isParticle);
 

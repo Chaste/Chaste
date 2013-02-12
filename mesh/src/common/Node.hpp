@@ -336,6 +336,7 @@ public:
 
     /**
      * Set whether this node is a particle, for cell_based simulations.
+     * @param isParticle whether this node is a particle or not.
      */
     void SetIsParticle(bool isParticle);
 
