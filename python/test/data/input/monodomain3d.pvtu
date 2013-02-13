@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData>
+      <PDataArray type="Float64" Name="V_000000"/>
+      <PDataArray type="Float64" Name="V_000001"/>
+      <PDataArray type="Float64" Name="V_000002"/>
+      <PDataArray type="Float64" Name="V_000003"/>
+      <PDataArray type="Float64" Name="V_000004"/>
+      <PDataArray type="Float64" Name="V_000005"/>
+      <PDataArray type="Float64" Name="V_000006"/>
+      <PDataArray type="Float64" Name="V_000007"/>
+      <PDataArray type="Float64" Name="V_000008"/>
+      <PDataArray type="Float64" Name="V_000009"/>
+      <PDataArray type="Float64" Name="V_000010"/>
+      <PDataArray type="Float64" Name="V_000011"/>
+      <PDataArray type="Float64" Name="V_000012"/>
+      <PDataArray type="Float64" Name="V_000013"/>
+      <PDataArray type="Float64" Name="V_000014"/>
+      <PDataArray type="Float64" Name="V_000015"/>
+      <PDataArray type="Float64" Name="V_000016"/>
+      <PDataArray type="Float64" Name="V_000017"/>
+      <PDataArray type="Float64" Name="V_000018"/>
+      <PDataArray type="Float64" Name="V_000019"/>
+      <PDataArray type="Float64" Name="V_000020"/>
+      <PDataArray type="Float64" Name="V_000021"/>
+      <PDataArray type="Float64" Name="V_000022"/>
+      <PDataArray type="Float64" Name="V_000023"/>
+      <PDataArray type="Float64" Name="V_000024"/>
+      <PDataArray type="Float64" Name="V_000025"/>
+      <PDataArray type="Float64" Name="V_000026"/>
+      <PDataArray type="Float64" Name="V_000027"/>
+      <PDataArray type="Float64" Name="V_000028"/>
+      <PDataArray type="Float64" Name="V_000029"/>
+      <PDataArray type="Float64" Name="V_000030"/>
+      <PDataArray type="Float64" Name="V_000031"/>
+      <PDataArray type="Float64" Name="V_000032"/>
+      <PDataArray type="Float64" Name="V_000033"/>
+      <PDataArray type="Float64" Name="V_000034"/>
+      <PDataArray type="Float64" Name="V_000035"/>
+      <PDataArray type="Float64" Name="V_000036"/>
+      <PDataArray type="Float64" Name="V_000037"/>
+      <PDataArray type="Float64" Name="V_000038"/>
+      <PDataArray type="Float64" Name="V_000039"/>
+      <PDataArray type="Float64" Name="V_000040"/>
+      <PDataArray type="Float64" Name="V_000041"/>
+      <PDataArray type="Float64" Name="V_000042"/>
+      <PDataArray type="Float64" Name="V_000043"/>
+      <PDataArray type="Float64" Name="V_000044"/>
+      <PDataArray type="Float64" Name="V_000045"/>
+      <PDataArray type="Float64" Name="V_000046"/>
+      <PDataArray type="Float64" Name="V_000047"/>
+      <PDataArray type="Float64" Name="V_000048"/>
+      <PDataArray type="Float64" Name="V_000049"/>
+      <PDataArray type="Float64" Name="V_000050"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float64" Name="Vertex positions" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="monodomain3d_0.vtu"/>
+    <Piece Source="monodomain3d_1.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<!-- Created by Chaste version 3.1.17831 on Wed, 13 Feb 2013 14:49:13 +0000.  Chaste was built on Fri, 11 Jan 2013 18:22:46 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: Eikonal=44:47; jink=17831M; jmpf=17163:17174; papers=exported.
+-->

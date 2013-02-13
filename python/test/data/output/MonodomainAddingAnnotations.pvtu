@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid TimeValues="0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 " GhostLevel="0">
+    <PPointData>
+      <PDataArray type="Float64" Name="V" TimeStep="0" />
+      <PDataArray type="Float64" Name="V" TimeStep="1" />
+      <PDataArray type="Float64" Name="V" TimeStep="2" />
+      <PDataArray type="Float64" Name="V" TimeStep="3" />
+      <PDataArray type="Float64" Name="V" TimeStep="4" />
+      <PDataArray type="Float64" Name="V" TimeStep="5" />
+      <PDataArray type="Float64" Name="V" TimeStep="6" />
+      <PDataArray type="Float64" Name="V" TimeStep="7" />
+      <PDataArray type="Float64" Name="V" TimeStep="8" />
+      <PDataArray type="Float64" Name="V" TimeStep="9" />
+      <PDataArray type="Float64" Name="V" TimeStep="10" />
+      <PDataArray type="Float64" Name="V" TimeStep="11" />
+      <PDataArray type="Float64" Name="V" TimeStep="12" />
+      <PDataArray type="Float64" Name="V" TimeStep="13" />
+      <PDataArray type="Float64" Name="V" TimeStep="14" />
+      <PDataArray type="Float64" Name="V" TimeStep="15" />
+      <PDataArray type="Float64" Name="V" TimeStep="16" />
+      <PDataArray type="Float64" Name="V" TimeStep="17" />
+      <PDataArray type="Float64" Name="V" TimeStep="18" />
+      <PDataArray type="Float64" Name="V" TimeStep="19" />
+      <PDataArray type="Float64" Name="V" TimeStep="20" />
+      <PDataArray type="Float64" Name="V" TimeStep="21" />
+      <PDataArray type="Float64" Name="V" TimeStep="22" />
+      <PDataArray type="Float64" Name="V" TimeStep="23" />
+      <PDataArray type="Float64" Name="V" TimeStep="24" />
+      <PDataArray type="Float64" Name="V" TimeStep="25" />
+      <PDataArray type="Float64" Name="V" TimeStep="26" />
+      <PDataArray type="Float64" Name="V" TimeStep="27" />
+      <PDataArray type="Float64" Name="V" TimeStep="28" />
+      <PDataArray type="Float64" Name="V" TimeStep="29" />
+      <PDataArray type="Float64" Name="V" TimeStep="30" />
+      <PDataArray type="Float64" Name="V" TimeStep="31" />
+      <PDataArray type="Float64" Name="V" TimeStep="32" />
+      <PDataArray type="Float64" Name="V" TimeStep="33" />
+      <PDataArray type="Float64" Name="V" TimeStep="34" />
+      <PDataArray type="Float64" Name="V" TimeStep="35" />
+      <PDataArray type="Float64" Name="V" TimeStep="36" />
+      <PDataArray type="Float64" Name="V" TimeStep="37" />
+      <PDataArray type="Float64" Name="V" TimeStep="38" />
+      <PDataArray type="Float64" Name="V" TimeStep="39" />
+      <PDataArray type="Float64" Name="V" TimeStep="40" />
+      <PDataArray type="Float64" Name="V" TimeStep="41" />
+      <PDataArray type="Float64" Name="V" TimeStep="42" />
+      <PDataArray type="Float64" Name="V" TimeStep="43" />
+      <PDataArray type="Float64" Name="V" TimeStep="44" />
+      <PDataArray type="Float64" Name="V" TimeStep="45" />
+      <PDataArray type="Float64" Name="V" TimeStep="46" />
+      <PDataArray type="Float64" Name="V" TimeStep="47" />
+      <PDataArray type="Float64" Name="V" TimeStep="48" />
+      <PDataArray type="Float64" Name="V" TimeStep="49" />
+      <PDataArray type="Float64" Name="V" TimeStep="50" />
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float64" Name="Vertex positions" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="MonodomainAddingAnnotations_0.vtu"/>
+    <Piece Source="MonodomainAddingAnnotations_1.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<!-- Created by Chaste version 3.1.17831 on Wed, 13 Feb 2013 14:49:13 +0000.  Chaste was built on Fri, 11 Jan 2013 18:22:46 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: Eikonal=44:47; jink=17831M; jmpf=17163:17174; papers=exported.
+-->

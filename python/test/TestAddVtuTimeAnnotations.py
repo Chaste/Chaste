@@ -40,31 +40,40 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
     
     def TestAddingVtuAnnotationsMonodomain2d(self):
         #without suffices (input and output file names)
-        original_vtu1 = 'python/test/data/Monodomain2d_before_annotations'
+        original_vtu1 = 'python/test/data/input/Monodomain2d_before_annotations'
         output_vtu1 = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotationsTest')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu1 + ' ' + output_vtu1)
         self.assertEqual(rc, 0)
-        self.assertTrue(filecmp.cmp(output_vtu1+'.vtu','python/test/data/Monodomain2d_after_annotations.vtu'))
+        self.assertTrue(filecmp.cmp(output_vtu1+'.vtu','python/test/data/output/Monodomain2d_after_annotations.vtu'))
         
         #with suffices
-        original_vtu2 = 'python/test/data/Monodomain2d_before_annotations.vtu'
+        original_vtu2 = 'python/test/data/input/Monodomain2d_before_annotations.vtu'
         output_vtu2 = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotationsTest2.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu2 + ' ' + output_vtu2)
         self.assertEqual(rc, 0)
-        self.assertTrue(filecmp.cmp(output_vtu2,'python/test/data/Monodomain2d_after_annotations.vtu'))
+        self.assertTrue(filecmp.cmp(output_vtu2,'python/test/data/output/Monodomain2d_after_annotations.vtu'))
 
     def TestAddingVtuAnnotationsBidomain(self):
-        original_vtu = 'python/test/data/Bidomain3d_before_annotations.vtu'
+        original_vtu = 'python/test/data/input/Bidomain3d_before_annotations.vtu'
         output_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'BidomainAddingAnnotationsTest.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)
         self.assertEqual(rc, 0)
-        self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/Bidomain3d_after_annotations.vtu'))
+        self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/output/Bidomain3d_after_annotations.vtu'))
         
     def TestAddingVtuAnnotationsAirway(self):
-        original_vtu = 'python/test/data/ThreeBifurcations_before_annotations.vtu'
+        original_vtu = 'python/test/data/input/ThreeBifurcations_before_annotations.vtu'
         output_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'ThreeBifurcationsAddingAnnotationsTest.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)
         self.assertEqual(rc, 0)
-        self.assertTrue(filecmp.cmp(output_vtu, 'python/test/data/ThreeBifurcations_after_annotations.vtu'))
+        self.assertTrue(filecmp.cmp(output_vtu, 'python/test/data/output/ThreeBifurcations_after_annotations.vtu'))
         
+    def TestAddingVtuAnnotationsParallelPieces(self):
+        original_pvtu = 'python/test/data/input/monodomain3d.pvtu'
+        output_base_name = os.path.join(CHASTE_TEST_OUTPUT, 'MonodomainAddingAnnotations')
+        output_pvtu = output_base_name+'.pvtu'
+        rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_pvtu + ' ' + output_pvtu)
+        self.assertEqual(rc, 0)
+        self.assertTrue(filecmp.cmp(output_pvtu,'python/test/data/output/MonodomainAddingAnnotations.pvtu'))
+        self.assertTrue(filecmp.cmp(output_base_name+'_0.vtu','python/test/data/output/MonodomainAddingAnnotations_0.vtu'))
+        self.assertTrue(filecmp.cmp(output_base_name+'_1.vtu','python/test/data/output/MonodomainAddingAnnotations_1.vtu'))
         

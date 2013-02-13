@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import fileinput
 import sys
 import re
+import os
 
 """
     Check that the time steps start at zero and are monotonically increasing by 1 each time
@@ -75,28 +76,43 @@ nameTimePair is a regular expression
 lastTimeStep is calculated during an earlier pass (QueryVtuFile)
 """
 def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep):
+    print'Reading from', inputFileName, 'and writing to', outputFileName
     timevalues = range(0, lastTimeStep+1, 1)
     header_mode = True
     out_fp = file(outputFileName, 'w')
     for line in fileinput.input(inputFileName):
         if (header_mode):
-           if (line.find('<UnstructuredGrid>')>0):
-              line = '<UnstructuredGrid TimeValues="' 
+           # <UnstructuredGrid> ... or <PUnstructuredGrid>
+           if (line.find('<UnstructuredGrid')>0 or line.find('<PUnstructuredGrid')>0):
+              time_annotation = 'UnstructuredGrid TimeValues="' 
               for time in timevalues:
-                  line += str(time)+ ' '
-              line += '">\n'
-           if (line.find('</UnstructuredGrid>')>0):
+                  time_annotation += str(time)+ ' '
+              time_annotation += '"'
+              line = line.replace('UnstructuredGrid', time_annotation)
               header_mode = False
-           match = nameTimePair.search(line)
-           if (match):
-             var_name = match.group(1)
-             time_step_name = match.group(2)
-             #Strip the prefix of zeros from the time_step
-             time_step = str(int(time_step_name))
-             line = line.replace(  '_'+time_step_name+'\"', '\" TimeStep=\"'+time_step+'\" ')
+        match = nameTimePair.search(line)
+        if (match):
+            var_name = match.group(1)
+            time_step_name = match.group(2)
+            #Strip the prefix of zeros from the time_step
+            time_step = str(int(time_step_name))
+            line = line.replace(  '_'+time_step_name+'\"', '\" TimeStep=\"'+time_step+'\" ')
         # Line (possibly amended) gets written to the new file
         out_fp.write(line)
 
+"""
+Rename the chunks in a .pvtu to reflect the fact that we have copied them to a new
+location.
+
+Return the number of chunks (processes used in the original simulation)
+"""
+def RenameChunks(fileName, inBase, outBase):
+	text = open(fileName).read()
+	(new_text, num_chunks) = re.subn(inBase, outBase, text)
+	out_fp = file(fileName, 'w')
+	out_fp.write(new_text)
+	return num_chunks
+	
 if __name__ == "__main__":
     #Checking command line arguments
     if len(sys.argv) != 3:
@@ -105,21 +121,39 @@ if __name__ == "__main__":
     #Reading in command line arguments
     input_name = sys.argv[1]
     output_name = sys.argv[2]
-    #If input name doesn't end in .vtu then add it
-    if (input_name[-4:] != '.vtu'):
-        input_name = input_name+'.vtu'
-    #If output_name doesn't end in .vtu then add it
-    if (output_name[-4:] != '.vtu'):
-        output_name=output_name+'.vtu'
+    pvtu_mode = False
+    if (input_name[-5:] == '.pvtu'):
+        pvtu_mode = True
+        if (output_name[-5:] != '.pvtu'):
+            output_name=output_name+'.pvtu'
+    else:
+        #If input name doesn't end in .vtu then add it
+        if (input_name[-4:] != '.vtu'):
+            input_name = input_name+'.vtu'
+        #If output_name doesn't end in .vtu then add it
+        if (output_name[-4:] != '.vtu'):
+            output_name=output_name+'.vtu'
         
-    print'Reading from', input_name, 'and writing to', output_name
     
     #Regular expression for  ... Name="some_var_name_000020" ... as Chaste writes it.
     name_time_pair = re.compile('Name=\"(.*)_([0-9]{6})\"')
     
     # Check the time steps in the vtu file and query for the final time step 
     last_time_step = QueryVtuFile(input_name, name_time_pair)
-
     #Write a copy of the file but with annotations
     AnnotateVtuFile(input_name, name_time_pair, output_name, last_time_step)
+    
+    if (pvtu_mode):
+        #Remove path and suffix to get the expected base name for chunks
+        in_base_path = input_name[:-5]
+        in_base_name = os.path.basename(in_base_path)
+        out_base_path = output_name[:-5]
+        out_base_name = os.path.basename(out_base_path)
+
+        num_chunks = RenameChunks(output_name, in_base_name, out_base_name)
+        for chunk in range(0, num_chunks):
+            suffix = '_'+str(chunk)+'.vtu'
+            AnnotateVtuFile(in_base_path+suffix, name_time_pair, out_base_path+suffix, last_time_step)
+        
+        
 

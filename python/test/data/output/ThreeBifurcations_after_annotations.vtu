@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid TimeValues="0 1 2 3 4 5 6 7 8 9 10 ">
+    <Piece NumberOfPoints="8"                    NumberOfCells="7"                   >
+      <PointData>
+        <DataArray type="Float64" Name="Pressure" TimeStep="0"  format="appended" RangeMin="0"                    RangeMax="0"                    offset="0"                   />
+        <DataArray type="Float64" Name="Pressure" TimeStep="1"  format="appended" RangeMin="0"                    RangeMax="1.5"                  offset="92"                  />
+        <DataArray type="Float64" Name="Pressure" TimeStep="2"  format="appended" RangeMin="0"                    RangeMax="3"                    offset="184"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="3"  format="appended" RangeMin="0"                    RangeMax="4.5"                  offset="276"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="4"  format="appended" RangeMin="0"                    RangeMax="6"                    offset="368"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="5"  format="appended" RangeMin="0"                    RangeMax="7.5"                  offset="460"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="6"  format="appended" RangeMin="0"                    RangeMax="9"                    offset="552"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="7"  format="appended" RangeMin="0"                    RangeMax="10.5"                 offset="644"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="8"  format="appended" RangeMin="0"                    RangeMax="12"                   offset="736"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="9"  format="appended" RangeMin="0"                    RangeMax="13.5"                 offset="828"                 />
+        <DataArray type="Float64" Name="Pressure" TimeStep="10"  format="appended" RangeMin="0"                    RangeMax="15"                   offset="920"                 />
+      </PointData>
+      <CellData>
+        <DataArray type="Float64" Name="Flux" TimeStep="0"  format="appended" RangeMin="0"                    RangeMax="0"                    offset="1012"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="1"  format="appended" RangeMin="-0.0028706073224"     RangeMax="-0.00071765183059"    offset="1092"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="2"  format="appended" RangeMin="-0.0057412146447"     RangeMax="-0.0014353036612"     offset="1172"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="3"  format="appended" RangeMin="-0.0086118219671"     RangeMax="-0.0021529554918"     offset="1252"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="4"  format="appended" RangeMin="-0.011482429289"      RangeMax="-0.0028706073224"     offset="1332"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="5"  format="appended" RangeMin="-0.014353036612"      RangeMax="-0.0035882591529"     offset="1412"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="6"  format="appended" RangeMin="-0.017223643934"      RangeMax="-0.0043059109835"     offset="1492"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="7"  format="appended" RangeMin="-0.020094251257"      RangeMax="-0.0050235628141"     offset="1572"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="8"  format="appended" RangeMin="-0.022964858579"      RangeMax="-0.0057412146447"     offset="1652"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="9"  format="appended" RangeMin="-0.025835465901"      RangeMax="-0.0064588664753"     offset="1732"                />
+        <DataArray type="Float64" Name="Flux" TimeStep="10"  format="appended" RangeMin="-0.028706073224"      RangeMax="-0.0071765183059"     offset="1812"                />
+      </CellData>
+      <Points>
+        <DataArray type="Float64" Name="Vertex positions" NumberOfComponents="3" format="appended" RangeMin="0"                    RangeMax="1.1"                  offset="1892"                />
+      </Points>
+      <Cells>
+        <DataArray type="Int64" Name="connectivity" format="appended" RangeMin=""                     RangeMax=""                     offset="2156"                />
+        <DataArray type="Int64" Name="offsets" format="appended" RangeMin=""                     RangeMax=""                     offset="2312"                />
+        <DataArray type="UInt8" Name="types" format="appended" RangeMin=""                     RangeMax=""                     offset="2392"                />
+      </Cells>
+    </Piece>
+  </UnstructuredGrid>
+  <AppendedData encoding="base64">
+   _QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=QAAAAAAAAAAAAAAAWVVVVVVV5T/lOI7jOI7zP+U4juM4jvM/AAAAAAAA+D8AAAAAAAD4PwAAAAAAAPg/AAAAAAAA+D8=QAAAAAAAAAAAAAAAWVVVVVVV9T/lOI7jOI4DQOU4juM4jgNAAAAAAAAACEAAAAAAAAAIQAAAAAAAAAhAAAAAAAAACEA=QAAAAAAAAAAAAAAABAAAAAAAAEBZVVVVVVUNQFlVVVVVVQ1AAAAAAAAAEkAAAAAAAAASQAAAAAAAABJAAAAAAAAAEkA=QAAAAAAAAAAAAAAAWVVVVVVVBUDlOI7jOI4TQOU4juM4jhNAAAAAAAAAGEAAAAAAAAAYQAAAAAAAABhAAAAAAAAAGEA=QAAAAAAAAAAAAAAAr6qqqqqqCkAex3Ecx3EYQB7HcRzHcRhA////////HUD///////8dQP///////x1A////////HUA=QAAAAAAAAAAAAAAABAAAAAAAEEBZVVVVVVUdQFlVVVVVVR1AAAAAAAAAIkAAAAAAAAAiQAAAAAAAACJAAAAAAAAAIkA=QAAAAAAAAAAAAAAAr6qqqqqqEkDJcRzHcRwhQMlxHMdxHCFAAAAAAAAAJUAAAAAAAAAlQAAAAAAAACVAAAAAAAAAJUA=QAAAAAAAAAAAAAAAWVVVVVVVFUDlOI7jOI4jQOU4juM4jiNAAAAAAAAAKEAAAAAAAAAoQAAAAAAAAChAAAAAAAAAKEA=QAAAAAAAAAAAAAAABQAAAAAAGEACAAAAAAAmQAIAAAAAACZA////////KkD///////8qQP///////ypA////////KkA=QAAAAAAAAAAAAAAAr6qqqqqqGkAex3Ecx3EoQB7HcRzHcShA////////LUD///////8tQP///////y1A////////LUA=OAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAOXONpIZhGe/4842khmEV7/jzjaSGYRXv+HONpIZhEe/4c42khmER7/hzjaSGYRHv+HONpIZhEe/OAAAAOXONpIZhHe/4842khmEZ7/jzjaSGYRnv+HONpIZhFe/4c42khmEV7/hzjaSGYRXv+HONpIZhFe/OAAAAC4bqS0To4G/LBupLROjcb8sG6ktE6NxvyobqS0To2G/KhupLROjYb8qG6ktE6NhvyobqS0To2G/OAAAAOXONpIZhIe/4842khmEd7/jzjaSGYR3v+HONpIZhGe/4c42khmEZ7/hzjaSGYRnv+HONpIZhGe/OAAAAJ+CxPYfZY2/noLE9h9lfb+egsT2H2V9v5qCxPYfZW2/moLE9h9lbb+agsT2H2Vtv5qCxPYfZW2/OAAAAC4bqS0To5G/LBupLROjgb8sG6ktE6OBvyobqS0To3G/KhupLROjcb8qG6ktE6NxvyobqS0To3G/OAAAAAr171+Wk5S/CPXvX5aThL8I9e9flpOEvwT171+Wk3S/BPXvX5aTdL8E9e9flpN0vwT171+Wk3S/OAAAAOXONpIZhJe/4842khmEh7/jzjaSGYSHv+HONpIZhHe/4c42khmEd7/hzjaSGYR3v+HONpIZhHe/OAAAAMKofcScdJq/wKh9xJx0ir/AqH3EnHSKv72ofcScdHq/vah9xJx0er+9qH3EnHR6v72ofcScdHq/OAAAAJ+CxPYfZZ2/noLE9h9ljb+egsT2H2WNv5qCxPYfZX2/moLE9h9lfb+agsT2H2V9v5qCxPYfZX2/wAAAAAAAAAAAAAAAmpmZmZmZ8T8AAAAAAAAAAAAAAAAAAAAAmpmZmZmZ6T8AAAAAAAAAADMzMzMzM9O/mpmZmZmZ2T8AAAAAAAAAADMzMzMzM9M/mpmZmZmZ2T8AAAAAAAAAADMzMzMzM+O/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADMzMzMzM+M/AAAAAAAAAAAAAAAAAAAAAA==cAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAIAAAAAAAAAAQAAAAAAAAADAAAAAAAAAAIAAAAAAAAABAAAAAAAAAACAAAAAAAAAAUAAAAAAAAAAwAAAAAAAAAGAAAAAAAAAAMAAAAAAAAABwAAAAAAAAA=OAAAAAIAAAAAAAAABAAAAAAAAAAGAAAAAAAAAAgAAAAAAAAACgAAAAAAAAAMAAAAAAAAAA4AAAAAAAAABwAAAAMDAwMDAwM=
+  </AppendedData>
+</VTKFile>
+
+<!-- Created by Chaste version 3.1.17545 (with uncommitted modifications) on Tue, 04 Dec 2012 17:17:20 +0000.  Chaste was built on Tue, 04 Dec 2012 17:17:11 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: default, shared libraries.
+-->
