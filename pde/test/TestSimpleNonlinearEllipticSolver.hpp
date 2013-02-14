@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petsc.h>
 #include <vector>
 #include <cmath>
-//#include <iostream>
 
 #include "SimpleNonlinearEllipticSolver.hpp"
 #include "SimplePetscNonlinearSolver.hpp"

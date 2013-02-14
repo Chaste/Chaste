@@ -129,7 +129,7 @@ public:
 
         // Test SetupMatrix with non-default preallocation
         Mat mat2;
-        PetscTools::SetupMat(mat2, 12, 10, 4);
+        PetscTools::SetupMat(mat2, 12, 10, 4, PETSC_DECIDE, PETSC_DECIDE, false, false);
         MatGetSize(mat2, &m, &n);
         TS_ASSERT_EQUALS(m, 12);
         TS_ASSERT_EQUALS(n, 10);

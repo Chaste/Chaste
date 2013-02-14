@@ -68,7 +68,8 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
     VecDuplicate(initialGuess, &current_solution);
     VecCopy(initialGuess, current_solution);
 
-    LinearSystem linear_system(current_solution, fill);
+    // The "false" says that we are allowed to do new mallocs without PETSc 3.3 causing an error
+    LinearSystem linear_system(current_solution, fill, false);
 
     (*pComputeResidual)(NULL, current_solution, linear_system.rGetRhsVector(), pContext);
 

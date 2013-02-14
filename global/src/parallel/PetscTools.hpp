@@ -255,12 +255,17 @@ public:
      * @param numLocalRows the number of local rows (defaults to PETSC_DECIDE)
      * @param numLocalColumns the number of local columns (defaults to PETSC_DECIDE)
      * @param ignoreOffProcEntries tells PETSc to drop off-processor entries
+     * @param newAllocationError tells PETSc whether to set the MAT_NEW_NONZERO_ALLOCATION_ERR.
+     *        ** currently only used in PETSc 3.3 and later **
+     *        in PETSc 3.2 and earlier MAT_NEW_NONZERO_ALLOCATION_ERR defaults to false
+     *        in PETSc 3.3 MAT_NEW_NONZERO_ALLOCATION_ERR defaults to true
      */
     static void SetupMat(Mat& rMat, int numRows, int numColumns,
                          unsigned rowPreallocation,
                          int numLocalRows=PETSC_DECIDE,
                          int numLocalColumns=PETSC_DECIDE,
-                         bool ignoreOffProcEntries=true);
+                         bool ignoreOffProcEntries=true,
+                         bool newAllocationError=true);
 
     /**
      * Boolean AND of a flags between processes.

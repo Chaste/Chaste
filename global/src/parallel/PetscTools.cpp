@@ -241,7 +241,8 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
                           unsigned rowPreallocation,
                           int numLocalRows,
                           int numLocalColumns,
-                          bool ignoreOffProcEntries)
+                          bool ignoreOffProcEntries,
+                          bool newAllocationError)
 {
     assert(numRows > 0);
     assert(numColumns > 0);
@@ -293,6 +294,12 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
 #endif
         }
     }
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+    if (newAllocationError == false)
+    {
+    	MatSetOption(rMat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+    }
+#endif
 }
 
 void PetscTools::DumpPetscObject(const Mat& rMat, const std::string& rOutputFileFullPath)

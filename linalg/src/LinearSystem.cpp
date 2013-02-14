@@ -140,7 +140,7 @@ LinearSystem::LinearSystem(PetscInt lhsVectorSize, Mat lhsMatrix, Vec rhsVector)
 #endif
 }
 
-LinearSystem::LinearSystem(Vec templateVector, unsigned rowPreallocation)
+LinearSystem::LinearSystem(Vec templateVector, unsigned rowPreallocation, bool newAllocationError)
    :mPrecondMatrix(NULL),
     mMatNullSpace(NULL),
     mDestroyMatAndVec(true),
@@ -167,10 +167,10 @@ LinearSystem::LinearSystem(Vec templateVector, unsigned rowPreallocation)
     VecGetOwnershipRange(mRhsVector, &mOwnershipRangeLo, &mOwnershipRangeHi);
     PetscInt local_size = mOwnershipRangeHi - mOwnershipRangeLo;
 
-    PetscTools::SetupMat(mLhsMatrix, mSize, mSize, mRowPreallocation, local_size, local_size);
+    PetscTools::SetupMat(mLhsMatrix, mSize, mSize, mRowPreallocation, local_size, local_size, true, newAllocationError);
 
     /// \todo: if we create a linear system object outside a cardiac solver, these are gonna
-    /// be the default solver and preconditioner. Not consitent with ChasteDefaults.xml though...
+    /// be the default solver and preconditioner. Not consistent with ChasteDefaults.xml though...
     mKspType = "gmres";
     mPcType = "jacobi";
 

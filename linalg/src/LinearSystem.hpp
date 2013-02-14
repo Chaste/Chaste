@@ -199,8 +199,12 @@ public:
      *
      * @param templateVector  a PETSc vec
      * @param rowPreallocation the max number of nonzero entries expected on a row
+     * @param newAllocationError tells PETSc whether to set the MAT_NEW_NONZERO_ALLOCATION_ERR.
+     *        ** currently only used in PETSc 3.3 and later **
+     *        in PETSc 3.2 and earlier MAT_NEW_NONZERO_ALLOCATION_ERR defaults to false
+     *        in PETSc 3.3 MAT_NEW_NONZERO_ALLOCATION_ERR defaults to true
      */
-    LinearSystem(Vec templateVector, unsigned rowPreallocation);
+    LinearSystem(Vec templateVector, unsigned rowPreallocation, bool newAllocationError=true);
 
     /**
      * Alternative constructor.
