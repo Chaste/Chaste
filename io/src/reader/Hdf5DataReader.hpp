@@ -78,7 +78,7 @@ public:
      * @param rBaseName  The base name of the files to read (i.e. without the extensions)
      * @param makeAbsolute  Whether the h5 file should be treated as relative to Chaste test output,
      *                      and converted to absolute, the file is otherwise treated as relative to current working directory.
-     * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
+     * @param datasetName  The name of the HDF5 dataset to read, defaults to "Data".
      */
     Hdf5DataReader(const std::string& rDirectory,
                    const std::string& rBaseName,
@@ -90,7 +90,7 @@ public:
      *
      * @param rDirectory  The directory the files are stored in
      * @param rBaseName  The base name of the files to read (i.e. without the extensions)
-     * @param datasetName The name of the HDF5 dataset to write, defaults to "Data".
+     * @param datasetName The name of the HDF5 dataset to read, defaults to "Data".
      */
     Hdf5DataReader(const FileFinder& rDirectory,
                    const std::string& rBaseName,

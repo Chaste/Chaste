@@ -61,15 +61,14 @@ double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> ::GetIntegrand(C
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                                                                               const ChastePoint<SPACE_DIM>& rProbeElectrode,
-                                                                              std::string directory,
+                                                                              const FileFinder& rDirectory,
                                                                               std::string hdf5File,
-                                                                              std::string variableName,
-                                                                              bool makeAbsolute)
+                                                                              std::string variableName)
   : mrMesh(rMesh),
     mProbeElectrode(rProbeElectrode),
     mVariableName(variableName)
 {
-    mpDataReader = new Hdf5DataReader(directory, hdf5File, makeAbsolute);
+    mpDataReader = new Hdf5DataReader(rDirectory, hdf5File);
     mNumberOfNodes = mpDataReader->GetNumberOfRows();
     mNumTimeSteps = mpDataReader->GetVariableOverTime(mVariableName, 0u).size();
     mDiffusionCoefficient = 1.0;

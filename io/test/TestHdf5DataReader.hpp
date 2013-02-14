@@ -362,7 +362,7 @@ public:
         TS_ASSERT_EQUALS(i_k_values_over_multiple.size(),10u);
 
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTimeOverMultipleNodes("I_K", 0, NUMBER_NODES+5),
-                              "The file doesn't contain info for node 104");
+                              "The dataset 'Data' doesn't contain info for node 104");
 
         TS_ASSERT_EQUALS(i_k_values.size(), i_k_values_over_multiple.size());
 
@@ -440,14 +440,14 @@ public:
         TS_ASSERT_EQUALS(times[0],0.0);
 
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("Node", 99/*node*/),
-                "The file does not contain time dependent data");
+                "The dataset 'Data' does not contain time dependent data");
 
         Vec data = factory.CreateVec();
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverNodes(data, "Node", 1/*timestep*/),
-                "The file does not contain time dependent data");
+                "The dataset 'Data' does not contain time dependent data");
 
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTimeOverMultipleNodes("Node",0,10),
-                "The file does not contain time dependent data");
+                "The dataset 'Data' does not contain time dependent data");
 
         PetscTools::Destroy(data);
         reader.Close();
@@ -498,18 +498,18 @@ public:
 
         TS_ASSERT_THROWS_NOTHING(reader.GetVariableOverTime("Node", 99/*node*/));
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("WrongName", 99/*node*/),
-                "The file doesn\'t contain data for variable WrongName");
+                "The dataset 'Data' doesn\'t contain data for variable WrongName");
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("Node", 100/*node*/),
-                "The file doesn\'t contain info of node 100");
+                "The dataset 'Data' doesn\'t contain info of node 100");
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTimeOverMultipleNodes("WrongName", 90, 99),
-                "The file doesn\'t contain data for variable WrongName");
+                "The dataset 'Data' doesn\'t contain data for variable WrongName");
 
         Vec data = factory.CreateVec();
         reader.GetVariableOverNodes(data, "Node", 0/*timestep*/);
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverNodes(data, "WrongName"),
-                "The file does not contain data for variable WrongName"); //Wrong name
+                "The dataset 'Data' does not contain data for variable WrongName"); //Wrong name
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverNodes(data, "I_K", 1/*timestep*/),
-                "The file does not contain data for timestep number 1"); //Time step doesn't exist
+                "The dataset 'Data' does not contain data for timestep number 1"); //Time step doesn't exist
 
         DistributedVectorFactory factory2(NUMBER_NODES+1);
         Vec data_too_big = factory2.CreateVec();
@@ -565,7 +565,7 @@ public:
 
         // Data not included
         TS_ASSERT_THROWS_THIS(reader.GetVariableOverTime("Node", 22),
-                              "The incomplete file does not contain info of node 22");
+                              "The incomplete dataset 'Data' does not contain info of node 22");
 
         // another exception
         TS_ASSERT_THROWS_CONTAINS(reader.GetVariableOverTimeOverMultipleNodes("I_Na", 0, 1),

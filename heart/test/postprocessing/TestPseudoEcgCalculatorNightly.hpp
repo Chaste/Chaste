@@ -66,7 +66,11 @@ public:
 
         // The file 3D.h5 contains the first 5 time steps of a whole heart simulations known to produce
         // a reasonably-looking ECG trace.
-        PseudoEcgCalculator<3,3,1> calculator (mesh, probe_electrode, "heart/test/data/PseudoEcg", "3D", "V", false);
+        PseudoEcgCalculator<3,3,1> calculator (mesh,
+											   probe_electrode,
+											   FileFinder("heart/test/data/PseudoEcg",RelativeTo::ChasteSourceRoot),
+											   "3D",
+											   "V");
 
         calculator.SetDiffusionCoefficient(1.0);//the default value
 
@@ -97,7 +101,11 @@ public:
 
         // The file 3D.h5 contains the first 5 time steps of a whole heart simulations known to produce
         // a reasonably-looking ECG trace.
-        PseudoEcgCalculator<3,3,1> calculator (mesh, probe_electrode, "heart/test/data/PseudoEcg", "3D", "V", false);
+        PseudoEcgCalculator<3,3,1> calculator  (mesh,
+												probe_electrode,
+												FileFinder("heart/test/data/PseudoEcg",RelativeTo::ChasteSourceRoot),
+												"3D",
+												"V");
 
         calculator.SetDiffusionCoefficient(1.0);//the default value
 

@@ -497,7 +497,7 @@ public:
 
         //Can't read back this node as it wasn't written
         TS_ASSERT_THROWS_THIS( data_reader1.GetVariableOverTime("V", 1),
-                "The incomplete file does not contain info of node 1");
+                "The incomplete dataset 'Data' does not contain info of node 1");
 
         delete p_bidomain_problem;
 

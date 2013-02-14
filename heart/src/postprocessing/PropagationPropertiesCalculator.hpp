@@ -175,7 +175,7 @@ public:
                                                              double threshold);
 
      /**
-     * Calculate all the action potentials duration at a cells [lowerNodeIndex, upperNodeIndex-1].
+     * Calculate all the action potentials duration at cells [lowerNodeIndex, upperNodeIndex-1].
      *
      * @param percentage  The percentage of the amplitude to calculate for.
      * @param lowerNodeIndex  First cell at which to calculate.

@@ -572,6 +572,17 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
     delete mpWriter;
     mpWriter = NULL;
 
+    HeartEventHandler::BeginEvent(HeartEventHandler::POST_PROC);
+    if(HeartConfig::Instance()->IsPostProcessingRequested())
+    {
+    	FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
+        PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh,
+        		                                                 test_output,
+        		                                                 HeartConfig::Instance()->GetOutputFilenamePrefix());
+        post_writer.WritePostProcessingFiles();
+    }
+    HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);
+
     HeartEventHandler::BeginEvent(HeartEventHandler::DATA_CONVERSION);
     // Only if results files were written and we are outputting all nodes
     if (mNodesToOutput.empty())
@@ -614,15 +625,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
     }
     HeartEventHandler::EndEvent(HeartEventHandler::DATA_CONVERSION);
 
-    HeartEventHandler::BeginEvent(HeartEventHandler::POST_PROC);
-    if(HeartConfig::Instance()->IsPostProcessingRequested())
-    {
-        PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh, HeartConfig::Instance()->GetOutputDirectory(),
-                        HeartConfig::Instance()->GetOutputFilenamePrefix(), true);
-        post_writer.WritePostProcessingFiles();
-    }
 
-    HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

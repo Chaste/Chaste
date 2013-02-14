@@ -134,7 +134,9 @@ public:
         ///////////////////////////////////////////////////
         ChastePoint<1> probe_electrode(15.0);
 
-        PseudoEcgCalculator<1,1,1> calculator (mesh, probe_electrode, "hdf5", "gradient_V");
+        PseudoEcgCalculator<1,1,1> calculator (mesh, probe_electrode,
+        		                               FileFinder("hdf5",RelativeTo::ChasteTestOutput),
+        		                               "gradient_V");
         double pseudo_ecg;
 
         // The expected result is the integral of: - d(gradV)*dgrad(1/r) in dx
@@ -156,7 +158,10 @@ public:
         TS_ASSERT(comparer.CompareFiles());
 
         ChastePoint<1> bad_probe_electrode(0.0021132486540519);
-        PseudoEcgCalculator<1,1,1> bad_calculator (mesh, bad_probe_electrode, "hdf5", "gradient_V");
+        PseudoEcgCalculator<1,1,1> bad_calculator (mesh,
+        		                                   bad_probe_electrode,
+        		                                   FileFinder("hdf5",RelativeTo::ChasteTestOutput),
+        		                                   "gradient_V");
         TS_ASSERT_THROWS_THIS(bad_calculator.ComputePseudoEcgAtOneTimeStep(0), "Probe is on a mesh Gauss point.");
 
     }
@@ -231,7 +236,8 @@ public:
 
         ChastePoint<1> probe_electrode(15.0);
 
-        PseudoEcgCalculator<1,1,1> calculator (mesh, probe_electrode, "hdf5", "parabolic_V", "V", true);
+        PseudoEcgCalculator<1,1,1> calculator (mesh, probe_electrode,
+        		FileFinder("hdf5",RelativeTo::ChasteTestOutput), "parabolic_V", "V");
 
         double pseudo_ecg; //stores the results
 
@@ -300,14 +306,14 @@ public:
 
         // Test some Pseudo ECG calculation methods #2107
         ChastePoint<1> point1(0.0); // Point at which to calculate a pseudo-ECG - this is allowed.
-        PseudoEcgCalculator<1,1,1>  ecg_calculator1(mesh, point1, "BidomainBath1d_PseudoEcg", "bidomain_bath_1d");
+        PseudoEcgCalculator<1,1,1>  ecg_calculator1(mesh, point1, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d");
 
         // At the beginning we should have zero as voltage is uniform (in the tissue, this failed before #2107)
         double pseudo_ecg1_at_t_0 = ecg_calculator1.ComputePseudoEcgAtOneTimeStep(0);
         TS_ASSERT_DELTA(pseudo_ecg1_at_t_0, 0.0, 1e-9);
 
         ChastePoint<1> point2(0.3); // Point at which to calculate a pseudo-ECG - this should look decent
-        PseudoEcgCalculator<1,1,1> ecg_calculator2(mesh, point2, "BidomainBath1d_PseudoEcg", "bidomain_bath_1d");
+        PseudoEcgCalculator<1,1,1> ecg_calculator2(mesh, point2, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d");
 
         // At the beginning we should have zero as voltage is uniform (in the tissue, this failed before #2107)
         double pseudo_ecg2_at_t_0 = ecg_calculator2.ComputePseudoEcgAtOneTimeStep(0);

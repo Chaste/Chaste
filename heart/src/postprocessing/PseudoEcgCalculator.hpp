@@ -124,18 +124,16 @@ public:
      *
      * @param rMesh A reference to the mesh
      * @param rProbeElectrode The location of the recording electrode
-     * @param directory The directory where the simulation results are stored
+     * @param rDirectory  The directory where the simulation results are stored
      * @param hdf5File The file name  where the simulation results are stored
      * @param variableName  The name of the voltage variable (is V by default)
-     * @param makeAbsolute whether to make the path of directory absolute (using the OutputFileHandler)
      *
      */
     PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                         const ChastePoint<SPACE_DIM>& rProbeElectrode,
-                        std::string directory,
+                        const FileFinder& rDirectory,
                         std::string hdf5File,
-                        std::string variableName = "V",
-                        bool makeAbsolute = true);
+                        std::string variableName = "V");
 
     /**
      * Destructor.

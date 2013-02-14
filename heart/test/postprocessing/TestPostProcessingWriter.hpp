@@ -69,6 +69,13 @@ class TestPostProcessingWriter : public CxxTest::TestSuite
         return handler.FindFile("output");
     }
 
+    void CopyTestDataHdf5ToCleanTestOutputFolder(const FileFinder& rTestOutputDirectory, const std::string& rHdf5BaseName)
+    {
+        OutputFileHandler handler(rTestOutputDirectory);
+        FileFinder hdf5_file("heart/test/data/" + rHdf5BaseName + ".h5", RelativeTo::ChasteSourceRoot);
+        handler.CopyFileTo(hdf5_file);
+    }
+
 public:
     void TestWriterMethods() throw(Exception)
     {
@@ -78,11 +85,15 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        PostProcessingWriter<1,1> writer(mesh, "heart/test/data", "postprocessingapd", false);
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "postprocessingapd");
 
+        PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
         writer.WriteApdMapFile(60.0, -30.0);
 
-        std::string file1 = FileFinder("Apd_60_-30_Map.dat", output_dir).GetAbsolutePath();
+        FileFinder output_file("Apd_60_-30_Map.dat", output_dir);
+        TS_ASSERT(output_file.Exists());
+
+        std::string file1 = output_file.GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
@@ -125,7 +136,8 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        PostProcessingWriter<1,1> writer(mesh, "heart/test/data/Monodomain1d", "MonodomainLR91_1d", false);
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "Monodomain1d/MonodomainLR91_1d");
+        PostProcessingWriter<1,1> writer(mesh, output_dir, "MonodomainLR91_1d");
 
         writer.WriteApdMapFile(90.0, -30.0);
 
@@ -138,6 +150,7 @@ public:
     void TestPostProcessWriting() throw (Exception)
     {
         FileFinder output_dir = GetOutputPath("TestPostProcessingWriter_PostProcessWriting");
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "Monodomain1d/MonodomainLR91_1d");
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
         DistributedTetrahedralMesh<1,1> mesh;
@@ -162,7 +175,7 @@ public:
         conduction_velocity_map.push_back(0u);
         HeartConfig::Instance()->SetConductionVelocityMaps(conduction_velocity_map);
 
-        //test the mtehod that extrapolates nodal traces
+        //test the method that extrapolates nodal traces
         std::vector<unsigned> nodes_to_extrapolate;//1D test, does not cover node permutation case
         nodes_to_extrapolate.push_back(1u);
         nodes_to_extrapolate.push_back(99u);
@@ -173,10 +186,8 @@ public:
         pseudo_ecg_electrodes.push_back(ChastePoint<1>(-1.0));
         HeartConfig::Instance()->SetPseudoEcgElectrodePositions(pseudo_ecg_electrodes);
 
-        PostProcessingWriter<1,1> writer(mesh, "heart/test/data/Monodomain1d", "MonodomainLR91_1d", false);
-
+        PostProcessingWriter<1,1> writer(mesh, output_dir, "MonodomainLR91_1d");
         writer.WritePostProcessingFiles();
-
         writer.WriteAboveThresholdDepolarisationFile(-40.0);
 
         std::string file1 = FileFinder("Apd_80_-30_Map.dat", output_dir).GetAbsolutePath();
@@ -292,7 +303,8 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        PostProcessingWriter<1,1> writer(mesh, "heart/test/data", "Ead", false);
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "Ead");
+        PostProcessingWriter<1,1> writer(mesh, output_dir, "Ead");
 
         writer.WriteAboveThresholdDepolarisationFile(-30.0);
 
@@ -312,7 +324,8 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        PostProcessingWriter<1,1> writer(mesh, "heart/test/data", "postprocessingapd", false);
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "postprocessingapd");
+        PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
 
         writer.WriteApdMapFile(60.0, -30.0);
 
@@ -321,6 +334,63 @@ public:
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
+
+    // This test checks that the APD map is put into the HDF5 file.
+    // NB The dataset and variable name are Apd_60_minus_30_Map here...
+    void TestHdfOutput() throw(Exception)
+	{
+        HeartConfig::Instance()->Reset();
+        FileFinder output_dir("TestPostProcessingWriter_AddingToHdf5", RelativeTo::ChasteTestOutput);
+
+        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "postprocessingapd");
+
+        // See comment below for the reason for the block.
+        {
+			PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
+			writer.WriteApdMapFile(60.0, -30.0);
+        }
+        // This needs to be after the PostProcessingWriter has disappeared. This could perhaps
+        // be because PostProcessingWriter::mpDataReader exists and needs to let go of the file
+        // before someone can read the updated one? Not sure, but having the above lines in scope
+        // causes this line to say it can't find the "Apd_60_minus_30_Map" dataset.
+
+        Hdf5DataReader reader(output_dir, "postprocessingapd", "Apd_60_minus_30_Map"); // dataset name
+
+        // Check that the dataset contains just the new APD map we requested
+        std::vector<std::string> variable_names = reader.GetVariableNames();
+        TS_ASSERT_EQUALS(variable_names.size(), 1u);
+		TS_ASSERT_EQUALS(variable_names[0], "Apd_60_minus_30_Map"); // variable name
+
+		// Get an error if you ask for a timestep (pace number) that isn't there...
+		DistributedVectorFactory factory(reader.GetNumberOfRows());
+		Vec data = factory.CreateVec();
+		reader.GetVariableOverNodes(data, "Apd_60_minus_30_Map", 0/*timestep*/);
+
+		ReplicatableVector rep_vec;
+		rep_vec.ReplicatePetscVector(data);
+
+		if (PetscTools::AmMaster())
+		{
+			TS_ASSERT_DELTA(rep_vec[0],300.965 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[1],301.023 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[2],301.703 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[3],303.247 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[4],302.629 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[5],301.575 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[6],300.816 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[7],299.559 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[8],297.915 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[9],296.589 , 1e-3);
+			TS_ASSERT_DELTA(rep_vec[10],295.969, 1e-3);
+		}
+
+		PetscTools::Destroy(data);
+	}
+
 
 // Test fails as VTK post processing output not yet implemented - See #1660
 //    void xxxTestVtkOutput() throw (Exception)

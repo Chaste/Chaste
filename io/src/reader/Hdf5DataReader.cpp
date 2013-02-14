@@ -213,7 +213,7 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
 {
     if (!mIsUnlimitedDimensionSet)
     {
-        EXCEPTION("The file does not contain time dependent data");
+        EXCEPTION("The dataset '" << mDatasetName << "' does not contain time dependent data");
     }
 
     unsigned actual_node_index = nodeIndex;
@@ -230,18 +230,18 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
         }
         if ( node_index == mIncompleteNodeIndices.size())
         {
-            EXCEPTION("The incomplete file does not contain info of node " << nodeIndex);
+            EXCEPTION("The incomplete dataset '" << mDatasetName << "' does not contain info of node " << nodeIndex);
         }
     }
     if (actual_node_index >= mDatasetDims[1])
     {
-        EXCEPTION("The file doesn't contain info of node " << actual_node_index);
+        EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain info of node " << actual_node_index);
     }
 
     std::map<std::string, unsigned>::iterator col_iter = mVariableToColumnIndex.find(rVariableName);
     if (col_iter == mVariableToColumnIndex.end())
     {
-        EXCEPTION("The file doesn't contain data for variable " + rVariableName);
+        EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain data for variable " << rVariableName);
     }
     unsigned column_index = (*col_iter).second;
 
@@ -272,7 +272,7 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
 {
     if (!mIsUnlimitedDimensionSet)
     {
-        EXCEPTION("The file does not contain time dependent data");
+        EXCEPTION("The dataset '" << mDatasetName << "' does not contain time dependent data");
     }
 
     if (!mIsDataComplete)
@@ -282,13 +282,13 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
 
     if (upperIndex > mDatasetDims[1])
     {
-       EXCEPTION("The file doesn't contain info for node " << upperIndex-1);
+       EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain info for node " << upperIndex-1);
     }
 
     std::map<std::string, unsigned>::iterator col_iter = mVariableToColumnIndex.find(rVariableName);
     if (col_iter == mVariableToColumnIndex.end())
     {
-        EXCEPTION("The file doesn't contain data for variable " + rVariableName);
+        EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain data for variable " << rVariableName);
     }
     unsigned column_index = (*col_iter).second;
 
@@ -342,20 +342,20 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
     }
     if (!mIsUnlimitedDimensionSet && timestep!=0)
     {
-        EXCEPTION("The file does not contain time dependent data");
+        EXCEPTION("The dataset '" << mDatasetName << "' does not contain time dependent data");
     }
 
     std::map<std::string, unsigned>::iterator col_iter = mVariableToColumnIndex.find(rVariableName);
     if (col_iter == mVariableToColumnIndex.end())
     {
-        EXCEPTION("The file does not contain data for variable " + rVariableName);
+        EXCEPTION("The dataset '" << mDatasetName << "' does not contain data for variable " << rVariableName);
     }
     unsigned column_index = (*col_iter).second;
 
     // Check for valid timestep
     if (timestep >= mNumberTimesteps)
     {
-        EXCEPTION("The file does not contain data for timestep number " << timestep);
+        EXCEPTION("The dataset '" << mDatasetName << "' does not contain data for timestep number " << timestep);
     }
 
     int lo, hi, size;
