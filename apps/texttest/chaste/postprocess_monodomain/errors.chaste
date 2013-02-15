@@ -1,0 +1,16 @@
+HDF5-DIAG: Error detected in HDF5 library version: 1.6.6 MPI-process 0.  Back trace follows.
+  #000: H5D.c line 1169 in H5Dopen(): not found
+    major(15): Dataset interface
+    minor(48): Object not found
+  #001: H5G.c line 1783 in H5G_find(): object not found
+    major(10): Symbol table layer
+    minor(48): Object not found
+  #002: H5Gtraverse.c line 395 in H5G_namei(): component not found
+    major(10): Symbol table layer
+    minor(48): Object not found
+  #003: H5Gstab.c line 161 in H5G_stab_find(): not found
+    major(10): Symbol table layer
+    minor(48): Object not found
+  #004: H5Gnode.c line 954 in H5G_node_found(): not found
+    major(10): Symbol table layer
+    minor(48): Object not found
