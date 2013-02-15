@@ -37,11 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Concrete Simple Nonlinear PDE system solver.
  */
 
+#include <sstream>
+#include "petscsnes.h"
 #include "SimplePetscNonlinearSolver.hpp"
 #include "Exception.hpp"
-#include "petscsnes.h"
 #include "PetscTools.hpp"
-#include <sstream>
 
 Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
                                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat*,Mat*,MatStructure*,void*),
@@ -62,8 +62,8 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
     // Get the size of the Jacobian from the residual
     VecGetSize(initialGuess,&N);
 
-    ///\todo #2130 ? PetscTools::SetupMat(jacobian, N, N, fill, PETSC_DECIDE, PETSC_DECIDE, true, false /*malloc flag*/);
-    PetscTools::SetupMat(jacobian, N, N, fill);
+    // Note that the Jacobian matrix might involve new non-zero elements in the course of a SNES solve
+    PetscTools::SetupMat(jacobian, N, N, fill, PETSC_DECIDE, PETSC_DECIDE, true, false /*malloc flag*/);
 
     SNESCreate(PETSC_COMM_WORLD, &snes);
     SNESSetFunction(snes, residual, pComputeResidual, pContext);
