@@ -215,7 +215,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
 			}
 			else
 			{
-				distributed_vector[index] = 0.0;
+			    /// \todo #1660 make a test that has different numbers of APDs at different nodes.
+			    NEVER_REACHED;
+				//distributed_vector[index] = 0.0;
 			}
 		}
 		writer.PutVector(apd_id, apd_vec);
