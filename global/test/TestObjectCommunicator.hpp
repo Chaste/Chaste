@@ -117,7 +117,7 @@ class TestObjectCommunicator: public CxxTest::TestSuite
 
 public:
 
-    void TestSendingClass() throw(Exception)
+    void TestSendingClass() throw (Exception)
     {
         MPI_Status status;
         ObjectCommunicator communicator;
@@ -164,6 +164,46 @@ public:
             TS_ASSERT_EQUALS(j->GetVectorOfBools()[0],true);
             TS_ASSERT_EQUALS(j->GetVectorOfBools()[1],true);
 
+        }
+    }
+
+    void TestSendRecv() throw (Exception)
+    {
+        if (PetscTools::GetNumProcs() == 2)
+        {
+            MPI_Status status;
+            ObjectCommunicator communicator;
+
+            // Create a simple class to send
+
+            std::vector<double> doubles(3);
+            doubles[0] = 1.1;
+            doubles[1] = 1.2;
+            doubles[2] = 1.3;
+
+            std::vector<bool> bools(2);
+            bools[0] = true;
+            bools[1] = true;
+
+            ClassOfSimpleVariables i(42,"hello",doubles,bools);
+
+            ClassOfSimpleVariables* p_class;
+
+            // Arguments are object, destination, tag
+            p_class = communicator.SendRecvObject<ClassOfSimpleVariables>(&i, 1-PetscTools::GetMyRank(), 123, 1-PetscTools::GetMyRank(), 123, status);
+
+            // Check that the values are correct
+            TS_ASSERT_EQUALS(p_class->GetNumber(),42);
+            TS_ASSERT_EQUALS(p_class->GetString(),"hello");
+            TS_ASSERT_EQUALS(p_class->GetVectorOfDoubles().size(),3u);
+            TS_ASSERT_EQUALS(p_class->GetVectorOfBools().size(),2u);
+
+            TS_ASSERT_DELTA(p_class->GetVectorOfDoubles()[0],1.1,1e-12);
+            TS_ASSERT_DELTA(p_class->GetVectorOfDoubles()[1],1.2,1e-12);
+            TS_ASSERT_DELTA(p_class->GetVectorOfDoubles()[2],1.3,1e-12);
+
+            TS_ASSERT_EQUALS(p_class->GetVectorOfBools()[0],true);
+            TS_ASSERT_EQUALS(p_class->GetVectorOfBools()[1],true);
         }
     }
 

@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "NodeBasedCellPopulation.hpp"
 #include "VtkMeshWriter.hpp"
+#include "ObjectCommunicator.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -44,7 +45,9 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       bool validate)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mUseVariableRadii(false)
+      mUseVariableRadii(false),
+      mpCellsRecvRight(NULL),
+      mpCellsRecvLeft(NULL)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
     if (validate)
@@ -668,6 +671,49 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
 
     // Return pointer to new cell
     return p_created_cell;
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
+{
+    ObjectCommunicator communicator;
+    MPI_Status status;
+
+    if(!PetscTools::AmTopMost())
+    {
+        mpCellsRecvRight = communicator.SendRecvObject<std::set<std::pair<CellPtr, Node<DIM>*> > >(&mCellsToSendRight, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
+    }
+    if(!PetscTools::AmMaster())
+    {
+        mpCellsRecvLeft = communicator.SendRecvObject<std::set<std::pair<CellPtr, Node<DIM>*> > >(&mCellsToSendLeft, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
+    }
+}
+
+template<unsigned DIM>
+std::pair<CellPtr, Node<DIM>*> NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
+{
+    Node<DIM>* p_node = this->GetNode(nodeIndex);
+    CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
+
+    std::pair<CellPtr, Node<DIM>*> new_pair(p_cell, p_node);
+
+    return new_pair;
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendRight(unsigned nodeIndex)
+{
+    std::pair<CellPtr, Node<DIM>*> pair = GetCellNodePair(nodeIndex);
+
+    mCellsToSendRight.insert(pair);
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendLeft(unsigned nodeIndex)
+{
+    std::pair<CellPtr, Node<DIM>*> pair = GetCellNodePair(nodeIndex);
+
+    mCellsToSendLeft.insert(pair);
 }
 
 /////////////////////////////////////////////////////////////////////////////

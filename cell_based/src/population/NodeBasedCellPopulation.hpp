@@ -51,6 +51,7 @@ template<unsigned DIM>
 class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
 {
     friend class TestNodeBasedCellPopulation;
+    friend class TestNodeBasedCellPopulationParallelMethods;
     friend class TestBoxCollection;
 
 private:
@@ -77,6 +78,21 @@ private:
      * Whether or not to have cell radii updated from CellData defaults to false.
      */
     bool mUseVariableRadii;
+
+    /** The cells to send to the right process */
+    std::set<std::pair<CellPtr, Node<DIM>*> > mCellsToSendRight;
+
+    /** The cells to send to the left process */
+    std::set<std::pair<CellPtr, Node<DIM>*> > mCellsToSendLeft;
+
+    /** A pointer to the cells received from the right process */
+    std::set<std::pair<CellPtr, Node<DIM>*> >* mpCellsRecvRight;
+
+    /** A pointer to the cells received from the left process */
+    std::set<std::pair<CellPtr, Node<DIM>*> >* mpCellsRecvLeft;
+
+    /** The tag used to send and recieve cell information */
+    static const unsigned mCellCommunicationTag = 123;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -317,6 +333,41 @@ public:
      * @param pCell boost shared pointer to a cell
      */
     double GetVolumeOfCell(CellPtr pCell);
+
+    /////////////////////////////////////////////////////
+    // Parallel methods
+    /////////////////////////////////////////////////////
+
+    /**
+     * Send the contents of mCellsToSendRight/Left to
+     * neighbouring processes and receive from them into
+     * mpCellRecvRight/Left
+     */
+    void SendCellsToNeighbourProcesses();
+
+    /**
+     * Helper method to find and pack up nodes and cells together
+     *
+     * @return the pair.
+     */
+    std::pair<CellPtr, Node<DIM>*> GetCellNodePair(unsigned nodeIndex);
+
+    /**
+     * Add the node and cell with index nodeIndex to the list of cells to send
+     * to the process right.
+     *
+     * @param nodeIndex the index of the node and cell to send.
+     */
+    void AddNodeAndCellToSendRight(unsigned nodeIndex);
+
+    /**
+     * Add the node and cell with index nodeIndex to the list of cells to send
+     * to the process left.
+     *
+     * @param nodeIndex the index of the node and cell to send.
+     */
+    void AddNodeAndCellToSendLeft(unsigned nodeIndex);
+
 };
 
 #include "SerializationExportWrapper.hpp"

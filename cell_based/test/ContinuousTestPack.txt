@@ -44,6 +44,7 @@ population/TestMultipleCaUpdateRules.hpp
 population/TestNodeBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulationWithParticles.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
+population/TestNodeBasedCellPopulationParallelMethods.hpp
 population/TestPdeAndBoundaryConditions.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp
