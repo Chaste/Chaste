@@ -32,10 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-
 #include "NodeBasedCellPopulation.hpp"
 #include "VtkMeshWriter.hpp"
-#include "ObjectCommunicator.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -672,22 +670,22 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     // Return pointer to new cell
     return p_created_cell;
 }
-
-template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
-{
-    ObjectCommunicator communicator;
-    MPI_Status status;
-
-    if(!PetscTools::AmTopMost())
-    {
-        mpCellsRecvRight = communicator.SendRecvObject<std::set<std::pair<CellPtr, Node<DIM>*> > >(&mCellsToSendRight, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
-    }
-    if(!PetscTools::AmMaster())
-    {
-        mpCellsRecvLeft = communicator.SendRecvObject<std::set<std::pair<CellPtr, Node<DIM>*> > >(&mCellsToSendLeft, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
-    }
-}
+///\todo #1902 fix archive header includes for boost 1-34.
+//template<unsigned DIM>
+//void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
+//{
+//    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>*> > > communicator;
+//    MPI_Status status;
+//
+//    if(!PetscTools::AmTopMost())
+//    {
+//        mpCellsRecvRight = communicator.SendRecvObject(&mCellsToSendRight, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
+//    }
+//    if(!PetscTools::AmMaster())
+//    {
+//        mpCellsRecvLeft = communicator.SendRecvObject(&mCellsToSendLeft, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
+//    }
+//}
 
 template<unsigned DIM>
 std::pair<CellPtr, Node<DIM>*> NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)

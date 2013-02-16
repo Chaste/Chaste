@@ -36,12 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef NODEBASEDCELLPOPULATION_HPP_
 #define NODEBASEDCELLPOPULATION_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "BoxCollection.hpp"
-
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
 
 /**
  * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.
@@ -338,12 +338,13 @@ public:
     // Parallel methods
     /////////////////////////////////////////////////////
 
+    ///\todo #1902 fix archive header include for boost 1-34
     /**
      * Send the contents of mCellsToSendRight/Left to
      * neighbouring processes and receive from them into
      * mpCellRecvRight/Left
      */
-    void SendCellsToNeighbourProcesses();
+    //void SendCellsToNeighbourProcesses();
 
     /**
      * Helper method to find and pack up nodes and cells together

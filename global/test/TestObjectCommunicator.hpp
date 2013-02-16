@@ -52,65 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 #include "ObjectCommunicator.hpp"
-
-class ClassOfSimpleVariables
-{
-private:
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        // If Archive is an output archive, then & resolves to <<
-        // If Archive is an input archive, then & resolves to >>
-        archive & mNumber;
-        archive & mString;
-        archive & mVectorOfDoubles; // include <boost/serialization/vector.hpp> for this
-        archive & mVectorOfBools;
-    }
-
-    int mNumber;
-    std::string mString;
-    std::vector<double> mVectorOfDoubles;
-    std::vector<bool> mVectorOfBools;
-
-public:
-
-    ClassOfSimpleVariables()
-    {
-        // Do nothing. Used when loading into a pointer.
-    }
-    ClassOfSimpleVariables(int initial,
-                           std::string string,
-                           std::vector<double> doubles,
-                           std::vector<bool> bools)
-        : mString(string),
-          mVectorOfDoubles(doubles),
-          mVectorOfBools(bools)
-    {
-        mNumber = initial;
-    }
-
-    int GetNumber() const
-    {
-        return mNumber;
-    }
-
-    std::string GetString()
-    {
-        return mString;
-    }
-
-    std::vector<double>& GetVectorOfDoubles()
-    {
-        return mVectorOfDoubles;
-    }
-
-    std::vector<bool>& GetVectorOfBools()
-    {
-        return mVectorOfBools;
-    }
-};
+#include "ClassOfSimpleVariables.hpp"
 
 class TestObjectCommunicator: public CxxTest::TestSuite
 {
@@ -120,7 +62,7 @@ public:
     void TestSendingClass() throw (Exception)
     {
         MPI_Status status;
-        ObjectCommunicator communicator;
+        ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
         if (PetscTools::AmMaster())
         {
@@ -141,7 +83,7 @@ public:
             for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
             {
                 // Arguments are object, destination, tag
-                communicator.SendObject<ClassOfSimpleVariables>(&i, p, 123);
+                communicator.SendObject(&i, p, 123);
             }
 
         }
@@ -149,7 +91,7 @@ public:
         {
             ClassOfSimpleVariables* j;
 
-            j = communicator.RecvObject<ClassOfSimpleVariables>(0, 123, status);
+            j = communicator.RecvObject(0, 123, status);
 
             // Check that the values are correct
             TS_ASSERT_EQUALS(j->GetNumber(),42);
@@ -172,7 +114,7 @@ public:
         if (PetscTools::GetNumProcs() == 2)
         {
             MPI_Status status;
-            ObjectCommunicator communicator;
+            ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
             // Create a simple class to send
 
@@ -190,7 +132,7 @@ public:
             ClassOfSimpleVariables* p_class;
 
             // Arguments are object, destination, tag
-            p_class = communicator.SendRecvObject<ClassOfSimpleVariables>(&i, 1-PetscTools::GetMyRank(), 123, 1-PetscTools::GetMyRank(), 123, status);
+            p_class = communicator.SendRecvObject(&i, 1-PetscTools::GetMyRank(), 123, 1-PetscTools::GetMyRank(), 123, status);
 
             // Check that the values are correct
             TS_ASSERT_EQUALS(p_class->GetNumber(),42);
