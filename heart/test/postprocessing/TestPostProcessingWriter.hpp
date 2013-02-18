@@ -74,6 +74,7 @@ class TestPostProcessingWriter : public CxxTest::TestSuite
         OutputFileHandler handler(rTestOutputDirectory);
         FileFinder hdf5_file("heart/test/data/" + rHdf5BaseName + ".h5", RelativeTo::ChasteSourceRoot);
         handler.CopyFileTo(hdf5_file);
+        PetscTools::Barrier("CopyTestDataHdf5ToCleanTestOutputFolder");
     }
 
 public:

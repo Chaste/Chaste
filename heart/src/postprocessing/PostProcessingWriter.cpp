@@ -158,13 +158,13 @@ PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::~PostProcessingWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repolarisationPercentage, double threshold)
 {
-    std::vector<std::vector<double> > output_data = mpCalculator->CalculateAllActionPotentialDurationsForNodeRange(repolarisationPercentage, mLo, mHi, threshold);
+    std::vector<std::vector<double> > local_output_data = mpCalculator->CalculateAllActionPotentialDurationsForNodeRange(repolarisationPercentage, mLo, mHi, threshold);
 
     std::stringstream dataset_name;
     dataset_name << "Apd_" << repolarisationPercentage << "_" << threshold << "_Map";
     std::stringstream filename_stream;
     filename_stream << dataset_name.str() << ".dat";
-    WriteGenericFile(output_data, filename_stream.str());
+    WriteGenericFile(local_output_data, filename_stream.str());
 
     // Write to HDF5 file #1660
     // HDF5 shouldn't have minus signs in the data names..
@@ -193,11 +193,11 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
 
 	//Determine the maximum number of paces
 	unsigned max_paces = 0u;
-	for (unsigned node_index = 0; node_index < output_data.size(); ++node_index)
+    for (unsigned node_index = 0; node_index < local_output_data.size(); ++node_index)
 	{
-		max_paces = max_paces > output_data[node_index].size() ? max_paces : output_data[node_index].size();
+		max_paces = max_paces > local_output_data[node_index].size() ? max_paces : local_output_data[node_index].size();
 	}
-
+    ///\todo #1660 max_paces is local to the process.  We need to share it
 	for (unsigned pace_idx = 0; pace_idx < max_paces; pace_idx++)
 	{
 		Vec apd_vec = factory.CreateVec();
@@ -206,13 +206,13 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
 			 index!= distributed_vector.End();
 			 ++index)
 		{
-			unsigned node_idx = index.Global;
-
-			//pad with zeros if no pace defined at this node
-			if (output_data[node_idx].size() > pace_idx)
+            unsigned node_idx = index.Local;
+            
+            //pad with zeros if no pace defined at this node
+            if (local_output_data[node_idx].size() > pace_idx)
 			{
-				distributed_vector[index] = output_data[node_idx][pace_idx];
-			}
+                distributed_vector[index] = local_output_data[node_idx][pace_idx];
+            }
 			else
 			{
 			    /// \todo #1660 make a test that has different numbers of APDs at different nodes.
