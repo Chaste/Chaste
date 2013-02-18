@@ -104,6 +104,12 @@ double DiffusionForce<DIM>::GetViscosity()
 }
 
 template<unsigned DIM>
+double DiffusionForce<DIM>::GetDiffusionScalingConstant()
+{
+    return msBoltzmannConstant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
+}
+
+template<unsigned DIM>
 void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     double dt = SimulationTime::Instance()->GetTimeStep();
@@ -128,8 +134,7 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
          * eta = dynamic viscosity,
          * r = cell radius.
          */
-        double boltzmann_constant = 1.3806488e-23;
-        double diffusion_const_scaling = boltzmann_constant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
+        double diffusion_const_scaling = GetDiffusionScalingConstant();
         double diffusion_constant = diffusion_const_scaling/cell_radius;
 
         c_vector<double, DIM> force_contribution;

@@ -74,6 +74,11 @@ private :
     double mMechanicsCutOffLength;
 
     /**
+     * The boltzmann constant
+     */
+    static const double msBoltzmannConstant = 1.3806488e-23;
+
+    /**
      * Archiving.
      */
     friend class boost::serialization::access;
@@ -150,6 +155,13 @@ public :
       * @return mViscosity
       */
     double GetViscosity();
+
+    /**
+     * Calculate the scaling of the diffusion constant
+     *
+     * @return the scaled diffusion constant.
+     */
+    double GetDiffusionScalingConstant();
 
     /**
      * Get the cutoff length.
