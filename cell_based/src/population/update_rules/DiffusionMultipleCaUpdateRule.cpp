@@ -52,7 +52,8 @@ double DiffusionMultipleCaUpdateRule<DIM>::EvaluateProbability(unsigned currentN
                                                                unsigned targetNodeIndex,
                                                                MultipleCaBasedCellPopulation<DIM>& rCellPopulation,
                                                                double dt,
-                                                               double deltaX)
+                                                               double deltaX,
+                                                               CellPtr cell)
 {
    c_vector<double, DIM> node_index_location = rCellPopulation.GetNode(currentNodeIndex)->rGetLocation();
    c_vector<double, DIM> node_neighbour_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();

@@ -109,13 +109,16 @@ public:
      * @param rCellPopulation The cell population
      * @param dt is the time interval
      * @param deltaX defines the size of the lattice site
+     * @param cell a pointer to the cell (needed if more than one cell per lattice site
      * @return The probability of the cell moving from the current node to the target node
      */
     double EvaluateProbability(unsigned currentNodeIndex,
                                unsigned targetNodeIndex,
                                MultipleCaBasedCellPopulation<DIM>& rCellPopulation,
                                double dt,
-                               double deltaX);
+                               double deltaX,
+                               CellPtr cell
+                               );
 
     /**
       * @return mDiffusionParameter

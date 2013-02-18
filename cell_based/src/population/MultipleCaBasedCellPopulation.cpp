@@ -322,7 +322,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                          iterRule != mUpdateRuleCollection.end();
                          ++iterRule)
                     {
-                        probability_of_moving += (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1);
+                        probability_of_moving += (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
                         if (probability_of_moving < 0)
                         {
                             EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
