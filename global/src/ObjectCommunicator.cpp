@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassOfSimpleVariables.hpp"
 #include <sstream>
 #include <string>
-#include <stdio.h>
+#include <cstring>
 #include <set>
 #include <assert.h>
 
