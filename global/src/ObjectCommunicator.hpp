@@ -80,9 +80,12 @@ public:
      /**
      * Send and receive an object
      *
+     * @param pSendObject a pointer to the object to send
+     * @param destinationProcess the rank of the target process
+     * @param sendTag the tag to send with.
      * @param sourceProcess the process from which the data will be received
-     * @param tag the unique identifier code
-     * @param status pointer to the MPI status
+     * @param sourceTag the tag to receive with
+     * @param status a refernce to an MPI_Status object.
      *
      * @return A pointer to the object returned.
      */

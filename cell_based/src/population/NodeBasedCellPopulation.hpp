@@ -349,6 +349,7 @@ public:
     /**
      * Helper method to find and pack up nodes and cells together
      *
+     * @param nodeIndex the global index of the node.
      * @return the pair.
      */
     std::pair<CellPtr, Node<DIM>*> GetCellNodePair(unsigned nodeIndex);
