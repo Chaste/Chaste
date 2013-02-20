@@ -177,9 +177,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
     }
     hdf5_dataset_name << "Apd_" << repolarisationPercentage << extra_message << "_" << threshold << "_Map";
 
-    DistributedVectorFactory factory(mrMesh.GetNumNodes());
+    DistributedVectorFactory* p_factory = mrMesh.GetDistributedVectorFactory();
     FileFinder test_output("", RelativeTo::ChasteTestOutput);
-	Hdf5DataWriter writer(factory,
+	Hdf5DataWriter writer(*p_factory,
 			              mDirectory.GetRelativePath(test_output),  // Path relative to CHASTE_TEST_OUTPUT
 			              mHdf5File,
 			              false, // to wiping
@@ -192,24 +192,29 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
 	writer.EndDefineMode();
 
 	//Determine the maximum number of paces
-	unsigned max_paces = 0u;
+	unsigned local_max_paces = 0u;
     for (unsigned node_index = 0; node_index < local_output_data.size(); ++node_index)
 	{
-		max_paces = max_paces > local_output_data[node_index].size() ? max_paces : local_output_data[node_index].size();
+		if (local_output_data[node_index].size() > local_max_paces)
+        {
+             local_max_paces = local_output_data[node_index].size();
+        }
 	}
-    ///\todo #1660 max_paces is local to the process.  We need to share it
+
+    unsigned max_paces = 0u;
+    MPI_Allreduce(&local_max_paces, &max_paces, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+    //assert(local_max_paces == max_paces); 
 	for (unsigned pace_idx = 0; pace_idx < max_paces; pace_idx++)
 	{
-		Vec apd_vec = factory.CreateVec();
-		DistributedVector distributed_vector = factory.CreateDistributedVector(apd_vec);
+		Vec apd_vec = p_factory->CreateVec();
+		DistributedVector distributed_vector = p_factory->CreateDistributedVector(apd_vec);
 		for (DistributedVector::Iterator index = distributed_vector.Begin();
 			 index!= distributed_vector.End();
 			 ++index)
 		{
             unsigned node_idx = index.Local;
-            
             //pad with zeros if no pace defined at this node
-            if (local_output_data[node_idx].size() > pace_idx)
+            if (pace_idx < local_output_data[node_idx].size() )
 			{
                 distributed_vector[index] = local_output_data[node_idx][pace_idx];
             }
