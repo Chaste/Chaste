@@ -1017,8 +1017,12 @@ public:
         {
             chmod(handler.GetOutputDirectoryFullPath().c_str(), 0555);
         }
-        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
-                              "Hdf5DataWriter could not create " + handler.GetOutputDirectoryFullPath() + "results.h5 , H5Fcreate error code = -1");
+        H5E_BEGIN_TRY //Supress HDF5 error in this test
+        {
+            TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
+                                  "Hdf5DataWriter could not create " + handler.GetOutputDirectoryFullPath() + "results.h5 , H5Fcreate error code = -1");
+        }
+        H5E_END_TRY;
         if (PetscTools::AmMaster())
         {
             chmod(handler.GetOutputDirectoryFullPath().c_str(), 0755);

@@ -165,7 +165,11 @@ void Hdf5DataReader::CommonConstructor()
     free(string_array);
 
     // Find out if it's incomplete data
-    attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
+    H5E_BEGIN_TRY //Supress HDF5 error if the IsDataComplete name isn't there
+    {
+        attribute_id = H5Aopen_name(mVariablesDatasetId, "IsDataComplete");
+    }
+    H5E_END_TRY;
     if (attribute_id < 0)
     {
         // This is in the old format (before we added the IsDataComplete attribute).

@@ -456,9 +456,12 @@ public:
         FileFinder absent_dir("absent_dir", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader(absent_dir, "base"), "Directory does not exist: ");
 
-        std::cout << "Testing an HDF5 exception is handled properly:" << std::endl << std::flush;
-        TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader("hdf5_reader", "hdf5_test_overtime_exceptions", true, "Postprocessing"),
-                "but could not find the dataset 'Postprocessing',");
+        H5E_BEGIN_TRY //Supress HDF5 error in this test
+        {
+            TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader("hdf5_reader", "hdf5_test_overtime_exceptions", true, "Postprocessing"),
+                    "but could not find the dataset 'Postprocessing',");
+        }
+        H5E_END_TRY;
     }
 
     void TestMultiStepExceptions() throw (Exception)
@@ -490,8 +493,12 @@ public:
             OutputFileHandler file_handler("hdf5_reader",false);
             out_stream p_wrong_format = file_handler.OpenOutputFile("hdf5_wrong_format.h5");
             p_wrong_format->close();
-            TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader reader2("hdf5_reader", "hdf5_wrong_format"),
-                                      "H5Fopen error code");
+            H5E_BEGIN_TRY //Supress HDF5 error in this test
+            {
+                TS_ASSERT_THROWS_CONTAINS(Hdf5DataReader reader2("hdf5_reader", "hdf5_wrong_format"),
+                                          "H5Fopen error code");
+            }
+            H5E_END_TRY;
         }
 
         Hdf5DataReader reader("hdf5_reader", "hdf5_test_overtime_exceptions");

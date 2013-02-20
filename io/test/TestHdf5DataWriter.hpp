@@ -1116,7 +1116,11 @@ public:
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "empty", false);
         writer.DefineVariable("Node","dimensionless");
         writer.DefineFixedDimension(number_nodes);
-        TS_ASSERT_THROWS_CONTAINS(writer.EndDefineMode(), "Hdf5DataWriter could not create");
+        H5E_BEGIN_TRY //Supress HDF5 error in this test
+        {
+            TS_ASSERT_THROWS_CONTAINS(writer.EndDefineMode(), "Hdf5DataWriter could not create");
+        }
+        H5E_END_TRY;
         writer.Close();
 
         // Re-instate permission to overwrite file
@@ -1311,9 +1315,12 @@ public:
             out_stream p_wrong_format = file_handler.OpenOutputFile("hdf5_wrong_format.h5");
             *p_wrong_format << "gobbledegook" << std::endl;
             p_wrong_format->close();
-            TS_ASSERT_THROWS_CONTAINS(Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_wrong_format", false, true),
-                                      "H5Fopen error code");
-
+            H5E_BEGIN_TRY //Supress HDF5 error in this test
+            {
+                TS_ASSERT_THROWS_CONTAINS(Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_wrong_format", false, true),
+                                          "H5Fopen error code");
+            }
+            H5E_END_TRY;
             TS_ASSERT_THROWS_CONTAINS(Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "absent_file", false, true),
                                       "as it does not exist");
 
