@@ -43,14 +43,20 @@ bool AbstractHdf5Access::DoesDatasetExist(const std::string& rDatasetName)
     htri_t dataset_status = H5Lexists(mFileId, rDatasetName.c_str(), H5P_DEFAULT);
     return (dataset_status>0);
 #else
-    // This is not a nice way of doing it because it produces a load of 'HDF failed' output, but it works.
     bool result=false;
-    hid_t dataset_id = H5Dopen(mFileId, rDatasetName.c_str());
-    if (dataset_id>0)
+    // This is not a nice way of doing it because the error stack produces a load of 'HDF failed' output.
+    // The "TRY" macros are a convenient way to temporarily turn the error stack off.
+    H5E_BEGIN_TRY
     {
-        H5Dclose(dataset_id);
-        result = true;
+        hid_t dataset_id = H5Dopen(mFileId, rDatasetName.c_str());
+        if (dataset_id>0)
+        {
+            H5Dclose(dataset_id);
+            result = true;
+        }
     }
+    H5E_END_TRY;
+
     return result;
 #endif
 }
