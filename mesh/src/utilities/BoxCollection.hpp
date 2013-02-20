@@ -70,7 +70,7 @@ private:
     bool mIsPeriodicInX;
 
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
-    static const double mFudge;
+    const double mFudge;
 
 public:
 
