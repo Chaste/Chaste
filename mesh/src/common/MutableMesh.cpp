@@ -758,7 +758,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
     else // in 3D, remesh using tetgen
     {
 
-        struct tetgen::tetgenio mesher_input, mesher_output;
+        class tetgen::tetgenio mesher_input, mesher_output;
 
         this->ExportToMesher(map, mesher_input);
 

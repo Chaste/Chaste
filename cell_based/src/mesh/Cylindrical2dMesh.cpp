@@ -64,7 +64,7 @@ Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
     {
         Node<2>* p_temp_node = nodes[index];
         double x = p_temp_node->rGetLocation()[0];
-        x = x; // Fix optimised build
+        UNUSED_OPT(x); // Fix optimised build
         assert( 0 <= x && x < width);
         mNodes.push_back(p_temp_node);
     }

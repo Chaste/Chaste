@@ -293,7 +293,7 @@ public:
      *
      * @param rNodes  set of nodes to check for
      */
-    void FlagElementsNotContainingNodes(const std::set<unsigned> rNodes);
+    void FlagElementsNotContainingNodes(std::set<unsigned> rNodes);
 
     /** Update mElementJacobians, mElementWeightedDirections and mBoundaryElementWeightedDirections. */
     virtual void RefreshJacobianCachedData();
