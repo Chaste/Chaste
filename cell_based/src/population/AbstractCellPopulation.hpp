@@ -422,7 +422,8 @@ public:
     /**
      * Get the cell corresponding to a given location index.
      *
-     * his method assumes that there is at most one cell attached to a location index and an assertion fails if not.
+     * This method assumes that there is at most one cell attached to a location index and an assertion fails if not.
+     * \todo should be an exception?
      *
      * @param index the location index
      *
