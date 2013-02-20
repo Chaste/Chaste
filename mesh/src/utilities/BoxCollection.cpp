@@ -45,7 +45,8 @@ template<unsigned DIM>
 BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX)
     : mDomainSize(domainSize),
       mBoxWidth(boxWidth),
-      mIsPeriodicInX(isPeriodicInX)
+      mIsPeriodicInX(isPeriodicInX),
+      mFudge(5e-14)
 {
     // Periodicity only works in 2d
     if (isPeriodicInX)

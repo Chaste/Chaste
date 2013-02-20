@@ -66,11 +66,11 @@ private:
     /** The boxes local (itself and nearest neighbour) to a given box. */
     std::vector< std::set<unsigned> > mLocalBoxes;
 
-    /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
-    static const double mFudge = 5e-14;
-
     /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
     bool mIsPeriodicInX;
+
+    /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
+    static const double mFudge;
 
 public:
 
