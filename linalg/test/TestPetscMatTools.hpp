@@ -146,6 +146,34 @@ public:
 
         PetscTools::Destroy(matrix);
     }
+
+
+    void TestTurnOffVariableAllocationError() throw (Exception)
+	{
+    	Mat matrix;
+		const unsigned size = 5u;
+		PetscTools::SetupMat(matrix, size, size, 1);
+
+		//Shows that TurnOffVariableAllocationError doesn't *have* to be called straight after SetupMat,
+		//but must be called before an allocation problem occurs.
+		PetscMatTools::SetElement(matrix, 0, 0, 4.0);
+		PetscMatTools::Finalise(matrix);
+
+	    PetscMatTools::TurnOffVariableAllocationError(matrix);
+
+		for (unsigned row=0; row<size; row++)
+		{
+			for (unsigned col=0; col<size; col++)
+			{
+				PetscMatTools::SetElement(matrix, row, col, 2.78);
+			}
+		}
+
+		PetscMatTools::Finalise(matrix);
+
+		TS_ASSERT_DELTA(PetscMatTools::GetElement(matrix, 3, 3), 2.78, 1e-6);
+        PetscTools::Destroy(matrix);
+	}
 };
 
 #endif /*TESTPETSCMATTOOLS_HPP_*/

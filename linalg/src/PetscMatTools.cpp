@@ -401,3 +401,11 @@ bool PetscMatTools::CheckSymmetry(const Mat matrix, double tol)
     PetscTools::Destroy(trans);
     return is_symmetric;
 }
+
+void PetscMatTools::TurnOffVariableAllocationError(Mat matrix)
+{
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+  	MatSetOption(matrix, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+#endif
+}
+

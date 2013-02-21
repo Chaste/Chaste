@@ -209,6 +209,20 @@ public:
     static bool CheckSymmetry(const Mat matrix, double tol=1e-10);
 
     /**
+     * Tells PETSc to set MAT_NEW_NONZERO_ALLOCATION_ERR to false.
+     *
+     * This should be called immediately after PetscTools::SetupMat and before any
+     * other operations on the matrix.
+     *
+     *  ** Currently only used in PETSc 3.3 and later **
+     * 		in PETSc 3.2 and earlier MAT_NEW_NONZERO_ALLOCATION_ERR defaults to false
+     * 		in PETSc 3.3 MAT_NEW_NONZERO_ALLOCATION_ERR defaults to true
+     *
+     * @param matrix The matrix to set
+     */
+    static void TurnOffVariableAllocationError(Mat matrix);
+
+    /**
      * Add multiple values to a matrix.
      *
      * @param matrix  the matrix
