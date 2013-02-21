@@ -132,7 +132,7 @@ CLASS* ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProcess, unsigned ta
     MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &status);
 
     char* recv_string = new char[string_length];
-    MPI_Recv(&recv_string, string_length, MPI_CHAR, sourceProcess , tag, PETSC_COMM_WORLD, &status);
+    MPI_Recv(recv_string, string_length, MPI_CHAR, sourceProcess , tag, PETSC_COMM_WORLD, &status);
 
     // Extract a proper object from the buffer
     std::stringstream ss;
@@ -167,7 +167,7 @@ CLASS* ObjectCommunicator<CLASS>::SendRecvObject(CLASS* const pSendObject, unsig
 
     // Send archive data
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Sendrecv(send_buf, send_string_length, MPI_CHAR, destinationProcess, sendTag, &recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
+    MPI_Sendrecv(send_buf, send_string_length, MPI_CHAR, destinationProcess, sendTag, recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
 
     // Extract received object
     std::istringstream iss;
