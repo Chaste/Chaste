@@ -338,13 +338,12 @@ public:
     // Parallel methods
     /////////////////////////////////////////////////////
 
-    ///\todo #1902 fix archive header include for boost 1-34
     /**
-     * Send the contents of mCellsToSendRight/Left to
+     * Send the contents of #mCellsToSendRight/Left to
      * neighbouring processes and receive from them into
-     * mpCellRecvRight/Left
+     * #mpCellsRecvRight/Left.
      */
-    //void SendCellsToNeighbourProcesses();
+    void SendCellsToNeighbourProcesses();
 
     /**
      * Helper method to find and pack up nodes and cells together

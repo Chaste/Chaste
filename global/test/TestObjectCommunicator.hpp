@@ -38,21 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
-#include <string>
+// Needs to be first as includes archive headers
+#include "ObjectCommunicator.hpp"
 
-
-#include "OutputFileHandler.hpp"
-#include "SmartPointers.hpp"
-#include "CommandLineArguments.hpp"
+#include <vector>
 
 #include "PetscTools.hpp"
-#include "PetscSetupAndFinalize.hpp"
-
-#include "ObjectCommunicator.hpp"
 #include "ClassOfSimpleVariables.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestObjectCommunicator: public CxxTest::TestSuite
 {

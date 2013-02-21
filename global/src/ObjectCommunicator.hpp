@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _OBJECTCOMMUNICATOR_HPP_
 #define _OBJECTCOMMUNICATOR_HPP_
 
-#include <string>
-#include <assert.h>
-#include <sstream>
-#include "PetscTools.hpp"
+// Serialisation headers - must come first
+#include "CheckpointArchiveTypes.hpp"
+
+#include "PetscTools.hpp" // For MPI methods
 
 /**
  * This is a helper method to enable classes that can be serialized to be sent using
@@ -91,5 +91,94 @@ public:
      */
     CLASS* SendRecvObject(CLASS* const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status);   
 };
+
+
+#include <sstream>
+#include <string>
+#include <cstring>
+
+// Implementation needs to be here, as CLASS could be anything
+
+template<typename CLASS>
+ObjectCommunicator<CLASS>::ObjectCommunicator()
+{
+}
+
+template<typename CLASS>
+void ObjectCommunicator<CLASS>::SendObject(CLASS* const pObject, unsigned destinationProcess, unsigned tag)
+{
+    // Create an output archive
+    std::stringstream ss;
+    boost::archive::text_oarchive output_arch(ss);
+
+    output_arch << pObject;
+
+    const std::string send_msg = ss.str();
+
+    // Get + send string length
+    unsigned string_length = send_msg.size();
+    MPI_Send(&string_length, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD);
+
+    // Send archive data
+    // The buffer is treated as const, but not specified as such by MPI_Send's signature
+    char* send_buf = const_cast<char*>(send_msg.data());
+    MPI_Send(send_buf, string_length, MPI_CHAR, destinationProcess, tag, PETSC_COMM_WORLD);
+}
+
+template<typename CLASS>
+CLASS* ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status)
+{
+    unsigned string_length = 0;
+    MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &status);
+
+    char* recv_string = new char[string_length];
+    MPI_Recv(&recv_string, string_length, MPI_CHAR, sourceProcess , tag, PETSC_COMM_WORLD, &status);
+
+    // Extract a proper object from the buffer
+    std::stringstream ss;
+    ss.rdbuf()->pubsetbuf(recv_string, string_length);
+
+    CLASS* p_recv_object;
+    boost::archive::text_iarchive input_arch(ss);
+
+    input_arch >> p_recv_object;
+
+    return p_recv_object;
+}
+
+template<typename CLASS>
+CLASS* ObjectCommunicator<CLASS>::SendRecvObject(CLASS* const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status)
+{
+    // Create an output archive
+    std::stringstream oss;
+    boost::archive::text_oarchive output_arch(oss);
+
+    output_arch << pSendObject;
+
+    std::string send_msg = oss.str();
+
+    // Get + send string length
+    unsigned send_string_length = send_msg.size();
+    unsigned recv_string_length;
+
+    MPI_Sendrecv(&send_string_length, 1, MPI_UNSIGNED, destinationProcess, sendTag, &recv_string_length, 1, MPI_UNSIGNED, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
+
+    char recv_string[recv_string_length];
+
+    // Send archive data
+    char* send_buf = const_cast<char*>(send_msg.data());
+    MPI_Sendrecv(send_buf, send_string_length, MPI_CHAR, destinationProcess, sendTag, &recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
+
+    // Extract received object
+    std::istringstream iss;
+    iss.rdbuf()->pubsetbuf(recv_string, recv_string_length);
+
+    CLASS* p_recv_object;
+    boost::archive::text_iarchive input_arch(iss);
+
+    input_arch >> p_recv_object;
+
+    return p_recv_object;
+}
 
 #endif // _OBJECTCOMMUNICATOR_HPP_

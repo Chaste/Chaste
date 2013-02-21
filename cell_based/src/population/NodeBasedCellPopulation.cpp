@@ -32,6 +32,13 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+// ObjectCommunicator needs to come first since it includes archive headers, but this won't work on early Boosts
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 103700
+#include "ObjectCommunicator.hpp"
+#endif
+
 #include "NodeBasedCellPopulation.hpp"
 #include "VtkMeshWriter.hpp"
 
@@ -670,22 +677,26 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
     // Return pointer to new cell
     return p_created_cell;
 }
-///\todo #1902 fix archive header includes for boost 1-34.
-//template<unsigned DIM>
-//void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
-//{
-//    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>*> > > communicator;
-//    MPI_Status status;
-//
-//    if(!PetscTools::AmTopMost())
-//    {
-//        mpCellsRecvRight = communicator.SendRecvObject(&mCellsToSendRight, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
-//    }
-//    if(!PetscTools::AmMaster())
-//    {
-//        mpCellsRecvLeft = communicator.SendRecvObject(&mCellsToSendLeft, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
-//    }
-//}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
+{
+#if BOOST_VERSION < 103700
+    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
+#else // BOOST_VERSION >= 103700
+    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>*> > > communicator;
+    MPI_Status status;
+
+    if(!PetscTools::AmTopMost())
+    {
+        mpCellsRecvRight = communicator.SendRecvObject(&mCellsToSendRight, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
+    }
+    if(!PetscTools::AmMaster())
+    {
+        mpCellsRecvLeft = communicator.SendRecvObject(&mCellsToSendLeft, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
+    }
+#endif
+}
 
 template<unsigned DIM>
 std::pair<CellPtr, Node<DIM>*> NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
