@@ -160,7 +160,18 @@ Vec DistributedVectorFactory::CreateVec()
 Vec DistributedVectorFactory::CreateVec(unsigned stride)
 {
     Vec vec;
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+    //In PETSc 3.3 we cannot alter the stride (block size) after it has been created
+    //There is no VecCreateMPI with block size
+    VecCreate(PETSC_COMM_WORLD, &vec);
+    VecSetBlockSize(vec, stride);
+    VecSetSizes(vec, stride*(mHi-mLo), stride*mProblemSize);
+    VecSetType(vec,VECMPI);
+    //VecCreateMPIWithArray(PETSC_COMM_WORLD, stride, stride*(mHi-mLo), stride*mProblemSize, PETSC_NULL/*No array*/, &vec);
+#else
     VecCreateMPI(PETSC_COMM_WORLD, stride*(mHi-mLo), stride*mProblemSize, &vec);
+    VecSetBlockSize(vec, stride);
+#endif
     return vec;
 }
 

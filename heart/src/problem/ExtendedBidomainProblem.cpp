@@ -324,7 +324,10 @@ void ExtendedBidomainProblem<DIM>::WriteInfo(double time)
 
     double phi_i_max_first_cell, phi_i_min_first_cell, phi_i_max_second_cell, phi_i_min_second_cell, phi_e_min, phi_e_max;
 
-    VecSetBlockSize( this->mSolution, 3 );
+    ///\todo #2130 - defensive code can probably be removed
+    PetscInt block;
+    VecGetBlockSize( this->mSolution, &block );
+    assert(block == 3);
 
     VecStrideMax( this->mSolution, 0, PETSC_NULL, &phi_i_max_first_cell );
     VecStrideMin( this->mSolution, 0, PETSC_NULL, &phi_i_min_first_cell );

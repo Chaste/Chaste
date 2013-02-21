@@ -313,7 +313,14 @@ public:
     void TestReadWithNonDefaultParallelLayout() throw (Exception)
     {
         DistributedVectorFactory factory(5);
-        Vec parallel_layout = factory.CreateVec(2);
+
+
+        //This is like factory.CreateVec(2) but doesn't change the block size
+        Vec parallel_layout;
+        unsigned small_locals =  factory.GetHigh() - factory.GetLow();
+        VecCreateMPI(PETSC_COMM_WORLD, 2*small_locals, 10, &parallel_layout);
+
+
 
         PetscInt lo, hi;
         VecGetOwnershipRange(parallel_layout, &lo, &hi);
