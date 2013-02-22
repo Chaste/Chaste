@@ -164,7 +164,7 @@ public:
              it!=particle_indices.end();
              it++)
         {
-        	TS_ASSERT_EQUALS(cell_population.GetNode(*it)->IsParticle(), true)
+            TS_ASSERT_EQUALS(cell_population.GetNode(*it)->IsParticle(), true)
         }
 
         // Test the GetParticleIndices method

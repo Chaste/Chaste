@@ -339,7 +339,7 @@ public:
     // This test checks that the APD map is put into the HDF5 file.
     // NB The dataset and variable name are Apd_60_minus_30_Map here...
     void TestHdfOutput() throw(Exception)
-	{
+    {
         HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_AddingToHdf5", RelativeTo::ChasteTestOutput);
 
@@ -351,8 +351,8 @@ public:
 
         // See comment below for the reason for the block.
         {
-			PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
-			writer.WriteApdMapFile(60.0, -30.0);
+            PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
+            writer.WriteApdMapFile(60.0, -30.0);
         }
         // This needs to be after the PostProcessingWriter has disappeared. This could perhaps
         // be because PostProcessingWriter::mpDataReader exists and needs to let go of the file
@@ -364,33 +364,33 @@ public:
         // Check that the dataset contains just the new APD map we requested
         std::vector<std::string> variable_names = reader.GetVariableNames();
         TS_ASSERT_EQUALS(variable_names.size(), 1u);
-		TS_ASSERT_EQUALS(variable_names[0], "Apd_60_minus_30_Map"); // variable name
+        TS_ASSERT_EQUALS(variable_names[0], "Apd_60_minus_30_Map"); // variable name
 
-		// Get an error if you ask for a timestep (pace number) that isn't there...
-		DistributedVectorFactory factory(reader.GetNumberOfRows());
-		Vec data = factory.CreateVec();
-		reader.GetVariableOverNodes(data, "Apd_60_minus_30_Map", 0/*timestep*/);
+        // Get an error if you ask for a timestep (pace number) that isn't there...
+        DistributedVectorFactory factory(reader.GetNumberOfRows());
+        Vec data = factory.CreateVec();
+        reader.GetVariableOverNodes(data, "Apd_60_minus_30_Map", 0/*timestep*/);
 
-		ReplicatableVector rep_vec;
-		rep_vec.ReplicatePetscVector(data);
+        ReplicatableVector rep_vec;
+        rep_vec.ReplicatePetscVector(data);
 
-		if (PetscTools::AmMaster())
-		{
-			TS_ASSERT_DELTA(rep_vec[0],300.965 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[1],301.023 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[2],301.703 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[3],303.247 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[4],302.629 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[5],301.575 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[6],300.816 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[7],299.559 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[8],297.915 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[9],296.589 , 1e-3);
-			TS_ASSERT_DELTA(rep_vec[10],295.969, 1e-3);
-		}
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT_DELTA(rep_vec[0],  300.965, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[1],  301.023, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[2],  301.703, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[3],  303.247, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[4],  302.629, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[5],  301.575, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[6],  300.816, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[7],  299.559, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[8],  297.915, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[9],  296.589, 1e-3);
+            TS_ASSERT_DELTA(rep_vec[10], 295.969, 1e-3);
+        }
 
-		PetscTools::Destroy(data);
-	}
+        PetscTools::Destroy(data);
+    }
 
 
 // Test fails as VTK post processing output not yet implemented - See #1660

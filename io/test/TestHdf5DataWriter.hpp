@@ -1196,102 +1196,102 @@ public:
          * test doesn't have to depend on a previous test.
          */
         {
-        	Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false);
+            Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false);
 
-			writer.DefineFixedDimension(number_nodes);
+            writer.DefineFixedDimension(number_nodes);
 
-			int node_id = writer.DefineVariable("Node", "dimensionless");
-			int ik_id = writer.DefineVariable("I_K", "milliamperes");
-			writer.DefineUnlimitedDimension("Time", "msec", 10);
+            int node_id = writer.DefineVariable("Node", "dimensionless");
+            int ik_id = writer.DefineVariable("I_K", "milliamperes");
+            writer.DefineUnlimitedDimension("Time", "msec", 10);
 
-			writer.EndDefineMode();
+            writer.EndDefineMode();
 
-			Vec petsc_data_1 = factory.CreateVec();
-			DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+            Vec petsc_data_1 = factory.CreateVec();
+            DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-			Vec petsc_data_2 = factory.CreateVec();
-			DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
+            Vec petsc_data_2 = factory.CreateVec();
+            DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
 
 
-			for (unsigned time_step=0; time_step<10; time_step++)
-			{
-				// Write some values
-				for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-					 index!= distributed_vector_1.End();
-					 ++index)
-				{
-					distributed_vector_1[index] = index.Global;
-					distributed_vector_2[index] = time_step*1000 + 100 + index.Global;
-				}
-				distributed_vector_1.Restore();
-				distributed_vector_2.Restore();
+            for (unsigned time_step=0; time_step<10; time_step++)
+            {
+                // Write some values
+                for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                     index!= distributed_vector_1.End();
+                     ++index)
+                {
+                    distributed_vector_1[index] = index.Global;
+                    distributed_vector_2[index] = time_step*1000 + 100 + index.Global;
+                }
+                distributed_vector_1.Restore();
+                distributed_vector_2.Restore();
 
-				// Write the vector
-				writer.PutVector(node_id, petsc_data_1);
-				writer.PutVector(ik_id, petsc_data_2);
-				writer.PutUnlimitedVariable(time_step);
-				writer.AdvanceAlongUnlimitedDimension();
-			}
+                // Write the vector
+                writer.PutVector(node_id, petsc_data_1);
+                writer.PutVector(ik_id, petsc_data_2);
+                writer.PutUnlimitedVariable(time_step);
+                writer.AdvanceAlongUnlimitedDimension();
+            }
 
-			writer.Close();
-			PetscTools::Destroy(petsc_data_1);
-			PetscTools::Destroy(petsc_data_2);
+            writer.Close();
+            PetscTools::Destroy(petsc_data_1);
+            PetscTools::Destroy(petsc_data_2);
         }
 
         /* Re-open the file and add the new data */
 
-		TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false,
-				              false /*(do not extend)*/, "Extra stuff"),
-				              "Adding new data only makes sense when extending an existing file");
-		Hdf5DataWriter annotating_writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false, true, "Extra stuff");
+        TS_ASSERT_THROWS_THIS(Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false,
+                              false /*(do not extend)*/, "Extra stuff"),
+                              "Adding new data only makes sense when extending an existing file");
+        Hdf5DataWriter annotating_writer(factory, "TestHdf5DataWriter", "hdf5_test_adding_variables", false, true, "Extra stuff");
 
 
-		int phase_id =	annotating_writer.DefineVariable("Phase","radians");
-		int plasma_id =	annotating_writer.DefineVariable("Plasma","gloops");
+        int phase_id = annotating_writer.DefineVariable("Phase","radians");
+        int plasma_id = annotating_writer.DefineVariable("Plasma","gloops");
         int node_id_again = annotating_writer.DefineVariable("Node", "dimensionless");
-		annotating_writer.DefineFixedDimension(number_nodes);
-		annotating_writer.DefineUnlimitedDimension("Time", "years", 2);
-		annotating_writer.EndDefineMode();
-		{
-			Vec petsc_data_1 = factory.CreateVec();
-			DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
+        annotating_writer.DefineFixedDimension(number_nodes);
+        annotating_writer.DefineUnlimitedDimension("Time", "years", 2);
+        annotating_writer.EndDefineMode();
+        {
+            Vec petsc_data_1 = factory.CreateVec();
+            DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
             Vec petsc_data_2 = factory.CreateVec();
             DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
-            
+
             Vec petsc_data_3 = factory.CreateVec();
             DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_2);
-			
+
             for (unsigned time_step=0; time_step<2; time_step++)
-			{
-				// Write some values
-				for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-					 index!= distributed_vector_1.End();
-					 ++index)
-				{
-					distributed_vector_3[index] = index.Global;
-					distributed_vector_1[index] = index.Global;
+            {
+                // Write some values
+                for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                     index!= distributed_vector_1.End();
+                     ++index)
+                {
+                    distributed_vector_3[index] = index.Global;
+                    distributed_vector_1[index] = index.Global;
                     distributed_vector_2[index] = time_step*1000 + 100 + index.Global;
-				}
-				distributed_vector_1.Restore();
-				distributed_vector_2.Restore();
+                }
+                distributed_vector_1.Restore();
+                distributed_vector_2.Restore();
                 distributed_vector_3.Restore();
 
-				// Write the vector
-				annotating_writer.PutVector(phase_id, petsc_data_1);
+                // Write the vector
+                annotating_writer.PutVector(phase_id, petsc_data_1);
                 annotating_writer.PutVector(plasma_id, petsc_data_2);
                 annotating_writer.PutVector(node_id_again, petsc_data_3);
-				annotating_writer.PutUnlimitedVariable(time_step);
-				annotating_writer.AdvanceAlongUnlimitedDimension();
-			}
+                annotating_writer.PutUnlimitedVariable(time_step);
+                annotating_writer.AdvanceAlongUnlimitedDimension();
+            }
 
-    		annotating_writer.Close();
+            annotating_writer.Close();
             PetscTools::Destroy(petsc_data_1);
             PetscTools::Destroy(petsc_data_2);
             PetscTools::Destroy(petsc_data_3);
         }
-	    TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
-	                                             "io/test/data", "hdf5_test_adding_variables", false));
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
+                                                 "io/test/data", "hdf5_test_adding_variables", false));
   }
 
     /**

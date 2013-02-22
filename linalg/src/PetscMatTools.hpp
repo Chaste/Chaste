@@ -215,8 +215,8 @@ public:
      * other operations on the matrix.
      *
      *  ** Currently only used in PETSc 3.3 and later **
-     * 		in PETSc 3.2 and earlier MAT_NEW_NONZERO_ALLOCATION_ERR defaults to false
-     * 		in PETSc 3.3 MAT_NEW_NONZERO_ALLOCATION_ERR defaults to true
+     *         in PETSc 3.2 and earlier MAT_NEW_NONZERO_ALLOCATION_ERR defaults to false
+     *         in PETSc 3.3 MAT_NEW_NONZERO_ALLOCATION_ERR defaults to true
      *
      * @param matrix The matrix to set
      */

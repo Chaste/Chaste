@@ -658,7 +658,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
      * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
      */
     NodesOnlyMesh<DIM> temp_mesh;
-    temp_mesh.ConstructNodesWithoutMesh(nodes, 1.5);	// Arbitrary cut off as connectivity not used.
+    temp_mesh.ConstructNodesWithoutMesh(nodes, 1.5);  // Arbitrary cut off as connectivity not used.
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";

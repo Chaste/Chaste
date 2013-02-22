@@ -138,10 +138,10 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
         for (unsigned i=0; i<electrodes.size(); i++)
         {
             PseudoEcgCalculator<ELEMENT_DIM,SPACE_DIM,1> calculator(mrMesh,
-            		                                                electrodes[i],
-            		                                                mDirectory,
-            		                                                mHdf5File,
-            		                                                mVoltageName);
+                                                                    electrodes[i],
+                                                                    mDirectory,
+                                                                    mHdf5File,
+                                                                    mVoltageName);
             calculator.WritePseudoEcg();
         }
     }
@@ -168,69 +168,69 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
 
     // Write to HDF5 file #1660
     // HDF5 shouldn't have minus signs in the data names..
-	std::stringstream hdf5_dataset_name;
+    std::stringstream hdf5_dataset_name;
     std::string extra_message = "";
     if (threshold < 0.0)
     {
-    	extra_message = "_minus";
-    	threshold = -threshold;
+        extra_message = "_minus";
+        threshold = -threshold;
     }
     hdf5_dataset_name << "Apd_" << repolarisationPercentage << extra_message << "_" << threshold << "_Map";
 
     DistributedVectorFactory* p_factory = mrMesh.GetDistributedVectorFactory();
     FileFinder test_output("", RelativeTo::ChasteTestOutput);
-	Hdf5DataWriter writer(*p_factory,
-			              mDirectory.GetRelativePath(test_output),  // Path relative to CHASTE_TEST_OUTPUT
-			              mHdf5File,
-			              false, // to wiping
-			              true,  // to extending
-			              hdf5_dataset_name.str()); // dataset name
+    Hdf5DataWriter writer(*p_factory,
+                          mDirectory.GetRelativePath(test_output),  // Path relative to CHASTE_TEST_OUTPUT
+                          mHdf5File,
+                          false, // to wiping
+                          true,  // to extending
+                          hdf5_dataset_name.str()); // dataset name
 
-	int apd_id = writer.DefineVariable(hdf5_dataset_name.str(),"msec");
-	writer.DefineFixedDimension(mrMesh.GetNumNodes());
-	writer.DefineUnlimitedDimension("PaceNumber", "dimensionless");
-	writer.EndDefineMode();
+    int apd_id = writer.DefineVariable(hdf5_dataset_name.str(),"msec");
+    writer.DefineFixedDimension(mrMesh.GetNumNodes());
+    writer.DefineUnlimitedDimension("PaceNumber", "dimensionless");
+    writer.EndDefineMode();
 
-	//Determine the maximum number of paces
-	unsigned local_max_paces = 0u;
+    //Determine the maximum number of paces
+    unsigned local_max_paces = 0u;
     for (unsigned node_index = 0; node_index < local_output_data.size(); ++node_index)
-	{
-		if (local_output_data[node_index].size() > local_max_paces)
+    {
+        if (local_output_data[node_index].size() > local_max_paces)
         {
              local_max_paces = local_output_data[node_index].size();
         }
-	}
+    }
 
     unsigned max_paces = 0u;
     MPI_Allreduce(&local_max_paces, &max_paces, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
     //assert(local_max_paces == max_paces); 
-	for (unsigned pace_idx = 0; pace_idx < max_paces; pace_idx++)
-	{
-		Vec apd_vec = p_factory->CreateVec();
-		DistributedVector distributed_vector = p_factory->CreateDistributedVector(apd_vec);
-		for (DistributedVector::Iterator index = distributed_vector.Begin();
-			 index!= distributed_vector.End();
-			 ++index)
-		{
+    for (unsigned pace_idx = 0; pace_idx < max_paces; pace_idx++)
+    {
+        Vec apd_vec = p_factory->CreateVec();
+        DistributedVector distributed_vector = p_factory->CreateDistributedVector(apd_vec);
+        for (DistributedVector::Iterator index = distributed_vector.Begin();
+             index!= distributed_vector.End();
+             ++index)
+        {
             unsigned node_idx = index.Local;
             //pad with zeros if no pace defined at this node
             if (pace_idx < local_output_data[node_idx].size() )
-			{
+            {
                 distributed_vector[index] = local_output_data[node_idx][pace_idx];
             }
-			else
-			{
-			    /// \todo #1660 make a test that has different numbers of APDs at different nodes.
-			    NEVER_REACHED;
-				//distributed_vector[index] = 0.0;
-			}
-		}
-		writer.PutVector(apd_id, apd_vec);
-		PetscTools::Destroy(apd_vec);
-		writer.PutUnlimitedVariable(pace_idx);
-		writer.AdvanceAlongUnlimitedDimension();
-	}
-	writer.Close();
+            else
+            {
+                /// \todo #1660 make a test that has different numbers of APDs at different nodes.
+                NEVER_REACHED;
+                //distributed_vector[index] = 0.0;
+            }
+        }
+        writer.PutVector(apd_id, apd_vec);
+        PetscTools::Destroy(apd_vec);
+        writer.PutUnlimitedVariable(pace_idx);
+        writer.AdvanceAlongUnlimitedDimension();
+    }
+    writer.Close();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

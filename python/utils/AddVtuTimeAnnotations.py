@@ -107,12 +107,12 @@ location.
 Return the number of chunks (processes used in the original simulation)
 """
 def RenameChunks(fileName, inBase, outBase):
-	text = open(fileName).read()
-	(new_text, num_chunks) = re.subn(inBase, outBase, text)
-	out_fp = file(fileName, 'w')
-	out_fp.write(new_text)
-	return num_chunks
-	
+    text = open(fileName).read()
+    (new_text, num_chunks) = re.subn(inBase, outBase, text)
+    out_fp = file(fileName, 'w')
+    out_fp.write(new_text)
+    return num_chunks
+
 if __name__ == "__main__":
     #Checking command line arguments
     if len(sys.argv) != 3:

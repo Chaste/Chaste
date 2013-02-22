@@ -575,10 +575,10 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
     HeartEventHandler::BeginEvent(HeartEventHandler::POST_PROC);
     if(HeartConfig::Instance()->IsPostProcessingRequested())
     {
-    	FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
+        FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
         PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh,
-        		                                                 test_output,
-        		                                                 HeartConfig::Instance()->GetOutputFilenamePrefix());
+                                                                 test_output,
+                                                                 HeartConfig::Instance()->GetOutputFilenamePrefix());
         post_writer.WritePostProcessingFiles();
     }
     HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);

@@ -948,74 +948,74 @@ public:
     }
 
     void TestSolvePdeAndWriteResultsToFileCoarsePdeMeshNeumann() throw(Exception)
-	{
-		EXIT_IF_PARALLEL;
+    {
+        EXIT_IF_PARALLEL;
 
-		// Set up SimulationTime
-		SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.05, 6);
+        // Set up SimulationTime
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.05, 6);
 
-		// Create a cigar-shaped mesh
-		TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-		MutableMesh<2,2> mesh;
-		mesh.ConstructFromMeshReader(mesh_reader);
-		mesh.Scale(5.0, 1.0);
+        // Create a cigar-shaped mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+        mesh.Scale(5.0, 1.0);
 
-		// Create a cell population
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        // Create a cell population
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-		MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-		// Create a PDE handler object using this cell population
-		CellBasedPdeHandler<2> pde_handler(&cell_population);
+        // Create a PDE handler object using this cell population
+        CellBasedPdeHandler<2> pde_handler(&cell_population);
 
-		// Set up PDE and pass to handler
-		AveragedSourcePde<2> pde(cell_population, -0.01);
-		ConstBoundaryCondition<2> bc(0.0);
-		PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Last boolean specifies Neuman conditions
-		pde_and_bc.SetDependentVariableName("variable");
+        // Set up PDE and pass to handler
+        AveragedSourcePde<2> pde(cell_population, -0.01);
+        ConstBoundaryCondition<2> bc(0.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true); // Last boolean specifies Neuman conditions
+        pde_and_bc.SetDependentVariableName("variable");
 
-		pde_handler.AddPdeAndBc(&pde_and_bc);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
 
-		// Solve PDEs on a coarse mesh
-		ChastePoint<2> lower(0.0, 0.0);
-		ChastePoint<2> upper(50.0, 50.0);
-		ChasteCuboid<2> cuboid(lower, upper);
-		pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
-		pde_handler.SetImposeBcsOnCoarseBoundary(false);
+        // Solve PDEs on a coarse mesh
+        ChastePoint<2> lower(0.0, 0.0);
+        ChastePoint<2> upper(50.0, 50.0);
+        ChasteCuboid<2> cuboid(lower, upper);
+        pde_handler.UseCoarsePdeMesh(10.0, cuboid, true);
+        pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
-		// For coverage, provide an initial guess for the solution
-		std::vector<double> data(pde_handler.mpCoarsePdeMesh->GetNumNodes());
-		for (unsigned i=0; i<pde_handler.mpCoarsePdeMesh->GetNumNodes(); i++)
-		{
-			data[i] = 1.0;
-		}
+        // For coverage, provide an initial guess for the solution
+        std::vector<double> data(pde_handler.mpCoarsePdeMesh->GetNumNodes());
+        for (unsigned i=0; i<pde_handler.mpCoarsePdeMesh->GetNumNodes(); i++)
+        {
+            data[i] = 1.0;
+        }
 
-		Vec vector = PetscTools::CreateVec(data);
-		pde_and_bc.SetSolution(vector);
+        Vec vector = PetscTools::CreateVec(data);
+        pde_and_bc.SetSolution(vector);
 
-		// Open result file ourselves
-		OutputFileHandler output_file_handler("TestWritePdeSolution", false);
-		pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+        // Open result file ourselves
+        OutputFileHandler output_file_handler("TestWritePdeSolution", false);
+        pde_handler.mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
 
-		// Solve PDE (set sampling timestep multiple to be large doesn't do anything as always output on 1st timestep)
-		pde_handler.SolvePdeAndWriteResultsToFile(10);
+        // Solve PDE (set sampling timestep multiple to be large doesn't do anything as always output on 1st timestep)
+        pde_handler.SolvePdeAndWriteResultsToFile(10);
 
-		// Close result file ourselves
-		pde_handler.mpVizPdeSolutionResultsFile->close();
+        // Close result file ourselves
+        pde_handler.mpVizPdeSolutionResultsFile->close();
 
-		// Test that boundary cells experience the right boundary condition
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-			if (cell_population.GetNodeCorrespondingToCell(*cell_iter)->IsBoundaryNode())
-			{
-				TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), 0.0, 1e-1);
-			}
-		}
-	}
+        // Test that boundary cells experience the right boundary condition
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            if (cell_population.GetNodeCorrespondingToCell(*cell_iter)->IsBoundaryNode())
+            {
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), 0.0, 1e-1);
+            }
+        }
+    }
 
     void TestSolvePdeAndWriteResultsToFileWithCoarsePdeMesh() throw(Exception)
     {

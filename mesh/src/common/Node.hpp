@@ -403,7 +403,7 @@ public:
 
     /**
      * Get the node's region ID.
-     * Defaults to 0 if no NodeAttributes have been setup.	
+     * Defaults to 0 if no NodeAttributes have been setup.
      */
     unsigned GetRegion() const;
 

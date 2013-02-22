@@ -297,7 +297,7 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
     if (newAllocationError == false)
     {
-    	MatSetOption(rMat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
+        MatSetOption(rMat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
     }
 #endif
 }

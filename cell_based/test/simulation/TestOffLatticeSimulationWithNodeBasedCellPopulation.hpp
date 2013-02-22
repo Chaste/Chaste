@@ -143,7 +143,7 @@ public:
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
         nodes.push_back(new Node<2>(1,  false,  1.0, 0.0));
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);	// Large cut off as larger cells.
+        p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);    // Large cut off as larger cells.
 
         // Modify the radii of the cells
         p_mesh->GetNode(0)->SetRadius(1.0);
@@ -202,7 +202,7 @@ public:
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
         nodes.push_back(new Node<2>(1,  false,  1.0, 0.0));
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);	// Larger cut off as bigger cells.
+        p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);    // Larger cut off as bigger cells.
 
         // Create cells
         std::vector<CellPtr> cells;

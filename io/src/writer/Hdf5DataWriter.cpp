@@ -82,8 +82,8 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
     }
     if (!mUseExistingFile && mDatasetName != "Data")
     {
-    	//User is trying to add a new dataset, but they are not extending a existing file
-    	EXCEPTION("Adding new data only makes sense when extending an existing file");
+        //User is trying to add a new dataset, but they are not extending a existing file
+        EXCEPTION("Adding new data only makes sense when extending an existing file");
     }
     if (mUseExistingFile)
     {

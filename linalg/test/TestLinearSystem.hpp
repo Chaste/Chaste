@@ -241,26 +241,26 @@ public:
     void TestAddingNonzeroesLater()
     {
         // Make a linear system from which the vector becomes a template to use in a later constructor
-    	LinearSystem ls_template(5);
-    	for (int i=0; i<5; i++)
-    	{
-    		ls_template.SetMatrixElement(i, i, 3.0);
-    	}
-    	ls_template.SetMatrixElement(1, 3, 3.0);
-    	ls_template.AssembleFinalLinearSystem();
+        LinearSystem ls_template(5);
+        for (int i=0; i<5; i++)
+        {
+            ls_template.SetMatrixElement(i, i, 3.0);
+        }
+        ls_template.SetMatrixElement(1, 3, 3.0);
+        ls_template.AssembleFinalLinearSystem();
 
-		// The "false" says that we are allowed to do new mallocs without PETSc 3.3 causing an error
-    	LinearSystem ls(ls_template.rGetRhsVector(), 1, false);
-    	for (int i=0; i<5; i++)
-    	{
-    		ls.SetMatrixElement(i, i, 3.0);
-    	}
-    	ls.AssembleFinalLinearSystem();
-    	//Adding a new non-zero element gives an error in PETSc 3.3
-    	ls.SetMatrixElement(1, 3, 3.0);
-    	ls.AssembleFinalLinearSystem();
+        // The "false" says that we are allowed to do new mallocs without PETSc 3.3 causing an error
+        LinearSystem ls(ls_template.rGetRhsVector(), 1, false);
+        for (int i=0; i<5; i++)
+        {
+            ls.SetMatrixElement(i, i, 3.0);
+        }
+        ls.AssembleFinalLinearSystem();
+        //Adding a new non-zero element gives an error in PETSc 3.3
+        ls.SetMatrixElement(1, 3, 3.0);
+        ls.AssembleFinalLinearSystem();
 
-    	TS_ASSERT(PetscMatTools::CheckEquality(ls_template.rGetLhsMatrix(), ls.rGetLhsMatrix()));
+        TS_ASSERT(PetscMatTools::CheckEquality(ls_template.rGetLhsMatrix(), ls.rGetLhsMatrix()));
     }
 
     void TestZeroingLinearSystemByColumn()

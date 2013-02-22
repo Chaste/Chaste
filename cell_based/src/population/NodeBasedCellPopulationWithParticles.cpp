@@ -44,38 +44,38 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
     : NodeBasedCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh, false)
 {
     if (!locationIndices.empty())
-	{
-		// Create a set of node indices corresponding to particles
-		std::set<unsigned> node_indices;
-		std::set<unsigned> location_indices;
-		std::set<unsigned> particle_indices;
+    {
+        // Create a set of node indices corresponding to particles
+        std::set<unsigned> node_indices;
+        std::set<unsigned> location_indices;
+        std::set<unsigned> particle_indices;
 
-		for (unsigned i=0; i<this->GetNumNodes(); i++)
-		{
-			node_indices.insert(this->GetNode(i)->GetIndex());
-		}
-		for (unsigned i=0; i<locationIndices.size(); i++)
-		{
-			location_indices.insert(locationIndices[i]);
-		}
+        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        {
+            node_indices.insert(this->GetNode(i)->GetIndex());
+        }
+        for (unsigned i=0; i<locationIndices.size(); i++)
+        {
+            location_indices.insert(locationIndices[i]);
+        }
 
-		std::set_difference(node_indices.begin(), node_indices.end(),
-							location_indices.begin(), location_indices.end(),
-							std::inserter(particle_indices, particle_indices.begin()));
+        std::set_difference(node_indices.begin(), node_indices.end(),
+                            location_indices.begin(), location_indices.end(),
+                            std::inserter(particle_indices, particle_indices.begin()));
 
-		// This method finishes and then calls Validate()
-		SetParticles(particle_indices);
-	}
-	else
-	{
-		for (typename NodesOnlyMesh<DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
-				node_iter != rMesh.GetNodeIteratorEnd();
-				++node_iter)
-		{
-			(*node_iter).SetIsParticle(false);
-		}
-		NodeBasedCellPopulationWithParticles::Validate();
-	}
+        // This method finishes and then calls Validate()
+        SetParticles(particle_indices);
+    }
+    else
+    {
+        for (typename NodesOnlyMesh<DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
+                node_iter != rMesh.GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            (*node_iter).SetIsParticle(false);
+        }
+        NodeBasedCellPopulationWithParticles::Validate();
+    }
 }
 
 template<unsigned DIM>
@@ -99,10 +99,10 @@ std::set<unsigned> NodeBasedCellPopulationWithParticles<DIM>::GetParticleIndices
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
-    	if (node_iter->IsParticle())
-    	{
-    		particle_indices.insert(node_iter->GetIndex());
-    	}
+        if (node_iter->IsParticle())
+        {
+            particle_indices.insert(node_iter->GetIndex());
+        }
     }
 
     return particle_indices;
@@ -115,10 +115,10 @@ void NodeBasedCellPopulationWithParticles<DIM>::SetParticles(const std::set<unsi
          node_iter != this->mrMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
-    	if (rParticleIndices.find(node_iter->GetIndex()) != rParticleIndices.end())
-    	{
-    		node_iter->SetIsParticle(true);
-    	}
+        if (rParticleIndices.find(node_iter->GetIndex()) != rParticleIndices.end())
+        {
+            node_iter->SetIsParticle(true);
+        }
     }
     NodeBasedCellPopulationWithParticles::Validate();
 }
@@ -137,7 +137,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::UpdateParticlePositions(double d
     double damping_constant = this->GetDampingConstantNormal();
     for (unsigned i=0; i<drdt.size(); i++)
     {
-    	drdt[i]=this->GetNode(i)->rGetAppliedForce()/damping_constant;
+        drdt[i]=this->GetNode(i)->rGetAppliedForce()/damping_constant;
     }
 
     for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
@@ -178,12 +178,12 @@ CellPtr NodeBasedCellPopulationWithParticles<DIM>::AddCell(CellPtr pNewCell, con
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::Validate()
 {
-	std::map<unsigned, bool> validated_nodes;
+    std::map<unsigned, bool> validated_nodes;
     for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-    		node_iter != this->mrMesh.GetNodeIteratorEnd();
-    		++node_iter)
+            node_iter != this->mrMesh.GetNodeIteratorEnd();
+            ++node_iter)
     {
-    	validated_nodes[node_iter->GetIndex()] = node_iter->IsParticle();
+        validated_nodes[node_iter->GetIndex()] = node_iter->IsParticle();
     }
 
     // Look through all of the cells and record what node they are associated with.
@@ -200,8 +200,8 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
     }
 
     for (std::map<unsigned, bool>::iterator map_iter = validated_nodes.begin();
-    		map_iter != validated_nodes.end();
-    		map_iter++)
+            map_iter != validated_nodes.end();
+            map_iter++)
     {
         if (!map_iter->second)
         {

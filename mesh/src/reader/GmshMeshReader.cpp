@@ -71,7 +71,7 @@ GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GmshMeshReader(std::string pathBaseName,
     }
 
     OpenFiles();
-	ReadHeaders();
+    ReadHeaders();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -121,16 +121,16 @@ void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
 
     if(mVersionNumber != 2.2)
     {
-    	EXCEPTION("Only .msh version 2.2 files are supported.");
+        EXCEPTION("Only .msh version 2.2 files are supported.");
     }
     assert(mFileType == 0);
 
     //Check mesh format close string
     getline(mNodeFile, this_line);
-	assert(this_line == "$EndMeshFormat");
+    assert(this_line == "$EndMeshFormat");
 
-	ReadNodeHeader();
-	ReadElementHeader();
+    ReadNodeHeader();
+    ReadElementHeader();
     ReadFaceHeader();
 }
 

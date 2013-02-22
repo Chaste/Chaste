@@ -580,39 +580,39 @@ public:
     }
 
     void TestReadingExtraData() throw(Exception)
-	{
-    	// In this test we read data from a file in the source
-    	// (which is re-created and compared with in TestHdf5DataWriter.hpp)
+    {
+        // In this test we read data from a file in the source
+        // (which is re-created and compared with in TestHdf5DataWriter.hpp)
 
-    	{ // Original / Normal data in a datastructure called "Data"
-    		Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables", false);
-    		std::vector<std::string> variable_names = reader.GetVariableNames();
-    		TS_ASSERT_EQUALS(variable_names[0], "Node");
-    		TS_ASSERT_EQUALS(variable_names[1], "I_K");
-    	}
+        { // Original / Normal data in a datastructure called "Data"
+            Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables", false);
+            std::vector<std::string> variable_names = reader.GetVariableNames();
+            TS_ASSERT_EQUALS(variable_names[0], "Node");
+            TS_ASSERT_EQUALS(variable_names[1], "I_K");
+        }
 
-    	{ // Added data in a datastructure called "Extra stuff"
-    		Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables", false, "Extra stuff");
-    		std::vector<std::string> variable_names = reader.GetVariableNames();
-    		TS_ASSERT_EQUALS(variable_names[0], "Phase");
-    		TS_ASSERT_EQUALS(variable_names[1], "Plasma");
+        { // Added data in a datastructure called "Extra stuff"
+            Hdf5DataReader reader("io/test/data","hdf5_test_adding_variables", false, "Extra stuff");
+            std::vector<std::string> variable_names = reader.GetVariableNames();
+            TS_ASSERT_EQUALS(variable_names[0], "Phase");
+            TS_ASSERT_EQUALS(variable_names[1], "Plasma");
 
-    		DistributedVectorFactory factory(reader.GetNumberOfRows());
+            DistributedVectorFactory factory(reader.GetNumberOfRows());
             Vec data = factory.CreateVec();
             reader.GetVariableOverNodes(data, "Plasma", 1/*timestep*/);
             DistributedVector distributed_vector_1 = factory.CreateDistributedVector(data);
 
             for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-            					 index!= distributed_vector_1.End();
-            					 ++index)
-			{
-            	// These magic numbers come from TestHdf5DataWriter - where they are written into the HDF5 file.
-				TS_ASSERT_DELTA(distributed_vector_1[index], 1*1000 + 100 + index.Global, 1e-9);
-			}
+                                 index!= distributed_vector_1.End();
+                                 ++index)
+            {
+                // These magic numbers come from TestHdf5DataWriter - where they are written into the HDF5 file.
+                TS_ASSERT_DELTA(distributed_vector_1[index], 1*1000 + 100 + index.Global, 1e-9);
+            }
 
             PetscTools::Destroy(data);
-    	}
-	}
+        }
+    }
 };
 
 #endif /*TESTHDF5READER_HPP_*/

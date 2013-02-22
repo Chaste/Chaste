@@ -77,9 +77,9 @@ public:
      *     membrane potential. It is used in the creation of the PropagationPropertiesCalculator object. Defaults to "V".
      */
     PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-    		             const FileFinder& rDirectory,
-    		             std::string hdf5File,
-    		             std::string voltageName = "V");
+                         const FileFinder& rDirectory,
+                         std::string hdf5File,
+                         std::string voltageName = "V");
 
     /**
      *  Write out data files. The data that is written depends on which maps have been requested using
