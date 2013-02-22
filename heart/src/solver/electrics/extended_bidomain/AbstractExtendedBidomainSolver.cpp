@@ -71,6 +71,8 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(V
     }
     else
     {
+        //Turn off preallocation so that we can have one dense row in the matrix.
+        PetscMatTools::TurnOffVariableAllocationError(this->mpLinearSystem->rGetLhsMatrix());
         // applying average(phi)=0 constraint, so matrix is not symmetric
         this->mpLinearSystem->SetMatrixIsSymmetric(false);
     }
