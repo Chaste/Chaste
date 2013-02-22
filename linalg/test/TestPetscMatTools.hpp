@@ -171,7 +171,13 @@ public:
 
         PetscMatTools::Finalise(matrix);
 
-        TS_ASSERT_DELTA(PetscMatTools::GetElement(matrix, 3, 3), 2.78, 1e-6);
+        PetscInt lo, hi;
+        PetscMatTools::GetOwnershipRange(matrix, lo, hi);
+        if (lo<=3 && 3<hi)
+        {
+            TS_ASSERT_DELTA(PetscMatTools::GetElement(matrix, 3, 3), 2.78, 1e-6);
+        }
+
         PetscTools::Destroy(matrix);
     }
 };
