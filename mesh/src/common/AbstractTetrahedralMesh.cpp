@@ -647,40 +647,48 @@ bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnersh
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeConnectivityPerProcess() const
 {
-    unsigned max_num = 0u;
-    unsigned connected_node_index = 0u;
-    for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
-    {
-        unsigned num = this->mNodes[local_node_index]->GetNumContainingElements();
-        if (num>max_num)
-        {
-            max_num = num;
-            connected_node_index = local_node_index;
-        }
-    }
-    if (max_num == 0u)
+
+    if (this->mNodes.size() == 0u)
     {
 #define COVERAGE_IGNORE
         /*
          * Coverage of this block requires a mesh regular slab mesh with the number of
          * elements in the primary dimension less than (num_procs - 1), e.g. a 1D mesh
          * one element wide with num_procs >=3.
-         */
-
-        // This process owns no nodes and thus owns none of the mesh
-        assert(this->mNodes.size() == 0u);
-        return (1u);
-
-        /*
          * Note that if a process owns no nodes, then it will still need to enter the
          * collective call to MatMPIAIJSetPreallocation. In PetscTools::SetupMat, the
          * rowPreallocation parameter uses the special value zero to indicate no preallocation.
          */
+
+        // This process owns no nodes and thus owns none of the mesh
+        return (1u);
 #undef COVERAGE_IGNORE
     }
-    // connected_node_index now has the index of a maximally connected node
+
+    unsigned max_num = 0u;
+    unsigned connected_node_index = 0u;
+    unsigned boundary_max_num = 0u;
+    unsigned boundary_connected_node_index = 0u;
+    for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
+    {
+        unsigned num = this->mNodes[local_node_index]->GetNumContainingElements();
+        if (this->mNodes[local_node_index]->IsBoundaryNode()==false && num>max_num)
+        {
+            max_num = num;
+            connected_node_index = local_node_index;
+        }
+        if (this->mNodes[local_node_index]->IsBoundaryNode() && num>boundary_max_num)
+        {
+            boundary_max_num = num;
+            boundary_connected_node_index = local_node_index;
+        }
+    }
+    assert (max_num != 0u || boundary_max_num != 0u);
+    // connected_node_index now has the index of a maximally connected internal node
+    // boundary_connected_node_index now has the index of a maximally connected boundary node
     std::set<unsigned> forward_star_nodes;
     unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case
+
     for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[connected_node_index]->ContainingElementsBegin();
         it != this->mNodes[connected_node_index]->ContainingElementsEnd();
         ++it)
@@ -690,6 +698,23 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
         {
             forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
         }
+    }
+
+    std::set<unsigned> boundary_forward_star_nodes;
+    for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[boundary_connected_node_index]->ContainingElementsBegin();
+        it != this->mNodes[boundary_connected_node_index]->ContainingElementsEnd();
+        ++it)
+    {
+        Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
+        for (unsigned i=0; i<nodes_per_element; i++)
+        {
+            boundary_forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
+        }
+    }
+
+    if (boundary_forward_star_nodes.size() > forward_star_nodes.size())
+    {
+        return boundary_forward_star_nodes.size();
     }
     return forward_star_nodes.size();
 }

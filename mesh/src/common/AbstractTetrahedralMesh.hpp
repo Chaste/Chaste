@@ -528,9 +528,11 @@ public:
     virtual bool CalculateDesignatedOwnershipOfElement( unsigned elementIndex );
 
     /**
-     * @return Iterates through local nodes and finds the node with the/a maximum number of
-     * containing elements for all locally owned nodes.  At that representative node the
-     * node connectivity (number of nodes in forward star) is determined.
+     * @return Iterates through local nodes and finds two representative nodes with a maximum number of
+     * containing elements for all locally owned nodes.  The two representative nodes are the most connected
+     * nodes at the boundary and the most connected node in the interior.  This is because a well-element-connected
+     * boundary node is likely to be connected to more nodes since fewer of them will overlap.)  At these
+     * representative node the node connectivity (number of nodes in forward star) is determined.
      *
      * Useful for determining FEM matrix fill.
      */

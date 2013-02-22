@@ -151,6 +151,15 @@ public:
         TS_ASSERT_EQUALS( num_halo_nodes, 0u );
     }
 
+    void TestMeshMoreStatistics() throw(Exception)
+    {
+        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        TetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+        TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 22U);
+        TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  15U);
+    }
+
     void TestMeshConstructionFromMeshReaderIndexedFromOne() throw(Exception)
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
