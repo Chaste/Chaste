@@ -74,7 +74,7 @@ Vec AbstractStaticLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve(Ve
     // Set up the linear system
     this->InitialiseForSolve(initialGuess);
 
-    // This method can be overloaded if neccessary
+    // This method can be overloaded if necessary
     this->PrepareForSetupLinearSystem(NULL);
 
     // This method should be implemented by the concrete class

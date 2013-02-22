@@ -153,13 +153,7 @@ void AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseFor
 {
     if (this->mpLinearSystem == NULL)
     {
-        unsigned preallocation=(mpMesh->CalculateMaximumContainingElementsPerProcess() + ELEMENT_DIM);
-        if (ELEMENT_DIM > 1)
-        {
-            // Highest connectivity is closed
-            preallocation--;
-        }
-        preallocation *= PROBLEM_DIM;
+        unsigned preallocation= PROBLEM_DIM * mpMesh->CalculateMaximumNodeConnectivityPerProcess();
 
         HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
         if (initialSolution == NULL)
