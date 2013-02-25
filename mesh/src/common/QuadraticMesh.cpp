@@ -449,7 +449,7 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
     else // in 3D, remesh using tetgen
     {
 
-        struct tetgen::tetgenio mesher_input, mesher_output;
+        class tetgen::tetgenio mesher_input, mesher_output;
 
         mesher_input.numberoftetrahedra = this->GetNumElements();
         mesher_input.tetrahedronlist = new int[this->GetNumElements() * (DIM+1)];

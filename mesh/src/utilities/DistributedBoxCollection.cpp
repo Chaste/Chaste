@@ -47,7 +47,9 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     : mDomainSize(domainSize),
       mBoxWidth(boxWidth),
       mIsPeriodicInX(isPeriodicInX),
-      mAreLocalBoxesSet(false)
+      mAreLocalBoxesSet(false),
+      mFudge(5e-14)
+
 {
     // Periodicity only works in 2d and in serial.
     if (isPeriodicInX)

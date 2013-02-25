@@ -708,7 +708,7 @@ public:
                 //This may not work sequentially on some versions of MPI (MPICH2)
                 MPI_Send( &my_entry, 1, MPI_UNSIGNED, destination_rank, my_tag, PETSC_COMM_WORLD );
 
-                unsigned neighbours_entry;
+                unsigned neighbours_entry=0;
                 MPI_Recv( &neighbours_entry, 1, MPI_UNSIGNED, source_rank, source_tag, PETSC_COMM_WORLD, &status );
                 PetscTools::Barrier();
 

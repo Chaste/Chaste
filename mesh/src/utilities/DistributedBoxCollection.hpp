@@ -107,14 +107,14 @@ private:
     /** The largest index of the boxes owned by this process. */
     unsigned mMaxBoxIndex;
 
-    /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
-    static const double mFudge = 5e-14;
-
     /** Whether the domain is periodic in the X dimension Note this currently only works for DIM=2.*/
     bool mIsPeriodicInX;
 
     /** Whether the local boxes have been setup or not. */
     bool mAreLocalBoxesSet;
+
+    /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
+    const double mFudge;
 
     /** The rank of the process to the right */
     unsigned mProcRight;
