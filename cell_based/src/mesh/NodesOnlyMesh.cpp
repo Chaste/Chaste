@@ -59,6 +59,8 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
     assert(maxInteractionDistance > 0.0 && maxInteractionDistance < DBL_MAX);
     mMaximumInteractionDistance = maxInteractionDistance;
 
+    mMinimumNodeDomainBoundarySeparation = mMaximumInteractionDistance;
+
     this->Clear();
     mpBoxCollection = NULL;
 
@@ -300,6 +302,45 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     delete mpBoxCollection;
 
     mpBoxCollection = new BoxCollection<SPACE_DIM>(mMaximumInteractionDistance, new_domain_size);
+}
+
+template<unsigned SPACE_DIM>
+bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
+{
+    assert (mpBoxCollection);
+
+    bool is_any_node_close = false;
+    c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
+
+    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+            node_iter != this->GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        c_vector<double, SPACE_DIM> location = node_iter->rGetLocation();
+
+        for (unsigned d=0; d < SPACE_DIM; d++)
+        {
+            if (location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation))
+            {
+                is_any_node_close = true;
+                break;
+            }
+        }
+        if (is_any_node_close)
+        {
+            break;  // Saves checking every node if we find one close to the boundary.
+        }
+    }
+
+    return is_any_node_close;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetMinimumNodeDomainBoundarySeparation(double separation)
+{
+    assert(!(separation < 0.0));
+
+    mMinimumNodeDomainBoundarySeparation = separation;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

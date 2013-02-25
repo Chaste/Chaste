@@ -154,6 +154,45 @@ public:
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(3)), 89u);
     }
 
+    void TestCheckingBoxCollectionSizeAndSwelling() throw (Exception)
+    {
+        double cut_off = 0.5;
+
+        /*
+         * Nodes chosen so to test the cases that the domain width in x is
+         * "divisible" by the cut_off, the y-dimension is not "divisible" and
+         * the z-direction has zero extent.
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, -0.9, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 0.9, -0.9, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 0.9, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.9, 0.9, 0.0));
+
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, cut_off);
+
+        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16u);
+
+        bool enlarge = mesh.IsANodeCloseToDomainBoundary();
+
+        TS_ASSERT(enlarge);
+
+        // Enlarge twice to make domain large enough in z-direction for the enlarge test to fail.
+        mesh.EnlargeBoxCollection();
+        mesh.EnlargeBoxCollection();
+
+        enlarge = mesh.IsANodeCloseToDomainBoundary();
+
+        TS_ASSERT(!enlarge);
+
+        mesh.SetMinimumNodeDomainBoundarySeparation(2.0);
+
+        enlarge = mesh.IsANodeCloseToDomainBoundary();
+
+        TS_ASSERT(enlarge);
+    }
+
     void TestClearingNodesOnlyMesh()
     {
         std::vector<Node<3>*> nodes;

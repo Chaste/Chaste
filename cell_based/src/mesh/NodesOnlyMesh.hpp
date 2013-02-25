@@ -59,30 +59,6 @@ protected:
 
 private:
 
-    /** The global number of nodes in the mesh. */
-    unsigned mTotalNumNodes;
-
-    /** Vector of pointer to halo nodes used by this process. */
-    std::vector<Node<SPACE_DIM>* > mHaloNodes;
-
-    /**
-     * Defines connectivity in NodesOnlyMesh. Two nodes are connected
-     * if their centres are less than mMaximumInteractionDistance apart.
-     */
-    double mMaximumInteractionDistance;
-
-    /** A map from node global index to local index used by this process. */
-    std::map<unsigned, unsigned> mNodesMapping;
-
-    /** A map from halo node global index to local index used by this process. */
-    std::map<unsigned, unsigned> mHaloNodesMapping;
-
-    /** A counter of the number of fresh indices used on this process. */
-    unsigned mIndexCounter;
-
-    /** A vector of the global indices that have been freed on the process from deleting a node */
-    //std::vector<unsigned> mDeletedGlobalNodeIndices;
-
     friend class TestNodesOnlyMesh;
 
     /** Needed for serialization. */
@@ -105,6 +81,33 @@ private:
         archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
         archive & mMaximumInteractionDistance;
     }
+
+    /** The global number of nodes in the mesh. */
+    unsigned mTotalNumNodes;
+
+    /** Vector of pointer to halo nodes used by this process. */
+    std::vector<Node<SPACE_DIM>* > mHaloNodes;
+
+    /**
+     * Defines connectivity in NodesOnlyMesh. Two nodes are connected
+     * if their centres are less than mMaximumInteractionDistance apart.
+     */
+    double mMaximumInteractionDistance;
+
+    /** A map from node global index to local index used by this process. */
+    std::map<unsigned, unsigned> mNodesMapping;
+
+    /** A map from halo node global index to local index used by this process. */
+    std::map<unsigned, unsigned> mHaloNodesMapping;
+
+    /** A counter of the number of fresh indices used on this process. */
+    unsigned mIndexCounter;
+
+    /** If a node in the mesh is within this distance of the boundary of mpBoxCollection, IsANodeCloseToDomainBoundary returns true. Assigned equal to mMaximumInteractionDistance by default.*/
+    double mMinimumNodeDomainBoundarySeparation;
+
+    /** A vector of the global indices that have been freed on the process from deleting a node */
+    //std::vector<unsigned> mDeletedGlobalNodeIndices;
 
     /**
      * Calculate the next unique global index available on this
@@ -130,6 +133,13 @@ private:
 
     /** Enlarge the underlying BoxCollection.*/
     void EnlargeBoxCollection();
+
+    /**
+     * Check whether any of the nodes lie close to the domain boundary
+     *
+     * @return Whether any node (deleted or otherwise) is close to the domain boundary.
+     */
+    bool IsANodeCloseToDomainBoundary();
 
 public:
 
@@ -251,6 +261,12 @@ public:
      */
     void DeleteNode(unsigned index);
 
+    /**
+     * Set the value of mMinimumNodeDomainBoundarySeparation
+     *
+     * @param separation the new value for the separation
+     */
+    void SetMinimumNodeDomainBoundarySeparation(double separation);
 };
 
 #include "SerializationExportWrapper.hpp"
