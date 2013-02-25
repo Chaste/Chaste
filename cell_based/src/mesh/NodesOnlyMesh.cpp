@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include "NodesOnlyMesh.hpp"
+#include "ChasteCuboid.hpp"
 
 template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
@@ -61,42 +62,17 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
     this->Clear();
     mpBoxCollection = NULL;
 
-    // Work out a bounding box for the nodes.
-    c_vector<double, 2*SPACE_DIM> min_max_location;
-    for (unsigned d=0; d<SPACE_DIM; d++)
+    ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox(rNodes);
+
+    ///\todo #2323 make a constructor for BoxCollection that accepts a ChasteCuboid.
+    c_vector<double, 2*SPACE_DIM> domain_size;
+    for (unsigned i=0; i < SPACE_DIM; i++)
     {
-        min_max_location[2*d] = DBL_MAX;
-        min_max_location[2*d+1] = -DBL_MAX;
+        domain_size[2*i] = bounding_box.rGetLowerCorner()[i];
+        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i];
     }
 
-    for (unsigned i=0; i<rNodes.size(); i++)
-    {
-        c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
-        for (unsigned d=0; d<SPACE_DIM; d++)
-        {
-           min_max_location[2*d] = (location[d] < min_max_location[2*d]) ? location[d] : min_max_location[2*d];
-           min_max_location[2*d+1] = (location[d] > min_max_location[2*d+1]) ? location[d] : min_max_location[2*d+1];
-        }
-    }
-
-    // Make sure there is enough domain space for all processes. If we have a growing population this allows to use more processes.
-//    double width = (min_max_locations[2*SPACE_DIM-1] - min_max_locations[2*SPACE_DIM-2]);
-//    unsigned num_procs = PetscTools::GetNumProcs();
-//
-//    double min_width = (double)num_procs*maxInteractionDistance;
-//
-//    if (width < min_width)
-//    {
-//        min_max_locations[2*SPACE_DIM-1] += (min_width - width + 0.1)/2.0; // 0.1 padding to make sure we have space for all processes.
-//        min_max_locations[2*SPACE_DIM-2] -= (min_width - width + 0.1)/2.0;
-//    }
-
-    // Add domain padding to allow for node movement.
-    for (unsigned d=0; d<SPACE_DIM; d++)
-    {
-        min_max_location[2*d] -= domainPadding;
-        min_max_location[2*d+1] += domainPadding;
-    }
+    mpBoxCollection = new BoxCollection<SPACE_DIM>(mMaximumInteractionDistance, domain_size);
 
     for (unsigned i=0; i<rNodes.size(); i++)
     {

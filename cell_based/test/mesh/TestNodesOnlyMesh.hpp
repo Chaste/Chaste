@@ -90,6 +90,57 @@ public:
         }
     }
 
+    void TestCalculateBoundingBox() throw (Exception)
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, -1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, -1.0, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(3, false, 1.0, 1.0, 0.0));
+
+        NodesOnlyMesh<3> mesh;
+        ChasteCuboid<3> bounding_cuboid = mesh.CalculateBoundingBox(nodes);
+
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[0], 1.0, 1e-10);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[1], 1.0, 1e-10);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetUpperCorner()[2], 0.0, 1e-10);
+
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[0], -1.0, 1e-10);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[1], -1.0, 1e-10);
+        TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[2], 0.0, 1e-10);
+    }
+
+    void TestConstuctingInitialBoxCollection() throw (Exception)
+    {
+        double cut_off = 0.5;
+
+        /*
+         * Nodes chosen so to test the cases that the domain width in x is
+         * "divisible" by the cut_off, the y-dimension is not "divisible" and
+         * the z-direction has zero extent.
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, -1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 1.0, -1.1, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 1.1, 0.0));
+        nodes.push_back(new Node<3>(3, false, 1.0, 1.0, 0.0));
+
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, cut_off);
+
+        BoxCollection<3>* p_box_collection = mesh.mpBoxCollection;
+
+        TS_ASSERT(p_box_collection != NULL);
+
+        // 5x5x1 box collection
+        TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), 25u);
+
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(0)), 10u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(1)), 4u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(2)), 22u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(3)), 24u);
+    }
+
     void TestClearingNodesOnlyMesh()
     {
         std::vector<Node<3>*> nodes;

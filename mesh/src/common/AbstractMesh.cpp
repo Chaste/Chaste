@@ -217,12 +217,11 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetWidth(const unsigned& rDimension) const
 {
     assert(rDimension < SPACE_DIM);
-    return CalculateBoundingBox().GetWidth(rDimension);
+    return CalculateBoundingBox(mNodes).GetWidth(rDimension);
 }
 
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox() const
+ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox(const std::vector<Node<SPACE_DIM> *>& rNodes) const
 {
     // Set min to DBL_MAX etc.
     c_vector<double, SPACE_DIM> minimum_point = scalar_vector<double>(SPACE_DIM, DBL_MAX);
@@ -232,11 +231,11 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
 
     // Iterate through nodes
     /// \todo #1322 use a const version of NodeIterator here
-    for (unsigned index=0; index<mNodes.size(); index++)
+    for (unsigned index=0; index<rNodes.size(); index++)
     {
-        if (!mNodes[index]->IsDeleted())
+        if (!rNodes[index]->IsDeleted())
         {
-            c_vector<double, SPACE_DIM> position  = mNodes[index]->rGetLocation();
+            c_vector<double, SPACE_DIM> position  = rNodes[index]->rGetLocation();
 
             // Update max/min
             for (unsigned i=0; i<SPACE_DIM; i++)
@@ -256,6 +255,14 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
     ChastePoint<SPACE_DIM> max(maximum_point);
 
     return ChasteCuboid<SPACE_DIM>(min, max);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox() const
+{
+    ChasteCuboid<SPACE_DIM> bounding_cuboid = CalculateBoundingBox(mNodes);
+
+    return bounding_cuboid;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

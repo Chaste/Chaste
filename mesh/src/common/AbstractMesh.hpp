@@ -122,6 +122,16 @@ protected:  // Give access of these variables to subclasses
      * Does nothing.  Used in derived classes which have elements
      */
     virtual void SetElementOwnerships();
+
+    /**
+     * Calculate a bounding box from a set of nodes. A generalised version of the public
+     * CalculateBoundingBox method.
+     *
+     * @param rNodes the list of nodes to calculate the bounding box for.
+     * @return the bounding box in the form of a ChasteCuboid.
+     */
+    ChasteCuboid<SPACE_DIM> CalculateBoundingBox(const std::vector<Node<SPACE_DIM>* >& rNodes) const;
+
 public:
 
     //////////////////////////////////////////////////////////////////////
@@ -315,7 +325,7 @@ public:
 
     /**
      * Calculate the bounding box (width extremes for all dimensions of the mesh.
-     * Overridden in Distribute case
+     * Overridden in Distributed case
      *
      * @return The minimum and maximum co-ordinates of any node in each dimension
      *
