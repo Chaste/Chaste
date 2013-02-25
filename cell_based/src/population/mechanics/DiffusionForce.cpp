@@ -42,7 +42,8 @@ DiffusionForce<DIM>::DiffusionForce()
       mDiffusionConstant(0.01),
       mAbsoluteTemperature(296.0), // default to room temperature
       mViscosity(3.204e-6), // default to viscosity of water at room temperature in (using microns and hours)
-      mMechanicsCutOffLength(10.0)
+      mMechanicsCutOffLength(10.0),
+      mBoltzmannConstant(1.3806488e-23)
 {
 }
 
@@ -106,7 +107,7 @@ double DiffusionForce<DIM>::GetViscosity()
 template<unsigned DIM>
 double DiffusionForce<DIM>::GetDiffusionScalingConstant()
 {
-    return msBoltzmannConstant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
+    return mBoltzmannConstant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
 }
 
 template<unsigned DIM>
