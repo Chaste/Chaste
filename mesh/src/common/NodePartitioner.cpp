@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "petscao.h"
 #include "petscmat.h"
+
 /*
  * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
  * the library was compiled with a plain-C compiler, it fails to link using a C++ compiler.
@@ -142,8 +143,27 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
         }
         rMeshReader.Reset();
 
-        int etype;
+        int nparts = PetscTools::GetNumProcs();
+        int edgecut;
+        idxtype* epart = new idxtype[ne];
+        assert(epart != NULL);
 
+        Timer::Reset();
+#if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above implies METIS 5.x and above
+        //New interface
+        //Where to find information on element i in the elmnts array
+        idxtype* eptr = new idxtype[ne+1];
+        for (idxtype i=0; i<=ne; i++)
+        {
+            eptr[i]= i * (ELEMENT_DIM+1);
+        }
+        METIS_PartMeshNodal(&ne, &nn,  eptr, elmnts,
+                NULL /*vwgt*/, NULL /*vsize*/, &nparts, NULL /*tpwgts*/,
+                NULL /*options*/, &edgecut /*aka objval*/, epart, npart);
+#else
+        //Old interface
+        int numflag = 0; //0 means C-style numbering is assumed
+        int etype;
         switch (ELEMENT_DIM)
         {
             case 2:
@@ -156,45 +176,6 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
                 NEVER_REACHED;
         }
 
-        int nparts = PetscTools::GetNumProcs();
-        int edgecut;
-        idxtype* epart = new idxtype[ne];
-        assert(epart != NULL);
-
-        Timer::Reset();
-#if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above implies METIS 5.x and above
-        ///\todo 2250 This bit is not working yet - SegFault
-        //New interface (which allows for extra weights)
-        int options[METIS_NOPTIONS];
-        // Default options
-        METIS_SetDefaultOptions(options);
-
-
-        options[METIS_OPTION_NUMBERING]=0;
-        //Fake equal weights
-        real_t* tpwgts=new real_t[nparts];
-        for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
-        {
-            tpwgts[proc]=1.0/((real_t)nparts);
-        }
-        options[METIS_OPTION_IPTYPE]    = 0;
-        options[METIS_OPTION_RTYPE]     = 0;
-        options[METIS_OPTION_OBJTYPE]   = 0;
-        options[METIS_OPTION_CTYPE]     = 1;
-        options[METIS_OPTION_DBGLVL]    = 0;
-        options[METIS_OPTION_NITER]     = 10;
-        options[METIS_OPTION_NCUTS]     = 1;
-        options[METIS_OPTION_MINCONN]   = 0;
-        options[METIS_OPTION_CONTIG]    = 0;
-        options[METIS_OPTION_UFACTOR]   = 1;
-
-        METIS_PartMeshNodal(&ne, &nn, elmnts, &etype,
-                NULL /*vwgt*/, NULL /*vsize*/, &nparts, NULL/*tpwgts*/,
-                NULL/*options*/, &edgecut /*aka objval*/, epart, npart);
-        delete [] tpwgts;
-#else
-        //Old interface
-        int numflag = 0; //0 means C-style numbering is assumed
         METIS_PartMeshNodal(&ne, &nn, elmnts, &etype, &numflag, &nparts, &edgecut, epart, npart);
 #endif
         delete[] elmnts;
