@@ -120,6 +120,13 @@ public:
     std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
 
     /**
+     * Return the size of the domain partitioned by this collection
+     *
+     * @return the vector of the domain edges (xmin, xmax etc).
+     */
+    const c_vector<double, 2*DIM>& rGetDomainSize() const;
+
+    /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
      *  local box to the box containing the first node. **Note: the user still has to check that the node
      *  pairs are less than the cut-off distance apart.** The pairs are checked so that index1 < index2,

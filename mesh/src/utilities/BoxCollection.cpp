@@ -690,6 +690,12 @@ std::set<unsigned> BoxCollection<DIM>::GetLocalBoxes(unsigned boxIndex)
 }
 
 template<unsigned DIM>
+const c_vector<double, 2*DIM>& BoxCollection<DIM>::rGetDomainSize() const
+{
+    return mDomainSize;
+}
+
+template<unsigned DIM>
 void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();

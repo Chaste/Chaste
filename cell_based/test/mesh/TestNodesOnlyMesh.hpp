@@ -110,7 +110,7 @@ public:
         TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[2], 0.0, 1e-10);
     }
 
-    void TestConstuctingInitialBoxCollection() throw (Exception)
+    void TestConstuctingAndSwellingInitialBoxCollection() throw (Exception)
     {
         double cut_off = 0.5;
 
@@ -139,6 +139,19 @@ public:
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(1)), 4u);
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(2)), 22u);
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(3)), 24u);
+
+        mesh.EnlargeBoxCollection();
+
+        BoxCollection<3>* p_new_collection = mesh.mpBoxCollection;
+
+        // 7x7x3 box collection
+        TS_ASSERT_EQUALS(p_new_collection->GetNumBoxes(), 147u);
+
+        // The "old" boxes should be in the same spatial position.
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(0)), 71u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(1)), 61u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(2)), 87u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(3)), 89u);
     }
 
     void TestClearingNodesOnlyMesh()

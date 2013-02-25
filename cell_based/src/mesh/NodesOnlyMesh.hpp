@@ -128,6 +128,9 @@ private:
      */
     unsigned GetNextAvailableIndex();
 
+    /** Enlarge the underlying BoxCollection.*/
+    void EnlargeBoxCollection();
+
 public:
 
     /**
@@ -247,6 +250,7 @@ public:
      * @param index is the index of the node to be deleted
      */
     void DeleteNode(unsigned index);
+
 };
 
 #include "SerializationExportWrapper.hpp"

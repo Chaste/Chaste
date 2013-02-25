@@ -981,6 +981,13 @@ public:
 
         box_collection.SetupLocalBoxesHalfOnly();
 
+        // Check the GetDomainSize method is working.
+        const c_vector<double, 2*3> returned_domain_size = box_collection.rGetDomainSize();
+        for (unsigned i=0; i < 2*3; i++)
+        {
+            TS_ASSERT_DELTA(returned_domain_size[i], domain_size[i], 1e-10);
+        }
+
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));

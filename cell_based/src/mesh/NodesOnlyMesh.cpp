@@ -283,6 +283,25 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
     mTotalNumNodes -= 1;
 }
 
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
+{
+    assert(mpBoxCollection);
+
+    c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
+    c_vector<double, 2*SPACE_DIM> new_domain_size;
+
+    for (unsigned d=0; d < SPACE_DIM; d++)
+    {
+        new_domain_size[2*d] = current_domain_size[2*d] - mMaximumInteractionDistance;
+        new_domain_size[2*d+1] = current_domain_size[2*d+1] + mMaximumInteractionDistance;
+    }
+
+    delete mpBoxCollection;
+
+    mpBoxCollection = new BoxCollection<SPACE_DIM>(mMaximumInteractionDistance, new_domain_size);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////
