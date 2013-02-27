@@ -108,6 +108,11 @@ public:
         TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[0], -1.0, 1e-10);
         TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[1], -1.0, 1e-10);
         TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[2], 0.0, 1e-10);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestConstuctingAndSwellingInitialBoxCollection() throw (Exception)
@@ -148,10 +153,15 @@ public:
         TS_ASSERT_EQUALS(p_new_collection->GetNumBoxes(), 147u);
 
         // The "old" boxes should be in the same spatial position.
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(0)), 71u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(1)), 61u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(2)), 87u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(3)), 89u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(0)), 71u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(1)), 61u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(2)), 87u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(3)), 89u);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestCheckingBoxCollectionSizeAndSwelling() throw (Exception)
@@ -191,6 +201,11 @@ public:
         enlarge = mesh.IsANodeCloseToDomainBoundary();
 
         TS_ASSERT(enlarge);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestClearingNodesOnlyMesh()

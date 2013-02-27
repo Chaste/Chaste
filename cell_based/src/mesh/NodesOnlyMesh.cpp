@@ -184,6 +184,11 @@ void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
 {
+    if (mpBoxCollection)
+    {
+        delete mpBoxCollection;
+    }
+
     mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
     mpBoxCollection->SetupLocalBoxesHalfOnly();
 
@@ -299,9 +304,7 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
         new_domain_size[2*d+1] = current_domain_size[2*d+1] + mMaximumInteractionDistance;
     }
 
-    delete mpBoxCollection;
-
-    mpBoxCollection = new BoxCollection<SPACE_DIM>(mMaximumInteractionDistance, new_domain_size);
+    SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size);
 }
 
 template<unsigned SPACE_DIM>
