@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
+
 #include "BoxCollection.hpp"
 #include "MutableMesh.hpp"
 
@@ -49,14 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM>
 class NodesOnlyMesh: public MutableMesh<SPACE_DIM, SPACE_DIM>
 {
-
-protected:
-    /**
-     * A pointer to a box collection. Used to calculate neighbourhood information
-     * for nodes in the mesh.
-     */
-    BoxCollection<SPACE_DIM>* mpBoxCollection;
-
 private:
 
     friend class TestNodesOnlyMesh;
@@ -78,20 +71,15 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
         archive & mMaximumInteractionDistance;
+		archive & mMinimumNodeDomainBoundarySeparation;
+        archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
     }
-
-    /** The global number of nodes in the mesh. */
-    unsigned mTotalNumNodes;
 
     /** Vector of pointer to halo nodes used by this process. */
     std::vector<Node<SPACE_DIM>* > mHaloNodes;
 
-    /**
-     * Defines connectivity in NodesOnlyMesh. Two nodes are connected
-     * if their centres are less than mMaximumInteractionDistance apart.
-     */
+    /** Nodes less than mMaximumInteractionDistance are neighbours. */
     double mMaximumInteractionDistance;
 
     /** A map from node global index to local index used by this process. */
@@ -100,18 +88,15 @@ private:
     /** A map from halo node global index to local index used by this process. */
     std::map<unsigned, unsigned> mHaloNodesMapping;
 
-    /** A counter of the number of fresh indices used on this process. */
+    /** A counter of the number of fresh node indices used on this process. */
     unsigned mIndexCounter;
 
-    /** If a node in the mesh is within this distance of the boundary of mpBoxCollection, IsANodeCloseToDomainBoundary returns true. Assigned equal to mMaximumInteractionDistance by default.*/
+    /** A minimum separation to maintain between nodes and the boundary of mpBoxCollection. */
     double mMinimumNodeDomainBoundarySeparation;
-
-    /** A vector of the global indices that have been freed on the process from deleting a node */
-    //std::vector<unsigned> mDeletedGlobalNodeIndices;
 
     /**
      * Calculate the next unique global index available on this
-     * process. Uses a hashing function to ensure that a unqiue
+     * process. Uses a hashing function to ensure that a unique
      * index is given to every node.
      *
      * For example for 3 process they will have access to the following
@@ -125,13 +110,16 @@ private:
      *
      * Deleted node indices can be locally re-used.
      *
-     * Deleted node inidces of nodes that have *moved* process cannot be re-used.
+     * Deleted node indices of nodes that have *moved* process cannot be re-used.
      *
      * @return the next available index.
      */
     unsigned GetNextAvailableIndex();
 
-    /** Enlarge the underlying BoxCollection.*/
+    /**
+     * Enlarge the underlying BoxCollection by adding an extra row / face of boxes
+     * to each edge / face of the current collection.
+     */
     void EnlargeBoxCollection();
 
     /**
@@ -140,6 +128,42 @@ private:
      * @return Whether any node (deleted or otherwise) is close to the domain boundary.
      */
     bool IsANodeCloseToDomainBoundary();
+
+    /**
+     * Set up the box collection. Overridden in subclasses to implement periodicity.
+     *
+     * @param cutOffLength the cut off length for node neighbours
+     * @param domainSize the size of the domain containing the nodes.
+     */
+     virtual void SetUpBoxCollection(double cutOff, c_vector<double, 2*SPACE_DIM> domainSize);
+
+     /**
+      * Set up a box collection by calculating the correct domain size from the node locations
+      */
+     void SetUpBoxCollection();
+
+     /**
+      * Clear the old box collection and set up a new one if necessary.
+      */
+     void UpdateBoxCollection();
+
+protected:
+
+    /**
+     * A pointer to a box collection. Used to calculate neighbourhood information
+     * for nodes in the mesh.
+     */
+    BoxCollection<SPACE_DIM>* mpBoxCollection;
+
+    /**
+     * Iterate through each node and add it to its appropriate box.
+     */
+    void AddNodesToBoxes();
+
+    /**
+     * Clear the BoxCollection
+     */
+    void ClearBoxCollection();
 
 public:
 
@@ -163,9 +187,8 @@ public:
      *
      * @param rNodes a vector of pointers to nodes
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
-     * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance, double domainPadding = 2.0);
+    void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance);
 
     /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
@@ -176,9 +199,8 @@ public:
      *
      * @param rGeneratingMesh any mesh with nodes, used to generate the NodesOnlyMesh
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
-     * @param domainPadding the amount of padding space added to the edge of the spatial domain on construction. Should be larger than max movement distance of a node in one step.
      */
-    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance, double domainPadding = 2.0);
+    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance);
 
     /**
      * Overridden Clear() method for NodesOnlyMesh.
@@ -201,34 +223,9 @@ public:
     unsigned GetNumNodes() const;
 
     /**
-     * Get the global number of nodes.
-     */
-    unsigned GetGlobalNumNodes() const;
-
-    /**
      * @return mMaxInteractionDistance
      */
     double GetMaximumInteractionDistance();
-
-    /**
-     * Get mpBoxCollection
-     *
-     * @return mpBoxCollection
-     */
-    BoxCollection<SPACE_DIM>* GetBoxCollection();
-
-    /**
-     * Clear the BoxCollection
-     */
-    void ClearBoxCollection();
-
-    /**
-     * Set up the box collection. Overridden in subclasses to implement periodicity.
-     *
-     * @param cutOffLength the cut off length for node neighbours
-     * @param domainSize the size of the domain containing the nodes.
-     */
-    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
 
     /**
      * Calculate pairs of nodes using the BoxCollection

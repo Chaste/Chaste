@@ -91,11 +91,6 @@ public:
     Cylindrical2dNodesOnlyMesh(double width);
 
     /**
-     * Over-written destructor to delete pointer to BoxCollection
-     */
-    ~Cylindrical2dNodesOnlyMesh();
-
-    /**
      * Set up the box collection
      *
      * @param cutOffLength the cut off length for node neighbours

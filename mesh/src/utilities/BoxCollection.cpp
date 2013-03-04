@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoxCollection.hpp"
 #include "Exception.hpp"
 
-
 /////////////////////////////////////////////////////////////////////////////
 // BoxCollection methods
 /////////////////////////////////////////////////////////////////////////////
@@ -122,6 +121,15 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
 
     // Check that we have the correct number of boxes
     assert(num_boxes == mBoxes.size());
+}
+
+template<unsigned DIM>
+void BoxCollection<DIM>::EmptyBoxes()
+{
+    for (unsigned i=0; i<mBoxes.size(); i++)
+    {
+        mBoxes[i].ClearNodes();
+    }
 }
 
 template<unsigned DIM>

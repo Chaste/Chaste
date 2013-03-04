@@ -68,7 +68,6 @@ public:
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
-        TS_ASSERT_EQUALS(p_mesh->GetGlobalNumNodes(), 8u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), 8u);
@@ -80,7 +79,7 @@ public:
             TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(i), p_mesh->mNodesMapping[i]);
         }
 
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8), " does not belong to process ")
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8), " does not belong to process ");
 
         // Avoid memory leak
         delete p_mesh;
@@ -115,7 +114,7 @@ public:
         }
     }
 
-    void TestConstuctingAndSwellingInitialBoxCollection() throw (Exception)
+    void TestConstuctingAndEnlargingInitialBoxCollection() throw (Exception)
     {
         double cut_off = 0.5;
 
@@ -164,7 +163,7 @@ public:
         }
     }
 
-    void TestCheckingBoxCollectionSizeAndSwelling() throw (Exception)
+    void TestBoxCollectionSizeAndSwelling() throw (Exception)
     {
         double cut_off = 0.5;
 
@@ -208,6 +207,45 @@ public:
         }
     }
 
+    void TestMovingNodesInBoxCollection() throw (Exception)
+    {
+        double cut_off = 0.5;
+
+        /*
+         * Nodes chosen so to test the cases that the domain width in x is
+         * "divisible" by the cut_off, the y-dimension is not "divisible" and
+         * the z-direction has zero extent.
+         */
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false, -0.9, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, 0.9, -0.9, 0.0));
+        nodes.push_back(new Node<3>(2, false, 0.0, 0.9, 0.0));
+        nodes.push_back(new Node<3>(3, false, 0.9, 0.9, 0.0));
+
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, cut_off);
+
+        // 4 x 4 x 1 collection
+        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16u);
+
+        // Test what happens if nodes move in initial collection.
+        c_vector<double, 3> initial_location = mesh.GetNode(0)->rGetLocation();
+        c_vector<double, 3> translation = scalar_vector<double>(3, -2.0*cut_off);
+        ChastePoint<3> new_point(initial_location + translation);
+        mesh.GetNode(0)->SetPoint(new_point);
+
+        NodeMap map(4);
+        TS_ASSERT_THROWS_NOTHING(mesh.ReMesh(map));
+
+        // 10 x 10 x 7
+        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 700u);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
     void TestClearingNodesOnlyMesh()
     {
         std::vector<Node<3>*> nodes;
@@ -233,7 +271,6 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), 0u);
-        TS_ASSERT(!p_mesh->mpBoxCollection);
 
         // Avoid memory leak
         delete p_mesh;

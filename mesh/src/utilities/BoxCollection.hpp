@@ -84,6 +84,11 @@ public:
     BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false);
 
     /**
+     * Remove the list of nodes stored in each box.
+     */
+    void EmptyBoxes();
+
+    /**
      * Calculate which box this node is contained in.
      * @param pNode address of the node
      */

@@ -40,9 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM>
 NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
         : MutableMesh<SPACE_DIM, SPACE_DIM>(),
-          mpBoxCollection(NULL),
-          mTotalNumNodes(0u),
-          mIndexCounter(0u)
+          mMaximumInteractionDistance(1.0),
+          mIndexCounter(0u),
+          mMinimumNodeDomainBoundarySeparation(1.0),
+          mpBoxCollection(NULL)
 {
 }
 
@@ -54,27 +55,14 @@ NodesOnlyMesh<SPACE_DIM>::~NodesOnlyMesh()
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance, double domainPadding)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance)
 {
     assert(maxInteractionDistance > 0.0 && maxInteractionDistance < DBL_MAX);
     mMaximumInteractionDistance = maxInteractionDistance;
 
     mMinimumNodeDomainBoundarySeparation = mMaximumInteractionDistance;
 
-    this->Clear();
-    mpBoxCollection = NULL;
-
-    ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox(rNodes);
-
-    ///\todo #2323 make a constructor for BoxCollection that accepts a ChasteCuboid.
-    c_vector<double, 2*SPACE_DIM> domain_size;
-    for (unsigned i=0; i < SPACE_DIM; i++)
-    {
-        domain_size[2*i] = bounding_box.rGetLowerCorner()[i];
-        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i];
-    }
-
-    mpBoxCollection = new BoxCollection<SPACE_DIM>(mMaximumInteractionDistance, domain_size);
+    Clear();
 
     for (unsigned i=0; i<rNodes.size(); i++)
     {
@@ -92,13 +80,13 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         mIndexCounter++;
     }
 
-    mTotalNumNodes = rNodes.size();
+    SetUpBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance, double domainPadding)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance)
 {
-    ConstructNodesWithoutMesh(rGeneratingMesh.mNodes, maxInteractionDistance, domainPadding);
+    ConstructNodesWithoutMesh(rGeneratingMesh.mNodes, maxInteractionDistance);
 }
 
 template<unsigned SPACE_DIM>
@@ -115,23 +103,6 @@ unsigned NodesOnlyMesh<SPACE_DIM>::SolveNodeMapping(unsigned index) const
 }
 
 template<unsigned SPACE_DIM>
-unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
-{
-//    if(!this->mDeletedGlobalNodeIndices.empty())
-//    {
-//        unsigned index = this->mDeletedGlobalNodeIndices.back();
-//        this->mDeletedGlobalNodeIndices.pop_back();
-//        return index;
-//    }
-//    else
-    {
-        unsigned counter = mIndexCounter;
-        mIndexCounter++;
-        return counter * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
-    }
-}
-
-template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::Clear()
 {
     // Call Clear() on the parent class
@@ -139,12 +110,6 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 
     // Clear the nodes mapping
     mNodesMapping.clear();
-
-    // Set the global number of nodes to zero.
-    mTotalNumNodes = 0u;
-
-    // Clear the box collection.
-    ClearBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
@@ -154,58 +119,16 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
 }
 
 template<unsigned SPACE_DIM>
-unsigned NodesOnlyMesh<SPACE_DIM>::GetGlobalNumNodes() const
-{
-    return mTotalNumNodes;
-}
-
-template<unsigned SPACE_DIM>
 double NodesOnlyMesh<SPACE_DIM>::GetMaximumInteractionDistance()
 {
     return mMaximumInteractionDistance;
 }
 
 template<unsigned SPACE_DIM>
-BoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
-{
-    return mpBoxCollection;
-}
-
-template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
-{
-    if (mpBoxCollection != NULL)
-    {
-        delete mpBoxCollection;
-    }
-    mpBoxCollection = NULL;
-}
-
-template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
-{
-    if (mpBoxCollection)
-    {
-        delete mpBoxCollection;
-    }
-
-    mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
-    mpBoxCollection->SetupLocalBoxesHalfOnly();
-
-    //Put the nodes in the boxes.
-    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
-            node_iter != this->GetNodeIteratorEnd();
-            ++node_iter)
-    {
-        unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
-        mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
-    }
-}
-
-template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
-    assert(mpBoxCollection != NULL);
+    assert(mpBoxCollection);
+
     mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
 }
 
@@ -234,8 +157,9 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
             new_index++;
         }
     }
+
     // Remove current data
-    this->Clear();
+    Clear();
 
     // Construct the nodes
     for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
@@ -251,8 +175,9 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
         mNodesMapping[p_node->GetIndex()] = this->mNodes.size()-1;
     }
 
-    // Update the global number of nodes
-    mTotalNumNodes = this->mNodes.size();
+    this->SetMeshHasChangedSinceLoading();
+
+    UpdateBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
@@ -267,9 +192,6 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
     // Then update cell radius to default.
     pNewNode->SetRadius(0.5);
 
-    // Increase the counter for the number of nodes.
-    mTotalNumNodes += 1;
-
     return new_node_index;
 }
 
@@ -283,11 +205,23 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
 
     this->mNodes[index]->MarkAsDeleted();
     this->mDeletedNodeIndices.push_back(index);
-//    mDeletedGlobalNodeIndices.push_back(index);
     mNodesMapping.erase(index);
+}
 
-    // Decrease the counter for the number of nodes.
-    mTotalNumNodes -= 1;
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetMinimumNodeDomainBoundarySeparation(double separation)
+{
+    assert(!(separation < 0.0));
+
+    mMinimumNodeDomainBoundarySeparation = separation;
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
+{
+    unsigned counter = mIndexCounter;
+    mIndexCounter++;
+    return counter * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
 }
 
 template<unsigned SPACE_DIM>
@@ -310,7 +244,7 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
 template<unsigned SPACE_DIM>
 bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
 {
-    assert (mpBoxCollection);
+    assert(mpBoxCollection);
 
     bool is_any_node_close = false;
     c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
@@ -339,11 +273,71 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetMinimumNodeDomainBoundarySeparation(double separation)
+void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
 {
-    assert(!(separation < 0.0));
+    if (mpBoxCollection)
+    {
+        delete mpBoxCollection;
+    }
+    mpBoxCollection = NULL;
+}
 
-    mMinimumNodeDomainBoundarySeparation = separation;
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection()
+{
+    ClearBoxCollection();
+
+    ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox();
+
+    c_vector<double, 2*SPACE_DIM> domain_size;
+    for (unsigned i=0; i < SPACE_DIM; i++)
+    {
+        domain_size[2*i] = bounding_box.rGetLowerCorner()[i];
+        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i];
+    }
+
+    SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
+{
+     ClearBoxCollection();
+
+     mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
+     mpBoxCollection->SetupLocalBoxesHalfOnly();
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::AddNodesToBoxes()
+{
+     // Put the nodes in the boxes.
+     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+               node_iter != this->GetNodeIteratorEnd();
+               ++node_iter)
+     {
+          unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
+          mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
+     }
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
+{
+    if (!mpBoxCollection)
+     {
+          SetUpBoxCollection();
+     }
+
+    // Remove node pointers from boxes in BoxCollection.
+    mpBoxCollection->EmptyBoxes();
+
+    while (IsANodeCloseToDomainBoundary())
+    {
+        EnlargeBoxCollection();
+    }
+
+     AddNodesToBoxes();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

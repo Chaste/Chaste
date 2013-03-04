@@ -64,6 +64,12 @@ void Box<DIM>::RemoveNode(Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
+void Box<DIM>::ClearNodes()
+{
+    mNodesContained = std::set< Node<DIM>* >();
+}
+
+template<unsigned DIM>
 std::set< Node<DIM>* >& Box<DIM>::rGetNodesContained()
 {
     return mNodesContained;

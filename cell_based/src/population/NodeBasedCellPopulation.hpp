@@ -143,19 +143,6 @@ protected:
 private:
 
     /**
-     * Method for Initially Splitting up cell population into neighbouring boxes, to decrease runtime.
-     *
-     * @param cutOffLength length of spring cut off between nodes
-     * @param domainSize c_vector of size 2*dimension reads minX, maxX, minY, maxY, etc
-     */
-    void SplitUpIntoBoxes(double cutOffLength, c_vector<double, 2*DIM> domainSize);
-
-    /**
-     * Loops over nodes and sets mMinSpatialPositions and mMaxSpatialPositions
-     */
-    void FindMaxAndMin();
-
-    /**
      * Overridden WriteCellVolumeResultsToFile() method.
      */
     void WriteCellVolumeResultsToFile();
@@ -252,11 +239,6 @@ public:
      * @param hasHadBirthsOrDeaths whether cell population has had Births Or Deaths
      */
     void Update(bool hasHadBirthsOrDeaths=true);
-
-    /**
-     * @return pointer to a node box collection.
-     */
-    BoxCollection<DIM>* GetBoxCollection();
 
     /**
      * Overridden rGetNodePairs method

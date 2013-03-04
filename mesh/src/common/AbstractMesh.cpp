@@ -223,34 +223,45 @@ double AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetWidth(const unsigned& rDimension
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox(const std::vector<Node<SPACE_DIM> *>& rNodes) const
 {
-    // Set min to DBL_MAX etc.
-    c_vector<double, SPACE_DIM> minimum_point = scalar_vector<double>(SPACE_DIM, DBL_MAX);
+    // Work out the max and min location in each co-ordinate direction.
+    c_vector<double, SPACE_DIM> minimum_point;
+    c_vector<double, SPACE_DIM> maximum_point;
 
-    // Set max to -DBL_MAX etc.
-    c_vector<double, SPACE_DIM> maximum_point=-minimum_point;
-
-    // Iterate through nodes
-    /// \todo #1322 use a const version of NodeIterator here
-    for (unsigned index=0; index<rNodes.size(); index++)
+    // Deal with the special case of no nodes by returning a cuboid with zero volume.
+    if (rNodes.empty())
     {
-        if (!rNodes[index]->IsDeleted())
-        {
-            c_vector<double, SPACE_DIM> position  = rNodes[index]->rGetLocation();
+        minimum_point = scalar_vector<double>(SPACE_DIM, 0.0);
+        maximum_point = scalar_vector<double>(SPACE_DIM, 0.0);
+    }
+    else
+    {
+        minimum_point = scalar_vector<double>(SPACE_DIM, DBL_MAX);
+        maximum_point = scalar_vector<double>(SPACE_DIM, -DBL_MAX);
 
-            // Update max/min
-            for (unsigned i=0; i<SPACE_DIM; i++)
+        // Iterate through nodes
+        /// \todo #1322 use a const version of NodeIterator here
+        for (unsigned index=0; index<rNodes.size(); index++)
+        {
+            if (!rNodes[index]->IsDeleted())
             {
-                if (position[i] < minimum_point[i])
+                c_vector<double, SPACE_DIM> position  = rNodes[index]->rGetLocation();
+
+                // Update max/min
+                for (unsigned i=0; i<SPACE_DIM; i++)
                 {
-                    minimum_point[i] = position[i];
-                }
-                if (position[i] > maximum_point[i])
-                {
-                    maximum_point[i] = position[i];
+                    if (position[i] < minimum_point[i])
+                    {
+                        minimum_point[i] = position[i];
+                    }
+                    if (position[i] > maximum_point[i])
+                    {
+                        maximum_point[i] = position[i];
+                    }
                 }
             }
         }
     }
+
     ChastePoint<SPACE_DIM> min(minimum_point);
     ChastePoint<SPACE_DIM> max(maximum_point);
 

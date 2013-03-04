@@ -85,6 +85,11 @@ public:
     void RemoveNode(Node<DIM>* pNode);
 
     /**
+     * Remove all nodes from the box.
+     */
+    void ClearNodes();
+
+    /**
      * An element to this box.
      * @param pElement address of the element to be added
      */

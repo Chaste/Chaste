@@ -463,6 +463,13 @@ public:
 
         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
+        // Check we empty boxes correctly
+        box_collection.EmptyBoxes();
+        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        {
+            TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
+        }
+
         for (unsigned i=0; i<points.size(); i++)
         {
             delete nodes[i];

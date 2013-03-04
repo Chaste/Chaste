@@ -118,50 +118,6 @@ void NodeBasedCellPopulation<DIM>::Validate()
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::SplitUpIntoBoxes(double cutOffLength, c_vector<double, 2*DIM> domainSize)
-{
-    mpNodesOnlyMesh->SetUpBoxCollection(cutOffLength, domainSize);
-}
-
-template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::FindMaxAndMin()
-{
-    c_vector<double, DIM> min_posn;
-    c_vector<double, DIM> max_posn;
-    for (unsigned i=0; i<DIM; i++)
-    {
-        min_posn(i) = DBL_MAX;
-        max_posn(i) = -DBL_MAX;
-    }
-
-    for (unsigned i=0; i<this->mrMesh.GetNumNodes(); i++)
-    {
-        c_vector<double, DIM> posn = this->GetNode(i)->rGetLocation();
-
-        for (unsigned j=0; j<DIM; j++)
-        {
-            if (posn(j) > max_posn(j))
-            {
-                max_posn(j) = posn(j);
-            }
-            if (posn(j) < min_posn(j))
-            {
-                min_posn(j) = posn(j);
-            }
-        }
-    }
-
-    for (unsigned i=0; i<DIM; i++)
-    {
-        assert(min_posn(i) != DBL_MAX);
-        mMinSpatialPositions(i) = min_posn(i);
-
-        assert(max_posn(i) != -DBL_MAX);
-        mMaxSpatialPositions(i) = max_posn(i);
-    }
-}
-
-template<unsigned DIM>
 Node<DIM>* NodeBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
     return this->mrMesh.GetNode(index);
@@ -206,30 +162,6 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
         this->Validate();
     }
-
-    mpNodesOnlyMesh->SetMeshHasChangedSinceLoading();
-
-    mpNodesOnlyMesh->ClearBoxCollection();
-
-    FindMaxAndMin();
-
-    // Something here to set up the domain size (max and min of each node position dimension)
-    c_vector<double, 2*DIM> domain_size;
-    for (unsigned i=0; i<DIM; i++)
-    {
-        domain_size(2*i) = mMinSpatialPositions(i);
-        domain_size(2*i+1) = mMaxSpatialPositions(i);
-    }
-
-    // This should be set when the mesh is constructed.
-    assert(mpNodesOnlyMesh->GetMaximumInteractionDistance() != DBL_MAX);
-
-    /*
-     * Add this parameter and suggest that mechanics systems set it.
-     * Allocates memory for mpBoxCollection and does the splitting
-     * and putting nodes into boxes.
-     */
-    mpNodesOnlyMesh->SetUpBoxCollection(mpNodesOnlyMesh->GetMaximumInteractionDistance(), domain_size);
 
     mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
 
@@ -294,12 +226,6 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 }
 
 template<unsigned DIM>
-BoxCollection<DIM>* NodeBasedCellPopulation<DIM>::GetBoxCollection()
-{
-    return mpNodesOnlyMesh->GetBoxCollection();
-}
-
-template<unsigned DIM>
 std::set< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rGetNodePairs()
 {
 //    if (mNodePairs.empty())
@@ -341,13 +267,7 @@ void NodeBasedCellPopulation<DIM>::SetUseVariableRadii(bool useVariableRadii)
 template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
-    // Update the member variables mMinSpatialPositions and mMaxSpatialPositions
-    FindMaxAndMin();
-
-    // Compute the maximum distance between any nodes in this dimension
-    double width = mMaxSpatialPositions(rDimension) - mMinSpatialPositions(rDimension);
-
-    return width;
+    return mpNodesOnlyMesh->GetWidth(rDimension);
 }
 
 template<unsigned DIM>
