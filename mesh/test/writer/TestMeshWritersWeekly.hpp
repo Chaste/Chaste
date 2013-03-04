@@ -73,7 +73,7 @@ private:
     void RunTest(unsigned numStepsInEachDimension)
     {
         MeshEventHandler::Reset();
-        unsigned nodes = SmallPow(numStepsInEachDimension+1, 3);
+        unsigned nodes = (unsigned) SmallPow(numStepsInEachDimension+1, 3);
         if (PetscTools::AmMaster())
         {
             std::cout<<"Number steps per dimension = " << std::setw(12) << numStepsInEachDimension<<std::endl;
@@ -138,10 +138,11 @@ public:
             {
                 std::cout<<"Power                      = " << std::setw(12) << pow<<std::endl;
             }
-            unsigned steps = SmallPow(2, pow);
+            unsigned steps = (unsigned) SmallPow(2, pow);
             RunTest(steps);
         }
-        /* Rough times (sequential, 2-way, 3-way, 4-way GccOpt)
+        /* See #2351
+         * Rough times (sequential, 2-way, 3-way, 4-way GccOpt)
          *
             pow     nodes   time    time2   time3   time4
             4       4K      1s      1s      8s      16s
@@ -149,6 +150,42 @@ public:
             6       280K    45s     >5m
             7       2M      (uses more than 4Gb RAM)
          */
+        /* Timing of pow=5 test for IntelProduction:
+         *
+        Power                      =            5
+        Number steps per dimension =           32
+        Number nodes               =        35937
+              Construct        Tri write        Bin write        VTK write       PVTK write            Total
+           1.794 ( 38%)     0.303 (  6%)     0.152 (  3%)     1.196 ( 25%)     1.330 ( 28%)     4.775 (100%)  (seconds)
+
+        Proc       Construct        Tri write        Bin write        VTK write       PVTK write            Total
+          0:    0.959 (  5%)     5.778 ( 29%)     5.604 ( 28%)     6.886 ( 35%)     0.727 (  4%)    19.955 (100%)  (seconds)
+          1:    0.929 (  5%)     5.809 ( 29%)     5.604 ( 28%)     6.886 ( 35%)     0.559 (  3%)    19.956 (100%)  (seconds)
+        avg:    0.944 (  5%)     5.794 ( 29%)     5.604 ( 28%)     6.886 ( 35%)     0.643 (  3%)    19.955 (100%)  (seconds)
+        max:    0.959 (  5%)     5.809 ( 29%)     5.604 ( 28%)     6.886 ( 35%)     0.727 (  4%)    19.956 (100%)  (seconds)
+
+        Proc       Construct        Tri write        Bin write        VTK write       PVTK write            Total
+          0:    0.508 (  0%)   252.454 ( 31%)   231.030 ( 28%)   328.700 ( 40%)     0.314 (  0%)   813.054 (100%)  (seconds)
+          1:    0.507 (  0%)   252.455 ( 31%)   231.030 ( 28%)   328.700 ( 40%)     0.362 (  0%)   813.054 (100%)  (seconds)
+          2:    0.442 (  0%)   252.520 ( 31%)   231.030 ( 28%)   328.700 ( 40%)     0.315 (  0%)   813.054 (100%)  (seconds)
+          3:    0.399 (  0%)   252.564 ( 31%)   231.030 ( 28%)   328.700 ( 40%)     0.281 (  0%)   813.054 (100%)  (seconds)
+        avg:    0.464 (  0%)   252.498 ( 31%)   231.030 ( 28%)   328.700 ( 40%)     0.318 (  0%)   813.054 (100%)  (seconds)
+        max:    0.508 (  0%)   252.564 ( 31%)   231.030 ( 28%)   328.700 ( 40%)     0.362 (  0%)   813.054 (100%)  (seconds)
+
+        Proc       Construct        Tri write        Bin write        VTK write       PVTK write            Total
+          0:    0.255 (  0%)   727.416 ( 25%)  1109.748 ( 38%)  1094.729 ( 37%)     0.190 (  0%)  2932.420 (100%)  (seconds)
+          1:    0.254 (  0%)   727.416 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.273 (  0%)  2932.419 (100%)  (seconds)
+          2:    0.254 (  0%)   727.417 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.198 (  0%)  2932.420 (100%)  (seconds)
+          3:    0.254 (  0%)   727.417 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.236 (  0%)  2932.419 (100%)  (seconds)
+          4:    0.255 (  0%)   727.416 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.189 (  0%)  2932.420 (100%)  (seconds)
+          5:    0.258 (  0%)   727.413 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.185 (  0%)  2932.419 (100%)  (seconds)
+          6:    0.253 (  0%)   727.418 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.185 (  0%)  2932.420 (100%)  (seconds)
+          7:    0.209 (  0%)   727.463 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.149 (  0%)  2932.420 (100%)  (seconds)
+        avg:    0.249 (  0%)   727.422 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.201 (  0%)  2932.420 (100%)  (seconds)
+        max:    0.258 (  0%)   727.463 ( 25%)  1109.748 ( 38%)  1094.729 ( 37%)     0.273 (  0%)  2932.420 (100%)  (seconds)
+         *
+         */
+
     }
 
 };
