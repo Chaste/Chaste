@@ -112,6 +112,17 @@ public:
         {
             delete nodes[i];
         }
+
+        // Make sure we get a zero-element box if there are no nodes.
+        std::vector<Node<3>* > empty_nodes;
+        NodesOnlyMesh<3> empty_mesh;
+
+        ChasteCuboid<3> empty_bounding_cuboid = empty_mesh.CalculateBoundingBox(empty_nodes);
+
+        for (unsigned i=0; i<3; i++)
+        {
+        	TS_ASSERT_DELTA(empty_bounding_cuboid.rGetLowerCorner()[i], empty_bounding_cuboid.rGetUpperCorner()[i], 1e-4);
+        }
     }
 
     void TestConstuctingAndEnlargingInitialBoxCollection() throw (Exception)
