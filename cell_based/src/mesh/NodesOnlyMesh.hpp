@@ -135,7 +135,7 @@ private:
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
      */
-     virtual void SetUpBoxCollection(double cutOff, c_vector<double, 2*SPACE_DIM> domainSize);
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
 
      /**
       * Set up a box collection by calculating the correct domain size from the node locations
