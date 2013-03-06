@@ -44,27 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshWriter.hpp"
 #include "VtkMeshWriter.hpp"
 #include "OutputFileHandler.hpp"
-#include "GenericEventHandler.hpp"
 #include "MathsCustomFunctions.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
-
-class MeshEventHandler : public GenericEventHandler<6, MeshEventHandler>
-{
-public:
-    static const char* EventName[6];
-
-    typedef enum
-    {
-        CONSTR=0,
-        TRIANGLES,
-        BINTRI,
-        VTK,
-        PVTK
-    } EventType;
-};
-
-const char* MeshEventHandler::EventName[] = { "Construct", "Tri write", "Bin write", "VTK write", "PVTK write", "Total"};
 
 
 class TestMeshWritersWeekly : public CxxTest::TestSuite
@@ -84,10 +66,8 @@ private:
         directory_stream << "TestMeshWritersWeekly/steps_" << std::setw(12) << std::setfill('0')<< numStepsInEachDimension;
         std::string directory_name = directory_stream.str();
 
-        MeshEventHandler::BeginEvent(MeshEventHandler::CONSTR);
         DistributedTetrahedralMesh<3,3> cuboid_mesh;
         cuboid_mesh.ConstructCuboid(numStepsInEachDimension, numStepsInEachDimension, numStepsInEachDimension);
-        MeshEventHandler::EndEvent(MeshEventHandler::CONSTR);
         TS_ASSERT_EQUALS(cuboid_mesh.GetNumNodes(), nodes);
 
 
@@ -98,30 +78,30 @@ private:
         }
         MeshEventHandler::EndEvent(MeshEventHandler::TRIANGLES);
 
-        MeshEventHandler::BeginEvent(MeshEventHandler::BINTRI);
-        {
-            TrianglesMeshWriter<3,3> bin_mesh_writer(directory_name,  file_name+"_bin", false);
-            bin_mesh_writer.SetWriteFilesAsBinary();
-            bin_mesh_writer.WriteFilesUsingMesh(cuboid_mesh);
-        }
-        MeshEventHandler::EndEvent(MeshEventHandler::BINTRI);
+//        MeshEventHandler::BeginEvent(MeshEventHandler::BINTRI);
+//        {
+//            TrianglesMeshWriter<3,3> bin_mesh_writer(directory_name,  file_name+"_bin", false);
+//            bin_mesh_writer.SetWriteFilesAsBinary();
+//            bin_mesh_writer.WriteFilesUsingMesh(cuboid_mesh);
+//        }
+//        MeshEventHandler::EndEvent(MeshEventHandler::BINTRI);
 
 
 #ifdef CHASTE_VTK
-        MeshEventHandler::BeginEvent(MeshEventHandler::VTK);
-        {
-            VtkMeshWriter<3,3> vtk_writer(directory_name, file_name, false);
-            vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
-        }
-        MeshEventHandler::EndEvent(MeshEventHandler::VTK);
+//        MeshEventHandler::BeginEvent(MeshEventHandler::VTK);
+//        {
+//            VtkMeshWriter<3,3> vtk_writer(directory_name, file_name, false);
+//            vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
+//        }
+//        MeshEventHandler::EndEvent(MeshEventHandler::VTK);
 
-        MeshEventHandler::BeginEvent(MeshEventHandler::PVTK);
-        {
-            VtkMeshWriter<3,3> parallel_vtk_writer(directory_name, file_name+"par",false);
-            parallel_vtk_writer.SetParallelFiles(cuboid_mesh);
-            parallel_vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
-        }
-        MeshEventHandler::EndEvent(MeshEventHandler::PVTK);
+//        MeshEventHandler::BeginEvent(MeshEventHandler::PVTK);
+//        {
+//            VtkMeshWriter<3,3> parallel_vtk_writer(directory_name, file_name+"par",false);
+//            parallel_vtk_writer.SetParallelFiles(cuboid_mesh);
+//            parallel_vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
+//        }
+//        MeshEventHandler::EndEvent(MeshEventHandler::PVTK);
 #endif //CHASTE_VTK
         MeshEventHandler::Headings();
         MeshEventHandler::Report();
@@ -183,6 +163,42 @@ public:
           7:    0.209 (  0%)   727.463 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.149 (  0%)  2932.420 (100%)  (seconds)
         avg:    0.249 (  0%)   727.422 ( 25%)  1109.748 ( 38%)  1094.728 ( 37%)     0.201 (  0%)  2932.420 (100%)  (seconds)
         max:    0.258 (  0%)   727.463 ( 25%)  1109.748 ( 38%)  1094.729 ( 37%)     0.273 (  0%)  2932.420 (100%)  (seconds)
+         *
+         */
+        // Changes at r18242
+        /* Using finer timings and barrier synchronisation
+         *
+      Number nodes               =        35937
+      Tri write       node write        ele write       face write            spare            Total
+   0.299 (100%)     0.086 ( 29%)     0.202 ( 67%)     0.011 (  4%)     0.000 (  0%)     0.299 (100%)  (seconds)
+
+Proc       Tri write       node write        ele write       face write            spare            Total
+  0:    1.421 (100%)     0.095 (  7%)     1.254 ( 88%)     0.071 (  5%)     0.000 (  0%)     1.421 (100%)  (seconds)
+  1:    1.480 (100%)     0.095 (  6%)     1.254 ( 85%)     0.071 (  5%)     0.000 (  0%)     1.480 (100%)  (seconds)
+avg:    1.450 (100%)     0.095 (  7%)     1.254 ( 86%)     0.071 (  5%)     0.000 (  0%)     1.450 (100%)  (seconds)
+max:    1.480 (100%)     0.095 (  6%)     1.254 ( 85%)     0.071 (  5%)     0.000 (  0%)     1.480 (100%)  (seconds)
+
+Proc       Tri write       node write        ele write       face write            spare            Total
+  0:  242.766 (100%)     1.768 (  1%)   240.746 ( 99%)     0.252 (  0%)     0.000 (  0%)   242.766 (100%)  (seconds)
+  1:  242.772 (100%)     1.768 (  1%)   240.746 ( 99%)     0.252 (  0%)     0.000 (  0%)   242.772 (100%)  (seconds)
+  2:  242.774 (100%)     1.768 (  1%)   240.746 ( 99%)     0.252 (  0%)     0.000 (  0%)   242.774 (100%)  (seconds)
+  3:  242.815 (100%)     1.768 (  1%)   240.746 ( 99%)     0.252 (  0%)     0.000 (  0%)   242.815 (100%)  (seconds)
+avg:  242.782 (100%)     1.768 (  1%)   240.746 ( 99%)     0.252 (  0%)     0.000 (  0%)   242.782 (100%)  (seconds)
+max:  242.815 (100%)     1.768 (  1%)   240.746 ( 99%)     0.252 (  0%)     0.000 (  0%)   242.815 (100%)  (seconds)
+
+Proc       Tri write       node write        ele write       face write            spare            Total
+  0:  903.342 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.342 (100%)  (seconds)
+  1:  903.348 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.348 (100%)  (seconds)
+  2:  903.347 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.347 (100%)  (seconds)
+  3:  903.349 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.349 (100%)  (seconds)
+  4:  903.346 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.346 (100%)  (seconds)
+  5:  903.350 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.350 (100%)  (seconds)
+  6:  903.344 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.344 (100%)  (seconds)
+  7:  903.394 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.394 (100%)  (seconds)
+avg:  903.352 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.352 (100%)  (seconds)
+max:  903.394 (100%)     2.740 (  0%)   900.387 (100%)     0.214 (  0%)     0.000 (  0%)   903.394 (100%)  (seconds)
+
+
          *
          */
 

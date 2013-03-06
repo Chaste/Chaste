@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <mpi.h> // For MPI_Send, MPI_Recv
 
+const char* MeshEventHandler::EventName[] = { "Tri write", "node write", "ele write", "face write", "spare", "Total"};
+
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
  */
@@ -375,6 +377,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
         bool invertMeshPermutation)
 {
+    MeshEventHandler::BeginEvent(MeshEventHandler::NCL);
     unsigned max_elements_all;
     if (PetscTools::IsSequential())
     {
@@ -472,6 +475,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         remove(temp_ncl_path.GetAbsolutePath().c_str());
     }
     PetscTools::Barrier("AbstractTetrahedralMeshWriter::WriteNclFile");
+    MeshEventHandler::EndEvent(MeshEventHandler::NCL);
 }
 
 ///\todo #1322 Mesh should be const
@@ -578,6 +582,8 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
         }
         else
         {
+            PetscTools::Barrier("DodgyBarrierBeforeNODE");
+            MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
             double raw_coords[SPACE_DIM];
             // Slaves concentrate the Nodes
             typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
@@ -589,7 +595,10 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                 }
                 MPI_Send(raw_coords, SPACE_DIM, MPI_DOUBLE, 0, it->GetIndex(), PETSC_COMM_WORLD);//Nodes sent with positive tags
             }
+            PetscTools::Barrier("DodgyBarrierAfterNODE");
+            MeshEventHandler::EndEvent(MeshEventHandler::NODE);
 
+            MeshEventHandler::BeginEvent(MeshEventHandler::ELE);
             // Slaves concentrate the Elements for which they are owners
             unsigned raw_indices[mNodesPerElement]; // Assuming that we don't have parallel quadratic elements
             typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElementIterType;
@@ -613,7 +622,9 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                             PETSC_COMM_WORLD);
                 }
             }
-
+            PetscTools::Barrier("DodgyBarrierAfterELE");
+            MeshEventHandler::EndEvent(MeshEventHandler::ELE);
+            MeshEventHandler::BeginEvent(MeshEventHandler::FACE);
             // Slaves concentrate the Faces for which they are owners (not in 1-d)
             if (ELEMENT_DIM != 1)
             {
@@ -634,6 +645,8 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     }
                 }
             }
+            PetscTools::Barrier("DodgyBarrierAfterFACE");
+            MeshEventHandler::EndEvent(MeshEventHandler::FACE);
 
             // Slaves concentrate the cable elements for which they are owners
             if (mpMixedMesh)

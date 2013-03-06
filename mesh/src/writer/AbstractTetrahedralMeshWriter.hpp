@@ -58,6 +58,22 @@ struct MeshWriterIterators;
 #include "AbstractMesh.hpp"
 #include "NodeMap.hpp"
 
+#include "GenericEventHandler.hpp"
+class MeshEventHandler : public GenericEventHandler<6, MeshEventHandler>
+{
+public:
+    static const char* EventName[6];
+
+    typedef enum
+    {
+        TRIANGLES=0,
+        NODE,
+        ELE,
+        FACE,
+        NCL
+    } EventType;
+};
+
 /**
  * An abstract tetrahedral mesh writer class.
  */
