@@ -68,7 +68,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
     std::string comment = "#\n# " + ChasteBuildInfo::GetProvenanceString();
-    PetscTools::Barrier("DodgyBarrierBeforeNODE");
+//    PetscTools::Barrier("DodgyBarrierBeforeNODE");
     MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
     // Write node file
     std::string node_file_name = this->mBaseName + ".node";
@@ -117,7 +117,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     }
     *p_node_file << comment << "\n";
     p_node_file->close();
-    PetscTools::Barrier("DodgyBarrierAfterNODE");
+//    PetscTools::Barrier("DodgyBarrierAfterNODE");
     MeshEventHandler::EndEvent(MeshEventHandler::NODE);
     MeshEventHandler::BeginEvent(MeshEventHandler::ELE);
     if (ELEMENT_DIM < SPACE_DIM)
@@ -194,7 +194,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         *p_element_file << comment << "\n";
         p_element_file->close();
     }
-    PetscTools::Barrier("DodgyBarrierAfterELE");
+//    PetscTools::Barrier("DodgyBarrierAfterELE");
     MeshEventHandler::EndEvent(MeshEventHandler::ELE);
     MeshEventHandler::BeginEvent(MeshEventHandler::FACE);
     // Write boundary face file
@@ -278,7 +278,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             p_cable_element_file->close();
         }
     }
-    PetscTools::Barrier("DodgyBarrierAfterFACE");
+//    PetscTools::Barrier("DodgyBarrierAfterFACE");
     MeshEventHandler::EndEvent(MeshEventHandler::FACE);
 
 }
