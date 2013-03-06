@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <mpi.h> // For MPI_Send, MPI_Recv
 
-const char* MeshEventHandler::EventName[] = { "Tri write", "node write", "ele write", "face write", "spare", "Total"};
+const char* MeshEventHandler::EventName[] = { "Tri write", "node write", "ele write", "face write", "spare", "comm1","comm2","Total"};
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
@@ -215,9 +215,11 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 unsigned raw_indices[mNodesPerElement];
                 MPI_Status status;
                 //Get it from elsewhere
+                MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
                 MPI_Recv(raw_indices, mNodesPerElement, MPI_UNSIGNED, MPI_ANY_SOURCE,
                          this->mNumNodes + mElementCounterForParallelMesh,
                          PETSC_COMM_WORLD, &status);
+                MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
                 // Convert to std::vector
                 for (unsigned j=0; j< elem_data.NodeIndices.size(); j++)
                 {
@@ -225,9 +227,11 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 }
                 // Attribute value has the same tag (assume that it doesn't overtake the previous message)
                 double attribute;
+                MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
                 MPI_Recv(&attribute, 1U, MPI_DOUBLE, MPI_ANY_SOURCE,
                          this->mNumNodes + mElementCounterForParallelMesh,
                          PETSC_COMM_WORLD, &status);
+                MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
 
                 // Attribute value
                 elem_data.AttributeValue = attribute;
@@ -582,7 +586,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
         }
         else
         {
-            PetscTools::Barrier("DodgyBarrierBeforeNODE");
+//            PetscTools::Barrier("DodgyBarrierBeforeNODE");
             MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
             double raw_coords[SPACE_DIM];
             // Slaves concentrate the Nodes
@@ -595,7 +599,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                 }
                 MPI_Send(raw_coords, SPACE_DIM, MPI_DOUBLE, 0, it->GetIndex(), PETSC_COMM_WORLD);//Nodes sent with positive tags
             }
-            PetscTools::Barrier("DodgyBarrierAfterNODE");
+//            PetscTools::Barrier("DodgyBarrierAfterNODE");
             MeshEventHandler::EndEvent(MeshEventHandler::NODE);
 
             MeshEventHandler::BeginEvent(MeshEventHandler::ELE);
@@ -612,17 +616,21 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
 
+                    MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
                     MPI_Send(raw_indices, mNodesPerElement, MPI_UNSIGNED, 0,
                              this->mNumNodes + index, //Elements sent with tags offset
                              PETSC_COMM_WORLD);
+                    MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
                     // Attribute value has the same tag (assume that it doesn't overtake the previous message)
                     double attribute = it->GetAttribute();
+                    MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
                     MPI_Send(&attribute, 1, MPI_DOUBLE, 0,
                             this->mNumNodes + index, //Elements sent with tags offset
                             PETSC_COMM_WORLD);
+                    MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
                 }
             }
-            PetscTools::Barrier("DodgyBarrierAfterELE");
+//            PetscTools::Barrier("DodgyBarrierAfterELE");
             MeshEventHandler::EndEvent(MeshEventHandler::ELE);
             MeshEventHandler::BeginEvent(MeshEventHandler::FACE);
             // Slaves concentrate the Faces for which they are owners (not in 1-d)
@@ -645,7 +653,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     }
                 }
             }
-            PetscTools::Barrier("DodgyBarrierAfterFACE");
+//            PetscTools::Barrier("DodgyBarrierAfterFACE");
             MeshEventHandler::EndEvent(MeshEventHandler::FACE);
 
             // Slaves concentrate the cable elements for which they are owners

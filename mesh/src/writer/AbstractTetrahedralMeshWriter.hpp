@@ -59,10 +59,10 @@ struct MeshWriterIterators;
 #include "NodeMap.hpp"
 
 #include "GenericEventHandler.hpp"
-class MeshEventHandler : public GenericEventHandler<6, MeshEventHandler>
+class MeshEventHandler : public GenericEventHandler<8, MeshEventHandler>
 {
 public:
-    static const char* EventName[6];
+    static const char* EventName[8];
 
     typedef enum
     {
@@ -70,7 +70,9 @@ public:
         NODE,
         ELE,
         FACE,
-        NCL
+        NCL,
+        COMM1,
+        COMM2,
     } EventType;
 };
 
