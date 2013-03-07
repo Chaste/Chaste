@@ -59,11 +59,13 @@ struct MeshWriterIterators;
 #include "NodeMap.hpp"
 
 #include "GenericEventHandler.hpp"
+/** \todo Temporary for #2351 */
 class MeshEventHandler : public GenericEventHandler<8, MeshEventHandler>
 {
 public:
-    static const char* EventName[8];
+    static const char* EventName[8]; /**< See #2351*/
 
+    /** See #2351*/
     typedef enum
     {
         TRIANGLES=0,
