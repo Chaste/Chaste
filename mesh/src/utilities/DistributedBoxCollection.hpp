@@ -159,6 +159,11 @@ public:
     ~DistributedBoxCollection();
 
     /**
+     * Remove the list of nodes stored in each box.
+     */
+    void EmptyBoxes();
+
+    /**
      * Setup the halo box structure on this process.
      *
      * Sets up the containers mHaloBoxes, mHalosRight, mHalosLeft

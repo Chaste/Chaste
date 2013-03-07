@@ -205,6 +205,15 @@ DistributedBoxCollection<DIM>::~DistributedBoxCollection()
 }
 
 template<unsigned DIM>
+void DistributedBoxCollection<DIM>::EmptyBoxes()
+{
+    for (unsigned i=0; i<mBoxes.size(); i++)
+    {
+        mBoxes[i].ClearNodes();
+    }
+}
+
+template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupHaloBoxes()
 {
     // Get top-most and bottom-most value of Distributed Box Stack.
