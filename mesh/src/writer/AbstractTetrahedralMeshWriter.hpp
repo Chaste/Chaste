@@ -72,7 +72,7 @@ public:
         FACE,
         NCL,
         COMM1,
-        COMM2,
+        COMM2
     } EventType;
 };
 
