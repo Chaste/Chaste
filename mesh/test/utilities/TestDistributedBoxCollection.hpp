@@ -1345,9 +1345,13 @@ public:
 
         // Check we empty boxes correctly
         box_collection.EmptyBoxes();
+
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
+        	if (box_collection.GetBoxOwnership(i) )
+        	{
+        		TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
+        	}
         }
 
         for (unsigned i=0; i<points.size(); i++)
