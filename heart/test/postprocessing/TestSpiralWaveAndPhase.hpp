@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudySpiralWaveCellFactory.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "FileFinder.hpp"
+#include "NumericFileComparison.hpp"
 #include "FileComparison.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
 
@@ -127,7 +128,7 @@ public:
                 {
                     *voltage_loops << voltages[node_idx][time_idx];
 
-                    if (node_idx==voltages.size()-1)
+                    if (node_idx==voltages.size()-1u)
                     {
                         *voltage_loops << std::endl;
                     }
@@ -139,6 +140,7 @@ public:
             }
             voltage_loops->close();
         }
+        assert(0); // Should stop test and copy results across now.
     }
 
     void TestPhaseCalculation() throw (Exception)
@@ -169,7 +171,7 @@ public:
         Hdf5DataWriter writer(factory, results_folder_name, results_file_name, false, true, "Phase"); // false to wiping, true to extending
         int phase_id = writer.DefineVariable("Phase","radians");
         writer.DefineFixedDimension(mpMesh->GetNumNodes());
-        writer.DefineUnlimitedDimension("Time", "msec");
+        writer.DefineUnlimitedDimension(p_data_reader->GetUnlimitedDimensionName(), p_data_reader->GetUnlimitedDimensionUnit());
         writer.EndDefineMode();
 
         // Work out the index of the first time greater than or equal to tau.

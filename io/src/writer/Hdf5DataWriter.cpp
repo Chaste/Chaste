@@ -168,10 +168,10 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             H5Aclose(attribute_id);
 
             // Now deal with time
-            SetTimeDatasetId();
+            SetUnlimitedDatasetId();
 
             // How many time steps have been written so far?
-            hid_t timestep_dataspace = H5Dget_space(mTimeDatasetId);
+            hid_t timestep_dataspace = H5Dget_space(mUnlimitedDatasetId);
             hsize_t num_timesteps;
             H5Sget_simple_extent_dims(timestep_dataspace, &num_timesteps, NULL);
             H5Sclose(timestep_dataspace);
@@ -231,7 +231,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                 /// and PutStripedVector is impossible.
                 mDataFixedDimensionSize = UINT_MAX;
                 H5Dclose(mVariablesDatasetId);
-                H5Dclose(mTimeDatasetId);
+                H5Dclose(mUnlimitedDatasetId);
                 H5Fclose(mFileId);
                 EXCEPTION("Unable to extend an incomplete data file at present.");
             }
@@ -645,24 +645,39 @@ void Hdf5DataWriter::EndDefineMode()
 
         hid_t time_filespace = H5Screate_simple(1, time_dataset_dims, time_dataset_max_dims);
 
-        // Create the dataset
-        mTimeDatasetId = H5Dcreate(mFileId, (mDatasetName + "_" + mUnlimitedDimensionName).c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
+        // Create the unlimited dimension dataset
+
+    	// * Files post r18257 (inc. Release 3.2 onwards) use "<DatasetName>_Unlimited" for "<DatasetName>"'s
+    	//   unlimited variable,
+    	//   - a new attribute "Name" has been added to the Unlimited Dataset to allow it to assign
+    	//     any name to the unlimited variable. Which can then be easily read by Hdf5DataReader.
+
+        mUnlimitedDatasetId = H5Dcreate(mFileId, (mDatasetName + "_Unlimited").c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
 
         // Create the dataspace for the attribute
         hsize_t one = 1;
         hid_t one_column_space = H5Screate_simple(1, &one, NULL);
 
         // Create an attribute for the time unit
-        hid_t unit_attr = H5Acreate(mTimeDatasetId, "Unit", string_type, one_column_space, H5P_DEFAULT);
+        hid_t unit_attr = H5Acreate(mUnlimitedDatasetId, "Unit", string_type, one_column_space, H5P_DEFAULT);
+
+        // Create an attribute for the time name
+        hid_t name_attr = H5Acreate(mUnlimitedDatasetId, "Name", string_type, one_column_space, H5P_DEFAULT);
 
         // Copy the unit to a string MAX_STRING_SIZE long and write it
         char unit_string[MAX_STRING_SIZE];
         strcpy(unit_string, mUnlimitedDimensionUnit.c_str());
         H5Awrite(unit_attr, string_type, unit_string);
 
+        // Copy the unit to a string MAX_STRING_SIZE long and write it
+        char name_string[MAX_STRING_SIZE];
+        strcpy(name_string, mUnlimitedDimensionName.c_str());
+        H5Awrite(name_attr, string_type, name_string);
+
         // Close the filespace
         H5Sclose(one_column_space);
         H5Aclose(unit_attr);
+        H5Aclose(name_attr);
         H5Sclose(time_filespace);
     }
 
@@ -957,10 +972,10 @@ void Hdf5DataWriter::PutUnlimitedVariable(double value)
     // Select hyperslab in the file.
     hsize_t count[1] = {1};
     hsize_t offset[1] = {mCurrentTimeStep};
-    hid_t hyperslab_space = H5Dget_space(mTimeDatasetId);
+    hid_t hyperslab_space = H5Dget_space(mUnlimitedDatasetId);
     H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, NULL, count, NULL);
 
-    H5Dwrite(mTimeDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, H5P_DEFAULT, &value);
+    H5Dwrite(mUnlimitedDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, H5P_DEFAULT, &value);
 
     H5Sclose(hyperslab_space);
     H5Sclose(memspace);
@@ -976,7 +991,7 @@ void Hdf5DataWriter::Close()
     H5Dclose(mVariablesDatasetId);
     if (mIsUnlimitedDimensionSet)
     {
-        H5Dclose(mTimeDatasetId);
+        H5Dclose(mUnlimitedDatasetId);
     }
     H5Fclose(mFileId);
 
@@ -998,9 +1013,9 @@ void Hdf5DataWriter::DefineUnlimitedDimension(const std::string& rVariableName,
         EXCEPTION("Cannot define variables when not in Define mode");
     }
 
-    mIsUnlimitedDimensionSet = true;
-    mUnlimitedDimensionName = rVariableName;
-    mUnlimitedDimensionUnit = rVariableUnits;
+    this->mIsUnlimitedDimensionSet = true;
+    this->mUnlimitedDimensionName = rVariableName;
+    this->mUnlimitedDimensionUnit = rVariableUnits;
     mEstimatedUnlimitedLength = estimatedLength;
 }
 
@@ -1038,7 +1053,7 @@ void Hdf5DataWriter::PossiblyExtend()
     if (mNeedExtend)
     {
         H5Dextend (mVariablesDatasetId, mDatasetDims);
-        H5Dextend (mTimeDatasetId, mDatasetDims);
+        H5Dextend (mUnlimitedDatasetId, mDatasetDims);
     }
     mNeedExtend = false;
 }

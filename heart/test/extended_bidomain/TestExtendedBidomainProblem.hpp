@@ -174,12 +174,12 @@ public:
 
         /**
          * Compare with valid data.
-         * As Martin's code is an FD code, results wwill never match exactly.
+         * As Martin's code is an FD code, results will never match exactly.
          * The comparison below is done against a 'valid' h5 file.
          *
          * The h5 file is valid because, when extrapolating results from it, they look very similar
-         * (excpet for a few points at the end of the upstroke) to the results taken
-         * directly from Martin's code. A plot of Chaste results Vs Martin's result (at node 50) is stored
+         * (except for a few points at the end of the upstroke) to the results taken
+         * directly from Martin's code. A plot of Chaste results versus Martin's result (at node 50) is stored
          * in the file 1DChasteVsMartin.eps for reference.
          *
          */
@@ -188,7 +188,7 @@ public:
                                                  1.7e-3));
     }
 
-    // Test the functionality for outputing the values of requested cell state variables
+    // Test the functionality for outputting the values of requested cell state variables
     void TestExtendedBidomainProblemPrintsMultipleVariables() throw (Exception)
     {
         // Get the singleton in a clean state

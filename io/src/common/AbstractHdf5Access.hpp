@@ -64,12 +64,12 @@ protected:
     bool mIsDataComplete;                           /**< Whether the data file is complete. */
     std::string mUnlimitedDimensionName;            /**< The name of the unlimited dimension. */
     std::string mUnlimitedDimensionUnit;            /**< The physical units of the unlimited dimension. */
-    bool mIsUnlimitedDimensionSet;                  /**< Is the unlimited dimension set */
+    bool mIsUnlimitedDimensionSet;                  /**< Is the unlimited dimension set up at the moment?*/
     std::vector<unsigned> mIncompleteNodeIndices;   /**< Vector of node indices for which the data file does not contain data. */
 
     hid_t mFileId;                                  /**< The data file ID. */
-    hid_t mTimeDatasetId;                           /**< The time dataset ID. */
-    hid_t mVariablesDatasetId;                      /**< The variables dataset ID. */
+    hid_t mUnlimitedDatasetId;                      /**< The dataset ID for the unlimited (independent) variable - usually time. */
+    hid_t mVariablesDatasetId;                      /**< The dataset ID for the dependent variables. */
     hsize_t mDatasetDims[DATASET_DIMS];             /**< The sizes of each dimension of the dataset (variable, node, time). */
 
     /**
@@ -81,15 +81,13 @@ protected:
     bool DoesDatasetExist(const std::string& rDatasetName);
 
     /**
-     * This method sets #mTimeDatasetId, the unlimited dataset ID. It does this
+     * This method sets #mUnlimitedDatasetId, the unlimited dataset ID. It does this
      * by looking for a given unlimited dataset name in the file.
      *
-     * Either one of the new format of [#mDatasetName + "_" + #mUnlimitedDimensionName],
-     * or one of the old format of [#mUnlimitedDimensionName].
-     *
-     * At present this only works when #mUnlimitedDimensionName=="Time".
+     * Either one of the new format of [#mDatasetName + "_Unlimited"],
+     * or one of the old format of ["Time"].
      */
-    void SetTimeDatasetId();
+    void SetUnlimitedDatasetId();
 
 
 public:
@@ -133,6 +131,16 @@ public:
      * Get method for mIncompleteNodeIndices.
      */
     std::vector<unsigned> GetIncompleteNodeMap();
+
+    /**
+     * @return the name of the Unlimited dimension (usually "Time").
+     */
+    std::string GetUnlimitedDimensionName();
+
+    /**
+     * @return the unit of the Unlimited dimension (usually "msec").
+     */
+    std::string GetUnlimitedDimensionUnit();
 };
 
 #endif // ABSTRACTHDF5ACCESS_HPP_

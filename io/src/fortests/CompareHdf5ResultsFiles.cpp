@@ -59,11 +59,28 @@ bool CompareFilesViaHdf5DataReader(std::string pathname1, std::string filename1,
     // Check the variable names and units
     std::vector<std::string> variable_names1 = reader1.GetVariableNames();
     std::vector<std::string> variable_names2 = reader2.GetVariableNames();
+    std::string unlimited_variable1 = reader1.GetUnlimitedDimensionName();
+    std::string unlimited_variable2 = reader2.GetUnlimitedDimensionName();
+    std::string unlimited_variable_unit1 = reader1.GetUnlimitedDimensionUnit();
+    std::string unlimited_variable_unit2 = reader2.GetUnlimitedDimensionUnit();
+
     unsigned num_vars = variable_names1.size();
     if (num_vars != variable_names2.size())
     {
         std::cout << "Number of variables " << variable_names1.size()
                   << " and " << variable_names2.size() << " don't match\n";
+        return false;
+    }
+    if (unlimited_variable1 != unlimited_variable2)
+    {
+        std::cout << "Unlimited variable names " << unlimited_variable1 << " and "
+                  << unlimited_variable2 << " don't match\n";
+        return false;
+    }
+    if (unlimited_variable_unit1 != unlimited_variable_unit2)
+    {
+        std::cout << "Unlimited variable units " << unlimited_variable_unit1 << " and "
+                  << unlimited_variable_unit2 << " don't match\n";
         return false;
     }
     for (unsigned var=0; var<num_vars; var++)

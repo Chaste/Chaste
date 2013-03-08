@@ -317,7 +317,8 @@ public:
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("TestHdf5DataWriter", "hdf5_test_multi_column", true,
             "io/test/data", "hdf5_test_multi_column", false));
 
-        // We make that the comparison fails if the files are different
+        std::cout << "The next comparison should fail...\n";
+        // We make that the comparison fails as the files are different
         TS_ASSERT(!CompareFilesViaHdf5DataReaderGlobalNorm("TestHdf5DataWriter", "hdf5_test_multi_column", true,
             "io/test/data", "hdf5_test_full_format_extended", false));
 
@@ -469,6 +470,8 @@ public:
 
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete", true,
                                                 "io/test/data", "hdf5_test_full_format_incomplete", false));
+
+        std::cout << "This one needs fixing too:\n" << std::flush;
 
         // Test whether one with big-endian datatypes looks the same:
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_full_format_incomplete", true,
@@ -1250,7 +1253,7 @@ public:
         int plasma_id = annotating_writer.DefineVariable("Plasma","gloops");
         int node_id_again = annotating_writer.DefineVariable("Node", "dimensionless");
         annotating_writer.DefineFixedDimension(number_nodes);
-        annotating_writer.DefineUnlimitedDimension("Time", "years", 2);
+        annotating_writer.DefineUnlimitedDimension("Distance", "LightYears", 2);
         annotating_writer.EndDefineMode();
         {
             Vec petsc_data_1 = factory.CreateVec();
@@ -1290,9 +1293,23 @@ public:
             PetscTools::Destroy(petsc_data_2);
             PetscTools::Destroy(petsc_data_3);
         }
+
+        // This one has the wrong name on the unlimited variable of the Extra Stuff dataset.
+        TS_ASSERT_EQUALS(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
+                                                       "io/test/data", "hdf5_test_adding_variables_bad", false, 1e-10, "Extra stuff"), false);
+
+        // The 'bad' file isn't actually bad for the original Data (voltage etc. just the units of the new 'Extra Stuff').
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
+                                                "io/test/data", "hdf5_test_adding_variables_bad", false));
+
+        // This one is correct for both original and extra stuff datasets.
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
                                                  "io/test/data", "hdf5_test_adding_variables", false));
-  }
+
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_test_adding_variables", true,
+                                                "io/test/data", "hdf5_test_adding_variables", false, 1e-10, "Extra stuff"));
+
+    }
 
     /**
      * Test the functionality for adding further data to an existing file.

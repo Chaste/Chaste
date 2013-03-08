@@ -410,6 +410,7 @@ public:
 
         // Resume
         CardiacSimulation simulation("heart/test/data/xml/resume_migration.xml");
+
         // Compare results
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "resume_bidomain_short_results", false,
                                                  "SaveBidomainShort", "SimulationResults", true, 1e-6));

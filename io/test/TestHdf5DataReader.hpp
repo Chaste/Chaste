@@ -597,6 +597,9 @@ public:
             TS_ASSERT_EQUALS(variable_names[0], "Phase");
             TS_ASSERT_EQUALS(variable_names[1], "Plasma");
 
+            TS_ASSERT_EQUALS(reader.GetUnlimitedDimensionName(), "Distance");
+            TS_ASSERT_EQUALS(reader.GetUnlimitedDimensionUnit(), "LightYears");
+
             DistributedVectorFactory factory(reader.GetNumberOfRows());
             Vec data = factory.CreateVec();
             reader.GetVariableOverNodes(data, "Plasma", 1/*timestep*/);
