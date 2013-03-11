@@ -165,6 +165,18 @@ protected:
      */
     void ClearBoxCollection();
 
+    /**
+     * Remove all nodes marked as deleted.
+     *
+     * @param NodeMap the map to record which nodes have been removed.
+     */
+    void RemoveDeletedNodes(NodeMap& map);
+
+    /**
+     * Make sure that node indices match their location, and update mNodesMapping.
+     */
+    void UpdateNodeIndices(NodeMap& map);
+
 public:
 
     /**

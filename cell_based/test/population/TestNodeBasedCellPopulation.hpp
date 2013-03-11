@@ -533,7 +533,7 @@ public:
 
         CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(0u);
 
-        node_based_cell_population.AddCell(p_new_cell, new_location,p_parent_cell);
+        node_based_cell_population.AddCell(p_new_cell, new_location, p_parent_cell);
 
         // Test that the numbers of nodes and cells has been updated
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 82u);
@@ -568,6 +568,7 @@ public:
         // Avoid memory leak
         delete p_mesh;
     }
+
     void TestGetNeighbouringNodeIndices()
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();

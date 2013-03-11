@@ -135,49 +135,53 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 {
-    // Store the node locations
-    std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
-    std::vector<double> old_cell_radii;
-    std::vector<bool> old_is_particle;
+	RemoveDeletedNodes(map);
 
-    unsigned new_index = 0;
-    for (unsigned i=0; i<this->GetNumAllNodes(); i++)
-    {
-        if (this->mNodes[i]->IsDeleted())
-        {
-            map.SetDeleted(i);
-        }
-        else
-        {
-            map.SetNewIndex(i, new_index);
-            old_node_locations.push_back(this->mNodes[i]->rGetLocation());
-            old_cell_radii.push_back(this->mNodes[i]->GetRadius());
-            old_is_particle.push_back(this->mNodes[i]->IsParticle());
+	this->mDeletedNodeIndices.clear();
+	this->mAddedNodes = false;
 
-            new_index++;
-        }
-    }
-
-    // Remove current data
-    Clear();
-
-    // Construct the nodes
-    for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
-    {
-        Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, old_node_locations[node_index], false);
-        p_node->SetRadius(old_cell_radii[node_index]);
-        if (old_is_particle[node_index])
-        {
-            p_node->SetIsParticle(true);
-        }
-        this->mNodes.push_back(p_node);
-
-        mNodesMapping[p_node->GetIndex()] = this->mNodes.size()-1;
-    }
+	UpdateNodeIndices(map);
 
     this->SetMeshHasChangedSinceLoading();
 
     UpdateBoxCollection();
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
+{
+	typename std::vector<Node<SPACE_DIM>* >::iterator node_iter = this->mNodes.begin();
+	while (node_iter != this->mNodes.end())
+	{
+        if ((*node_iter)->IsDeleted())
+        {
+            map.SetDeleted((*node_iter)->GetIndex());
+
+            // Free memory before erasing the pointer from the list of nodes.
+            delete (*node_iter);
+            node_iter = this->mNodes.erase(node_iter);
+        }
+        else
+        {
+        	++node_iter;
+        }
+    }
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices(NodeMap& map)
+{
+	///\todo #2354 do not reset node indices.
+	for (unsigned node_index=0; node_index<this->mNodes.size(); node_index++)
+    {
+		Node<SPACE_DIM>* p_node = this->mNodes[node_index];
+
+		unsigned old_index = p_node->GetIndex();
+		p_node->SetIndex(node_index);
+		map.SetNewIndex(old_index, node_index);
+
+        mNodesMapping[this->mNodes[node_index]->GetIndex()] = node_index;
+    }
 }
 
 template<unsigned SPACE_DIM>
