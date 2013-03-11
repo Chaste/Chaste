@@ -1,4 +1,4 @@
-HDF5 "/home/jmpf/.texttest/tmp/chaste.25Jan095839.12955/chaste/save_bidomain/ChasteResults_checkpoints/10ms/ChasteResults_10ms/AbstractCardiacProblem_mSolution.h5" {
+HDF5 "/home/chaste/.texttest/tmp/chaste.11Mar200027.7905/chaste/save_bidomain/ChasteResults_checkpoints/10ms/ChasteResults_10ms/AbstractCardiacProblem_mSolution.h5" {
 GROUP "/" {
    DATASET "Data" {
       DATATYPE  H5T_IEEE_F64LE
@@ -408,12 +408,12 @@ GROUP "/" {
             }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.1.17957 on Fri, 25 Jan 2013 10:00:49 +0000.  Chaste was built on Fri, 25 Jan 2013 09:54:52 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=48:49; jink=17831M; jmpf=17163:17174; papers=exported.
+         (0): "Created by Chaste version 3.1.18267 on Mon, 11 Mar 2013 20:05:24 +0000.  Chaste was built on Mon, 11 Mar 2013 19:50:14 +0000 by machine (uname) 'Linux userpc58.cs.ox.ac.uk 2.6.32-45-generic #104-Ubuntu SMP Tue Feb 19 21:20:09 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: FunctionalCuration=17565; SimpleSensitivity=17567:17707.
            "
          }
       }
    }
-   DATASET "Data_Time" {
+   DATASET "Data_Unlimited" {
       DATATYPE  H5T_IEEE_F64LE
       DATASPACE  SIMPLE { ( 1 ) / ( H5S_UNLIMITED ) }
       DATA {
@@ -429,6 +429,18 @@ GROUP "/" {
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
          (0): "msec"
+         }
+      }
+      ATTRIBUTE "Name" {
+         DATATYPE  H5T_STRING {
+               STRSIZE 100;
+               STRPAD H5T_STR_NULLTERM;
+               CSET H5T_CSET_ASCII;
+               CTYPE H5T_C_S1;
+            }
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): "Time"
          }
       }
    }
