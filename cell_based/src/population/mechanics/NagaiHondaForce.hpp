@@ -60,6 +60,20 @@ friend class TestForces;
 
 private:
 
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
+        archive & mNagaiHondaDeformationEnergyParameter;
+        archive & mNagaiHondaMembraneSurfaceEnergyParameter;
+        archive & mNagaiHondaCellCellAdhesionEnergyParameter;
+        archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
+        archive & mMatureCellTargetArea;
+    }
+
+protected:
+
     /**
      * Cell deformation energy parameter. Has units of kg s^-2 (cell size at equilibrium rest length)^-1.
      */
@@ -84,18 +98,6 @@ private:
      * Non-dimensional target area of a mature (fully-grown) Cell.
      */
     double mMatureCellTargetArea;
-
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
-        archive & mNagaiHondaDeformationEnergyParameter;
-        archive & mNagaiHondaMembraneSurfaceEnergyParameter;
-        archive & mNagaiHondaCellCellAdhesionEnergyParameter;
-        archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
-        archive & mMatureCellTargetArea;
-    }
 
 public:
 
