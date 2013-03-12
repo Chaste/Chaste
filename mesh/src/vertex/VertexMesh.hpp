@@ -451,6 +451,18 @@ public:
      */
     double GetEdgeLength(unsigned elementIndex1, unsigned elementIndex2);
 
+    /**
+     * Get the elongation shape factor of a given element.
+     * This is defined as the square root of the ratio of
+     * the two second moments of the element around its
+     * principal axes.
+     *
+     * @param elementIndex index of an element in the mesh
+     *
+     * @return the elongation shape factor of the element.
+     */
+    double GetElongationShapeFactorOfElement(unsigned elementIndex);
+
     //////////////////////////////////////////////////////////////////////
     //                        3D-specific methods                       //
     //////////////////////////////////////////////////////////////////////

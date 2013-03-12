@@ -1240,6 +1240,64 @@ public:
         TS_ASSERT_DELTA(short_axis(1), 0.5422, 1e-4);
     }
 
+    void TestGetElongationShapeFactorOfElement()
+    {
+        // Create a mesh comprising a single square element
+        std::vector<Node<2>*> square_nodes;
+        square_nodes.push_back(new Node<2>(0, false,  1.0,  1.0));
+        square_nodes.push_back(new Node<2>(1, false, -1.0,  1.0));
+        square_nodes.push_back(new Node<2>(2, false, -1.0, -1.0));
+        square_nodes.push_back(new Node<2>(3, false,  1.0, -1.0));
+
+        std::vector<VertexElement<2,2>*> square_elements;
+        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
+
+        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+
+        /*
+         * By symmetry, the two eigenvalues are equal. Therefore the elongation shape factor
+         * should be equal to one.
+         */
+        double elongation_shape_factor = square_mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT_DELTA(elongation_shape_factor, 1.0, 1e-6);
+
+        // We should obtain the same result regardless of the square's size
+        square_mesh.Scale(5.0, 5.0);
+        elongation_shape_factor = square_mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT_DELTA(elongation_shape_factor, 1.0, 1e-6);
+
+        // Create a mesh comprising a single rectangular element
+        std::vector<Node<2>*> rectangle_nodes;
+        rectangle_nodes.push_back(new Node<2>(0, false,  1.0,  2.0));
+        rectangle_nodes.push_back(new Node<2>(1, false, -1.0,  2.0));
+        rectangle_nodes.push_back(new Node<2>(2, false, -1.0, -2.0));
+        rectangle_nodes.push_back(new Node<2>(3, false,  1.0, -2.0));
+
+        std::vector<VertexElement<2,2>*> rectangle_elements;
+        rectangle_elements.push_back(new VertexElement<2,2>(0, rectangle_nodes));
+
+        VertexMesh<2,2> rectangle_mesh(rectangle_nodes, rectangle_elements);
+
+        /*
+         * For a rectangle of width a (parallel to the x axis) and height b (parallel to the
+         * y axis), the second moments of area are given by J_xx = a*b^3/12, J_yy = b*a^3/12
+         * and J_xy = 0. Therefore the two eigenvalues are given by J_xx and J_yy and if b>a,
+         * the elongation shape factor should be equal to sqrt(a*b^3/b*a^3) = b/a.
+         */
+        elongation_shape_factor = rectangle_mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT_DELTA(elongation_shape_factor, 4.0/2.0, 1e-6);
+
+        // We should obtain the same result regardless of the orientation of the rectangle
+        rectangle_mesh.Scale(2.0, 0.5);
+        elongation_shape_factor = rectangle_mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT_DELTA(elongation_shape_factor, 4.0/2.0, 1e-6);
+
+        // Check the formula is correct for a different aspect ratio
+        rectangle_mesh.Scale(3.0, 1.0);
+        elongation_shape_factor = rectangle_mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT_DELTA(elongation_shape_factor, 12.0/2.0, 1e-6);
+    }
+
     void TestScaleAndTranslate()
     {
         // Create mesh

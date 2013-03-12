@@ -450,6 +450,23 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
     return edge_length;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
+{
+    assert(SPACE_DIM == 2);
+
+    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+
+    double discriminant = sqrt((moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2));
+
+    // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
+    double largest_eigenvalue = (moments(0) + moments(1) + discriminant)*0.5;
+    double smallest_eigenvalue = (moments(0) + moments(1) - discriminant)*0.5;
+
+    double elongation_shape_factor = sqrt(largest_eigenvalue/smallest_eigenvalue);
+    return elongation_shape_factor;
+}
+
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
@@ -1257,9 +1274,7 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
         c_vector<double, 2> pos_1 = this->GetVectorFromAtoB(centroid, original_pos_1);
         c_vector<double, 2> pos_2 = this->GetVectorFromAtoB(centroid, original_pos_2);
 
-        /*
-         * Note these formulae require the polygon to be centered on the origin
-         */
+        // Note these formulae require the polygon to be centered on the origin
         double a = pos_1(0)*pos_2(1)-pos_2(0)*pos_1(1);
 
         // Ixx
@@ -1295,12 +1310,13 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
     c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
 
-    double largest_eigenvalue, discriminant;
+    double discriminant = sqrt((moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2));
 
-    discriminant = sqrt((moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2));
-    // This is always the largest eigenvalue as both eigenvalues are real as it is a
-    // symmetric matrix
-    largest_eigenvalue = (moments(0) + moments(1) + discriminant)*0.5;
+    /*
+     * As the matrix of second moments of area is symmetric, both its eigenvalues are real,
+     * so this is the largest eigenvalue.
+     */
+    double largest_eigenvalue = (moments(0) + moments(1) + discriminant)*0.5;
 
     ///\todo remove magic number? (#1884)
     if (fabs(discriminant) < 1e-10)
