@@ -117,7 +117,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Get the adhesion parameter for the edge between two given nodes.
@@ -187,7 +187,7 @@ public:
      * @param pCell the cell
      * @return the cell's target area
      */
-    double GetTargetAreaOfCell(const CellPtr pCell) const;
+    virtual double GetTargetAreaOfCell(const CellPtr pCell) const;
 
     /**
      * @return mMatureCellTargetArea
