@@ -121,7 +121,7 @@ public:
 
         for (unsigned i=0; i<3; i++)
         {
-        	TS_ASSERT_DELTA(empty_bounding_cuboid.rGetLowerCorner()[i], empty_bounding_cuboid.rGetUpperCorner()[i], 1e-4);
+            TS_ASSERT_DELTA(empty_bounding_cuboid.rGetLowerCorner()[i], empty_bounding_cuboid.rGetUpperCorner()[i], 1e-4);
         }
     }
 

@@ -72,7 +72,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & mMaximumInteractionDistance;
-		archive & mMinimumNodeDomainBoundarySeparation;
+        archive & mMinimumNodeDomainBoundarySeparation;
         archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
     }
 

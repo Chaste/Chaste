@@ -135,12 +135,12 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 {
-	RemoveDeletedNodes(map);
+    RemoveDeletedNodes(map);
 
-	this->mDeletedNodeIndices.clear();
-	this->mAddedNodes = false;
+    this->mDeletedNodeIndices.clear();
+    this->mAddedNodes = false;
 
-	UpdateNodeIndices(map);
+    UpdateNodeIndices(map);
 
     this->SetMeshHasChangedSinceLoading();
 
@@ -150,9 +150,9 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
 {
-	typename std::vector<Node<SPACE_DIM>* >::iterator node_iter = this->mNodes.begin();
-	while (node_iter != this->mNodes.end())
-	{
+    typename std::vector<Node<SPACE_DIM>* >::iterator node_iter = this->mNodes.begin();
+    while (node_iter != this->mNodes.end())
+    {
         if ((*node_iter)->IsDeleted())
         {
             map.SetDeleted((*node_iter)->GetIndex());
@@ -163,7 +163,7 @@ void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
         }
         else
         {
-        	++node_iter;
+            ++node_iter;
         }
     }
 }
@@ -171,14 +171,14 @@ void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices(NodeMap& map)
 {
-	///\todo #2354 do not reset node indices.
-	for (unsigned node_index=0; node_index<this->mNodes.size(); node_index++)
+    ///\todo #2354 do not reset node indices.
+    for (unsigned node_index=0; node_index<this->mNodes.size(); node_index++)
     {
-		Node<SPACE_DIM>* p_node = this->mNodes[node_index];
+        Node<SPACE_DIM>* p_node = this->mNodes[node_index];
 
-		unsigned old_index = p_node->GetIndex();
-		p_node->SetIndex(node_index);
-		map.SetNewIndex(old_index, node_index);
+        unsigned old_index = p_node->GetIndex();
+        p_node->SetIndex(node_index);
+        map.SetNewIndex(old_index, node_index);
 
         mNodesMapping[this->mNodes[node_index]->GetIndex()] = node_index;
     }
