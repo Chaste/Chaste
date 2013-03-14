@@ -534,14 +534,14 @@ public:
         nodes.push_back(new Node<2>(6, false, 0.6, 0.5));
         nodes.push_back(new Node<2>(7, false, 0.0, 0.5));
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Test that there are never any boundary nodes
-        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryNodes(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 0u);
         NodeMap node_map(8);
-        p_mesh->ReMesh(node_map);
-        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryNodes(), 0u);
+        mesh.ReMesh(node_map);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 0u);
 
         // Free memory - the constructor does a deep copy of its input
         for (unsigned i=0; i<nodes.size(); i++)
@@ -552,64 +552,70 @@ public:
         // Set radii of cells from 1 to 8
         for (unsigned i=0; i<nodes.size(); i++)
         {
-            p_mesh->GetNode(i)->SetRadius(i+1);
+            mesh.GetNode(i)->SetRadius(i+1);
         }
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 8u);
 
         // Delete from interior
-        TS_ASSERT_DELTA(p_mesh->GetNode(6)->GetRadius(), 7.0, 1e-4);
-        p_mesh->DeleteNode(6);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 7u);
+        TS_ASSERT_DELTA(mesh.GetNode(6)->GetRadius(), 7.0, 1e-4);
+        mesh.DeleteNode(6);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
 
         // Delete from edge
-        p_mesh->DeleteNode(1);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 6u);
+        mesh.DeleteNode(1);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
 
         // Delete from corner
-        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 4.0, 1e-4);
-        p_mesh->DeleteNode(3);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u);
+        TS_ASSERT_DELTA(mesh.GetNode(3)->GetRadius(), 4.0, 1e-4);
+        mesh.DeleteNode(3);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
 
         // Deleting a deleted node should throw an exception
-        TS_ASSERT_THROWS_THIS(p_mesh->DeleteNode(3),"Trying to delete a deleted node");
+        TS_ASSERT_THROWS_THIS(mesh.DeleteNode(3),"Trying to delete a deleted node");
 
         /*
          * Check that the cell radii are updated correctly when a new cell
          * is added using the most recently deleted index.
          * (Index 3 is at the back of the deleted nodes list and is thus the one to be reused.)
          */
-        p_mesh->AddNode(new Node<2>(0, true, 6.0, 6.0)); //This node pointer is added to the mesh and deleted by the destructor
+        mesh.AddNode(new Node<2>(0, true, 6.0, 6.0)); // This node pointer is added to the mesh and deleted by the destructor
+
+        // Has the node been put in the correct place
+        TS_ASSERT_EQUALS(mesh.SolveNodeMapping(8), 3u);
 
         // Check the most recently deleted node now has the correct cell radius
-        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 0.5, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(8)->GetRadius(), 0.5, 1e-4);
 
-        // Now we have deleted/reused 3, and deleted 1 and 6.
-        // The new nodes are:
-        // New:     0     1     2     3     4     5
-        // Old:     0     2 (new3)    4     5     7
-        // Radius:  1     3     0.5     5     6     8
 
+        // Global node indices should stay the same after remesh
         NodeMap map(8);
-        p_mesh->ReMesh(map);
+        mesh.ReMesh(map);
         TS_ASSERT_EQUALS(map.GetNewIndex(0), 0u);
         TS_ASSERT(map.IsDeleted(1));
-        TS_ASSERT_EQUALS(map.GetNewIndex(2), 1u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(3), 2u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(4), 3u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(5), 4u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(2), 2u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(3), 3u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(4), 4u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(5), 5u);
         TS_ASSERT(map.IsDeleted(6));
-        TS_ASSERT_EQUALS(map.GetNewIndex(7), 5u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(7), 7u);
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 3.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.5, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 5.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(4)->GetRadius(), 6.0, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(5)->GetRadius(), 8.0, 1e-4);
+        // But local indices (the location in mNodes) should change).
+        TS_ASSERT_EQUALS(mesh.SolveNodeMapping(0), 0u);
+		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(2), 1u);
+		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(8), 2u);
+		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(4), 3u);
+		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(5), 4u);
+		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(7), 5u);
 
-        // Avoid memory leak
-        delete p_mesh;
+		TS_ASSERT_THROWS_THIS(mesh.SolveNodeMapping(6), "Requested node 6 does not belong to process 0");
+
+        TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(2)->GetRadius(), 3.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(8)->GetRadius(), 0.5, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(4)->GetRadius(), 5.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(5)->GetRadius(), 6.0, 1e-4);
+        TS_ASSERT_DELTA(mesh.GetNode(7)->GetRadius(), 8.0, 1e-4);
     }
 
     void TestArchiving() throw(Exception)

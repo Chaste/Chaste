@@ -159,7 +159,7 @@ private:
       *
       * @param map the NodeMap to record which nodes have been removed.
       */
-     void UpdateNodeIndices(NodeMap& map);
+     void UpdateNodeIndices();
 
 protected:
 
@@ -237,6 +237,13 @@ public:
     unsigned GetNumNodes() const;
 
     /**
+     * Get the largest node global index on this process.
+     *
+     * @return the maximum node index.
+     */
+    virtual unsigned GetMaximumNodeIndex();
+
+    /**
      * @return mMaxInteractionDistance
      */
     double GetMaximumInteractionDistance();
@@ -278,6 +285,13 @@ public:
      * @param separation the new value for the separation
      */
     void SetMinimumNodeDomainBoundarySeparation(double separation);
+
+    /**
+     * Overridden ConstructFromMeshReader to correctly assign global node indices on load.
+     *
+     * @param rMeshReader the mesh reader for input.
+     */
+    void ConstructFromMeshReader(AbstractMeshReader<SPACE_DIM, SPACE_DIM>& rMeshReader);
 };
 
 #include "SerializationExportWrapper.hpp"

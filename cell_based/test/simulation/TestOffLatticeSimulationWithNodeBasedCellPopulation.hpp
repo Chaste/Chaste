@@ -371,9 +371,9 @@ public:
         // Check some results
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 17u);
 
-        std::vector<double> node_3_location = simulator.GetNodeLocation(3);
-        TS_ASSERT_DELTA(node_3_location[0], 3.4931, 1e-4);
-        TS_ASSERT_DELTA(node_3_location[1], 1.0062, 1e-4);
+        std::vector<double> node_8_location = simulator.GetNodeLocation(8);
+        TS_ASSERT_DELTA(node_8_location[0], 3.4931, 1e-4);
+        TS_ASSERT_DELTA(node_8_location[1], 1.0062, 1e-4);
 
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
         TS_ASSERT_DELTA(node_4_location[0], 1.0840, 1e-4);

@@ -89,7 +89,7 @@ void Cylindrical2dNodesOnlyMesh::SetNode(unsigned nodeIndex, ChastePoint<2> poin
     }
 
     // Update the node's location
-    MutableMesh<2,2>::SetNode(nodeIndex, point, false);
+    this->GetNode(nodeIndex)->SetPoint(point);
 }
 
 unsigned Cylindrical2dNodesOnlyMesh::AddNode(Node<2>* pNewNode)

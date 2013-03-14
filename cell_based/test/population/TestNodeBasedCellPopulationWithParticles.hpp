@@ -317,7 +317,7 @@ public:
         for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
         {
             // True (ie should be a particle) if i<10 or i==79, else false
-            TS_ASSERT_EQUALS(cell_population_with_particles.IsParticle(i), ((i<10)||(i==79)));
+            TS_ASSERT_EQUALS(cell_population_with_particles.IsParticle(i), ((i<10)||(i==80)));
         }
 
         // Finally, check the cells node indices have updated
@@ -326,9 +326,12 @@ public:
         std::set<unsigned> expected_node_indices;
         for (unsigned i=0; i<cell_population_with_particles.GetNumRealCells(); i++)
         {
-            expected_node_indices.insert(i+10);
+        	if (i!=27)
+        	{
+        		expected_node_indices.insert(i+10);
+        	}
         }
-
+        expected_node_indices.insert(79);
         // Get actual cell node indices
         std::set<unsigned> node_indices_with_particles;
 

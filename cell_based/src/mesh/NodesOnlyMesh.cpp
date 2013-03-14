@@ -69,15 +69,13 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
         assert(!rNodes[i]->IsDeleted());
         c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
 
-        Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(i, location);
+        Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(GetNextAvailableIndex(), location);
         p_node_copy->SetRadius(0.5);    // Default value.
 
         this->mNodes.push_back(p_node_copy);
 
         // Update the node map
         mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
-
-        mIndexCounter++;
     }
 
     SetUpBoxCollection();
@@ -110,12 +108,20 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 
     // Clear the nodes mapping
     mNodesMapping.clear();
+
+    mIndexCounter = 0;
 }
 
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
 {
     return this->mNodes.size() - this->mDeletedNodeIndices.size();
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::GetMaximumNodeIndex()
+{
+	return std::max(mIndexCounter, this->GetNumAllNodes()) * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
 }
 
 template<unsigned SPACE_DIM>
@@ -135,12 +141,14 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 {
+	map.ResetToIdentity();
+
     RemoveDeletedNodes(map);
 
     this->mDeletedNodeIndices.clear();
     this->mAddedNodes = false;
 
-    UpdateNodeIndices(map);
+    UpdateNodeIndices();
 
     this->SetMeshHasChangedSinceLoading();
 
@@ -169,34 +177,44 @@ void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices(NodeMap& map)
+void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
 {
-    ///\todo #2354 do not reset node indices.
-    for (unsigned node_index=0; node_index<this->mNodes.size(); node_index++)
+    for (unsigned location_in_vector=0; location_in_vector < this->mNodes.size(); location_in_vector++)
     {
-        Node<SPACE_DIM>* p_node = this->mNodes[node_index];
-
-        unsigned old_index = p_node->GetIndex();
-        p_node->SetIndex(node_index);
-        map.SetNewIndex(old_index, node_index);
-
-        mNodesMapping[this->mNodes[node_index]->GetIndex()] = node_index;
+        unsigned global_index = this->mNodes[location_in_vector]->GetIndex();
+        mNodesMapping[global_index] = location_in_vector;
     }
 }
 
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
-    // Call method on parent class
-    unsigned new_node_index = MutableMesh<SPACE_DIM, SPACE_DIM>::AddNode(pNewNode);
+	unsigned fresh_global_index = GetNextAvailableIndex();
+	pNewNode->SetIndex(fresh_global_index);
+	unsigned location_in_nodes_vector = 0;
 
-    // update mNodesMapping
-    mNodesMapping[pNewNode->GetIndex()] = new_node_index;
+	if (this->mDeletedNodeIndices.empty())
+	{
+		this->mNodes.push_back(pNewNode);
+		location_in_nodes_vector = this->mNodes.size() - 1;
+	}
+	else
+	{
+		location_in_nodes_vector = this->mDeletedNodeIndices.back();
+		this->mDeletedNodeIndices.pop_back();
+		delete this->mNodes[location_in_nodes_vector];
+		this->mNodes[location_in_nodes_vector] = pNewNode;
+	}
+
+    this->mAddedNodes = true;
+
+    // Update mNodesMapping
+    mNodesMapping[fresh_global_index] = location_in_nodes_vector;
 
     // Then update cell radius to default.
     pNewNode->SetRadius(0.5);
 
-    return new_node_index;
+    return fresh_global_index;
 }
 
 template<unsigned SPACE_DIM>
@@ -342,6 +360,18 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
     }
 
      AddNodesToBoxes();
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_DIM, SPACE_DIM>& rMeshReader)
+{
+	TetrahedralMesh<SPACE_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
+
+	// Set the correct global node indices
+	for (unsigned i=0; i<this->mNodes.size(); i++)
+	{
+		this->mNodes[i]->SetIndex(GetNextAvailableIndex());
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

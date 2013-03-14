@@ -742,16 +742,16 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
                 // If we're in the same box, then take care not to store the node pair twice
                 if (*box_iter == box_index)
                 {
-                    if (other_node_index > node_index)
+                    if (other_node_index > rNodes[node_index]->GetIndex())
                     {
-                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], rNodes[other_node_index]));
+                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], (*node_iter)));
                         rNodeNeighbours[node_index].insert(other_node_index);
                         rNodeNeighbours[other_node_index].insert(node_index);
                     }
                 }
                 else
                 {
-                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], rNodes[other_node_index]));
+                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], (*node_iter)));
                     rNodeNeighbours[node_index].insert(other_node_index);
                     rNodeNeighbours[other_node_index].insert(node_index);
                 }

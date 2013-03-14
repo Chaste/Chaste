@@ -216,6 +216,37 @@ public:
         delete p_mesh;
     }
 
+    void TestUpdatingCellLocationMapOnDelete() throw (Exception)
+	{
+    	std::vector<Node<3>* > nodes;
+    	nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+    	nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
+
+    	NodesOnlyMesh<3> mesh;
+    	mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+    	std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, 2);
+
+        NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
+
+        TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(cells[0]), 0u);
+        TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(cells[1]), 1u);
+
+        cells[0]->Kill();
+        node_based_cell_population.RemoveDeadCells();
+
+        node_based_cell_population.Update();
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 1u);
+        TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(cells[1]), 1u);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+        	delete nodes[i];
+        }
+	}
+
     void TestAddCell()
     {
         // Create two nodes
@@ -333,7 +364,7 @@ public:
         Node<2>* p_node2 = new Node<2>(num_nodes, new_point2, false);
         unsigned new_node_index = node_based_cell_population.AddNode(p_node2);
 
-        TS_ASSERT_EQUALS(new_node_index, 0u);
+        TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(new_node_index), 0u);
         TS_ASSERT_DELTA(node_based_cell_population.GetNode(0)->rGetLocation()[0], 0.51, 1e-12);
         TS_ASSERT_DELTA(node_based_cell_population.GetNode(0)->rGetLocation()[1], 0.52, 1e-12);
 
@@ -355,7 +386,7 @@ public:
 
         CellPtr p_parent_cell = node_based_cell_population.GetCellUsingLocationIndex(1u);
 
-        node_based_cell_population.AddCell(p_cell, new_cell_location,p_parent_cell);
+        CellPtr p_child_cell = node_based_cell_population.AddCell(p_cell, new_cell_location, p_parent_cell);
 
         // CellPopulation should have updated nodes and cells
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), old_num_nodes+1);
@@ -363,12 +394,13 @@ public:
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), old_num_nodes);
 
         // Check the location of the new node
-        TS_ASSERT_DELTA(node_based_cell_population.GetNode(old_num_nodes)->rGetLocation()[0], 2.0, 1e-12);
-        TS_ASSERT_DELTA(node_based_cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 2.0, 1e-12);
+        unsigned location_index_new_cell = node_based_cell_population.GetLocationIndexUsingCell(p_child_cell);
+        TS_ASSERT_DELTA(node_based_cell_population.GetNode(location_index_new_cell)->rGetLocation()[0], 2.0, 1e-12);
+        TS_ASSERT_DELTA(node_based_cell_population.GetNode(location_index_new_cell)->rGetLocation()[1], 2.0, 1e-12);
 
         // Check the index of the new cell
         CellPtr& new_cell = node_based_cell_population.rGetCells().back();
-        TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(new_cell), old_num_nodes);
+        TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(new_cell), old_num_nodes+1);
 
         // Avoid memory leak
         delete p_mesh;
@@ -416,13 +448,15 @@ public:
         // Test that one node has been removed
         TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 80u);
 
-        // Test that each cell's node index has been correctly updated
+        // Test that each cell'slocation index.
         unsigned index = 0;
         for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
              cell_iter != node_based_cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(*cell_iter), index);
+        	unsigned global_index = node_based_cell_population.GetLocationIndexUsingCell(*cell_iter);
+        	unsigned local_index = p_mesh->SolveNodeMapping(global_index);
+            TS_ASSERT_EQUALS(local_index, index);
             index++;
         }
 

@@ -206,7 +206,7 @@ public:
 
         // Add this new node to the mesh
         new_index = p_mesh->AddNode(p_node2);
-        TS_ASSERT_EQUALS(new_index, 14u);
+        TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(new_index), 14u);
 
         // Avoid memory leak
         delete p_mesh;

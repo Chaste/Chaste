@@ -368,6 +368,14 @@ public:
     virtual unsigned GetNumVertices() const;
 
     /**
+     * Get the largest index of nodes on this process. Overwritten in subclasses and used for setting
+     * up NodeMaps
+     *
+     * @return the largest node index on this process.
+     */
+    virtual unsigned GetMaximumNodeIndex();
+
+    /**
      * Get the element with a given index in the mesh.
      *
      * @param index the global index of the element

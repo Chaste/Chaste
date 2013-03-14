@@ -100,8 +100,6 @@ public:
         buske_adhesive_force.SetAdhesionEnergyParameter(200);
 
         // Test node force calculation
-
-
         for (unsigned step=0; step<40; step++)
         {
             // Move nodes close together

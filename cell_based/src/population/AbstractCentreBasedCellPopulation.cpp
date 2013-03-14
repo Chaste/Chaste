@@ -76,7 +76,7 @@ CellPtr AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCell(CellP
     this->mCells.push_back(pNewCell);
 
     // Update mappings between cells and location indices
-    this->SetCellUsingLocationIndex(new_node_index,pNewCell);
+    this->SetCellUsingLocationIndex(new_node_index, pNewCell);
     this->mCellLocationMap[pNewCell.get()] = new_node_index;
 
     return pNewCell;
@@ -211,8 +211,12 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
     }
 
     // Write cell data to file
-    for (unsigned node_index=0; node_index<this->GetNumNodes(); node_index++)
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+    		node_iter != this->mrMesh.GetNodeIteratorEnd();
+    		++node_iter)
     {
+    	unsigned node_index = node_iter->GetIndex();
+
         // Hack that covers the case where the node is associated with a cell that has just been killed (#1129)
         bool node_corresponds_to_dead_cell = false;
         if (this->IsCellAttachedToLocationIndex(node_index))

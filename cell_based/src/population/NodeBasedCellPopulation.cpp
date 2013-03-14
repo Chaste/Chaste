@@ -55,6 +55,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
       mpCellsRecvLeft(NULL)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
+
     if (validate)
     {
         Validate();
@@ -132,7 +133,7 @@ void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>&
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    NodeMap map(this->mrMesh.GetNumAllNodes());
+    NodeMap map(mpNodesOnlyMesh->GetMaximumNodeIndex());
     mpNodesOnlyMesh->ReMesh(map);
 
     if (!map.IsIdentityMap())
@@ -193,7 +194,8 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
         {
             // Remove the node from the mesh
             num_removed++;
-            mpNodesOnlyMesh->DeleteNodePriorToReMesh(this->GetLocationIndexUsingCell((*cell_iter)));
+            unsigned location_index = mpNodesOnlyMesh->SolveNodeMapping(this->GetLocationIndexUsingCell((*cell_iter)));
+            mpNodesOnlyMesh->DeleteNodePriorToReMesh(location_index);
 
             // Update mappings between cells and location indices
             unsigned location_index_of_removed_node = this->GetLocationIndexUsingCell((*cell_iter));

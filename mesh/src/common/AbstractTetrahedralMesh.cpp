@@ -118,16 +118,22 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumAllBoundaryEleme
     return mBoundaryElements.size();
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 {
     return 0u;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumVertices() const
 {
     return this->GetNumNodes();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetMaximumNodeIndex()
+{
+	return this->GetNumAllNodes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
