@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *       terminate called after throwing an instance of 'boost::archive::archive_exception
  *       what():  unregistered class
  *
- * No member variable is defined to be of any of these clases, so removing them won't
+ * No member variable is defined to be of any of these classes, so removing them won't
  * produce any compiler error.  The exception above will occur at runtime.
  *
  * This might not be even necessary in certain cases, if the file is included implicitly by
@@ -142,6 +142,7 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
         EXCEPTION("Checkpoint directory does not exist: " + dir_path);
     }
     assert(*(dir_path.end()-1) == '/'); // Paranoia
+
     // Load the info file
     std::string info_path = dir_path + "archive.info";
     std::ifstream info_file(info_path.c_str());

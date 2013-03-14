@@ -80,11 +80,13 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
     {
         EXCEPTION("You are asking to delete a file and then extend it, change arguments to constructor.");
     }
+
     if (!mUseExistingFile && mDatasetName != "Data")
     {
         //User is trying to add a new dataset, but they are not extending a existing file
         EXCEPTION("Adding new data only makes sense when extending an existing file");
     }
+
     if (mUseExistingFile)
     {
         // Variables should already be defined if we are extending.
