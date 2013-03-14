@@ -240,6 +240,7 @@ private:
     }
 
 public:
+
     void TestBox() throw (Exception)
     {
         c_vector<double, 2*2> box_size;

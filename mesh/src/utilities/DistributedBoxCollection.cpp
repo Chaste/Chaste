@@ -36,26 +36,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
-
-/////////////////////////////////////////////////////////////////////////////
-// DistributedBoxCollection methods
-/////////////////////////////////////////////////////////////////////////////
-
-
 template<unsigned DIM>
 DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
-    : mDomainSize(domainSize),
-      mBoxWidth(boxWidth),
-      mIsPeriodicInX(isPeriodicInX),
-      mAreLocalBoxesSet(false),
-      mFudge(5e-14)
-
+	: mDomainSize(domainSize),
+	  mBoxWidth(boxWidth),
+	  mIsPeriodicInX(isPeriodicInX),
+	  mAreLocalBoxesSet(false),
+	  mFudge(5e-14)
 {
     // Periodicity only works in 2d and in serial.
     if (isPeriodicInX)
     {
-        assert(DIM==2);
-        assert(PetscTools::IsSequential());
+        assert(DIM==2 && PetscTools::IsSequential());
     }
 
     // We insist that the user provide a box width that divides the domainSize in each direction.
@@ -68,63 +60,20 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         }
     }
 
-    /*
-     * Start by calculating the number of boxes in each direction and total number of boxes.
-     * Also create a helper vector of coefficients, whose first entry is 1 and whose i-th
-     * entry (for i>1) is the i-th partial product of the vector mNumBoxesEachDirection. This
-     * vector of coefficients will be used in the next code block to compute how many boxes
-     * along in each dimension each box, given its index.
-     */
-    unsigned num_boxes = 1;
-    std::vector<unsigned> coefficients;
-    coefficients.push_back(1);
-
+    // Calculate the number of boxes in each direction.
     for (unsigned i=0; i<DIM; i++)
     {
-        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge);
-        num_boxes *= mNumBoxesEachDirection(i);
-        coefficients.push_back(coefficients[i]*mNumBoxesEachDirection(i));
+        mNumBoxesEachDirection(i) = (unsigned) floor((mDomainSize(2*i+1) - mDomainSize(2*i))/mBoxWidth + mFudge);
     }
 
-    /*
-     * Set up a PETSc distributed vector (0,1,2,....mNumBixesEachDirection(0)) to divide the
-     * stacks of boxes among the processes.
-     */
-    std::vector<double> stacks_vector;
-    for (unsigned i=0;i<mNumBoxesEachDirection(DIM-1);i++)
-    {
-        stacks_vector.push_back(i);
-    }
-
-    DistributedVectorFactory factory(mNumBoxesEachDirection(DIM-1), localRows);
-
-    Vec petsc_vec = PetscTools::CreateVec(stacks_vector.size(), localRows);
-
-    // Add data from mNumBoxesEachDirection(DIM-1)
-    double* p_ret;
-    VecGetArray(petsc_vec, &p_ret);
-    int lo, hi;
-    VecGetOwnershipRange(petsc_vec, &lo, &hi);
-
-    for (int global_index=lo; global_index<hi; global_index++)
-    {
-        int local_index = global_index - lo;
-        p_ret[local_index] = stacks_vector[global_index];
-    }
-    VecRestoreArray(petsc_vec, &p_ret);
-
-    mpDistributedBoxStacks = new DistributedVector(petsc_vec, &factory);
-
-    // Set up MPI information.
-    mProcRight  = (PetscTools::AmTopMost()) ?   MPI_PROC_NULL   :   (int)PetscTools::GetMyRank()    +1;
-    mProcLeft   = (PetscTools::AmMaster())  ?   MPI_PROC_NULL   :   (int)PetscTools::GetMyRank()    -1;
+    mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
     mMinBoxIndex = UINT_MAX;
     mMaxBoxIndex = 0;
 
-    for (DistributedVector::Iterator stack_index = mpDistributedBoxStacks->Begin();
-         stack_index != mpDistributedBoxStacks->End();
-         ++stack_index)
+    for (unsigned stack_index = mpDistributedBoxStackFactory->GetLow();
+         stack_index != mpDistributedBoxStackFactory->GetHigh();
+         stack_index++)
     {
         int num_boxes_in_plane = 1; // The number of boxes in each layer of boxes.
         std::vector<unsigned> counter_conditions(1, 1u); // The conditions to increment each counter.
@@ -146,9 +95,9 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
                 box_coords[2*d+1] = (double)domainSize[2*d]+mBoxWidth*(1+counters[d]);
                 box_indices[d] = counters[d];
             }
-            box_coords[2*DIM-2]=domainSize[2*DIM-2]+mBoxWidth*(*mpDistributedBoxStacks)[stack_index];
-            box_coords[2*DIM-1]=domainSize[2*DIM-2]+mBoxWidth*((*mpDistributedBoxStacks)[stack_index]+1);
-            box_indices[DIM-1] = (unsigned)(*mpDistributedBoxStacks)[stack_index];
+            box_coords[2*DIM-2]=domainSize[2*DIM-2]+mBoxWidth*stack_index;
+            box_coords[2*DIM-1]=domainSize[2*DIM-2]+mBoxWidth*(stack_index+1);
+            box_indices[DIM-1] = stack_index;
 
             Box<DIM> new_box(box_coords);
             mBoxes.push_back(new_box);
@@ -174,13 +123,13 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     /**
      * Update the local domain region.
      */
-    unsigned num_rows = mpDistributedBoxStacks->GetHigh() - mpDistributedBoxStacks->GetLow();
+    unsigned num_rows = mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow();
     for (int d=0; d<(int)DIM-1; d++)
     {
         mLocalDomainSize[2*d] = domainSize[2*d];
         mLocalDomainSize[2*d+1] = domainSize[2*d+1];
     }
-    mLocalDomainSize[2*DIM-2] = domainSize[2*DIM-2] + mBoxWidth*(*mpDistributedBoxStacks)[mpDistributedBoxStacks->Begin()];
+    mLocalDomainSize[2*DIM-2] = domainSize[2*DIM-2] + mBoxWidth*mpDistributedBoxStackFactory->GetLow();
     mLocalDomainSize[2*DIM-1] = mLocalDomainSize[2*DIM-2] + mBoxWidth*num_rows;
 
     // Check we have set up the right number of total boxes set up.
@@ -195,13 +144,12 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     MPI_Allreduce(&local_boxes,&total_boxes,1,MPI_UNSIGNED,MPI_SUM,PETSC_COMM_WORLD);
 
     mNumBoxes=total_boxes;
-    PetscTools::Destroy(petsc_vec);
 }
 
 template<unsigned DIM>
 DistributedBoxCollection<DIM>::~DistributedBoxCollection()
 {
-    delete mpDistributedBoxStacks;
+    delete mpDistributedBoxStackFactory;
 }
 
 template<unsigned DIM>
@@ -217,8 +165,8 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupHaloBoxes()
 {
     // Get top-most and bottom-most value of Distributed Box Stack.
-    unsigned Hi=mpDistributedBoxStacks->GetHigh();
-    unsigned Lo=mpDistributedBoxStacks->GetLow();
+    unsigned Hi=mpDistributedBoxStackFactory->GetHigh();
+    unsigned Lo=mpDistributedBoxStackFactory->GetLow();
 
     c_vector<double, 2*DIM> box_coords;
 
@@ -511,7 +459,7 @@ double DistributedBoxCollection<DIM>::GetBoxWidth() const
 template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::GetNumRowsOfBoxes() const
 {
-    return mpDistributedBoxStacks->GetHigh() - mpDistributedBoxStacks->GetLow();
+    return mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow();
 }
 
 template<unsigned DIM>
@@ -541,7 +489,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     // Set some bools to find out where we are
                     bool right = (global_index==mNumBoxesEachDirection(0)-1);
                     bool left = (global_index == 0);
-                    bool proc_left = (global_index == mpDistributedBoxStacks->GetLow());
+                    bool proc_left = (global_index == mpDistributedBoxStackFactory->GetLow());
 
                     // If we're not at the right-most box, then insert the box to the right
                     if (!right)
@@ -572,7 +520,7 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     bool right = (global_index%mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0)-1);
                     bool top = !(global_index < mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1) - mNumBoxesEachDirection(0));
                     bool bottom = (global_index < mNumBoxesEachDirection(0));
-                    bool bottom_proc = (CalculateCoordinateIndices(global_index)[1] == mpDistributedBoxStacks->GetLow());
+                    bool bottom_proc = (CalculateCoordinateIndices(global_index)[1] == mpDistributedBoxStackFactory->GetLow());
 
                     // Insert the current box
                     local_boxes.insert(global_index);
@@ -649,8 +597,8 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                     bool right = (global_index % mNumBoxesEachDirection(0) == mNumBoxesEachDirection(0) - 1);
                     bool front = (global_index < num_boxes_xy);
                     bool back = !(global_index < num_boxes_xy*mNumBoxesEachDirection(2) - num_boxes_xy);
-                    bool proc_front = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStacks->GetLow());
-                    bool proc_back = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStacks->GetHigh()-1);
+                    bool proc_front = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStackFactory->GetLow());
+                    bool proc_back = (CalculateCoordinateIndices(global_index)[2] == mpDistributedBoxStackFactory->GetHigh()-1);
 
                     // Insert the current box
                     local_boxes.insert(global_index);
@@ -1130,8 +1078,8 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
         {
             rNodeNeighbours[node_index] = std::set<unsigned>();
         }
-
     }
+
     for (unsigned i=0; i<rNodes.size(); i++)
     {
         unsigned node_index = rNodes[i]->GetIndex();
