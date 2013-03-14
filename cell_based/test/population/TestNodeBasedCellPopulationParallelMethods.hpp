@@ -64,7 +64,7 @@ private:
 
     NodeBasedCellPopulation<3>* mpNodeBasedCellPopulation;
 
-    void setUp() throw (Exception)
+    void setUp()
     {
         AbstractCellBasedTestSuite::setUp();
 
@@ -107,7 +107,7 @@ public:
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetLocationIndexUsingCell(p_returned_cell), node_index);
     }
 
-    void noTestAddNodeAndCellsToSend() throw (Exception)
+    void TestAddNodeAndCellsToSend() throw (Exception)
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -124,7 +124,7 @@ public:
 
     }
 
-    void noTestSendAndRecieveCells() throw (Exception)
+    void TestSendAndRecieveCells() throw (Exception)
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -146,14 +146,14 @@ public:
             TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvRight->size(), 1u);
 
             unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvRight->begin()).second->GetIndex();
-            TS_ASSERT_EQUALS(index, 0u);
+            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
         }
         if (!PetscTools::AmMaster())
         {
             TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
 
             unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
-            TS_ASSERT_EQUALS(index, 0u);
+            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
         }
 #endif
     }
