@@ -985,7 +985,7 @@ public:
             {
                 ///\todo #2146 Check the element attributes in other written meshes
                 ///\todo #2146 Element attributes are sometimes written/read as unsigned
-                TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), ascii_mesh.GetElement(i)->GetAttribute(), 0.4);
+                TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), ascii_mesh.GetElement(i)->GetAttribute(), 0.4 + 1e-12);
 //                TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), bin_mesh.GetElement(i)->GetAttribute(), 1e-15);
 //                  TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), reader_mesh.GetElement(i)->GetAttribute(), 1e-15);
             }
