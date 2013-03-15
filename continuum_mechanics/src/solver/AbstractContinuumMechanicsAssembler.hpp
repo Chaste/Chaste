@@ -138,6 +138,7 @@ protected:
      *  @param rGradQuadPhi  Gradients of all the quadratic basis functions on this element, evaluated at the current quad point
      *  @param rX Current location (physical position)
      *  @param pElement Current element
+     *  @return stencil matrix
      */
     virtual c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialSpatialMatrixTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
@@ -168,6 +169,7 @@ protected:
      *  @param rGradLinearPhi  Gradients of all the linear basis functions on this element, evaluated at the current quad point
      *  @param rX Current location (physical position corresponding to quad point)
      *  @param pElement Current element
+     *  @return stencil matrix
      */
     virtual c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputeSpatialPressureMatrixTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
@@ -198,6 +200,7 @@ protected:
      *  @param rGradLinearPhi  Gradients of all the linear basis functions on this element, evaluated at the current quad point
      *  @param rX Current location (physical position)
      *  @param pElement Current element
+     *  @return stencil matrix
      */
     virtual c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressurePressureMatrixTerm(
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
@@ -229,6 +232,7 @@ protected:
      *  @param rGradQuadPhi  Gradients of all the quadratic basis functions on this element, evaluated at the current quad point
      *  @param rX Current location (physical position)
      *  @param pElement Current element
+     *  @return stencil vector
      */
     virtual c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
@@ -260,6 +264,7 @@ protected:
      *  @param rGradLinearPhi  Gradients of all the linear basis functions on this element, evaluated at the current quad point
      *  @param rX Current location (physical position)
      *  @param pElement Current element
+     *  @return stencil vector
      */
     virtual c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressureVectorTerm(
             c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,

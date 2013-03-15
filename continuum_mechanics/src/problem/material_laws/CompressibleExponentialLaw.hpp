@@ -104,19 +104,19 @@ public:
                                           FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
                                           bool computeDTdE);
 
-    /** Get method for the parameter a */
+    /** @return the parameter a */
     double GetA()
     {
         return mA;
     }
 
-    /**  Get method for the parameter b (the values which multiply the strains in Q) */
+    /**  @return the parameter b (the values which multiply the strains in Q) */
     std::vector<std::vector<double> > GetB()
     {
         return mB;
     }
 
-    /** Get method for compressibility parameter */
+    /** @return compressibility parameter */
     double GetCompressibilityParam()
     {
         return mCompressibilityParam;

@@ -74,7 +74,7 @@ private:
 public:
 
     /**
-     * Get the first derivative dW/dI1.
+     * @return the first derivative dW/dI1.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -84,7 +84,7 @@ public:
     double Get_dW_dI1(double I1, double I2);
 
     /**
-     * Get the first derivative dW/dI2.
+     * @return the first derivative dW/dI2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -94,7 +94,7 @@ public:
     double Get_dW_dI2(double I1, double I2);
 
     /**
-     * Get the second derivative d^2W/dI1^2.
+     * @return the second derivative d^2W/dI1^2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -104,7 +104,7 @@ public:
     double Get_d2W_dI1(double I1, double I2);
 
     /**
-     * Get the second derivative d^2W/dI2^2.
+     * @return the second derivative d^2W/dI2^2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -114,7 +114,7 @@ public:
     double Get_d2W_dI2(double I1, double I2);
 
     /**
-     * Get the second derivative d^2W/dI1dI2.
+     * @return the second derivative d^2W/dI1dI2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -123,10 +123,10 @@ public:
      */
     double Get_d2W_dI1I2(double I1, double I2);
 
-    /** Get method for mC1. */
+    /** @return  mC1. */
     double GetC1();
 
-    /** Get method for mC2. */
+    /** @return  mC2. */
     double GetC2();
 
     /**

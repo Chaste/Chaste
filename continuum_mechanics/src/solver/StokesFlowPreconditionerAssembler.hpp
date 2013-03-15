@@ -81,7 +81,7 @@ private:
      *  [B2^T  C ]
      *  The function is related to the pressure-pressure block, i.e. C
      *
-     *  The method just returns C=M, the mass matrix.
+     *  @return C=M, the mass matrix.
      *
      *  @param rLinearPhi  All the linear basis functions on this element, evaluated at the current quad point
      *  @param rGradLinearPhi  Gradients of all the linear basis functions on this element, evaluated at the current quad point

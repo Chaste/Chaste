@@ -79,7 +79,7 @@ private:
 public:
 
     /**
-     * Get the first derivative dW/dI1.
+     * @return the first derivative dW/dI1.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -91,7 +91,7 @@ public:
     }
 
     /**
-     * Get the first derivative dW/dI2.
+     * @return the first derivative dW/dI2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -103,7 +103,7 @@ public:
     }
 
     /**
-     * Get the first derivative dW/dI3.
+     * @return the first derivative dW/dI3.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -116,7 +116,7 @@ public:
     }
 
     /**
-     * Get the second derivative d^2W/dI1^2.
+     * @return the second derivative d^2W/dI1^2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -129,7 +129,7 @@ public:
 
 
     /**
-     * Get the second derivative d^2W/dI2^2.
+     * @return the second derivative d^2W/dI2^2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -142,7 +142,7 @@ public:
 
 
     /**
-     * Get the second derivative d^2W/dI3^2.
+     * @return the second derivative d^2W/dI3^2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -157,7 +157,7 @@ public:
 
 
     /**
-     * Get the second derivative d^2W/dI2dI3.
+     * @return the second derivative d^2W/dI2dI3.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -170,7 +170,7 @@ public:
 
 
     /**
-     * Get the second derivative d^2W/dI1dI3.
+     * @return the second derivative d^2W/dI1dI3.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -183,7 +183,7 @@ public:
 
 
     /**
-     * Get the second derivative d^2W/dI1dI2.
+     * @return the second derivative d^2W/dI1dI2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -195,13 +195,13 @@ public:
     }
 
 
-    /** Get method for mC1. */
+    /** @return  mC1. */
     double GetC1()
     {
         return mC1;
     }
 
-    /** Get method for mC3. */
+    /** @return  mC3. */
     double GetC3()
     {
         return mC3;

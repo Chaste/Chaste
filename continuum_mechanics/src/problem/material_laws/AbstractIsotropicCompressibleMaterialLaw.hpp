@@ -56,7 +56,7 @@ class AbstractIsotropicCompressibleMaterialLaw : public AbstractCompressibleMate
 protected:
 
     /**
-     * Get the first derivative dW/dI1.
+     * @return the first derivative dW/dI1.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -65,7 +65,7 @@ protected:
     virtual double Get_dW_dI1(double I1, double I2, double I3)=0;
 
     /**
-     * Get the first derivative dW/dI2.
+     * @return the first derivative dW/dI2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -74,7 +74,7 @@ protected:
     virtual double Get_dW_dI2(double I1, double I2, double I3)=0;
 
     /**
-     * Get the first derivative dW/dI3.
+     * @return the first derivative dW/dI3.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -84,7 +84,7 @@ protected:
 
 
     /**
-     * Get the second derivative d^2W/dI1^2.
+     * @return the second derivative d^2W/dI1^2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -93,7 +93,7 @@ protected:
     virtual double Get_d2W_dI1(double I1, double I2, double I3)=0;
 
     /**
-     * Get the second derivative d^2W/dI2^2.
+     * @return the second derivative d^2W/dI2^2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -102,7 +102,7 @@ protected:
     virtual double Get_d2W_dI2(double I1, double I2, double I3)=0;
 
     /**
-     * Get the second derivative d^2W/dI3^2.
+     * @return the second derivative d^2W/dI3^2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -112,7 +112,7 @@ protected:
 
 
     /**
-     * Get the second derivative d^2W/dI2dI3.
+     * @return the second derivative d^2W/dI2dI3.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -121,7 +121,7 @@ protected:
     virtual double Get_d2W_dI2I3(double I1, double I2, double I3)=0;
 
     /**
-     * Get the second derivative d^2W/dI1dI3.
+     * @return the second derivative d^2W/dI1dI3.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C
@@ -130,7 +130,7 @@ protected:
     virtual double Get_d2W_dI1I3(double I1, double I2, double I3)=0;
 
     /**
-     * Get the second derivative d^2W/dI1dI2.
+     * @return the second derivative d^2W/dI1dI2.
      *
      * @param I1 first principal invariant of C
      * @param I2 second principal invariant of C

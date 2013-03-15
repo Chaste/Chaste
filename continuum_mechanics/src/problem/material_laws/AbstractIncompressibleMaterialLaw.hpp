@@ -58,9 +58,11 @@ public:
         : AbstractMaterialLaw<DIM>()
     {
     }
+    /** Virtual Destructor */
+    virtual ~AbstractIncompressibleMaterialLaw(){}
 
     /**
-     *  Get the pressure corresponding to zero stress given zero strain.
+     *  @return the pressure corresponding to zero stress given zero strain.
      */
     virtual double GetZeroStrainPressure()=0;
 };

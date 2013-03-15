@@ -78,7 +78,7 @@ public:
     }
 
     /**
-     * Get the viscosity. Exception thrown if this hasn't been set yet.
+     * @return the viscosity. Exception thrown if this hasn't been set yet.
      */
     double GetViscosity()
     {

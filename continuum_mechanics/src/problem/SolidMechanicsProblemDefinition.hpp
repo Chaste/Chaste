@@ -119,21 +119,21 @@ public:
     void SetMaterialLaw(CompressibilityType compressibilityType, std::vector<AbstractMaterialLaw<DIM>*>& rMaterialLaws);
 
     /**
-     * Get whether the material is homogeneous or heterogeneous.
+     * @return whether the material is homogeneous or heterogeneous.
      * SetMaterialLaw() must be called before calling this.
      */
     bool IsHomogeneousMaterial();
 
 
     /**
-     * Get whether the material is incompressible or compressible.
+     * @return whether the material is incompressible or compressible.
      * SetMaterialLaw() must be called before calling this. (Which can be checked
      * by calling Validate()).
      */
     CompressibilityType GetCompressibilityType();
 
     /**
-     * Get the material law for a given element, when the body is incompressible. An assertion will
+     * @return the material law for a given element, when the body is incompressible. An assertion will
      * fail if GetCompressibilityType()!=INCOMPRESSIBLE. If the material is homogeneous, it doesn't matter what
      * the element index is.
      * @param elementIndex index of element
@@ -141,7 +141,7 @@ public:
     AbstractIncompressibleMaterialLaw<DIM>* GetIncompressibleMaterialLaw(unsigned elementIndex);
 
     /**
-     * Get the material law for a given element, when the body is compressible. An assertion will
+     * @return the material law for a given element, when the body is compressible. An assertion will
      * fail if GetCompressibilityType()!=COMPRESSIBLE. If the material is homogeneous, it doesn't matter what
      * the element index is.
      * @param elementIndex index of element
@@ -191,7 +191,7 @@ public:
     }
 
     /**
-     *  Get whether solver should use Petsc SNES nonlinear solver or not
+     *  @return whether solver should use PETSc SNES nonlinear solver or not
      */
     bool GetSolveUsingSnes()
     {

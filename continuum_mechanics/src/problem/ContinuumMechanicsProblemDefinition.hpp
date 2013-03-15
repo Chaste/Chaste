@@ -161,7 +161,7 @@ public:
     void SetDensity(double density);
 
     /**
-     * Get the density
+     * @return the density
      */
     double GetDensity();
 
@@ -174,12 +174,12 @@ public:
     // No method here for setting non-zero Dirichlet BCs - these are in the subclasses..
 
     /**
-     *  Get the Dirichlet nodes
+     *  @return the Dirichlet nodes
      */
     std::vector<unsigned>& rGetDirichletNodes();
 
     /**
-     * Get the Dirichlet node values.
+     * @return the Dirichlet node values.
      */
     std::vector<c_vector<double,DIM> >& rGetDirichletNodeValues();
 
@@ -197,7 +197,7 @@ public:
     void SetBodyForce(c_vector<double,DIM> (*pFunction)(c_vector<double,DIM>& rX, double t));
 
     /**
-     * Get the body force at a particular point and time.
+     * @return the body force at a particular point and time.
      * Note: The user can either call this, or check what type of body force has been set using
      * GetBodyForceType() and then call GetConstantBodyForce() or EvaluateBodyForceFunction(X,t).
      *
@@ -207,17 +207,17 @@ public:
     c_vector<double,DIM> GetBodyForce(c_vector<double,DIM>& rX, double t = 0.0);
 
     /**
-     * Get the body force type
+     * @return the body force type
      */
     BodyForceType GetBodyForceType();
 
     /**
-     * Get the constant body force (error if GetBodyForceType()!=CONSTANT_BODY_FORCE)
+     * @return the constant body force (error if GetBodyForceType()!=CONSTANT_BODY_FORCE)
      */
     c_vector<double,DIM> GetConstantBodyForce();
 
     /**
-     * Evaluate the body force function (error if GetBodyForceType()!=FUNCTIONAL_BODY_FORCE)
+     * @return the body force function (error if GetBodyForceType()!=FUNCTIONAL_BODY_FORCE)
      *
      * @param rX spatial location
      * @param t current time
@@ -225,7 +225,7 @@ public:
     c_vector<double,DIM> EvaluateBodyForceFunction(c_vector<double,DIM>& rX, double t);
 
     /**
-     * Get the traction (Neumann) boundary condition type
+     * @return the traction (Neumann) boundary condition type
      */
     TractionBoundaryConditionType GetTractionBoundaryConditionType();
 
@@ -272,19 +272,19 @@ public:
                                                  double (*pFunction)(double t));
 
     /**
-     * Get the vector of traction boundary elements
+     * @return the vector of traction boundary elements
      */
     std::vector<BoundaryElement<DIM-1,DIM>*>& rGetTractionBoundaryElements();
 
     /**
-     *  Get the element-wise tractions vector (corresponding to
+     *  @return the element-wise tractions vector (corresponding to
      *  vector returned by rGetTractionBoundaryElements())
      *  (error if GetTractionBoundaryConditionType()!=ELEMENTWISE_TRACTION)
      */
     std::vector<c_vector<double,DIM> >& rGetElementwiseTractions();
 
     /**
-     *  Get the pressure for the boundary elements (corresponding to
+     *  @return the pressure for the boundary elements (corresponding to
      *  vector returned by rGetTractionBoundaryElements())
      *  (error if GetTractionBoundaryConditionType()!=PRESSURE_ON_DEFORMED)
      */
@@ -306,7 +306,7 @@ public:
     void SetPressureScaling(double scaleFactor);
 
     /**
-     * Evaluate the traction boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_TRACTION)
+     * @return the traction boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_TRACTION)
      *
      * @param rX spatial location
      * @param t current time
@@ -314,7 +314,7 @@ public:
     c_vector<double,DIM> EvaluateTractionFunction(c_vector<double,DIM>& rX, double t);
 
     /**
-     * Evaluate the pressure boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_PRESSURE_ON_DEFORMED)
+     * @return the pressure boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_PRESSURE_ON_DEFORMED)
      *
      * @param t current time
      */
@@ -337,7 +337,7 @@ public:
     }
 
     /**
-     *  Get whether the solver should be verbose or not
+     *  @return whether the solver should be verbose or not
      */
     bool GetVerboseDuringSolve()
     {

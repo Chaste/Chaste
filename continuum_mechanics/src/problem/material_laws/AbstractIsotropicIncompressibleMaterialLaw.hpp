@@ -57,7 +57,7 @@ class AbstractIsotropicIncompressibleMaterialLaw : public AbstractIncompressible
 protected:
 
     /**
-     * Get the first derivative dW/dI1.
+     * @return the first derivative dW/dI1.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -67,7 +67,7 @@ protected:
     virtual double Get_dW_dI1(double I1, double I2)=0;
 
     /**
-     * Get the first derivative dW/dI2.
+     * @return the first derivative dW/dI2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -77,7 +77,7 @@ protected:
     virtual double Get_dW_dI2(double I1, double I2)=0;
 
     /**
-     * Get the second derivative d^2W/dI1^2.
+     * @return the second derivative d^2W/dI1^2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -87,7 +87,7 @@ protected:
     virtual double Get_d2W_dI1(double I1, double I2)=0;
 
     /**
-     * Get the second derivative d^2W/dI2^2.
+     * @return the second derivative d^2W/dI2^2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -97,7 +97,7 @@ protected:
     virtual double Get_d2W_dI2(double I1, double I2)=0;
 
     /**
-     * Get the second derivative d^2W/dI1dI2.
+     * @return the second derivative d^2W/dI1dI2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -142,7 +142,7 @@ public:
     virtual ~AbstractIsotropicIncompressibleMaterialLaw();
 
     /**
-     *  Get the pressure corresponding to E=0, ie corresponding to C=identity
+     *  @return the pressure corresponding to E=0, ie corresponding to C=identity
      *
      *  Since T = 2*Get_dW_dI1 identity + 4*Get_dW_dI2 (I1*identity - C) - p inverse(C),
      *  this is equal to 2*Get_dW_dI1(3,3) + 4*Get_dW_dI2(3,3) in 3D

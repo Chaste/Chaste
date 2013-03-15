@@ -451,7 +451,7 @@ protected:
     /**
      * When pressure-on-deformed-body boundary conditions are used:
      *
-     * For some reason the use of the jacobian corresponding to the pressure term doesn't help
+     * For some reason the use of the Jacobian corresponding to the pressure term doesn't help
      * (makes things worse!) if the current guess is not close enough to the solution, and can
      * lead to immediate divergence. It will lead to faster convergence once close enough to the
      * solution. This method contains the logic used to decide whether to include the jacobian
@@ -460,6 +460,7 @@ protected:
      * We only assemble the contribution to the matrix if the last damping value is
      * close enough to 1 (non-snes solver). This will current always return false if the snes solver
      * is being used
+     * @return true if we are assembling pressure-on-deformed-body
      */
     bool ShouldAssembleMatrixTermForPressureOnDeformedBc();
 
@@ -504,10 +505,11 @@ protected:
      *   will throw an exception as the strains are too large. If this bool is
      *   set to true, the exception will be caught, and DBL_MAX returned as the
      *   residual norm
+     * @return residual norm
      */
     double ComputeResidualAndGetNorm(bool allowException);
 
-    /** Calculate |r|_2 / length(r), where r is the current residual vector. */
+    /** @return  |r|_2 / length(r), where r is the current residual vector. */
     double CalculateResidualNorm();
 
     /**
@@ -546,6 +548,7 @@ protected:
      * increasing.
      *
      * @param solution The solution of the linear solve in newton's method, ie the update vector u.
+     * @return norm of residual
      */
     double UpdateSolutionUsingLineSearch(Vec solution);
 
@@ -640,7 +643,7 @@ public:
     }
 
     /**
-     * Get number of Newton iterations taken in last solve.
+     * @return number of Newton iterations taken in last solve.
      */
     unsigned GetNumNewtonIterations();
 
@@ -763,13 +766,13 @@ public:
     void WriteCurrentAverageElementStresses(std::string fileName, int counterToAppend = -1);
 
     /**
-     * Implemented method, returns the deformed position.
+     * @return the deformed position.
      * Note: return_value[i](j) = x_j for node i.
      */
     std::vector<c_vector<double,DIM> >& rGetSpatialSolution();
 
     /**
-     * Get the deformed position. Note: return_value[i](j) = x_j for node i. Just
+     * @return the deformed position. Note: return_value[i](j) = x_j for node i. Just
      * calls rGetSpatialSolution().
      */
     std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
@@ -780,6 +783,7 @@ public:
      * element.
      *
      * @param elementIndex elementIndex
+     * @return stress tensor
      */
     c_matrix<double,DIM,DIM> GetAverageStressPerElement(unsigned elementIndex);
 };

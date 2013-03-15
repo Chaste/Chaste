@@ -47,7 +47,7 @@ class NonlinearElasticityTools
 public:
 
     /**
-     * Collect all the nodes which satisfy x[k] = c, for given k and c, in order
+     * @return all the nodes which satisfy x[k] = c, for given k and c, in order
      * to be set as fixed (or displacement boundary condition) nodes. Note that
      * this method does not check if the nodes on the required surface are actually
      * boundary nodes. It does however throw an exception if no nodes on the given

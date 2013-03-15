@@ -74,7 +74,7 @@ private:
 public:
 
     /**
-     * Get the first derivative dW/dI1.
+     * @return the first derivative dW/dI1.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -84,7 +84,7 @@ public:
     double Get_dW_dI1(double I1, double I2);
 
     /**
-     * Get the first derivative dW/dI2.
+     * @return the first derivative dW/dI2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -94,7 +94,7 @@ public:
     double Get_dW_dI2(double I1, double I2);
 
     /**
-     * Get the second derivative d^2W/dI1^2.
+     * @return the second derivative d^2W/dI1^2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -104,7 +104,7 @@ public:
     double Get_d2W_dI1(double I1, double I2);
 
     /**
-     * Get the second derivative d^2W/dI2^2.
+     * @return the second derivative d^2W/dI2^2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -114,7 +114,7 @@ public:
     double Get_d2W_dI2(double I1, double I2);
 
     /**
-     * Get the second derivative d^2W/dI1dI2.
+     * @return the second derivative d^2W/dI1dI2.
      *
      * \todo The name of this method should not include underscores.
      *
@@ -124,7 +124,7 @@ public:
     double Get_d2W_dI1I2(double I1, double I2);
 
     /**
-     * Get the parameter alpha_{ij}.
+     * @return the parameter alpha_{ij}.
      *
      * @param i index i
      * @param j index j
@@ -145,6 +145,7 @@ public:
      * Resize the matrix alpha to be of size (n+1)*(n+1) and zero all entries.
      *
      * @param n the parameter n
+     * @return the matrix alpha
      */
     static std::vector<std::vector<double> > GetZeroedAlpha(unsigned n);
 };

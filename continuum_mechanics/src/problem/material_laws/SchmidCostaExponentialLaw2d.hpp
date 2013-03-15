@@ -99,17 +99,17 @@ public:
                                           bool                   computeDTdE);
 
     /**
-     * Get method for mA.
+     * @return  mA.
      */
     double GetA();
 
     /**
-     * Get method for mB.
+     * @return  mB.
      */
     std::vector<std::vector<double> > GetB();
 
     /**
-     * Get the pressure corresponding to E=0, ie C=identity.
+     * @return the pressure corresponding to E=0, i.e. C=identity.
      */
     double GetZeroStrainPressure();
 };

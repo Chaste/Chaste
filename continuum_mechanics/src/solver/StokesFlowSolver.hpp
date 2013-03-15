@@ -120,13 +120,13 @@ public:
 
 
     /**
-     * Implemented method, returns the flow.
+     * @return the flow.
      * Note: return_value[i](j) = u_j for node i.
      */
     std::vector<c_vector<double,DIM> >& rGetSpatialSolution();
 
     /**
-     * Get the flow. Note: return_value[i](j) = u_j for node i. Just
+     * @return the flow. Note: return_value[i](j) = u_j for node i. Just
      * calls rGetSpatialSolution().
      */
     std::vector<c_vector<double,DIM> >& rGetVelocities();

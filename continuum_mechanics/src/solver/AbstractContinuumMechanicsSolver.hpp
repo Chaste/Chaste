@@ -347,7 +347,7 @@ public:
     void CreateVtkOutput(std::string spatialSolutionName="Spatial solution");
 
     /**
-     * Get the current solution vector (advanced use only - for getting the deformed position use
+     * @return the current solution vector (advanced use only - for getting the deformed position use
      * rGetDeformedPosition()).
      */
     std::vector<double>& rGetCurrentSolution()
@@ -356,13 +356,13 @@ public:
     }
 
     /**
-     * Get the spatial solution. For solids problems this will be the deformed position,
+     * @return the spatial solution. For solids problems this will be the deformed position,
      * for fluids problems this will be the flow.
      */
     virtual std::vector<c_vector<double,DIM> >& rGetSpatialSolution()=0;
 
     /**
-     *  Get the pressure, for each NODE in the mesh. If the node is an internal node of the quadratic mesh
+     *  @return the pressure, for each NODE in the mesh. If the node is an internal node of the quadratic mesh
      *  the pressure is not computed at this node (as linear basis functions are used for the pressure, so
      *  pressures unknowns are only present at vertices), so a dummy pressure value of 0 is returned in this
      *  vector.
@@ -754,7 +754,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
             PetscVecTools::SetElement(matrix_col, col, 0.0);
 
             // Set up the RHS Dirichlet boundary conditions vector
-            // Eg, for a boundary node at the zeroth node (x_0 = value), this is equal to
+            // E.g. for a boundary node at the zeroth node (x_0 = value), this is equal to
             //   -value*[0 a_21 a_31 .. a_N1]
             // and will be added to the RHS.
             PetscVecTools::AddScaledVector(mDirichletBoundaryConditionsVector, matrix_col, minus_value);

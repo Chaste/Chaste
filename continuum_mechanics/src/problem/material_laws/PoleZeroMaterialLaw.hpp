@@ -143,7 +143,7 @@ public:
                                           bool                      computeDTdE);
 
     /**
-     * Get the pressure corresponding to E=0, ie C=identity.
+     * @return the pressure corresponding to E=0, ie C=identity.
      */
     double GetZeroStrainPressure();
 
