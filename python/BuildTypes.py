@@ -943,12 +943,15 @@ class Intel(BuildType):
             version = self.GetCompilerVersion()
             assert version > 0
             if version >= 12:
-                # 2304 = non-explicit constructor with single argument
                 self._cc_flags.extend(['-Wall',
                                        '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
-                                       '-wr2304'])
-            elif version == 10: # \todo #1360 Working through version 10 issues on userpc60
-                #\todo #1360 What about version 11?
+                                       '-wr2304', #2304: non-explicit constructor with single argument
+                                       # Switch these ones on for compatibility
+                                       '-we271', #271: trailing comma is nonstandard
+                                       #Following doesn't seem to play
+                                       '-we810', #810: conversion from "double" to "unsigned int" may lose significant bits
+                                       ])
+            elif (version == 10 or version == 11): # \todo #1360 Working through version 10 issues on userpc60
                 #\todo #1360 Justify or fix the supressions given below
                 self._cc_flags.extend(['-Wall',
                                        '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
