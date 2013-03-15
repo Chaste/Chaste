@@ -107,18 +107,18 @@ public:
     std::string PopWarning() const;
 
     /**
-     * Return a pointer to the Warnings object.
+     * @return a pointer to the Warnings object.
      * The object is created the first time this method is called.
      */
     static Warnings* Instance();
 
     /**
-     * How many warnings are in the queue.
+     * @return how many warnings are in the queue.
      */
     unsigned GetNumWarnings();
 
     /**
-     * Remove and inspect a warning.
+     * @return next warning.  Remove and inspect a warning.
      */
     std::string GetNextWarningMessage();
 };

@@ -86,7 +86,7 @@ public:
     ~ReplicatableVector();
 
     /**
-     * Return the size of the vector.
+     * @return the size of the vector.
      */
     unsigned GetSize();
 
@@ -101,6 +101,7 @@ public:
      * Access the vector.
      *
      * @param index the index of the vector to return
+     * @return reference to component of the vector
      */
     double& operator[](unsigned index);
 

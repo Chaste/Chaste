@@ -102,7 +102,7 @@ public:
     bool DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const;
 
     /**
-     * @returns the size of the nodes list
+     * @return the size of the nodes list
      */
     unsigned GetSize() const;
 

@@ -647,7 +647,7 @@ c_vector<T, 3> VectorProduct(const c_vector<T, 3>& rA, const c_vector<T, 3>& rB)
  * Convenience function for quickly creating test vectors (1D).
  *
  * @param x entry in vector
- * @returns vector=(x)
+ * @return vector=(x)
  */
 c_vector<double, 1> Create_c_vector(double x);
 
@@ -656,7 +656,7 @@ c_vector<double, 1> Create_c_vector(double x);
  *
  * @param x entry in vector
  * @param y entry in vector
- * @returns vector=(x,y)
+ * @return vector=(x,y)
  */
 c_vector<double, 2> Create_c_vector(double x, double y);
 
@@ -666,7 +666,7 @@ c_vector<double, 2> Create_c_vector(double x, double y);
  * @param x entry in vector
  * @param y entry in vector
  * @param z entry in vector
- * @returns vector=(x,y,z)
+ * @return vector=(x,y,z)
  */
 c_vector<double, 3> Create_c_vector(double x, double y, double z);
 

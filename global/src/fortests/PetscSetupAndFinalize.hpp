@@ -82,7 +82,9 @@ class PetscSetup : public CxxTest::GlobalFixture
 {
 public:
 
-    /** Standard setup method for PETSc. */
+    /** Standard setup method for PETSc.
+     * @return true (by CxxTest convention)
+     */
     bool setUpWorld()
     {
         // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
@@ -114,7 +116,9 @@ public:
 #endif
         return true;
     }
-    /** Clean up PETSc after running all tests. */
+    /** Clean up PETSc after running all tests.
+     * * @return true (by CxxTest convention)
+     */
     bool tearDownWorld()
     {
         ///Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1

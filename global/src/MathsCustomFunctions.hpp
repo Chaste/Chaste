@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 double SmallPow(double x, unsigned exponent);
 
 /**
+ * @return true if the smaller number divides the larger (to machine precision)
  * Uses fmod to determine if smallerNumber divides the largerNumber.
  * We expect smallerNumber/largerNumber <= 1 and therefore
  * fmod(largerNumber,smallerNumber) should be close to zero or close to smallerNumber.
@@ -64,7 +65,7 @@ double SmallPow(double x, unsigned exponent);
 bool Divides(double smallerNumber, double largerNumber);
 
 /**
- * Returns the sign of the argument, i.e. -1 if value<0, 0 if value=0, or +1 if value>0.
+ * @return the sign of the argument, i.e. -1 if value<0, 0 if value=0, or +1 if value>0.
  *
  * @param value  the argument value
  */
@@ -78,7 +79,7 @@ class CompareDoubles
 {
 public:
     /**
-     * Test whether a number is close to zero, as defined by the given tolerance.
+     * @return true if a number is close to zero, as defined by the given tolerance.
      * A number equal in magnitude to the tolerance is OK.
      *
      * @param number  the number to compare
@@ -87,7 +88,7 @@ public:
     static bool IsNearZero(double number, double tolerance);
 
     /**
-     * Test whether two numbers are close within the given relative tolerance.
+     * @return true if  two numbers are close within the given relative tolerance.
      *
      * @param number1  the first number to compare
      * @param number2  the second number to compare
@@ -96,7 +97,7 @@ public:
     static bool WithinRelativeTolerance(double number1, double number2, double tolerance);
 
     /**
-     * Test whether two numbers are close within the given absolute tolerance.
+     * @return true if two numbers are close within the given absolute tolerance.
      * A difference of exactly the tolerance is OK.
      *
      * @param number1  the first number to compare
@@ -106,7 +107,7 @@ public:
     static bool WithinAbsoluteTolerance(double number1, double number2, double tolerance);
 
     /**
-     * Test whether two numbers are close within the given tolerance, and print an
+     * @return true if two numbers are close within the given tolerance, and print an
      * error message to stdout if not.
      *
      * @param number1  the first number to compare
@@ -117,7 +118,7 @@ public:
     static bool WithinTolerance(double number1, double number2, double tolerance, bool toleranceIsAbsolute);
 
     /**
-     * Test whether two numbers are close within the given tolerances.  If either the relative or
+     * @return true if two numbers are close within the given tolerances.  If either the relative or
      * absolute tolerance is satisfied, then the result is true.
      *
      * @param number1  the first number to compare
@@ -131,7 +132,7 @@ public:
                                    bool printError=false);
 
     /**
-     * Compute the relative or absolute difference between two numbers.
+     * @return the relative or absolute difference between two numbers.
      *
      * @param number1  the first number to compare
      * @param number2  the second number to compare

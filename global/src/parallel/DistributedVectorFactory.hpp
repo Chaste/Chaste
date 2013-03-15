@@ -160,7 +160,7 @@ public:
     /**
      * Create a PETSc vector of the problem size.
      *
-     * @return the created vector
+     * @return new PETSc vector
      */
     Vec CreateVec();
 
@@ -168,6 +168,7 @@ public:
      * Create a striped PETSc vector of size: stride * problem size.
      *
      * @param stride
+     * @return new PETSc vector
      */
     Vec CreateVec(unsigned stride);
 
@@ -183,6 +184,7 @@ public:
      * Test if the given global index is owned by the current process, i.e. is local to it.
      *
      * @param globalIndex a global index
+     * @return true if the global index can be accessed by this process
      */
     bool IsGlobalIndexLocal(unsigned globalIndex);
 
@@ -240,6 +242,7 @@ public:
     /**
      * Determine whether, when loading an instance from an archive, to check that the
      * current number of processes matches that used in creating the archive.
+     * @return true when check is required
      */
     static bool CheckNumberOfProcessesOnLoad()
     {
@@ -251,6 +254,7 @@ public:
      * an archive, then return a factory with the settings from the archive, which may
      * not be the same as ours - if running on a different number of processes from
      * the original, we will have used PETSC_DECIDE to set the local ownership on load.
+     * @return the original factory
      */
     DistributedVectorFactory* GetOriginalFactory()
     {
@@ -273,7 +277,7 @@ public:
     void SetFromFactory(DistributedVectorFactory* pFactory);
 
     /**
-     * @returns the mLo value from each process in a vector. This is calculated on the first call
+     * @return the mLo value from each process in a vector. This is calculated on the first call
      * and cached for later use.
      */
     std::vector<unsigned> &rGetGlobalLows();

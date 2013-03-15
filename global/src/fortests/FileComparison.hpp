@@ -138,6 +138,7 @@ public:
     }
 
     /**
+     * @return true if the files are identical to within tolerance.
      * Compare the files under both relative and absolute tolerances.
      * The comparison only fails if neither tolerance holds.  The
      * default settings effectively require numbers to match exactly.

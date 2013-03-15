@@ -49,27 +49,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Usage (in test):
  *
- * // begining of test
- * LogFile* p_log = LogFile::Instance();
- * p_log->Set(level, "dir","file");
- * p_log->WriteHeader("type_of_sim"); // optional
- *
- * // at end of simulation
- * LogFile::Close();
+ * \verbatim
+  // beginning of test
+  LogFile* p_log = LogFile::Instance();
+  p_log->Set(level, "dir","file");
+  p_log->WriteHeader("type_of_sim"); // optional
+
+  // at end of simulation
+  LogFile::Close();
+ *\endverbatim
  *
  * Here 'level' is a number between 0 and LogFile::MaxLoggingLevel, with zero
  * meaning no logging and MaxLoggingLevel meaning full logging.
  *
  * Usage (in source) - use the macro 'LOG'
- * LOG(1, "Info to be written to the log file\n" << "More info\n");
- * LogFile::Instance()->WriteElapsedTime(); // optional
+ * \verbatim
+  LOG(1, "Info to be written to the log file\n" << "More info\n");
+  LogFile::Instance()->WriteElapsedTime(); // optional
+ * \endverbatim
  *
  * This checks whether the given level (here '1') is greater or equal to the given
  * logging level, in which case it writes to the current log file. If there is
  * no log file set up it does nothing.
  *
  * Note the log file can be written to directly, without any level-checking, using
- * (*LogFile::Instance()) << "Info to be written to the log file\n";
+ * \verbatim
+  (*LogFile::Instance()) << "Info to be written to the log file\n";
+ * \endverbatim
  */
 class LogFile
 {
@@ -104,12 +110,12 @@ private:
 public:
 
     /**
-     * Get the single instance of the LogFile object.
+     * @return the single instance of the LogFile object.
      */
     static LogFile* Instance();
 
     /**
-     * Get the logging level.
+     * @return the logging level.
      */
     static unsigned Level();
 
@@ -132,7 +138,7 @@ public:
     void Set(unsigned level, const std::string& rDirectory, const std::string& rFileName="log.txt");
 
     /**
-     * Get the maximum allowed logging level.
+     * @return the maximum allowed logging level.
      */
     static unsigned MaxLoggingLevel();
 
@@ -166,11 +172,12 @@ public:
     static void Close();
 
     /**
-     * Whether Set() has been called.
+     * @return true if Set() has been called.
      */
     bool IsFileSet();
 
     /**
+     * @return reference to this object (as convention)
      * Overloaded << operator, to write to the log file, if one has been set, and
      * does nothing if not.
      *

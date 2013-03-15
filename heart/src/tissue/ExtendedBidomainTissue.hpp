@@ -332,32 +332,32 @@ public:
      ReplicatableVector& rGetGgapCacheReplicated();
 
      /**
-      * @returns Am for the first cell
+      * @return Am for the first cell
       */
      double GetAmFirstCell();
 
      /**
-      * @returns Am for the second cell
+      * @return Am for the second cell
       */
      double GetAmSecondCell();
 
      /**
-      * @returns Am for the gap junction
+      * @return Am for the gap junction
       */
      double GetAmGap();
 
      /**
-      * @returns Cm for the first cell
+      * @return Cm for the first cell
       */
      double GetCmFirstCell();
 
      /**
-      * @returns Cm for the second cell
+      * @return Cm for the second cell
       */
      double GetCmSecondCell();
 
      /**
-      *  @returns the conducatnce of the gap junction (mGGap)
+      *  @return the conducatnce of the gap junction (mGGap)
       */
      double GetGGap();
 

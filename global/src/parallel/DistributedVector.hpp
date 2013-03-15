@@ -91,6 +91,7 @@ public:
      * Test if the given global index is owned by the current process, i.e. is local to it.
      *
      * @param globalIndex
+     * @return true if the global index can be accessed by this process
      */
     bool IsGlobalIndexLocal(unsigned globalIndex);
 
@@ -159,10 +160,13 @@ public:
          * Compare two indices for inequality.
          *
          * @param rOther
+         * @return true when not equal
          */
         bool operator!=(const Iterator& rOther);
 
-        /** Increment the iterator to the next index. */
+        /** Increment the iterator to the next index.
+         * @return incremented operator
+         */
         Iterator& operator++();
     };
 

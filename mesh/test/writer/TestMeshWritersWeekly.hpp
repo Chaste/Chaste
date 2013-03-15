@@ -112,7 +112,8 @@ public:
 
     void TestRunAllTests()
     {
-        for (unsigned pow = 0; pow<6; pow++)
+        //for (unsigned pow = 0; pow<6; pow++)
+        unsigned pow = 5;
         {
             if (PetscTools::AmMaster())
             {

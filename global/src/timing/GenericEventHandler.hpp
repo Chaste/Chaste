@@ -85,7 +85,7 @@ private:
         }
     }
 
-    /** Helper function - get the current wall clock time. */
+    /** Helper function - @return the current wall clock time. */
     inline double GetWallTime()
     {
         return MPI_Wtime();
@@ -95,6 +95,7 @@ private:
      * Convert a wall clock time to milliseconds.
      *
      * @param wallTime  the wall time
+     * @return time in milliseconds.
      */
     inline double ConvertWallTimeToMilliseconds(double wallTime)
     {
@@ -102,9 +103,10 @@ private:
     }
 
     /**
-     * Convert a wall clock time to seconds.
+     * Convert a wall clock time to seconds.  (Identity function in this implementation.)
      *
      * @param wallTime  the wall time
+     * @return Time in seconds
      */
     inline double ConvertWallTimeToSeconds(double wallTime)
     {
@@ -114,7 +116,7 @@ private:
 public:
 
     /**
-     * Get the singleton instance of the event handler.
+     * @return Get the singleton instance of the event handler.
      */
     static GenericEventHandler<NUM_EVENTS, CONCRETE>* Instance()
     {
@@ -151,7 +153,7 @@ public:
     }
 
     /**
-     * Get the time (in milliseconds) accounted so far to the given event.
+     * @return The time (in milliseconds) accounted so far to the given event.
      *
      * Will automatically determine if the event is currently ongoing or not.
      *
@@ -197,7 +199,9 @@ public:
         Instance()->DisableImpl();
     }
 
-    /** Check whether the event handler is enabled. */
+    /** Check whether the event handler is enabled.
+     * @return true if enabled
+     */
     static bool IsEnabled()
     {
         return Instance()->IsEnabledImpl();
@@ -301,7 +305,7 @@ private:
     }
 
     /**
-     * Get the time (in milliseconds) accounted so far to the given event.
+     * @return The time (in milliseconds) accounted so far to the given event.
      *
      * Will automatically determine if the event is currently ongoing or not.
      *
@@ -466,7 +470,9 @@ private:
         mEnabled = false;
     }
 
-    /** Check whether the event handler is enabled. */
+    /** Check whether the event handler is enabled.
+     * @return true if enabled
+     */
     bool IsEnabledImpl()
     {
         return mEnabled;

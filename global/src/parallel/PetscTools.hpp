@@ -153,36 +153,36 @@ public:
     static void ResetCache();
 
     /**
-     * Just returns whether there is one process or not.
+     *  @return whether there is one process or not.
      */
     static bool IsSequential();
 
     /**
-     * Just returns whether there is more than one process.
+     * @return whether there is more than one process.
      */
     static bool IsParallel();
 
     /**
-     * Returns total number of processors.
+     * @return total number of processors.
      */
     static unsigned GetNumProcs();
 
     /**
-     * Return our rank.
+     * @return our rank.
      *
      * If PETSc has not been initialized, returns 0.
      */
     static unsigned GetMyRank();
 
     /**
-     * Just returns whether it is the master process or not.
+     * @return whether it is the master process or not.
      *
      * If not running in parallel, or if IsolateProcesses has been called, always returns true.
      */
     static bool AmMaster();
 
     /**
-     * Just returns whether it is the right-most process or not.
+     * @return whether it is the right-most process or not.
      *
      * If not running in parallel, or if IsolateProcesses has been called, always returns true.
      */
@@ -223,6 +223,7 @@ public:
      * @param size  the size of the vector
      * @param localSize  the local number of items owned by this process
      * @param ignoreOffProcEntries whether to ignore entries destined to be stored on a separate processor when assembling (eliminates global reductions).
+     * @return new PETSc vector
      */
     static Vec CreateVec(int size, int localSize=PETSC_DECIDE, bool ignoreOffProcEntries = true);
 
@@ -230,6 +231,7 @@ public:
      * Create a Vec from the given data.
      *
      * @param data  some data
+     * @return new PETSc vector
      */
     static Vec CreateVec(std::vector<double> data);
 
@@ -239,6 +241,7 @@ public:
      *
      * @param size  the size of the vector
      * @param value  the value to set each entry
+     * @return new PETSc vector
      */
     static Vec CreateAndSetVec(int size, double value);
 
@@ -268,7 +271,7 @@ public:
                          bool newAllocationError=true);
 
     /**
-     * Boolean AND of a flags between processes.
+     * Boolean OR of flags between processes.
      *
      * @param flag is set to true on this process.
      * @return true if any process' flag is set to true.
@@ -318,9 +321,9 @@ public:
     static void ReadPetscObject(Vec& rVec, const std::string& rOutputFileFullPath, Vec rParallelLayout=NULL);
 
     /**
-     * Checks if Petsc has been configured with ParMetis partioning support.
+     * Checks if PETSc has been configured with ParMetis partioning support.
      *
-     * @returns true If ParMetis partioning is available
+     * @return true If ParMetis partitioning (via PETSc) is available
      */
     static bool HasParMetis();
 

@@ -94,11 +94,12 @@ public:
      *
      * Static so an output file handler does not have to be created if the test output
      * directory is wanted for, say, reading a file.
+     * @return the test output directory name (CHASTE_TEST_OUTPUT)
      */
     static std::string GetChasteTestOutputDirectory();
 
     /**
-     * Return the full pathname to the directory this object will create files
+     * @return the full pathname to the directory this object will create files
      * in.
      */
     std::string GetOutputDirectoryFullPath() const;
@@ -131,6 +132,7 @@ public:
      * @param rFileFormat  the file format
      * @param mode  optionally, flags to use when opening the file (defaults are as for
      *         std::ofstream).
+     * @return  a managed pointer to the opened file stream.
      */
     out_stream OpenOutputFile(const std::string& rFileName,
                               unsigned number,
@@ -148,7 +150,7 @@ public:
     FileFinder CopyFileTo(const FileFinder& rSourceFile) const;
 
     /**
-     * Get a FileFinder for a file in this output directory.
+     * @return a FileFinder for a file in this output directory.
      *
      * @param leafName  the name of the file to find
      */

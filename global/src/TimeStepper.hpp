@@ -84,41 +84,41 @@ public:
     void AdvanceOneTimeStep();
 
     /**
-     * Get the time.
+     * @return Get the time.
      */
     double GetTime() const;
 
     /**
-     * Get the value time will take at the next step.
+     * @return Get the value time will take at the next step.
      */
     double GetNextTime() const;
 
     /**
-     * Get the size of the next time step which will be taken.
+     * @return Get the size of the next time step which will be taken.
      * GetNextTimeStep() == GetNextTime() - GetTime()
      */
     double GetNextTimeStep();
 
     /**
-     * Get the size of the ideal time step (as set in the constructor.
+     * @return Get the size of the ideal time step (as set in the constructor.
      * Note when a fixed time step is used GetNextTimeStep() ==  GetIdealTimeStep()
      * until the end of the simulation when GetNextTimeStep() == 0.0
      */
     double GetIdealTimeStep();
 
     /**
-     * True when GetTime == endTime.
+     * @return True when GetTime == endTime.
      */
     bool IsTimeAtEnd() const;
 
     /**
-     * Estimate number of time steps remaining, which may be an overestimate.
+     * @return Estimate number of time steps remaining, which may be an overestimate.
      * Used to reserve memory for writing intermediate solutions.
      */
     unsigned EstimateTimeSteps() const;
 
     /**
-     * The number of times AdvanceOneTimeStep() has been called SINCE
+     * @return The number of times AdvanceOneTimeStep() has been called SINCE
      * the last time ResetTimeStep() was called.
      */
     unsigned GetTotalTimeStepsTaken() const;
@@ -162,7 +162,7 @@ private:
      */
     double mEpsilon;
 
-    /** Compute what the time will be after the next time step. */
+    /** @return Compute what the time will be at the next time step. */
     double CalculateNextTime();
 
     /** Vector to store the additional times the stepper must stop at. */

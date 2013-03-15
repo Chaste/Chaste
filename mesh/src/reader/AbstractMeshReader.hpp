@@ -98,7 +98,7 @@ public:
     virtual unsigned GetNumCableElementAttributes() const;
 
     /**
-     * @returns the vector of node attributes
+     * @return the vector of node attributes
      * Returns an empty vector here. Over-ride in child classes if needed.
      * Ideally, this method would be in AbstractCachedMeshReader (where it would return the cached attribuites)
      * but TrianglesMeshReader (the class this method was created for)

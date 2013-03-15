@@ -146,7 +146,7 @@ public:
     double StandardNormalRandomDeviate();
 
     /**
-     * Generate a random number from a normal distribution with given
+     * @return Generate a random number from a normal distribution with given
      * mean and standard deviation.
      *
      * @param mean the mean of the normal distribution from which the random number is drawn
@@ -155,12 +155,12 @@ public:
     double NormalRandomDeviate(double mean, double sd);
 
     /**
-     * Generate a uniform random number in (0,1).
+     * @return Generate a uniform random number in (0,1).
      */
     double ranf();
 
     /**
-     * Generate a random number modulo base (i.e. an integer
+     * @return Generate a random number modulo base (i.e. an integer
      * within the range 0,..,base-1),
      *
      * @param base the order of the field of positive integers from which the random number is drawn
@@ -205,7 +205,7 @@ public:
     void Shuffle(unsigned num, std::vector<unsigned>& rValues);
 
     /**
-     * Return a pointer to the random number generator object.
+     * @return a pointer to the random number generator object.
      * The object is created the first time this method is called.
      */
     static RandomNumberGenerator* Instance();

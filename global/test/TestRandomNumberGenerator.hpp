@@ -52,6 +52,33 @@ public:
 
     double ran1;
 
+    void LongerTestToFindPeriod()
+    {
+        srand(0);
+        int first = rand();
+        unsigned period_srand;
+        for (period_srand=0; ; period_srand++)
+        {
+            if (rand() == first)
+            {
+                break;
+            }
+        }
+        TS_ASSERT_EQUALS(period_srand, 2147483647U /*2^31-1*/);
+
+        srandom(0);
+        first = random();
+        unsigned period_srandom;
+        for (period_srandom=0; ; period_srandom++)
+        {
+            if (random() == first)
+            {
+                break;
+            }
+        }
+        TS_ASSERT_EQUALS(period_srandom, 2147483647U /*2^31-1*/);
+    }
+
     void TestRandomNumbers()
     {
         srandom(0);

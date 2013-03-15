@@ -56,13 +56,13 @@ public:
     static const char* GetRootDir();
 
     /**
-     * Get a string representation of the current Chaste version. This combines the
+     * @return A string representation of the current Chaste version. This combines the
      * information from GetMajorReleaseNumber, GetMinorReleaseNumber, and GetRevisionNumber.
      */
     static std::string GetVersionString();
 
     /**
-     * Get the major number of the "current" Chaste release.
+     * @return The major number of the "current" Chaste release.
      * If this is a development build, this will be the number of the last release.
      *
      * @note This must be set manually by modifying Version.cpp.in.
@@ -70,7 +70,7 @@ public:
     static unsigned GetMajorReleaseNumber();
 
     /**
-     * Get the minor number of the "current" Chaste release.
+     * @return The minor number of the "current" Chaste release.
      * If this is a development build, this will be the number of the last release.
      *
      * @note This must be set manually by modifying Version.cpp.in.
@@ -78,7 +78,7 @@ public:
     static unsigned GetMinorReleaseNumber();
 
     /**
-     * Get the subversion revision number of the Chaste source tree.
+     * @return  Get the subversion revision number of the Chaste source tree.
      *
      * If the file ReleaseVersion.txt exists in the directory given by GetRootDir, then
      * we assume this is not a working copy, and read the version information from there.
@@ -91,7 +91,7 @@ public:
     static unsigned GetRevisionNumber();
 
     /**
-     * If this Chaste was built from a subversion working copy, then return whether there
+     * @return  If this Chaste was built from a subversion working copy, then return whether there
      * were local modifications.  If it's not a working copy, return false.
      */
     static bool IsWorkingCopyModified();
@@ -102,7 +102,7 @@ public:
     static const char* GetBuildTime();
 
     /**
-     * Get the current date and time, in the same format as GetBuildTime.
+     * @return Get the current date and time, in the same format as GetBuildTime.
      * The returned 'string' is statically allocated, so you don't need to free the memory.
      * However, if you call this method again, the contents will be overwritten.
      */
@@ -114,38 +114,38 @@ public:
     static const char* GetBuilderUnameInfo();
 
     /**
-     * Get information about this build of Chaste: the build type used, whether libraries
+     * @return  Information about this build of Chaste: the build type used, whether libraries
      * were used, and if so what kind.
      */
     static const char* GetBuildInformation();
 
     /**
-     * Get the compiler type used to build (must be either 'intel' or 'gcc').
+     * @return The compiler type used to build (must be either 'intel' or 'gcc').
      */
     static const char* GetCompilerType();
 
     /**
-     * Get the compiler version number.
+     * @return  The compiler version number.
      */
     static const char* GetCompilerVersion();
 
     /**
-     * Get the compiler flags.
+     * @return  The compiler flags.
      */
     static const char* GetCompilerFlags();
 
     /**
-     * Get the XSD binary version number.
+     * @return  The XSD binary version number.
      */
     static const char* GetXsdVersion();
 
     /**
-     * Get the version numbers (i.e. revisions) of any checked-out projects.
+     * @return  The version numbers (i.e. revisions) of any checked-out projects.
      */
     static const std::map<std::string, std::string>& rGetProjectVersions();
 
     /**
-     * Get a single-line string representation of the provenance information to be attached
+     * @return  A single-line string representation of the provenance information to be attached
      * to any files we generate.  This includes the version of the Chaste code used, how and
      * when it was built, and the current date and time.
      */

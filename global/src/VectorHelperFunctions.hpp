@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /**
+ * @return The vector component
  * Helper function to get a vector component.
  *
  * This isn't a member so that we can specialise it without having to
@@ -125,6 +126,7 @@ inline VECTOR CreateEmptyVector();
  * Helper function to test whether a vector is empty/unset.
  *
  * @param rVec  the vector
+ * @return true if empty
  */
 template<typename VECTOR>
 inline bool IsEmptyVector(VECTOR& rVec);
@@ -147,6 +149,7 @@ inline void DeleteVector(VECTOR& rVec);
  * specialise the whole class.
  *
  * @param rVec  the vector to copy
+ * @return A copy
  */
 template<typename VECTOR>
 inline VECTOR CopyVector(VECTOR& rVec);
@@ -181,6 +184,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, VECTOR& rDest);
  * Specialisation for std::vector<double>.
  * @param rVec
  * @param index
+ * @return vector component
  */
 template<>
 inline double GetVectorComponent(const std::vector<double>& rVec, unsigned index)
@@ -205,6 +209,7 @@ inline void SetVectorComponent(std::vector<double>& rVec, unsigned index, double
 /**
  * Specialisation for std::vector<double>.
  * @param rVec
+ * @return size
  */
 template<>
 inline unsigned GetVectorSize(const std::vector<double>& rVec)
@@ -237,6 +242,7 @@ inline void CreateVectorIfEmpty(std::vector<double>& rVec, unsigned size)
 
 /**
  * Specialisation for std::vector<double>.
+ * @return empty vector
  */
 template<>
 inline std::vector<double> CreateEmptyVector()
@@ -247,6 +253,7 @@ inline std::vector<double> CreateEmptyVector()
 /**
  * Specialisation for std::vector<double>.
  * @param rVec
+ * @return true if empty
  */
 template<>
 inline bool IsEmptyVector(std::vector<double>& rVec)
@@ -266,6 +273,7 @@ inline void DeleteVector(std::vector<double>& rVec)
 /**
  * Specialisation for std::vector<double>.
  * @param rVec
+ * @return copy
  */
 template<>
 inline std::vector<double> CopyVector(std::vector<double>& rVec)
@@ -303,6 +311,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<doubl
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
  * @param index
+ * @return the vector component
  */
 template<>
 inline double GetVectorComponent(const N_Vector& rVec, unsigned index)
@@ -327,6 +336,7 @@ inline void SetVectorComponent(N_Vector& rVec, unsigned index, double value)
 /**
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
+ * @return size
  */
 template<>
 inline unsigned GetVectorSize(const N_Vector& rVec)
@@ -361,6 +371,7 @@ inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * @return empty vector
  */
 template<>
 inline N_Vector CreateEmptyVector()
@@ -371,6 +382,7 @@ inline N_Vector CreateEmptyVector()
 /**
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
+ * @return true if empty
  */
 template<>
 inline bool IsEmptyVector(N_Vector& rVec)
@@ -395,6 +407,7 @@ inline void DeleteVector(N_Vector& rVec)
 /**
  * Specialisation for CVODE's N_Vector type.
  * @param rVec
+ * @return copy
  */
 template<>
 inline N_Vector CopyVector(N_Vector& rVec)
