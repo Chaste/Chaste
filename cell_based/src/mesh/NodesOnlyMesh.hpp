@@ -156,8 +156,6 @@ private:
 
      /**
       * Make sure that node indices match their location, and update mNodesMapping.
-      *
-      * @param map the NodeMap to record which nodes have been removed.
       */
      void UpdateNodeIndices();
 

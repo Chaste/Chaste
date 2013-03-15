@@ -86,9 +86,6 @@ private:
     /** The domain being partitioned. */
     c_vector<double, 2*DIM> mDomainSize;
 
-    /** The local portion of the domain. */
-    c_vector<double, 2*DIM> mLocalDomainSize;
-
     /** The width of each box. */
     double mBoxWidth;
 
@@ -97,6 +94,9 @@ private:
 
     /** Number of boxes in each direction. */
     c_vector<unsigned, DIM> mNumBoxesEachDirection;
+
+    /** Number of boxes in a face (1 in 1d, mNumBoxesEachDirection(0) in 2d, mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1) in 3d */
+    unsigned mNumBoxesInAFace;
 
     /** The boxes local (itself and nearest neighbour) to a given box. */
     std::vector< std::set<unsigned> > mLocalBoxes;
@@ -287,13 +287,6 @@ public:
      * @return the set containing the indices of boxes local to box boxIndex.
      */
     std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
-
-    /**
-     * Return the local portion of space owned by this process
-     *
-     * @return mLocalDomainSize
-     */
-    c_vector<double, 2*DIM> GetLocalDomainSize();
 
     /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a

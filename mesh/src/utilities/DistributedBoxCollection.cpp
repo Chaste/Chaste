@@ -68,82 +68,28 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
 
     mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
-    mMinBoxIndex = UINT_MAX;
-    mMaxBoxIndex = 0;
-
-    for (unsigned stack_index = mpDistributedBoxStackFactory->GetLow();
-         stack_index != mpDistributedBoxStackFactory->GetHigh();
-         stack_index++)
+    mNumBoxesInAFace = 1;
+    for (unsigned i=1; i<DIM; i++)
     {
-        int num_boxes_in_plane = 1; // The number of boxes in each layer of boxes.
-        std::vector<unsigned> counter_conditions(1, 1u); // The conditions to increment each counter.
-
-        for (int i=0; i<(int)DIM-1; i++)
-        {
-            num_boxes_in_plane *= mNumBoxesEachDirection(i);
-            counter_conditions.push_back(mNumBoxesEachDirection(i));
-        }
-
-        std::vector<unsigned> counters(DIM-1, 0);
-        for (int i=0; i<num_boxes_in_plane; /*No increment here */)
-        {
-            c_vector<double, 2*DIM> box_coords;
-            c_vector<unsigned, DIM> box_indices;
-            for (int d=0; d<(int)DIM-1; d++)
-            {
-                box_coords[2*d] = (double)domainSize[2*d]+mBoxWidth*counters[d];
-                box_coords[2*d+1] = (double)domainSize[2*d]+mBoxWidth*(1+counters[d]);
-                box_indices[d] = counters[d];
-            }
-            box_coords[2*DIM-2]=domainSize[2*DIM-2]+mBoxWidth*stack_index;
-            box_coords[2*DIM-1]=domainSize[2*DIM-2]+mBoxWidth*(stack_index+1);
-            box_indices[DIM-1] = stack_index;
-
-            Box<DIM> new_box(box_coords);
-            mBoxes.push_back(new_box);
-
-            unsigned global_index = CalculateGlobalIndex(box_indices);
-            mBoxesMapping[global_index] = mBoxes.size()-1;
-            mMinBoxIndex = (global_index < mMinBoxIndex) ? global_index : mMinBoxIndex;
-            mMaxBoxIndex = (mMaxBoxIndex < global_index) ? global_index : mMaxBoxIndex;
-
-            /* Increment counters */
-            i++;
-            for (int var = 0; var < (int)DIM-1; var++)
-            {
-              if (i%counter_conditions[var] == 0)
-              {
-                  counters[var] = ((counters[var]+1)%mNumBoxesEachDirection(var));
-              }
-            }
-            /* Incremented counters */
-        }
+    	mNumBoxesInAFace *= mNumBoxesEachDirection(i-1);
     }
 
-    /**
-     * Update the local domain region.
-     */
-    unsigned num_rows = mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow();
-    for (int d=0; d<(int)DIM-1; d++)
+    unsigned num_boxes = mNumBoxesInAFace * (mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow());
+
+    mMinBoxIndex = mpDistributedBoxStackFactory->GetLow() * mNumBoxesInAFace;
+    mMaxBoxIndex = mpDistributedBoxStackFactory->GetHigh() * mNumBoxesInAFace - 1;
+
+    c_vector<double, 2*DIM> arbitrary_location;
+    for (unsigned i=0; i<num_boxes; i++)
     {
-        mLocalDomainSize[2*d] = domainSize[2*d];
-        mLocalDomainSize[2*d+1] = domainSize[2*d+1];
+    	Box<DIM> new_box(arbitrary_location);
+    	mBoxes.push_back(new_box);	// The location of the Boxes doesn't matter.
+
+    	unsigned global_index = mMinBoxIndex + i;
+    	mBoxesMapping[global_index] = mBoxes.size() - 1;
     }
-    mLocalDomainSize[2*DIM-2] = domainSize[2*DIM-2] + mBoxWidth*mpDistributedBoxStackFactory->GetLow();
-    mLocalDomainSize[2*DIM-1] = mLocalDomainSize[2*DIM-2] + mBoxWidth*num_rows;
 
-    // Check we have set up the right number of total boxes set up.
-    unsigned local_boxes=mBoxes.size();
-    unsigned expected_boxes=1;
-    for (unsigned i=0;i<DIM;i++)
-    {
-        expected_boxes*=mNumBoxesEachDirection[i];
-    }
-    unsigned total_boxes;
-
-    MPI_Allreduce(&local_boxes,&total_boxes,1,MPI_UNSIGNED,MPI_SUM,PETSC_COMM_WORLD);
-
-    mNumBoxes=total_boxes;
+    mNumBoxes = mNumBoxesInAFace * mNumBoxesEachDirection(DIM-1);
 }
 
 template<unsigned DIM>
@@ -165,104 +111,37 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupHaloBoxes()
 {
     // Get top-most and bottom-most value of Distributed Box Stack.
-    unsigned Hi=mpDistributedBoxStackFactory->GetHigh();
-    unsigned Lo=mpDistributedBoxStackFactory->GetLow();
-
-    c_vector<double, 2*DIM> box_coords;
-
-    std::vector<unsigned> counter_conditions(1,1);
-    unsigned num_boxes_in_plane = 1;
-    for (int d=0; d<(int)DIM-1; d++)
-    {
-        num_boxes_in_plane*=mNumBoxesEachDirection(d);
-        counter_conditions.push_back(mNumBoxesEachDirection(d));
-    }
+    unsigned Hi = mpDistributedBoxStackFactory->GetHigh();
+    unsigned Lo = mpDistributedBoxStackFactory->GetLow();
 
     // If I am not the top-most process, add halo structures to the right.
     if (!PetscTools::AmTopMost())
     {
-        std::vector<unsigned> counters(DIM-1, 0);
-        box_coords[2*DIM-2] = mDomainSize[2*DIM-2]+Hi*mBoxWidth;
-        box_coords[2*DIM-1] = mDomainSize[2*DIM-2]+(Hi+1)*mBoxWidth;
-
-        for (unsigned i=0; i< num_boxes_in_plane; /* Increment later*/)
+        for (unsigned i=0; i < mNumBoxesInAFace; i++)
         {
-            for (int d=0; d<(int)DIM-1; d++)
-            {
-                box_coords[2*d] = mDomainSize[2*d] + counters[d]*mBoxWidth;
-                box_coords[2*d+1] = mDomainSize[2*d] + (1+counters[d])*mBoxWidth;
-            }
-
-            // Add the halo box
-            Box<DIM> new_box(box_coords);
+        	c_vector<double, 2*DIM> arbitrary_location;
+            Box<DIM> new_box(arbitrary_location);
             mHaloBoxes.push_back(new_box);
 
-            // Add the corresponding halo on this process to mHalosRight
-            c_vector<unsigned, DIM> coords;
-            for (int d=0; d<(int)DIM-1; d++)
-            {
-                coords[d] = counters[d];
-            }
-            coords[DIM-1]= Hi;
-            mHaloBoxesMapping[CalculateGlobalIndex(coords)]=mHaloBoxes.size()-1;
-
-            coords[DIM-1] = Hi-1;
-            mHalosRight.push_back(CalculateGlobalIndex(coords));
-
-
-
-            /* Increment counters */
-            i++;
-            for (int var = 0; var < (int)DIM-1; var++)
-            {
-              if (i%counter_conditions[var] == 0)
-              {
-                  counters[var] = ((counters[var]+1)%mNumBoxesEachDirection(var));
-              }
-            }
-            /* Incremented counters */
+            unsigned global_index = Hi * mNumBoxesInAFace + i;
+            mHaloBoxesMapping[global_index] = mHaloBoxes.size()-1;
+            mHalosRight.push_back(global_index - mNumBoxesInAFace);
         }
     }
+
     // If I am not the bottom-most process, add halo structures to the left.
     if (!PetscTools::AmMaster())
     {
-        std::vector<unsigned> counters(DIM-1, 0);
-        box_coords[2*DIM-2] = mDomainSize[2*DIM-2]+(Lo-1)*mBoxWidth;
-        box_coords[2*DIM-1] = mDomainSize[2*DIM-2]+Lo*mBoxWidth;
-
-        for (unsigned i=0; i< num_boxes_in_plane; /* Increment later*/)
+        for (unsigned i=0; i< mNumBoxesInAFace; i++)
         {
-            for (int d=0; d<(int)DIM-1; d++)
-            {
-                box_coords[2*d] = mDomainSize[2*d] + counters[d]*mBoxWidth;
-                box_coords[2*d+1] = mDomainSize[2*d] + (1+counters[d])*mBoxWidth;
-            }
-
-            Box<DIM> new_box(box_coords);
+        	c_vector<double, 2*DIM> arbitrary_location;
+            Box<DIM> new_box(arbitrary_location);
             mHaloBoxes.push_back(new_box);
 
-            // Add the corresponding halo on this process to mHalosLeft
-            c_vector<unsigned, DIM> coords;
-            for (int d=0; d<(int)DIM-1; d++)
-            {
-                coords[d] = counters[d];
-            }
-            coords[DIM-1]= Lo-1;
-            mHaloBoxesMapping[CalculateGlobalIndex(coords)]=mHaloBoxes.size()-1;
+            unsigned global_index = (Lo - 1) * mNumBoxesInAFace + i;
+            mHaloBoxesMapping[global_index] = mHaloBoxes.size() - 1;
 
-            coords[DIM-1] = Lo;
-            mHalosLeft.push_back(CalculateGlobalIndex(coords));
-
-            /* Increment counters */
-            i++;
-            for (int var = 0; var < (int)DIM-1; var++)
-            {
-              if (i%counter_conditions[var] == 0)
-              {
-                  counters[var] = ((counters[var]+1)%mNumBoxesEachDirection(var));
-              }
-            }
-            /* Incremented counters */
+            mHalosLeft.push_back(global_index  + mNumBoxesInAFace);
         }
     }
 }
@@ -303,19 +182,10 @@ bool DistributedBoxCollection<DIM>::GetBoxOwnership(unsigned globalIndex)
 template<unsigned DIM>
 bool DistributedBoxCollection<DIM>::GetHaloBoxOwnership(unsigned globalIndex)
 {
-    assert(globalIndex < mNumBoxes);
+    bool is_halo_right = ((globalIndex > mMaxBoxIndex) && !(globalIndex > mMaxBoxIndex + mNumBoxesInAFace));
+    bool is_halo_left = ((globalIndex < mMinBoxIndex) && !(globalIndex < mMinBoxIndex - mNumBoxesInAFace));
 
-    unsigned num_boxes_in_face = 1;
-    for (int d=0; d<(int)DIM-1; d++)
-    {
-        num_boxes_in_face*=mNumBoxesEachDirection(d);
-    }
-    bool is_parallel = PetscTools::IsParallel();
-
-    bool is_halo_right = ((globalIndex > mMaxBoxIndex) && !(globalIndex > mMaxBoxIndex + num_boxes_in_face));
-    bool is_halo_left = ((globalIndex < mMinBoxIndex) && !(globalIndex < mMinBoxIndex - num_boxes_in_face));
-
-    return (is_parallel && (is_halo_right || is_halo_left));
+    return (PetscTools::IsParallel() && (is_halo_right || is_halo_left));
 }
 
 template<unsigned DIM>
@@ -465,7 +335,7 @@ unsigned DistributedBoxCollection<DIM>::GetNumRowsOfBoxes() const
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 {
-    if(mAreLocalBoxesSet)
+    if (mAreLocalBoxesSet)
     {
         EXCEPTION("Local Boxes Are Already Set");
     }
@@ -1052,12 +922,6 @@ std::set<unsigned> DistributedBoxCollection<DIM>::GetLocalBoxes(unsigned boxInde
     // Make sure the box is locally owned
     assert(!(boxIndex < mMinBoxIndex) && !(mMaxBoxIndex<boxIndex));
     return mLocalBoxes[boxIndex-mMinBoxIndex];
-}
-
-template<unsigned DIM>
-c_vector<double, 2*DIM> DistributedBoxCollection<DIM>::GetLocalDomainSize()
-{
-    return mLocalDomainSize;
 }
 
 template<unsigned DIM>

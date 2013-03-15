@@ -324,34 +324,6 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumLocalBoxes(), local_rows);
 
-        // Make sure the domain size is correctly set.
-        if(PetscTools::IsSequential())
-        {
-            TS_ASSERT_DELTA(box_collection.GetLocalDomainSize()[1] - box_collection.GetLocalDomainSize()[0], (double)(cut_off_length*local_rows), 1e-5);
-        }
-
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
-        {
-            if (box_collection.GetBoxOwnership(i))
-            {
-                std::set< Node<1>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
-                c_vector<double, 2> box_min_max_values = box_collection.rGetBox(i).rGetMinAndMaxValues();
-
-                for (std::set< Node<1>* >::iterator it_nodes_in_box = nodes_in_box.begin();
-                     it_nodes_in_box != nodes_in_box.end();
-                     it_nodes_in_box++)
-                {
-                    Node<1>* current_node = *it_nodes_in_box;
-                    double x_position = current_node->rGetLocation()[0];
-
-                    double epsilon = 1e-12;
-
-                    TS_ASSERT_LESS_THAN(box_min_max_values(0)-epsilon, x_position);
-                    TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1)+epsilon);
-                }
-            }
-        }
-
         if (box_collection.GetBoxOwnership(0))
         {
             std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
@@ -926,31 +898,6 @@ public:
         }
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36u);
-
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
-        {
-            if (box_collection.GetBoxOwnership(i))
-            {
-                std::set< Node<2>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
-                c_vector<double, 2*2> box_min_max_values = box_collection.rGetBox(i).rGetMinAndMaxValues();
-
-                for (std::set< Node<2>* >::iterator it_nodes_in_box = nodes_in_box.begin();
-                     it_nodes_in_box != nodes_in_box.end();
-                     it_nodes_in_box++)
-                {
-                    Node<2>* current_node = *it_nodes_in_box;
-                    double x_position = current_node->rGetLocation()[0];
-                    double y_position = current_node->rGetLocation()[1];
-
-                    double epsilon = 1e-12;
-
-                    TS_ASSERT_LESS_THAN(box_min_max_values(0)-epsilon, x_position);
-                    TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1)+epsilon);
-                    TS_ASSERT_LESS_THAN(box_min_max_values(2)-epsilon, y_position);
-                    TS_ASSERT_LESS_THAN(y_position, box_min_max_values(3)+epsilon);
-                }
-            }
-        }
 
         // Have checked that all the local boxes are calculated correctly on a 5 by 6 grid - here we
         // hardcode a few checks on the 7 by 7 grid.
@@ -1703,33 +1650,6 @@ public:
         }
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36u);
-
-        for (unsigned i=box_collection.mMinBoxIndex; i<box_collection.mMaxBoxIndex; i++)
-        {
-            if (box_collection.GetBoxOwnership(i))
-            {
-                std::set< Node<3>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
-                c_vector<double, 2*3> box_min_max_values = box_collection.rGetBox(i).rGetMinAndMaxValues();
-                for (std::set< Node<3>* >::iterator it_nodes_in_box = nodes_in_box.begin();
-                     it_nodes_in_box != nodes_in_box.end();
-                     it_nodes_in_box++)
-                {
-                    Node<3>* current_node = *it_nodes_in_box;
-                    double x_position = current_node->rGetLocation()[0];
-                    double y_position = current_node->rGetLocation()[1];
-                    double z_position = current_node->rGetLocation()[2];
-
-                    double epsilon = 1e-12;
-
-                    TS_ASSERT_LESS_THAN(box_min_max_values(0)-epsilon, x_position);
-                    TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1)+epsilon);
-                    TS_ASSERT_LESS_THAN(box_min_max_values(2)-epsilon, y_position);
-                    TS_ASSERT_LESS_THAN(y_position, box_min_max_values(3)+epsilon);
-                    TS_ASSERT_LESS_THAN(box_min_max_values(4)-epsilon, z_position);
-                    TS_ASSERT_LESS_THAN(z_position, box_min_max_values(5)+epsilon);
-                }
-            }
-        }
 
         if (box_collection.GetBoxOwnership(0))
         {
