@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * Create the default Chaste parameters.
+ * @return the default Chaste parameters.
  *
  * It sets up an object equivalent to the following XML file:
  * \verbatim

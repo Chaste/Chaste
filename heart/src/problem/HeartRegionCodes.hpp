@@ -53,21 +53,21 @@ class HeartRegionCode
 {
 
 public:
-    /** Convenience method that returns a valid tissue identifier */
+    /** @return a valid tissue identifier */
     static HeartRegionType GetValidTissueId();
 
-    /** Convenience method that returns a valid bath identifier */
+    /** @return a valid bath identifier */
     static HeartRegionType GetValidBathId();
 
     /**
-     *  For a given region identifier, determines whether it is a tissue identifier
+     *  @return For a given region identifier, determines whether it is a tissue identifier
      *
      *  @param regionId region identifier
      */
     static bool IsRegionTissue(HeartRegionType regionId);
 
     /**
-     *  For a given region identifier, determines whether it is a bath identifier
+     *  @return For a given region identifier, determines whether it is a bath identifier
      *
      *  @param regionId region identifier
      */
@@ -78,7 +78,8 @@ private:
     HeartRegionCode();
     /** No instances of this class should be created. */
     HeartRegionCode(const HeartRegionCode&);
-    /** No instances of this class should be created. */
+    /** No instances of this class should be created.
+     * @return reference by language convention*/
     HeartRegionCode& operator=(const HeartRegionCode&);
 };
 

@@ -77,7 +77,7 @@ protected:
     void IncrementInterpolatedQuantities(double phiI, const Node<SPACE_DIM>* pNode);
 
     /**
-     * Determine whether to assemble the correction term for this element.
+     * @return true if we should assemble the correction term for this element.
      * Checks if there is a sufficiently steep ionic current gradient to make the expense worthwhile, by checking
      * if the maximum difference between nodal ionic currents is greater than 1 uA/cm^2^.
      *

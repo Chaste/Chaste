@@ -125,7 +125,7 @@ protected:
     virtual void FinaliseLinearSystem(Vec existingSolution);
 
     /**
-     *  GenerateNullBasis
+     *  @return null basis vector
      *
      *  Called by FinaliseAssembleSystem to get the null basis to use for the particular
      *  formulation of the bidomain equations used.
@@ -187,7 +187,7 @@ public:
      void SetRowForAverageOfPhiZeroed(unsigned rowMeanPhiEZero);
 
     /**
-     *  Get the boundary conditions being used
+     *  @return the boundary conditions being used
      */
     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* GetBoundaryConditions()
     {

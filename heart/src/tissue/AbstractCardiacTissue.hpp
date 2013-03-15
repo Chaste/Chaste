@@ -372,7 +372,7 @@ public:
     /** Virtual destructor */
     virtual ~AbstractCardiacTissue();
 
-    /** Determine whether this tissue contains Purkinje fibres. */
+    /** @return whether this tissue contains Purkinje fibres. */
     bool HasPurkinje();
 
     /**
@@ -390,13 +390,13 @@ public:
      */
     bool GetDoCacheReplication();
 
-    /** Get the intracellular conductivity tensor for the given element
+    /** @return the intracellular conductivity tensor for the given element
      * @param elementIndex  index of the element of interest
      */
     const c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetIntracellularConductivityTensor(unsigned elementIndex);
 
     /**
-     * Get the extracellular conductivity tensor for the given element
+     * @return the extracellular conductivity tensor for the given element
      * (this throws an exception in this abstract class since monodomain don't have extracellular ones)
      * it is overridden in the BidomainTissue.
      *
@@ -405,7 +405,7 @@ public:
     virtual const c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetExtracellularConductivityTensor(unsigned elementIndex);
 
     /**
-     * Get a pointer to a cell, indexed by the global node index.
+     * @return a pointer to a cell, indexed by the global node index.
      *
      * \note Should only called by the process owning the cell -
      * triggers an assertion otherwise.
@@ -415,7 +415,7 @@ public:
     AbstractCardiacCellInterface* GetCardiacCell( unsigned globalIndex );
 
     /**
-     * Get a pointer to a Purkinje cell, indexed by the global node index.
+     * @return a pointer to a Purkinje cell, indexed by the global node index.
      *
      * \note Should only called by the process owning the cell -
      * triggers an assertion otherwise.
@@ -425,7 +425,7 @@ public:
     AbstractCardiacCellInterface* GetPurkinjeCell( unsigned globalIndex );
 
     /**
-     * Get a pointer to a halo cell, indexed by the global node index.
+     * @return a pointer to a halo cell, indexed by the global node index.
      *
      * \note Should only called by the process halo owning the cell -
      * triggers an assertion otherwise.
@@ -445,16 +445,16 @@ public:
      */
     virtual void SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage=false);
 
-    /** Get the entire ionic current cache */
+    /** @return the entire ionic current cache */
     ReplicatableVector& rGetIionicCacheReplicated();
 
-    /** Get the entire stimulus current cache */
+    /** @return the entire stimulus current cache */
     ReplicatableVector& rGetIntracellularStimulusCacheReplicated();
 
-    /** Get the entire Purkinje ionic current cache */
+    /** @return the entire Purkinje ionic current cache */
     ReplicatableVector& rGetPurkinjeIionicCacheReplicated();
 
-    /** Get the entire Purkinje stimulus current cache */
+    /** @return the entire Purkinje stimulus current cache */
     ReplicatableVector& rGetPurkinjeIntracellularStimulusCacheReplicated();
 
 
@@ -482,17 +482,17 @@ public:
     void ReplicateCaches();
 
     /**
-     *  Returns a reference to the vector of distributed cells. Needed for archiving.
+     *  @return a reference to the vector of distributed cells. Needed for archiving.
      */
     const std::vector<AbstractCardiacCellInterface*>& rGetCellsDistributed() const;
 
     /**
-     *  Returns a reference to the vector of distributed Purkinje cells. Needed for archiving.
+     *  @return a reference to the vector of distributed Purkinje cells. Needed for archiving.
      */
     const std::vector<AbstractCardiacCellInterface*>& rGetPurkinjeCellsDistributed() const;
 
     /**
-     *  Returns a pointer to the mesh object
+     *  @return a pointer to the mesh object
      *
      *  @return pointer to mesh object
      */

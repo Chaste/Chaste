@@ -73,10 +73,10 @@ protected:
     MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* mpMonodomainTissue;
 
 public:
-    /** Create our monodomain tissue. */
+    /** @return Created monodomain tissue. */
     AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* CreateCardiacTissue();
 
-    /** Create an suitable solver for monodomain problems. */
+    /** @return Created suitable solver for monodomain problems. */
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* CreateSolver();
 
 public:
@@ -97,7 +97,7 @@ public:
      */
     virtual ~MonodomainProblem();
 
-    /** Get the monodomain PDE */
+    /** @return the monodomain PDE */
     MonodomainTissue<ELEMENT_DIM,SPACE_DIM> * GetMonodomainTissue();
 
     /**

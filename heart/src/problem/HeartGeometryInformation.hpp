@@ -138,7 +138,7 @@ private:
     std::vector<HeartLayerType> mLayerForEachNode;
 
     /**
-     * Get a bounding box for a group of node indices (such as the epi-surface)
+     * @return a bounding box for a group of node indices (such as the epi-surface)
      *
      * @param rSurfaceNodes The indices of the nodes which represent this surface
      */
@@ -250,28 +250,28 @@ public:
         return mDistMapLeftVentricle;
     }
 
-    /** Get the nodes on the epicardial surface */
+    /** @return the nodes on the epicardial surface */
     const std::vector<unsigned>& rGetNodesOnEpiSurface()
     {
         return mEpiSurface;
     }
 
 
-    /** Get the nodes on the endocardial surface */
+    /** @return the nodes on the endocardial surface */
     const std::vector<unsigned>& rGetNodesOnEndoSurface()
     {
         assert(mNumberOfSurfacesProvided==2);
         return mEndoSurface;
     }
 
-    /** Get the nodes on the endocardial left ventricular surface */
+    /** @return the nodes on the endocardial left ventricular surface */
     const std::vector<unsigned>& rGetNodesOnLVSurface()
     {
         assert(mNumberOfSurfacesProvided==3);
         return mLVSurface;
     }
 
-    /** Get the nodes on the endocardial right ventricular surface */
+    /** @return the nodes on the endocardial right ventricular surface */
     const std::vector<unsigned>& rGetNodesOnRVSurface()
     {
         assert(mNumberOfSurfacesProvided==3);
@@ -279,7 +279,7 @@ public:
     }
 
     /**
-     * Get the layer for every node in the mesh.
+     * @return the layer for every node in the mesh.
      */
     const std::vector<HeartLayerType>& rGetLayerForEachNode()
     {
@@ -288,7 +288,7 @@ public:
     }
 
     /**
-     * Calculates the relative position within the wall thickness (normalised to [0,1])
+     * @return the relative position within the wall thickness (normalised to [0,1])
      * @param nodeIndex index is the index of the node in the mesh
      * @return the relative position
      */
@@ -311,6 +311,7 @@ public:
     void WriteLayerForEachNode(std::string outputDir, std::string file);
 
     /**
+     * @return bounding box
      * Uses CalculateBoundingBoxOfSurface to calculate an
      * axis-aligned bounding box of the nodes in the input
      * epicardial surface
@@ -321,6 +322,7 @@ public:
         return CalculateBoundingBoxOfSurface(mEpiSurface);
     }
     /**
+     * @return bounding box
      * Uses CalculateBoundingBoxOfSurface to calculate an
      * axis-aligned bounding box of the nodes in the input
      * endocardial surface
@@ -331,6 +333,7 @@ public:
         return CalculateBoundingBoxOfSurface(mEndoSurface);
     }
     /**
+     * @return bounding box
      * Uses CalculateBoundingBoxOfSurface to calculate an
      * axis-aligned bounding box of the nodes in the input
      * endocardial left ventricular surface
@@ -341,6 +344,7 @@ public:
         return CalculateBoundingBoxOfSurface(mLVSurface);
     }
     /**
+     * @return bounding box
      * Uses CalculateBoundingBoxOfSurface to calculate an
      * axis-aligned bounding box of the nodes in the input
      * endocardial left ventricular surface

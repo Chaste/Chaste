@@ -80,7 +80,7 @@ public:
                               std::vector<double>& rEnds);
 
     /**
-     * Creates an appropriate stimuus for each node as to abide compatibility conditions.
+     * @return Creates an appropriate stimulus for each node as to abide compatibility conditions.
      *
      * @param nodeIndex the node index for which to create the stimulus
      */

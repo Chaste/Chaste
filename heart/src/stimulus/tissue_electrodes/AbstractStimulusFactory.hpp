@@ -72,7 +72,7 @@ protected:
 public:
 
     /**
-     * Create a stimulus object for the given node.
+     * @return Create a stimulus object for the given node.
      * Default implementation here returns a zero stimulus.
      *
      *  May be overridden by child classes.
@@ -122,7 +122,7 @@ public:
 //    void SetRegionToBeGrounded(AbstractChasteRegion<SPACE_DIM>* pRegion);
 
     /**
-     * Access to the variable mGroundedRegions which
+     * @return access to the variable mGroundedRegions which
      * stores the regions to be grounded
      */
     std::vector<AbstractChasteRegion<SPACE_DIM>* > GetRegionsToBeGrounded();

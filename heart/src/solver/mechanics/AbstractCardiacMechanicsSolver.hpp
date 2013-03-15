@@ -148,7 +148,7 @@ protected:
     ElectroMechanicsProblemDefinition<DIM>& mrElectroMechanicsProblemDefinition;
 
     /**
-     *  Whether the solver is implicit or not (ie whether the contraction model depends on lambda (and depends on
+     *  @return whether the solver is implicit or not (i.e. whether the contraction model depends on lambda (and depends on
      *  lambda at the current time)). For whether dTa_dLam dependent terms need to be added to the Jacbobian
      */
     virtual bool IsImplicitSolver()=0;
@@ -246,20 +246,20 @@ public:
      */
     void SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair);
 
-    /** Get the total number of quad points in the mesh. Pure, implemented in concrete solver */
+    /** @return the total number of quad points in the mesh. Pure, implemented in concrete solver */
     unsigned GetTotalNumQuadPoints()
     {
         return mTotalQuadPoints;
     }
 
-    /** Get the quadrature rule used in the elements. */
+    /** @return the quadrature rule used in the elements. */
     virtual GaussianQuadratureRule<DIM>* GetQuadratureRule()
     {
         return this->mpQuadratureRule;
     }
 
     /**
-     * Access mQuadPointToDataAtQuadPointMap. See doxygen for this variable
+     * @return access mQuadPointToDataAtQuadPointMap. See doxygen for this variable
      */
     std::map<unsigned,DataAtQuadraturePoint>& rGetQuadPointToDataAtQuadPointMap()
     {

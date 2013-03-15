@@ -221,7 +221,7 @@ public:
     ~HeartConfig(); /**< Destructor*/
 
     /**
-     * Get the Chaste version of a parameters file, given its namespace URI.
+     * @return the Chaste version of a parameters file, given its namespace URI.
      * The version will be encoded as major*1000+minor.
      *
      * @param rNamespaceUri  the namespace URI of the parameters file
@@ -235,7 +235,7 @@ public:
     ///////////////////////////////////////////////////////////////
 
     /**
-     * Get where the user parameters were read from.
+     * @return where the user parameters were read from.
      * The result is undefined if no parameters file has been read.
      */
     FileFinder GetParametersFilePath();
@@ -434,7 +434,7 @@ public:
     bool GetOutputVariablesProvided() const;
 
     /**
-     * Get the extra output variables from the xml file.
+     * @return the extra output variables from the xml file.
      *
      * @param rOutputVariables reference to std::vector to contain the output variables requested.
      *    Note: will be cleared before being filled.
@@ -471,7 +471,7 @@ public:
 
     // ResumeSimulation
     /**
-     * Get directory where the archived simulation to resume is defined
+     * @return directory where the archived simulation to resume is defined
      */
     HeartFileFinder GetArchivedSimulationDir() const;
 
@@ -699,8 +699,8 @@ public:
     /** Whether to convert the output from HDF5 to parallel Vtk readable format */
     bool GetVisualizeWithParallelVtk() const;
 
-    /** Get the number of digits to be output in the converted solution data files. */
-     unsigned GetVisualizerOutputPrecision();
+    /** @return the number of digits to be output in the converted solution data files. */
+    unsigned GetVisualizerOutputPrecision();
 
 
     /**
@@ -723,28 +723,28 @@ public:
                                 double& rStartTime, double& rDuration );
 
     /**
-     * Get whether to use mass lumping in the FE solver or not.
+     * @return whether to use mass lumping in the FE solver or not.
      */
     bool GetUseMassLumping();
 
     /**
-     * Get whether to use mass lumping in the construction of the preconditioner of the FE solver or not.
+     * @return whether to use mass lumping in the construction of the preconditioner of the FE solver or not.
      */
     bool GetUseMassLumpingForPrecond();
 
     /**
-     *  Get whether to use Strang operator splitting of the reaction and diffusion terms (see
+     *  @return whether to use Strang operator splitting of the reaction and diffusion terms (see
      *  Set method documentation).
      */
     bool GetUseReactionDiffusionOperatorSplitting();
 
     /**
-     *  Get whether to use a fixed number of iterations in the linear solver
+     *  @return whether to use a fixed number of iterations in the linear solver
      */
     bool GetUseFixedNumberIterationsLinearSolver();
 
     /**
-     *  Get how often perform a solve with residual-based stop criteria in order to decide how many iterations to perform in following linear solves.
+     *  @return how often perform a solve with residual-based stop criteria in order to decide how many iterations to perform in following linear solves.
      */
     unsigned GetEvaluateNumItsEveryNSolves();
 
@@ -1263,12 +1263,12 @@ public:
     //
 
     /**
-     * Get whether this simulation contains a Purkinje system.
+     * @return whether this simulation contains a Purkinje system.
      */
     bool HasPurkinje();
 
     /**
-     * Get the surface capacitance for Purkinje myocytes.
+     * @return the surface capacitance for Purkinje myocytes.
      */
     double GetPurkinjeCapacitance();
 
@@ -1279,7 +1279,7 @@ public:
     void SetPurkinjeCapacitance(double capacitance);
 
     /**
-     * Get the surface area to volume ratio for Purkinje fibres.
+     * @return the surface area to volume ratio for Purkinje fibres.
      */
     double GetPurkinjeSurfaceAreaToVolumeRatio();
 
@@ -1290,7 +1290,7 @@ public:
     void SetPurkinjeSurfaceAreaToVolumeRatio(double ratio);
 
     /**
-     * Get the default conductivity for Purkinje fibres.
+     * @return the default conductivity for Purkinje fibres.
      */
     double GetPurkinjeConductivity();
 

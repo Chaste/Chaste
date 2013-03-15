@@ -239,7 +239,7 @@ public:
     void SetIntracellularConductivitiesSecondCell(c_vector<double, SPACE_DIM> conductivities);
 
     /**
-     * Returns a pointer to the second cell
+     * @return a pointer to the second cell
      *
      * @param globalIndex the global index in the mesh
      */
@@ -247,25 +247,25 @@ public:
 
 
     /**
-     * Returns a pointer to the extracellular stimulus. Useful for testing
+     * @return a pointer to the extracellular stimulus. Useful for testing
      *
      * @param globalIndex the global index in the mesh
      */
     boost::shared_ptr<AbstractStimulusFunction> GetExtracellularStimulus( unsigned globalIndex );
 
     /**
-     *  Returns a reference to the vector of distributed cells (second cell). Needed for archiving.
+     *  @return a reference to the vector of distributed cells (second cell). Needed for archiving.
      */
     const std::vector<AbstractCardiacCellInterface*>& rGetSecondCellsDistributed() const;
 
     /**
-     *  Returns a reference to the vector of distributed values of Ggaps. Needed for archiving.
+     *  @return a reference to the vector of distributed values of Ggaps. Needed for archiving.
      */
     const std::vector<double>& rGetGapsDistributed() const;
 
 
     /**
-     *  Returns a reference to the vector of distributed extracellular stimuli. Needed for archiving.
+     *  @return a reference to the vector of distributed extracellular stimuli. Needed for archiving.
      */
     const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rGetExtracellularStimulusDistributed() const;
 
@@ -307,28 +307,28 @@ public:
     void CreateGGapConductivities();
 
     /**
-     * Get the extracellular conductivity tensor for the given element
+     * @return the extracellular conductivity tensor for the given element
      * @param elementIndex  index of the element of interest
      */
      const c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetExtracellularConductivityTensor(unsigned elementIndex);
 
      /**
-      * Get the intracellular conductivity tensor for the given element for tehs econd cell
+      * @return the intracellular conductivity tensor for the given element for tehs econd cell
       * @param elementIndex  index of the element of interest
       */
       const c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetIntracellularConductivityTensorSecondCell(unsigned elementIndex);
 
 
-     /** Get the entire ionic current cache for the second cell*/
+     /** @return the entire ionic current cache for the second cell*/
      ReplicatableVector& rGetIionicCacheReplicatedSecondCell();
 
-     /** Get the entire stimulus current cache for the second cell*/
+     /** @return the entire stimulus current cache for the second cell*/
      ReplicatableVector& rGetIntracellularStimulusCacheReplicatedSecondCell();
 
-     /** Get the extracellular stimulus*/
+     /** @return the extracellular stimulus*/
      ReplicatableVector& rGetExtracellularStimulusCacheReplicated();
 
-     /** Get the values of ggap*/
+     /** @return the values of ggap*/
      ReplicatableVector& rGetGgapCacheReplicated();
 
      /**

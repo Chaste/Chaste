@@ -106,7 +106,7 @@ public:
     ~BidomainTissue();
 
     /**
-     * Get the extracellular conductivity tensor for the given element
+     * @return the extracellular conductivity tensor for the given element
      * @param elementIndex  index of the element of interest
      */
      const c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetExtracellularConductivityTensor(unsigned elementIndex);

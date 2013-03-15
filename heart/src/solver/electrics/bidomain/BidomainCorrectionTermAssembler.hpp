@@ -67,6 +67,7 @@ protected:
      * @param rU The unknown as a vector, u(i) = u_i
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
+     * @return stencil matrix
      */
     c_vector<double,2*(ELEM_DIM+1)> ComputeVectorTerm(
                 c_vector<double, ELEM_DIM+1> &rPhi,

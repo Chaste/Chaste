@@ -66,6 +66,7 @@ protected:
      * @param rSurfaceElement the element which is being considered.
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rX The point in space
+     * @return stencil vector
      */
     virtual c_vector<double, 2*ELEMENT_DIM> ComputeVectorSurfaceTerm(
         const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,

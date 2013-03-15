@@ -65,10 +65,10 @@ public:
     {
     }
 
-    /** Get the total number of quad points in the mesh. Pure, implemented in concrete solver */
+    /** @return the total number of quad points in the mesh. Pure, implemented in concrete solver */
     virtual unsigned GetTotalNumQuadPoints()=0;
 
-    /** Get the quadrature rule used in the elements. */
+    /** @return the quadrature rule used in the elements. */
     virtual GaussianQuadratureRule<DIM>* GetQuadratureRule()=0;
 
     /**

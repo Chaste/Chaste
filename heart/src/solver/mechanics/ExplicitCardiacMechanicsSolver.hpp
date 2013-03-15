@@ -63,7 +63,7 @@ class ExplicitCardiacMechanicsSolver : public AbstractCardiacMechanicsSolver<ELA
 friend class TestExplicitCardiacMechanicsSolver;
 
 private:
-    /** This solver is an explicit solver (overloaded pure method) */
+    /** @return true if this solver is an explicit solver (overloaded pure method) */
     bool IsImplicitSolver()
     {
         return false;

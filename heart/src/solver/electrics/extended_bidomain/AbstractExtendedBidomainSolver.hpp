@@ -134,7 +134,7 @@ protected:
 
 
     /**
-     *  GenerateNullBasis
+     *  @return vector for null basis
      *
      *  Called by FinaliseAssembleSystem to get the null basis to use for the particular
      *  formulation of the extended idomain equations used.
@@ -181,7 +181,7 @@ public:
      void SetRowForAverageOfPhiZeroed(unsigned rowMeanPhiEZero);
 
      /**
-      *  Get the boundary conditions being used
+      *  @return the boundary conditions being used
       */
      BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* GetBoundaryConditions()
      {

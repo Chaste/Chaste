@@ -67,7 +67,7 @@ class AbstractStimulusFunction
 public:
 
     /**
-     * Returns the stimulus at a given time.
+     * @return the stimulus at a given time.
      *
      * @param time  time at which to return the stimulus
      */

@@ -109,7 +109,7 @@ public:
     void SetAppliedToPurkinjeCellModel();
 
     /**
-     * Returns the stimulus at a given time.
+     * @return the stimulus at a given time.
      *
      * @param time  time at which to return the stimulus (note that this is ignored in PurkinjeVentricularStimuli)
      */
