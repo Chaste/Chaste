@@ -86,6 +86,7 @@ protected:
      * Overridden solve node mapping method.
      *
      * @param index the global index of the node
+     * @return local index
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
@@ -93,6 +94,7 @@ protected:
      * Overridden solve element mapping method.
      *
      * @param index the global index of the element
+     * @return local index
      */
     unsigned SolveElementMapping(unsigned index) const;
 
@@ -100,6 +102,7 @@ protected:
      * Overridden solve boundary element mapping method.
      *
      * @param index the global index of the boundary element
+     * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
@@ -208,13 +211,13 @@ public:
     bool CheckIsConforming();
 
     /**
-     * Return the volume of the mesh, calculated by adding the determinant of each element
+     * @return the volume of the mesh, calculated by adding the determinant of each element
      * and dividing by n!, where n is the element dimension.
      */
     double GetVolume();
 
     /**
-     * Return the surface area of the mesh.
+     * @return the surface area of the mesh.
      */
     double GetSurfaceArea();
 
@@ -237,7 +240,7 @@ public:
     void PermuteNodes(const std::vector<unsigned>& perm);
 
     /**
-     * Return the element index for the first element that contains a test point. Like GetContainingElementIndex
+     * @return the element index for the first element that contains a test point. Like GetContainingElementIndex
      * but uses the user given element (M say) as the first element checked, and then checks M+1,M+2,..,Ne,0,1..
      *
      * @param rTestPoint reference to the point
@@ -248,7 +251,7 @@ public:
     unsigned GetContainingElementIndexWithInitialGuess(const ChastePoint<SPACE_DIM>& rTestPoint, unsigned startingElementGuess, bool strict=false);
 
     /**
-     * Return the element index for an element is closest to the testPoint.
+     * @return the element index for an element is closest to the testPoint.
      *
      * "Closest" means that the minimum interpolation weights for the testPoint are
      * maximised for this element.
@@ -258,7 +261,7 @@ public:
     unsigned GetNearestElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint);
 
     /**
-     * Return all element indices for elements that are known to contain a test point.
+     * @return all element indices for elements that are known to contain a test point.
      *
      * @param rTestPoint reference to the point
      */
@@ -270,12 +273,12 @@ public:
     virtual void Clear();
 
     /**
-     * Return the set of nodes which are on the boundary of the flagged region(s).
+     * @return the set of nodes which are on the boundary of the flagged region(s).
      */
     std::set<unsigned> CalculateBoundaryOfFlaggedRegion();
 
     /**
-     * Calcuate the angle between the node at indexB and the x axis about
+     * @return calculated the angle between the node at indexB and the x axis about
      * the node at indexA. The angle returned is in the range (-pi,pi].
      *
      * @param indexA a node index
@@ -299,7 +302,7 @@ public:
     virtual void RefreshJacobianCachedData();
 
     /**
-     * Get the Jacobian matrix and its determinant for a given element.
+     * @return the Jacobian matrix and its determinant for a given element.
      *
      * @param elementIndex index of the element in the mesh
      * @param rJacobian the Jacobian matrix
@@ -308,7 +311,7 @@ public:
     virtual void GetJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, SPACE_DIM>& rJacobian, double& rJacobianDeterminant) const;
 
     /**
-     * Get the Jacobian matrix, its inverse and its determinant for a given element.
+     * @return the Jacobian matrix, its inverse and its determinant for a given element.
      *
      * @param elementIndex index of the element in the mesh
      * @param rJacobian the Jacobian matrix
@@ -318,7 +321,7 @@ public:
     virtual void GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const;
 
     /**
-     * Get the weighted direction and the determinant of the Jacobian for a given element.
+     * @return the weighted direction and the determinant of the Jacobian for a given element.
      *
      * @param elementIndex index of the element in the mesh
      * @param rWeightedDirection the weighted direction
@@ -327,7 +330,7 @@ public:
     virtual void GetWeightedDirectionForElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const;
 
     /**
-     * Get the weighted direction and the determinant of the Jacobian for a given boundary element.
+     * @return the weighted direction and the determinant of the Jacobian for a given boundary element.
      *
      * @param elementIndex index of the element in the mesh
      * @param rWeightedDirection the weighted direction
@@ -345,16 +348,16 @@ public:
     {
     public:
         /**
-         * Get a pointer to the node in the mesh at end A of the spring.
+         * @return a pointer to the node in the mesh at end A of the spring.
          */
         Node<SPACE_DIM>* GetNodeA();
         /**
-         * Get a pointer to the node in the mesh at end B of the spring.
+         * @return a pointer to the node in the mesh at end B of the spring.
          */
         Node<SPACE_DIM>* GetNodeB();
 
         /**
-         * Comparison not-equal-to.
+         * @return comparison not-equal-to.
          *
          * @param rOther edge iterator with which comparison is made
          */
@@ -362,6 +365,7 @@ public:
 
         /**
          * Prefix increment operator.
+         * @return reference to incremented object
          */
         EdgeIterator& operator++();
 

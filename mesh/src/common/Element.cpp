@@ -244,11 +244,6 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
     return weights;
 }
 
-/**
- * Calculate the interpolation weights, but if we are not within
- * the element (one or more negative weights), we project onto the
- * element, rather than extrapolating from it.
- */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeightsWithProjection(const ChastePoint<SPACE_DIM>& rTestPoint)
 {

@@ -85,7 +85,7 @@ public:
     {}
 
     /**
-     * Get the location of the centroid of the element.
+     * @return the location of the centroid of the element.
      */
     c_vector<double, SPACE_DIM> CalculateCentroid() const;
 
@@ -107,7 +107,7 @@ public:
     void CalculateWeightedDirection(c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant);
 
     /**
-     * Compute a unit vector normal to this element, if possible.
+     * @return computed a unit vector normal to this element, if possible.
      */
     c_vector<double, SPACE_DIM> CalculateNormal();
 
@@ -122,7 +122,7 @@ public:
                                   double& rJacobianDeterminant,
                                   c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian);
 
-    /** Get the volume of an element (or area in 2d, or length in 1d)
+    /** @return the volume of an element (or area in 2d, or length in 1d)
      * @param determinant a pre-calculated Jacobian determinant for this element.
      * @return volume (which is simply the determinant weighted by the SPACE_DIM)
      */
@@ -175,7 +175,7 @@ public:
     {}
 
     /**
-     * Get the location of the centroid of the element.
+     * @return the location of the centroid of the element.
      */
     c_vector<double, SPACE_DIM> CalculateCentroid() const;
 
@@ -188,7 +188,7 @@ public:
     void CalculateWeightedDirection(c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant);
 
     /**
-     * Compute a unit vector normal to this element, if possible.
+     * @return computed unit vector normal to this element, if possible.
      */
     c_vector<double, SPACE_DIM> CalculateNormal();
 

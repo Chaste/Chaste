@@ -69,7 +69,7 @@ public:
      */
     Box(c_vector<double, 2*DIM>& rMinAndMaxValues);
 
-    /** Get the coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
+    /** @return the coordinates of the box, in the form (for 2D) (xmin, xmax, ymin, ymax) (etc). */
     c_vector<double, 2*DIM>& rGetMinAndMaxValues();
 
     /**
@@ -95,10 +95,10 @@ public:
      */
     void AddElement(Element<DIM,DIM>* pElement);
 
-    /** Get all the nodes in this box. */
+    /** @return all the nodes in this box. */
     std::set< Node<DIM>* >& rGetNodesContained();
 
-    /** Get all the elements in this box. */
+    /** @return all the elements in this box. */
     std::set< Element<DIM,DIM>* >& rGetElementsContained();
 };
 

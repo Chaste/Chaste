@@ -89,24 +89,24 @@ public:
     void EmptyBoxes();
 
     /**
-     * Calculate which box this node is contained in.
+     * @return the index of the box this node is contained in.
      * @param pNode address of the node
      */
     unsigned CalculateContainingBox(Node<DIM>* pNode);
 
     /**
-     * Calculate which box a point is contained in
+     * @return the index of the box a point is contained in
      * @param rLocation The point
      */
     unsigned CalculateContainingBox(c_vector<double, DIM>& rLocation);
 
     /**
-     * Get a box.
+     * @return a box.
      * @param boxIndex the index of the box to return
      */
     Box<DIM>& rGetBox(unsigned boxIndex);
 
-    /** Get the number of boxes. */
+    /** @return the number of boxes. */
     unsigned GetNumBoxes();
 
     /** Set up the local boxes (ie itself and its nearest-neighbours) for each of the boxes.
@@ -119,7 +119,7 @@ public:
     void SetupAllLocalBoxes();
 
     /**
-     * Get the set of all the local boxes, i.e. itself and its nearest-neighbours.
+     * @return the set of all the local boxes, i.e. itself and its nearest-neighbours.
      * @param boxIndex the index of the box
      */
     std::set<unsigned> GetLocalBoxes(unsigned boxIndex);

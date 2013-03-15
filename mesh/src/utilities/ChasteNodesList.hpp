@@ -91,11 +91,11 @@ public:
      */
     ~ChasteNodesList();
 
-    /** @return the list of ndoes in this nodes list */
+    /** @return the list of nodes in this nodes list */
     const std::vector< Node<SPACE_DIM>*>& rGetNodesList() const;
 
     /**
-     * Checks if a given point is contained in the ndoe list.
+     * @return true if a given point is contained in the node list.
      *
      * @param rPointToCheck Point to be checked whether it is a node in the list.
      */

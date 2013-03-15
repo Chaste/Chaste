@@ -81,7 +81,7 @@ public:
     ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, ChastePoint<SPACE_DIM>& rUpperPoint);
 
     /**
-     * Checks if a given point is contained in the cuboid.
+     * @return true if a given point is contained in the cuboid.
      *
      * @param rPointToCheck Point to be checked to be contained in the cuboid.
      */

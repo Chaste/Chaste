@@ -102,19 +102,19 @@ public:
     ChastePoint(c_vector<double, DIM> location);
 
     /**
-     * Get the location of the Point.
+     * @return the location of the Point.
      */
     c_vector<double, DIM>& rGetLocation();
 
     /**
-     * Access the vector mLocation.
+     * @return the vector mLocation.
      *
      * @param i the index of the vector to return
      */
     double operator[] (unsigned i) const;
 
     /**
-     * Get a co-ordinate, returning the default value if the co-ordinate doesn't exist.
+     * @return a co-ordinate, returning the default value if the co-ordinate doesn't exist.
      * @param i  the co-ordinate to get
      * @param def  the default value
      */
@@ -203,7 +203,7 @@ public:
     ChastePoint(double v1=0, double v2=0, double v3=0);
 
     /**
-     * Access the vector mLocation.  Actually raises an exception, since
+     * @return Access the vector mLocation.  Actually raises an exception, since
      * a 0d point has no location.
      *
      * @param i the index of the vector to return

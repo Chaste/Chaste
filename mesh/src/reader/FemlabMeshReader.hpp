@@ -55,7 +55,7 @@ private:
      * a Femlab or Matlab PDE toolbox file.
      *
      * Each string is expected to be a series of doubles.
-     * Return value is a vector where each item is a vector of double which represents
+     * @return a vector where each item is a vector of double which represents
      * position.  Indices are implicit in the vector.
      *
      * @param rRawData the node data to be read
@@ -70,7 +70,7 @@ private:
      *  The rest contains extra information which are ignored currently.
      *  ( In 2-D: 2 indices for an edge, 3 for a triangle)
      *  ( In 3-D: 3 indices for a face, 4 for a tetrahedron)
-     * Return value is a vector where each item is a vector of ints which represents
+     * @return a vector where each item is a vector of ints which represents
      * indices of nodes.
      *
      * @param rRawData  the element, face or edge data to be read

@@ -151,42 +151,42 @@ public:
     virtual ~VtkMeshReader();
 
     /**
-     * Returns the mNumElements
+     * @return the mNumElements
      */
     unsigned GetNumElements() const;
 
     /**
-     * Returns the mNumCableElements
+     * @return the mNumCableElements
      */
     unsigned GetNumCableElements() const;
 
     /**
-     * Returns mNumNodes
+     * @return mNumNodes
      */
     unsigned GetNumNodes() const;
 
     /**
-     * Returns mNumFaces (synonym of GetNumEdges() method)
+     * @return mNumFaces (synonym of GetNumEdges() method)
      */
     unsigned GetNumFaces() const;
 
     /**
-     * Returns mNumFaces (synonym of GetNumFaces() method)
+     * @return mNumFaces (synonym of GetNumFaces() method)
      */
     unsigned GetNumEdges() const;
 
     /**
-     * Returns mNumElementAttributes
+     * @return mNumElementAttributes
      */
     unsigned GetNumElementAttributes() const;
 
     /**
-     * Returns mNumCableElementAttributes
+     * @return mNumCableElementAttributes
      */
     unsigned GetNumCableElementAttributes() const;
 
     /**
-     * Returns mNumFaceAttributes
+     * @return mNumFaceAttributes
      */
     unsigned GetNumFaceAttributes() const;
 
@@ -204,28 +204,28 @@ public:
     void Initialize();
 
     /**
-     * Returns a vector of the coordinates of each node in turn
+     * @return a vector of the coordinates of each node in turn
      */
     std::vector<double> GetNextNode();
 
     /**
-     * Returns a vector of the nodes of each element (and any attribute information, if there is any) in turn
+     * @return a vector of the nodes of each element (and any attribute information, if there is any) in turn
      */
     ElementData GetNextElementData();
 
     /**
-     * Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData())
+     * @return a vector of the nodes of each face in turn (synonym of GetNextEdgeData())
      */
     ElementData GetNextFaceData();
 
     /**
-     * Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData())
+     * @return a vector of the nodes of each face in turn (synonym of GetNextEdgeData())
      */
     ElementData GetNextCableElementData();
 
 
     /**
-     * Returns an std::vector containing the vtkCellData with attribute name specified
+     * @return an std::vector containing the vtkCellData with attribute name specified
      * Throws if the attribute name does not exist
      * @param dataName Name of the cell data
      * @param dataPayload in which to store the result
@@ -233,7 +233,7 @@ public:
      void GetCellData(std::string dataName, std::vector<double>& dataPayload);
 
     /**
-     * Returns an std::vector containing the vtkPointData with attribute name specified
+     * @return an std::vector containing the vtkPointData with attribute name specified
      * Throws if the attribute name does not exist
      *
      * @param dataName Name of the point data
@@ -242,7 +242,7 @@ public:
     void GetPointData(std::string dataName, std::vector<double>& dataPayload);
 
     /**
-     * Returns an std::vector containing the vector-directed vtkCellData with attribute name specified
+     * @return an std::vector containing the vector-directed vtkCellData with attribute name specified
      * Throws if the attribute name does not exist
      * @param dataName Name of the cell data
      * @param dataPayload in which to store the result
@@ -250,7 +250,7 @@ public:
      void GetCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload);
 
     /**
-     * Returns an std::vector containing the vector-directed vtkPointData with attribute name specified
+     * @return an std::vector containing the vector-directed vtkPointData with attribute name specified
      * Throws if the attribute name does not exist
      *
      * @param dataName Name of the point data
@@ -259,7 +259,7 @@ public:
     void GetPointData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload);
 
     /**
-     * Return a pointer to mpVtkUnstructuredGrid
+     * @return a pointer to #mpVtkUnstructuredGrid
      */
     vtkUnstructuredGrid* OutputMeshAsVtkUnstructuredGrid();
 

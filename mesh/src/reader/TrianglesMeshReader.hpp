@@ -148,40 +148,40 @@ public:
      */
      ~TrianglesMeshReader();
 
-    /** Returns the number of elements in the mesh */
+    /** @return the number of elements in the mesh */
     unsigned GetNumElements() const;
 
-    /** Returns the number of nodes in the mesh */
+    /** @return the number of nodes in the mesh */
     unsigned GetNumNodes() const;
 
-    /** Returns the number of faces in the mesh (synonym of GetNumEdges()) */
+    /** @return the number of faces in the mesh (synonym of GetNumEdges()) */
     unsigned GetNumFaces() const;
 
-    /** Returns the number of cable elements in the mesh */
+    /** @return the number of cable elements in the mesh */
     unsigned GetNumCableElements() const;
 
-    /** Returns the number of attributes in the mesh */
+    /** @return the number of attributes in the mesh */
     unsigned GetNumElementAttributes() const;
 
-    /** Returns the number of attributes in the mesh */
+    /** @return the number of attributes in the mesh */
     unsigned GetNumFaceAttributes() const;
 
-    /** Returns the number of cable element attributes in the mesh */
+    /** @return the number of cable element attributes in the mesh */
     unsigned GetNumCableElementAttributes() const;
 
     /** Resets pointers to beginning*/
     void Reset();
 
-    /** Returns a vector of the coordinates of each node in turn */
+    /** @return a vector of the coordinates of each node in turn */
     std::vector<double> GetNextNode();
 
-    /** Returns a vector of the nodes of each element (and any attribute information, if there is any) in turn */
+    /** @return a vector of the nodes of each element (and any attribute information, if there is any) in turn */
     ElementData GetNextElementData();
 
-    /** Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData()) */
+    /** @return a vector of the nodes of each face in turn (synonym of GetNextEdgeData()) */
     ElementData GetNextFaceData();
 
-    /** Returns a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
+    /** @return a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
     ElementData GetNextCableElementData();
 
 
@@ -247,11 +247,11 @@ public:
     std::vector<unsigned> GetContainingElementIndices(unsigned index);
 
 
-    /*** Returns true if reading binary files, false if reading ascii files */
+    /*** @return true if reading binary files, false if reading ascii files */
     bool IsFileFormatBinary();
 
     /**
-     * Returns true if there is a node connectivity list (NCL) file available.
+     * @return true if there is a node connectivity list (NCL) file available.
      *
      * @return whether there is a node connectivity list (NCL) file available
      */
@@ -306,7 +306,7 @@ private:
     void GetNextLineFromStream(std::ifstream& rFileStream, std::string& rRawLine);
 
     /**
-     * Returns the Item details from the next line via a call to GetNextLineFromStream()
+     * @return the Item details from the next line via a call to GetNextLineFromStream()
      *
      * @param rFileStream  The file to read from
      * @param expectedItemNumber  To check file syntax, what item is expected to be on the next line.
@@ -319,7 +319,7 @@ private:
                                std::vector<T_DATA>& rDataPacket, const unsigned& rNumAttributes,
                                std::vector<T_ATTR>& rAttributes);
 
-    /** Get method for mFilesBaseName. */
+    /** @return #mFilesBaseName. */
     std::string GetMeshFileBaseName();
 
     /** Get method specialized to 1D meshes */

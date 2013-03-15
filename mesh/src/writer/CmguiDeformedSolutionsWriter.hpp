@@ -84,7 +84,8 @@ private:
     unsigned mNumNodesToUse;
 
     /**
-     *  Overloaded GetNumNodes(), returns either mpQuadraticMesh->GetNumVertices() for linear
+     *  Overloaded GetNumNodes().
+     *  @return either mpQuadraticMesh->GetNumVertices() for linear
      *  visualisation or mpQuadraticMesh->GetNumNodes() for quadratic visualisation
      */
     unsigned GetNumNodes()

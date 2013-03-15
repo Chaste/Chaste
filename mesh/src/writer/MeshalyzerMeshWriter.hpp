@@ -49,6 +49,7 @@ private:
     /**
      * Open the file node information is written to.
      *
+     * @return file handler
      * @param append  whether to append to the file, or overwrite it
      */
     out_stream OpenNodeFile(bool append=false);
@@ -56,13 +57,14 @@ private:
     /**
      * Open the file element information is written to.
      *
+     * @return file handler
      * @param append  whether to append to the file, or overwrite it
      */
     out_stream OpenElementFile(bool append=false);
 
     /**
      * Open the file face information is written to.
-     *
+     * @return file handler
      * @param append  whether to append to the file, or overwrite it
      */
     out_stream OpenFaceFile(bool append=false);
@@ -78,7 +80,7 @@ private:
     void WriteFilesFooter();
 
     /**
-     * Get the mode to use when opening files.
+     * @return the mode to use when opening files.
      *
      * @param append  whether to append to the file, or overwrite it
      */

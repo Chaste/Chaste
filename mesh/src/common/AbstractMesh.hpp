@@ -71,6 +71,7 @@ private:
      * Overridden in TetrahedralMesh DistributedTetrahedralMesh and Vertex Mesh classes.
      *
      * @param index the global index of the node
+     * @return local index
      */
     virtual unsigned SolveNodeMapping(unsigned index) const = 0;
 
@@ -145,14 +146,14 @@ public:
     class NodeIterator;
 
     /**
-     * Get an iterator to the first node in the mesh.
+     * @return an iterator to the first node in the mesh.
      *
      * @param skipDeletedNodes whether to include deleted nodes
      */
     inline NodeIterator GetNodeIteratorBegin(bool skipDeletedNodes=true);
 
     /**
-     * Get an iterator to one past the last node in the mesh.
+     * @return an iterator to one past the last node in the mesh.
      */
     inline NodeIterator GetNodeIteratorEnd();
 
@@ -171,24 +172,24 @@ public:
     virtual ~AbstractMesh();
 
     /**
-     * Get the number of nodes that are actually in use.
+     * @return the number of nodes that are actually in use.
      *
      * Overridden in MutableMesh and DistributedTetrahedralMesh.
      */
     virtual unsigned GetNumNodes() const;
 
     /**
-     * Get the number of boundary nodes in the mesh.
+     * @return the number of boundary nodes in the mesh.
      */
     unsigned GetNumBoundaryNodes() const;
 
     /**
-     * Get the total number of nodes (including those marked as deleted).
+     * @return the total number of nodes (including those marked as deleted).
      */
     virtual unsigned GetNumAllNodes() const;
 
     /**
-     * Get the  number of attributes on each node.
+     * @return the  number of attributes on each node.
      * Note, this implementation assumes that all nodes have the same number of attributes
      * so that the first node in the container is indicative of the others.
      */
@@ -234,7 +235,7 @@ public:
     virtual void ReadNodesPerProcessorFile(const std::string& rNodesPerProcessorFile);
 
     /**
-     * Get method for DistributedVectorFactory.
+     * @return the DistributedVectorFactory.
      */
     virtual DistributedVectorFactory * GetDistributedVectorFactory();
 
@@ -255,18 +256,18 @@ public:
     virtual void PermuteNodes();
 
     /**
-     * Return a pointer to the first boundary node in the mesh.
+     * @return a pointer to the first boundary node in the mesh.
      */
     BoundaryNodeIterator GetBoundaryNodeIteratorBegin() const;
 
     /**
-     * Return a pointer to *one past* the last boundary node in the mesh
+     * @return a pointer to *one past* the last boundary node in the mesh
      * (for consistency with STL iterators).
      */
     BoundaryNodeIterator GetBoundaryNodeIteratorEnd() const;
 
     /**
-     * Get method for mMeshFileBaseName.
+     * @return mMeshFileBaseName.
      */
     std::string GetMeshFileBaseName() const;
 
@@ -278,7 +279,7 @@ public:
     bool IsMeshOnDisk() const;
 
     /**
-     * Get method for #mNodesPermutation.
+     * @return #mNodesPermutation.
      *
      *  When empty (most meshes) there is no node permutation
      *  When non-empty (parallel distributed meshes) then for a given original_index
@@ -288,7 +289,7 @@ public:
     const std::vector<unsigned>& rGetNodePermutation() const;
 
     /**
-     * Return a vector between two points in space.
+     * @return a vector between two points in space.
      *
      * This method is overridden in some daughter classes (e.g. Cylindrical2dMesh).
      *
@@ -438,18 +439,19 @@ public:
     public:
         /**
          * Dereference the iterator giving you a *reference* to the current node.
-         *
+         * @return reference
          * Make sure to use a reference for the result to avoid copying nodes unnecessarily.
          */
         inline Node<SPACE_DIM>& operator*();
 
         /**
          * Member access from a pointer.
+         * @return pointer
          */
         inline Node<SPACE_DIM>* operator->();
 
         /**
-         * Comparison not-equal-to.
+         * @return Comparison not-equal-to.
          *
          * @param rOther iterator with which comparison is made
          */
@@ -457,6 +459,7 @@ public:
 
         /**
          * Prefix increment operator.
+         * @return incremented object
          */
         inline NodeIterator& operator++();
 
@@ -485,11 +488,13 @@ public:
 
         /**
          * Helper method to say when we're at the end.
+         * @return true if at end
          */
         inline bool IsAtEnd();
 
         /**
          * Helper method to say if we're allowed to point at this node.
+         * @return true if allowed
          */
         inline bool IsAllowedNode();
     };

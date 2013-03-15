@@ -80,27 +80,27 @@ public:
     virtual ~AbstractMeshWriter();
 
     /**
-     * Return the full path to the directory where meshes will be written.
+     * @return the full path to the directory where meshes will be written.
      */
     std::string GetOutputDirectory();
 
     /**
-     * Get the number of nodes in the mesh.
+     * @return the number of nodes in the mesh.
      */
     virtual unsigned GetNumNodes();
 
     /**
-     * Get the number of elements in the mesh.
+     * @return the number of elements in the mesh.
      */
     unsigned GetNumElements();
 
     /**
-     * Get the number of boundary elements in the mesh.
+     * @return the number of boundary elements in the mesh.
      */
     unsigned GetNumBoundaryFaces();
 
     /**
-     * Get the number of cable elements in the mesh.
+     * @return the number of cable elements in the mesh.
      */
     unsigned GetNumCableElements();
 

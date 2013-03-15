@@ -154,6 +154,7 @@ private:
 
 #define COVERAGE_IGNORE
     /**
+     * @return true if the mesh is Voronoi local to the given element.
      * Check whether any neighbouring node is inside the circumsphere of this element.
      *
      * @param pElement pointer to an element
@@ -188,17 +189,17 @@ public:
     void Clear();
 
     /**
-     * Get the number of nodes that are actually in use.
+     * @return the number of nodes that are actually in use.
      */
     unsigned GetNumNodes() const;
 
     /**
-     * Get the number of elements that are actually in use.
+     * @return the number of elements that are actually in use.
      */
     unsigned GetNumElements() const;
 
     /**
-     * Get the number of boundary elements that are actually in use.
+     * @return the number of boundary elements that are actually in use.
      */
     unsigned GetNumBoundaryElements() const;
 
@@ -218,6 +219,7 @@ public:
      * NB. After calling this one or more times, you must then call ReMesh
      *
      * @param pNewNode  pointer to the new node
+     * @return the index of the new node in the mesh
      */
     virtual unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
@@ -275,6 +277,7 @@ public:
      *
      * @param pElement  pointer to the element
      * @param point  a point located in the element
+     * @return index of the new node which has been created at the given location
      */
     unsigned RefineElement(Element<ELEMENT_DIM,SPACE_DIM>* pElement, ChastePoint<SPACE_DIM> point);
 
@@ -338,7 +341,7 @@ public:
 
 #define COVERAGE_IGNORE
     /**
-     * Checks the entire mesh element by element and checks whether any neighbouring node
+     * @return true if Voronoi.  Checks the entire mesh element by element and checks whether any neighbouring node
      * is inside the circumsphere of this element.
      *
      * @param maxPenetration is the maximum distance a node is allowed to be inside the

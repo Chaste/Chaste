@@ -76,7 +76,7 @@ protected:
      * Reads an input file rFileName, removes comments (indicated by a #) and blank
      * lines and returns a vector of strings. Each string corresponds to one line
      * of the input file.
-     *
+     * @return a vector of strings
      * @param rFileName  the name of the file to read from, relative to the output directory
      */
     std::vector<std::string> GetRawDataFromFile(const std::string& rFileName);
@@ -88,24 +88,24 @@ public:
     virtual ~AbstractCachedMeshReader()
     {} /**< Destructor. */
 
-    unsigned GetNumElements() const; /**< Returns the number of elements in the mesh. */
-    unsigned GetNumNodes() const;    /**< Returns the number of nodes in the mesh. */
-    unsigned GetNumFaces() const;    /**< Returns the number of faces in the mesh (synonym of GetNumEdges()) */
+    unsigned GetNumElements() const; /**< @return the number of elements in the mesh. */
+    unsigned GetNumNodes() const;    /**< @return the number of nodes in the mesh. */
+    unsigned GetNumFaces() const;    /**< @return the number of faces in the mesh (synonym of GetNumEdges()) */
 
     /**
-     *  Returns the maximum node index. Used in testing to check that output nodes
+     *  @return the maximum node index. Used in testing to check that output nodes
      *  are always indexed from zero even if they are input indexed from one.
      */
     unsigned GetMaxNodeIndex();
 
     /**
-     *  Returns the minimum node index. Used in testing to check that output nodes
+     *  @return the minimum node index. Used in testing to check that output nodes
      *  are always indexed from zero even if they are input indexed from one.
      */
     unsigned GetMinNodeIndex();
 
     /**
-     *  Returns a vector of the coordinates of each node in turn, starting with
+     *  @return a vector of the coordinates of each node in turn, starting with
      *  node 0 the first time it is called followed by nodes 1, 2, ... , mNumNodes-1.
      */
     std::vector<double> GetNextNode();
@@ -113,14 +113,14 @@ public:
     void Reset(); /**< Resets pointers to beginning*/
 
     /**
-     *  Returns a vector of the nodes of each element in turn, starting with
+     *  @return a vector of the nodes of each element in turn, starting with
      *  element 0 the first time it is called followed by elements 1, 2, ... ,
      *  mNumElements-1.
      */
     ElementData GetNextElementData();
 
     /**
-     *  Returns a vector of the nodes of each face in turn, starting with face 0 the
+     *  @return a vector of the nodes of each face in turn, starting with face 0 the
      *  first time it is called followed by faces 1, 2, ... , mNumFaces-1.
      *
      *  Is a synonum of GetNextEdge(). The two functions can be used interchangeably,

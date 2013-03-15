@@ -87,25 +87,25 @@ public:
      */
      ~GmshMeshReader();
 
-    /** Returns the number of elements in the mesh */
+    /** @return the number of elements in the mesh */
     unsigned GetNumElements() const;
 
-    /** Returns the number of nodes in the mesh */
+    /** @return the number of nodes in the mesh */
     unsigned GetNumNodes() const;
 
-    /** Returns the number of faces in the mesh (synonym of GetNumEdges()) */
+    /** @return the number of faces in the mesh (synonym of GetNumEdges()) */
     unsigned GetNumFaces() const;
 
-    /** Returns the number of cable elements in the mesh */
+    /** @return the number of cable elements in the mesh */
     unsigned GetNumCableElements() const;
 
-    /** Returns the number of attributes in the mesh */
+    /** @return the number of attributes in the mesh */
     unsigned GetNumElementAttributes() const;
 
-    /** Returns the number of attributes in the mesh */
+    /** @return the number of attributes in the mesh */
     unsigned GetNumFaceAttributes() const;
 
-    /** Returns the number of cable element attributes in the mesh */
+    /** @return the number of cable element attributes in the mesh */
     unsigned GetNumCableElementAttributes() const;
 
     /** * @return the expected order of the element file (1=linear, 2=quadratic) */
@@ -117,16 +117,16 @@ public:
     /** Resets pointers to beginning*/
     void Reset();
 
-    /** Returns a vector of the coordinates of each node in turn */
+    /** @return a vector of the coordinates of each node in turn */
     std::vector<double> GetNextNode();
 
-    /** Returns a vector of the nodes of each element (and any attribute information, if there is any) in turn */
+    /** @return a vector of the nodes of each element (and any attribute information, if there is any) in turn */
     ElementData GetNextElementData();
 
-    /** Returns a vector of the nodes of each face in turn (synonym of GetNextEdgeData()) */
+    /** @return a vector of the nodes of each face in turn (synonym of GetNextEdgeData()) */
     ElementData GetNextFaceData();
 
-    /** Returns a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
+    /** @return a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
     ElementData GetNextCableElementData();
 
     /**

@@ -569,7 +569,7 @@ protected:
     std::vector<unsigned> mReordering;
 
     /**
-     * Get the mode to use when opening files.
+     * @return the mode to use when opening files.
      *
      * @param append  whether to append to the file, or overwrite it
      */
@@ -578,12 +578,14 @@ protected:
     /**
      * Open the file node information is written to.
      *
+     * @return file handler
      * @param append whether to clear (append=false) or to append (append=true). False by default.
      */
     out_stream OpenNodeFile(bool append = false);
 
     /**
      * Helper method that open all the elements files (one per region in this case)
+     * @return vector of file handlers
      *
      * @param append whether to clear (append=false) or to append (append=true). False by default. It applies to all files.
      */

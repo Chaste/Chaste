@@ -85,6 +85,8 @@ private:
      * Overridden in TetrahedralMesh and DistributedTetrahedralMesh classes.
      *
      * @param index the global index of the element
+     * @return local index
+     *
      */
     virtual unsigned SolveElementMapping(unsigned index) const = 0;
 
@@ -94,6 +96,7 @@ private:
      * Overridden in TetrahedralMesh and DistributedTetrahedralMesh classes.
      *
      * @param index the global index of the boundary element
+     * @return local index
      */
     virtual unsigned SolveBoundaryElementMapping(unsigned index) const = 0;
 
@@ -298,14 +301,14 @@ public:
     class ElementIterator;
 
     /**
-     * Get an iterator to the first element in the mesh.
+     * @return an iterator to the first element in the mesh.
      *
      * @param skipDeletedElements whether to include deleted element
      */
     inline ElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
 
     /**
-     * Get an iterator to one past the last element in the mesh.
+     * @return an iterator to one past the last element in the mesh.
      */
     inline ElementIterator GetElementIteratorEnd();
 
@@ -325,50 +328,50 @@ public:
 
 
     /**
-     * Get the number of elements that are actually in use.
+     * @return the number of elements that are actually in use.
      */
     virtual unsigned GetNumElements() const;
 
     /**
-     * Get the number of local elements that are in use on this process (only over-ridden when the mesh is distributed).
+     * @return the number of local elements that are in use on this process (only over-ridden when the mesh is distributed).
      */
     virtual unsigned GetNumLocalElements() const;
 
     /**
-     * Get the number of boundary elements that are actually in use.
+     * @return the number of boundary elements that are actually in use.
      */
     virtual unsigned GetNumBoundaryElements() const;
 
     /**
-     * Get the number of local boundary elements that are in use on this process (only over-ridden when the mesh is distributed).
+     * @return the number of local boundary elements that are in use on this process (only over-ridden when the mesh is distributed).
      */
     virtual unsigned GetNumLocalBoundaryElements() const;
 
     /**
-     * Get the total number of elements (including those marked as deleted).
+     * @return the total number of elements (including those marked as deleted).
      */
     unsigned GetNumAllElements() const;
 
     /**
-     * Get the total number of boundary elements (including those marked as deleted).
+     * @return the total number of boundary elements (including those marked as deleted).
      */
     unsigned GetNumAllBoundaryElements() const;
 
     /**
-     * Get the number of cable elements that are actually in use.
+     * @return the number of cable elements that are actually in use.
      *
      * This will always return zero until overridden in the MixedDimensionMesh class
      */
     virtual unsigned GetNumCableElements() const;
 
     /**
-     * Get the number of vertices (nodes which are also corners of elements).  For a linear mesh all nodes are vertices,
+     * @return the number of vertices (nodes which are also corners of elements).  For a linear mesh all nodes are vertices,
      * so this method is a synonym for GetNumNodes.  However, it is over-ridden in quadratic meshes.
      */
     virtual unsigned GetNumVertices() const;
 
     /**
-     * Get the largest index of nodes on this process. Overwritten in subclasses and used for setting
+     * @return the largest index of nodes on this process. Overwritten in subclasses and used for setting
      * up NodeMaps
      *
      * @return the largest node index on this process.
@@ -412,12 +415,12 @@ public:
 
 
     /**
-     * Return a pointer to the first boundary element in the mesh.
+     * @return a pointer to the first boundary element in the mesh.
      */
     BoundaryElementIterator GetBoundaryElementIteratorBegin() const;
 
     /**
-     * Return a pointer to *one past* the last boundary element in the mesh
+     * @return a pointer to *one past* the last boundary element in the mesh
      * (for consistency with STL iterators).
      */
     BoundaryElementIterator GetBoundaryElementIteratorEnd() const;
@@ -524,6 +527,7 @@ public:
      * to file for when two or more share ownership of a face).
      *
      * @param faceIndex is the global index of the face
+     * @return true if this process is designated owner
      */
     virtual bool CalculateDesignatedOwnershipOfBoundaryElement( unsigned faceIndex );
 
@@ -532,6 +536,7 @@ public:
      * to file for when two or more share ownership of an element).
      *
      * @param elementIndex is the global index of the element
+     * @return true if this process is designated owner
      */
     virtual bool CalculateDesignatedOwnershipOfElement( unsigned elementIndex );
 
@@ -592,6 +597,7 @@ public:
       * @param onlyTryWithTestElements Do not continue with other elements after trying the with testElements
       *      (for cases where you know the testPoint must be in the set of test elements or maybe outside
       *      the mesh).
+      * @return element index
       */
      unsigned GetContainingElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint,
                                         bool strict=false,
@@ -599,8 +605,9 @@ public:
                                         bool onlyTryWithTestElements = false);
 
      /** As with GetNearestElementIndex() except only searches in the given set of elements.
-      *  @param rTestPoint reference to the point
-      *  @param testElements a set of elements (element indices) to look in
+      * @param rTestPoint reference to the point
+      * @param testElements a set of elements (element indices) to look in
+      * @return element index
       */
      unsigned GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
                                                      std::set<unsigned> testElements);
@@ -620,18 +627,19 @@ public:
     public:
         /**
          * Dereference the iterator giving you a *reference* to the current element.
-         *
+         * @return reference
          * Make sure to use a reference for the result to avoid copying elements unnecessarily.
          */
         inline Element<ELEMENT_DIM, SPACE_DIM>& operator*();
 
         /**
          * Member access from a pointer.
+         * @return pointer
          */
         inline Element<ELEMENT_DIM, SPACE_DIM>* operator->();
 
         /**
-         * Comparison not-equal-to.
+         * @return Comparison not-equal-to.
          *
          * @param rOther iterator with which comparison is made
          */
@@ -639,6 +647,7 @@ public:
 
         /**
          * Prefix increment operator.
+         * @return reference to incremented object
          */
         inline ElementIterator& operator++();
 
@@ -668,11 +677,13 @@ public:
 
         /**
          * Helper method to say when we're at the end.
+         * @return true if at end
          */
         inline bool IsAtEnd();
 
         /**
          * Helper method to say if we're allowed to point at this element.
+         * @return true if allowed
          */
         inline bool IsAllowedElement();
     };

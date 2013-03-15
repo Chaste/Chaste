@@ -82,7 +82,7 @@ public:
     ChasteEllipsoid(ChastePoint<SPACE_DIM>& rCentre, ChastePoint<SPACE_DIM>& rRadii);
 
     /**
-     * Checks if a given point is contained in the ellipsoid.
+     * @return true if a given point is contained in the ellipsoid.
      *
      * @param rPointToCheck Point to be checked to be contained in the ellipsoid.
      */

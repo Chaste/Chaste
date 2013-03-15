@@ -111,24 +111,24 @@ public:
     c_vector<double,SPACE_DIM+1> CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian);
 
     /**
-     * Get the volume of the circumsphere, or area of the circumcircle, of this element.
+     * @return the volume of the circumsphere, or area of the circumcircle, of this element.
      */
     double CalculateCircumsphereVolume();
 
     /**
-     * The quality of a triangle/tetrahedron is the ratio between the
+     * @return the quality of a triangle/tetrahedron is the ratio between the
      * volume of the shape and the volume of its circumsphere.
      * This is normalised by dividing through by the Platonic ratio.
      */
     double CalculateQuality();
 
     /**
-     * The maximum and minimum edge lengths
+     * @return calculated maximum and minimum edge lengths
      */
     c_vector <double, 2> CalculateMinMaxEdgeLengths();
 
     /**
-     * Calculate the interpolation weights: the vector
+     * @return calculated interpolation weights: the vector
      *  (1-xi(0)-xi(1)-xi(2), xi(0), xi(1), xi(2))
      * (in the 3D case) for a given point. (see CalculateXi() documentation)
      *
@@ -137,7 +137,7 @@ public:
     c_vector<double, SPACE_DIM+1> CalculateInterpolationWeights(const ChastePoint<SPACE_DIM>& rTestPoint);
 
     /**
-     * Calculate the interpolation weights (see CalculateInterpolationWeights() documentation),
+     * @return calculated interpolation weights (see CalculateInterpolationWeights() documentation),
      * but if we are not within the element (one or more negative weights), we project onto the
      * element, rather than extrapolating from it.
      *
@@ -146,7 +146,7 @@ public:
     c_vector<double, SPACE_DIM+1> CalculateInterpolationWeightsWithProjection(const ChastePoint<SPACE_DIM>& rTestPoint);
 
     /**
-     * Calculate xi at a given point. These are the values in the canonical element, using the
+     * @return calculated xi at a given point. These are the values in the canonical element, using the
      *  the canonical element coordinate system (relative to node 0), corresponding to the test point in this element.
      *  For example, if the test point is node 0, xi=(0,0,0); if node 2, then xi=(0,1,0); if the
      *  test point is halfway between nodes 1 and 2 on the edge between then, then xi=(0.5,0.5,0);
@@ -157,7 +157,7 @@ public:
     c_vector<double, SPACE_DIM> CalculateXi(const ChastePoint<SPACE_DIM>& rTestPoint);
 
     /**
-     * Get whether a given point lies inside this element.
+     * @return whether a given point lies inside this element.
      *
      * @param rTestPoint reference to the point
      * @param strict whether the point must not be too close to an edge/face (defaults to false)

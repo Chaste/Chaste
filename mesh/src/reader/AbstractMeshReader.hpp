@@ -76,55 +76,55 @@ public:
     virtual ~AbstractMeshReader()
     {}
 
-    /** Returns the number of elements in the mesh */
+    /** @return the number of elements in the mesh */
     virtual unsigned GetNumElements() const =0;
 
-    /** Returns the number of nodes in the mesh */
+    /** @return the number of nodes in the mesh */
     virtual unsigned GetNumNodes() const =0;
 
-    /** Returns the number of faces in the mesh (also has synonym GetNumEdges()) */
+    /** @return the number of faces in the mesh (also has synonym GetNumEdges()) */
     virtual unsigned GetNumFaces() const =0;
 
-    /** Returns the number of cable elements in the mesh */
+    /** @return the number of cable elements in the mesh */
     virtual unsigned GetNumCableElements() const;
 
-    /** Returns the number of element attributes in the mesh */
+    /** @return the number of element attributes in the mesh */
     virtual unsigned GetNumElementAttributes() const;
 
-    /** Returns the number of face attributes in the mesh */
+    /** @return the number of face attributes in the mesh */
     virtual unsigned GetNumFaceAttributes() const;
 
-    /** Returns the number of cable element attributes in the mesh */
+    /** @return the number of cable element attributes in the mesh */
     virtual unsigned GetNumCableElementAttributes() const;
 
     /**
      * @return the vector of node attributes
-     * Returns an empty vector here. Over-ride in child classes if needed.
+     * @return an empty vector here. Over-ride in child classes if needed.
      * Ideally, this method would be in AbstractCachedMeshReader (where it would return the cached attribuites)
      * but TrianglesMeshReader (the class this method was created for)
      * does not inherit from AbstractCachedMeshReader, so it needs to be here.
      */
     virtual std::vector<double> GetNodeAttributes();
 
-    /** Returns the number of edges in the mesh (synonym of GetNumFaces()) */
+    /** @return the number of edges in the mesh (synonym of GetNumFaces()) */
     unsigned GetNumEdges() const;
 
-    /** Returns a vector of the coordinates of each node in turn */
+    /** @return a vector of the coordinates of each node in turn */
     virtual std::vector<double> GetNextNode()=0;
 
     /** Resets pointers to beginning*/
     virtual void Reset()=0;
 
-    /** Returns a vector of the node indices of each element (and any attribute information, if there is any) in turn */
+    /** @return a vector of the node indices of each element (and any attribute information, if there is any) in turn */
     virtual ElementData GetNextElementData()=0;
 
-    /** Returns a vector of the node indices of each face (and any attribute/containment information, if there is any) in turn */
+    /** @return a vector of the node indices of each face (and any attribute/containment information, if there is any) in turn */
     virtual ElementData GetNextFaceData()=0;
 
-    /** Returns a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
+    /** @return a vector of the node indices of each cable element (and any attribute information, if there is any) in turn */
     virtual ElementData GetNextCableElementData();
 
-    /** Returns a vector of the node indices of each edge (and any attribute/containment information, if there is any) in turn (synonym of GetNextFaceData()) */
+    /** @return a vector of the node indices of each edge (and any attribute/containment information, if there is any) in turn (synonym of GetNextFaceData()) */
     ElementData GetNextEdgeData();
 
 
@@ -170,7 +170,7 @@ public:
     virtual std::vector<unsigned> GetContainingElementIndices(unsigned index);
 
     /**
-     * Get the base name (less any extension) for mesh files.  Only implemented for some mesh types.
+     * @return the base name (less any extension) for mesh files.  Only implemented for some mesh types.
      */
     virtual std::string GetMeshFileBaseName();
 
@@ -191,7 +191,7 @@ public:
 
 
     /**
-     * Returns true if reading binary files, false if reading ascii files.
+     * @return true if reading binary files, false if reading ascii files.
      *
      * Note, this will always return false unless over-ridden by a derived class that is able to support binary file
      * formats.
@@ -199,11 +199,10 @@ public:
     virtual bool IsFileFormatBinary();
 
     /**
-     * Returns true if there is a node connectivity list (NCL) file available.
+     * @return true if there is a node connectivity list (NCL) file available.
      *
      * Note, this will always return false unless over-ridden by a derived class that is able to support NCL files.
      *
-     * @return whether there is a node connectivity list (NCL) file available
      */
     virtual bool HasNclFile();
 
@@ -255,7 +254,7 @@ public:
                         AbstractMeshReader* pReader);
 
         /**
-         * Get the index of the item pointed at.
+         * @return the index of the item pointed at.
          */
         unsigned GetIndex() const
         {
@@ -280,7 +279,7 @@ public:
         void increment();
 
         /**
-         * Test whether two iterators point at the same item.
+         * @return true if two iterators point at the same item.
          * @param rOther  the other iterator
          */
         bool equal(const ElementIterator& rOther) const
@@ -293,6 +292,7 @@ public:
          *
          * Note that the returned reference is only valid for as long as this iterator
          * is pointing at the item.
+         * @return reference
          */
         const ElementData& dereference() const
         {
@@ -319,7 +319,7 @@ public:
     };
 
     /**
-     * Return an iterator to the first element in the file.
+     * @return an iterator to the first element in the file.
      *
      * Note that, in the case of an ASCII mesh file, for efficiency this will actually
      * start wherever the file pointer currently is.  The user is responsible
@@ -328,7 +328,7 @@ public:
     ElementIterator GetElementIteratorBegin();
 
     /**
-     * Return an iterator over a set of elements whose indices are given
+     * @return an iterator over a set of elements whose indices are given
      *
      * @param rIndices  subset of indices
      *
@@ -339,7 +339,7 @@ public:
     ElementIterator GetElementIteratorBegin(const std::set<unsigned>& rIndices);
 
     /**
-     * Return an iterator to (one past the) end of the element data.
+     * @return an iterator to (one past the) end of the element data.
      */
     ElementIterator GetElementIteratorEnd();
 
@@ -392,7 +392,7 @@ public:
                         AbstractMeshReader* pReader);
 
         /**
-         * Get the index of the item pointed at.
+         * @return the index of the item pointed at.
          */
         unsigned GetIndex() const
         {
@@ -417,7 +417,7 @@ public:
         void increment();
 
         /**
-         * Test whether two iterators point at the same item.
+         * @return true if two iterators point at the same item.
          * @param rOther  the other iterator
          */
         bool equal(const NodeIterator& rOther) const
@@ -427,7 +427,7 @@ public:
 
         /**
          * Dereference this iterator to get the data for the item pointed at.
-         *
+         * @return reference
          * Note that the returned reference is only valid for as long as this iterator
          * is pointing at the item.
          */
@@ -456,7 +456,7 @@ public:
     };
 
     /**
-     * Return an iterator to the first node in the file.
+     * @return an iterator to the first node in the file.
      *
      * Note that, in the case of an ASCII mesh file, for efficiency this will actually
      * start wherever the file pointer currently is.  The user is responsible
@@ -465,7 +465,7 @@ public:
     NodeIterator GetNodeIteratorBegin();
 
     /**
-     * Return an iterator over a set of nodes whose indices are given
+     * @return an iterator over a set of nodes whose indices are given
      *
      * @param rIndices  subset of indices
      *
@@ -476,7 +476,7 @@ public:
     NodeIterator GetNodeIteratorBegin(const std::set<unsigned>& rIndices);
 
     /**
-     * Return an iterator to (one past the) end of the node data.
+     * @return an iterator to (one past the) end of the node data.
      */
     NodeIterator GetNodeIteratorEnd();
 };

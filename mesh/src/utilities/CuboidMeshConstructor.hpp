@@ -66,17 +66,17 @@ public:
     void Construct(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, unsigned meshRefinementNum, double meshWidth);
 
     /**
-     * Get the width of the mesh.
+     * @return the width of the mesh.
      */
     double GetWidth();
 
     /**
-     * Get the number of elements in the mesh.
+     * @return the number of elements in the mesh.
      */
     unsigned GetNumElements();
 
     /**
-     * Get the number of nodes in the mesh.
+     * @return the number of nodes in the mesh.
      */
     unsigned GetNumNodes();
 };

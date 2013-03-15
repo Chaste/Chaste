@@ -80,12 +80,12 @@ public:
     void RegisterCableElement(unsigned index);
 
     /**
-     * Get the number of cable elements.
+     * @return the number of cable elements.
      */
     unsigned GetNumCableElements() const;
 
     /**
-     * Get the number of cable elements on this process.
+     * @return the number of cable elements on this process.
      */
     unsigned GetNumLocalCableElements() const;
 
@@ -100,7 +100,7 @@ public:
     /**
      * Determine whether or not the current process owns node 0 of this cable element (tie breaker to determine which process writes
      * to file for when two or more share ownership of a cable element).
-     *
+     * @return true if designated owner
      * @param globalElementIndex is the global index of the cable element
      */
      bool CalculateDesignatedOwnershipOfCableElement( unsigned globalElementIndex );
@@ -112,7 +112,7 @@ public:
      typedef std::pair<NodeCableIterator, NodeCableIterator> CableRangeAtNode;
 
      /**
-      * Get the cables that are attached to the given node.
+      * @return the cables that are attached to the given node.
       *
       * @param pNode a node to find the adjoining cables of
       * @return the adjoining cables.
@@ -156,12 +156,12 @@ public:
     typedef typename std::vector<Element<1, SPACE_DIM> *>::const_iterator CableElementIterator;
 
     /**
-     * Return a pointer to the first boundary element in the mesh.
+     * @return a pointer to the first boundary element in the mesh.
      */
     CableElementIterator GetCableElementIteratorBegin() const;
 
     /**
-     * Return a pointer to *one past* the last boundary element in the mesh
+     * @return a pointer to *one past* the last boundary element in the mesh
      * (for consistency with STL iterators).
      */
     CableElementIterator GetCableElementIteratorEnd() const;

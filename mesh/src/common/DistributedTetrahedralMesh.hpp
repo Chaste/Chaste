@@ -149,52 +149,52 @@ public:
     virtual void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
 
     /**
-     * Get the number of nodes that are entirely owned by the local process.
+     * @return the number of nodes that are entirely owned by the local process.
      * (Does not include halo nodes).
      */
     unsigned GetNumLocalNodes() const;
 
     /**
-     * Get the number of nodes that are halo owned by the local process.
+     * @return the number of nodes that are halo owned by the local process.
      */
     unsigned GetNumHaloNodes() const;
 
     /**
-     * Get the number of Elements which are owned by this process (have at least one entirely
+     * @return the number of Elements which are owned by this process (have at least one entirely
      * locally-owned node).
      */
     unsigned GetNumLocalElements() const;
 
     /**
-     * Get the number of Boundary Elements which are owned by this process (have at least one entirely
+     * @return the number of Boundary Elements which are owned by this process (have at least one entirely
      * locally-owned node).
      */
     unsigned GetNumLocalBoundaryElements() const;
 
     /**
-     * Get the total number of nodes that are actually in use (globally).
+     * @return the total number of nodes that are actually in use (globally).
      */
     unsigned GetNumNodes() const;
 
     /**
-     * Get the total number of nodes that are actually in use (globally).
+     * @return the total number of nodes that are actually in use (globally).
      */
     unsigned GetNumAllNodes() const;
 
     /**
-     * Get the total number of elements that are actually in use (globally).
+     * @return the total number of elements that are actually in use (globally).
      */
     unsigned GetNumElements() const;
 
     /**
-     * Get the type of mesh partitioning that is being used...
+     * @return the type of mesh partitioning that is being used...
      *
      * serialization uses this method.
      */
     DistributedTetrahedralMeshPartitionType::type GetPartitionType() const;
 
     /**
-     * Get the total number of boundary elements that are actually in use (globally).
+     * @return the total number of boundary elements that are actually in use (globally).
      */
     unsigned GetNumBoundaryElements() const;
 
@@ -222,6 +222,7 @@ public:
      * Determine whether or not the current process owns node 0 of this element (tie breaker to determine which process writes
      * to file for when two or more share ownership of an element).
      *
+     * @return true if process is designated owner
      * @param elementIndex is the global index of the element
      */
     bool CalculateDesignatedOwnershipOfElement( unsigned elementIndex );
@@ -229,7 +230,7 @@ public:
     /**
      * Determine whether or not the current process owns node 0 of this boundary element (tie breaker to determine which process writes
      * to file for when two or more share ownership of a face).
-     *
+     * @return true if process is designated owner
      * @param faceIndex is the global index of the face
      */
     bool CalculateDesignatedOwnershipOfBoundaryElement( unsigned faceIndex );
@@ -280,7 +281,7 @@ public:
     virtual void Scale(const double xFactor=1.0, const double yFactor=1.0, const double zFactor=1.0);
 
     /**
-     * Returns the local pointer to a node which is
+     * @return the local pointer to a node which is
      * either owned or in the halo of this process.
      *
      * We first search halo node (as there are fewer),
@@ -315,6 +316,7 @@ protected:
      * Overridden solve node mapping method.
      *
      * @param index the global index of the node
+     * @return local index
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
@@ -322,6 +324,7 @@ protected:
      * Overridden solve element mapping method.
      *
      * @param index the global index of the element
+     * @return local index
      */
     unsigned SolveElementMapping(unsigned index) const;
 
@@ -329,6 +332,7 @@ protected:
      * Overridden solve boundary element mapping method.
      *
      * @param index the global index of the boundary element
+     * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 private:
@@ -416,12 +420,12 @@ public:
     typedef typename std::vector<Node<SPACE_DIM> *>::const_iterator HaloNodeIterator;
 
     /**
-     * Get an iterator to the first halo node in the mesh.
+     * @return an iterator to the first halo node in the mesh.
      */
     HaloNodeIterator GetHaloNodeIteratorBegin() const;
 
     /**
-     * Get an iterator to one past the last halo node in the mesh.
+     * @return an iterator to one past the last halo node in the mesh.
      */
     HaloNodeIterator GetHaloNodeIteratorEnd() const;
 };

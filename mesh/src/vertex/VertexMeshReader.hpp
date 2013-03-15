@@ -158,16 +158,16 @@ public:
     unsigned GetNumElementAttributes() const;
 
     /**
-     * Returns the number of faces in the mesh (synonym of GetNumEdges()).
+     * @return the number of faces in the mesh (synonym of GetNumEdges()).
      */
     unsigned GetNumFaces() const;
 
     /**
-     * Returns a vector of the nodes of each face in turn.
+     * @return a vector of the nodes of each face in turn.
      */
     ElementData GetNextFaceData();
 
-    /** Returns the number of edges in the mesh (synonym of GetNumFaces()) */
+    /** @return the number of edges in the mesh (synonym of GetNumFaces()) */
     unsigned GetNumEdges() const;
 
     /**

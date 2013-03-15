@@ -55,7 +55,7 @@ private:
      * TokenizeStringsToDoubles is specific to reading node data which came from
      * a Memfem file.
      * Each string is expected to be 3 doubles (representing x,y,z)
-     * Return value is a vector where each item is a vector of doubles which represents
+     * @return a vector where each item is a vector of doubles which represents
      * position.  Indices are implicit in the vector.
      *
      * @param rRawData  the node data to be read
@@ -70,7 +70,7 @@ private:
      *  ( 3 indices for a face, 4 for a tetrahedron)
      *  a region marker? (if it's an element)
      *  NB: Region markers are currently ignored.
-     * Return value is a vector where each item is a vector of ints which represents
+     * @return a vector where each item is a vector of ints which represents
      * indices of nodes.
      *
      * @param rRawData  the element or boundary face data to be read

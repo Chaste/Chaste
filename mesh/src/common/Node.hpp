@@ -218,12 +218,12 @@ public:
     void SetAsBoundaryNode(bool value=true);
 
     /**
-     * Get the node's location as a ChastePoint.
+     * @return the node's location as a ChastePoint.
      */
     ChastePoint<SPACE_DIM> GetPoint() const;
 
     /**
-     * Get the node's location as a c_vector.
+     * @return the node's location as a c_vector.
      *
      * The returned location may not be modified; if you want that functionality use
      * rGetModifiableLocation instead.
@@ -231,7 +231,7 @@ public:
     const c_vector<double, SPACE_DIM>& rGetLocation() const;
 
     /**
-     * Get the node's location as a c_vector.
+     * @return the node's location as a c_vector.
      *
      * If you modify the returned location,
      * Jacobian and JacobianDeterminant of elements need to be updated.
@@ -241,12 +241,12 @@ public:
     c_vector<double, SPACE_DIM>& rGetModifiableLocation();
 
     /**
-     * Get the index of this node in the mesh.
+     * @return the index of this node in the mesh.
      */
     unsigned GetIndex() const;
 
     /**
-     * Get whether this node is a boundary node.
+     * @return whether this node is a boundary node.
      */
     bool IsBoundaryNode() const;
 
@@ -279,17 +279,17 @@ public:
     void AddBoundaryElement(unsigned index);
 
     /**
-     * Return a set of indices of elements containing this node as a vertex.
+     * @return a set of indices of elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingElementIndices();
 
     /**
-     * Returns a vector containing the node attributes.
+     * @return a vector containing the node attributes.
      */
     std::vector<double>& rGetNodeAttributes();
 
     /**
-     * Reutrn the number of node attributes associated with this node.
+     * @return the number of node attributes associated with this node.
      */
     unsigned GetNumNodeAttributes();
 
@@ -299,22 +299,22 @@ public:
     bool HasNodeAttributes();
 
     /**
-     * Return a set of indices of boundary elements containing this node as a vertex.
+     * @return a set of indices of boundary elements containing this node as a vertex.
      */
     std::set<unsigned>& rGetContainingBoundaryElementIndices();
 
     /**
-     * Get the number of elements in the mesh that contain this node.
+     * @return the number of elements in the mesh that contain this node.
      */
     unsigned GetNumContainingElements() const;
 
     /**
-     * Get the number of boundary elements in the mesh that contain this node.
+     * @return the number of boundary elements in the mesh that contain this node.
      */
     unsigned GetNumBoundaryElements() const;
 
     /**
-     * Get the force applied to this node.
+     * @return the force applied to this node.
      */
     c_vector<double, SPACE_DIM>& rGetAppliedForce();
 
@@ -330,7 +330,7 @@ public:
     void AddAppliedForceContribution(c_vector<double, SPACE_DIM>& forceContribution);
 
     /**
-     * Identify whether this node is a particle or not
+     * @return whether this node is a particle or not
      */
     bool IsParticle();
 
@@ -341,7 +341,7 @@ public:
     void SetIsParticle(bool isParticle);
 
     /**
-     * Get the radius of this node.
+     * @return the radius of this node.
      */
     double GetRadius();
 
@@ -358,7 +358,7 @@ public:
     void MarkAsDeleted();
 
     /**
-     * Get whether the node is marked as deleted.
+     * @return whether the node is marked as deleted.
      */
     bool IsDeleted() const;
 
@@ -368,12 +368,12 @@ public:
     void MarkAsInternal();
 
     /**
-     * Get whether the node is internal (not vertex) in a quadratic element.
+     * @return whether the node is internal (not vertex) in a quadratic element.
      */
     bool IsInternal() const;
 
     /**
-     * Determine if a node lives within a flagged element.
+     * @return true if a node lives within a flagged element.
      *
      * @param rMesh the mesh containing the nodes and elements
      */
@@ -402,7 +402,7 @@ public:
     void SetRegion(unsigned region);
 
     /**
-     * Get the node's region ID.
+     * @return the node's region ID.
      * Defaults to 0 if no NodeAttributes have been setup.
      */
     unsigned GetRegion() const;
@@ -423,13 +423,14 @@ public:
         {}
         /**
          * Prefix dereference operator.
+         * @return reference
          */
         const unsigned& operator*() const
         {
             return *mIndexIterator;
         }
         /**
-         * Comparison not-equal-to.
+         * @return Comparison not-equal-to.
          *
          * @param rOther ContainingElementIterator with which comparison is made
          */
@@ -438,7 +439,7 @@ public:
             return mIndexIterator != rOther.mIndexIterator;
         }
         /**
-         * Comparison equal-to.
+         * @return Comparison equal-to.
          *
          * @param rOther ContainingElementIterator with which comparison is made
          */
@@ -448,6 +449,7 @@ public:
         }
         /**
          * Prefix increment operator.
+         * @return reference to incremented object
          */
         ContainingElementIterator& operator++()
         {
@@ -459,7 +461,7 @@ public:
     };
 
     /**
-     * Get a ContainingElementIterator pointing to the first containing element
+     * @return a ContainingElementIterator pointing to the first containing element
      */
     ContainingElementIterator ContainingElementsBegin() const
     {
@@ -467,7 +469,7 @@ public:
     }
 
     /**
-     * Get a ContainingElementIterator pointing to one past the last containing element
+     * @return a ContainingElementIterator pointing to one past the last containing element
      */
     ContainingElementIterator ContainingElementsEnd() const
     {
@@ -490,13 +492,14 @@ public:
         {}
         /**
          * Prefix dereference operator.
+         * @return reference
          */
         const unsigned& operator*() const
         {
             return *mIndexIterator;
         }
         /**
-         * Comparison not-equal-to.
+         * @return Comparison not-equal-to.
          *
          * @param rOther ContainingBoundaryElementIterator with which comparison is made
          */
@@ -505,7 +508,7 @@ public:
             return mIndexIterator != rOther.mIndexIterator;
         }
         /**
-         * Comparison equal-to.
+         * @return Comparison equal-to.
          *
          * @param rOther ContainingBoundaryElementIterator with which comparison is made
          */
@@ -515,6 +518,7 @@ public:
         }
         /**
          * Prefix increment operator.
+         * @return reference
          */
         ContainingBoundaryElementIterator& operator++()
         {
@@ -526,7 +530,7 @@ public:
     };
 
     /**
-     * Get a ContainingBoundaryElementIterator pointing to the first containing boundary element
+     * @return a ContainingBoundaryElementIterator pointing to the first containing boundary element
      */
     ContainingBoundaryElementIterator ContainingBoundaryElementsBegin() const
     {
@@ -534,7 +538,7 @@ public:
     }
 
     /**
-     * Get a ContainingBoundaryElementIterator pointing to one past the last containing boundary element
+     * @return a ContainingBoundaryElementIterator pointing to one past the last containing boundary element
      */
     ContainingBoundaryElementIterator ContainingBoundaryElementsEnd() const
     {

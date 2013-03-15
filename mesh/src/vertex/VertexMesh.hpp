@@ -95,6 +95,7 @@ protected:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the node
+     * @return local index
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
@@ -103,6 +104,7 @@ protected:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the element
+     * @return local index
      */
     unsigned SolveElementMapping(unsigned index) const;
 
@@ -111,6 +113,7 @@ protected:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the boundary element
+     * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
@@ -204,14 +207,14 @@ public:
     class VertexElementIterator;
 
     /**
-     * Get an iterator to the first element in the mesh.
+     * @return an iterator to the first element in the mesh.
      *
      * @param skipDeletedElements whether to include deleted element
      */
     inline VertexElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
 
     /**
-     * Get an iterator to one past the last element in the mesh.
+     * @return an iterator to one past the last element in the mesh.
      */
     inline VertexElementIterator GetElementIteratorEnd();
 
@@ -328,16 +331,15 @@ public:
     virtual void Clear();
 
     /**
-     * Given the global index of an element in the Voronoi mesh, returns the
-     * global index of the corresponding element in the Delaunay mesh.
-     *
+     * @return the global index of the corresponding element in the Delaunay mesh,
+     * given the global index of an element in the Voronoi mesh.
      * @param elementIndex global index of an element in the Voronoi mesh
      */
     unsigned GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(unsigned elementIndex);
 
     /**
-     * Given the global index of a node in the Delaunay mesh, returns the
-     * global index of the corresponding element in the Voronoi mesh or
+     * @return the global index of the corresponding element in the Voronoi
+     * mesh given the global index of a node in the Delaunay mesh,  or
      * throws an exception if this does not exist.
      *
      * @param nodeIndex global index of a node in the Delaunay mesh
@@ -444,7 +446,7 @@ public:
     virtual c_vector<double, 3> CalculateMomentsOfElement(unsigned index);
 
     /**
-     * Get the length of the edge separating two given elements in 2D.
+     * @return the length of the edge separating two given elements in 2D.
      *
      * @param elementIndex1 index of an element in the mesh
      * @param elementIndex2 index of an element in the mesh
@@ -547,25 +549,27 @@ public:
     public:
         /**
          * Dereference the iterator giving you a *reference* to the current element.
-         *
+         * @return reference
          * Make sure to use a reference for the result to avoid copying elements unnecessarily.
          */
         inline VertexElement<ELEMENT_DIM, SPACE_DIM>& operator*();
 
         /**
          * Member access from a pointer.
+         * @return pointer
          */
         inline VertexElement<ELEMENT_DIM, SPACE_DIM>* operator->();
 
         /**
          * Comparison not-equal-to.
-         *
+         * @return true if not equal
          * @param rOther iterator with which comparison is made
          */
         inline bool operator!=(const VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator& rOther);
 
         /**
          * Prefix increment operator.
+         * @return reference to incremented object
          */
         inline VertexElementIterator& operator++();
 
@@ -595,11 +599,13 @@ public:
 
         /**
          * Helper method to say when we're at the end.
+         * @return true if at end
          */
         inline bool IsAtEnd();
 
         /**
          * Helper method to say if we're allowed to point at this element.
+         * @return true if allowed
          */
         inline bool IsAllowedElement();
     };

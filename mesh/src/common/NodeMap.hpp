@@ -88,26 +88,26 @@ public:
     void SetDeleted(unsigned index);
 
     /**
-     * Get whether a given old index is marked as 'deleted'.
+     * @return whether a given old index is marked as 'deleted'.
      *
      * @param index  the old index of a node
      */
     bool IsDeleted(unsigned index);
 
     /**
-     * Get the new index associated with a given old index.
+     * @return the new index associated with a given old index.
      *
      * @param oldIndex  the old index of a node
      */
     unsigned GetNewIndex(unsigned oldIndex) const;
 
     /**
-     * Get whether the NodeMap is the identity map.
+     * @return whether the NodeMap is the identity map.
      */
     bool IsIdentityMap();
 
     /**
-     * Get the size of the NodeMap.
+     * @return the size of the NodeMap.
      */
     unsigned Size();
 

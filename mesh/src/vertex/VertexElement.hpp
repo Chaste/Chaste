@@ -145,7 +145,7 @@ public:
     ~VertexElement();
 
     /**
-     * Get the number of faces owned by this element.
+     * @return the number of faces owned by this element.
      */
     unsigned GetNumFaces() const;
 
@@ -164,7 +164,7 @@ public:
     VertexElement<ELEMENT_DIM-1, SPACE_DIM>* GetFace(unsigned index) const;
 
     /**
-     * Get whether the face with a given index is oriented clockwise.
+     * @return whether the face with a given index is oriented clockwise.
      *
      * @param index the index of the face
      */
@@ -196,7 +196,7 @@ public:
     VertexElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes);
 
     /**
-     * Get the number of faces owned by this element.
+     * @return the number of faces owned by this element.
      */
     unsigned GetNumFaces() const;
 
@@ -208,7 +208,7 @@ public:
     VertexElement<0, SPACE_DIM>* GetFace(unsigned index) const;
 
     /**
-     * Get whether the face with a given index is oriented clockwise.
+     * @return whether the face with a given index is oriented clockwise.
      *
      * @param index the index of the face
      */

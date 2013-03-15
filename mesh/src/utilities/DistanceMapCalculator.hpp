@@ -152,7 +152,7 @@ public:
     void ComputeDistanceMap(const std::vector<unsigned>& rSourceNodeIndices,
                             std::vector<double>& rNodeDistances);
     /**
-     *  Calculates a single point-to-point distance
+     *  @return calculated single point-to-point distance
      *
      *  @param sourceNodeIndex node index for source of distance computation.  Calculations will be cached so
      *  that multiple point-to-point distance computations will get faster.

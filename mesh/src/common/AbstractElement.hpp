@@ -128,7 +128,7 @@ public:
     virtual void RegisterWithNodes()=0;
 
     /**
-     * Get a single component of the location in space of one of the nodes
+     * @return a single component of the location in space of one of the nodes
      * in this element.
      *
      * @param localIndex  the index of the node to query, in [0,N) where N
@@ -138,7 +138,7 @@ public:
     double GetNodeLocation(unsigned localIndex, unsigned dimension) const;
 
     /**
-     * Get the location in space of one of the nodes in this element.
+     * @return the location in space of one of the nodes in this element.
      *
      * @param localIndex  the index of the node to query, in [0,N) where N
      *   is the number of nodes in this element.
@@ -163,7 +163,7 @@ public:
     Node<SPACE_DIM>* GetNode(unsigned localIndex) const;
 
     /**
-     * Get the number of nodes owned by this element.
+     * @return the number of nodes owned by this element.
      */
     unsigned GetNumNodes() const;
 
@@ -182,7 +182,7 @@ public:
     bool IsDeleted() const;
 
     /**
-     *  Get the index of this element
+     *  @return the index of this element
      */
     unsigned GetIndex() const;
 
@@ -194,7 +194,7 @@ public:
     void SetIndex(unsigned index);
 
     /**
-     * Get whether the current process owns this element.
+     * @return whether the current process owns this element.
      */
     bool GetOwnership() const;
 
@@ -216,7 +216,7 @@ public:
     void Unflag();
 
     /**
-     * Get whether the element is flagged.
+     * @return whether the element is flagged.
      */
     bool IsFlagged() const;
 
@@ -228,7 +228,7 @@ public:
     void SetAttribute(double attribute);
 
     /**
-     * Get the element's attribute value
+     * @return the element's attribute value
      */
     double GetAttribute();
 
