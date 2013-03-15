@@ -135,7 +135,7 @@ public:
     static std::string GetArchiveRelativePath();
 
     /**
-     * Get whether the directory provided is relative to CHASTE_TEST_OUTPUT.
+     * @return true if the directory provided is relative to CHASTE_TEST_OUTPUT.
      */
     static bool GetIsDirRelativeToChasteTestOutput();
 };

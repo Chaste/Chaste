@@ -93,7 +93,7 @@ public:
     ~ArchiveOpener();
 
     /**
-     * Get the main archive for replicated data.
+     * @return the main archive for replicated data.
      */
     Archive* GetCommonArchive()
     {

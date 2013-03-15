@@ -142,7 +142,7 @@ public:
                                              double timeStep);
 
     /**
-     * Determine whether the solver quit due to the ODE's stopping event
+     * @return true if the solver quit due to the ODE's stopping event
      * triggering
      */
     bool StoppingEventOccurred();
@@ -150,7 +150,7 @@ public:
     /**
      * Get the stopping time for the solver.
      *
-     * @return mStoppingTime.
+     * @return #mStoppingTime.
      */
     double GetStoppingTime();
 

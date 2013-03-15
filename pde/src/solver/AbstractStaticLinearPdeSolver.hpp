@@ -64,6 +64,7 @@ public:
      * Static solve method.
      *
      * @param initialGuess optional initial guess for passing into the linear solve method
+     * @return the solution vector
      */
     Vec Solve(Vec initialGuess=NULL);
 };

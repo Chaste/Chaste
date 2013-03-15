@@ -99,7 +99,7 @@ public:
     /**
      * Get the number of times the ODE solver has been called.
      *
-     * @return mCallCount.
+     * @return #mCallCount.
      */
     unsigned GetCallCount();
 

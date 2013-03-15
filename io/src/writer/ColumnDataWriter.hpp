@@ -225,7 +225,7 @@ public:
     virtual void Close();
 
     /**
-     * Return the full pathname of the directory where we're writing files.
+     * @return the full pathname of the directory where we're writing files.
      */
     std::string GetOutputDirectory();
 };

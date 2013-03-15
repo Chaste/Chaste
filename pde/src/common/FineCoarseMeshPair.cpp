@@ -446,17 +446,17 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
     }
 }
 
-/**
- * \todo: could possibly merge with ComputeFineElementAndWeightForGivenPoint(). Differences
- * between the methods are: the other method uses fine mesh and fine mesh box, computes
- * weights as well (and sets the element and weight in the vec), rather than returning the
- * element, and that method saves information in mStatisticsCounters.
- */
 template<unsigned DIM>
 unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<DIM>& rPoint,
                                                                     bool safeMode,
                                                                     unsigned boxForThisPoint)
 {
+    /**
+     * \todo: could possibly merge with ComputeFineElementAndWeightForGivenPoint(). Differences
+     * between the methods are: the other method uses fine mesh and fine mesh box, computes
+     * weights as well (and sets the element and weight in the vec), rather than returning the
+     * element, and that method saves information in mStatisticsCounters.
+     */
     std::set<unsigned> test_element_indices;
     CollectElementsInContainingBox(mpCoarseMeshBoxCollection, boxForThisPoint, test_element_indices);
 

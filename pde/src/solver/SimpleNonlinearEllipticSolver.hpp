@@ -51,7 +51,7 @@ private:
     AbstractNonlinearEllipticPde<SPACE_DIM>* mpNonlinearEllipticPde;
 
     /**
-     * This method returns the matrix to be added to element stiffness matrix
+     * @return the matrix to be added to element stiffness matrix
      * for a given Gauss point. The arguments are the bases, bases gradients,
      * x and current solution computed at the Gauss point. The returned matrix
      * will be multiplied by the Gauss weight and Jacobian determinant and
@@ -73,7 +73,7 @@ private:
         Element<ELEMENT_DIM,SPACE_DIM>* pElement);
 
     /**
-     * This method returns the vector to be added to element stiffness vector
+     * @return the vector to be added to element stiffness vector
      * for a given Gauss point. The arguments are the bases,
      * x and current solution computed at the Gauss point. The returned vector
      * will be multiplied by the Gauss weight and Jacobian determinant and

@@ -79,6 +79,7 @@ protected:
      *      EXCEPTION(DumpState("Gating variable out of range"));
      *
      * @param rMessage  the exception message
+     * @return an augmented message which includes the values of the internal state variables
      */
     std::string DumpState(const std::string& rMessage);
 
@@ -89,6 +90,7 @@ protected:
      *
      * @param rMessage  the exception message
      * @param Y  the values of the state variables
+     * @return an augmented message which includes the values of the state variables from Y
      */
     std::string DumpState(const std::string& rMessage,
                           VECTOR Y);
@@ -118,12 +120,12 @@ public:
     //
 
     /**
-     * Get the values of the state variables in the ODE system.
+     * @return the values of the state variables in the ODE system.
      */
     VECTOR& rGetStateVariables();
 
     /**
-     * Get a copy of the state variable vector.
+     * @return a copy of the state variable vector.
      * Caller takes responsibility for deleting the returned vector (if required for the VECTOR type).
      */
     VECTOR GetStateVariables();
@@ -137,14 +139,14 @@ public:
     void SetStateVariables(const VECTOR& rStateVariables);
 
     /**
-     * Get the value of a given state variable.
+     * @return the value of a given state variable.
      *
      * @param index the index of the state variable
      */
     double GetStateVariable(unsigned index) const;
 
     /**
-     * Get the value of a given state variable.
+     * @return the value of a given state variable.
      *
      * @param rName the name of the state variable
      */
@@ -209,7 +211,7 @@ public:
     void SetDefaultInitialCondition(unsigned index, double initialCondition);
 
     /**
-     * Get the default initial conditions for this system.
+     * @return the default initial conditions for this system.
      *
      * @note Returns a fresh vector, which the caller should delete if appropriate for the type.
      */
@@ -225,14 +227,14 @@ public:
     //
 
     /**
-     * Get the value of a given parameter.
+     * @return the value of a given parameter.
      *
      * @param index the index of the parameter
      */
     double GetParameter(unsigned index) const;
 
     /**
-     * Get the value of a given parameter.
+     * @return the value of a given parameter.
      *
      * @param rName the name of the parameter
      */
@@ -259,7 +261,7 @@ public:
     //
 
     /**
-     * Get the value of a variable, whether a state variable, parameter,
+     * @return the value of a variable, whether a state variable, parameter,
      * or derived quantity.
      *
      * Note that if the variable is a derived quantity, this method will compute
@@ -275,7 +277,7 @@ public:
                           VECTOR* pDerivedQuantities=NULL);
 
     /**
-     * Get the value of a variable, whether a state variable, parameter,
+     * @return the value of a variable, whether a state variable, parameter,
      * or derived quantity.
      *
      * Note that if the variable is a derived quantity, this method will compute
@@ -318,6 +320,7 @@ public:
      *
      * @param time  the time at which to compute the derived quantities
      * @param rState  values for the state variables
+     * @return a VECTOR of derived quantities
      */
     virtual VECTOR ComputeDerivedQuantities(double time,
                                             const VECTOR& rState);
@@ -326,6 +329,7 @@ public:
      * Compute the derived quantities based on the current system state.
      *
      * @param time  the time at which to compute the derived quantities
+     * @return a VECTOR of derived quantities
      */
     VECTOR ComputeDerivedQuantitiesFromCurrentState(double time);
 };

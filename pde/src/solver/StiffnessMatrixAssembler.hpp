@@ -62,6 +62,7 @@ public:
      * @param rU The unknown as a vector, u(i) = u_i.
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
+     * @return computed stencil matrix
      */
     c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)>
         ComputeMatrixTerm(

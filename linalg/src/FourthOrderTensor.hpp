@@ -56,7 +56,7 @@ private:
 
     std::vector<double> mData;  /**< The components of the tensor. */
 
-    /** Get the index into the mData vector corresponding to this set of indices
+    /** @return the index into the mData vector corresponding to this set of indices
       * @param M  first index
       * @param N  second index
       * @param P  third index
@@ -124,7 +124,7 @@ public:
     void SetAsContractionOnFourthDimension(const c_matrix<double,DIM4,CONTRACTED_DIM>& rMatrix, FourthOrderTensor<DIM1,DIM2,DIM3,CONTRACTED_DIM>& rTensor);
 
     /**
-     * Access the MNPQ-component of the tensor.
+     * @return the MNPQ-component of the tensor.
      *
      * @param M  first index
      * @param N  second index
@@ -139,7 +139,7 @@ public:
     void Zero();
 
     /**
-     * Get a reference to the internal data of the tensor.
+     * @return a reference to the internal data of the tensor.
      */
     std::vector<double>& rGetData()
     {

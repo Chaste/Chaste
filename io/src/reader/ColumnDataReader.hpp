@@ -131,14 +131,14 @@ public:
                      const std::string& rBaseName);
 
     /**
-     * Get the entries for a given variable.
+     * @return the entries for a given variable.
      *
      * @param rVariableName
      */
     std::vector<double> GetValues(const std::string& rVariableName);
 
     /**
-     * Get the entries for a given variable with fixed dimension.
+     * @return the entries for a given variable with fixed dimension.
      *
      * @param rVariableName
      * @param fixedDimension
@@ -146,19 +146,19 @@ public:
     std::vector<double> GetValues(const std::string& rVariableName, int fixedDimension);
 
     /**
-     * Get the entries for a given variable with unlimited dimension.
+     * @return the entries for a given variable with unlimited dimension.
      */
     std::vector<double> GetUnlimitedDimensionValues();
 
     /**
-     * Determine whether the data file has entries for a given variable.
+     * @return true if the data file has entries for a given variable.
      *
      * @param rVariableName
      */
     bool HasValues(const std::string& rVariableName);
 
     /**
-     *  Get the field width (the number of characters (excl. preceding '+' or '-') printed for each data entry in the file).
+     *  @return the field width (the number of characters (excl. preceding '+' or '-') printed for each data entry in the file).
      */
     unsigned GetFieldWidth();
 };

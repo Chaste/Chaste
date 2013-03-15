@@ -123,12 +123,12 @@ public:
     MutableMesh<2,2>* GetCircularMesh(double radius);
 
     /**
-     * @return mDomainDepth
+     * @return #mDomainDepth
      */
     double GetDomainDepth();
 
     /**
-     * @return mDomainWidth
+     * @return #mDomainWidth
      */
     double GetDomainWidth();
 };

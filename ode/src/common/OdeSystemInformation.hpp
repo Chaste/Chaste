@@ -80,6 +80,7 @@ protected:
     OdeSystemInformation(const OdeSystemInformation<ODE_SYSTEM>&);
 
     /**
+     * @return reference to this object (as language convention)
      * Overloaded assignment operator.
      */
     OdeSystemInformation& operator= (const OdeSystemInformation<ODE_SYSTEM>&);
@@ -104,7 +105,7 @@ void OdeSystemInformation<MyNewOdeSystem>::Initialise()
 public:
 
     /**
-     * Return a pointer to the singleton instance, creating it if necessary.
+     * @return a pointer to the singleton instance, creating it if necessary.
      */
     static boost::shared_ptr<OdeSystemInformation<ODE_SYSTEM> > Instance();
 

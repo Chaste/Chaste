@@ -93,12 +93,12 @@ public:
                                     double distance=1e-5);
 
     /**
-     * @return mCentreOfSphere.
+     * @return #mCentreOfSphere.
      */
     const c_vector<double, DIM>& rGetCentreOfSphere() const;
 
     /**
-     * @return mRadiusOfSphere.
+     * @return #mRadiusOfSphere.
      */
     double GetRadiusOfSphere() const;
 

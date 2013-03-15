@@ -66,7 +66,7 @@ private:
 public:
 
     /**
-     * Get the value of the boundary condition at a given point.
+     * @return the value of the boundary condition at a given point.
      *
      * @param rX The point at which to evaluate the boundary condition
      */

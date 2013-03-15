@@ -120,17 +120,17 @@ public:
     virtual ~AbstractOdeSystemInformation();
 
     /**
-     * Get the name of this system of ODEs.
+     * @return the name of this system of ODEs.
      */
     std::string GetSystemName() const;
 
     /**
-     * Get the name of the free variable in this system of ODEs.
+     * @return the name of the free variable in this system of ODEs.
      */
     std::string GetFreeVariableName() const;
 
     /**
-     * Get the units of the free variable in this system of ODEs.
+     * @return the units of the free variable in this system of ODEs.
      */
     std::string GetFreeVariableUnits() const;
 
@@ -152,17 +152,17 @@ public:
     void SetDefaultInitialCondition(unsigned index, double initialCondition);
 
     /**
-     * Get a copy of the suggested initial conditions.
+     * @return a copy of the suggested initial conditions.
      */
     std::vector<double> GetInitialConditions() const;
 
     /**
-     * Get the state variable names vector.
+     * @return the state variable names vector.
      */
     const std::vector<std::string>& rGetStateVariableNames() const;
 
     /**
-     * Get the state variable units vector.
+     * @return the state variable units vector.
      */
     const std::vector<std::string>& rGetStateVariableUnits() const;
 
@@ -188,7 +188,7 @@ public:
     bool HasStateVariable(const std::string& rName) const;
 
     /**
-     * Get the units of a state variable given its index in the ODE system.
+     * @return the units of a state variable given its index in the ODE system.
      *
      * @param index  a state variable's position within the vector of
      *               state variables associated with the ODE system.
@@ -197,12 +197,12 @@ public:
     std::string GetStateVariableUnits(unsigned index) const;
 
     /**
-     * Get the vector of parameter names.
+     * @return the vector of parameter names.
      */
     const std::vector<std::string>& rGetParameterNames() const;
 
     /**
-     * Get the vector of parameter units.
+     * @return the vector of parameter units.
      */
     const std::vector<std::string>& rGetParameterUnits() const;
 
@@ -242,7 +242,7 @@ public:
     unsigned GetNumberOfParameters() const;
 
     /**
-     * Get the index of a variable, whether a state variable, parameter,
+     * @return the index of a variable, whether a state variable, parameter,
      * or derived quantity, with the given name.  The returned index is
      * suitable for use with GetAnyVariableUnits.
      *
@@ -273,17 +273,17 @@ public:
     std::string GetAnyVariableUnits(unsigned index) const;
 
     /**
-     * Get the vector of derived quantity names.
+     * @return the vector of derived quantity names.
      */
     const std::vector<std::string>& rGetDerivedQuantityNames() const;
 
     /**
-     * Get the vector of derived quantity units.
+     * @return the vector of derived quantity units.
      */
     const std::vector<std::string>& rGetDerivedQuantityUnits() const;
 
     /**
-     * Get the index of a derived quantity, given its name.
+     * @return the index of a derived quantity, given its name.
      *
      * @param rName  the name of a derived quantity.
      */
@@ -322,13 +322,13 @@ public:
     unsigned GetNumberOfAttributes() const;
 
     /**
-     * Test whether this system has a particular named attribute.
+     * @return true if this system has a particular named attribute.
      * @param rName  the attribute name.
      */
     bool HasAttribute(const std::string& rName) const;
 
     /**
-     * Get the value of a named attribute.
+     * @return the value of a named attribute.
      * @param rName  the attribute name.
      */
     double GetAttribute(const std::string& rName) const;

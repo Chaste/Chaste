@@ -86,6 +86,8 @@ protected:
 
     /**
      * Overloaded assignment operator.  Not defined.
+     * @return reference to this object (as language convention)
+     *
      */
     CombinedOdeSystemInformation& operator= (const CombinedOdeSystemInformation&);
 
@@ -98,7 +100,7 @@ protected:
 public:
 
     /**
-     * Return a pointer to the singleton instance, creating it if necessary.
+     * @return a pointer to the singleton instance, creating it if necessary.
      *
      * @param rSubsystems  the ODE systems used to construct the system we are providing information about.
      */

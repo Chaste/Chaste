@@ -70,7 +70,7 @@ private:
     static CommandLineArguments* mpInstance;
 
     /**
-     * Get the index for the given argument. Returns -1 if the argument is not found.
+     * @return the index for the given argument. Returns -1 if the argument is not found.
      *
      * @param argument  the argument name as a string.
      * @return the position of the argument in the list (indexed from 1)
@@ -78,7 +78,7 @@ private:
     int GetIndexForArgument(std::string argument);
 
     /**
-     * Get the number of arguments for a given option. Throws an Exception if the
+     * @return the number of arguments for a given option. Throws an Exception if the
      * option does not have any following arguments, or the option does not exist.
      * So you can use OptionExists() to avoid Exceptions in your code when using the other public methods.
      *
@@ -102,19 +102,19 @@ public:
     /** The arguments themselves. */
     char*** p_argv;
 
-    /** Get the single instance of this class. */
+    /** @return the single instance of this class. */
     static CommandLineArguments* Instance();
 
 
     /**
-     * Check whether a given option exists in the command line arguments.
+     * @return true if a given option exists in the command line arguments.
      *
      * @param option  the option name as a string.
      */
     bool OptionExists(std::string option);
 
     /**
-     * Get the value for a given option, i.e. the argument after the option name in
+     * @return the value for a given option, i.e. the argument after the option name in
      * the list of command line arguments. For example, if the following arguments
      * were given
      *  ./heart/build/debug/TestMyClassRunner -timestep 0.04
@@ -130,7 +130,7 @@ public:
     char* GetValueCorrespondingToOption(std::string option, int valueNumber=1);
 
     /**
-     * Get the double for a given option.
+     * @return the double for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to a double.
      *
@@ -140,7 +140,7 @@ public:
     double GetDoubleCorrespondingToOption(std::string option, int valueNumber=1);
 
     /**
-     * Get the int for a given option.
+     * @return the int for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to an int.
      *
@@ -150,7 +150,7 @@ public:
     int GetIntCorrespondingToOption(std::string option, int valueNumber=1);
 
     /**
-     * Get the unsigned for a given option.
+     * @return the unsigned for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to an unsigned.
      * Throws an exception if the option converts to a negative integer.
@@ -161,7 +161,7 @@ public:
     unsigned GetUnsignedCorrespondingToOption(std::string option, int valueNumber=1);
 
     /**
-     * Get the string for a given option.
+     * @return the string for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to a std::string.
      *
@@ -171,7 +171,7 @@ public:
     std::string GetStringCorrespondingToOption(std::string option, int valueNumber=1);
 
     /**
-     * Get a collection of strings for a given option (useful for inputting a list of files for example).
+     * @return a collection of strings for a given option (useful for inputting a list of files for example).
      *
      * This uses GetStringCorrespondingToOption repeatedly.
      *
@@ -180,7 +180,7 @@ public:
     std::vector<std::string> GetStringsCorrespondingToOption(std::string option);
 
     /**
-     * Get a collection of doubles for a given option.
+     * @return a collection of doubles for a given option.
      *
      * This uses GetDoubleCorrespondingToOption repeatedly.
      *
@@ -189,7 +189,7 @@ public:
     std::vector<double> GetDoublesCorrespondingToOption(std::string option);
 
     /**
-     * Get a collection of ints for a given option.
+     * @return a collection of ints for a given option.
      *
      * This uses GetIntCorrespondingToOption repeatedly.
      *
@@ -198,7 +198,7 @@ public:
     std::vector<int> GetIntsCorrespondingToOption(std::string option);
 
     /**
-     * Get a collection of unsigneds for a given option.
+     * @return a collection of unsigneds for a given option.
      *
      * This uses GetUnsignedCorrespondingToOption repeatedly.
      *

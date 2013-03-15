@@ -77,7 +77,7 @@ public:
                           GaussianQuadratureRule<DIM>& rQuadRule);
 
     /**
-     * Access the stored quadrature point by element index and quad index in the element.
+     * @return a stored quadrature point by element index and quad index in the element.
      *
      * @param elementIndex
      * @param quadIndex
@@ -85,19 +85,19 @@ public:
     c_vector<double,DIM>& rGet(unsigned elementIndex, unsigned quadIndex);
 
     /**
-     * Get the i-th stored quadrature point.
+     * @return the i-th stored quadrature point.
      *
      * @param i
      */
     c_vector<double,DIM>& rGet(unsigned i);
 
-    /** Number of elements in the mesh that was given in the constructor */
+    /** @return number of elements in the mesh that was given in the constructor */
     unsigned GetNumElements() const;
 
-    /** Number of quad points per element in the rule that was given in the constructor */
+    /** @return number of quad points per element in the rule that was given in the constructor */
     unsigned GetNumQuadPointsPerElement() const;
 
-    /** Total size, ie total number of quad points, i.e. num_elem times num_quad_points_per_elem */
+    /** @return total size, i.e. total number of quad points, i.e. num_elem times num_quad_points_per_elem */
     unsigned Size() const;
 };
 

@@ -134,7 +134,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef SERIALIZATIONEXPORTWRAPPER_HPP_
+/** \cond */
 #define SERIALIZATIONEXPORTWRAPPER_HPP_
+/** \endcond */
 // Code in the next block is only compiled when the .hpp is first seen
 
 ////////////////////////////////////////////////////////////////////////////////

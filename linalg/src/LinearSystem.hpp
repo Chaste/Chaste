@@ -417,7 +417,7 @@ public:
 
     /**
      * Solve the linear system.
-     *
+     * @return the solution vector
      * @param lhsGuess  an optional initial guess for the solution (defaults to NULL)
      */
     Vec Solve(Vec lhsGuess=NULL);
@@ -439,7 +439,7 @@ public:
     void AddToRhsVectorElement(PetscInt row, double value);
 
     /**
-     * Get method for mSize.
+     * @return #mSize.
      */
     unsigned GetSize() const;
 
@@ -465,32 +465,32 @@ public:
     void RemoveNullSpace();
 
     /**
-     * Get access to the RHS vector directly. Shouldn't generally need to be called.
+     * @return access to the RHS vector directly. Shouldn't generally need to be called.
      */
     Vec& rGetRhsVector();
 
     /**
-     * Get access to the RHS vector for archiving
+     * @return access to the RHS vector for archiving
      */
     Vec GetRhsVector() const;
 
     /**
-     * Get access to the LHS matrix directly. Shouldn't generally need to be called.
+     * @return access to the LHS matrix directly. Shouldn't generally need to be called.
      */
     Mat& rGetLhsMatrix();
 
     /**
-     * Get access to the LHS matrix for archiving
+     * @return access to the LHS matrix for archiving
      */
     Mat GetLhsMatrix() const;
 
     /**
-     * Get access to the matrix used for preconditioning.
+     * @return access to the matrix used for preconditioning.
      */
     Mat& rGetPrecondMatrix();
 
     /**
-     * Get access to the dirichlet boundary conditions vector.
+     * @return access to the dirichlet boundary conditions vector.
      *
      * Should only be used by the BoundaryConditionsContainer.
      */
@@ -498,7 +498,7 @@ public:
 
     // DEBUGGING CODE:
     /**
-     * Get this process's ownership range of the contents of the system.
+     * @return this process's ownership range of the contents of the system.
      *
      * @param lo  lowest index owned by this process
      * @param hi  highest index owned by this process
@@ -506,7 +506,7 @@ public:
     void GetOwnershipRange(PetscInt& lo, PetscInt& hi);
 
     /**
-     * Return an element of the matrix.
+     * @return an element of the matrix.
      * May only be called for elements you own.
      *
      * @param row  the row index
@@ -515,7 +515,7 @@ public:
     double GetMatrixElement(PetscInt row, PetscInt col);
 
     /**
-     * Return an element of the RHS vector.
+     * @return an element of the RHS vector.
      * May only be called for elements you own.
      *
      * @param row  the row index
@@ -523,7 +523,7 @@ public:
     double GetRhsVectorElement(PetscInt row);
 
     /**
-     * Return the number of iterations taken by the last Solve()
+     * @return the number of iterations taken by the last Solve()
      */
     unsigned GetNumIterations() const;
 

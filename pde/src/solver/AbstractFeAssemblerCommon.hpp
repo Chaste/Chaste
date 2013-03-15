@@ -82,7 +82,7 @@ protected:
     ReplicatableVector mCurrentSolutionOrGuessReplicated;
 
     /**
-     * Useful inline function for getting an entry from the current solution vector.
+     * @return an entry from the solution vector.
      *
      * @param nodeIndex node index
      * @param indexOfUnknown index of unknown

@@ -244,7 +244,7 @@ public:
     virtual unsigned GetMaximumNodeIndex();
 
     /**
-     * @return mMaxInteractionDistance
+     * @return #mMaxInteractionDistance
      */
     double GetMaximumInteractionDistance();
 

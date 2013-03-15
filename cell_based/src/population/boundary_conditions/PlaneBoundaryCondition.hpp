@@ -91,12 +91,12 @@ public:
                            c_vector<double, DIM> normal);
 
     /**
-     * @return mPointOnPlane.
+     * @return #mPointOnPlane.
      */
     const c_vector<double, DIM>& rGetPointOnPlane() const;
 
     /**
-     * @return mNormalToPlane.
+     * @return #mNormalToPlane.
      */
     const c_vector<double, DIM>& rGetNormalToPlane() const;
 

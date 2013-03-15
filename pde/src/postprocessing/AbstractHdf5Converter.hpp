@@ -109,7 +109,7 @@ public:
     ~AbstractHdf5Converter();
 
     /**
-     * Get the relative path of the subdirectory in which the converted output is stored.
+     * @return the relative path of the subdirectory in which the converted output is stored.
      */
     std::string GetSubdirectory();
 };

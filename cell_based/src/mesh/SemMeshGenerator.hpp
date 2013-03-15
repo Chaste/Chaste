@@ -93,7 +93,7 @@ public:
     /**
      * Return the calculated equilibrium distance between two nodes.
      *
-     * @return mNodeEquilibriumDistance
+     * @return #mNodeEquilibriumDistance
      */
     double GetEquilibriumDistance();
 

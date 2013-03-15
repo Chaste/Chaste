@@ -66,7 +66,7 @@ public:
     virtual ~Identifiable();
 
     /**
-     * Return the unique identifier of the concrete class.
+     * @return the unique identifier of the concrete class.
      *
      * This method uses Boost's serialization's extended_type_info and returns
      * the identifier of the derived class (this is defined when the macro
@@ -81,6 +81,7 @@ public:
 private:
 
     /**
+     * @return a name which is suitable for use as an XML element name
      * Templated classes get Boost Serialization export keys that look like
      * "pack<void (NameOfDerivedType< DIM >)>::type".
      * This method converts it to a nice name suitable for use as an XML element name,

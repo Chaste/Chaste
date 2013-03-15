@@ -54,14 +54,14 @@ class AbstractNonlinearEllipticPde
 public:
 
     /**
-     * Compute linear source term.
+     * @return computed linear source term.
      *
      * @param rX the point in space at which the linear source term is computed
      */
     virtual double ComputeLinearSourceTerm(const ChastePoint<SPACE_DIM>& rX)=0;
 
     /**
-     * Compute nonlinear source term.
+     * @return computed nonlinear source term.
      *
      * @param rX the point in space at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the point
@@ -69,7 +69,7 @@ public:
     virtual double ComputeNonlinearSourceTerm(const ChastePoint<SPACE_DIM>& rX, double u)=0;
 
     /**
-     * Compute diffusion term. The diffusion tensor should be symmetric and positive definite.
+     * @return computed diffusion term. The diffusion tensor should be symmetric and positive definite.
      *
      * @param rX the point in space at which the diffusion term is computed.
      * @param u the value of the dependent variable at the point
@@ -77,7 +77,7 @@ public:
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX, double u)=0;
 
     /**
-     * Compute derivative of diffusion term.
+     * @return computed derivative of diffusion term.
      *
      * @param rX the point in space at which the diffusion term is computed.
      * @param u the value of the dependent variable at the point
@@ -85,7 +85,7 @@ public:
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTermPrime(const ChastePoint<SPACE_DIM>& rX, double u)=0;
 
     /**
-     * Compute derivative of nonlinear source term.
+     * @return computed derivative of nonlinear source term.
      *
      * @param rX the point in space at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the point

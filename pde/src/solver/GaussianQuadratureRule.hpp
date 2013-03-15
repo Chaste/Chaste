@@ -81,14 +81,14 @@ public:
     const ChastePoint<ELEMENT_DIM>& rGetQuadPoint(unsigned index) const;
 
     /**
-     * Get the weight associated with a quadrature point.
+     * @return the weight associated with a quadrature point.
      *
      * @param index The index of the point to return.
      */
     double GetWeight(unsigned index) const;
 
     /**
-     * Get the number of quadrature points. This is the number of points in
+     * @return the number of quadrature points. This is the number of points in
      * each dimension, raised to the power of the number of dimensions.
      */
     unsigned GetNumQuadPoints() const;

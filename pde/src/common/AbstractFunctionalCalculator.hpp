@@ -63,7 +63,7 @@ private:
     ReplicatableVector mSolutionReplicated;
 
     /**
-     * Get the integrand. Must be defined by the user.
+     * @return the integrand. Must be defined by the user.
      *
      * @param rX The point in space
      * @param rU The unknown as a vector, u(i) = u_i
@@ -91,7 +91,7 @@ public:
     }
 
     /**
-     * Calculate the integral over the given mesh, using the given solution
+     * @return calculated integral over the given mesh, using the given solution
      * vector on the mesh.
      *
      * Note that, in parallel, this method uses a collective reduction step and
@@ -103,7 +103,7 @@ public:
     double Calculate(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh, Vec solution);
 
     /**
-     * Compute the contribution to the integral from one element.
+     * @return computed the contribution to the integral from one element.
      *
      * @param rElement The element
      */

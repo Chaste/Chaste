@@ -183,7 +183,8 @@ public:
      * negative.
      *
      * After each timestep the solver will call this method on the ODE to see if
-     * it should stop there. By default, false is returned here.
+     * it should stop there.
+     * @return true if the solver should stop now.  By default, false is returned here.
      *
      * @param time  the current time
      * @param rY  the current values of the state variables
@@ -199,13 +200,14 @@ public:
      *
      * @param time  the current time
      * @param rY  the current values of the state variables
+     * @return value of the root function
      */
     virtual double CalculateRootFunction(double time, const std::vector<double>& rY);
 
     /**
      * Get whether an analytic Jacobian is used.
      *
-     * @return mUseAnalyticJacobian
+     * @return #mUseAnalyticJacobian
      */
     bool GetUseAnalyticJacobian();
 

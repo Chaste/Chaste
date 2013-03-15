@@ -61,7 +61,7 @@ class AbstractLinearParabolicPdeSystemForCoupledOdeSystem
 {
 public:
     /**
-     * Compute the function c_i(x).
+     * @return computed function c_i(x).
      *
      * @param rX the point x at which the function c_i is computed
      * @param pdeIndex the index of the PDE, denoted by i above
@@ -69,7 +69,7 @@ public:
     virtual double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX, unsigned pdeIndex)=0;
 
     /**
-     * Compute the source term f_i(x, u_1, u_2, ..., u_p) at a point in space.
+     * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a point in space.
      *
      * @param rX the point x at which the nonlinear source term is computed
      * @param rU the vector of dependent variables (u_1, u_2, ..., u_p) at the point x
@@ -79,7 +79,7 @@ public:
     virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX, c_vector<double,PROBLEM_DIM>& rU, std::vector<double>& rOdeSolution, unsigned pdeIndex)=0;
 
     /**
-     * Compute source term f_i(x, u_1, u_2, ..., u_p) at a node.
+     * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a node.
      *
      * @param rNode the node at which the nonlinear source term f_i is computed
      * @param rU the vector of dependent variables (u_1, u_2, ..., u_p) at the node
@@ -89,7 +89,7 @@ public:
     virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode, c_vector<double,PROBLEM_DIM>& rU, std::vector<double>& rOdeSolution, unsigned pdeIndex);
 
     /**
-     * Compute diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
+     * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
      *
      * @param rX The point x at which the diffusion term D_i is computed
      * @param pdeIndex the index of the PDE, denoted by i above

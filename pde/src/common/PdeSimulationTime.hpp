@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PDESIMULATIONTIME_HPP_
 
 /**
+ * \todo Integrate with other time stepping classes or remove?
  * A small convenience class providing a consistent global time to the
  * PDE solver classes.
  *
@@ -54,7 +55,7 @@ public:
      */
     static void SetTime(double time);
 
-    /** Get the current time. */
+    /** @return the current time. */
     static double GetTime();
 
     /**
@@ -64,10 +65,10 @@ public:
      */
     static void SetPdeTimeStep(double timestep);
 
-    /** Get the current PDE timestep. */
+    /** @return the current PDE timestep. */
     static double GetPdeTimeStep();
 
-    /** Get 1/dt. */
+    /** @return 1/dt. */
     static double GetPdeTimeStepInverse();
 
 private:

@@ -82,7 +82,7 @@ public:
     }
 
     /**
-     * Get #mPdeSolution.
+     * @return #mPdeSolution.
      */
     std::vector<double>& rGetPdeSolution()
     {
@@ -104,7 +104,7 @@ public:
     }
 
     /**
-     * Get #mPdeSolutionSize.
+     * @return #mPdeSolutionSize.
      */
     unsigned GetPdeSolutionSize()
     {

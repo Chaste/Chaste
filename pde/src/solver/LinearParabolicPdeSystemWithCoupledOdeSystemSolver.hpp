@@ -104,7 +104,7 @@ private:
     void WriteVtkResultsToFile();
 
     /**
-     * The term to be added to the element stiffness matrix.
+     * @return the term to be added to the element stiffness matrix.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
@@ -122,7 +122,7 @@ private:
         Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
     /**
-     * The term to be added to the element stiffness vector.
+     * @return the term to be added to the element stiffness vector.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)

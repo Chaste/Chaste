@@ -53,7 +53,7 @@ private:
     double mMaximumTimeStep;
 
     /**
-     * Pure method to be implemented which returns the timestep based on the
+     * @return the timestep based on the
      * current solution and current time. Doesn't need to be checked to be
      * between the minimum and maximum timesteps.
      *
@@ -85,7 +85,7 @@ public:
     }
 
     /**
-     * Get the actual timestep to be used.
+     * @return the actual timestep to be used.
      *
      * @param currentTime current time
      * @param currentSolution current solution

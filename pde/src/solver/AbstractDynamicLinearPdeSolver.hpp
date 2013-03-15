@@ -176,7 +176,9 @@ public:
      */
     void SetInitialCondition(Vec initialCondition);
 
-    /** Dynamic solve method. */
+    /** Dynamic solve method.
+     * @return solution vector
+     */
     virtual Vec Solve();
 
     /** Tell the solver to assemble the matrix again next timestep. */

@@ -354,6 +354,7 @@ public:
      * @param maxDt  maximum time step to be taken by the adaptive solver
      *   (set this appropriately to avoid missing a stimulus)
      * @param tSamp  sampling interval at which to store results
+     * @return the solution object with results at each sampling step
      */
     OdeSolution Solve(realtype tStart,
                       realtype tEnd,
@@ -388,7 +389,7 @@ public:
     void SetMaxSteps(long int numSteps);
 
     /**
-     * Get the maximum number of steps to be taken by the solver
+     * @return the maximum number of steps to be taken by the solver
      * in its attempt to reach the next output time.
      */
     long int GetMaxSteps();
@@ -403,17 +404,17 @@ public:
     void SetTolerances(double relTol=1e-5, double absTol=1e-7);
 
     /**
-     * Get the relative tolerance.
+     * @return the relative tolerance.
      */
     double GetRelativeTolerance();
 
     /**
-     * Get the absolute tolerance.
+     * @return the absolute tolerance.
      */
     double GetAbsoluteTolerance();
 
     /**
-     * Get the last step size used internally by CVODE in the last Solve call.
+     * @return the last step size used internally by CVODE in the last Solve call.
      */
     double GetLastStepSize();
 
@@ -432,9 +433,7 @@ public:
 //    virtual double CalculateRootFunction(double time, const std::vector<double>& rY);
 
     /**
-     * Get whether an analytic Jacobian is used.
-     *
-     * @return mUseAnalyticJacobian
+     * @return whether an analytic Jacobian is used (#mUseAnalyticJacobian)
      */
     bool GetUseAnalyticJacobian();
 

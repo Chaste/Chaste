@@ -129,34 +129,34 @@ public:
     virtual void SetPath(const std::string& rLeafName, const FileFinder& rParentOrSibling);
 
     /**
-     * Test whether this FileFinder has been given a path.
+     * @return true if this FileFinder has been given a path.
      */
     bool IsPathSet() const;
 
     /**
-     * Test whether we exist.
+     * @return true if we exist.
      */
     bool Exists() const;
 
     /**
-     * Are we pointing at a file?
+     * @return true if we are pointing at a file
      */
     bool IsFile() const;
 
     /**
-     * Are we pointing at a directory?
+     * @return true if we are pointing at a directory
      */
     bool IsDir() const;
 
     /**
-     * If this is a file, whether it has size zero.
-     * If this is a folder, whether it contains no non-hidden items.
+     * @return true if this is a file of size zero or
+     * if this is a folder, whether it contains no non-hidden items.
      * If this doesn't exist, throws.
      */
     bool IsEmpty() const;
 
     /**
-     * Get the absolute path to this file/dir.
+     * @return the absolute path to this file/dir.
      *
      * If this is a directory that exists (at the instant of this call), the absolute path is
      * guaranteed to end in a '/'.  Otherwise, the path is guaranteed not to end in a '/'.
@@ -164,7 +164,7 @@ public:
     std::string GetAbsolutePath() const;
 
     /**
-     * Test whether this file/dir is newer than another file/dir.
+     * @return true if this file/dir is newer than another file/dir.
      * Compares modification times.
      *
      * @param rOtherEntity  the entity to test against.
@@ -172,32 +172,32 @@ public:
     bool IsNewerThan(const FileFinder& rOtherEntity) const;
 
     /**
-     * Get the leaf name of this file or directory.
+     * @return the leaf name of this file or directory.
      *
      * i.e. the individual file or directory name and none of the preceding folders on its path.
      */
     std::string GetLeafName() const;
 
     /**
-     * Get the leaf name of this file or directory, with any file extension removed.
+     * @return the leaf name of this file or directory, with any file extension removed.
      *
      * i.e. the individual file or directory name and none of the preceding folders on its path.
      */
     std::string GetLeafNameNoExtension() const;
 
     /**
-     * Get the extension of the leaf name of this file or directory, if any.
+     * @return the extension of the leaf name of this file or directory, if any.
      * The '.' will be included in the extension if an extension exists.
      */
     std::string GetExtension() const;
 
     /**
-     * Get a finder for the folder containing this file or directory.
+     * @return a finder for the folder containing this file or directory.
      */
     FileFinder GetParent() const;
 
     /**
-     * Get the relative path to this finder from another.  Throws if this is not found under rBasePath.
+     * @return the relative path to this finder from another.  Throws if this is not found under rBasePath.
      *
      * @param rBasePath  where the returned path should be relative to
      */
@@ -245,7 +245,7 @@ public:
     void DangerousRemove() const;
 
     /**
-     * Find files in this folder matching a simple glob pattern.
+     * @return a list of files in this folder matching a simple glob pattern.
      * This method must be called on a FileFinder that points at a folder, and the pattern
      * will be matched against file (or folder) names in that folder.  The pattern can use
      * a subset of shell-style glob syntax.  A '?' anywhere in the string matches any single
@@ -258,7 +258,7 @@ public:
     std::vector<FileFinder> FindMatches(const std::string& rPattern) const;
 
     /**
-     * Test whether a path is absolute.
+     * @return true if the path is absolute.
      *
      * @param rPath  the path to test
      */

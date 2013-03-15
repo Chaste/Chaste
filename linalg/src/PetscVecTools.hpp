@@ -87,14 +87,14 @@ public:
     static void AddToElement(Vec vector, PetscInt row, double value);
 
     /**
-     * Get the size of a vector.
+     * @return the size of a vector.
      *
      * @param vector  the vector
      */
     static unsigned GetSize(Vec vector);
 
     /**
-     * Get this process's ownership range of the contents of the vector.
+     * @return this process's ownership range of the contents of the vector.
      *
      * @param vector  the vector
      * @param lo  lowest index owned by this process
@@ -103,7 +103,7 @@ public:
     static void GetOwnershipRange(Vec vector, PetscInt& lo, PetscInt& hi);
 
     /**
-     * Return an element of a vector.
+     * @return an element of a vector.
      * May only be called for elements you own.
      *
      * @param vector  the vector

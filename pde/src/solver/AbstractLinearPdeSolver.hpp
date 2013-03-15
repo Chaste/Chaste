@@ -140,7 +140,7 @@ public:
     virtual void SetupLinearSystem(Vec currentSolution, bool computeMatrix)=0;
 
     /**
-     * Get a pointer to the linear system.
+     * @return a pointer to the linear system.
      */
     LinearSystem* GetLinearSystem()
     {

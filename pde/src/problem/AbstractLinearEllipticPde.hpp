@@ -88,7 +88,7 @@ public:
     {}
 
     /**
-     * Compute the constant in u part of the source term, i.e g(x) in
+     * @return computed constant in u part of the source term, i.e g(x) in
      * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point.
      *
      * @param rX The point in space
@@ -97,7 +97,7 @@ public:
     virtual double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX, Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
 
     /**
-     * Compute the coefficient of u in the linear part of the source term, i.e f(x) in
+     * @return computed coefficient of u in the linear part of the source term, i.e f(x) in
      * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point in space.
      *
      * @param rX The point in space
@@ -107,7 +107,7 @@ public:
                                                      Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
 
     /**
-     * Compute the diffusion term at a given point. The diffusion tensor should be symmetric and positive definite
+     * @return computed diffusion term at a given point. The diffusion tensor should be symmetric and positive definite
      *
      * @param rX The point in space at which the diffusion term is computed.
      * @return A matrix.
@@ -115,7 +115,7 @@ public:
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX)=0;
 
     /**
-     * Compute the constant in u part of the source term, i.e g(x) in
+     * @return computed constant in u part of the source term, i.e g(x) in
      * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given node.
      *
      * @param rNode the node
@@ -123,7 +123,7 @@ public:
     virtual double ComputeConstantInUSourceTermAtNode(const Node<SPACE_DIM>& rNode);
 
     /**
-     * Compute the coefficient of u in the linear part of the source term, i.e f(x) in
+     * @return computed coefficient of u in the linear part of the source term, i.e f(x) in
      * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given node.
      *
      * @param rNode the node

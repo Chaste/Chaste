@@ -67,7 +67,7 @@ public:
     FunctionalBoundaryCondition(double (*func)(const ChastePoint<SPACE_DIM>& rX));
 
     /**
-     * Get the value of the boundary condition at a given point.
+     * @return the value of the boundary condition at a given point.
      *
      * @param rX a point in space
      */

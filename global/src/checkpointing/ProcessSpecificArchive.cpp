@@ -40,9 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProcessSpecificArchive.hpp"
 
 /** The process-specific output archive */
+/** \cond */
 template <>
 boost::archive::text_oarchive* ProcessSpecificArchive<boost::archive::text_oarchive>::mpArchive = NULL;
+/**\endcond */
 
 /** The process-specific input archive */
+/** \cond */
 template <>
 boost::archive::text_iarchive* ProcessSpecificArchive<boost::archive::text_iarchive>::mpArchive = NULL;
+/**\endcond */

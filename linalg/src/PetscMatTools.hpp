@@ -143,13 +143,13 @@ public:
     static void Zero(Mat matrix);
 
     /**
-     * Get the size of a matrix
+     * @return the size of a matrix
      * @param matrix  the matrix
      */
     static unsigned GetSize(Mat matrix);
 
     /**
-     * Get this process's ownership range of the contents of the system.
+     * @return this process's ownership range of the contents of the system.
      *
      * @param matrix  the matrix
      * @param lo  lowest index owned by this process
@@ -158,7 +158,7 @@ public:
     static void GetOwnershipRange(Mat matrix, PetscInt& lo, PetscInt& hi);
 
     /**
-     * Return an element of a matrix.
+     * @return an element of a matrix.
      * May only be called for elements you own.
      *
      * @param matrix  the matrix
@@ -185,7 +185,7 @@ public:
     static Vec GetMatrixRowDistributed(Mat matrix, unsigned rowIndex);
 
     /**
-     * Check whether two matrices are equal to within a given tolerance.
+     * @return true if two matrices are equal to within a given tolerance.
      *
      * @param mat1  the first matrix
      * @param mat2  the second matrix
@@ -194,7 +194,8 @@ public:
     static bool CheckEquality(const Mat mat1, const Mat mat2, double tol=1e-10);
 
     /**
-     * Check whether a matrix is symmetrix, to within a given tolerance, by
+     * @return true if the matrix is symmetric
+     * Check whether a matrix is symmetric, to within a given tolerance, by
      * checking if it is (approximately) equal to its transpose.
      *
      * Note that while there is a PETSc method MatIsSymmetric, it won't work in

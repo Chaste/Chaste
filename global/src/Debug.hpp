@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @note Use of these should be removed from source code when committing.
  */
 
-/** Print a 'header' for a debug output line */
+/** @return a 'header' which can be printed in each debug output line */
 std::string FormDebugHead();
 
 /**

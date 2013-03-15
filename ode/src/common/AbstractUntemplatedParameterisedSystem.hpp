@@ -64,12 +64,12 @@ public:
     virtual ~AbstractUntemplatedParameterisedSystem();
 
     /**
-     * Get the object which provides information about this ODE system.
+     * @return the object which provides information about this ODE system.
      */
     boost::shared_ptr<const AbstractOdeSystemInformation> GetSystemInformation() const;
 
     /**
-     * Get the name of this system.
+     * @return the name of this system.
      */
     std::string GetSystemName() const;
 
@@ -78,18 +78,18 @@ public:
     //
 
     /**
-     * Return the number of named attributes that this system has.
+     * @return the number of named attributes that this system has.
      */
     unsigned GetNumberOfAttributes() const;
 
     /**
-     * Test whether this system has a particular named attribute.
+     * @return true if this system has a particular named attribute.
      * @param rName  the attribute name.
      */
     bool HasAttribute(const std::string& rName) const;
 
     /**
-     * Get the value of a named attribute.
+     * @return the value of a named attribute.
      * @param rName  the attribute name.
      */
     double GetAttribute(const std::string& rName) const;
@@ -99,19 +99,19 @@ public:
     //
 
     /**
-     * Get the number of state variables in the ODE system.
+     * @return the number of state variables in the ODE system.
      *
-     * @return mNumberOfStateVariables
+     * @return #mNumberOfStateVariables
      */
     unsigned GetNumberOfStateVariables() const;
 
     /**
-     * Get the names of the state variables in the ODE system.
+     * @return the names of the state variables in the ODE system.
      */
     const std::vector<std::string>& rGetStateVariableNames() const;
 
     /**
-     * Get the units of the state variables in the ODE system.
+     * @return the units of the state variables in the ODE system.
      */
     const std::vector<std::string>& rGetStateVariableUnits() const;
 
@@ -138,7 +138,7 @@ public:
     bool HasStateVariable(const std::string& rName) const;
 
     /**
-     * Get the units of a state variable given its index in the ODE system.
+     * @return the units of a state variable given its index in the ODE system.
      *
      * @param index  a state variable's position within the vector of
      *               state variables associated with the ODE system.
@@ -156,17 +156,17 @@ public:
     //
 
     /**
-     * Get the number of parameters.
+     * @return the number of parameters.
      */
     unsigned GetNumberOfParameters() const;
 
     /**
-     * Get the names of the parameters in the ODE system.
+     * @return the names of the parameters in the ODE system.
      */
     const std::vector<std::string>& rGetParameterNames() const;
 
     /**
-     * Get the units of the parameters in the ODE system.
+     * @return the units of the parameters in the ODE system.
      */
     const std::vector<std::string>& rGetParameterUnits() const;
 
@@ -192,7 +192,7 @@ public:
     bool HasParameter(const std::string& rName) const;
 
     /**
-     * Get the units of a parameter given its index in the ODE system.
+     * @return the units of a parameter given its index in the ODE system.
      *
      * @param index  a state variable's position within the vector of
      *               state variables associated with the ODE system.
@@ -205,22 +205,22 @@ public:
     //
 
     /**
-     * Get the number of derived quantities.
+     * @return the number of derived quantities.
      */
     unsigned GetNumberOfDerivedQuantities() const;
 
     /**
-     * Get the vector of derived quantity names.
+     * @return the vector of derived quantity names.
      */
     const std::vector<std::string>& rGetDerivedQuantityNames() const;
 
     /**
-     * Get the vector of derived quantity units.
+     * @return the vector of derived quantity units.
      */
     const std::vector<std::string>& rGetDerivedQuantityUnits() const;
 
     /**
-     * Get the index of a derived quantity, given its name.
+     * @return the index of a derived quantity, given its name.
      *
      * @param rName  the name of a derived quantity.
      */
@@ -237,7 +237,7 @@ public:
     bool HasDerivedQuantity(const std::string& rName) const;
 
     /**
-     * Get the units of a derived quantity.
+     * @return the units of a derived quantity.
      *
      * @param index  an index from GetDerivedQuantityIndex.
      * @return the units of the variable.
@@ -249,7 +249,7 @@ public:
     //
 
     /**
-     * Get the index of a variable, whether a state variable, parameter,
+     * @return the index of a variable, whether a state variable, parameter,
      * or derived quantity, with the given name.
      * The returned index is suitable for use with GetAnyVariableUnits,
      * GetAnyVariable, etc.
@@ -270,7 +270,7 @@ public:
     bool HasAnyVariable(const std::string& rName) const;
 
     /**
-     * Get the units of a variable, whether a state variable, parameter, or
+     * @return the units of a variable, whether a state variable, parameter, or
      * derived quantity, given its index as returned by GetAnyVariableIndex.
      *
      * @param index  an index from GetAnyVariableIndex.
@@ -279,7 +279,7 @@ public:
     std::string GetAnyVariableUnits(unsigned index) const;
 
     /**
-     * Get the units of a variable, whether a state variable, parameter, or
+     * @return the units of a variable, whether a state variable, parameter, or
      * derived quantity, given its index as returned by GetAnyVariableIndex.
      *
      * @param rName  the name of any variable in the model.

@@ -54,7 +54,7 @@ struct LessThanNode
 {
     /**
      * Less-then node index comparison operator.
-     *
+     * @return true if n1<n2
      * @param n1 pointer to a node
      * @param n2 pointer to a node
      */
@@ -82,13 +82,13 @@ protected:
         DirichletIteratorType;
     DirichletIteratorType mDirichIterator; /**< Internal iterator over Dirichlet boundary conditions */
 
-    /** Whether there are any Dirichlet BCs anywhere on the mesh*/
+    /** @return true if there are any Dirichlet BCs anywhere on the mesh*/
     bool mHasDirichletBCs;
 
-    /** Have we calculated mHasDirichletBCs. */
+    /** @return true if we calculated mHasDirichletBCs. */
     bool mCheckedAndCommunicatedIfDirichletBcs;
 
-    /** Whether to delete BCs in destructor. */
+    /** @return true if we need to delete BCs in destructor. */
     bool mDeleteConditions;
 
     /**
@@ -117,7 +117,7 @@ public:
     ~AbstractBoundaryConditionsContainer();
 
     /**
-     * Return whether any Dirichlet conditions are defined (for ANY of the unknowns, on ANY of the processes).
+     * @return whether any Dirichlet conditions are defined (for ANY of the unknowns, on ANY of the processes).
      * Must be called collectively. The first time this is called, the result is communicated to all processes
      * and then cached locally (the bool mHasDirichletBCs). If this needs recalculating
      * mCheckedAndCommunicatedIfDirichletBcs must be reset to zero.
@@ -125,7 +125,7 @@ public:
     bool HasDirichletBoundaryConditions();
 
     /**
-     * Obtain value of Dirichlet boundary condition at specified node.
+     * @return value of Dirichlet boundary condition at specified node.
      *
      * This is unlikely to be needed by the user, the methods ApplyDirichletToLinearProblem or
      * ApplyDirichletToNonlinearProblem can be called instead to apply all Dirichlet boundary conditions
@@ -137,7 +137,7 @@ public:
     double GetDirichletBCValue(const Node<SPACE_DIM>* pBoundaryNode, unsigned indexOfUnknown = 0);
 
     /**
-     * Test if there is a Dirichlet boundary condition defined on the given node.
+     * @return true if there is a Dirichlet boundary condition defined on the given node.
      *
      * @param pNode pointer to a node
      * @param indexOfUnknown index of the unknown for which to obtain the value of the boundary condition (defaults to 0)

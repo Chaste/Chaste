@@ -65,7 +65,7 @@ using namespace boost::numeric::ublas;
 
 /**
  * 1x1 Determinant.
- * Get the determinant of a ublas matrix.
+ * @return the determinant of a ublas matrix.
  *
  * @param rM The matrix of which to find the determinant.
  */
@@ -79,7 +79,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 1>& rM)
 
 /**
  * 2x2 Determinant.
- * Get the determinant of a ublas matrix.
+ * @return the determinant of a ublas matrix.
  *
  * @param rM The matrix of which to find the determinant.
  */
@@ -93,7 +93,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T,2,2>& rM)
 
 /**
  * 3x3 Determinant.
- * Get the determinant of a ublas matrix.
+ * @return the determinant of a ublas matrix.
  *
  * @param rM The matrix of which to find the determinant.
  */
@@ -111,7 +111,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 3>& rM)
 
 /**
  * 3x2 (Generalized determinant).
- * Calculate the generalized determinant of a 3x2 matrix.
+ * @return calculated generalized determinant of a 3x2 matrix.
  * The generalized determinant is given by det(T) = sqrt(det(T'T));
  *
  * @param rM The matrix of which to find the generalized determinant.
@@ -126,7 +126,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 2>& rM)
 
 /**
  * 3x1 (Generalized determinant).
- * Calculate the generalized determinant of a 3x1 matrix.
+ * @return calculated generalized determinant of a 3x1 matrix.
  * The generalized determinant is given by det(T) = sqrt(det(T'T));
  *
  * @param rM The matrix of which to find the generalized determinant.
@@ -140,7 +140,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 1>& rM)
 
 /**
  * 2x1 (Generalized determinant).
- * Calculate the generalized determinant of a 2x1 matrix.
+ * @return calculated generalized determinant of a 2x1 matrix.
  * The generalized determinant is given by det(T) = sqrt(det(T'T));
  *
  * @param rM The matrix of which to find the generalized determinant.
@@ -153,6 +153,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 2, 1>& rM)
 }
 
 /**
+ * @return (nothing)
  * 3x0 (Generalized determinant) - not implement, but needed by some compilers.
  *
  * @param rM The matrix of which to find the generalized determinant.
@@ -164,6 +165,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 0>& rM)
 }
 
 /**
+ * @return (nothing)
  * 2x0 (Generalized determinant) - not implement, but needed by some compilers.
  *
  * @param rM The matrix of which to find the generalized determinant.
@@ -175,6 +177,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 2, 0>& rM)
 }
 
 /**
+ * @return (nothing)
  * 1x0 (Generalized determinant) - not implement, but needed by some compilers.
  *
  * @param rM The matrix of which to find the generalized determinant.
@@ -189,7 +192,7 @@ T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 0>& rM)
 
 /**
  * 1x1 SubDeterminant.
- * Return the determinant of a submatrix after removing a particular row and column
+ * @return the determinant of a submatrix after removing a particular row and column
  * For a 1x1 matrix this should always remove the only row and column (0,0).
  *
  * @param rM The matrix of which to find the subdeterminant.
@@ -208,7 +211,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 1, 1>& rM, const unsig
 
 /**
  * 2x2 SubDeterminant.
- * Return the determinant of a submatrix after removing a particular row and column.
+ * @return the determinant of a submatrix after removing a particular row and column.
  *
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
@@ -229,7 +232,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 2, 2>& rM, const unsig
 
 /**
  * SubDeterminant 3x3.
- * Determinant of a submatrix after removing a particular row and column.
+ * @return determinant of a submatrix after removing a particular row and column.
  *
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
@@ -254,7 +257,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 3, 3>& rM, const unsig
 
 /**
  * SubDeterminant 3x2.
- * Determinant of a submatrix after removing a particular row and column.
+ * @return determinant of a submatrix after removing a particular row and column.
  *
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
@@ -277,7 +280,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 3, 2>& rM, const unsig
 
 /**
  * SubDeterminant 3x1.
- * Determinant of a submatrix after removing a particular row and column.
+ * @return determinant of a submatrix after removing a particular row and column.
  * @param rM The matrix of which to find the subdeterminant.
  *
  * @param missrow The index to the row to remove
@@ -300,7 +303,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 3, 1>& rM, const unsig
 
 /**
  * SubDeterminant 2x1.
- * Determinant of a submatrix after removing a particular row and column.
+ * @return determinant of a submatrix after removing a particular row and column.
  *
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
@@ -324,7 +327,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 2, 1>& rM, const unsig
 #else //#if defined(__xlC__)
 /**
  * SubDeterminant 3x0 - Not implemented, but needed by some compilers for recursive template calls.
- * Determinant of a submatrix after removing a particular row and column.
+ * @return (nothing)
  *
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
@@ -338,7 +341,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 3, 0>& rM, const unsig
 
 /**
  * SubDeterminant 2x0 - Not implemented, but needed by some compilers for recursive template calls.
- * Determinant of a submatrix after removing a particular row and column.
+ * @return (nothing)
  *
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
@@ -353,7 +356,7 @@ T SubDeterminant(const boost::numeric::ublas::c_matrix<T, 2, 0>& rM, const unsig
 /**
  * SubDeterminant 1x0 - Not implemented, but needed by some compilers for recursive template calls.
  * Determinant of a submatrix after removing a particular row and column.
- *
+ * @return (nothing)
  * @param rM The matrix of which to find the subdeterminant.
  * @param missrow The index to the row to remove
  * @param misscol The index to the column to remove
@@ -576,7 +579,7 @@ T Trace(const c_matrix<T, 4, 4>& rM)
 // OTHER MATRIX FUNCTIONS (INVARIANTS, EIGENVECTORS)
 
 /**
- * 3x3 second invariant.
+ * @return 3x3 second invariant.
  * @note Implementation only correct for
  * a SYMMETRIC matrix though. It is up to the user to check the
  * input matrix is symmetric.
@@ -591,7 +594,7 @@ T SecondInvariant(const c_matrix<T, 3, 3>& rM)
 }
 
 /**
- * 2x2 second invariant.
+ * @return 2x2 second invariant.
  * Second invariant of a 2d matrix, i.e. the determinant. This function
  * is mainly here just so that the same code can be used in 2d and 3d.
  *

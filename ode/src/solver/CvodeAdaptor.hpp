@@ -209,17 +209,17 @@ public:
     void SetTolerances(double relTol=1e-4, double absTol=1e-6);
 
     /**
-     * Get the relative tolerance.
+     * @return the relative tolerance.
      */
     double GetRelativeTolerance();
 
     /**
-     * Get the absolute tolerance.
+     * @return the absolute tolerance.
      */
     double GetAbsoluteTolerance();
 
     /**
-     * Get the last step size used internally by CVODE in the last Solve call
+     * @return the last step size used internally by CVODE in the last Solve call
      */
     double GetLastStepSize();
 
@@ -304,7 +304,7 @@ public:
     void SetMaxSteps(long int numSteps);
 
     /**
-     * Get the maximum number of steps to be taken by the solver
+     * @return the maximum number of steps to be taken by the solver
      * in its attempt to reach the next output time.
      */
     long int GetMaxSteps();

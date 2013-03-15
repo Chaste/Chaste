@@ -128,7 +128,7 @@ public:
     bool IsDataComplete();
 
     /**
-     * Get method for mIncompleteNodeIndices.
+     * @return #mIncompleteNodeIndices.
      */
     std::vector<unsigned> GetIncompleteNodeMap();
 

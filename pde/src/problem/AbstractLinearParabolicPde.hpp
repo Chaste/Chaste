@@ -55,14 +55,14 @@ class AbstractLinearParabolicPde
 public:
 
     /**
-     * The function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
      *
      * @param rX the point in space at which the function c is computed
      */
     virtual double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX)=0;
 
     /**
-     * Compute source term.
+     * @return computed source term.
      *
      * @param rX the point in space at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the point
@@ -70,7 +70,7 @@ public:
     virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX, double u)=0;
 
     /**
-     * Compute source term at a node.
+     * @return computed source term at a node.
      *
      * @param rNode the node at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the node
@@ -79,7 +79,7 @@ public:
 
 
     /**
-     * Compute diffusion term. The diffusion tensor should be symmetric and positive definite.
+     * @return computed diffusion term. The diffusion tensor should be symmetric and positive definite.
      *
      * @param rX The point in space at which the diffusion term is computed.
      * @param pElement The mesh element that x is contained in (optional).

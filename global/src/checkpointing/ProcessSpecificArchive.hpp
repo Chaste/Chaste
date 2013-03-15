@@ -74,7 +74,7 @@ private:
 
 public:
 
-    /** Retrieve the stored secondary archive for this process. */
+    /** @return the stored secondary archive for this process. */
     static Archive* Get(void)
     {
         if (mpArchive == NULL)

@@ -74,7 +74,7 @@ protected:
     typedef LinearBasisFunction<ELEMENT_DIM-1> SurfaceBasisFunction;
 
     /**
-     * This method returns the vector to be added to full vector
+     * @return the vector to be added to full vector
      * for a given Gauss point in BoundaryElement, ie, essentially the
      * INTEGRAND in the boundary integral part of the definition of the vector.
      * The arguments are the bases, x and current solution computed at the

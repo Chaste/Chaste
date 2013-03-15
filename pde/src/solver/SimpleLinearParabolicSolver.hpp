@@ -57,7 +57,7 @@ protected:
     AbstractLinearParabolicPde<ELEMENT_DIM,SPACE_DIM>* mpParabolicPde;
 
     /**
-     * The term to be added to the element stiffness matrix - see AbstractFeVolumeIntegralAssembler
+     * @return the term to be added to the element stiffness matrix - see AbstractFeVolumeIntegralAssembler
      *
      * grad_phi[row] . ( pde_diffusion_term * grad_phi[col]) +
      *  (1.0/mDt) * pPde->ComputeDuDtCoefficientFunction(rX) * rPhi[row] * rPhi[col]
@@ -78,7 +78,7 @@ protected:
         Element<ELEMENT_DIM,SPACE_DIM>* pElement);
 
     /**
-     * The term to be added to the element stiffness vector - see AbstractFeVolumeIntegralAssembler
+     * @return the term to be added to the element stiffness vector - see AbstractFeVolumeIntegralAssembler
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)

@@ -45,13 +45,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 /**
- * Get the path to the root directory of the Chaste source tree.
+ * @return the path to the root directory of the Chaste source tree.
  * Will always give you the absolute path with a trailing slash.
  */
 const char* ChasteBuildRootDir();
 
 /**
- * Get the folder in which compiled files are placed for the given
+ * @return the folder in which compiled files are placed for the given
  * Chaste component.
  * Will always give you the absolute path with a trailing slash.
  *
@@ -60,13 +60,13 @@ const char* ChasteBuildRootDir();
 std::string ChasteComponentBuildDir(const std::string& rComponent);
 
 /**
- * Get the name of the folder within the 'build' dir of a component
+ * @return the name of the folder within the 'build' dir of a component
  * that contains the compiled files.
  */
 std::string ChasteBuildDirName();
 
 /**
- * Get the build type string used in building Chaste.
+ * @return the build type string used in building Chaste.
  */
 std::string ChasteBuildType();
 

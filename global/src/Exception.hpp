@@ -89,9 +89,9 @@ public:
     /**
      * Helper method for checking we have the right exception.
      *
-     * Checks that #mShortMessage matches that given, and returns
-     * a suitable error message string if not.  If they do match,
-     * returns the empty string.
+     * @return an empty string when the expected message matches.
+     * Checks that #mShortMessage matches that given, and
+     * a suitable error message string if not.
      *
      * @param expected  the expected value of #mShortMessage
      */
@@ -100,9 +100,9 @@ public:
     /**
      * Helper method for checking we have the right exception.
      *
+     * @return an empty string when the message contains the expected string.
      * Checks that #mShortMessage contains the given string, and
-     * returns a suitable error message string if not.  If it does,
-     * returns the empty string.
+     * returns a suitable error message string if not.
      *
      * @param expected  some expected substring of #mShortMessage
      */

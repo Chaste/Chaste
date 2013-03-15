@@ -92,7 +92,7 @@ public:
     /**
      * Get the number of timesteps.
      *
-     * @return mNumberOfTimeSteps
+     * @return #mNumberOfTimeSteps
      */
     unsigned GetNumberOfTimeSteps() const;
 
@@ -111,7 +111,7 @@ public:
     void SetOdeSystemInformation(boost::shared_ptr<const AbstractOdeSystemInformation> pOdeSystemInfo);
 
     /**
-     * Get the values of a state variable, parameter or derived quantity with a given index in
+     * @return the values of a state variable, parameter or derived quantity with a given index in
      * the ODE system at each output timestep.
      * The index is that given by AbstractOdeSystemInformation::GetAnyVariableIndex, which for state
      * variables (the most common case) is equal to their index within the state variable vector.
@@ -121,7 +121,7 @@ public:
     std::vector<double> GetVariableAtIndex(unsigned index) const;
 
     /**
-     * Get the values of a state variable, parameter or derived quantity with a given name in
+     * @return the values of a state variable, parameter or derived quantity with a given name in
      * the ODE system for each output timestep.
      *
      * @param rName  the name of the variable to extract
@@ -129,30 +129,30 @@ public:
     std::vector<double> GetAnyVariable(const std::string& rName) const;
 
     /**
-     * Get the times at which the solution to the ODE system is stored.
+     * @return the times at which the solution to the ODE system is stored.
      *
-     * @return mTimes.
+     * @return #mTimes.
      */
     std::vector<double>& rGetTimes();
 
     /**
-     * Get the times at which the solution to the ODE system is stored.
+     * @return the times at which the solution to the ODE system is stored.
      *
-     * @return mTimes.
+     * @return #mTimes.
      */
     const std::vector<double>& rGetTimes() const;
 
     /**
-     * Get the values of the solution to the ODE system at each timestep.
+     * @return the values of the solution to the ODE system at each timestep.
      *
-     * @return mSolutions.
+     * @return #mSolutions.
      */
     std::vector<std::vector<double> >& rGetSolutions();
 
     /**
-     * Get the values of the solution to the ODE system at each timestep.
+     * @return the values of the solution to the ODE system at each timestep.
      *
-     * @return mSolutions.
+     * @return #mSolutions.
      */
     const std::vector<std::vector<double> >& rGetSolutions() const;
 
@@ -165,7 +165,7 @@ public:
         mSolverName = solverName;
     }
 
-    /** Set the ODE solver used to create these results */
+    /** @return the ODE solver used to create these results */
     std::string GetSolverName()
     {
         return mSolverName;
@@ -180,7 +180,7 @@ public:
     void CalculateDerivedQuantitiesAndParameters(AbstractParameterisedSystem<VECTOR>* pOdeSystem);
 
     /**
-     * Get the derived quantities for this ODE system at each timestep.
+     * @return the derived quantities for this ODE system at each timestep.
      *
      * @param pOdeSystem  the ODE system which was solved to generate this solution object
      * @return  A vector of vectors of derived quantities for each time step.
@@ -189,7 +189,7 @@ public:
 
 #ifdef CHASTE_CVODE
     /**
-     * Get the derived quantities for this ODE system at each timestep.
+     * @return the derived quantities for this ODE system at each timestep.
      *
      * @param pOdeSystem  the ODE system which was solved to generate this solution object
      * @return  A std::vector of vectors of derived quantities for each time step.

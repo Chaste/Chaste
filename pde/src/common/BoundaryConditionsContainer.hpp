@@ -281,7 +281,7 @@ public:
     bool Validate(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 
     /**
-     * Obtain value of Neumann boundary condition at a specified point in a given surface element
+     * @return value of Neumann boundary condition at a specified point in a given surface element
      *
      * It is up to the user to ensure that the point x is contained in the surface element.
      *
@@ -294,7 +294,7 @@ public:
                              unsigned indexOfUnknown = 0);
 
     /**
-     * Test if there is a Neumann boundary condition defined on the given element.
+     * @return true if there is a Neumann boundary condition defined on the given element.
      *
      * \todo #1321
      * This is a horrendously inefficient fix. Perhaps have flag in element object?

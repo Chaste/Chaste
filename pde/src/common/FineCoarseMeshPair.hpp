@@ -182,7 +182,7 @@ private:
                                                   unsigned index);
 
     /**
-     * For a given point, compute the containing element in the coarse mesh (returned).
+     * @return for a given point the containing element in the coarse mesh
      *
      * @param rPoint The point
      * @param safeMode See documentation in ComputeCoarseElementsForFineNodes
@@ -366,7 +366,7 @@ public:
     }
 
     /**
-     * Get the elements in the coarse mesh that each fine mesh node is contained in (or nearest to).
+     * @return the elements in the coarse mesh that each fine mesh node is contained in (or nearest to).
      * ComputeCoarseElementsForFineNodes() needs to be called before calling this.
      */
     std::vector<unsigned>& rGetCoarseElementsForFineNodes()
@@ -376,7 +376,7 @@ public:
     }
 
     /**
-     * Get the elements in the coarse mesh that each fine mesh element centroid is contained in (or nearest to).
+     * @return the elements in the coarse mesh that each fine mesh element centroid is contained in (or nearest to).
      * ComputeCoarseElementsForFineElementCentroids() needs to be called before calling this.
      */
     std::vector<unsigned>& rGetCoarseElementsForFineElementCentroids()

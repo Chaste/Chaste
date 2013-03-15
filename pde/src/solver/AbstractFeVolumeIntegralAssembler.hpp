@@ -121,7 +121,7 @@ protected:
 protected:
 
     /**
-     * This method returns the matrix to be added to element stiffness matrix
+     * @return the matrix to be added to element stiffness matrix
      * for a given Gauss point, ie, essentially the INTEGRAND in the integral
      * definition of the matrix. The arguments are the bases, bases gradients,
      * x and current solution computed at the Gauss point. The returned matrix
@@ -154,7 +154,7 @@ protected:
     }
 
     /**
-     * This method returns the vector to be added to element stiffness vector
+     * @return the vector to be added to element stiffness vector
      * for a given Gauss point, ie, essentially the INTEGRAND in the integral
      * definition of the vector. The arguments are the bases,
      * x and current solution computed at the Gauss point. The returned vector
@@ -206,7 +206,7 @@ protected:
                                    c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)>& rBElem);
 
     /**
-     * Whether to include this (volume) element when assembling. Returns true
+     * @return true if we should include this (volume) element when assembling. Returns true
      * here but can be overridden by the concrete assembler if not all
      * elements should be included.
      *

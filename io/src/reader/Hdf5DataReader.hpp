@@ -97,7 +97,7 @@ public:
                    std::string datasetName="Data");
 
     /**
-     * Get the values of a given variable at each time step at a given node.
+     * @return the values of a given variable at each time step at a given node.
      *
      * @param rVariableName  name of a variable in the data file
      * @param nodeIndex the index of the node for which the data is obtained
@@ -106,7 +106,7 @@ public:
                                             unsigned nodeIndex);
 
     /**
-     * Get the values of a given variable at each time step over multiple nodes.
+     * @return the values of a given variable at each time step over multiple nodes.
      *
      * @param rVariableName  name of a variable in the data file
      * @param lowerIndex the index of the lower node for which the data is obtained
@@ -117,7 +117,7 @@ public:
                                                                            unsigned upperIndex);
 
     /**
-     * Get the values of a given variable at each node at a given time step.
+     * @return the values of a given variable at each node at a given time step.
      *
      * @param data  PETSc vec to hold the data
      * @param rVariableName  name of a variable in the data file
@@ -126,22 +126,22 @@ public:
     void GetVariableOverNodes(Vec data, const std::string& rVariableName, unsigned timestep=0);
 
     /**
-     * Get the unlimited dimension values.
+     * @return the unlimited dimension values.
      */
     std::vector<double> GetUnlimitedDimensionValues();
 
     /**
-     * Get the number of rows in the data file.
+     * @return the number of rows in the data file.
      */
     unsigned GetNumberOfRows();
 
     /**
-     * Get the variable names.
+     * @return the variable names.
      */
     std::vector<std::string> GetVariableNames();
 
     /**
-     * Get the units in which a given variable is measured.
+     * @return the units in which a given variable is measured.
      *
      * @param rVariableName  name of a variable in the data file
      */

@@ -81,7 +81,7 @@ class SerializableSingleton : private boost::noncopyable
 {
 public:
     /**
-     * Get the wrapper object to use to serialize the related singleton instance.
+     * @return the wrapper object to use to serialize the related singleton instance.
      */
     SerializableSingleton<SINGLETON_CLASS>* GetSerializationWrapper() const
     {
