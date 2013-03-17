@@ -34,6 +34,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
+#include "Hdf5ToCmguiConverter.hpp"
+#include "FineCoarseMeshPair.hpp"
+#include "ReplicatableVector.hpp"
+#include "HeartConfig.hpp"
+#include "Hdf5DataReader.hpp"
+#include "PetscTools.hpp"
+#include "Hdf5DataWriter.hpp"
 
 template<unsigned DIM>
 VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(

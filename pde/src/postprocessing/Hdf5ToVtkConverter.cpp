@@ -51,7 +51,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(std::string input
                                                                AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                                bool parallelVtk,
                                                                bool usingOriginalNodeOrdering)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "vtk_output")
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "vtk_output",0u)
 {
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
 

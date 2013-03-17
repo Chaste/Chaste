@@ -49,6 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * - Upstroke Velocity map
  * - Conduction Velocity map
  *
+ * N.B. You should only ever have one PostProcessingWriter around at once, as
+ * multiple Hdf5Readers (a member variable of this class) seem to cause problems.
+ *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class PostProcessingWriter
@@ -212,6 +215,13 @@ private:
      * @param  rFileName where to put the data.
      */
     void WriteGenericFileToMeshalyzer(std::vector<std::vector<double> >& rDataPayload, const std::string& rFolder, const std::string& rFileName);
+
+
+    /**
+     * Convert a set of post-processed data to a visualizer format, via the HDF5 converters.
+     * @param rDatasetName  The name of the dataset in the HDF5 file (the postprocessed data).
+     */
+    void RunHdf5Converters(const std::string& rDatasetName);
 
 };
 

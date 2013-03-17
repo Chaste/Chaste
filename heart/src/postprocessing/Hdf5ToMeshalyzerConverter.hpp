@@ -82,12 +82,14 @@ public:
      * @param fileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
      * @param usingOriginalNodeOrdering Whether HDF5 output was written using the original node ordering
+     * @param the precision (number of digits) to use in writing numerical data to file.
      * @param datasetName  The name of the dataset to convert (defaults to voltage etc. not postprocessing).
      */
     Hdf5ToMeshalyzerConverter(std::string inputDirectory,
                               std::string fileBaseName,
                               AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                               bool usingOriginalNodeOrdering,
+                              unsigned precision = 0,
                               std::string datasetName = "Data");
 };
 

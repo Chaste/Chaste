@@ -41,11 +41,13 @@ AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(std::string
                                                                      std::string fileBaseName,
                                                                      AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                                      std::string subdirectoryName,
+                                                                     unsigned precision,
                                                                      std::string datasetName)
     : mFileBaseName(fileBaseName),
       mDatasetName(datasetName),
       mpMesh(pMesh),
-      mRelativeSubdirectory(subdirectoryName)
+      mRelativeSubdirectory(subdirectoryName),
+      mPrecision(precision)
 {
     // Store directory, mesh and filenames and create the reader
     mpReader = new Hdf5DataReader(inputDirectory, mFileBaseName, true, mDatasetName);
@@ -83,7 +85,7 @@ void AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::WriteInfoFile()
         }
         else
         {
-           time_info_filename = mFileBaseName + "_" + mDatasetName + "_times.info";
+           time_info_filename = mDatasetName + "_times.info";
         }
         out_stream p_file = mpOutputFileHandler->OpenOutputFile(time_info_filename);
 
@@ -116,6 +118,7 @@ std::string AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GetSubdirectory()
 {
     return mRelativeSubdirectory;
 }
+
 
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation

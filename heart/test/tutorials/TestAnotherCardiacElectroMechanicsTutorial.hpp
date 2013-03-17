@@ -239,7 +239,9 @@ public:
          * can't be) created by `CardiacElectroMechanicsProblem`. We can use a converter as follows
          * to post-process:
          */
-        Hdf5ToMeshalyzerConverter<2,2> converter("TestCardiacElectroMechanicsWithMef/electrics", "voltage", &electrics_mesh, false);
+        Hdf5ToMeshalyzerConverter<2,2> converter("TestCardiacElectroMechanicsWithMef/electrics", "voltage",
+        		                                 &electrics_mesh, false,
+        		                                 HeartConfig::Instance()->GetVisualizerOutputPrecision());
         /* Some other notes. If you want to apply time-dependent traction boundary conditions, this is possible by
          * specifying the traction in functional form - see solid mechanics tutorials. Similarly, more natural
          * 'pressure acting on the deformed body' boundary conditions are possible - see below tutorial.

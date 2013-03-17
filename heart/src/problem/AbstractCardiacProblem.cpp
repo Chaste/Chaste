@@ -591,7 +591,10 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         {
             // Convert simulation data to Meshalyzer format
             Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM> converter(HeartConfig::Instance()->GetOutputDirectory(),
-                    HeartConfig::Instance()->GetOutputFilenamePrefix(), mpMesh, HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+                    HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                    mpMesh,
+                    HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
+                    HeartConfig::Instance()->GetVisualizerOutputPrecision() );
             std::string subdirectory_name = converter.GetSubdirectory();
             HeartConfig::Instance()->Write(false, subdirectory_name);
         }

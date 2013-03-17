@@ -47,7 +47,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(std::string inputDirectory,
                                                                std::string fileBaseName,
                                                                AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "txt_output")
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "txt_output", 0u)
 {
     // Make sure that we are never trying to write from an incomplete data HDF5 file
     assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());

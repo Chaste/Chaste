@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
 #include "FileFinder.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "Hdf5DataReader.hpp"
+#include "ReplicatableVector.hpp"
 
 class TestVoltageInterpolaterOntoMechanicsMesh : public CxxTest::TestSuite
 {

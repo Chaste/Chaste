@@ -78,6 +78,12 @@ protected:
      */
     std::string mRelativeSubdirectory;
 
+    /**
+     * The precision with which to write files:
+     * that is, the number of digits to use in numerical output.
+     */
+    unsigned mPrecision;
+
 public:
 
     /**
@@ -89,12 +95,14 @@ public:
      * @param fileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
      * @param subdirectoryName name for the output directory to be created (relative to inputDirectory)
+     * @param precision  the number of digits to use in numerical output to file.
      * @param datasetName  The name of the dataset to convert, defaults to "Data" which gives the PDE variables.
      */
     AbstractHdf5Converter(std::string inputDirectory,
                           std::string fileBaseName,
                           AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                           std::string subdirectoryName,
+                          unsigned precision,
                           std::string datasetName = "Data");
 
 

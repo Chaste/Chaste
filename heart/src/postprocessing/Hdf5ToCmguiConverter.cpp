@@ -138,7 +138,7 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(std::string in
                                                                   std::string fileBaseName,
                                                                   AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                                                   bool hasBath)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "cmgui_output")
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "cmgui_output", 0u)
 {
     // Write the node data out
     Write("");

@@ -702,7 +702,6 @@ public:
     /** @return the number of digits to be output in the converted solution data files. */
     unsigned GetVisualizerOutputPrecision();
 
-
     /**
      * @return true if there is an electrodes section
      */

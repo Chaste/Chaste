@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshalyzerMeshWriter.hpp"
 #include "GenericMeshReader.hpp"
 #include "UblasCustomFunctions.hpp"
-#include "HeartConfig.hpp"
 #include "PetscTools.hpp"
 #include "Exception.hpp"
 #include "ReplicatableVector.hpp"
@@ -48,16 +47,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
 {
+
+	std::string filename = "";
+	if (this->mDatasetName == "Data")
+	{
+		filename += this->mFileBaseName + "_";
+	}
+	filename += type + ".dat";
+
     out_stream p_file = out_stream(NULL);
     if (PetscTools::AmMaster())
     {
-        p_file = this->mpOutputFileHandler->OpenOutputFile(this->mFileBaseName + "_" + type + ".dat");
+        p_file = this->mpOutputFileHandler->OpenOutputFile(filename);
 
         // Check how many digits are to be output in the solution (0 goes to default value of digits)
-        unsigned num_digits = HeartConfig::Instance()->GetVisualizerOutputPrecision();
-        if (num_digits != 0)
+        if (this->mPrecision != 0)
         {
-           p_file->precision(num_digits);
+           p_file->precision(this->mPrecision);
         }
     }
 
@@ -97,8 +103,9 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(std:
                                                                             std::string fileBaseName,
                                                                             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                                                             bool usingOriginalNodeOrdering,
+                                                                            unsigned precision,
                                                                             std::string datasetName)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "output", datasetName)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "output", precision, datasetName)
 {
     std::vector<std::string> variable_names = this->mpReader->GetVariableNames();
     for (unsigned i=0; i<variable_names.size(); i++)

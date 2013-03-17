@@ -133,8 +133,8 @@ AbstractHdf5Access::AbstractHdf5Access(const std::string& rDirectory,
 }
 
 AbstractHdf5Access::AbstractHdf5Access(const FileFinder& rDirectory,
-                   const std::string& rBaseName,
-                   const std::string& rDatasetName)
+                                       const std::string& rBaseName,
+                                       const std::string& rDatasetName)
  : mBaseName(rBaseName),
    mDatasetName(rDatasetName),
    mDirectory(rDirectory),

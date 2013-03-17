@@ -161,7 +161,9 @@ public:
         std::vector<double> times = p_data_reader->GetUnlimitedDimensionValues();
 
         // Get voltage at lots of nodes, NB hi_idx is one past the end.
-        std::vector<std::vector<double> > voltages = p_data_reader->GetVariableOverTimeOverMultipleNodes("V",0u, p_data_reader->GetNumberOfRows());
+        std::vector<std::vector<double> > voltages = p_data_reader->GetVariableOverTimeOverMultipleNodes("V",
+                                                                                                0u,
+                                                                                                p_data_reader->GetNumberOfRows());
 
         ///\todo #2137 Figure out how to automate Vstar selection from the voltage loops output by above test.
         double v_star = -40.0; // This will be model-specific(ish). Might work OK as general postprocessing voltage threshold.
@@ -217,11 +219,13 @@ public:
         Hdf5ToMeshalyzerConverter<2,2> converter1("SpiralWaveAndPhase", "results", mpMesh, true);
 
         // Write out postprocessed quantities too (in dataset "Phase")
-        Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true, "Phase");
+        Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true,
+        										  0u /* default precision */,
+        										  "Phase");
 
         // Check the phase file is written correctly.
         {
-            FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/results_Phase.dat", RelativeTo::ChasteTestOutput);
+            FileFinder meshalyzer_phase_file("SpiralWaveAndPhase/output/Phase.dat", RelativeTo::ChasteTestOutput);
             TS_ASSERT(meshalyzer_phase_file.IsFile());
             FileFinder reference_file("heart/test/data/PhasePostprocessing/results_Phase.dat", RelativeTo::ChasteSourceRoot);
 
@@ -231,7 +235,7 @@ public:
 
         // Check the times info file is generated correctly.
         {
-            FileFinder generated_file("SpiralWaveAndPhase/output/results_Phase_times.info", RelativeTo::ChasteTestOutput);
+            FileFinder generated_file("SpiralWaveAndPhase/output/Phase_times.info", RelativeTo::ChasteTestOutput);
             TS_ASSERT(generated_file.IsFile());
             FileFinder reference_file("heart/test/data/PhasePostprocessing/results_Phase_times.info", RelativeTo::ChasteSourceRoot);
 

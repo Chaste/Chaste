@@ -109,7 +109,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
 #include "NobleVargheseKohlNoble1998WithSac.hpp"
-#include "Hdf5ToMeshalyzerConverter.hpp"
 #include "ZeroStimulusCellFactory.hpp"
 #include "FileComparison.hpp"
 #include "FileFinder.hpp"
