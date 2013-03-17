@@ -505,7 +505,6 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
     }
 }
 
-#include "Debug.hpp"
 void HeartConfig::SetParametersFile(const std::string& rFileName)
 {
     mpParameters = ReadFile(rFileName);
