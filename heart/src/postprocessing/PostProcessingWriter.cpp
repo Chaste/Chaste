@@ -234,11 +234,13 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
     }
     writer.Close();
 
+    ///\todo #1660 work out why we can't have more than one HDF5 DataReader in existence at once.
     delete mpDataReader;
 
     RunHdf5Converters(hdf5_dataset_name.str());
 
     mpDataReader = new Hdf5DataReader(mDirectory, mHdf5File);
+    mpCalculator->SetHdf5DataReader(mpDataReader);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -314,3 +314,10 @@ std::vector<double>& PropagationPropertiesCalculator::rGetCachedVoltages(unsigne
     }
     return mCachedVoltages;
 }
+
+void PropagationPropertiesCalculator::SetHdf5DataReader(Hdf5DataReader* pDataReader)
+{
+	mpDataReader = pDataReader;
+}
+
+

@@ -207,6 +207,13 @@ public:
     unsigned CalculateAboveThresholdDepolarisationsForLastAp(unsigned globalNodeIndex,
                                                              double threshold);
 
+    /**
+     * Provide a new pointer to an HDF5 data reader
+     *
+     * @param pDataReader  An HDF5 data reader to use (needed if the existing one is deleted and a new one opened)
+     */
+    void SetHdf5DataReader(Hdf5DataReader* pDataReader);
+
 };
 
 #endif //_PROPAGATIONPROPERTIESCALCULATOR_HPP_
