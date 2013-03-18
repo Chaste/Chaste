@@ -52,8 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-#include "Debug.hpp"
-
 //#include "VtkMeshReader.hpp" //Needed for commented out test, see #1660
 
 
@@ -94,11 +92,8 @@ class TestPostProcessingWriter : public CxxTest::TestSuite
     void CopyTestDataHdf5ToCleanTestOutputFolder(const FileFinder& rTestOutputDirectory, const std::string& rHdf5BaseName)
     {
         OutputFileHandler handler(rTestOutputDirectory);
-        if (PetscTools::AmMaster())
-        {
-            FileFinder hdf5_file("heart/test/data/" + rHdf5BaseName + ".h5", RelativeTo::ChasteSourceRoot);
-            handler.CopyFileTo(hdf5_file);
-        }
+        FileFinder hdf5_file("heart/test/data/" + rHdf5BaseName + ".h5", RelativeTo::ChasteSourceRoot);
+        handler.CopyFileTo(hdf5_file);
         PetscTools::Barrier("CopyTestDataHdf5ToCleanTestOutputFolder");
     }
 
