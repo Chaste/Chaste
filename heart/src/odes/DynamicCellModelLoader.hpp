@@ -68,6 +68,7 @@ public:
      * and this factory function must be used to create a loader.
      *
      * @param rLoadableModulePath  path to .so file
+     * @return loader object
      */
     static DynamicCellModelLoaderPtr Create(const std::string& rLoadableModulePath);
 
@@ -77,7 +78,7 @@ public:
     ~DynamicCellModelLoader();
 
     /**
-     * Create a new cardiac cell from this dynamic module.
+     * @return a newly created cardiac cell from this dynamic module.
      *
      * The caller takes responsibility for deleting the cell when it's finished with.
      *

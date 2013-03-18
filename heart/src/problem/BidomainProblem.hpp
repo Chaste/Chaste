@@ -137,6 +137,7 @@ protected:
     /**
      *  Create normal initial condition but overwrite V to zero for bath nodes, if
      *  there are any.
+     *  @return the newly created intial conditions vector
      */
     Vec CreateInitialCondition();
 
@@ -153,10 +154,10 @@ protected:
      */
     AbstractBidomainSolver<DIM,DIM>* mpSolver;
 
-    /** Create our bidomain PDE object */
+    /** @return a newly created bidomain PDE object */
     virtual AbstractCardiacTissue<DIM> *CreateCardiacTissue();
 
-    /** Create a suitable bidomain solver */
+    /** @return a newly created suitable bidomain solver */
     virtual AbstractDynamicLinearPdeSolver<DIM,DIM,2>* CreateSolver();
 
 public:
@@ -198,7 +199,7 @@ public:
     void SetNodeForAverageOfPhiZeroed(unsigned node);
 
     /**
-     *  Get the pde. Can only be called after Initialise()
+     *  @return the pde. Can only be called after Initialise()
      */
     BidomainTissue<DIM>* GetBidomainTissue();
 
@@ -280,7 +281,7 @@ public:
     void LoadExtraArchiveForBidomain(Archive & archive, unsigned version);
 
     /**
-     * Return whether this is a bidomain problem with bath or not
+     * @return whether this is a bidomain problem with bath or not
      */
     bool GetHasBath();
 

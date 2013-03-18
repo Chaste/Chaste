@@ -191,7 +191,7 @@ public:
     void WriteMeshToDistributedFile(std::string directory, std::string fileName);
 
     /**
-     * Return a pointer to mpVtkUnstructuredGrid
+     * @return a pointer to mpVtkUnstructuredGrid
      */
     vtkUnstructuredGrid* GetVtkUnstructuredGrid();
 
@@ -205,32 +205,32 @@ public:
     void SetAdaptCriterion(double range, double criterion);
 
     /**
-     * Return the number of nodes in the mesh
+     * @return the number of nodes in the mesh
      */
     unsigned GetNumNodes();
 
     /**
-     * Return the number of locally owned nodes, excluding halos
+     * @return the number of locally owned nodes, excluding halos
      */
     unsigned GetNumLocalNodes();
 
     /**
-     * Return the number of locally owned nodes, including halos (i.e. mpVtkUnstructuredGrid->GetNumberOfPoints())
+     * @return the number of locally owned nodes, including halos (i.e. mpVtkUnstructuredGrid->GetNumberOfPoints())
      */
     unsigned GetNumLocalAndHaloNodes();
 
     /**
-     * Return the number of elements in the mesh
+     * @return the number of elements in the mesh
      */
     unsigned GetNumElements();
 
     /**
-     * Return the number of locally owned elements (i.e. mpVtkUnstructuredGrid->GetNumberOfCells())
+     * @return the number of locally owned elements (i.e. mpVtkUnstructuredGrid->GetNumberOfCells())
      */
     unsigned GetNumLocalElements();
 
     /**
-     * Return the number of surface elements in the mesh. Can only be called after CalculateSENListAndSids(),
+     * @return the number of surface elements in the mesh. Can only be called after CalculateSENListAndSids(),
      * since vtkUnstructuredGrids do not know about surface elements.
      */
     unsigned GetNumSurfaceElements();
@@ -243,7 +243,7 @@ public:
     void CalculateSENListAndSids(double coplanarTolerance = 0.9999999);
 
     /**
-     * Return the proportion of edges with an error metric value in the range [1 - range, 1 + range].
+     * @return the proportion of edges with an error metric value in the range [1 - range, 1 + range].
      *
      * @param range The size of the interval that we are interested in
      */
@@ -265,7 +265,7 @@ public:
     void Reset();
 
     /**
-     * Return mAdaptSuccess
+     * @return mAdaptSuccess
      */
     bool GetAdaptSuccess();
 

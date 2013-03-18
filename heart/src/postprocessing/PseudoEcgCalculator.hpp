@@ -83,7 +83,7 @@ private:
     std::string mVariableName;/**< the variable for which we want to calculate the pseudo ecg, defaults to "V"*/
 
     /**
-     * Get the integrand.
+     * @return the integrand.
      * The pseudo-ECG is defined as the integral over the mesh of the following integrand:
      *
      * - D * grad (solution) dot grad (1/r)

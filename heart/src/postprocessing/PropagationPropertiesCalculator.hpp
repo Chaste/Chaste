@@ -66,7 +66,7 @@ private:
 
 protected:
     /**
-     * Read the voltages vector for the given node and cache it, returning a reference
+     * @return the voltages vector for the given node and cache it, returning a reference
      * to the cached vector.  If subsequently called with the same index, will return
      * the cached vector without re-reading from file.
      *
@@ -91,7 +91,7 @@ public:
     virtual ~PropagationPropertiesCalculator();
 
     /**
-     * Calculate the maximum upstroke velocity at a single cell.
+     * @return the maximum upstroke velocity at a single cell.
      * We calculate for the last upstroke found in the simulation data.
      *
      * @param globalNodeIndex  The cell at which to calculate.
@@ -99,7 +99,7 @@ public:
     double CalculateMaximumUpstrokeVelocity(unsigned globalNodeIndex);
 
      /**
-     * Calculate the maximum upstroke velocity at a single cell.
+     * @return the maximum upstroke velocity at a single cell.
      * We return all the max upstroke velocities for all APs.
      *
      * @param globalNodeIndex  The cell at which to calculate.
@@ -108,7 +108,7 @@ public:
     std::vector<double> CalculateAllMaximumUpstrokeVelocities(unsigned globalNodeIndex, double threshold);
 
      /**
-     * Calculate the times of upstroke at a single cell.
+     * @return the times of upstroke at a single cell.
      * We return all the times of upstroke velocities for all APs.
      *
      * @param globalNodeIndex  The cell at which to calculate.
@@ -117,7 +117,7 @@ public:
     std::vector<double> CalculateUpstrokeTimes(unsigned globalNodeIndex, double threshold);
 
     /**
-     * Calculate the conduction velocity between two cells, i.e. the time
+     * @return the conduction velocity between two cells, i.e. the time
      * taken for an AP to propagate from one to the other. It returns
      * the value of conduction velocity of the LAST action potential
      * that reached both nodes. Throws exceptions if an AP never reached
@@ -132,7 +132,7 @@ public:
                                        const double euclideanDistance);
 
      /**
-     * Calculate all the conduction velocities between two cells, i.e. the time
+     * @return all the conduction velocities between two cells, i.e. the time
      * taken for all APs to propagate from one to the other. It returns a vector
      * containing all the conduction velocities for each of the APs that
      * reached the two nodes (only the APs that reached both nodes).
@@ -146,7 +146,7 @@ public:
                                                           unsigned globalFarNodeIndex,
                                                           const double euclideanDistance);
     /**
-     * Calculate the action potential duration at a single cell.
+     * @return the action potential duration at a single cell.
      * We calculate for the last AP found in the simulation data.
      *
      * @param percentage  The percentage of the amplitude to calculate for.
@@ -155,7 +155,7 @@ public:
     double CalculateActionPotentialDuration(const double percentage,
                                             unsigned globalNodeIndex);
     /**
-     * Calculate the maximum transmembrane potential (maximum systolic
+     * @return the maximum transmembrane potential (maximum systolic
      * potential) at a single cell.
      * We calculate for the last AP found in the simulation data.
      *
@@ -164,7 +164,7 @@ public:
     double CalculatePeakMembranePotential(unsigned globalNodeIndex);
 
      /**
-     * Calculate all the action potentials duration at a single cell.
+     * @return all the action potentials duration at a single cell.
      *
      * @param percentage  The percentage of the amplitude to calculate for.
      * @param globalNodeIndex  The cell at which to calculate.
@@ -175,7 +175,7 @@ public:
                                                              double threshold);
 
      /**
-     * Calculate all the action potentials duration at cells [lowerNodeIndex, upperNodeIndex-1].
+     * @return all the action potentials duration at cells [lowerNodeIndex, upperNodeIndex-1].
      *
      * @param percentage  The percentage of the amplitude to calculate for.
      * @param lowerNodeIndex  First cell at which to calculate.
@@ -188,7 +188,7 @@ public:
                                                                                        double threshold);
 
      /**
-      * Calculates all the depolarisations that occur above threshold at a single cell.
+      * @return all the depolarisations that occur above threshold at a single cell.
       *
       * @param globalNodeIndex the cell at which to calculate
       * @param threshold the threshold above which the depolarisations are counted
@@ -198,7 +198,7 @@ public:
                                                                     double threshold);
 
      /**
-      * Calculates the depolarisations that occur above threshold at a single cell during the last recorded Ap
+      * @return the depolarisations that occur above threshold at a single cell during the last recorded Ap
       *
       * @param globalNodeIndex the cell at which to calculate
       * @param threshold the threshold above which the depolarisations are counted

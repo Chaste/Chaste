@@ -209,6 +209,7 @@ public:
     /**
      * Utility method to parse an XML parameters file.
      * @param rFileName  Name of XML file
+     * @return a pointer to the parameters in a convenience class created by CodeSynthesis XSD
      */
     boost::shared_ptr<cp::chaste_parameters_type> ReadFile(const std::string& rFileName);
 
@@ -684,19 +685,19 @@ public:
 
     // Output visualization
 
-    /** Whether there is an OutputVisualizer element present. */
+    /** @return whether there is an OutputVisualizer element present. */
     bool IsOutputVisualizerPresent() const;
 
-    /** Whether to convert the output from HDF5 to meshalyzer readable format */
+    /** @return whether to convert the output from HDF5 to meshalyzer readable format */
     bool GetVisualizeWithMeshalyzer() const;
 
-    /** Whether to convert the output from HDF5 to Cmgui readable format */
+    /** @return whether to convert the output from HDF5 to Cmgui readable format */
     bool GetVisualizeWithCmgui() const;
 
-    /** Whether to convert the output from HDF5 to Vtk readable format */
+    /** @return whether to convert the output from HDF5 to Vtk readable format */
     bool GetVisualizeWithVtk() const;
 
-    /** Whether to convert the output from HDF5 to parallel Vtk readable format */
+    /** @return whether to convert the output from HDF5 to parallel Vtk readable format */
     bool GetVisualizeWithParallelVtk() const;
 
     /** @return the number of digits to be output in the converted solution data files. */
@@ -1318,7 +1319,7 @@ private:
     FileFinder mParametersFilePath;
 
     /**
-     * Whether to read the schema location from the XML file (false) or use the schema
+     * @return whether to read the schema location from the XML file (false) or use the schema
      * located at heart/src/io/ChasteParameters.xsd in the Chaste source tree (true).
      */
     bool mUseFixedSchemaLocation;
@@ -1369,7 +1370,7 @@ private:
     bool mUseMassLumpingForPrecond;
 
     /**
-     *  Whether to use Strang operator splitting of the diffusion and reaction terms (see
+     *  @return whether to use Strang operator splitting of the diffusion and reaction terms (see
      *  Set method documentation).
      */
     bool mUseReactionDiffusionOperatorSplitting;
@@ -1390,7 +1391,7 @@ private:
     std::set<unsigned> mBathIdentifiers;
 
     /**
-     * Whether to use a fixed number of iterations for the linear solver
+     * @return whether to use a fixed number of iterations for the linear solver
      */
     bool mUseFixedNumberIterations;
 

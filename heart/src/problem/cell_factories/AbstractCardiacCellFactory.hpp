@@ -82,7 +82,7 @@ protected:
 
 public:
     /**
-     * Create a cell object for the given node.
+     * @return a newly created cell object for the given node.
      *
      * The default implementation checks whether the node is in the bath (in which
      * case a pointer to a (unique) fake cell is returned) and if not, calls
@@ -96,6 +96,7 @@ public:
      * Must be overridden by subclasses to return a cell object for the given node.
      *
      * @param nodeIndex  Global node index.
+     * @return a newly created cell object for the given tissue node.
      */
     virtual AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned nodeIndex)=0;
 

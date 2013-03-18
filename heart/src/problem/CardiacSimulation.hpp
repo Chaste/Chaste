@@ -192,6 +192,7 @@ private:
     /**
      * Convert a boolean to a "yes" or "no" string.
      * @param yesNo
+     * @return a "yes" or "no" string.
      */
     std::string BoolToString(bool yesNo);
 public:
@@ -209,7 +210,7 @@ public:
                       bool saveProblemInstance=false);
 
     /**
-     * Get the saved problem instance, if any.  Will return an empty pointer if the
+     * @return the saved problem instance, if any.  Will return an empty pointer if the
      * instance was not saved.
      */
     boost::shared_ptr<AbstractUntemplatedCardiacProblem> GetSavedProblem();

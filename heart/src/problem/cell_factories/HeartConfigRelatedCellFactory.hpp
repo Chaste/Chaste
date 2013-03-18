@@ -139,7 +139,7 @@ private:
     void PreconvertCellmlFiles();
 
     /**
-     * Get a loader for the given (dynamically loadable) cell model.
+     * @return a loader for the given (dynamically loadable) cell model.
      * @param rModel  model to load
      * @param isCollective  whether we are being called collectively
      */
@@ -158,7 +158,7 @@ public:
     ~HeartConfigRelatedCellFactory();
 
     /**
-     * Create the correct tissue cell for a given region in the mesh
+     * @return a newly created correct tissue cell for a given region in the mesh
      * @param intracellularStimulus is computed in CreateCardiacCellForTissueNode determined by the list of stimulation regions
      * @param nodeIndex is the global index within the mesh
      */
@@ -167,7 +167,7 @@ public:
             unsigned nodeIndex);
 
     /**
-     * Create the correct stimulated tissue cell for a given region in the mesh
+     * @return a newly created correct stimulated tissue cell for a given region in the mesh
      * The stimulus is determined in this method (using the list of stimulation regions).
      * The cardiac cell type (and parameters) are
      * determined in the CreateCellWithIntracellularStimulus method

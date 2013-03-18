@@ -61,7 +61,7 @@ private:
 
 public:
     /**
-     * Create the cell factory.
+     * @return a newly created cell factory.
      * @param stimulusMagnitude
      * @param stimulatedPoint spatial co-ordinates of where to stimulate.
      *    Must correspond to a node location.
@@ -74,7 +74,7 @@ public:
     }
 
     /**
-     * Create a new cell.
+     * @return a newly created new cell.
      * @param node  where to put the cell
      */
     AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
@@ -145,6 +145,7 @@ void SetCircularTissueIn2dMesh(MeshType* pMesh,
  * @param centreX X co-ord of tissue centre
  * @param centreY Y co-ord of tissue centre
  * @param radius radius of tissue
+ * @return the new mesh
  */
 template<class MeshType>
 MeshType* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,
@@ -166,6 +167,7 @@ MeshType* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,
  * @param centreX X co-ord of tissue centre
  * @param centreY Y co-ord of tissue centre
  * @param radius radius of tissue
+ * @return the new mesh
  */
 template<>
 DistributedTetrahedralMesh<2,2>* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,

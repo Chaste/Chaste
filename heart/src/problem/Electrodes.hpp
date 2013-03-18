@@ -159,14 +159,14 @@ public:
     Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh); // implemented in cpp
 
     /**
-     *  Get the boundary conditions container in which is set up the Neumann
+     *  @return the boundary conditions container in which is set up the Neumann
      *  fluxes for the first electrode, and the opposite fluxes for the second
      *  electrode if the the second electrode isn't grounded
      */
     boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > GetBoundaryConditionsContainer();
 
     /**
-     *  Whether it is time to switch off the electrodes yet. THIS ONLY RETURNS
+     *  @return whether it is time to switch off the electrodes yet. THIS ONLY RETURNS
      *  TRUE ONCE - the first appropriate time. After that the electrodes assume
      *  they have been switched off and therefore this returns false.
      *
@@ -175,7 +175,7 @@ public:
     bool SwitchOff(double time);
 
     /**
-     *  Whether it is time to switch on the electrodes yet. THIS ONLY RETURNS
+     *  @return whether it is time to switch on the electrodes yet. THIS ONLY RETURNS
      *  TRUE ONCE - the first appropriate time. After that the electrodes assume
      *  they have been switched on and therefore this returns false.
      *
@@ -183,19 +183,19 @@ public:
      */
     bool SwitchOn(double time);
 
-    /** Get the time the electrodes are switched on */
+    /** @return the time the electrodes are switched on */
     double GetSwitchOnTime()
     {
         return mStartTime;
     }
 
-    /** Get the time the electrodes are switched off */
+    /** @return the time the electrodes are switched off */
     double GetSwitchOffTime()
     {
         return mEndTime;
     }
 
-    /** Whether the second electrode is grounded or not */
+    /** @return whether the second electrode is grounded or not */
     bool HasGroundedElectrode()
     {
         return mGroundSecondElectrode;

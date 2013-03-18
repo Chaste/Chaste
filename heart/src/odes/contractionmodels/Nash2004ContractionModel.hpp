@@ -110,7 +110,7 @@ public:
     }
 
     /**
-     *  Get the current active tension
+     *  @return the current active tension
      */
     double GetActiveTension()
     {
@@ -118,7 +118,7 @@ public:
     }
 
     /**
-     *  Get the active tension corresponding to the temporary stored state variables
+     *  @return the active tension corresponding to the temporary stored state variables
      *  produced by calling RunDoNotUpdate (and before calling UpdateStateVariables())
      */
     double GetNextActiveTension()
@@ -128,7 +128,7 @@ public:
 
 
     /**
-     *  This model is stretch-independent
+     *  @return whether model is stretch-independent
      */
     bool IsStretchDependent()
     {
@@ -136,7 +136,7 @@ public:
     }
 
     /**
-     *  This model is stretch-rate-independent
+     *  @return whether model is stretch-rate-independent
      */
     bool IsStretchRateDependent()
     {

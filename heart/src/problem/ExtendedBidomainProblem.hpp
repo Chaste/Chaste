@@ -354,6 +354,7 @@ protected:
     /**
      *  Create normal initial condition but overwrite V to zero for bath nodes, if
      *  there are any.
+     *  @return the newly created intial conditions vector
      */
     Vec CreateInitialCondition();
 
@@ -381,10 +382,10 @@ protected:
      */
     AbstractExtendedBidomainSolver<DIM,DIM>* mpSolver;
 
-    /** Create our bidomain PDE object */
+    /** @return a newly created bidomain PDE object */
     virtual AbstractCardiacTissue<DIM> *CreateCardiacTissue();
 
-    /** Create a suitable bidomain solver */
+    /** @return a newly created suitable bidomain solver */
     virtual AbstractDynamicLinearPdeSolver<DIM,DIM,3>* CreateSolver();
 
 public:
@@ -472,7 +473,7 @@ public:
 
 
     /**
-     *  Access the tissue object. Can only be called after Initialise()
+     *  @return the tissue object. Can only be called after Initialise()
      */
     ExtendedBidomainTissue<DIM>* GetExtendedBidomainTissue();
 
@@ -520,7 +521,7 @@ public:
 
 
     /**
-     * Return whether this is a problem with bath or not
+     * @return whether this is a problem with bath or not
      */
     bool GetHasBath();
 

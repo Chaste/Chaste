@@ -63,7 +63,7 @@ public:
                                    std::string component="heart");
 
     /**
-     * Get a loadable module from the given file, and return a loader for it.
+     * @return a loadable module from the given file, and return a loader for it.
      * The file can be a .so, in which case there isn't much to do, just create
      * the loader.  The interesting case comes when it is a .cellml file.  If
      * the file has any other extension, an exception is thrown.

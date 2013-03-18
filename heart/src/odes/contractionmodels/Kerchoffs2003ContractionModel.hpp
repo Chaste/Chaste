@@ -79,7 +79,7 @@ private:
     bool mElectricallyUnactivated;
 
     /**
-     *  Get the active tension as a function of length of contractile element. This is private. The public
+     *  @return the active tension as a function of length of contractile element. This is private. The public
      *  GetActiveTension() calls this using the value of lc in the state variable
      *  @param lengthOfContractileElement length of contractile element (the state variable in this model).
      */
@@ -114,12 +114,12 @@ public:
     void SetStretchAndStretchRate(double stretch, double stretchRate);
 
     /**
-     *  Get the active tension (note: actually a stress), ie kPa
+     *  @return the active tension (note: actually a stress), ie kPa
      */
     double GetActiveTension();
 
     /**
-     *  This model is stretch-dependent
+     *  @return whether model is stretch-dependent
      */
     bool IsStretchDependent()
     {
@@ -127,7 +127,7 @@ public:
     }
 
     /**
-     *  This model is stretch-rate-independent
+     *  @return whether model is stretch-rate-independent
      */
     bool IsStretchRateDependent()
     {
@@ -135,7 +135,7 @@ public:
     }
 
     /**
-     *  Get the active tension corresponding to the temporary stored state variables
+     *  @return the active tension corresponding to the temporary stored state variables
      *  produced by calling RunDoNotUpdate (and before calling UpdateStateVariables())
      */
     double GetNextActiveTension();

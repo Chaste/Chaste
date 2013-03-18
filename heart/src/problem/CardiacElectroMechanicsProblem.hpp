@@ -237,7 +237,8 @@ public :
     void Solve();
 
     /**
-     *  Short helper function - the max of a std::vector
+     *  Short helper function
+     *  @return the max of a std::vector
      *  @param vec a vector of doubles
      */
     double Max(std::vector<double>& vec);

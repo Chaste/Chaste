@@ -221,7 +221,7 @@ public:
     void SetApplyAnisotropicCrossFibreTension(bool applyCrossFibreTension, double sheetTensionFraction, double sheetNormalTensionFraction);
 
     /**
-     *  Get the contraction model
+     *  @return the contraction model
      */
     ContractionModelName GetContractionModel()
     {
@@ -230,7 +230,7 @@ public:
     }
 
     /**
-     *  Get the contraction model timestep
+     *  @return the contraction model timestep
      */
     double GetContractionModelOdeTimestep()
     {
@@ -239,7 +239,7 @@ public:
     }
 
     /**
-     *  Get how often the mechanics is solved
+     *  @return how often the mechanics is solved
      */
     double GetMechanicsSolveTimestep()
     {
@@ -248,7 +248,7 @@ public:
     }
 
     /**
-     *  Get whether the deformation affects the electrical physiological conductivity
+     *  @return whether the deformation affects the electrical physiological conductivity
      *  (or whether this effect is neglected).
      */
     bool GetDeformationAffectsConductivity()
@@ -257,7 +257,7 @@ public:
     }
 
     /**
-     *  Get whether the deformation affects the cardiac cell models, for example if
+     *  @return whether the deformation affects the cardiac cell models, for example if
      *  there are stretch-activated channels in the cell model.
      */
     bool GetDeformationAffectsCellModels()
@@ -266,7 +266,7 @@ public:
     }
 
     /**
-     *  Whether the fibre-sheet info should be read from file (if not the defaults should be used).
+     *  @return whether the fibre-sheet info should be read from file (if not the defaults should be used).
      */
     bool ReadFibreSheetDirectionsFromFile()
     {
@@ -274,7 +274,7 @@ public:
     }
 
     /**
-     *  Get the fibre-sheet file (should only be called if ReadFibreSheetDirectionsFromFile() returns true).
+     *  @return the fibre-sheet file (should only be called if ReadFibreSheetDirectionsFromFile() returns true).
      */
     FileFinder GetFibreSheetDirectionsFile()
     {
@@ -284,7 +284,7 @@ public:
     }
 
     /**
-     *  Get whether the fibre-sheet info is defined for each quadrature point in the mesh (if not,
+     *  @return whether the fibre-sheet info is defined for each quadrature point in the mesh (if not,
      *  if it defined for each element in the mesh). (Should only be called if
      *  ReadFibreSheetDirectionsFromFile() returns true).
      */
@@ -310,7 +310,7 @@ public:
     }
 
     /**
-     *  Get the number of increments to be used in the initial deformation
+     *  @return the number of increments to be used in the initial deformation
      *  (see SetNumIncrementsForInitialDeformation() for more details).
      */
     unsigned GetNumIncrementsForInitialDeformation()
@@ -319,7 +319,7 @@ public:
     }
 
     /**
-     * Returns true if cross-fibre tension is applied.
+     * @return true if cross-fibre tension is applied.
      */
     double GetApplyCrossFibreTension()
     {
@@ -327,7 +327,7 @@ public:
     }
 
     /**
-     * Returns the value of the cross-fibre sheet tension fraction.
+     * @return the value of the cross-fibre sheet tension fraction.
      */
     double GetSheetTensionFraction()
     {
@@ -335,7 +335,7 @@ public:
     }
 
     /**
-     * Returns the value of the cross-fibre sheet-normal tension fraction.
+     * @return the value of the cross-fibre sheet-normal tension fraction.
      */
     double GetSheetNormalTensionFraction()
     {

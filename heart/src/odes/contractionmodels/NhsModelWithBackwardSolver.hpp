@@ -126,7 +126,7 @@ public :
 
 
     /**
-     *  Get the active tension corresponding to the stored state variables computed
+     *  @return the active tension corresponding to the stored state variables computed
      *  from the last RunDoNotUpdate(), ie the active tension at the next time.
      *  Note that calling GetActiveTension() on the base class will use the internal
      *  state variables and return the active tension at the last time, if

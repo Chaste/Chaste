@@ -63,6 +63,7 @@ public:
      *
      * @param param  the current value of the quantity which is being modified
      * @param time  the current simulation time
+     * @return the new value for the quantity which is being modified
      */
     virtual double Calc(double param, double time)
     {
@@ -90,6 +91,7 @@ public:
      *
      * @param param  the current value of the quantity which is being modified
      * @param time  the current simulation time
+     * @return the new value for the quantity which is being modified
      */
     virtual double Calc(double param, double time)
     {
@@ -149,6 +151,7 @@ public:
      *
      * @param param  the current value of the quantity which is being modified
      * @param time  the current simulation time
+     * @return the new value for the quantity which is being modified
      */
     virtual double Calc(double param, double time)
     {

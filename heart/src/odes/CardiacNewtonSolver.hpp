@@ -163,7 +163,7 @@ protected:
     {}
     /** Singleton pattern - protected copy constructor.  Not implemented. */
     CardiacNewtonSolver(const CardiacNewtonSolver<SIZE, CELLTYPE>&);
-    /** Singleton pattern - protected assignment operator.  Not implemented. */
+    /** Singleton pattern - protected assignment operator.  Not implemented. @return (would be reference)*/
     CardiacNewtonSolver<SIZE, CELLTYPE>& operator= (const CardiacNewtonSolver<SIZE, CELLTYPE>&);
 
     /**

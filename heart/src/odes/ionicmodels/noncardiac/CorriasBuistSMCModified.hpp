@@ -179,12 +179,12 @@ public:
     void SetFakeIccStimulusPresent(bool present);
 
     /**
-     * Return true if the fake ICC stimulus is present
+     * @return true if the fake ICC stimulus is present
      */
     bool GetFakeIccStimulusPresent();
 
     /**
-     * Returns the Carbon Monoxide scale for
+     * @return the Carbon Monoxide scale for
      */
     double SetCarbonMonoxideScaleFactor();
 
@@ -197,7 +197,7 @@ public:
     void SetCarbonMonoxideScaleFactor(double scaleFactor);
 
     /**
-     * Returns the Carbon Monoxide scale factor
+     * @return the Carbon Monoxide scale factor
      */
     double GetCarbonMonoxideScaleFactor();
 

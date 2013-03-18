@@ -149,7 +149,7 @@ protected :
     void CalculateCalciumTrop50();
 
     /**
-     *  Calculate T0. This is a function of constants, lambda and z
+     *  @return T0. This is a function of constants, lambda and z
      *
      *  @param z
      */
@@ -184,7 +184,7 @@ public :
     void SetIntracellularCalciumConcentration(double calciumConcentration);
 
     /**
-     *  Get the current Calcium Troponin (one of the state variables) value. This
+     *  @return the current Calcium Troponin (one of the state variables) value. This
      *  may be needed if the cell model has Calcium troponin and might need overwriting
      */
     double GetCalciumTroponinValue();
@@ -199,12 +199,12 @@ public :
     void EvaluateYDerivatives(double time, const std::vector<double> &rY, std::vector<double> &rDY);
 
     /**
-     *  Get the active tension, which is a function of the constants and current state variables. KILOPASCALS
+     *  @return the active tension, which is a function of the constants and current state variables. KILOPASCALS
      */
     double GetActiveTension();
 
     /**
-     *  GetNextActiveTension() normally returns the active tension corresponding to the state variables
+     *  @return GetNextActiveTension() normally returns the active tension corresponding to the state variables
      *  that have been computed in RunDoNotUpdate. However, this only applies to when an implicit cardiac
      *  mechanics solver is used, in which case the NhsModelWithBackwardSolver should be used.
      */
@@ -214,7 +214,7 @@ public :
     }
 
    /**
-    *  This model is stretch-dependent
+    *  @return whether model is stretch-dependent
     */
     bool IsStretchDependent()
     {
@@ -222,7 +222,7 @@ public :
     }
 
    /**
-    *  This model is stretch-rate-dependent
+    *  @return whether model is stretch-rate-dependent
     */
     bool IsStretchRateDependent()
     {

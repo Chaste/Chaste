@@ -149,7 +149,7 @@ public:
     void GetFibreVector(unsigned fibreIndex, c_vector<double,DIM>& rFibreVector, bool checkNormalised=true);
 
     /**
-     *  Get the number of lines of data in the file - this is the value read from
+     *  @return the number of lines of data in the file - this is the value read from
      *  the first line.
      */
     unsigned GetNumLinesOfData()

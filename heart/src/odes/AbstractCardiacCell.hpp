@@ -188,6 +188,7 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      * @param tSamp  sampling interval for returned results (defaults to #mDt)
+     * @return solution object
      */
     virtual OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0);
 
@@ -206,7 +207,7 @@ public:
     void SetVoltage(double voltage);
 
     /**
-     * Get the current value of the transmembrane potential, as given
+     * @return the current value of the transmembrane potential, as given
      * in our state variable vector.
      */
     double GetVoltage();
@@ -368,7 +369,7 @@ public:
     virtual void SetSlowValues(const std::vector<double> &rSlowValues);
 
     /**
-     * Get the current values of the slow variables. Should only be valid in slow mode.
+     * @return the current values of the slow variables. Should only be valid in slow mode.
      *
      * \note  This \e must be implemented by fast/slow cardiac cell subclasses.
      *
@@ -376,7 +377,7 @@ public:
      */
     virtual void GetSlowValues(std::vector<double>& rSlowValues);
 
-    /** Get whether this cell is a fast or slow version.
+    /** @return whether this cell is a fast or slow version.
      *
      * \note  This \e must be implemented by fast/slow cardiac cell subclasses.
      */
@@ -397,7 +398,7 @@ public:
     virtual void AdjustOutOfRangeSlowValues(std::vector<double>& rSlowValues);
 
     /**
-     * Get the number of slow variables for the cell model
+     * @return the number of slow variables for the cell model
      * (irrespective of whether in fast or slow mode).
      *
      * \note  This \e must be implemented by fast/slow cardiac cell subclasses.

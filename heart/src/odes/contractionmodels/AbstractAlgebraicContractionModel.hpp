@@ -82,7 +82,7 @@ public:
     }
 
     /**
-     *  Same as GetActiveTension() for algebraic models (uses which stretch and
+     *  @return same as GetActiveTension() for algebraic models (uses which stretch and
      *  and stretch rate has been passed in).
      */
     double GetNextActiveTension()

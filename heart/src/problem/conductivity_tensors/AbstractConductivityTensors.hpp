@@ -131,7 +131,7 @@ public:
     virtual void Init(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> *pMesh) throw (Exception) = 0;
 
     /**
-     *  Returns the diffussion tensor of the element number "index"
+     *  @return the diffussion tensor of the element number "index"
      *
      *  @param global_index Global index of the element of the mesh
      */

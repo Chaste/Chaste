@@ -83,7 +83,7 @@ public:
     /** Destructor. */
     ~CML_noble_varghese_kohl_noble_1998_basic_with_sac();
 
-    /** Compute the total ionic current
+    /** @return the total ionic current
      * @param pStateVariables  state variable vector; if not given, use cell's internal state
      */
     double GetIIonic(const std::vector<double>* pStateVariables=NULL);
@@ -109,7 +109,7 @@ public:
     }
 
     /**
-     *  Get the stretch
+     *  @return the stretch
      */
     double GetStretch()
     {

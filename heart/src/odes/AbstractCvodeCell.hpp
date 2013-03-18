@@ -121,7 +121,7 @@ public:
     virtual ~AbstractCvodeCell();
 
     /**
-     * Get the current value of the transmembrane potential, as given
+     * @return the current value of the transmembrane potential, as given
      * in our state variable vector.
      */
     double GetVoltage();
@@ -162,6 +162,7 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      * @param tSamp  sampling interval for returned results (defaults to dt)
+     * @return solution object
      */
     OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0);
 

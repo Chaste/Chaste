@@ -55,18 +55,18 @@ class DynamicModelLoaderRegistry : boost::noncopyable
 {
 public:
     /**
-     * Get the single instance of the registry.
+     * @return the single instance of the registry.
      */
     static DynamicModelLoaderRegistry* Instance();
 
     /**
-     * Get the loader for the given .so file.
+     * @return the loader for the given .so file.
      * @param rPath  absolute path to the .so
      */
     DynamicCellModelLoaderPtr GetLoader(const std::string& rPath);
 
     /**
-     * Get the loader for the given .so file.
+     * @return the loader for the given .so file.
      * @param rFileFinder  finder for the .so file
      */
     DynamicCellModelLoaderPtr GetLoader(const FileFinder& rFileFinder);

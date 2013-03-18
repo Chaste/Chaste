@@ -75,6 +75,7 @@ public:
      * @param rFileName  the file to read
      * @param rProps  properties that specify fixed schema locations, if wanted
      * @param validate  whether to perform schema validation
+     * @return Xerces convenience object
      */
     static xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> ReadXmlFile(
         const std::string& rFileName,
@@ -123,6 +124,7 @@ public:
      * @param rErrorHandler  handler for any parsing errors
      * @param rProps  properties that specify fixed schema locations, if wanted
      * @param validate  whether to perform schema validation
+     * @return Xerces convenience object
      */
     static xsd::cxx::xml::dom::auto_ptr<xercesc::DOMDocument> ReadFileToDomDocument(
         const std::string& rFileName,
@@ -148,6 +150,7 @@ public:
      * @param pDocument  the DOM document containing the tree to be transformed
      * @param pElement  the root of the tree to be transformed
      * @param rNamespace  the namespace to put elements in
+     * @return Xerces element
      */
     static xercesc::DOMElement* SetNamespace(xercesc::DOMDocument* pDocument,
                                              xercesc::DOMElement* pElement,
@@ -162,6 +165,7 @@ public:
      * @param pDocument  the DOM document containing the tree to be transformed
      * @param pElement  the root of the tree to be transformed
      * @param pNamespace  the namespace to put elements in
+     * @return Xerces element
      */
     static xercesc::DOMElement* SetNamespace(xercesc::DOMDocument* pDocument,
                                              xercesc::DOMElement* pElement,
@@ -183,14 +187,14 @@ public:
                                      const XMLCh* pNewElementLocalName);
 
     /**
-     * Get all the child elements of the given element.
+     * @return all the child elements of the given element.
      *
      * @param pElement  the parent element
      */
     static std::vector<xercesc::DOMElement*> GetChildElements(const xercesc::DOMElement* pElement);
 
     /**
-     * Find all elements matching the given path from this context element.
+     * @return all elements matching the given path from this context element.
      *
      * @param pContextElement  the root element to search from
      * @param rPath  where to search.  This should be a '/'-separated path of element names.
@@ -218,6 +222,7 @@ public:
      * do general URL-escaping.
      *
      * @param rPath  the path to escape
+     * @return path with spaces escaped
      */
     static std::string EscapeSpaces(const std::string& rPath);
 

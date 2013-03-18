@@ -204,6 +204,7 @@ public:
      * The actual creation method.
      * @param problemType
      * @param pCellFactory
+     * @return newly created cardiac problem
      */
     static AbstractCardiacProblem<DIM, DIM, PROBLEM_DIM>* Create(ElectricsProblemType problemType,
                                                                  AbstractCardiacCellFactory<DIM>* pCellFactory);
@@ -220,6 +221,7 @@ public:
      * The actual creation method.
      * @param problemType
      * @param pCellFactory
+     * @return newly created cardiac problem
      */
     static AbstractCardiacProblem<DIM, DIM, 1u>* Create(ElectricsProblemType problemType,
                                                         AbstractCardiacCellFactory<DIM>* pCellFactory)
@@ -243,6 +245,7 @@ public:
      * The actual creation method.
      * @param problemType
      * @param pCellFactory
+     * @return newly created cardiac problem
      */
     static AbstractCardiacProblem<DIM, DIM, 2u>* Create(ElectricsProblemType problemType,
                                                         AbstractCardiacCellFactory<DIM>* pCellFactory)

@@ -55,19 +55,19 @@ public:
     AbstractLookupTableCollection();
 
     /**
-     * Get the names of variables used to index lookup tables.
+     * @return the names of variables used to index lookup tables.
      */
     std::vector<std::string> GetKeyingVariableNames() const;
 
     /**
-     * Get the number of lookup tables keyed by the given variable.
+     * @return the number of lookup tables keyed by the given variable.
      *
      * @param rKeyingVariableName  the table key name
      */
     unsigned GetNumberOfTables(const std::string& rKeyingVariableName) const;
 
     /**
-     * Get the properties of lookup tables keyed by the given variable.
+     * @return the properties of lookup tables keyed by the given variable.
      *
      * @param rKeyingVariableName  the table key name
      * @param rMin  will be filled with the lower table bound
@@ -121,7 +121,7 @@ public:
 
 protected:
     /**
-     * Get the index of the given keying variable within our vector.
+     * @return the index of the given keying variable within our vector.
      *
      * @param rKeyingVariableName  the table key name
      */

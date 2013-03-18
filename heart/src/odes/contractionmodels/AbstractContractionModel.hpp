@@ -75,12 +75,12 @@ public:
     }
 
     /**
-     *  Does the model depend on the stretch. (Pure, to be implemented in the concrete class).
+     *  @return whether the model depend on the stretch. (Pure, to be implemented in the concrete class).
      */
     virtual bool IsStretchDependent()=0;
 
     /**
-     *  Does the model depend on the stretch-rate. (Pure, to be implemented in the concrete class).
+     *  @return whether the model depend on the stretch-rate. (Pure, to be implemented in the concrete class).
      */
     virtual bool IsStretchRateDependent()=0;
 
@@ -137,7 +137,7 @@ public:
     virtual void UpdateStateVariables()=0;
 
     /**
-     *  Get the current active tension (note, actually a stress). (Pure, to be implemented in the concrete class).
+     *  @return the current active tension (note, actually a stress). (Pure, to be implemented in the concrete class).
      *
      *  DO NOT call inbetween RunDoNotUpdate() and UpdateStateVariables() as the old state variables but
      *  the next time would then be used in calculating Ta. Instead, use GetNextActiveTension(), or
@@ -146,7 +146,7 @@ public:
     virtual double GetActiveTension()=0;
 
     /**
-     *  Get the current active tension (note, actually a stress), using the current temporary
+     *  @return the current active tension (note, actually a stress), using the current temporary
      *  state variables (ie those obtained after RunDoNotUpdate has been called).
      */
     virtual double GetNextActiveTension()=0;

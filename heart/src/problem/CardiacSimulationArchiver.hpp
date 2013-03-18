@@ -75,6 +75,7 @@ public:
      *
      * @param rDirectory directory where the multiple files defining the checkpoint are located
      *     (relative to CHASTE_TEST_OUTPUT)
+     * @return a pointer to the unarchived cardiac problem class
      */
     static PROBLEM_CLASS* Load(const std::string& rDirectory);
 
@@ -87,6 +88,7 @@ public:
      * @note Must be called collectively, i.e. by all processes.
      *
      * @param rDirectory directory where the multiple files defining the checkpoint are located
+     * @return a pointer to the unarchived cardiac problem class
      */
     static PROBLEM_CLASS* Load(const FileFinder& rDirectory);
 
@@ -105,6 +107,7 @@ public:
      * simulation was saved on, it uses exactly the same distribution as before.
      *
      * @param rDirectory directory where the multiple files defining the checkpoint are located
+     * @return a pointer to the migrated cardiac problem class
      */
     static PROBLEM_CLASS* Migrate(const FileFinder& rDirectory);
 };

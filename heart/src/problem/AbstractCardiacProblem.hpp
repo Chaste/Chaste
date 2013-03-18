@@ -430,6 +430,7 @@ protected:
      * Subclasses must override this method to create a PDE object of the appropriate type.
      *
      * This class will take responsibility for freeing the object when it is finished with.
+     * @return a pointer to the newly created tissue
      */
     virtual AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* CreateCardiacTissue() =0;
 
@@ -437,6 +438,7 @@ protected:
      * Subclasses must override this method to create a suitable solver object.
      *
      * This class will take responsibility for freeing the object when it is finished with.
+     * @return pointer to newly created PDE solver
      */
     virtual AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* CreateSolver() =0;
 
@@ -520,6 +522,7 @@ public:
      * there are any.
      *
      * \todo Perhaps this should be a method of AbstractCardiacTissue??
+     * @return the newly created intial conditions vector
      */
     virtual Vec CreateInitialCondition();
 
@@ -545,7 +548,7 @@ public:
     void SetWriteInfo(bool writeInfo = true);
 
     /**
-     *  Get the final solution vector. This vector is distributed over all processes.
+     *  @return the final solution vector. This vector is distributed over all processes.
      *
      *  In case of Bidomain, this is of length 2*numNodes, and of the form
      *  (V_1, phi_1, V_2, phi_2, ......, V_N, phi_N).
@@ -557,7 +560,7 @@ public:
     Vec GetSolution();
 
     /**
-     * Get the solution vector, wrapped in a DistributedVector.
+     * @return the solution vector, wrapped in a DistributedVector.
      *
      * See also GetSolution.
      */
@@ -654,7 +657,7 @@ public:
     void SetOutputNodes(std::vector<unsigned> & rNodesToOutput);
 
     /**
-     * Create and return a data reader configured to read the results we've been outputting.
+     * @return a newly created data reader configured to read the results we've been outputting.
      */
     Hdf5DataReader GetDataReader();
 
@@ -725,7 +728,7 @@ public:
     void LoadExtraArchive(Archive & archive, unsigned version);
 
     /**
-     * Return whether there's bath defined in this problem
+     * @return whether there's bath defined in this problem
      */
     virtual bool GetHasBath();
 

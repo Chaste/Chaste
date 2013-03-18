@@ -74,12 +74,12 @@ public:
     void SetStretchAndStretchRate(double stretch, double stretchRate);
 
     /**
-     *  Get the active tension given the current stretch and time
+     *  @return the active tension given the current stretch and time
      */
     double GetActiveTension();
 
     /**
-     *  This model is stretch-rate-independent
+     *  @return whether model is stretch-rate-independent
      */
     bool IsStretchDependent()
     {
@@ -87,7 +87,7 @@ public:
     }
 
     /**
-     *  This model is stretch-rate-independent
+     *  @return whether model is stretch-rate-independent
      */
     bool IsStretchRateDependent()
     {

@@ -211,6 +211,7 @@ public:
      * and return state variable values.  The timestep used will depend on the
      * subclass implementation.
      *
+     * @return state variable values.
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      * @param tSamp  sampling interval for returned results (defaults to dt)
@@ -231,7 +232,7 @@ public:
      * Computes the total current flowing through the cell membrane, using the current
      * values of the state variables.
      *
-     * Should return a value in units of microamps/cm^2.  Note that many cell models
+     * @return a value in units of microamps/cm^2.  Note that many cell models
      * do not use these dimensions (let alone these units) and so a complex conversion
      * is required.  There are 2 main cases:
      *   - Cell model uses amps per unit capacitance.  Often in this case the units used
@@ -265,12 +266,12 @@ public:
     virtual void SetVoltage(double voltage)=0;
 
     /**
-     * Get the current value of the cellular transmembrane potential.
+     * @return the current value of the cellular transmembrane potential.
      */
     virtual double GetVoltage()=0;
 
     /**
-     * Get the index of the cellular transmembrane potential within this system.
+     * @return the index of the cellular transmembrane potential within this system.
      * Usually it will be an index into the state variable vector, but this is not guaranteed.
      * It will however always be suitable for use with AbstractParameterisedSystem::GetAnyVariable
      * and OdeSolution::GetVariableAtIndex.
@@ -285,7 +286,7 @@ public:
     void SetStimulusFunction(boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
-     * Get the value of the intracellular stimulus.
+     * @return the value of the intracellular stimulus.
      * Shorthand for GetIntracellularStimulus.
      * @param time  the time at which to evaluate the stimulus
      */
@@ -300,7 +301,7 @@ public:
     void SetIntracellularStimulusFunction(boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /**
-     * Get the value of the intracellular stimulus.
+     * @return the value of the intracellular stimulus.
      * This will have units of uA/cm^2 for single-cell problems,
      * or uA/cm^3 in a tissue simulation.
      *
@@ -309,7 +310,7 @@ public:
     double GetIntracellularStimulus(double time);
 
     /**
-     * Get the value of the intracellular stimulus.
+     * @return the value of the intracellular stimulus.
      * This will always be in units of uA/cm^2.
      *
      * @param time  the time at which to evaluate the stimulus
@@ -340,7 +341,7 @@ public:
     bool HasCellMLDefaultStimulus();
 
     /**
-     * If this cell uses lookup tables, returns the singleton object containing the
+     * @return If this cell uses lookup tables, returns the singleton object containing the
      * tables for this cell's concrete class.  Otherwise, returns NULL.
      *
      * Must be implemented by subclasses iff they support lookup tables.
@@ -403,6 +404,7 @@ public:
      *  types of cells). This method by default throws an exception, so should be
      *  implemented in the concrete class if intracellular (cytosolic) calcium concentration is
      *  one of the state variables.
+     *  @return intracellular calcium concentration
      */
     virtual double GetIntracellularCalciumConcentration();
 

@@ -266,7 +266,7 @@ public:
     void SetCarbonMonoxideScaleFactor(double scaleFactor);
 
     /**
-     * Returns the Carbon Monoxide scale factor
+     * @return the Carbon Monoxide scale factor
      */
     double GetCarbonMonoxideScaleFactor();
 };

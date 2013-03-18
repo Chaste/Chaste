@@ -114,7 +114,7 @@ public:
 
 
     /**
-     * Create cell model
+     * @return a newly createdcell model
      *
      * @param node Global node index
      */
@@ -693,9 +693,9 @@ public:
     virtual void SetInitialConvergenceParameters()=0;
     /** Update the parameter which is being varied*/
     virtual void UpdateConvergenceParameters()=0;
-    /** Assess whether to abort the convergence test (convergence is unlikely to happen).*/
+    /** @return whether to abort the convergence test (convergence is unlikely to happen).*/
     virtual bool GiveUpConvergence()=0;
-    /** The value of the parameter which is being varied*/
+    /** @return value of the parameter which is being varied*/
     virtual double Abscissa()=0;
     /** This is currently used as stub for convergence testers which need to converge
      * to a known standardised result (the StimulusConvergence tester in projects/jmpf).

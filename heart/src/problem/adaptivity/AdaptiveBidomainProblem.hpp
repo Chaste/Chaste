@@ -204,37 +204,37 @@ public:
     void AdaptMesh();
 
     /**
-     * Return value of mError
+     * @return value of mError
      */
     double GetTargetError();
 
     /**
-     * Return value of mSigma
+     * @return value of mSigma
      */
     double GetSigma();
 
     /**
-     * Return value of mMaxEdgeLength
+     * @return value of mMaxEdgeLength
      */
     double GetMaxEdgeLength();
 
     /**
-     * Return value of mMinEdgeLength
+     * @return value of mMinEdgeLength
      */
     double GetMinEdgeLength();
 
     /**
-     * Return value of mGradation
+     * @return value of mGradation
      */
     double GetGradation();
 
     /**
-     * Return value of mMaxMeshNodes
+     * @return value of mMaxMeshNodes
      */
     unsigned GetMaxMeshNodes();
 
     /**
-     * Return value of mNumAdaptSweeps
+     * @return value of mNumAdaptSweeps
      */
     unsigned GetNumAdaptSweeps();
 

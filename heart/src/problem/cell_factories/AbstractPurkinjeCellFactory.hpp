@@ -69,6 +69,7 @@ protected:
     std::map<unsigned, double> mJunctionMap;
 
     /**
+     * @return a newly created purkinje cells for the given node.
      * Must be overridden by subclasses to return a Purkinje cell object for the given node.
      * @param nodeIndex  global node index.
      * @param pCardiacCell  the cardiac cell that has already been created at this node
@@ -77,7 +78,7 @@ protected:
                                                                           AbstractCardiacCellInterface* pCardiacCell)=0;
 
     /**
-     * Create a purkinje-ventricular junction between the two cells provided.
+     * @return a newly created purkinje-ventricular junction between the two cells provided.
      *
      * @param pNode  the node in the mesh at which this junction is located
      * @param pPurkinjeCell  the Purkinje cell
@@ -91,7 +92,7 @@ protected:
 
 
     /**
-     * Create a purkinje-ventricular junction between the two cells provided if the junction is defined in the corresponding .pvj file.
+     * @return a newly created purkinje-ventricular junction between the two cells provided if the junction is defined in the corresponding .pvj file.
      *
      * ReadJunctionsFile() must be called before calling this method
      *
@@ -115,7 +116,7 @@ public:
     void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 
     /**
-     * Create a cell object for the given node.
+     * @return a newly created cell object for the given node.
      *
      * The default implementation checks whether the node is in a Purkinje node, in which
      * case it calls CreatePurkinjeCellForTissueNode (which must be defined by subclasses),
@@ -141,7 +142,7 @@ public:
     }
 
     /**
-     *  Get the mixed dimension mesh (for possible use in CreatePurkinjeCellForTissueNode()).
+     *  @return the mixed dimension mesh (for possible use in CreatePurkinjeCellForTissueNode()).
      *  Note: GetMesh() just returns a pointer to an AbstractTetrahedralMesh.
      */
     MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* GetMixedDimensionMesh();
