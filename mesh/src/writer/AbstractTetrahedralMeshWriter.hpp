@@ -77,6 +77,7 @@ public:
         COMM2
     } EventType;
 };
+//#include "Debug.hpp"
 
 /**
  * An abstract tetrahedral mesh writer class.
@@ -85,6 +86,66 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractTetrahedralMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+    /**
+     * Post an element from a slave process to the master for concentration
+     * @param globalIndex index of this element
+     * @param indices the node index data for this element
+     * @param numIndices number of indices
+     * @param tag temporary
+     * @param attribute
+     */
+    void PostElement(unsigned globalIndex, unsigned indices[], unsigned numIndices, unsigned tag, double attribute)
+    {
+        //PRINT_2_VARIABLES(globalIndex, numIndices);
+        MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
+        MPI_Send(indices, numIndices, MPI_UNSIGNED, 0,
+                 tag, //Elements sent with tags offset
+                 PETSC_COMM_WORLD);
+        MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
+        // Attribute value has the same tag (assume that it doesn't overtake the previous message)
+        MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
+        MPI_Send(&attribute, 1, MPI_DOUBLE, 0,
+                tag, //Elements sent with tags offset
+                PETSC_COMM_WORLD);
+        MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
+    }
+    /**
+     * Unpack an element from a slave process on the master for concentration
+     * @param rElementData the output structure to fill (should have the NodeIndices structure of the correct size
+     * @param globalIndex index of this element
+     * @param numIndices number of indices
+     * @param tag temporary
+     */
+    void UnpackElement(ElementData& rElementData, unsigned globalIndex, unsigned numIndices, unsigned tag)
+    {
+        //PRINT_2_VARIABLES(globalIndex, numIndices);
+        assert( numIndices = rElementData.NodeIndices.size());
+        unsigned raw_indices[numIndices];
+        MPI_Status status;
+        //Get it from elsewhere
+        MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
+        MPI_Recv(raw_indices, numIndices, MPI_UNSIGNED, MPI_ANY_SOURCE,
+                 tag,
+                 PETSC_COMM_WORLD, &status);
+        MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
+        // Convert to std::vector
+        for (unsigned j=0; j< rElementData.NodeIndices.size(); j++)
+        {
+            rElementData.NodeIndices[j] = raw_indices[j];
+        }
+
+        // Attribute value has the same tag (assume that it doesn't overtake the previous message)
+        double attribute;
+        MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
+        MPI_Recv(&attribute, 1U, MPI_DOUBLE, MPI_ANY_SOURCE,
+                 tag,
+                 PETSC_COMM_WORLD, &status);
+        MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
+
+        // Attribute value
+        rElementData.AttributeValue = attribute;
+
+    }
 
     /**
      * Write a parallel mesh to file. Used by the serialization methods.

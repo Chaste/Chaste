@@ -212,29 +212,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
             else
             {
                 //Master doesn't own this element.
-                unsigned raw_indices[mNodesPerElement];
-                MPI_Status status;
-                //Get it from elsewhere
-                MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
-                MPI_Recv(raw_indices, mNodesPerElement, MPI_UNSIGNED, MPI_ANY_SOURCE,
-                         this->mNumNodes + mElementCounterForParallelMesh,
-                         PETSC_COMM_WORLD, &status);
-                MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
-                // Convert to std::vector
-                for (unsigned j=0; j< elem_data.NodeIndices.size(); j++)
-                {
-                    elem_data.NodeIndices[j] = raw_indices[j];
-                }
-                // Attribute value has the same tag (assume that it doesn't overtake the previous message)
-                double attribute;
-                MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
-                MPI_Recv(&attribute, 1U, MPI_DOUBLE, MPI_ANY_SOURCE,
-                         this->mNumNodes + mElementCounterForParallelMesh,
-                         PETSC_COMM_WORLD, &status);
-                MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
-
-                // Attribute value
-                elem_data.AttributeValue = attribute;
+                UnpackElement(elem_data, mElementCounterForParallelMesh, mNodesPerElement, this->mNumNodes +  mElementCounterForParallelMesh);
             }
             // increment element counter
             mElementCounterForParallelMesh++;
@@ -268,9 +246,9 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
                 unsigned old_index = (*(*(mpIters->pBoundaryElemIter)))->GetNodeGlobalIndex(j);
                 boundary_elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
             }
+            boundary_elem_data.AttributeValue = (*(*(mpIters->pBoundaryElemIter)))->GetAttribute();
 
             ++(*(mpIters->pBoundaryElemIter));
-
             return boundary_elem_data;
         }
         else //Parallel mesh
@@ -287,21 +265,12 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
                 {
                     boundary_elem_data.NodeIndices[j] = p_boundary_element->GetNodeGlobalIndex(j);
                 }
+                boundary_elem_data.AttributeValue = p_boundary_element->GetAttribute();
             }
             else
             {
                 //Master doesn't own this boundary element.
-                unsigned raw_indices[ELEMENT_DIM];
-                MPI_Status status;
-                //Get it from elsewhere
-                MPI_Recv(raw_indices, ELEMENT_DIM, MPI_UNSIGNED, MPI_ANY_SOURCE,
-                         this->mNumNodes + this->mNumElements + mBoundaryElementCounterForParallelMesh,
-                         PETSC_COMM_WORLD, &status);
-                // Convert to std::vector
-                for (unsigned j=0; j< boundary_elem_data.NodeIndices.size(); j++)
-                {
-                    boundary_elem_data.NodeIndices[j] = raw_indices[j];
-                }
+                UnpackElement(boundary_elem_data, mBoundaryElementCounterForParallelMesh, ELEMENT_DIM, this->mNumNodes + this->mNumElements + mBoundaryElementCounterForParallelMesh);
             }
             // increment element counter
             mBoundaryElementCounterForParallelMesh++;
@@ -346,24 +315,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableE
         else
         {
             //Master doesn't own this element.
-            unsigned raw_indices[2];
-            MPI_Status status;
-            //Get it from elsewhere
-            MPI_Recv(raw_indices, 2, MPI_UNSIGNED, MPI_ANY_SOURCE,
-                     this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + mCableElementCounterForParallelMesh,
-                     PETSC_COMM_WORLD, &status);
-
-            // Convert to ElementData (2 nodes plus an attribute value)
-            for (unsigned j=0; j< 2; j++)
-            {
-                elem_data.NodeIndices[j] = raw_indices[j];
-            }
-            // Attribute value
-            double radius;
-            MPI_Recv(&radius, 1, MPI_DOUBLE, MPI_ANY_SOURCE,
-                     this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + mCableElementCounterForParallelMesh,
-                     PETSC_COMM_WORLD, &status);
-            elem_data.AttributeValue = radius;
+            UnpackElement(elem_data, mCableElementCounterForParallelMesh, 2, this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + mCableElementCounterForParallelMesh);
         }
         // increment element counter
         mCableElementCounterForParallelMesh++;
@@ -615,19 +567,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     {
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
-
-                    MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
-                    MPI_Send(raw_indices, mNodesPerElement, MPI_UNSIGNED, 0,
-                             this->mNumNodes + index, //Elements sent with tags offset
-                             PETSC_COMM_WORLD);
-                    MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
-                    // Attribute value has the same tag (assume that it doesn't overtake the previous message)
-                    double attribute = it->GetAttribute();
-                    MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
-                    MPI_Send(&attribute, 1, MPI_DOUBLE, 0,
-                            this->mNumNodes + index, //Elements sent with tags offset
-                            PETSC_COMM_WORLD);
-                    MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
+                    PostElement(index, raw_indices, mNodesPerElement, this->mNumNodes + index, it->GetAttribute());
                 }
             }
 //            PetscTools::Barrier("DodgyBarrierAfterELE");
@@ -647,9 +587,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                         {
                             raw_face_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }
-                        MPI_Send(raw_face_indices, ELEMENT_DIM, MPI_UNSIGNED, 0,
-                                 this->mNumNodes + this->mNumElements + index, //Faces sent with tags offset even more
-                                 PETSC_COMM_WORLD);
+                        PostElement(index, raw_face_indices, ELEMENT_DIM, this->mNumNodes + this->mNumElements + index, (*it)->GetAttribute());
                     }
                 }
             }
@@ -670,14 +608,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                         {
                             raw_cable_element_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }
-                        MPI_Send(raw_cable_element_indices, 2, MPI_UNSIGNED, 0,
-                                 this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + index, //Cable elements sent with tags offset even more
-                                 PETSC_COMM_WORLD);
-                        double cable_radius = (*it)->GetAttribute();
-                        //Assume this message doesn't overtake previous
-                        MPI_Send(&cable_radius, 1, MPI_DOUBLE, 0,
-                                 this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + index, //Cable elements sent with tags offset even more
-                                 PETSC_COMM_WORLD);
+                        PostElement(index, raw_cable_element_indices, 2, this->mNumNodes + this->mNumElements + this->mNumBoundaryElements + index, (*it)->GetAttribute());
                     }
                 }
             }
