@@ -165,13 +165,14 @@ public:
     std::vector<unsigned>& rGetAvailableSpaces();
 
     /**
-     * Find if a given node has space available.
+     * Find if a given node has space available. Overridden in subclasses to implement different division regiemes.
      *
      * @param index the global index of a specified node
+     * @param the cell wanting to divide into the lattice site (defaults to NULL)
      *
      * @return whether the node is an empty site
      */
-    bool IsSiteAvailable(unsigned index);
+    virtual bool IsSiteAvailable(unsigned index, CellPtr pCell);
 
     /**
      * @return reference to #mrMesh.

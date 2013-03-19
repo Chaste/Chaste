@@ -69,10 +69,13 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
     }
     else
     {
-        // Create a set of node indices corresponding to empty sites
-        for (unsigned i=0; i<locationIndices.size(); i++)
-        {
-            if (!IsSiteAvailable(locationIndices[i]))
+        // Create a set of node indices corresponding to empty sites.
+    	// Note iterating over mCells is OK as it has the same order as location indices at this point (its just coppied from rCells)
+    	std::list<CellPtr>::iterator it = this->mCells.begin();
+		for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
+		{
+			assert(i<locationIndices.size());
+            if (!IsSiteAvailable(locationIndices[i],*it))
             {
                 EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
@@ -107,9 +110,10 @@ std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 }
 
 template<unsigned DIM>
-bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index)
+bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index, CellPtr pCell)
 {
-    return (mAvailableSpaces[index] != 0);
+	// TODO this is where to deal with carrying capacity
+	return (mAvailableSpaces[index] != 0);
 }
 
 template<unsigned DIM>
@@ -151,7 +155,7 @@ Node<DIM>* MultipleCaBasedCellPopulation<DIM>::GetNodeCorrespondingToCell(CellPt
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-    if (!IsSiteAvailable(index))
+    if (!IsSiteAvailable(index, pCell))
     {
         EXCEPTION("No available spaces at location index " << index << ".");
     }
@@ -187,7 +191,7 @@ bool MultipleCaBasedCellPopulation<DIM>::IsRoomToDivide(CellPtr pCell)
          neighbour_iter != neighbouring_node_indices.end();
          ++neighbour_iter)
     {
-        if (IsSiteAvailable(*neighbour_iter))
+        if (IsSiteAvailable(*neighbour_iter, pCell))
         {
             is_room = true;
             break;
@@ -229,7 +233,7 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     unsigned count = 0;
     while (count < num_neighbours)
     {
-        bool is_empty_site = IsSiteAvailable(*neighbour_iter);
+        bool is_empty_site = IsSiteAvailable(*neighbour_iter, pParentCell);
 
         if (is_empty_site)
         {
@@ -317,7 +321,7 @@ void MultipleCaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
                 neighbouring_node_indices_vector.push_back(*iter);
 
-                if (IsSiteAvailable(*iter))
+                if (IsSiteAvailable(*iter, *cell_iter))
                 {
                     // Iterating over the update rule
                     for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
