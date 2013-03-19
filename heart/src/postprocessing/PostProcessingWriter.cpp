@@ -157,28 +157,12 @@ PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::~PostProcessingWriter()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repolarisationPercentage, double threshold)
+void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const std::vector<std::vector<double> >& rDataPayload,
+																		 const std::string& rDatasetName,
+																		 const std::string& rDatasetUnit,
+																		 std::string unlimitedVariableName,
+																		 std::string unlimitedVariableUnit)
 {
-	std::vector<std::vector<double> > local_output_data = mpCalculator->CalculateAllActionPotentialDurationsForNodeRange(repolarisationPercentage, mLo, mHi, threshold);
-
-    /// This is the old way of writing out post-processing.
-//    std::stringstream dataset_name;
-//    dataset_name << "Apd_" << repolarisationPercentage << "_" << threshold << "_Map";
-//    std::stringstream filename_stream;
-//    filename_stream << dataset_name.str() << ".dat";
-//    WriteGenericFile(local_output_data, filename_stream.str());
-
-    // Write to HDF5 file #1660
-    // HDF5 shouldn't have minus signs in the data names..
-    std::stringstream hdf5_dataset_name;
-    std::string extra_message = "";
-    if (threshold < 0.0)
-    {
-        extra_message = "_minus";
-        threshold = -threshold;
-    }
-    hdf5_dataset_name << "Apd_" << repolarisationPercentage << extra_message << "_" << threshold << "_Map";
-
     DistributedVectorFactory* p_factory = mrMesh.GetDistributedVectorFactory();
     FileFinder test_output("", RelativeTo::ChasteTestOutput);
     Hdf5DataWriter writer(*p_factory,
@@ -186,20 +170,20 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
                           mHdf5File,
                           false, // to wiping
                           true,  // to extending
-                          hdf5_dataset_name.str()); // dataset name
+                          rDatasetName); // dataset name
 
-    int apd_id = writer.DefineVariable(hdf5_dataset_name.str(),"msec");
+    int apd_id = writer.DefineVariable(rDatasetName,rDatasetUnit);
     writer.DefineFixedDimension(mrMesh.GetNumNodes());
-    writer.DefineUnlimitedDimension("PaceNumber", "dimensionless");
+    writer.DefineUnlimitedDimension(unlimitedVariableName, unlimitedVariableUnit);
     writer.EndDefineMode();
 
     //Determine the maximum number of paces
     unsigned local_max_paces = 0u;
-    for (unsigned node_index = 0; node_index < local_output_data.size(); ++node_index)
+    for (unsigned node_index = 0; node_index < rDataPayload.size(); ++node_index)
     {
-        if (local_output_data[node_index].size() > local_max_paces)
+        if (rDataPayload[node_index].size() > local_max_paces)
         {
-             local_max_paces = local_output_data[node_index].size();
+             local_max_paces = rDataPayload[node_index].size();
         }
     }
 
@@ -216,9 +200,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
         {
             unsigned node_idx = index.Local;
             // pad with zeros if no pace defined at this node
-            if (pace_idx < local_output_data[node_idx].size() )
+            if (pace_idx < rDataPayload[node_idx].size() )
             {
-                distributed_vector[index] = local_output_data[node_idx][pace_idx];
+                distributed_vector[index] = rDataPayload[node_idx][pace_idx];
             }
             else
             {
@@ -233,14 +217,25 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
         writer.AdvanceAlongUnlimitedDimension();
     }
     writer.Close();
+}
 
-    ///\todo #1660 work out why we can't have more than one HDF5 DataReader in existence at once.
-    delete mpDataReader;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repolarisationPercentage, double threshold)
+{
+	std::vector<std::vector<double> > local_output_data = mpCalculator->CalculateAllActionPotentialDurationsForNodeRange(repolarisationPercentage, mLo, mHi, threshold);
 
+    // HDF5 shouldn't have minus signs in the data names..
+    std::stringstream hdf5_dataset_name;
+    std::string extra_message = "_";
+    if (threshold < 0.0)
+    {
+        extra_message += "minus_";
+        threshold = -threshold;
+    }
+    hdf5_dataset_name << "Apd_" << repolarisationPercentage << extra_message << threshold << "_Map";
+
+	WriteOutputDataToHdf5(local_output_data, hdf5_dataset_name.str(), "msec");
     RunHdf5Converters(hdf5_dataset_name.str());
-
-    mpDataReader = new Hdf5DataReader(mDirectory, mHdf5File);
-    mpCalculator->SetHdf5DataReader(mpDataReader);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -263,9 +258,18 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
         }
         output_data.push_back(upstroke_times);
     }
+
     std::stringstream filename_stream;
-    filename_stream << "UpstrokeTimeMap_" << threshold << ".dat";
-    WriteGenericFile(output_data, filename_stream.str());
+    std::string extra_message = "_";
+    if (threshold < 0.0)
+    {
+        extra_message += "minus_";
+        threshold = -threshold;
+    }
+    filename_stream << "UpstrokeTimeMap" << extra_message << threshold;
+
+    WriteOutputDataToHdf5(output_data, filename_stream.str(), "msec");
+    RunHdf5Converters(filename_stream.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -288,9 +292,18 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteMaxUpstrokeVelocityMap(d
         }
         output_data.push_back(upstroke_velocities);
     }
+
     std::stringstream filename_stream;
-    filename_stream << "MaxUpstrokeVelocityMap_" << threshold << ".dat";
-    WriteGenericFile(output_data, filename_stream.str());
+    std::string extra_message = "_";
+    if (threshold < 0.0)
+    {
+        extra_message += "minus_";
+        threshold = -threshold;
+    }
+    filename_stream << "MaxUpstrokeVelocityMap" << extra_message << threshold;
+
+    WriteOutputDataToHdf5(output_data, filename_stream.str(), "mV_per_msec");
+    RunHdf5Converters(filename_stream.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -314,8 +327,10 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteConductionVelocityMap(un
         output_data.push_back(conduction_velocities);
     }
     std::stringstream filename_stream;
-    filename_stream << "ConductionVelocityFromNode" << originNode << ".dat";
-    WriteGenericFile(output_data, filename_stream.str());
+    filename_stream << "ConductionVelocityFromNode" << originNode;
+
+    WriteOutputDataToHdf5(output_data, filename_stream.str(), "cm_per_msec");
+    RunHdf5Converters(filename_stream.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -339,7 +354,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
         catch(Exception& e)
         {
             upstroke_velocities.push_back(0);
-            assert(upstroke_velocities.size() ==1);
+            assert(upstroke_velocities.size() == 1);
             no_upstroke_occurred = true;
         }
         // This method won't throw any exception, so there is no need to put it into the try/catch:
@@ -366,8 +381,16 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
 
         output_data.push_back(output_item);
     }
+
     std::stringstream filename_stream;
-    filename_stream << "AboveThresholdDepolarisations" << threshold << ".dat";
+    std::string extra_message = "_";
+    if (threshold < 0.0)
+    {
+        extra_message += "minus_";
+        threshold = -threshold;
+    }
+    filename_stream << "AboveThresholdDepolarisations" << extra_message << threshold << ".dat";
+
     WriteGenericFile(output_data, filename_stream.str());
 }
 
@@ -480,6 +503,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::RunHdf5Converters(const std::string& rDatasetName)
 {
+    ///\todo #2359 work out why we can't have more than one HDF5 DataReader in existence at once.
+    delete mpDataReader;
+
     if(HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
     {
         FileFinder test_output("", RelativeTo::ChasteTestOutput);
@@ -492,6 +518,10 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::RunHdf5Converters(const std::
                                                           rDatasetName);
     }
     ///\todo #1660 put the other HDF5 converters as options here...
+
+    ///\todo #2359 work out why we can't have more than one HDF5 DataReader in existence at once.
+    mpDataReader = new Hdf5DataReader(mDirectory, mHdf5File);
+    mpCalculator->SetHdf5DataReader(mpDataReader);
 }
 
 /////////////////////////////////////////////////////////////////////

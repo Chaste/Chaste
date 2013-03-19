@@ -100,19 +100,19 @@ class TestPostProcessingWriter : public CxxTest::TestSuite
 public:
     void TestWriterMethods() throw(Exception)
     {
-    	FileFinder test_dir = GetOutputPath("TestPostProcessingWriter_WriterMethods");
+    	FileFinder test_dir = GetPath("TestPostProcessingWriter_WriterMethods");
         FileFinder output_dir = GetOutputPath("TestPostProcessingWriter_WriterMethods");
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "postprocessingapd");
+        CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "postprocessingapd");
 
-        PostProcessingWriter<1,1> via_hdf5_writer(mesh, test_dir, "postprocessingapd");
-        via_hdf5_writer.WriteApdMapFile(60.0, -30.0);
+        PostProcessingWriter<1,1> writer(mesh, test_dir, "postprocessingapd");
+        writer.WriteApdMapFile(60.0, -30.0);
 
-        FileFinder output_file("output/Apd_60_minus_30_Map.dat", output_dir);
+        FileFinder output_file("output/Apd_60_minus_30_Map.dat", test_dir);
         TS_ASSERT(output_file.Exists());
 
         std::string file1 = output_file.GetAbsolutePath();
@@ -120,17 +120,17 @@ public:
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
 
-        PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
+        //PostProcessingWriter<1,1> writer(mesh, test_dir, "postprocessingapd");
         writer.WriteUpstrokeTimeMap(-30.0);
 
-        file1 = FileFinder("UpstrokeTimeMap_-30.dat", output_dir).GetAbsolutePath();
+        file1 = FileFinder("UpstrokeTimeMap_minus_30.dat", output_dir).GetAbsolutePath();
         file2 = "heart/test/data/PostProcessorWriter/good_upstroke_time_postprocessing.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
         writer.WriteMaxUpstrokeVelocityMap(-30.0);
 
-        file1 = FileFinder("MaxUpstrokeVelocityMap_-30.dat", output_dir).GetAbsolutePath();
+        file1 = FileFinder("MaxUpstrokeVelocityMap_minus_30.dat", output_dir).GetAbsolutePath();
         file2 = "heart/test/data/PostProcessorWriter/good_upstroke_velocity_postprocessing.dat";
         NumericFileComparison comp3(file1, file2);
         TS_ASSERT(comp3.CompareFiles(1e-12));
@@ -224,7 +224,7 @@ public:
 		NumericFileComparison comp2(file1, file2);
 		TS_ASSERT(comp2.CompareFiles(1e-12));
 
-		file1 = FileFinder("UpstrokeTimeMap_-70.dat", output_dir).GetAbsolutePath();
+		file1 = FileFinder("UpstrokeTimeMap_minus_70.dat", output_dir).GetAbsolutePath();
 		file2 = "heart/test/data/PostProcessorWriter/UpstrokeTimeMap_-70.dat";
 		NumericFileComparison comp3(file1, file2);
 		TS_ASSERT(comp3.CompareFiles(1e-12));
@@ -234,7 +234,7 @@ public:
 		NumericFileComparison comp4(file1, file2);
 		TS_ASSERT(comp4.CompareFiles(1e-12));
 
-		file1 = FileFinder("MaxUpstrokeVelocityMap_-50.dat", output_dir).GetAbsolutePath();
+		file1 = FileFinder("MaxUpstrokeVelocityMap_minus_50.dat", output_dir).GetAbsolutePath();
 		file2 = "heart/test/data/PostProcessorWriter/MaxUpstrokeVelocityMap_-50.dat";
 		NumericFileComparison comp5(file1, file2);
 		TS_ASSERT(comp5.CompareFiles(1e-12));
@@ -259,7 +259,7 @@ public:
 		NumericFileComparison comp9(file1, file2);
 		TS_ASSERT(comp9.CompareFiles(1e-12));
 
-		file1 = FileFinder("AboveThresholdDepolarisations-40.dat", output_dir).GetAbsolutePath();
+		file1 = FileFinder("AboveThresholdDepolarisations_minus_40.dat", output_dir).GetAbsolutePath();
 		file2 = "heart/test/data/PostProcessorWriter/AboveThresholdDepolarisations-40.dat";
 		NumericFileComparison comp10(file1, file2);
 		TS_ASSERT(comp10.CompareFiles(1e-12));
@@ -322,7 +322,7 @@ public:
     void TestWritingEads() throw (Exception)
     {
         HeartConfig::Instance()->Reset();
-        FileFinder output_dir = GetOutputPath("TestPostProcessingWriter_WritingEads");
+        FileFinder output_dir = GetPath("TestPostProcessingWriter_WritingEads");
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
         DistributedTetrahedralMesh<1,1> mesh;
@@ -333,7 +333,7 @@ public:
 
         writer.WriteAboveThresholdDepolarisationFile(-30.0);
 
-        std::string file1 = FileFinder("AboveThresholdDepolarisations-30.dat", output_dir).GetAbsolutePath();
+        std::string file1 = FileFinder("output/AboveThresholdDepolarisations_minus_30.dat", output_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/AboveThresholdDepolarisations-30.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
@@ -354,20 +354,20 @@ public:
 
         double upstroke_threshold = -30.0;
         writer.WriteApdMapFile(60.0, upstroke_threshold);
-        writer.WriteUpstrokeTimeMap(upstroke_threshold);
+        writer.WriteAboveThresholdDepolarisationFile(upstroke_threshold); // This isn't written into a meshalyzer or cmgui format (two columns) - so keep exporting manually.
 
         std::string file1 = FileFinder("output/Apd_60_minus_30_Map.dat", test_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
 
-        file1 = FileFinder("output/UpstrokeTimeMap_-30.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/good_upstroke_postprocessing.dat";
+        file1 = FileFinder("output/AboveThresholdDepolarisations_minus_30.dat", test_dir).GetAbsolutePath();
+        file2 = "heart/test/data/PostProcessorWriter/good_ead_postprocessing.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
-        file1 = FileFinder("cmgui_output/UpstrokeTimeMap_-30.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/good_upstroke_postprocessing.dat";
+        file1 = FileFinder("cmgui_output/AboveThresholdDepolarisations_minus_30.dat", test_dir).GetAbsolutePath();
+        file2 = "heart/test/data/PostProcessorWriter/good_ead_postprocessing.dat";
         NumericFileComparison comp3(file1, file2);
         TS_ASSERT(comp3.CompareFiles(1e-12));
     }

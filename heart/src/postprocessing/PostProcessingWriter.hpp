@@ -223,6 +223,21 @@ private:
      */
     void RunHdf5Converters(const std::string& rDatasetName);
 
+    /**
+     * Put the post-processed data into the main HDF5 results file.
+     *
+     * @param rDataPayload  The postprocessed quantities
+     * @param rDatasetName  The name of the quantities
+     * @param rDatasetUnit  The unit of the quantities
+     * @param unlimitedVariableName  The name of the unlimited variable (defaults to "PaceNumber")
+     * @param unlimitedVariableUnit  The unlimited variable units (defaults to "dimensionless")
+     */
+    void WriteOutputDataToHdf5(const std::vector<std::vector<double> >& rDataPayload,
+							   const std::string& rDatasetName,
+							   const std::string& rDatasetUnit,
+							   std::string unlimitedVariableName = "PaceNumber",
+							   std::string unlimitedVariableUnit = "dimensionless");
+
 };
 
 #endif /*POSTPROCESSINGWRITER_HPP_*/
