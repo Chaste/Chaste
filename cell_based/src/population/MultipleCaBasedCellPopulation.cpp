@@ -155,6 +155,8 @@ void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned inde
     {
         EXCEPTION("No available spaces at location index " << index << ".");
     }
+
+
     mAvailableSpaces[index]--;
     AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
 }
@@ -543,6 +545,22 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_cycle_phases(num_cells, -1.0);
     std::vector<Node<DIM>*> nodes;
 
+    std::vector<std::vector<double> > cellwise_data;
+
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
+
+    // We assume that the first cell is representative of all cells
+    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cellwise_data_var(num_cells);
+        cellwise_data.push_back(cellwise_data_var);
+    }
+
+
     unsigned cell = 0;
 
     // Counter to keep track of how many cells are at a lattice site
@@ -618,10 +636,13 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             cell_cycle_phases[cell] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
         }
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            cellwise_data[var][cell] = cell_ptr->GetCellData()->GetItem(cell_data_names[var]);
+        }
 
         cell ++;
 
-        ///\todo #2032 Add CellData
     }
 
     // Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)
@@ -651,6 +672,13 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
         mesh_writer.AddPointData("Cell labels", cell_labels);
+    }
+    if (num_cell_data_items > 0)
+    {
+        for (unsigned var=0; var<cellwise_data.size(); var++)
+        {
+            mesh_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
+        }
     }
 
     /*
