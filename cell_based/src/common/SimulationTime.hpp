@@ -57,7 +57,7 @@ class SimulationTime : public SerializableSingleton<SimulationTime>
 public:
 
     /**
-     * Return a pointer to the simulation time object.
+     * @return a pointer to the simulation time object.
      * The first time this is called the simulation time object is created.
      */
     static SimulationTime* Instance();

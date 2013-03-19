@@ -66,7 +66,7 @@ private:
     }
 
     /**
-     * Compression energy parameter.
+     * @return Compression energy parameter.
      *
      * Represented by the parameter K in the model by Buske et al (2011) in
      * their off-lattice model of the intestinal crypt
@@ -84,7 +84,7 @@ public:
     BuskeCompressionForce();
 
     /**
-     * Get mCompressionEnergyParameter.
+     * @return mCompressionEnergyParameter.
      */
     double GetCompressionEnergyParameter();
 

@@ -138,7 +138,7 @@ public:
     CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
-     * Helper method that returns a set of pointers to two given Cells.
+     * @return a an ordered pair of pointers to two given Cells.
      * Used by the spring marking routines.
      * Elements in the returned pair are ordered by cell ID number - the
      * cell in the pair will have a smaller ID.

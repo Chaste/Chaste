@@ -55,7 +55,7 @@ friend class TestForces;
 private:
 
     /**
-     * Get the magnitude of the chemotactic force.
+     * @return the magnitude of the chemotactic force.
      *
      * @param concentration the local nutrient concentration
      * @param concentrationGradientMagnitude the magnitude of the local nutrient concentration gradient

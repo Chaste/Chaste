@@ -120,7 +120,7 @@ public:
     virtual ~CellCycleModelOdeHandler();
 
     /**
-     * Get mpOdeSystem.
+     * @return #mpOdeSystem.
      */
     AbstractOdeSystem* GetOdeSystem() const;
 
@@ -144,7 +144,7 @@ public:
     void SetLastTime(double lastTime);
 
     /**
-     * Get method for #mDt, which sets it to a default value if it hasn't
+     * @return #mDt.  This sets it to a default value if it hasn't
      * been set by calling SetDt.
      */
     double GetDt();

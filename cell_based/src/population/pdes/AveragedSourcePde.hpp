@@ -142,7 +142,7 @@ public:
     c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
 
     /**
-     * Returns the uptake rate.
+     * @return the uptake rate.
      *
      * @param elementIndex the element we wish to return the uptake rate for
      */

@@ -61,6 +61,7 @@ public:
     /**
      * Loads a saved cell-based simulation to run further.
      *
+     * @return the unarchived simulation object
      * @param rArchiveDirectory  the name of the simulation to load
      *   (specified originally by simulation.SetOutputDirectory("wherever"); )
      * @param rTimeStamp  the time at which to load the simulation (this must

@@ -79,17 +79,17 @@ private:
     }
 
 public:
-    /** Return a pointer to the singleton instance, creating it if necessary. */
+    /** @return a pointer to the singleton instance, creating it if necessary. */
     static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > Instance();
 
-    /** Is the instance in existence and fully set up. */
+    /** @return whether the instance in existence and fully set up. */
     bool IsSetUp();
 
     /** Initialise the ODE solver. */
     void Initialise();
 
     /**
-     * Return true iff this is an adaptive solver such as CVODE for which it is safe to set the 'timestep'
+     * @return true iff this is an adaptive solver such as CVODE for which it is safe to set the 'timestep'
      * to be the outer simulation timestep, because the ODE solver will use this as its maximum, not actual,
      * timestep.
      *
@@ -175,10 +175,10 @@ private:
     }
 
 public:
-    /** Return a pointer to the singleton instance, creating it if necessary. */
+    /** @return a pointer to the singleton instance, creating it if necessary. */
     static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > Instance();
 
-    /** Is the instance in existence and fully set up. */
+    /** @return whether the instance in existence and fully set up. */
     bool IsSetUp();
 
     /** Initialise the ODE solver. */

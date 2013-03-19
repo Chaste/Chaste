@@ -90,7 +90,7 @@ public:
     virtual ~CellLabel();
 
     /**
-     * Get #mColour.
+     * @return #mColour.
      */
     unsigned GetColour() const;
 };

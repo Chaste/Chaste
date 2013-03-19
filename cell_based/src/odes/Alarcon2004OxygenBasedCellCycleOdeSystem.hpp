@@ -171,12 +171,12 @@ public:
     void SetIsLabelled(bool isLabelled);
 
     /**
-     * Get method for mIsLabelled.
+     * @return #mIsLabelled.
      */
     bool IsLabelled() const;
 
     /**
-     * Get method for mOxygenConcentration.
+     * @return #mOxygenConcentration.
      */
     double GetOxygenConcentration() const;
 };

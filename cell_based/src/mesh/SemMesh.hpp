@@ -86,6 +86,7 @@ protected:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the node
+     * @return local index
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
@@ -94,6 +95,7 @@ protected:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the element
+     * @return local index
      */
     unsigned SolveElementMapping(unsigned index) const;
 
@@ -102,6 +104,7 @@ protected:
      * as it is pure virtual in the base class.
      *
      * @param index the global index of the boundary element
+     * @return local index
      */
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
@@ -159,14 +162,14 @@ public:
     class SemElementIterator;
 
     /**
-     * Get an iterator to the first element in the mesh.
+     * @return an iterator to the first element in the mesh.
      *
      * @param skipDeletedElements whether to include deleted element
      */
     inline SemElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
 
     /**
-     * Get an iterator to one past the last element in the mesh.
+     * @return an iterator to one past the last element in the mesh.
      */
     inline SemElementIterator GetElementIteratorEnd();
 
@@ -270,11 +273,13 @@ public:
          * Dereference the iterator giving you a *reference* to the current element.
          *
          * Make sure to use a reference for the result to avoid copying elements unnecessarily.
+         * @return reference
          */
         inline PottsElement<DIM>& operator*();
 
         /**
          * Member access from a pointer.
+         * @return pointer
          */
         inline PottsElement<DIM>* operator->();
 
@@ -282,11 +287,13 @@ public:
          * Comparison not-equal-to.
          *
          * @param rOther iterator with which comparison is made
+         * @return not-equal
          */
         inline bool operator!=(const SemMesh<DIM>::SemElementIterator& rOther);
 
         /**
          * Prefix increment operator.
+         * @return incremented object
          */
         inline SemElementIterator& operator++();
 
@@ -311,16 +318,18 @@ public:
         /** The actual element iterator. */
         typename std::vector<PottsElement<DIM> *>::iterator mElementIter;
 
-        /** Whether to skip deleted elements. */
+        /**  @return whether to skip deleted elements. */
         bool mSkipDeletedElements;
 
         /**
-         * Helper method to say when we're at the end.
+         * Helper method.
+         * @return whether we're at the end.
          */
         inline bool IsAtEnd();
 
         /**
-         * Helper method to say if we're allowed to point at this element.
+         * Helper method.
+         * @return whether we're allowed to point at this element.
          */
         inline bool IsAllowedElement();
     };

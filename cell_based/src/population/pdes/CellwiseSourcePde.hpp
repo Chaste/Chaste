@@ -119,6 +119,8 @@ public:
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.
      *
      * @param rNode reference to the node
+     * @return the coefficient of u in the linear part of the source term, i.e f(x) in
+     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
     double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode);
 

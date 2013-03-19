@@ -223,6 +223,7 @@ protected:
      * A child class can overload this if they want the simulation to stop
      * based on certain conditions before the specified end time (for example,
      * run until a crypt becomes monoclonal).
+     * @return true if stopping event has occurred
      */
     virtual bool StoppingEventHasOccurred();
 
@@ -310,7 +311,7 @@ public:
     unsigned GetNumDeaths();
 
     /**
-     * Get the output directory of the simulation.
+     * @return the output directory of the simulation.
      */
     std::string GetOutputDirectory();
 

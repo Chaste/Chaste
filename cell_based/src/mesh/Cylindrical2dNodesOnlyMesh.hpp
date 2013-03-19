@@ -137,6 +137,7 @@ public:
      * Overridden AddNode() method.
      *
      * @param pNewNode  pointer to the new node
+     * @return index of new node
      */
     unsigned AddNode(Node<2>* pNewNode);
 };

@@ -93,7 +93,7 @@ public:
     virtual ~AbstractCellCycleModelOdeSolver();
 
     /**
-     * Is the instance in existence and fully set up.
+     * @return whether the instance in existence and fully set up.
      */
     virtual bool IsSetUp()=0;
 
@@ -122,7 +122,7 @@ public:
     virtual void Initialise()=0;
 
     /**
-     * Determine whether the solver quit due to the ODE's stopping event
+     * @return whether the solver quit due to the ODE's stopping event
      * triggering
      */
     bool StoppingEventOccurred();
@@ -170,7 +170,7 @@ public:
     void SetTolerances(double relTol=1e-4, double absTol=1e-6);
 
     /**
-     * Return true iff this is an adaptive solver such as CVODE for which it is safe to set the 'timestep'
+     * @return true iff this is an adaptive solver such as CVODE for which it is safe to set the 'timestep'
      * to be the outer simulation timestep, because the ODE solver will use this as its maximum, not actual,
      * timestep.
      *

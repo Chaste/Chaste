@@ -105,6 +105,9 @@ public:
     /**
      * Overridden builder method to create new instances of
      * the cell-cycle model.
+     *
+     * @return new cell-cycle model
+     *
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 

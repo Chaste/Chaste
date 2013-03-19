@@ -97,19 +97,19 @@ public:
     void SetItem(const std::string& variableName, double data);
 
     /**
-     * Get data.
+     * @return data.
      *
      * @param variableName the index of the data required.
      */
     double GetItem(const std::string& variableName) const;
 
     /**
-     * Get number of data items
+     * @return number of data items
      */
     unsigned GetNumItems() const;
 
     /**
-     * Get all keys.
+     * @return all keys.
      * 
      * These are sorted in lexicographical/alphabetic order (so that the order is independent of any map iteration method).
      */

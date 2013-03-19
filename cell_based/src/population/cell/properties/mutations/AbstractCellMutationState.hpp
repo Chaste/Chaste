@@ -100,7 +100,7 @@ public:
     virtual ~AbstractCellMutationState();
 
     /**
-     * Get #mColour.
+     * @return #mColour.
      */
     unsigned GetColour() const;
 };

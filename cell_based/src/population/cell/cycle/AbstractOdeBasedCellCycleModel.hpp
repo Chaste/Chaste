@@ -129,7 +129,7 @@ public:
     void SetBirthTime(double birthTime);
 
     /**
-     * Returns the protein concentrations at the current time (useful for tests)
+     * @return the protein concentrations at the current time (useful for tests)
      *
      * NB: Will copy the vector - you can't use this to modify the concentrations.
      */

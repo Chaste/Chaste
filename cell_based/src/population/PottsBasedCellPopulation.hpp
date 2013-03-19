@@ -311,6 +311,7 @@ public:
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell boost shared pointer to a cell
+     * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
 
@@ -400,7 +401,7 @@ public:
     void CreateElementTessellation();
 
     /**
-     * Get a reference to mpElementTessellation.
+     * @return a reference to mpElementTessellation.
      */
     VertexMesh<DIM,DIM>* GetElementTessellation();
 

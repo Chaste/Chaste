@@ -380,6 +380,7 @@ public:
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell boost shared pointer to a cell
+     * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
 
@@ -389,12 +390,12 @@ public:
     void CreateVoronoiTessellation();
 
     /**
-     * Get a reference to mpVoronoiTessellation.
+     * @return a reference to mpVoronoiTessellation.
      */
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* GetVoronoiTessellation();
 
     /**
-     * Get the volume (or area in 2D, or length in 1D) of the element of mpVoronoiTessellation associated with
+     * @return the volume (or area in 2D, or length in 1D) of the element of mpVoronoiTessellation associated with
      * the node with this global index in the Delaunay mesh.
      *
      * This method should be called instead of calling GetVoronoiTessellation()->GetVolumeOfElement()
@@ -408,7 +409,7 @@ public:
     double GetVolumeOfVoronoiElement(unsigned index);
 
     /**
-     * Get the surface area of the element of mpVoronoiTessellation associated with
+     * @return the surface area of the element of mpVoronoiTessellation associated with
      * the node with this global index in the Delaunay mesh.
      *
      * This method should be called instead of calling GetVoronoiTessellation()->GetSurfaceAreaOfElement()
@@ -420,7 +421,7 @@ public:
     double GetSurfaceAreaOfVoronoiElement(unsigned index);
 
     /**
-     * Get the length of the edge of mpVoronoiTessellation associated with
+     * @return the length of the edge of mpVoronoiTessellation associated with
      * the two nodes with these global indices in the Delaunay mesh.
      *
      * This method should be called instead of calling GetVoronoiTessellation()->GetEdgeLength()
@@ -453,22 +454,22 @@ public:
     public:
 
         /**
-         * Get a pointer to the node in the mesh at end A of the spring.
+         * @return a pointer to the node in the mesh at end A of the spring.
          */
         Node<SPACE_DIM>* GetNodeA();
 
         /**
-         * Get a pointer to the node in the mesh at end B of the spring.
+         * @return a pointer to the node in the mesh at end B of the spring.
          */
         Node<SPACE_DIM>* GetNodeB();
 
         /**
-         * Get the cell at end A of the spring.
+         * @return the cell at end A of the spring.
          */
         CellPtr GetCellA();
 
         /**
-         * Get the cell at end B of the spring.
+         * @return the cell at end B of the spring.
          */
         CellPtr GetCellB();
 
@@ -476,11 +477,13 @@ public:
          * Comparison not-equal-to.
          *
          * @param rOther SpringIterator with which comparison is made
+         * @return not-equal
          */
         bool operator!=(const MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& rOther);
 
         /**
          * Prefix increment operator.
+         * @return incremented object
          */
         SpringIterator& operator++();
 
@@ -600,7 +603,7 @@ public:
     void CalculateRestLengths();
 
     /**
-     *  Return the rest length for a given spring
+     *  @return the rest length for a given spring
      *
      *  @param indexA index of first node in pair
      *  @param indexB index of second node in pair
@@ -608,7 +611,7 @@ public:
     double GetRestLength(unsigned indexA, unsigned indexB);
 
     /**
-     * Helper method that returns a pair of indices ordered by node index.
+     * @return a pair of indices ordered by node index.
      * Used by the rest length routines.
      *
      * @param index1 a node index

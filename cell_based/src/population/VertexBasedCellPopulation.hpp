@@ -311,6 +311,7 @@ public:
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell boost shared pointer to a cell
+     * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
 

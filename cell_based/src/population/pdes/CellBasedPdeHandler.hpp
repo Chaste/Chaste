@@ -239,7 +239,7 @@ public:
      *
      * @param pPdeAndBc a pointer to the pde and bcs
      * @param pMesh the mesh to solve the PDE On
-     * return The full boundary conditions container
+     * @return the full boundary conditions container
      *
      */
     virtual BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
@@ -264,7 +264,7 @@ public:
     unsigned FindCoarseElementContainingCell(CellPtr pCell);
 
     /**
-     * Get the solution to the PDE at this time step.
+     * @return the solution to the PDE at this time step.
      *
      * @param rName The name of the dependent variable for the PDE in the vector mPdeAndBcCollection.
      * This defaults to an empty string in the case there is only one PDE.

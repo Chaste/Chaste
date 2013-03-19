@@ -229,7 +229,7 @@ public:
     unsigned SolveNodeMapping(unsigned index) const;
 
     /**
-     * Get the local number of nodes that are actually in use.
+     * @return the local number of nodes that are actually in use.
      * Does not include halo nodes.
      */
     unsigned GetNumNodes() const;
@@ -242,7 +242,7 @@ public:
     virtual unsigned GetMaximumNodeIndex();
 
     /**
-     * @return #mMaxInteractionDistance
+     * @return mMaxInteractionDistance
      */
     double GetMaximumInteractionDistance();
 
@@ -267,6 +267,7 @@ public:
      * Overridden AddNode() method.
      *
      * @param pNewNode  pointer to the new node
+     * @return index of new node
      */
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 

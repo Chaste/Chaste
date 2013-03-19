@@ -89,7 +89,7 @@ public:
     virtual ~CellAncestor();
 
     /**
-     * Get #mAncestor.
+     * @return #mAncestor.
      */
     unsigned GetAncestor() const;
 };

@@ -103,21 +103,22 @@ public:
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
+     * @return new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Get the duration of the cell's S phase.
+     * @return the duration of the cell's S phase.
      */
     double GetSDuration();
 
     /**
-     * Get the duration of the cell's G2 phase.
+     * @return the duration of the cell's G2 phase.
      */
     double GetG2Duration();
 
     /**
-     * Get the duration of the cell's M phase.
+     * @return the duration of the cell's M phase.
      */
     double GetMDuration();
 
@@ -128,16 +129,19 @@ public:
 
     /**
      * Overridden GetAverageTransitCellCycleTime() method.
+     * @return time
      */
     double GetAverageTransitCellCycleTime();
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
+     * @return time
      */
     double GetAverageStemCellCycleTime();
 
     /**
      * Overridden CanCellTerminallyDifferentiate() method.
+     * @return whether cell can terminally differentiate
      */
     bool CanCellTerminallyDifferentiate();
 

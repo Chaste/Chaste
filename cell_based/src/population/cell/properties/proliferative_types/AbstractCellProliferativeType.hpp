@@ -100,7 +100,7 @@ public:
     virtual ~AbstractCellProliferativeType();
 
     /**
-     * Get #mColour.
+     * @return #mColour.
      */
     unsigned GetColour() const;
 };

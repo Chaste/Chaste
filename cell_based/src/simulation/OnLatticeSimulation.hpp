@@ -159,7 +159,7 @@ public:
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.
-     * Outputs the update rule information.
+     * @return the update rule information.
      */
     bool GetOutputCellVelocities();
 

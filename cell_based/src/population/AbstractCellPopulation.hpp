@@ -396,7 +396,7 @@ public:
     const std::vector<unsigned>& rGetCellCyclePhaseCount() const;
 
     /**
-     * Get the number of real cells.
+     * @return the number of real cells.
      */
     unsigned GetNumRealCells();
 
@@ -522,7 +522,7 @@ public:
     virtual double GetWidth(const unsigned& rDimension)=0;
 
     /**
-     * Get the volume (or area in 2D, or length in 1D) of a given cell.
+     * @return the volume (or area in 2D, or length in 1D) of a given cell.
      *
      * As this method is pure virtual, it must be overridden in subclasses.
      *
@@ -542,7 +542,7 @@ public:
     virtual std::set<unsigned> GetNeighbouringNodeIndices(unsigned index)=0;
 
     /**
-     * Returns the centroid of the cell population.
+     * @return the centroid of the cell population.
      */
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();
 
@@ -729,7 +729,7 @@ public:
     c_vector<double,SPACE_DIM> GetSizeOfCellPopulation();
 
     /**
-     * Method for determining whether there is room into which a given cell may divide.
+     * @return whether there is room into which a given cell may divide.
      * Returns true by default, but may be overridden in subclasses.
      *
      * @param pCell pointer to a cell
@@ -748,12 +748,14 @@ public:
 
         /**
          * Dereference the iterator giving you a pointer to the current cell.
+         * @return reference
          */
         inline CellPtr operator*();
 
         /**
          * Unusually for an iterator over a collection of pointers, this method
          * allows you to access the object pointed at, rather than the pointer itself.
+         * @return pointer
          */
         inline CellPtr operator->();
 
@@ -761,11 +763,13 @@ public:
          * Comparison not-equal-to.
          *
          * @param rOther iterator with which comparison is made
+         * @return not-equal
          */
         inline bool operator!=(const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther);
 
         /**
          * Prefix increment operator.
+         * @return incremented object
          */
         inline Iterator& operator++();
 
@@ -786,7 +790,8 @@ public:
     private:
 
         /**
-         * Private helper function which tells us if we're pointing at a real cell.
+         * Private helper function.
+         * @return whether we're pointing at a real cell.
          * Assumes we are within range (i.e. not at End).
          *
          * Real cells are not deleted.
@@ -794,7 +799,8 @@ public:
         virtual inline bool IsRealCell();
 
         /**
-         * Private helper function saying whether we're at the end of the cells.
+         * Private helper function.
+         * @return whether we're at the end of the cells.
          */
         inline bool IsAtEnd();
 

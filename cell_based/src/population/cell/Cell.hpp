@@ -152,7 +152,7 @@ public:
     ~Cell();
 
     /**
-     * Get the cell's proliferative type.
+     * @return the cell's proliferative type.
      */
     boost::shared_ptr<AbstractCellProliferativeType> GetCellProliferativeType() const;
 
@@ -178,7 +178,7 @@ public:
     void SetCellCycleModel(AbstractCellCycleModel* pCellCycleModel);
 
     /**
-     * Returns a pointer to the Cell's cell-cycle model.
+     * @return a pointer to the Cell's cell-cycle model.
      */
     AbstractCellCycleModel* GetCellCycleModel() const;
 
@@ -188,17 +188,17 @@ public:
     void InitialiseCellCycleModel();
 
     /**
-     * Get the cell's age from its cell-cycle model.
+     * @return the cell's age from its cell-cycle model.
      */
     double GetAge() const;
 
     /**
-     * Get the cell's birth time from its cell-cycle model.
+     * @return the cell's birth time from its cell-cycle model.
      */
     double GetBirthTime() const;
 
     /**
-     * Get the time at which apoptosis was commanded to start.
+     * @return the time at which apoptosis was commanded to start.
      */
     double GetStartOfApoptosisTime() const;
 
@@ -215,7 +215,7 @@ public:
     void SetApoptosisTime(double apoptosisTime);
 
     /**
-     * Get the cell's current mutation state.
+     * @return the cell's current mutation state.
      */
     boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
@@ -284,7 +284,7 @@ public:
     }
 
     /**
-     * Test whether the cell property collection contains a property that has the exact type CLASS.
+     * @return whether the cell property collection contains a property that has the exact type CLASS.
      * Just calls mCellPropertyCollection.HasProperty().
      */
     template<typename CLASS>
@@ -294,7 +294,7 @@ public:
     }
 
     /**
-     * Determine if this cell is ready to divide at the current simulation time.
+     * @return whether this cell is ready to divide at the current simulation time.
      * MUST be called before calling Divide().
      */
     bool ReadyToDivide();
@@ -322,7 +322,7 @@ public:
     void Kill();
 
     /**
-     * Returns whether the cell is undergoing apoptosis or not.
+     * @return whether the cell is undergoing apoptosis or not.
      */
     bool HasApoptosisBegun() const;
 
@@ -332,7 +332,7 @@ public:
     double GetTimeUntilDeath() const;
 
     /**
-     * Return whether the cell is dead or undergoing apoptosis.
+     * @return whether the cell is dead or undergoing apoptosis.
      */
     bool IsDead();
 

@@ -89,7 +89,7 @@ public:
     virtual ~ApoptoticCellProperty();
 
     /**
-     * Get #mColour.
+     * @return #mColour.
      */
     unsigned GetColour() const;
 };

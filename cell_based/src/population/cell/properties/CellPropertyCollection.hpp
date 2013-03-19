@@ -111,14 +111,14 @@ public:
     void SetCellPropertyRegistry(CellPropertyRegistry* pRegistry);
 
     /**
-     * Test whether this collection contains the given property @b object.
+     * @return whether this collection contains the given property @b object.
      *
      * @param rProp  the property to compare against
      */
     bool HasProperty(const boost::shared_ptr<AbstractCellProperty>& rProp) const;
 
     /**
-     * Test whether the collection contains a property that has the exact type CLASS.
+     * @return whether the collection contains a property that has the exact type CLASS.
      *
      * Should be used like
      *   bool healthy = collection.HasProperty<WildTypeCellMutationState>();
@@ -137,7 +137,7 @@ public:
     }
 
     /**
-     * Test whether the collection contains a property that inherits from BASECLASS.
+     * @return whether the collection contains a property that inherits from BASECLASS.
      *
      * Should be used like
      *   collection.HasPropertyType<AbstractCellMutationState>();
@@ -180,7 +180,7 @@ public:
     void RemoveProperty(const boost::shared_ptr<AbstractCellProperty>& rProp);
 
     /**
-     * Get the size of this container.
+     * @return the size of this container.
      */
     unsigned GetSize() const;
 
@@ -191,23 +191,23 @@ public:
     typedef CollectionType::iterator Iterator;
 
     /**
-     * Get an Iterator to the start of this collection.
+     * @return an Iterator to the start of this collection.
      */
     Iterator Begin();
 
     /**
-     * Get an Iterator to one past the end of this collection.
+     * @return an Iterator to one past the end of this collection.
      */
     Iterator End();
 
     /**
-     * If this collection contains a single property, then return it.
+     * @return If this collection contains a single property, then return it.
      * Otherwise, throws an exception.
      */
     boost::shared_ptr<AbstractCellProperty> GetProperty() const;
 
     /**
-     * Get a sub-collection containing all our properties that are instances
+     * @return a sub-collection containing all our properties that are instances
      * of the given class.
      */
     template<typename CLASS>
@@ -225,7 +225,7 @@ public:
     }
 
     /**
-     * Get a sub-collection containing all our properties that are instances
+     * @return a sub-collection containing all our properties that are instances
      * of the given class or any of its subclasses.
      */
     template<typename BASECLASS>

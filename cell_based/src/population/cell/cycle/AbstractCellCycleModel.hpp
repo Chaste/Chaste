@@ -235,7 +235,7 @@ public:
     void SetDimension(unsigned dimension);
 
     /**
-     * Get the dimension this cell-cycle model thinks the simulation is in.
+     * @return the dimension this cell-cycle model thinks the simulation is in.
      */
     unsigned GetDimension();
 
@@ -245,12 +245,12 @@ public:
     double GetBirthTime() const;
 
     /**
-     * Returns the cell's age.
+     * @return the cell's age.
      */
     double GetAge();
 
     /**
-     * Determine whether the cell is ready to divide (enter M phase).
+     * @return whether the cell is ready to divide (enter M phase).
      *
      * The intention is that this method is called precisely once at
      * each timestep of the simulation. However this does not appear
@@ -288,6 +288,9 @@ public:
      * CreateCellCycleModel() is called, so performing an exact copy of the
      * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
+     *
+     * @return new cell-cycle model
+     *
      */
     virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
 
@@ -367,19 +370,19 @@ public:
     void SetMDuration(double mDuration);
 
     /**
-     * Return the typical cell cycle duration for a transit cell, in hours.
+     * @return the typical cell cycle duration for a transit cell, in hours.
      * This method is overridden in some subclasses.
      */
     virtual double GetAverageTransitCellCycleTime();
 
     /**
-     * Return the typical cell cycle duration for a stem cell, in hours.
+     * @return the typical cell cycle duration for a stem cell, in hours.
      * This method is overridden in some subclasses.
      */
     virtual double GetAverageStemCellCycleTime();
 
     /**
-     * Whether a cell with this cell-cycle model is able to fully (terminally) differentiate.
+     *  @return whether a cell with this cell-cycle model is able to fully (terminally) differentiate.
      */
     virtual bool CanCellTerminallyDifferentiate();
 

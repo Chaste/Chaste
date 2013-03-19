@@ -52,7 +52,8 @@ class CellPropertyRegistry
 {
 public:
     /**
-     * The main interface to this class: get a particular cell property object.
+     * The main interface to this class.
+     * @return a particular cell property object.
      * Use like:
      *    boost::shared_ptr<AbstractCellProperty> p_property(
                 CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -61,12 +62,12 @@ public:
     boost::shared_ptr<AbstractCellProperty> Get();
 
     /**
-     * Get the single instance of the registry.
+     * @return the single instance of the registry.
      */
     static CellPropertyRegistry* Instance();
 
     /**
-     * Get a list of the cell properties registered.
+     * @return a list of the cell properties registered.
      */
     const std::vector<boost::shared_ptr<AbstractCellProperty> >& rGetAllCellProperties();
 
@@ -82,6 +83,7 @@ public:
      *
      * This method is intended for use by CellBasedSimulation, so that we can have
      * multiple concurrent simulations, each with their own registry.
+     * @return registry
      */
     CellPropertyRegistry* TakeOwnership();
 
@@ -114,6 +116,7 @@ private:
 
     /**
      * Overloaded assignment operator.
+     * @return reference by convention
      */
     CellPropertyRegistry& operator= (const CellPropertyRegistry&);
 

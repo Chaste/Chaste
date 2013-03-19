@@ -81,7 +81,7 @@ public:
     virtual ~AbstractCellProperty();
 
     /**
-     * Test whether this property is a particular class.  This tests for exact
+     * @return whether this property is a particular class.  This tests for exact
      * run-time class identity, and doesn't match subclasses.
      *
      * The current implementation requires that all cell properties have a default
@@ -99,7 +99,7 @@ public:
     }
 
     /**
-     * Test whether this property is an instance of a particular class, or any subclass
+     * @return whether this property is an instance of a particular class, or any subclass
      * of that class.
      *
      * It should be called like:
@@ -115,13 +115,13 @@ public:
     }
 
     /**
-     * Determine whether this property is the same class as another.
+     * @return whether this property is the same class as another.
      * @param pOther  the property to compare against.
      */
     bool IsSame(const AbstractCellProperty* pOther) const;
 
     /**
-     * Determine whether this property is the same as another.
+     * @return whether this property is the same as another.
      * @param pOther  the property to compare against.
      */
     bool IsSame(boost::shared_ptr<const AbstractCellProperty> pOther) const;
@@ -137,7 +137,7 @@ public:
     void DecrementCellCount();
 
     /**
-     * Get #mCellCount
+     * @return #mCellCount
      */
     unsigned GetCellCount() const;
 };

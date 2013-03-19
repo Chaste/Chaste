@@ -108,7 +108,7 @@ public:
     void SetGeneration(unsigned generation);
 
     /**
-     * Returns the cell's generation.
+     * @return the cell's generation.
      */
     unsigned GetGeneration() const;
 

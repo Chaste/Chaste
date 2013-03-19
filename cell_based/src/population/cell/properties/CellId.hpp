@@ -107,7 +107,7 @@ public:
     unsigned GetMaxCellId() const;
 
     /**
-     * Get #mCellId.
+     * @return #mCellId.
      */
     unsigned GetCellId() const;
 

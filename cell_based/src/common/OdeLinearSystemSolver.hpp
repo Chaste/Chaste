@@ -82,13 +82,13 @@ public:
     /** Destructor. */
     ~OdeLinearSystemSolver();
 
-    /** Get the timestep for the solver. */
+    /** @return the timestep for the solver. */
     double GetTimeStep();
 
-    /** Get the matrix. */
+    /** @return the matrix. */
     Mat& rGetLhsMatrix();
 
-    /** Get the force vector. */
+    /** @return the force vector. */
     Vec& rGetForceVector();
 
     /**
@@ -98,7 +98,9 @@ public:
      */
     void SetInitialConditionVector(Vec initialConditionsVector);
 
-    /** Solve the ODE system over one time step. */
+    /** Solve the ODE system over one time step.
+     * @return solution vector
+     */
     Vec SolveOneTimeStep();
 };
 

@@ -293,7 +293,7 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
-     * Return whether you have mismatched numbers of left and right boundary nodes
+     * @return whether you have mismatched numbers of left and right boundary nodes
      */
     bool GetInstanceOfMismatchedBoundaryNodes();
 };

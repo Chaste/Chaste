@@ -90,7 +90,7 @@ public:
     BuskeElasticForce();
 
     /**
-     * Get mDeformationEnergyParameter.
+     * @return mDeformationEnergyParameter.
      */
     double GetDeformationEnergyParameter();
 
@@ -102,7 +102,7 @@ public:
     void SetDeformationEnergyParameter(double deformationEnergyParameter);
 
     /**
-     * Calculate the force between two nodes.
+     * @return the force between two nodes.
      *
      * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode()
      *
@@ -113,7 +113,7 @@ public:
     c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Calculate the magnitude of the force between two nodes that are a given distance apart and
+     * @return calculated magnitude of the force between two nodes that are a given distance apart and
      * are associated with given cell radii.
      *
      * @param distanceBetweenNodes the distance between two nodes
