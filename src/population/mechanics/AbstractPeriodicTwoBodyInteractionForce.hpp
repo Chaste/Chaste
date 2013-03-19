@@ -109,19 +109,19 @@ public:
     void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Returns the width of the periodic domain.
+     * @return the width of the periodic domain.
      */
     double GetPeriodicDomainWidth();
 
     /**
-     * Returns the width of the periodic domain.
+     * @return the width of the periodic domain.
      *
      * @param periodicDomainWidth the width of the periodic domain
      */
     void SetPeriodicDomainWidth(double periodicDomainWidth);
 
     /**
-     * Returns the depth of the periodic domain.
+     * @return the depth of the periodic domain.
      */
     double GetPeriodicDomainDepth();
 
