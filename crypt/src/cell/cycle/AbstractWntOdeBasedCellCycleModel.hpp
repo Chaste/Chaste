@@ -76,7 +76,7 @@ private:
 protected:
 
     /**
-     * Get the Wnt level experienced by the cell.
+     * @return the Wnt level experienced by the cell.
      */
     double GetWntLevel();
 
@@ -124,16 +124,20 @@ public:
 
     /**
      * Overridden GetAverageTransitCellCycleTime() method.
+     * @return time
      */
     double GetAverageTransitCellCycleTime();
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
+     * @return time
      */
     double GetAverageStemCellCycleTime();
 
     /**
      * Overridden CanCellTerminallyDifferentiate() method.
+     * @return whether cell can terminally differentiate
+     *
      */
     virtual bool CanCellTerminallyDifferentiate();
 

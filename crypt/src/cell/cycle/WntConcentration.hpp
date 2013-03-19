@@ -208,14 +208,14 @@ public:
     double GetWntLevel(CellPtr pCell);
 
     /**
-     * Get the Wnt gradient at a given location in the crypt.
+     * @return the Wnt gradient at a given location in the crypt.
      *
      * @param rLocation  the location at which we want the Wnt gradient
      */
     c_vector<double, DIM> GetWntGradient(c_vector<double, DIM>& rLocation);
 
     /**
-     * Get the Wnt gradient at a given cell in the crypt.
+     * @return the Wnt gradient at a given cell in the crypt.
      *
      * @param pCell the cell at which we want the Wnt gradient
      */
@@ -246,7 +246,7 @@ public:
     void SetCryptLength(double cryptLength);
 
     /**
-     * Get the type of Wnt concentration.
+     * @return the type of Wnt concentration.
      */
     WntConcentrationType GetType();
 

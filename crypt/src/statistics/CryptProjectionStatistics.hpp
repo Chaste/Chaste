@@ -51,6 +51,7 @@ private:
      * @param angle  The angle between the crypt section and the x axis in the projection
      * @param rCellPosition  The vector of a cell's position
      * @param widthOfSection The width of the section
+     * @return whether the cell is in the section
      */
     bool CellIsInSection(double angle, const c_vector<double,2>& rCellPosition, double widthOfSection=0.6);
 
@@ -68,6 +69,7 @@ public:
      * interval (-pi, pi].
      *
      * @param angle  The angle between the crypt section and the x axis in the projection
+     * @return all cells in the section
      */
     std::vector<CellPtr> GetCryptSection(double angle = DBL_MAX);
 };

@@ -296,12 +296,12 @@ public:
     double CalculateRootFunction(double time, const std::vector<double>& rY);
 
     /**
-     * Get method for mWntLevel.
+     * @return #mWntLevel.
      */
     double GetWntLevel() const;
 
     /**
-     * Get method for mHypothesis.
+     * @return #mHypothesis.
      */
     unsigned GetHypothesis() const;
 };

@@ -101,12 +101,12 @@ protected:
     double mWntLabelledThreshold;
 
     /**
-     * Get the Wnt level experienced by the cell.
+     * @return the Wnt level experienced by the cell.
      */
     double GetWntLevel();
 
     /**
-     * Get the type of Wnt concentration (LINEAR, RADIAL, EXPONENTIAL or NONE).
+     * @return the type of Wnt concentration (LINEAR, RADIAL, EXPONENTIAL or NONE).
      * This affects how the cell cycle phase is updated.
      */
     WntConcentrationType GetWntType();
@@ -143,6 +143,7 @@ public:
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
+     * @return the new cell-cycle model
      */
     virtual AbstractCellCycleModel* CreateCellCycleModel();
 
@@ -154,6 +155,7 @@ public:
 
     /**
      * Overridden CanCellTerminallyDifferentiate() method.
+     * @return whether cell can terminally differentiate
      */
     virtual bool CanCellTerminallyDifferentiate();
 

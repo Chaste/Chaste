@@ -82,11 +82,11 @@ private:
     double mBetaCateninDivisionThreshold;
 
     /**
-     * Called by ::Initialise() and ::UpdateCellProliferativeType() only.
+     * Called by Initialise() and UpdateCellProliferativeType() only.
      * Updates the mpCell::mCellProliferativeType to match mpOdeSystem's
      * beta-catenin levels
      *
-     * This carries out the work for ::UpdateCellProliferativeType();
+     * This carries out the work for UpdateCellProliferativeType();
      * But does not check the current time so it can be used by the initialise method.
      */
     void ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
@@ -125,11 +125,12 @@ public:
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
+     * @return the new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
-     * Return the total beta-catenin concentration
+     * @return the total beta-catenin concentration
      */
     double GetBetaCateninConcentration();
 
@@ -141,7 +142,7 @@ public:
     void SetBetaCateninDivisionThreshold(double betaCateninDivisionThreshold);
 
     /**
-     * Get #mBetaCateninDivisionThreshold.
+     * @return #mBetaCateninDivisionThreshold.
      */
     double GetBetaCateninDivisionThreshold();
 

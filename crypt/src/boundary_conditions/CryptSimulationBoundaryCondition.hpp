@@ -107,7 +107,7 @@ public:
      */
     void SetUseJiggledBottomCells(bool useJiggledBottomCells);
 
-    /** Get method for mUseJiggledBottomCells. */
+    /** @return #mUseJiggledBottomCells. */
     bool GetUseJiggledBottomCells();
 
     /**

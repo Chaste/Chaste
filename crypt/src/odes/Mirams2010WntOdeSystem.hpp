@@ -157,7 +157,7 @@ public:
     void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
 
     /**
-     * Get method for mWntLevel.
+     * @return #mWntLevel.
      */
     double GetWntLevel() const;
 };

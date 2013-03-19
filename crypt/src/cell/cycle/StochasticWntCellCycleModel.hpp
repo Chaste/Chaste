@@ -98,6 +98,7 @@ public:
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
+     * @return the new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
@@ -122,7 +123,7 @@ public:
     void ResetForDivision();
 
     /**
-     * Get the duration of the G2 phase.
+     * @return the duration of the G2 phase.
      */
     double GetG2Duration();
 

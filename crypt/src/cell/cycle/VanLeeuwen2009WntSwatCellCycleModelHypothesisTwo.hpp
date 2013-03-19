@@ -73,6 +73,7 @@ public:
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
+     * @return the new cell-cycle model
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
