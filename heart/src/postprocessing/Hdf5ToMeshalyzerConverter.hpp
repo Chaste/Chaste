@@ -78,11 +78,11 @@ public:
      *
      * @note This method is collective, and hence must be called by all processes.
      *
-     * @param inputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
-     * @param fileBaseName The base name of the data file.
-     * @param pMesh Pointer to the mesh.
-     * @param usingOriginalNodeOrdering Whether HDF5 output was written using the original node ordering
-     * @param the precision (number of digits) to use in writing numerical data to file.
+     * @param inputDirectory  The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param fileBaseName  The base name of the data file.
+     * @param pMesh  Pointer to the mesh.
+     * @param usingOriginalNodeOrdering  Whether HDF5 output was written using the original node ordering
+     * @param precision  The precision (number of digits) to use in writing numerical data to file.
      * @param datasetName  The name of the dataset to convert (defaults to voltage etc. not postprocessing).
      */
     Hdf5ToMeshalyzerConverter(std::string inputDirectory,

@@ -352,12 +352,24 @@ public:
         CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "postprocessingapd");
         PostProcessingWriter<1,1> writer(mesh, test_dir, "postprocessingapd");
 
-        writer.WriteApdMapFile(60.0, -30.0);
+        double upstroke_threshold = -30.0;
+        writer.WriteApdMapFile(60.0, upstroke_threshold);
+        writer.WriteUpstrokeTimeMap(upstroke_threshold);
 
         std::string file1 = FileFinder("output/Apd_60_minus_30_Map.dat", test_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
+
+        file1 = FileFinder("output/UpstrokeTimeMap_-30.dat", test_dir).GetAbsolutePath();
+        file2 = "heart/test/data/PostProcessorWriter/good_upstroke_postprocessing.dat";
+        NumericFileComparison comp2(file1, file2);
+        TS_ASSERT(comp2.CompareFiles(1e-12));
+
+        file1 = FileFinder("cmgui_output/UpstrokeTimeMap_-30.dat", test_dir).GetAbsolutePath();
+        file2 = "heart/test/data/PostProcessorWriter/good_upstroke_postprocessing.dat";
+        NumericFileComparison comp3(file1, file2);
+        TS_ASSERT(comp3.CompareFiles(1e-12));
     }
 
     // This test checks that the APD map is put into the HDF5 file.

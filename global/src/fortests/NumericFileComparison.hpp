@@ -45,9 +45,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Compare files of numbers to see if they match to within a given tolerance.
+ *
+ * Any differences in words are ignored, as are comment lines starting with
+ * '#' or '!'.
  */
 class NumericFileComparison : public AbstractFileComparison
 {
+private:
+	/**
+	 * Read the next token in the file as a double.
+	 *
+	 * If we detect a comment skip the line.
+	 * If we detect a word assign the value A_WORD.
+	 * If we find nothing to read assign  NOTHING_TO_READ.
+	 *
+	 * @param pFile  The file from which to attempt to read a double.
+	 * @param rData  The double to assign a value to.
+	 */
+	void ReadNextToken(std::ifstream* pFile, double& rData)
+	{
+		if (!(*pFile>>rData))
+		{
+			// Cannot read the next token from file as a number, so try a word instead
+			std::string word;
+			pFile->clear(); // reset the "failbit"
+			if (*pFile >> word)
+			{
+				rData = A_WORD;
+				if (word == "#" || word == "!")
+				{
+					// Ignore comment (up to 1024 characters until newline)
+					pFile->ignore(1024, '\n');
+				}
+			}
+			else
+			{
+				pFile->clear(); // reset the "failbit"
+				rData = NOTHING_TO_READ;
+			}
+		}
+	}
+
 public:
 
     /**
@@ -109,47 +147,8 @@ public:
 
         do
         {
-            if (!(*mpFile1>>data1))
-            {
-                // Cannot read the next token from file as a number, so try a word instead
-                std::string word;
-                mpFile1->clear(); // reset the "failbit"
-                if (*mpFile1 >> word)
-                {
-                    data1 = A_WORD;
-                    if (word == "#" || word == "!")
-                    {
-                        // Ignore comment (up to 1024 characters until newline)
-                        mpFile1->ignore(1024, '\n');
-                    }
-                }
-                else
-                {
-                    mpFile1->clear(); // reset the "failbit"
-                    data1 = NOTHING_TO_READ;
-                }
-            }
-            if (!(*mpFile2 >> data2))
-            {
-                // Cannot read the next token from file as a number, so try a word instead
-                std::string word;
-                mpFile2->clear(); // reset the "failbit"
-                if (*mpFile2 >> word)
-                {
-                    data2 = A_WORD;
-                    if (word == "#" || word == "!")
-                    {
-                        // Ignore comment (up to 1024 characters until newline)
-                        mpFile2->ignore(1024, '\n');
-                    }
-                }
-                else
-                {
-                    mpFile2->clear(); // reset the "failbit"
-                    data2 = NOTHING_TO_READ;
-                }
-            }
-
+        	ReadNextToken(mpFile1, data1);
+        	ReadNextToken(mpFile2, data2);
             bool ok = CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol);
             if (!ok)
             {

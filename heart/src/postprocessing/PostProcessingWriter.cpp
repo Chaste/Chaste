@@ -421,18 +421,21 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, const std::string& rFileName)
 {
-    if(HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
-    {
-        WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
-    }
-    if(HeartConfig::Instance()->GetVisualizeWithCmgui())
-    {
-        //Special case use of the wrong method - \todo #1660 need to change the format of this data
-        WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
+	///\todo #1660 this whole method to be removed.
+	// At present there are no cmgui-format postprocessing maps,
+	// we just use meshalyzer format so that something is generated.
+
+	if ( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() )
+	{
+		WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
     }
 
-
+    if ( HeartConfig::Instance()->GetVisualizeWithCmgui() )
+    {
+    	WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
+    }
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(std::vector<std::vector<double> >& rDataPayload, const std::string& rFolder, const std::string& rFileName)
 {

@@ -165,6 +165,7 @@ public:
             std::string stim_counter_string = stringoutput.str();
 
             archive_dir_current = archive_dir_base + "_" + stim_counter_string;
+            OutputFileHandler archive_directory(archive_dir_current, true); // Clean a folder for new results
             HeartConfig::Instance()->SetOutputFilenamePrefix("results_" + stim_counter_string);
 
             // Solve problem (this does the postprocessing too when HeartConfig options are set).
@@ -179,11 +180,9 @@ public:
 
             // Copy the postprocessing results into the archive folders so they aren't wiped.
             std::vector<std::string> files;
-            files.push_back("Apd_90_-30_Map");
+            files.push_back("Apd_90_minus_30_Map");
 //                files.push_back("MaxUpstrokeVelocityMap_-30");
 //                files.push_back("UpstrokeTimeMap_-30");
-
-            OutputFileHandler archive_directory(archive_dir_current, false);
 
             for (unsigned i=0; i<files.size(); i++)
             {
