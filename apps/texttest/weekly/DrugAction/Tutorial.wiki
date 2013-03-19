@@ -95,7 +95,6 @@ In this folder you will find the following files and folders:
    * `DrugActionResults_mesh.cnnx` -- output converted into meshalyzer format
    * `DrugActionResults_V.dat` -- output converted into meshalyzer format
    * `NodalTraces_V.dat` -- voltage trace at node 200.
-   * `Apd_90_-30_Map.dat` -- the APD recorded at each node.
    
 Move now into the Meshalyzer-compatible output folder 
 {{{

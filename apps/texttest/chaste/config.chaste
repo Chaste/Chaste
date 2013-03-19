@@ -78,7 +78,7 @@ mesh_pts:ChasteResults/output/BathResults_mesh.pts
 mesh_tri:ChasteResults/output/BathResults_mesh.tri
 
 #[collate_file] Extra files to test against in postprocess_monodomain
-Apd_90_minus_30_Map_dat:ChasteResults/output/Apd_90_-30_Map.dat
+Apd_90_minus_30_Map_dat:ChasteResults/output/Apd_90_minus_30_Map.dat
 ConductionVelocityFromNode10_dat:ChasteResults/output/ConductionVelocityFromNode10.dat
 ConductionVelocityFromNode20_dat:ChasteResults/output/ConductionVelocityFromNode20.dat
 MaxUpstrokeVelocityMap_minus_30_dat:ChasteResults/output/MaxUpstrokeVelocityMap_-30.dat
