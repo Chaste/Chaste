@@ -81,8 +81,8 @@ mesh_tri:ChasteResults/output/BathResults_mesh.tri
 Apd_90_minus_30_Map_dat:ChasteResults/output/Apd_90_minus_30_Map.dat
 ConductionVelocityFromNode10_dat:ChasteResults/output/ConductionVelocityFromNode10.dat
 ConductionVelocityFromNode20_dat:ChasteResults/output/ConductionVelocityFromNode20.dat
-MaxUpstrokeVelocityMap_minus_30_dat:ChasteResults/output/MaxUpstrokeVelocityMap_-30.dat
-UpstrokeTimeMap_minus_30_dat:ChasteResults/output/UpstrokeTimeMap_-30.dat
+MaxUpstrokeVelocityMap_minus_30_dat:ChasteResults/output/MaxUpstrokeVelocityMap_minus_30.dat
+UpstrokeTimeMap_minus_30_dat:ChasteResults/output/UpstrokeTimeMap_minus_30.dat
 NodalTraces_V_dat:ChasteResults/output/NodalTraces_V.dat
 
 #[collate_file] Extra file to test against in save_monodomain and save_bidomain
