@@ -59,6 +59,8 @@ class TestNodeBasedCellPopulationWithBuskeUpdate : public AbstractCellBasedTestS
 public:
     void TestMethods()
     {
+        EXIT_IF_PARALLEL; ///\todo fix this #2261
+
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         MutableMesh<2,2> generating_mesh;
@@ -132,6 +134,8 @@ public:
 
     void TestArchivingCellPopulation() throw (Exception)
     {
+        EXIT_IF_PARALLEL; ///\todo fix this #2261
+
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "node_based_cell_population.arch";
         ArchiveLocationInfo::SetMeshFilename("node_based_cell_population_mesh");
