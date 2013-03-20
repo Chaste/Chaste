@@ -27,3 +27,14 @@ This is a test file for rounding
 #Some tricky ones which shouldn't be rounded
 -2,-3
 24-28-
+#A bit of HDF5 which came from adding post-processing for #1660
+GROUP "/" {
+   DATASET "ConductionVelocityFromNode200" {
+      DATATYPE  H5T_IEEE_F64LE
+      DATASPACE  SIMPLE { ( 1, 441, 1 ) / ( H5S_UNLIMITED, 441, 1 ) }
+      DATA {
+      (0,0,0): 0.0775958,
+      (0,1,0): 0.0730503,
+      (0,2,0): 0.0685049,
+      (0,3,0): 0.0639594,
+

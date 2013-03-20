@@ -56,10 +56,13 @@ def Replace(matchobj):
 
 #Number must either have a decimal point (and no "e") or match scientific notation
 decimal = '(\+|-)?\d+\.\d+'
-scientific = '(\+|-)?\d*(\.)?\d*e(\+|-)?\d+'
+#scientific notation usually has a decimal point
+scientific = '(\+|-)?\d*\.\d*e(\+|-)?\d+'
+#scientific notation might be of the form -8e-10 (a single digit with no decimal point)
+scientific_no_point = '(\+|-)?\de(\+|-)?\d+'
 
 #Match scientific first
-number = re.compile('(' + scientific +'|' + decimal + ')')
+number = re.compile('(' + scientific +'|' + decimal +'|' + scientific_no_point + ')')
 
 for line in sys.stdin:
     print re.sub(number, Replace, line),
