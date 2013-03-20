@@ -10,6 +10,7 @@ The following new files/directories were created:
 ------------.chaste_deletable_folder
 ------------ChasteParameters.xml
 ------------ConductionVelocityFromNode200.dat
+------------ConductionVelocityFromNode200_times.info
 ------------SimulationResults_V.dat
 ------------SimulationResults_mesh.pts
 ------------SimulationResults_mesh.tri
