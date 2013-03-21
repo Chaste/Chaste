@@ -19,7 +19,7 @@
 			Mesh definition 
 		-->
 		<Mesh unit="cm">
-			<LoadMesh name="heart_chaste2_renum_i_triangles" conductivity_media="Axisymmetric"/>
+			<LoadMesh name="OxfordRabbitHeart_482um" conductivity_media="Axisymmetric"/>
 	  	</Mesh>
 	
 	    <!-- 

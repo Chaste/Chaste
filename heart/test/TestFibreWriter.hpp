@@ -213,7 +213,7 @@ public:
     {
           ConvertToBinaryOrtho("heart/test/data/fibre_tests/", "downsampled", true);
           ConvertToBinaryOrtho("heart/test/data/point50_heart_mesh/", "point50", true);
-          ConvertToBinaryAxi("apps/texttest/weekly/Propagation3d/", "heart_chaste2_renum_i_triangles", true);
+          ConvertToBinaryAxi("apps/texttest/weekly/Propagation3d/", "OxfordRabbitHeart_482um", true);
           //This one is dodgy... ConvertToBinaryAxi("notforrelease/test/data/simplified_very_low_res/", "heart_chaste2_renum_e_triangles", true);
     }
 

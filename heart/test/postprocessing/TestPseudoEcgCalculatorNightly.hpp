@@ -57,7 +57,7 @@ public:
     void TestCalculatorRealistic3D() throw (Exception)
     {
         //get the mesh, whole heart mesh
-        TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/heart_chaste2_renum_i_triangles");
+        TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);  //The partition/numbering has to match that stored in the HDF5 file
         mesh.ConstructFromMeshReader(reader);
 
@@ -92,7 +92,7 @@ public:
     void TestCalculatorRealistic3DNotDistributed() throw (Exception)
     {
          //get the mesh, whole heart mesh
-        TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/heart_chaste2_renum_i_triangles");
+        TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
 

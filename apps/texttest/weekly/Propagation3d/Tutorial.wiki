@@ -97,11 +97,11 @@ The file should be reasonably readable; it defines:
  * the use of the monodomain model 
    * to use bidomain, the only thing that needs to be done is to change `Mono` to `Bi`
  * a `LuoRudyIBackwardEuler` cell model as the default cell model
- * a 3D mesh generated from an anatomical geometry. The are three files defining the mesh `heart_chaste2_renum_i_triangles`(`.node`, `.ele`, `.face`) representing respectively nodes elements and faces files.
- * an axisymmetric orientation of the fibres is used and is given in the file `heart_chaste2_renum_i_triangles.axi` where the longitudinal direction of the fibres is defined in each element.
+ * a 3D mesh generated from an anatomical geometry. The are three files defining the mesh `OxfordRabbitHeart_482um`(`.node`, `.ele`, `.face`) representing respectively nodes elements and faces files.
+ * an axisymmetric orientation of the fibres is used and is given in the file `OxfordRabbitHeart_482um.axi` where the longitudinal direction of the fibres is defined in each element.
  * a stimulated region  is defined in the apex. It starts at the beginning of the simulation and its duration is 2ms.
  * output directory and filenames
  * an `OutputVisualizer` element giving which visualiser formats to write
  * physiological parameters: conductivities, capacitance, surface-area-to-volume ratio
-   * in monodomain problems, the defined intracellular conductivity is used, '''not''' a harmonic mean.
+   * in monodomain problems, the defined intracellular conductivity is used, '''not''' a harmonic mean of intra and extracellular conductivities. 
  * Numerical parameters including ODE, PDE and printing timesteps

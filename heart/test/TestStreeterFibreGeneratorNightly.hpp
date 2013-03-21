@@ -141,10 +141,10 @@ public:
     void TestDownSampledRabbit() throw (Exception)
     {
 
-        TrianglesMeshReader<3,3> mesh_reader("apps/texttest/weekly/Propagation3d/heart_chaste2_renum_i_triangles");
-        std::string epi_face_file = "apps/texttest/weekly/Propagation3d/heart_chaste2_renum_i_triangles.epi";
-        std::string rv_face_file = "apps/texttest/weekly/Propagation3d/heart_chaste2_renum_i_triangles.rv";
-        std::string lv_face_file = "apps/texttest/weekly/Propagation3d/heart_chaste2_renum_i_triangles.lv";
+        TrianglesMeshReader<3,3> mesh_reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
+        std::string epi_face_file = "apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um.epi";
+        std::string rv_face_file = "apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um.rv";
+        std::string lv_face_file = "apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um.lv";
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
