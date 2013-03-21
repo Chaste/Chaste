@@ -61,6 +61,13 @@ typedef std::pair<std::string, std::string> StringPair;
 #endif
 //#include <xsd/cxx/version.hxx>
 
+// Check whether the version of ParMETIS being used is the one we wanted
+#ifdef CHASTE_PARMETIS_REQUIRED
+#  if PARMETIS_MAJOR_VERSION != CHASTE_PARMETIS_REQUIRED
+#    error "Wrong ParMETIS version found: " #CHASTE_PARMETIS_REQUIRED " requested but " #PARMETIS_MAJOR_VERSION " present"
+#  endif
+#endif
+
 FileFinder ExecutableSupport::mOutputDirectory;
 
 void ExecutableSupport::SetOutputDirectory(const std::string& rOutputDirectory)
