@@ -59,8 +59,6 @@ class TestNodeBasedCellPopulationWithBuskeUpdate : public AbstractCellBasedTestS
 public:
     void TestMethods()
     {
-        EXIT_IF_PARALLEL; ///\todo fix this #2261
-
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         MutableMesh<2,2> generating_mesh;
@@ -85,17 +83,22 @@ public:
         // Make up some forces
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (NodesOnlyMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+        		node_iter != p_mesh->GetNodeIteratorEnd();
+        		++node_iter)
         {
+        	unsigned node_index = node_iter->GetIndex();
+        	unsigned i = p_mesh->SolveNodeMapping(node_index);
+
             c_vector<double, 2> force;
-            old_posns[i][0] = cell_population.GetNode(i)->rGetLocation()[0];
-            old_posns[i][1] = cell_population.GetNode(i)->rGetLocation()[1];
+            old_posns[i][0] = node_iter->rGetLocation()[0];
+            old_posns[i][1] = node_iter->rGetLocation()[1];
 
             force[0] = i*0.01;
             force[1] = 2*i*0.01;
 
-            cell_population.GetNode(i)->ClearAppliedForce();
-            cell_population.GetNode(i)->AddAppliedForceContribution(force);
+            node_iter->ClearAppliedForce();
+            node_iter->AddAppliedForceContribution(force);
         }
 
         // Call method
@@ -104,10 +107,13 @@ public:
         cell_population.UpdateNodeLocations(time_step);
 
         // Check that node locations were correctly updated
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (NodesOnlyMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+        		node_iter != p_mesh->GetNodeIteratorEnd();
+        		++node_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
-            TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
+            unsigned i = p_mesh->SolveNodeMapping(node_iter->GetIndex());
+            TS_ASSERT_DELTA(node_iter->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
+            TS_ASSERT_DELTA(node_iter->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
         }
 
         // Test NodeBasedCellPopulationWithBuskeUpdate::OutputCellPopulationParameters()
@@ -134,7 +140,7 @@ public:
 
     void TestArchivingCellPopulation() throw (Exception)
     {
-        EXIT_IF_PARALLEL; ///\todo fix this #2261
+        EXIT_IF_PARALLEL; // Cell-based archiving doesn't yet work in parallel.
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "node_based_cell_population.arch";

@@ -76,9 +76,12 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
          ++cell_iter)
     {
         // Get index of node associated with cell
-        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        unsigned global_node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
-        Node<DIM>* p_node_i = this->GetNode(node_index);
+        // Get the local index using the mesh
+        unsigned node_index = this->rGetMesh().SolveNodeMapping(global_node_index);
+
+        Node<DIM>* p_node_i = this->GetNode(global_node_index);
 
         // Get the location of this node
         c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
@@ -87,23 +90,25 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         double radius_of_cell_i = p_node_i->GetRadius();
 
         // Get damping constant for node
-        double damping_const = this->GetDampingConstant(node_index);
+        double damping_const = this->GetDampingConstant(global_node_index);
 
         // loop over neighbours to add contribution
 
         // Get the set of node indices corresponding to this cell's neighbours
-        std::set<unsigned> neighbouring_node_indices = this->GetNeighbouringNodeIndices(node_index);
+        std::set<unsigned> neighbouring_node_indices = this->GetNeighbouringNodeIndices(global_node_index);
 
         for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
              iter != neighbouring_node_indices.end();
              ++iter)
         {
-            unsigned neighbour_node_index = *iter;
+            unsigned neighbour_node_global_index = *iter;
+
+            unsigned neighbour_node_index = this->rGetMesh().SolveNodeMapping(neighbour_node_global_index);
 
             // Calculate Aij
             double Aij = 0.0;
 
-            Node<DIM>* p_node_j = this->GetNode(neighbour_node_index);
+            Node<DIM>* p_node_j = this->GetNode(neighbour_node_global_index);
 
             // Get the location of this node
             c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
@@ -142,8 +147,8 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         }
 
         // Add current positions to initial_conditions and RHS vector
-        c_vector<double, DIM> current_location = this->GetNode(node_index)->rGetLocation();
-        c_vector<double, DIM> forces = this->GetNode(node_index)->rGetAppliedForce();
+        c_vector<double, DIM> current_location = this->GetNode(global_node_index)->rGetLocation();
+        c_vector<double, DIM> forces = this->GetNode(global_node_index)->rGetAppliedForce();
 
         for (unsigned i=0; i<DIM; i++)
         {
@@ -166,7 +171,9 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
          ++cell_iter)
     {
         // Get index of node associated with cell
-        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        unsigned global_node_index = this->GetLocationIndexUsingCell((*cell_iter));
+
+        unsigned node_index = this->rGetMesh().SolveNodeMapping(global_node_index);
 
         c_vector<double, DIM> new_node_location;
 
@@ -180,7 +187,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         ChastePoint<DIM> new_point(new_node_location);
 
         // Move the node
-        this->SetNode(node_index, new_point);
+        this->SetNode(global_node_index, new_point);
     }
 
     // Tidy up

@@ -715,10 +715,12 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
         rNodeNeighbours[node_index] = std::set<unsigned>();
     }
 
-    for (unsigned node_index=0; node_index<rNodes.size(); node_index++)
+    for (unsigned i=0; i<rNodes.size(); i++)
     {
+        unsigned node_index = rNodes[i]->GetIndex();
+
         // Get the box containing this node
-        unsigned box_index = CalculateContainingBox(rNodes[node_index]);
+        unsigned box_index = CalculateContainingBox(rNodes[i]);
 
         // Get the local boxes to this node
         std::set<unsigned> local_boxes_indices = GetLocalBoxes(box_index);
@@ -742,16 +744,16 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
                 // If we're in the same box, then take care not to store the node pair twice
                 if (*box_iter == box_index)
                 {
-                    if (other_node_index > rNodes[node_index]->GetIndex())
+                    if (other_node_index > rNodes[i]->GetIndex())
                     {
-                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], (*node_iter)));
+                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
                         rNodeNeighbours[node_index].insert(other_node_index);
                         rNodeNeighbours[other_node_index].insert(node_index);
                     }
                 }
                 else
                 {
-                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], (*node_iter)));
+                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
                     rNodeNeighbours[node_index].insert(other_node_index);
                     rNodeNeighbours[other_node_index].insert(node_index);
                 }

@@ -45,6 +45,12 @@ AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(AbstractMe
       mUpdateNodesInRandomOrder(true),
       mIterateRandomlyOverUpdateRuleCollection(false)
 {
+    std::list<CellPtr>::iterator it = this->mCells.begin();
+    for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
+    {
+        unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
+        AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(index, *it);
+    }
 }
 
 template<unsigned DIM>

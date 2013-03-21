@@ -1238,7 +1238,6 @@ public:
         // Create a simple mesh
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
-        p_mesh->GetNode(0)->MarkAsDeleted();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1247,7 +1246,8 @@ public:
 
         // Create cell population but do not try to validate
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells, std::vector<unsigned>(), false, false);
-
+        p_mesh->GetNode(0)->MarkAsDeleted();
+        
         // Test IsCellAssociatedWithADeletedLocation() method
         for (MeshBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

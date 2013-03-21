@@ -78,9 +78,6 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
     std::list<CellPtr>::iterator it = mCells.begin();
     for (unsigned i=0; it != mCells.end(); ++it, ++i)
     {
-        unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
-        AddCellUsingLocationIndex(index,*it);
-
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor).
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
     }

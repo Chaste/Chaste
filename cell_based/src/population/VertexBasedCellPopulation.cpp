@@ -50,6 +50,14 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
 
+    // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
+    std::list<CellPtr>::iterator it = this->mCells.begin();
+    for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
+    {
+        unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
+        AbstractCellPopulation<DIM, DIM>::AddCellUsingLocationIndex(index,*it);
+    }
+
     // Check each element has only one cell attached
     if (validate)
     {
