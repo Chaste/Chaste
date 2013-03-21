@@ -362,6 +362,8 @@ public:
         TS_ASSERT_EQUALS(mesh.GetDistributedVectorFactory()->GetProblemSize(), 543u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 984u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 100u);
+        ///\todo There is no way to count the *global* number of boundary nodes
+        //TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 100u);
 
         for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();

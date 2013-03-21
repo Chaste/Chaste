@@ -190,9 +190,8 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineConst
                                                unsigned indexOfUnknown)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
-
     // In applying a condition to the boundary, we need to be sure that the boundary exists
-    assert(pMesh->GetNumBoundaryNodes() > 0);
+    assert(PetscTools::ReplicateBool( pMesh->GetNumBoundaryNodes() > 0 ) );
 
     ConstBoundaryCondition<SPACE_DIM>* p_boundary_condition = new ConstBoundaryCondition<SPACE_DIM>(value);
 
