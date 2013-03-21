@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartEventHandler.hpp"
 #include "Hdf5DataWriter.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
+#include "Hdf5ToVtkConverter.hpp"
 
 #include <iostream>
 
@@ -160,8 +161,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const std::vector<std::vector<double> >& rDataPayload,
 																		 const std::string& rDatasetName,
 																		 const std::string& rDatasetUnit,
-																		 std::string unlimitedVariableName,
-																		 std::string unlimitedVariableUnit)
+																		 const std::string& rUnlimitedVariableName,
+																		 const std::string& rUnlimitedVariableUnit)
 {
     DistributedVectorFactory* p_factory = mrMesh.GetDistributedVectorFactory();
     FileFinder test_output("", RelativeTo::ChasteTestOutput);
@@ -174,7 +175,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
 
     int apd_id = writer.DefineVariable(rDatasetName,rDatasetUnit);
     writer.DefineFixedDimension(mrMesh.GetNumNodes());
-    writer.DefineUnlimitedDimension(unlimitedVariableName, unlimitedVariableUnit);
+    writer.DefineUnlimitedDimension(rUnlimitedVariableName, rUnlimitedVariableUnit);
     writer.EndDefineMode();
 
     //Determine the maximum number of paces
@@ -517,6 +518,17 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::RunHdf5Converters(const std::
                                                           HeartConfig::Instance()->GetVisualizerOutputPrecision(),
                                                           rDatasetName);
     }
+//    if(HeartConfig::Instance()->GetVisualizeWithVtk())
+//    {
+//        FileFinder test_output("", RelativeTo::ChasteTestOutput);
+//
+//        Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>(mDirectory.GetRelativePath(test_output),
+//									 			   mHdf5File,
+//									 			   &mrMesh,
+//												   HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
+//												   HeartConfig::Instance()->GetVisualizerOutputPrecision(),
+//												   rDatasetName);
+//    }
     ///\todo #1660 put the other HDF5 converters as options here...
 
     ///\todo #2359 work out why we can't have more than one HDF5 DataReader in existence at once.

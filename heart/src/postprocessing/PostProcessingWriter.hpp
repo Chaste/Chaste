@@ -229,14 +229,14 @@ private:
      * @param rDataPayload  The postprocessed quantities
      * @param rDatasetName  The name of the quantities
      * @param rDatasetUnit  The unit of the quantities
-     * @param unlimitedVariableName  The name of the unlimited variable (defaults to "PaceNumber")
-     * @param unlimitedVariableUnit  The unlimited variable units (defaults to "dimensionless")
+     * @param rUnlimitedVariableName  The name of the unlimited variable (defaults to "PaceNumber")
+     * @param rUnlimitedVariableUnit  The unlimited variable units (defaults to "dimensionless")
      */
     void WriteOutputDataToHdf5(const std::vector<std::vector<double> >& rDataPayload,
 							   const std::string& rDatasetName,
 							   const std::string& rDatasetUnit,
-							   std::string unlimitedVariableName = "PaceNumber",
-							   std::string unlimitedVariableUnit = "dimensionless");
+							   const std::string& rUnlimitedVariableName = "PaceNumber",
+							   const std::string& rUnlimitedVariableUnit = "dimensionless");
 
 };
 
