@@ -99,6 +99,8 @@ private:
 //        {
 //            VtkMeshWriter<3,3> parallel_vtk_writer(directory_name, file_name+"par",false);
 //            parallel_vtk_writer.SetParallelFiles(cuboid_mesh);
+//            std::vector<double> dummy_data(cuboid_mesh.GetNumLocalNodes(), PetscTools::GetMyRank());
+//            parallel_vtk_writer.AddPointData("Process", dummy_data);
 //            parallel_vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
 //        }
 //        MeshEventHandler::EndEvent(MeshEventHandler::PVTK);
