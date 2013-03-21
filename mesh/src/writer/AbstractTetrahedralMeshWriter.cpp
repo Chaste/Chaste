@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <mpi.h> // For MPI_Send, MPI_Recv
 
-const char* MeshEventHandler::EventName[] = { "Tri write", "node write", "ele write", "face write", "spare", "comm1","comm2","Total"};
+const char* MeshEventHandler::EventName[] = { "Tri write", "node write", "ele write", "face write", "ncl write", "comm1","comm2","Total"};
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.

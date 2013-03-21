@@ -361,55 +361,40 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
             unsigned number_of_nodes_to_send    = mNodesToSendPerProcess[send_to].size();
             unsigned number_of_nodes_to_receive = mNodesToReceivePerProcess[receive_from].size();
 
+            //??if ( number_of_nodes_to_send > 0 )
+            double send_data[number_of_nodes_to_send];
+            double receive_data[number_of_nodes_to_receive];
             // Pack
-            if ( number_of_nodes_to_send > 0 )
+            for (unsigned node = 0; node < number_of_nodes_to_send; node++)
             {
-                double send_data[number_of_nodes_to_send];
-
-                for (unsigned node = 0; node < number_of_nodes_to_send; node++)
-                {
-                    unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
-                    unsigned local_node_index = global_node_index
-                                - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
-                    send_data[node] = dataPayload[local_node_index];
-                }
-
+                unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
+                unsigned local_node_index = global_node_index
+                            - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
+                send_data[node] = dataPayload[local_node_index];
+            }
+            {
                 // Send
                 int ret;
-                ret = MPI_Send( send_data,
-                                number_of_nodes_to_send,
-                                MPI_DOUBLE,
-                                send_to,
-                                0,
-                                PETSC_COMM_WORLD );
+                MPI_Status status;
+                ret = MPI_Sendrecv(send_data, number_of_nodes_to_send,
+                                   MPI_DOUBLE,
+                                   send_to, 0,
+                                   receive_data,  number_of_nodes_to_receive,
+                                   MPI_DOUBLE,
+                                   receive_from, 0,
+                                   PETSC_COMM_WORLD, &status);
                 assert ( ret == MPI_SUCCESS );
             }
 
-            if ( number_of_nodes_to_receive > 0 )
+            // Unpack
+            for ( unsigned node = 0; node < number_of_nodes_to_receive; node++ )
             {
-                // Receive
-                double receive_data[number_of_nodes_to_receive];
-                MPI_Status status;
-
-                int ret;
-                ret = MPI_Recv( receive_data,
-                                number_of_nodes_to_receive,
-                                MPI_DOUBLE,
-                                receive_from,
-                                0,
-                                PETSC_COMM_WORLD,
-                                &status );
-                assert ( ret == MPI_SUCCESS);
-
-                // Unpack
-                for ( unsigned node = 0; node < number_of_nodes_to_receive; node++ )
-                {
-                    unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
-                    unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
-                    assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
-                    dataPayload[halo_index] = receive_data[node];
-                }
+                unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
+                unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
+                assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
+                dataPayload[halo_index] = receive_data[node];
             }
+
         }
     }
 
@@ -421,7 +406,6 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
     p_point_data->AddArray(p_scalars);
     p_scalars->Delete(); //Reference counted
-
 }
 
 
@@ -450,59 +434,40 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
             unsigned number_of_nodes_to_send    = mNodesToSendPerProcess[send_to].size();
             unsigned number_of_nodes_to_receive = mNodesToReceivePerProcess[receive_from].size();
 
-            // Pack
-            if ( number_of_nodes_to_send > 0 )
+            double send_data[number_of_nodes_to_send * SPACE_DIM];
+            double receive_data[number_of_nodes_to_receive * SPACE_DIM];
+
+            for (unsigned node = 0; node < number_of_nodes_to_send; node++)
             {
-                double send_data[number_of_nodes_to_send * SPACE_DIM];
-
-                for (unsigned node = 0; node < number_of_nodes_to_send; node++)
+                unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
+                unsigned local_node_index = global_node_index
+                            - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
+                for (unsigned j=0; j<SPACE_DIM; j++)
                 {
-                    unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
-                    unsigned local_node_index = global_node_index
-                                - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
-                    for (unsigned j=0; j<SPACE_DIM; j++)
-                    {
-                        send_data[ node*SPACE_DIM + j ] = dataPayload[local_node_index][j];
-                    }
+                    send_data[ node*SPACE_DIM + j ] = dataPayload[local_node_index][j];
                 }
-
-                // Send
-                int ret;
-                ret = MPI_Send( send_data,
-                                number_of_nodes_to_send * SPACE_DIM,
-                                MPI_DOUBLE,
-                                send_to,
-                                0,
-                                PETSC_COMM_WORLD );
-                assert ( ret == MPI_SUCCESS );
             }
 
-            if ( number_of_nodes_to_receive > 0 )
-            {
-                // Receive
-                double receive_data[number_of_nodes_to_receive * SPACE_DIM];
-                MPI_Status status;
-
                 int ret;
-                ret = MPI_Recv( receive_data,
-                                number_of_nodes_to_receive * SPACE_DIM,
-                                MPI_DOUBLE,
-                                receive_from,
-                                0,
-                                PETSC_COMM_WORLD,
-                                &status );
-                assert ( ret == MPI_SUCCESS);
+                MPI_Status status;
+                ret = MPI_Sendrecv(send_data, number_of_nodes_to_send * SPACE_DIM,
+                                   MPI_DOUBLE,
+                                   send_to, 0,
+                                   receive_data,  number_of_nodes_to_receive * SPACE_DIM,
+                                   MPI_DOUBLE,
+                                   receive_from, 0,
+                                   PETSC_COMM_WORLD, &status);
+                assert ( ret == MPI_SUCCESS );
 
-                // Unpack
-                for ( unsigned node = 0; node < number_of_nodes_to_receive; node++ )
+            // Unpack
+            for ( unsigned node = 0; node < number_of_nodes_to_receive; node++ )
+            {
+                unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
+                unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
+                assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
+                for (unsigned j=0; j<SPACE_DIM; j++)
                 {
-                    unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
-                    unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
-                    assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
-                    for (unsigned j=0; j<SPACE_DIM; j++)
-                    {
-                        dataPayload[halo_index][j] = receive_data[ node*SPACE_DIM + j ];
-                    }
+                    dataPayload[halo_index][j] = receive_data[ node*SPACE_DIM + j ];
                 }
             }
         }
