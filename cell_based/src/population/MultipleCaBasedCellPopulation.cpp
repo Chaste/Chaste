@@ -214,44 +214,54 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     // Each node must have at least one neighbour
     assert(!neighbouring_node_indices.empty());
 
-    // Randomly choose one of the neighbouring node indices
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-    unsigned chosen_start = p_gen->randMod(num_neighbours);
-    std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-    for (unsigned i=0; i<chosen_start; i++)
-    {
-        neighbour_iter++;
-    }
+    std::vector<double> neighbouring_node_propensities;
+    std::vector<unsigned> neighbouring_node_indices_vector;
 
-    /*
-     * Iterate through the neighbours until the first available site is found.
-     * Note that at least one such site is guaranteed, since this method is called
-     * within AbstractCellBasedSimulation::DoCellBirth() only if IsRoomToDivide()
-     * returns true for the parent cell.
-     */
-    unsigned daughter_node_index = UNSIGNED_UNSET;
-    unsigned count = 0;
-    while (count < num_neighbours)
-    {
-        bool is_empty_site = IsSiteAvailable(*neighbour_iter, pParentCell);
+	double total_propensity = 0.0;
 
-        if (is_empty_site)
+	for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+			neighbour_iter != neighbouring_node_indices.end();
+		 ++neighbour_iter)
+	{
+		neighbouring_node_indices_vector.push_back(*neighbour_iter);
+
+		double propensity_dividing_into_neighbour = EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+
+		if (!IsSiteAvailable(*neighbour_iter, pParentCell))
+		{
+			propensity_dividing_into_neighbour = 0.0;
+		}
+		neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
+		total_propensity += propensity_dividing_into_neighbour;
+	}
+
+	assert(total_propensity>0); // if this trips the cell cant divided so need to include this in the IsSiteAvailable method
+
+	for(unsigned i = 0; i< num_neighbours; i++)
+	{
+		neighbouring_node_propensities[i] /= total_propensity;
+	}
+
+	 // Sample random number to specify which move to make
+	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+	double random_number = p_gen->ranf();
+
+	double total_probability = 0.0;
+	unsigned daughter_node_index = UNSIGNED_UNSET;
+
+	unsigned counter;
+    for (counter=0; counter < num_neighbours; counter++)
+    {
+
+        total_probability += neighbouring_node_propensities[counter];
+        if (total_probability >= random_number)
         {
-            daughter_node_index = *neighbour_iter;
+            //Divide the parent cell to this neighbour location
+            daughter_node_index = neighbouring_node_indices_vector[counter];
             break;
         }
-        else
-        {
-            neighbour_iter++;
-
-            if (neighbour_iter == neighbouring_node_indices.end())
-            {
-                neighbour_iter = neighbouring_node_indices.begin();
-            }
-
-            count++;
-        }
     }
+    // This loop should always break as sum(neighbouring_node_propensities)=1.
 
     assert(daughter_node_index != UNSIGNED_UNSET);
     assert(daughter_node_index < this->mrMesh.GetNumNodes());
@@ -264,6 +274,14 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     AddCellUsingLocationIndex(daughter_node_index,p_created_cell);
 
     return p_created_cell;
+}
+
+template<unsigned DIM>
+double MultipleCaBasedCellPopulation<DIM>:: EvaluateDivisionPropensity(unsigned currentNodeIndex,
+																	   unsigned targetNodeIndex,
+																	   CellPtr pCell)
+{
+	return 1.0;
 }
 
 template<unsigned DIM>

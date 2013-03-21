@@ -250,6 +250,18 @@ public:
     CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
 
     /**
+      * Calculate the propensity of a dividing into a given site.
+      * Overridden in child classes to define other division methods. eg directed division.
+      *
+      * @param currentNodeIndex The index of the current node/lattice site
+      * @param targetNodeIndex The index of the target node/lattice site
+      * @param cell a pointer to the cell (needed if more than one cell per lattice site
+      * @return The probability of the cell dividing from the current node to the target node
+      */
+     double virtual EvaluateDivisionPropensity(unsigned currentNodeIndex,
+                                        unsigned targetNodeIndex,
+                                        CellPtr pCell);
+    /**
      * Remove all cells labelled as dead.
      *
      * Note that after calling this method the cell population will be in an inconsistent state until
