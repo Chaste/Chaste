@@ -78,24 +78,24 @@ private:
         }
         MeshEventHandler::EndEvent(MeshEventHandler::TRIANGLES);
 
-//        MeshEventHandler::BeginEvent(MeshEventHandler::BINTRI);
-//        {
-//            TrianglesMeshWriter<3,3> bin_mesh_writer(directory_name,  file_name+"_bin", false);
-//            bin_mesh_writer.SetWriteFilesAsBinary();
-//            bin_mesh_writer.WriteFilesUsingMesh(cuboid_mesh);
-//        }
-//        MeshEventHandler::EndEvent(MeshEventHandler::BINTRI);
+        MeshEventHandler::BeginEvent(MeshEventHandler::BINTRI);
+        {
+            TrianglesMeshWriter<3,3> bin_mesh_writer(directory_name,  file_name+"_bin", false);
+            bin_mesh_writer.SetWriteFilesAsBinary();
+            bin_mesh_writer.WriteFilesUsingMesh(cuboid_mesh);
+        }
+        MeshEventHandler::EndEvent(MeshEventHandler::BINTRI);
 
 
 #ifdef CHASTE_VTK
-//        MeshEventHandler::BeginEvent(MeshEventHandler::VTK);
-//        {
-//            VtkMeshWriter<3,3> vtk_writer(directory_name, file_name, false);
+        MeshEventHandler::BeginEvent(MeshEventHandler::VTK);
+        {
+            VtkMeshWriter<3,3> vtk_writer(directory_name, file_name, false);
 //            vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
-//        }
-//        MeshEventHandler::EndEvent(MeshEventHandler::VTK);
+        }
+        MeshEventHandler::EndEvent(MeshEventHandler::VTK);
 
-//        MeshEventHandler::BeginEvent(MeshEventHandler::PVTK);
+        MeshEventHandler::BeginEvent(MeshEventHandler::PVTK);
         {
             VtkMeshWriter<3,3> parallel_vtk_writer(directory_name, file_name+"par",false);
             parallel_vtk_writer.SetParallelFiles(cuboid_mesh);
@@ -103,7 +103,7 @@ private:
             parallel_vtk_writer.AddPointData("Process", dummy_data);
             parallel_vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
         }
-//        MeshEventHandler::EndEvent(MeshEventHandler::PVTK);
+        MeshEventHandler::EndEvent(MeshEventHandler::PVTK);
 #endif //CHASTE_VTK
         MeshEventHandler::Headings();
         MeshEventHandler::Report();
@@ -114,8 +114,8 @@ public:
 
     void TestRunAllTests()
     {
-        //for (unsigned pow = 0; pow<6; pow++)
-        unsigned pow = 5;
+        for (unsigned pow = 0; pow<5; pow++)
+        //unsigned pow = 5;
         {
             if (PetscTools::AmMaster())
             {

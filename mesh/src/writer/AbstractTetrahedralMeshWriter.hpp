@@ -60,15 +60,18 @@ struct MeshWriterIterators;
 
 #include "GenericEventHandler.hpp"
 /** \todo Temporary for #2351 */
-class MeshEventHandler : public GenericEventHandler<8, MeshEventHandler>
+class MeshEventHandler : public GenericEventHandler<11, MeshEventHandler>
 {
 public:
-    static const char* EventName[8]; /**< See #2351*/
+    static const char* EventName[11]; /**< See #2351*/
 
     /** See #2351*/
     typedef enum
     {
         TRIANGLES=0,
+        BINTRI,
+        VTK,
+        PVTK,
         NODE,
         ELE,
         FACE,
@@ -98,13 +101,13 @@ private:
     {
         //PRINT_2_VARIABLES(globalIndex, numIndices);
         MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
-        MPI_Send(indices, numIndices, MPI_UNSIGNED, 0,
+        MPI_Ssend(indices, numIndices, MPI_UNSIGNED, 0,
                  tag, //Elements sent with tags offset
                  PETSC_COMM_WORLD);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
         // Attribute value has the same tag (assume that it doesn't overtake the previous message)
         MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
-        MPI_Send(&attribute, 1, MPI_DOUBLE, 0,
+        MPI_Ssend(&attribute, 1, MPI_DOUBLE, 0,
                 tag, //Elements sent with tags offset
                 PETSC_COMM_WORLD);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
@@ -119,7 +122,7 @@ private:
     void UnpackElement(ElementData& rElementData, unsigned globalIndex, unsigned numIndices, unsigned tag)
     {
         //PRINT_2_VARIABLES(globalIndex, numIndices);
-        assert( numIndices = rElementData.NodeIndices.size());
+        assert( numIndices == rElementData.NodeIndices.size());
         unsigned raw_indices[numIndices];
         MPI_Status status;
         //Get it from elsewhere
