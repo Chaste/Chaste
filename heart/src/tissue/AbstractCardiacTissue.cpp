@@ -583,79 +583,63 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
             unsigned number_of_cells_to_send    = mNodesToSendPerProcess[send_to].size();
             unsigned number_of_cells_to_receive = mNodesToReceivePerProcess[receive_from].size();
 
-            // Pack
-            if ( number_of_cells_to_send > 0 )
+            // Pack send buffer
+            unsigned send_size = 0;
+            for (unsigned i=0; i<number_of_cells_to_send; i++)
             {
-                unsigned send_size = 0;
-                for (unsigned i=0; i<number_of_cells_to_send; i++)
-                {
-                    unsigned global_cell_index = mNodesToSendPerProcess[send_to][i];
-                    send_size += mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()]->GetNumberOfStateVariables();
-                }
-
-                double send_data[send_size];
-
-                unsigned send_index = 0;
-                for (unsigned cell = 0; cell < number_of_cells_to_send; cell++)
-                {
-                    unsigned global_cell_index = mNodesToSendPerProcess[send_to][cell];
-                    AbstractCardiacCellInterface* p_cell = mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()];
-                    std::vector<double> cell_data = p_cell->GetStdVecStateVariables();
-                    const unsigned num_state_vars = p_cell->GetNumberOfStateVariables();
-                    for (unsigned state_variable = 0; state_variable < num_state_vars; state_variable++)
-                    {
-                        send_data[send_index++] = cell_data[state_variable];
-                    }
-                }
-
-                // Send
-                int ret;
-                ret = MPI_Send( send_data,
-                                send_size,
-                                MPI_DOUBLE,
-                                send_to,
-                                0,
-                                PETSC_COMM_WORLD );
-                assert ( ret == MPI_SUCCESS );
+                unsigned global_cell_index = mNodesToSendPerProcess[send_to][i];
+                send_size += mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()]->GetNumberOfStateVariables();
             }
 
-            if ( number_of_cells_to_receive > 0 )
+            double send_data[send_size];
+
+            unsigned send_index = 0;
+            for (unsigned cell = 0; cell < number_of_cells_to_send; cell++)
             {
-                // Receive
-                unsigned receive_size = 0;
-                for (unsigned i=0; i<number_of_cells_to_receive; i++)
+                unsigned global_cell_index = mNodesToSendPerProcess[send_to][cell];
+                AbstractCardiacCellInterface* p_cell = mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()];
+                std::vector<double> cell_data = p_cell->GetStdVecStateVariables();
+                const unsigned num_state_vars = p_cell->GetNumberOfStateVariables();
+                for (unsigned state_variable = 0; state_variable < num_state_vars; state_variable++)
                 {
-                    unsigned halo_cell_index = mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][i]];
-                    receive_size += mHaloCellsDistributed[halo_cell_index]->GetNumberOfStateVariables();
+                    send_data[send_index++] = cell_data[state_variable];
                 }
+            }
+            // Receive buffer
+            unsigned receive_size = 0;
+            for (unsigned i=0; i<number_of_cells_to_receive; i++)
+            {
+                unsigned halo_cell_index = mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][i]];
+                receive_size += mHaloCellsDistributed[halo_cell_index]->GetNumberOfStateVariables();
+            }
 
-                double receive_data[receive_size];
-                MPI_Status status;
+            double receive_data[receive_size];
 
-                int ret;
-                ret = MPI_Recv( receive_data,
-                                receive_size,
-                                MPI_DOUBLE,
-                                receive_from,
-                                0,
-                                PETSC_COMM_WORLD,
-                                &status );
-                assert ( ret == MPI_SUCCESS);
+            // Send and receive
+            int ret;
+            MPI_Status status;
+            ret = MPI_Sendrecv(send_data, send_size,
+                               MPI_DOUBLE,
+                               send_to, 0,
+                               receive_data,  receive_size,
+                               MPI_DOUBLE,
+                               receive_from, 0,
+                               PETSC_COMM_WORLD, &status);
+            assert ( ret == MPI_SUCCESS);
 
-                // Unpack
-                unsigned receive_index = 0;
-                for ( unsigned cell = 0; cell < number_of_cells_to_receive; cell++ )
+            // Unpack
+            unsigned receive_index = 0;
+            for ( unsigned cell = 0; cell < number_of_cells_to_receive; cell++ )
+            {
+                AbstractCardiacCellInterface* p_cell = mHaloCellsDistributed[mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][cell]]];
+                const unsigned number_of_state_variables = p_cell->GetNumberOfStateVariables();
+
+                std::vector<double> cell_data(number_of_state_variables);
+                for (unsigned state_variable = 0; state_variable < number_of_state_variables; state_variable++)
                 {
-                    AbstractCardiacCellInterface* p_cell = mHaloCellsDistributed[mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][cell]]];
-                    const unsigned number_of_state_variables = p_cell->GetNumberOfStateVariables();
-
-                    std::vector<double> cell_data(number_of_state_variables);
-                    for (unsigned state_variable = 0; state_variable < number_of_state_variables; state_variable++)
-                    {
-                        cell_data[state_variable] = receive_data[receive_index++];
-                    }
-                    p_cell->SetStateVariables(cell_data);
+                    cell_data[state_variable] = receive_data[receive_index++];
                 }
+                p_cell->SetStateVariables(cell_data);
             }
         }
     }
