@@ -549,7 +549,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                 {
                     raw_coords[j] = it->GetPoint()[j];
                 }
-                MPI_Send(raw_coords, SPACE_DIM, MPI_DOUBLE, 0, it->GetIndex(), PETSC_COMM_WORLD);//Nodes sent with positive tags
+                MPI_Ssend(raw_coords, SPACE_DIM, MPI_DOUBLE, 0, it->GetIndex(), PETSC_COMM_WORLD);//Nodes sent with positive tags
             }
 //            PetscTools::Barrier("DodgyBarrierAfterNODE");
             MeshEventHandler::EndEvent(MeshEventHandler::NODE);
@@ -574,7 +574,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             MeshEventHandler::EndEvent(MeshEventHandler::ELE);
             MeshEventHandler::BeginEvent(MeshEventHandler::FACE);
             // Slaves concentrate the Faces for which they are owners (not in 1-d)
-            if (ELEMENT_DIM != 1)
+            if (ELEMENT_DIM != 1)  /// \todo #2351 Also exclude VTK writer
             {
                 unsigned raw_face_indices[ELEMENT_DIM]; // Assuming that we don't have parallel quadratic meshes
                 typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElementIterType;

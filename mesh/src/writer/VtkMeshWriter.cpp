@@ -133,6 +133,12 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         p_cell->Delete(); //Reference counted
     }
 
+    /// \todo #2351 Temporary workaround for parallel writer
+    for (unsigned item_num=0; item_num<this->GetNumBoundaryFaces(); item_num++)
+    {
+        this->GetNextBoundaryElement();
+    }
+
     //If necessary, construct cables
     if (this->GetNumCableElements() > 0)
     {
