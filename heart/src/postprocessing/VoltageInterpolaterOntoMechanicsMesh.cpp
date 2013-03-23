@@ -137,7 +137,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     // where to output
     std::string config_directory = HeartConfig::Instance()->GetOutputDirectory();
     HeartConfig::Instance()->SetOutputDirectory(directory);
-    Hdf5ToCmguiConverter<DIM,DIM> converter(directory,
+    Hdf5ToCmguiConverter<DIM,DIM> converter(FileFinder(directory, RelativeTo::ChasteTestOutput),
                                             "voltage_mechanics_mesh",
                                             &rMechanicsMesh,
                                             false);

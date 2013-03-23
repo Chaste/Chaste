@@ -49,10 +49,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractHdf5Converter
 {
+private:
+    /**
+     * Have a look in the HDF5 file and generate a list of the datasets that it contains.
+     *
+     * @param rH5Folder  The directory the h5 file is in.
+     * @param rFileName  The name of the h5 file.
+     */
+    void GenerateListOfDatasets(const FileFinder& rH5Folder, const std::string& rFileName);
+
 protected:
 
+    /** Folder that the h5 file to convert resides in */
+    const FileFinder& mrH5Folder;
+
     /** Pointer to reader of the dataset to be converted. */
-    Hdf5DataReader* mpReader;
+    boost::shared_ptr<Hdf5DataReader> mpReader;
 
     /** Number of variables to output. Read from the reader. */
     unsigned mNumVariables;
@@ -73,15 +85,6 @@ protected:
      */
     unsigned mOpenDatasetIndex;
 
-    /**
-     * Have a look in the HDF5 file and generate a list of the datasets that it contains.
-     *
-     * @param rH5Folder  The directory the h5 file is in.
-     * @param rFileName  The name of the h5 file.
-     * @param rDatasetName  The dataset we are currently interested in writing \todo #1660 remove this and do them all at once.
-     */
-    void GenerateListOfDatasets(const FileFinder& rH5Folder, const std::string& rFileName, const std::string& rDatasetName);
-
     /** Pointer to a mesh. */
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
 
@@ -100,6 +103,15 @@ protected:
      */
     unsigned mPrecision;
 
+    /**
+     * Close the existing dataset and open a new one.
+     *
+     * This method deletes the existing mpDataReader, and opens a new one for the new dataset.
+     *
+     * @return whether a new dataset is open, false if we have run out of them.
+     */
+    bool MoveOntoNextDataset();
+
 public:
 
     /**
@@ -107,20 +119,17 @@ public:
      *
      * @note This method is collective, and must be called by all processes.
      *
-     * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
-     * @param rFileBaseName The base name of the data file.
-     * @param pMesh Pointer to the mesh.
-     * @param rSubdirectoryName name for the output directory to be created (relative to inputDirectory)
-     * @param precision  the number of digits to use in numerical output to file.
-     * @param rDatasetName  The name of the dataset to convert, defaults to "Data" which gives the PDE variables.
+     * @param rInputDirectory  The input directory, where the .h5 file to post-process is.
+     * @param rFileBaseName  The base name of the data file.
+     * @param pMesh  Pointer to the mesh.
+     * @param rSubdirectoryName  Name for the output directory to be created (relative to inputDirectory).
+     * @param precision  The number of digits to use in numerical output to file.
      */
-    AbstractHdf5Converter(const std::string& rInputDirectory,
+    AbstractHdf5Converter(const FileFinder& rInputDirectory,
                           const std::string& rFileBaseName,
                           AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                           const std::string& rSubdirectoryName,
-                          unsigned precision,
-                          const std::string& rDatasetName = "Data");
-
+                          unsigned precision);
 
     /**
      * Wrtie the unlimited dimension information to file.
@@ -133,7 +142,7 @@ public:
     ~AbstractHdf5Converter();
 
     /**
-     * @return the relative path of the subdirectory in which the converted output is stored.
+     * @return the relative path of the sub-directory in which the converted output is stored.
      */
     std::string GetSubdirectory();
 };

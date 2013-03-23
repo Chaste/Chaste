@@ -51,14 +51,14 @@ public:
      *
      * @note This method is collective, and hence must be called by all processes.
      *
-     * @param inputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
-     * @param fileBaseName The base name of the data file.
+     * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param rFileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
      * @param parallelVtk When true, write with .pvtu and fragment meshes (only works for DistributedTetrahedralMesh)
      * @param usingOriginalNodeOrdering Whether HDF5 output was written using the original node ordering
      */
-    Hdf5ToVtkConverter(std::string inputDirectory,
-                       std::string fileBaseName,
+    Hdf5ToVtkConverter(const FileFinder& rInputDirectory,
+                       const std::string& rFileBaseName,
                        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                        bool parallelVtk,
                        bool usingOriginalNodeOrdering);

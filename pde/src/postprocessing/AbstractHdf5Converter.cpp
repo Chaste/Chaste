@@ -49,40 +49,25 @@ herr_t op_func (hid_t loc_id,
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(const std::string& rInputDirectory,
+AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(const FileFinder& rInputDirectory,
 																	 const std::string& rFileBaseName,
                                                                      AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                                      const std::string& rSubdirectoryName,
-                                                                     unsigned precision,
-                                                                     const std::string& rDatasetName)
-    : mFileBaseName(rFileBaseName),
+                                                                     unsigned precision)
+    : mrH5Folder(rInputDirectory),
+      mFileBaseName(rFileBaseName),
       mOpenDatasetIndex(UNSIGNED_UNSET),
       mpMesh(pMesh),
       mRelativeSubdirectory(rSubdirectoryName),
       mPrecision(precision)
 {
-	FileFinder h5_directory(rInputDirectory,RelativeTo::ChasteTestOutput);
-
-	GenerateListOfDatasets(h5_directory,mFileBaseName,rDatasetName);
-
-    // Store directory, mesh and filenames and create the reader
-    mpReader = new Hdf5DataReader(h5_directory, mFileBaseName, mDatasetNames[mOpenDatasetIndex]);
+	GenerateListOfDatasets(mrH5Folder, mFileBaseName);
 
     // Create new directory in which to store everything
-    mpOutputFileHandler = new OutputFileHandler(rInputDirectory + "/" + mRelativeSubdirectory, false);
+	FileFinder sub_directory(mRelativeSubdirectory, mrH5Folder);
+    mpOutputFileHandler = new OutputFileHandler(sub_directory, false);
 
-    // Check the data file for basic validity
-    std::vector<std::string> variable_names = mpReader->GetVariableNames();
-    mNumVariables = variable_names.size();
-
-    if (mpReader->GetNumberOfRows() != mpMesh->GetNumNodes())
-    {
-        delete mpReader;
-        delete mpOutputFileHandler;
-        EXCEPTION("Mesh and HDF5 file have a different number of nodes");
-    }
-
-    WriteInfoFile();
+	MoveOntoNextDataset();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -125,7 +110,6 @@ void AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::WriteInfoFile()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::~AbstractHdf5Converter()
 {
-    delete mpReader;
     delete mpOutputFileHandler;
 }
 
@@ -136,9 +120,44 @@ std::string AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GetSubdirectory()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
+{
+	// If we are already at the end just return false.
+	if (mDatasetNames.size() == mOpenDatasetIndex+1u)
+	{
+		return false;
+	}
+
+	// If we haven't read anything yet, start at the beginning, otherwise increment by one.
+	if (mOpenDatasetIndex==UNSIGNED_UNSET)
+	{
+		mOpenDatasetIndex = 0u;
+	}
+	else
+	{
+		mOpenDatasetIndex++;
+	}
+
+    // Store directory, mesh and filenames and create the reader
+    mpReader.reset(new Hdf5DataReader(mrH5Folder, mFileBaseName, mDatasetNames[mOpenDatasetIndex]));
+
+    // Check the data file for basic validity
+    std::vector<std::string> variable_names = mpReader->GetVariableNames();
+    mNumVariables = variable_names.size();
+
+    if (mpReader->GetNumberOfRows() != mpMesh->GetNumNodes())
+    {
+        delete mpOutputFileHandler;
+        EXCEPTION("Mesh and HDF5 file have a different number of nodes");
+    }
+    WriteInfoFile();
+
+	return true;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const FileFinder& rH5Folder,
-		                                                                  const std::string& rFileName,
-		                                                                  const std::string& rDatasetName)
+		                                                                  const std::string& rFileName)
 {
 	/*
 	 * Open file.
@@ -180,23 +199,6 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
 	    {
 	        ++iter;
 	    }
-	}
-
-	// Find the dataset we're interested in, and record which one it is.
-	for (unsigned i=0; i<mDatasetNames.size(); i++)
-	{
-		if (mDatasetNames[i]==rDatasetName)
-		{
-			mOpenDatasetIndex = i;
-			break;
-		}
-	}
-
-	if (mOpenDatasetIndex==UNSIGNED_UNSET)
-	{
-		NEVER_REACHED;
-		// Shouldn't ever be reached by a user, but we would want to catch it, so NEVER_REACHED for now.
-		//EXCEPTION("The requested dataset was not found in the HDF5 file.");
 	}
 }
 

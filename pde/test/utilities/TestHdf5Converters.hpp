@@ -94,7 +94,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToVtkConverter<3,3> converter(working_directory, "cube_2mm_12_elements", &mesh, false, true);
+        Hdf5ToVtkConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        		                          "cube_2mm_12_elements", &mesh, false, true);
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
         // Now do something else before reading back...
@@ -105,7 +106,8 @@ public:
             // Show that trying to write .pvtu files from a TetrahedralMesh gives a warning (but writes anyway)
             CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
                                   working_directory2);
-            Hdf5ToVtkConverter<3,3> converter2(working_directory2, "cube_2mm_12_elements", &mesh, true, true);
+            Hdf5ToVtkConverter<3,3> converter2(FileFinder(working_directory2, RelativeTo::ChasteTestOutput),
+            		                           "cube_2mm_12_elements", &mesh, true, true);
 
             //The reading part of this test is below
         }
@@ -179,7 +181,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToVtkConverter<2,2> converter(working_directory, "2D_0_to_1mm_400_elements", &mesh, true, false);
+        Hdf5ToVtkConverter<2,2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        		                          "2D_0_to_1mm_400_elements", &mesh, true, false);
 
         /*
          * Note that VTK is not thread-safe. The master process has spawned
@@ -225,7 +228,8 @@ public:
         }
 
         // Show that trying to write .pvtu files with original node ordering gives a warning (but writes anyway)
-        Hdf5ToVtkConverter<2,2> converter2(working_directory, "2D_0_to_1mm_400_elements", &mesh, true, true);
+        Hdf5ToVtkConverter<2,2> converter2(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        								   "2D_0_to_1mm_400_elements", &mesh, true, true);
 
         /*
          * Note that VTK is not thread-safe. The master process has spawned
@@ -263,7 +267,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToTxtConverter<3,3> converter(working_directory, "cube_2mm_12_elements", &mesh);
+        Hdf5ToTxtConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        							      "cube_2mm_12_elements", &mesh);
 
         std::vector<std::string> files_to_compare;
         files_to_compare.push_back("cube_2mm_12_elements_V_0.txt");

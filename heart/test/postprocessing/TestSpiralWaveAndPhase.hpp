@@ -211,17 +211,13 @@ public:
     }
 
     /**
-     * Here we test that we can successfully output a meshalyzer file of Phase.
+     * Here we test that we can successfully output meshalyzer files of both the original data and Phase.
      */
     void TestMeshalyzerPhasePlot() throw (Exception)
     {
         // Write out voltage (just for fun, to compare with phase plot).
-        Hdf5ToMeshalyzerConverter<2,2> converter1("SpiralWaveAndPhase", "results", mpMesh, true);
-
-        // Write out postprocessed quantities too (in dataset "Phase")
-        Hdf5ToMeshalyzerConverter<2,2> converter2("SpiralWaveAndPhase", "results", mpMesh, true,
-        										  0u /* default precision */,
-        										  "Phase");
+        Hdf5ToMeshalyzerConverter<2,2> converter1(FileFinder("SpiralWaveAndPhase", RelativeTo::ChasteTestOutput),
+        										  "results", mpMesh, true);
 
         // Check the phase file is written correctly.
         {
@@ -242,8 +238,6 @@ public:
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
-
-
     }
 };
 

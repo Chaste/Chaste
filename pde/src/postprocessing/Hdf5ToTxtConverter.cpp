@@ -44,15 +44,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(std::string inputDirectory,
-                                                               std::string fileBaseName,
+Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder& rInputDirectory,
+                                                               const std::string& rFileBaseName,
                                                                AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "txt_output", 0u)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "txt_output", 0u)
 {
-    // Make sure that we are never trying to write from an incomplete data HDF5 file
+	// Make sure that we are never trying to write from an incomplete data HDF5 file
     assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());
 
-    std::string output_directory = inputDirectory + "/" + this->mRelativeSubdirectory;
+    FileFinder output_directory(this->mRelativeSubdirectory,rInputDirectory);
     OutputFileHandler handler(output_directory);
 
     unsigned num_nodes = pMesh->GetNumNodes();
@@ -72,7 +72,7 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(std::string input
 
             // Create a .txt file for this time step and this variable
             std::stringstream file_name;
-            file_name << fileBaseName << "_" << variable_name << "_" << time_step << ".txt";
+            file_name << rFileBaseName << "_" << variable_name << "_" << time_step << ".txt";
             out_stream p_file = handler.OpenOutputFile(file_name.str());
 
             this->mpReader->GetVariableOverNodes(data, variable_name, time_step);

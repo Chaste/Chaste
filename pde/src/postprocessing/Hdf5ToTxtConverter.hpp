@@ -53,12 +53,12 @@ public:
     /**
      * Constructor, which does the conversion and writes the .txt file.
      *
-     * @param inputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
-     * @param fileBaseName The base name of the data file.
-     * @param pMesh Pointer to the mesh.
+     * @param rInputDirectory  The input directory, where the .h5 file has been written.
+     * @param rFileBaseName  The base name of the data file.
+     * @param pMesh  Pointer to the mesh.
      */
-    Hdf5ToTxtConverter(std::string inputDirectory,
-                       std::string fileBaseName,
+    Hdf5ToTxtConverter(const FileFinder& rInputDirectory,
+                       const std::string& rFileBaseName,
                        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 };
 

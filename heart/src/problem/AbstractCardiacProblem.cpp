@@ -572,16 +572,30 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
     delete mpWriter;
     mpWriter = NULL;
 
+    FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
+
+    /********************************************************************************
+     * Run all post processing.
+     *
+     * The PostProcessingWriter class examines what is requested in HeartConfig and
+     * adds the relevant data to the HDF5 file.
+     * This is converted to different visualizer formats along with the solution
+     * in the DATA_CONVERSION block below.
+     *********************************************************************************/
+
     HeartEventHandler::BeginEvent(HeartEventHandler::POST_PROC);
     if(HeartConfig::Instance()->IsPostProcessingRequested())
     {
-        FileFinder test_output(HeartConfig::Instance()->GetOutputDirectory(), RelativeTo::ChasteTestOutput);
         PostProcessingWriter<ELEMENT_DIM, SPACE_DIM> post_writer(*mpMesh,
                                                                  test_output,
                                                                  HeartConfig::Instance()->GetOutputFilenamePrefix());
         post_writer.WritePostProcessingFiles();
     }
     HeartEventHandler::EndEvent(HeartEventHandler::POST_PROC);
+
+    /********************************************************************************************
+     * Convert HDF5 datasets (solution and postprocessing maps) to different visualizer formats
+     ********************************************************************************************/
 
     HeartEventHandler::BeginEvent(HeartEventHandler::DATA_CONVERSION);
     // Only if results files were written and we are outputting all nodes
@@ -590,7 +604,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         if (HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
         {
             // Convert simulation data to Meshalyzer format
-            Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM> converter(HeartConfig::Instance()->GetOutputDirectory(),
+            Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM> converter(test_output,
                     HeartConfig::Instance()->GetOutputFilenamePrefix(),
                     mpMesh,
                     HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
@@ -602,8 +616,11 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         if (HeartConfig::Instance()->GetVisualizeWithCmgui())
         {
             // Convert simulation data to Cmgui format
-            Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM> converter(HeartConfig::Instance()->GetOutputDirectory(),
-                    HeartConfig::Instance()->GetOutputFilenamePrefix(), mpMesh, GetHasBath());
+            Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM> converter(test_output,
+                    HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                    mpMesh,
+                    GetHasBath(),
+                    HeartConfig::Instance()->GetVisualizerOutputPrecision() );
             std::string subdirectory_name = converter.GetSubdirectory();
             HeartConfig::Instance()->Write(false, subdirectory_name);
         }
@@ -611,8 +628,11 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         if (HeartConfig::Instance()->GetVisualizeWithVtk())
         {
             // Convert simulation data to VTK format
-            Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(HeartConfig::Instance()->GetOutputDirectory(),
-                    HeartConfig::Instance()->GetOutputFilenamePrefix(), mpMesh, false, HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+            Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(test_output,
+                    HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                    mpMesh,
+                    false,
+                    HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
             std::string subdirectory_name = converter.GetSubdirectory();
             HeartConfig::Instance()->Write(false, subdirectory_name);
         }
@@ -620,15 +640,16 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::CloseFilesAndPos
         if (HeartConfig::Instance()->GetVisualizeWithParallelVtk())
         {
             // Convert simulation data to parallel VTK (pvtu) format
-            Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(HeartConfig::Instance()->GetOutputDirectory(),
-                    HeartConfig::Instance()->GetOutputFilenamePrefix(), mpMesh, true, HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
+            Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(test_output,
+                    HeartConfig::Instance()->GetOutputFilenamePrefix(),
+                    mpMesh,
+                    true,
+                    HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
             std::string subdirectory_name = converter.GetSubdirectory();
             HeartConfig::Instance()->Write(false, subdirectory_name);
         }
     }
     HeartEventHandler::EndEvent(HeartEventHandler::DATA_CONVERSION);
-
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>

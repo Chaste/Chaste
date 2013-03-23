@@ -76,7 +76,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 
     // Please note that only the master processor should write to file.
     // Each of the private methods called here takes care of checking.
-
     if (HeartConfig::Instance()->IsApdMapsRequested())
     {
         std::vector<std::pair<double,double> > apd_maps;
@@ -137,6 +136,10 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
         std::vector<ChastePoint<SPACE_DIM> > electrodes;
         HeartConfig::Instance()->GetPseudoEcgElectrodePositions(electrodes);
 
+        ///\todo #2359 work out how to get rid of this line
+        /// needed because PseudoEcgCalculator makes its own Hdf5DataReader.
+        delete mpDataReader;
+
         for (unsigned i=0; i<electrodes.size(); i++)
         {
             PseudoEcgCalculator<ELEMENT_DIM,SPACE_DIM,1> calculator(mrMesh,
@@ -146,6 +149,10 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
                                                                     mVoltageName);
             calculator.WritePseudoEcg();
         }
+
+        ///\todo #2359 work out how to get rid of these lines
+        mpDataReader = new Hdf5DataReader(mDirectory, mHdf5File);
+        mpCalculator->SetHdf5DataReader(mpDataReader);
     }
 }
 
@@ -153,7 +160,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::~PostProcessingWriter()
 {
-    delete mpDataReader;
+	delete mpDataReader;
     delete mpCalculator;
 }
 
@@ -236,7 +243,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
     hdf5_dataset_name << "Apd_" << repolarisationPercentage << extra_message << threshold << "_Map";
 
 	WriteOutputDataToHdf5(local_output_data, hdf5_dataset_name.str(), "msec");
-    RunHdf5Converters(hdf5_dataset_name.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -270,7 +276,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
     filename_stream << "UpstrokeTimeMap" << extra_message << threshold;
 
     WriteOutputDataToHdf5(output_data, filename_stream.str(), "msec");
-    RunHdf5Converters(filename_stream.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -304,7 +309,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteMaxUpstrokeVelocityMap(d
     filename_stream << "MaxUpstrokeVelocityMap" << extra_message << threshold;
 
     WriteOutputDataToHdf5(output_data, filename_stream.str(), "mV_per_msec");
-    RunHdf5Converters(filename_stream.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -331,7 +335,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteConductionVelocityMap(un
     filename_stream << "ConductionVelocityFromNode" << originNode;
 
     WriteOutputDataToHdf5(output_data, filename_stream.str(), "cm_per_msec");
-    RunHdf5Converters(filename_stream.str());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -425,7 +428,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
                 }
 
                 //grab the data from the hdf5 file.
-                std::vector<double> time_series =  mpDataReader->GetVariableOverTime(variable_names[name_index], node_index);
+                std::vector<double> time_series = mpDataReader->GetVariableOverTime(variable_names[name_index], node_index);
                 assert ( time_series.size() == mpDataReader->GetUnlimitedDimensionValues().size());
 
                 //fill the output_data data structure
@@ -500,41 +503,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
     PetscTools::EndRoundRobin();
 }
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::RunHdf5Converters(const std::string& rDatasetName)
-{
-    ///\todo #2359 work out why we can't have more than one HDF5 DataReader in existence at once.
-    delete mpDataReader;
-
-    if(HeartConfig::Instance()->GetVisualizeWithMeshalyzer())
-    {
-        FileFinder test_output("", RelativeTo::ChasteTestOutput);
-
-        Hdf5ToMeshalyzerConverter<ELEMENT_DIM, SPACE_DIM>(mDirectory.GetRelativePath(test_output),
-                                                          mHdf5File,
-                                                          &mrMesh,
-                                                          HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
-                                                          HeartConfig::Instance()->GetVisualizerOutputPrecision(),
-                                                          rDatasetName);
-    }
-//    if(HeartConfig::Instance()->GetVisualizeWithVtk())
-//    {
-//        FileFinder test_output("", RelativeTo::ChasteTestOutput);
-//
-//        Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>(mDirectory.GetRelativePath(test_output),
-//									 			   mHdf5File,
-//									 			   &mrMesh,
-//												   HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
-//												   HeartConfig::Instance()->GetVisualizerOutputPrecision(),
-//												   rDatasetName);
-//    }
-    ///\todo #1660 put the other HDF5 converters as options here...
-
-    ///\todo #2359 work out why we can't have more than one HDF5 DataReader in existence at once.
-    mpDataReader = new Hdf5DataReader(mDirectory, mHdf5File);
-    mpCalculator->SetHdf5DataReader(mpDataReader);
-}
 
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation

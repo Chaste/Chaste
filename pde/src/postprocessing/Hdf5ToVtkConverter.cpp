@@ -46,18 +46,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(std::string inputDirectory,
-                                                               std::string fileBaseName,
+Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder& rInputDirectory,
+                                                               const std::string& rFileBaseName,
                                                                AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                                bool parallelVtk,
                                                                bool usingOriginalNodeOrdering)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "vtk_output",0u)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "vtk_output",0u)
 {
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
+	// Write mesh in a suitable form for VTK
+	FileFinder test_output("",RelativeTo::ChasteTestOutput);
+    std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
 
-    // Write mesh in a suitable form for VTK
-    std::string output_directory = inputDirectory + "/" + this->mRelativeSubdirectory;
-    VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> vtk_writer(output_directory, fileBaseName, false);
+    VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> vtk_writer(output_directory, rFileBaseName, false);
 
     DistributedVectorFactory* p_factory = pMesh->GetDistributedVectorFactory();
 

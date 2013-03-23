@@ -71,10 +71,9 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
             p_file = this->mpOutputFileHandler->OpenOutputFile(this->mFileBaseName + "_" + time_step_string.str() + ".exnode");
 
             // Check how many digits are to be output in the solution (0 goes to default value of digits)
-            unsigned int num_digits = HeartConfig::Instance()->GetVisualizerOutputPrecision();
-            if (num_digits != 0)
+            if (this->mPrecision != 0)
             {
-               p_file->precision(num_digits);
+               p_file->precision(this->mPrecision);
             }
         }
 
@@ -134,11 +133,12 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(std::string inputDirectory,
-                                                                  std::string fileBaseName,
+Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFinder& rInputDirectory,
+                                                                  const std::string& rFileBaseName,
                                                                   AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                                                  bool hasBath)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(inputDirectory, fileBaseName, pMesh, "cmgui_output", 0u)
+                                                                  bool hasBath,
+                                                                  unsigned precision)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "cmgui_output", precision)
 {
     // Write the node data out
     Write("");

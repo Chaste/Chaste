@@ -216,13 +216,6 @@ private:
      */
     void WriteGenericFileToMeshalyzer(std::vector<std::vector<double> >& rDataPayload, const std::string& rFolder, const std::string& rFileName);
 
-
-    /**
-     * Convert a set of post-processed data to a visualizer format, via the HDF5 converters.
-     * @param rDatasetName  The name of the dataset in the HDF5 file (the postprocessed data).
-     */
-    void RunHdf5Converters(const std::string& rDatasetName);
-
     /**
      * Put the post-processed data into the main HDF5 results file.
      *

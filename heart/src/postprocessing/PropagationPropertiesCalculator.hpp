@@ -54,7 +54,7 @@ class PropagationPropertiesCalculator
 {
 private:
     /** Reader to get the data from which we use to calculate properties. */
-    Hdf5DataReader *mpDataReader;
+    Hdf5DataReader* mpDataReader;
     /** Name of the variable representing the membrane potential. */
     const std::string mVoltageName;
     /** Time values */

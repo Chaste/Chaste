@@ -464,15 +464,18 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
 
     if (mOutputToVtk)
     {
-        Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(mOutputDirectory, mFilenamePrefix, this->mpMesh, false, false);
+        Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
+        		                                            mFilenamePrefix, this->mpMesh, false, false);
     }
     if (mOutputToParallelVtk)
     {
-        Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(mOutputDirectory, mFilenamePrefix, this->mpMesh, true, false);
+        Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
+        		                                            mFilenamePrefix, this->mpMesh, true, false);
     }
     if (mOutputToTxt)
     {
-        Hdf5ToTxtConverter<ELEMENT_DIM,SPACE_DIM> converter(mOutputDirectory, mFilenamePrefix, this->mpMesh);
+        Hdf5ToTxtConverter<ELEMENT_DIM,SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
+        		                                            mFilenamePrefix, this->mpMesh);
     }
 
     return solution;

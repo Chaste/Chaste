@@ -90,7 +90,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter("TestHdf5ToMeshalyzerConverter", "MonodomainLR91_1d", &mesh, true);
+        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder("TestHdf5ToMeshalyzerConverter",RelativeTo::ChasteTestOutput),
+        		                                 "MonodomainLR91_1d", &mesh, true);
 
         // Compare the voltage file with a correct version
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -114,7 +115,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter("TestHdf5ToMeshalyzerConverter", "bidomain", &mesh, true);
+        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder("TestHdf5ToMeshalyzerConverter",RelativeTo::ChasteTestOutput),
+        													"bidomain", &mesh, true);
 
         // Compare the voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -145,7 +147,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter("TestMeshalyzerConversion3Variables",  "3_vars", &mesh, true);
+        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder("TestMeshalyzerConversion3Variables", RelativeTo::ChasteTestOutput),
+        										 "3_vars", &mesh, true);
 
         // Compare the first voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -182,7 +185,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(output_dir,  "many_variables", &mesh, true);
+        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
+        										 "many_variables", &mesh, true);
 
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
@@ -224,7 +228,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToCmguiConverter<1,1> converter(output_dir, "many_variables", &mesh);
+        Hdf5ToCmguiConverter<1,1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
+        									"many_variables", &mesh, false, HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
@@ -254,7 +259,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToCmguiConverter<3,3> converter(working_directory, "cube_2mm_12_elements", &mesh);
+        Hdf5ToCmguiConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        								    "cube_2mm_12_elements", &mesh);
 
         // Compare the voltage file with a correct version
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -285,7 +291,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToCmguiConverter<3,3> converter(working_directory, "cube_2mm_12_elements", &mesh);
+        Hdf5ToCmguiConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        								    "cube_2mm_12_elements", &mesh, false, HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -314,7 +321,8 @@ public:
         // Convert
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_with_bath_1d");
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<1,1> converter(working_directory, "bidomain_with_bath_1d", &mesh, true);
+        Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        									"bidomain_with_bath_1d", &mesh, true, HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -355,7 +363,8 @@ public:
 
         // Convert
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<2,2> converter(working_directory, "2D_0_to_1mm_400_elements", &mesh);
+        Hdf5ToCmguiConverter<2,2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        									"2D_0_to_1mm_400_elements", &mesh);
 
         // Compare the voltage file with a correct version that visualizes Vm correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -383,7 +392,8 @@ public:
 
         // Convert
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<1,1> converter(working_directory, "1D_0_to_1_100_elements", &mesh);
+        Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        									"1D_0_to_1_100_elements", &mesh);
 
         // Compare the voltage file with a correct version that visualizes both Vm and Phie correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -412,7 +422,8 @@ public:
         // Convert
         HeartConfig::Instance()->SetOutputFilenamePrefix("3_vars");
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<1,1> converter(working_directory, "3_vars", &mesh);
+        Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        									"3_vars", &mesh);
 
         // Compare the voltage file with a correct version that visualizes both Vs and Phie correctly in cmgui
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -438,7 +449,8 @@ public:
 
         CopyToTestOutputDirectory("heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements.h5", directory);
 
-        TS_ASSERT_THROWS_THIS(CMGUI_3D converter(directory, "2D_0_to_1mm_400_elements", &mesh),
+        TS_ASSERT_THROWS_THIS(CMGUI_3D converter(FileFinder(directory, RelativeTo::ChasteTestOutput),
+        					  	  	  	  	     "2D_0_to_1mm_400_elements", &mesh),
                               "Mesh and HDF5 file have a different number of nodes");
     }
 };

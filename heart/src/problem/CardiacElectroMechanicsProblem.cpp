@@ -922,12 +922,15 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         std::string config_directory = HeartConfig::Instance()->GetOutputDirectory();
         HeartConfig::Instance()->SetOutputDirectory(input_dir);
 
-//      Hdf5ToMeshalyzerConverter<DIM,DIM> meshalyzer_converter(input_dir, "voltage", mpElectricsMesh,
+//      Hdf5ToMeshalyzerConverter<DIM,DIM> meshalyzer_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
+//                                                              "voltage", mpElectricsMesh,
 //															    HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
 //																HeartConfig::Instance()->GetVisualizerOutputPrecision() );
 
         // convert output to CMGUI format
-        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(input_dir,"voltage",mpElectricsMesh, mHasBath);
+        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
+        		                                      "voltage", mpElectricsMesh, mHasBath,
+        		                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Write mesh in a suitable form for meshalyzer
         //std::string output_directory =  mOutputDirectory + "/electrics/output";
