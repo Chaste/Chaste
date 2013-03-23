@@ -173,7 +173,7 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
 	H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &mDatasetNames);
 #else
 	//std::cout << "HDF5 1.6.x  detected.\n";
-	H5Giterate(file, "/", NULL, op_func, &dataset_names);
+	H5Giterate(file, "/", NULL, op_func, &mDatasetNames);
 #endif
 
 	H5Fclose(file);
