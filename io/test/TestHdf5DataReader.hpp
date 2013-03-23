@@ -694,7 +694,8 @@ herr_t op_func (hid_t loc_id, const char *name,
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
 	H5O_info_t infobuf;
 	H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
-	switch (infobuf.type) {
+	switch (infobuf.type)
+	{
 //		  case H5O_TYPE_GROUP:
 //			  printf ("  Group: %s\n", name);
 //			  break;

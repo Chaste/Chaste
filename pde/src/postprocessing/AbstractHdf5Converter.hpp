@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "Hdf5DataReader.hpp"
 
+
 /**
  * The derived children of this class convert output from Hdf5 format to
  * a range of other formats for postprocessing.
@@ -50,7 +51,7 @@ class AbstractHdf5Converter
 {
 protected:
 
-    /** Pointer to reader of the file to be converted. */
+    /** Pointer to reader of the dataset to be converted. */
     Hdf5DataReader* mpReader;
 
     /** Number of variables to output. Read from the reader. */
@@ -60,11 +61,26 @@ protected:
     std::string mFileBaseName;
 
     /**
-     * The dataset that we are working with,
+     * The datasets that we are working with.
+     *
      * 'Data' is a special case and handled slightly
      * differently as all variables use the same 'time'.
      */
-    std::string mDatasetName;
+    std::vector<std::string> mDatasetNames;
+
+    /**
+     * The index of the dataset that is currently open.
+     */
+    unsigned mOpenDatasetIndex;
+
+    /**
+     * Have a look in the HDF5 file and generate a list of the datasets that it contains.
+     *
+     * @param rH5Folder  The directory the h5 file is in.
+     * @param rFileName  The name of the h5 file.
+     * @param rDatasetName  The dataset we are currently interested in writing \todo #1660 remove this and do them all at once.
+     */
+    void GenerateListOfDatasets(const FileFinder& rH5Folder, const std::string& rFileName, const std::string& rDatasetName);
 
     /** Pointer to a mesh. */
     AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
@@ -91,19 +107,19 @@ public:
      *
      * @note This method is collective, and must be called by all processes.
      *
-     * @param inputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
-     * @param fileBaseName The base name of the data file.
+     * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param rFileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
-     * @param subdirectoryName name for the output directory to be created (relative to inputDirectory)
+     * @param rSubdirectoryName name for the output directory to be created (relative to inputDirectory)
      * @param precision  the number of digits to use in numerical output to file.
-     * @param datasetName  The name of the dataset to convert, defaults to "Data" which gives the PDE variables.
+     * @param rDatasetName  The name of the dataset to convert, defaults to "Data" which gives the PDE variables.
      */
-    AbstractHdf5Converter(std::string inputDirectory,
-                          std::string fileBaseName,
+    AbstractHdf5Converter(const std::string& rInputDirectory,
+                          const std::string& rFileBaseName,
                           AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                          std::string subdirectoryName,
+                          const std::string& rSubdirectoryName,
                           unsigned precision,
-                          std::string datasetName = "Data");
+                          const std::string& rDatasetName = "Data");
 
 
     /**

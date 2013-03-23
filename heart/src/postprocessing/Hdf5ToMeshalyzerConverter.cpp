@@ -49,7 +49,7 @@ void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
 {
 
 	std::string filename = "";
-	if (this->mDatasetName == "Data")
+	if (this->mDatasetNames[this->mOpenDatasetIndex] == "Data")
 	{
 		filename += this->mFileBaseName + "_";
 	}
