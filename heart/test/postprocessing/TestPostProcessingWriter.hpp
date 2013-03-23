@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
+#include "Hdf5ToCmguiConverter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 //#include "VtkMeshReader.hpp" //Needed for commented out test, see #1660
@@ -377,6 +378,18 @@ public:
 				                                 &mesh,
 				                                 HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
 
+		// Now (as part of #1660) call the converter in a separate step.
+		Hdf5ToCmguiConverter<1,1> converter2(test_dir,
+											"postprocessingapd",
+				                            &mesh);
+
+//		// Now (as part of #1660) call the converter in a separate step.
+//		Hdf5ToVtkConverter<1,1> converter3(test_dir,
+//										   "postprocessingapd",
+//				                           &mesh,
+//				                           false,
+//				                           true);
+
         std::string file1 = FileFinder("output/Apd_60_minus_30_Map.dat", test_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
         NumericFileComparison comp(file1, file2);
@@ -391,6 +404,14 @@ public:
         file2 = "heart/test/data/PostProcessorWriter/good_ead_postprocessing.dat";
         NumericFileComparison comp3(file1, file2);
         TS_ASSERT(comp3.CompareFiles(1e-12));
+
+        for (unsigned i=0; i<451u; i++)
+        {
+        	std::stringstream filename;
+        	filename << "postprocessingapd_" << i << ".exnode";
+        	FileFinder file("cmgui_output/" + filename.str(), test_dir);
+        	TS_ASSERT(file.IsFile());
+        }
     }
 
     // This test checks that the APD map is put into the HDF5 file.
@@ -449,47 +470,53 @@ public:
         PetscTools::Destroy(data);
     }
 
+    void TestVtkOutput() throw (Exception)
+    {
+#ifdef CHASTE_VTK
+        HeartConfig::Instance()->Reset();
 
-// Test fails as VTK post processing output not yet implemented - See #1660
-//    void xxxTestVtkOutput() throw (Exception)
-//    {
-//#ifdef CHASTE_VTK
-//        HeartConfig::Instance()->Reset();
-//
-//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-//        DistributedTetrahedralMesh<2,2> mesh;
-//        mesh.ConstructFromMeshReader(mesh_reader);
-//
-//        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-//        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-//        HeartConfig::Instance()->SetCapacitance(1.0);
-//        HeartConfig::Instance()->SetSimulationDuration(2); //ms
-//        HeartConfig::Instance()->SetVisualizeWithVtk();
-//        HeartConfig::Instance()->SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
-//
-//        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
-//        BidomainProblem<2> problem( &cell_factory );
-//        problem.SetMesh(&mesh);
-//
-//        problem.Initialise();
-//        problem.Solve();
-//
-//        OutputFileHandler handler("TestPostProcessingWriter_VtkOutput", false);
-//        FileFinder output_dir = handler.FindFile("vtk_output");
-//
-//        PostProcessingWriter<2,2> writer(mesh, handler.GetOutputDirectoryFullPath(), HeartConfig::Instance()->GetOutputFilenamePrefix(), false);
-//
-//        writer.WriteApdMapFile(60.0, -30.0);
-//
-//        //Read VTK file & check data.
-//        VtkMeshReader<2,2> vtk_reader(output_dir.GetAbsolutePath() + "/SimulationResults.vtu");
-//
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        DistributedTetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
+        HeartConfig::Instance()->SetCapacitance(1.0);
+        HeartConfig::Instance()->SetSimulationDuration(2); //ms
+        HeartConfig::Instance()->SetVisualizeWithVtk();
+        HeartConfig::Instance()->SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
+
+        std::vector<std::pair<double,double> > apd_maps;
+        apd_maps.push_back(std::pair<double, double>(90,-30));//repolarisation percentage first, as per schema
+        HeartConfig::Instance()->SetApdMaps(apd_maps);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
+        BidomainProblem<2> problem( &cell_factory );
+        problem.SetMesh(&mesh);
+
+        problem.Initialise();
+        problem.Solve();
+
+        OutputFileHandler handler("TestPostProcessingWriter_VtkOutput", false);
+        FileFinder output_dir = handler.FindFile("vtk_output");
+
+        TS_ASSERT(output_dir.IsDir());
+
+        FileFinder vtu_file = handler.FindFile("vtk_output/SimulationResults.vtu");
+        TS_ASSERT(vtu_file.IsFile());
+
+        // Read VTK file & check it doesn't cause any problems.
+        VtkMeshReader<2,2> vtk_reader(output_dir.GetAbsolutePath() + "/SimulationResults.vtu");
+
+        ///\todo #1660 load up and check APD data.
 //        std::vector<double> apd_data;
 //
 //        //This will currently fail as the APD map data is not yet written to the VTK file.
 //        vtk_reader.GetPointData("ApdMap", apd_data);
-//#endif
-//    }
+#else
+        std::cout << "VTK is not installed / Chaste is not configured to use it, this test didn't do anything.\n";
+#endif
+    }
 };
 
 

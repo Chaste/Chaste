@@ -54,6 +54,17 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "vtk_output",0u)
 {
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
+
+	///\todo #1660 at present this converter is hardcoded to work with "Data" using the below statement
+	if (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
+	{
+		bool next_open = this->MoveOntoNextDataset();
+		if (!next_open)
+		{
+			NEVER_REACHED;
+		}
+	}
+
 	// Write mesh in a suitable form for VTK
 	FileFinder test_output("",RelativeTo::ChasteTestOutput);
     std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
