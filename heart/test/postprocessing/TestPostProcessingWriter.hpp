@@ -369,6 +369,7 @@ public:
 			PostProcessingWriter<1,1> writer(mesh, test_dir, "postprocessingapd");
 			double upstroke_threshold = -30.0;
 			writer.WriteApdMapFile(60.0, upstroke_threshold);
+			writer.WriteApdMapFile(90.0, upstroke_threshold);
 			writer.WriteAboveThresholdDepolarisationFile(upstroke_threshold); // This isn't written into a meshalyzer or cmgui format (two columns) - so keep exporting manually.
         }
 
@@ -487,7 +488,8 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
 
         std::vector<std::pair<double,double> > apd_maps;
-        apd_maps.push_back(std::pair<double, double>(90,-30));//repolarisation percentage first, as per schema
+        apd_maps.push_back(std::pair<double, double>(90,-30)); // Repolarisation percentage and upstroke threshold.
+        apd_maps.push_back(std::pair<double, double>(50,-30));
         HeartConfig::Instance()->SetApdMaps(apd_maps);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;

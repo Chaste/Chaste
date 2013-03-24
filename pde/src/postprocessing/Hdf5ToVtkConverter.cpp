@@ -56,7 +56,7 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
 
 	///\todo #1660 at present this converter is hardcoded to work with "Data" using the below statement
-	if (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
+	while (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
 	{
 		bool next_open = this->MoveOntoNextDataset();
 		if (!next_open)

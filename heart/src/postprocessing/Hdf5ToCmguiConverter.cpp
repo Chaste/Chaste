@@ -141,7 +141,7 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "cmgui_output", precision)
 {
 	///\todo #1660 at present this converter is hardcoded to work with "Data" using the below statement
-	if (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
+	while (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
 	{
 		bool next_open = this->MoveOntoNextDataset();
 		if (!next_open)
