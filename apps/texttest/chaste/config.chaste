@@ -37,10 +37,10 @@ link_test_path:CheckpointExample.xml
 link_test_path:UsingCellmlFiles.xml
 link_test_path:LuoRudy1991.cellml
 link_test_path:Heterogeneous.xml
-link_test_path:heart_chaste2_renum_i_triangles.node
-link_test_path:heart_chaste2_renum_i_triangles.face
-link_test_path:heart_chaste2_renum_i_triangles.ele
-link_test_path:heart_chaste2_renum_i_triangles.axi
+link_test_path:OxfordRabbitHeart_482um.node
+link_test_path:OxfordRabbitHeart_482um.face
+link_test_path:OxfordRabbitHeart_482um.ele
+link_test_path:OxfordRabbitHeart_482um.axi
 #Mesh files to be converted
 link_test_path:simple_cube.node
 link_test_path:simple_cube.face
