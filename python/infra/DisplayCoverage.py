@@ -215,6 +215,8 @@ for src_file in src_files:
                     aggregated_count = '-'
                 else:
                     src_line_stripped = src_line.strip()
+                    # gcov is buggy: it claims some non-code lines are uncovered.
+                    # There are some other cases it gets wrong for better reasons too.
                     if not (ignore or src_line_stripped in ['{', '}', 'NEVER_REACHED;'] or
                             (src_line_stripped.startswith('return') and
                              src_line_stripped[6] in [';', ' ']) or
@@ -223,10 +225,11 @@ for src_file in src_files:
                              src_line_stripped.startswith('assert(ELEM_DIM') or
                              src_line_stripped.startswith('assert(SPACE_DIM') or
                              src_line_stripped.startswith('assert(ELEMENT_DIM')) or
-                            src_line_stripped.startswith('#') or #gcov bug
+                            src_line_stripped.startswith('#') or
                             src_line_stripped.startswith('EXPORT_TEMPLATE') or
-                            src_line_stripped.startswith('template class ') or #gcov bug
-                            (src_line_stripped.startswith('catch ') and #Line is catch(...)
+                            src_line_stripped.startswith('template class ') or
+                            (src_line_stripped.startswith('virtual ') and src_line_stripped.endswith('(')) or
+                            (src_line_stripped.startswith('catch ') and #Line is catch (...)
                              src_line_stripped[-1] == ')') or
                             #Method definition (possibly). Currently overlaps with previous 'catch' ignore
                             (len(src_line_stripped) > 0 and
