@@ -122,7 +122,8 @@ public:
 #ifdef TEST_FOR_FPE
 // If we are testing for divide-by-zero, then this will throw an exception
         //TS_ASSERT_THROWS_ANYTHING(ans = one / zero);
-        ans=zero*one;//otherwise compiler would complain
+        ans = zero*one;//otherwise compiler would complain
+        TS_ASSERT_EQUALS(ans, zero);
 #else
 // If we aren't testing for it, then there will be no exception
         TS_ASSERT_THROWS_NOTHING(ans = one / zero);
@@ -138,7 +139,8 @@ public:
 #ifdef TEST_FOR_FPE
 // If we are testing for divide-by-zero, then this will throw an exception
         //TS_ASSERT_THROWS_ANYTHING(ans = zero / zero);
-        ans=zero;//otherwise compiler would complain
+        ans = zero;//otherwise compiler would complain
+        TS_ASSERT_EQUALS(ans, zero);
 #else
 // If we aren't testing for it, then there will be no exception
         TS_ASSERT_THROWS_NOTHING(ans = zero / zero);
