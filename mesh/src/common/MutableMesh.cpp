@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "OutputFileHandler.hpp"
 #include "TrianglesMeshReader.hpp"
+#include "Debug.hpp"
 
 //Jonathan Shewchuk's triangle and Hang Si's tetgen
 #define REAL double
@@ -789,7 +790,7 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
     
     while(long_edge_exists)
     {
-        bool is_iterator_valid = true;
+        std::set<std::pair<unsigned, unsigned> > long_edges;
 
         // Loop over elements to check for Long edges
         for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
@@ -811,35 +812,62 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
 
                 if (distance_between_nodes > cutoffLength)
                 {
-                    c_vector<unsigned, 3> new_node_index = SplitEdge(p_node_a, p_node_b);
-
-                    c_vector<unsigned, 5> node_set;
-                    node_set(0) = new_node_index[0];
-                    node_set(1) = p_node_a->GetIndex();
-                    node_set(2) = p_node_b->GetIndex();
-                    node_set(3) = new_node_index[1];
-                    node_set(4) = new_node_index[2];
-                    history.push_back(node_set);
-
-                    is_iterator_valid = false;
-                    break;
+                	if (p_node_a->GetIndex() < p_node_b->GetIndex())
+                	{
+                		std::pair<unsigned, unsigned> long_edge(p_node_a->GetIndex(),p_node_b->GetIndex());
+                		long_edges.insert(long_edge);
+                	}
+                	else
+                	{
+                		std::pair<unsigned, unsigned> long_edge(p_node_b->GetIndex(),p_node_a->GetIndex());
+                		long_edges.insert(long_edge);
+                	}
                 }
-            }
-
-            /*
-             *  SplitEdge is likely to have invalidated elem_iter (if it has triggered a reallocation of mElements when pushing back).
-             *  If that's the case, calling ++elem_iter or checking the loop guard has undefined behaviour. Break the loop instead.
-             */
-            if (!is_iterator_valid)
-            {
-                break;
             }
         }
 
-        // No call to SplitEdge has happened. No long edges have been found.
-        if (is_iterator_valid)
+        if (long_edges.size() > 0) //Split the edges in decreasing order.
         {
-            long_edge_exists = false;
+        	while (long_edges.size() > 0)
+        	{
+        		double longest_edge = 0.0;
+        		std::set<std::pair<unsigned, unsigned> >::iterator longest_edge_iter;
+
+        		//Find the longest edge in the set and split it
+        		for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = long_edges.begin();
+        		         edge_iter != long_edges.end();
+        		         ++edge_iter)
+				{
+					unsigned node_a_global_index = edge_iter->first;
+					unsigned node_b_global_index = edge_iter->second;
+
+					double distance_between_nodes = this->GetDistanceBetweenNodes(node_a_global_index, node_b_global_index);
+
+					if (distance_between_nodes > longest_edge)
+					{
+						longest_edge = distance_between_nodes;
+						longest_edge_iter = edge_iter;
+					}
+				}
+        		assert(longest_edge >0);
+
+				c_vector<unsigned, 3> new_node_index = SplitEdge(this->GetNode(longest_edge_iter->first), this->GetNode(longest_edge_iter->second));
+
+				c_vector<unsigned, 5> node_set;
+				node_set(0) = new_node_index[0];
+				node_set(1) = longest_edge_iter->first;
+				node_set(2) = longest_edge_iter->second;
+				node_set(3) = new_node_index[1];
+				node_set(4) = new_node_index[2];
+				history.push_back(node_set);
+
+				// Delete pair from set
+				long_edges.erase(*longest_edge_iter);
+        	}
+        }
+        else
+        {
+        	long_edge_exists = false;
         }
     }
 
