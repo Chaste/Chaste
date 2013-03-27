@@ -1363,14 +1363,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
 {
     if (mHasVariableRestLength)
     {
-        if(indexA>indexB)
-        {
-            unsigned temp = indexA;
-            indexA = indexB;
-            indexB = temp;
-        }
-
-        std::pair<unsigned,unsigned> node_pair (indexA, indexB);
+        std::pair<unsigned,unsigned> node_pair = CreateOrderedPair(indexA, indexB);
 
         std::map<std::pair<unsigned,unsigned>, double>::const_iterator  iter = mSpringRestLengths.find(node_pair);
 
