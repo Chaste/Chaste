@@ -58,7 +58,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-#include "VtkMeshWriter.hpp"
 
 class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -433,20 +432,11 @@ public:
         TS_ASSERT_DELTA(cell_population.GetRestLength(2,4), 0.5*sqrt(2), 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(3,4), 0.5*sqrt(2), 1e-6);
 
-        VtkMeshWriter<2,3> mesh_writer_1("TempMeshLongEdge","mesh_1", false);
-        mesh_writer_1.WriteFilesUsingMesh(cell_population.rGetMesh());
-
         cell_population.DivideLongSprings(0.8);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 9u); // Mesh has 8 elements and 9 nodes
-        VtkMeshWriter<2,3> mesh_writer_2("TempMeshLongEdge","mesh_2", false);
-        mesh_writer_2.WriteFilesUsingMesh(cell_population.rGetMesh());
-
 
         cell_population.DivideLongSprings(0.45);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 25u); // Mesh has 32 Elements and 25 nodes
-        VtkMeshWriter<2,3> mesh_writer_3("TempMeshLongEdge","mesh_3", false);
-        mesh_writer_3.WriteFilesUsingMesh(cell_population.rGetMesh());
-
     }
 
     void TestRemoveDeadCellsAndUpdate()
