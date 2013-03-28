@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "UblasCustomFunctions.hpp"
 
-#include "Hdf5ToMeshalyzerConverter.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
@@ -58,10 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 typedef Hdf5ToCmguiConverter<3,3> CMGUI_3D;
-typedef Hdf5ToMeshalyzerConverter<3,3> MESHA_3D;
 
 /* HOW_TO_TAG Cardiac/Post-processing
- * Convert already generated simulation results to any of the visualiser formats
+ * Convert already generated simulation (HDF5) results to Cmgui format.
  */
 
 class TestHdf5ToVisualizerConverters : public CxxTest::TestSuite
@@ -78,138 +76,6 @@ private:
     }
 
 public:
-    void TestMonodomainMeshalyzerConversion() throw(Exception)
-    {
-        // Firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
-        // as that is where the reader reads from.
-        CopyToTestOutputDirectory("heart/test/data/Monodomain1d/MonodomainLR91_1d.h5",
-                                  "TestHdf5ToMeshalyzerConverter");
-
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder("TestHdf5ToMeshalyzerConverter",RelativeTo::ChasteTestOutput),
-        		                                 "MonodomainLR91_1d", &mesh, true);
-
-        // Compare the voltage file with a correct version
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_V.dat",
-                       "heart/test/data/Monodomain1d/MonodomainLR91_1d_V.dat").CompareFiles();
-        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/MonodomainLR91_1d_times.info",
-                       "heart/test/data/Monodomain1d/MonodomainLR91_1d_times.info").CompareFiles();
-    }
-
-    void TestBidomainMeshalyzerConversion() throw(Exception)
-    {
-        /*
-         * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
-         * as that is where the reader reads from.
-         */
-        CopyToTestOutputDirectory("heart/test/data/Bidomain1d/bidomain.h5",
-                                  "TestHdf5ToMeshalyzerConverter");
-
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder("TestHdf5ToMeshalyzerConverter",RelativeTo::ChasteTestOutput),
-        													"bidomain", &mesh, true);
-
-        // Compare the voltage file
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_V.dat",
-                       "heart/test/data/Bidomain1d/bidomain_V.dat").CompareFiles();
-
-        // Compare the Phi_e file
-        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_Phi_e.dat",
-                       "heart/test/data/Bidomain1d/bidomain_Phi_e.dat").CompareFiles();
-
-        // Compare the time information file
-        FileComparison(test_output_directory + "TestHdf5ToMeshalyzerConverter/output/bidomain_times.info",
-                       "heart/test/data/Bidomain1d/bidomain_times.info").CompareFiles();
-    }
-
-    // This test covers the case when the hdf5 file contains 3 variables (e.g., after solving a problem with PROBLEM_DIM=3)
-    void TestMeshalyzerConversion3Variables() throw(Exception)
-    {
-        /*
-         * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
-         * as that is where the reader reads from.
-         */
-        CopyToTestOutputDirectory("heart/test/data/three_variables/3_vars.h5",
-                                  "TestMeshalyzerConversion3Variables");
-
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder("TestMeshalyzerConversion3Variables", RelativeTo::ChasteTestOutput),
-        										 "3_vars", &mesh, true);
-
-        // Compare the first voltage file
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_1.dat",
-                       "heart/test/data/three_variables/extended_bidomain_Vm_1.dat").CompareFiles();
-
-        // Compare the second voltage file
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_2.dat",
-                       "heart/test/data/three_variables/extended_bidomain_Vm_2.dat").CompareFiles();
-
-        // Compare the Phi_e file
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Phi_e.dat",
-                       "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
-
-        // Compare the time information file
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
-                       "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
-    }
-
-    // This test covers the case when the hdf5 file contains more than 3 variables
-    void TestMeshalyzerConversionLotsOfVariables() throw(Exception)
-    {
-        std::string output_dir = "TestHdf5ToMeshalyzerConversionManyVariables";
-
-        /*
-         * Firstly, copy the .h5 file to CHASTE_TEST_OUTPUT/TestHdf5ToMeshalyzerConverter,
-         * as that is where the reader reads from.
-         */
-        CopyToTestOutputDirectory("heart/test/data/many_variables/many_variables.h5",
-                                  output_dir);
-
-        TrianglesMeshReader<1,1> mesh_reader("heart/test/data/many_variables/1D_65_elements");
-        TetrahedralMesh<1,1> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
-        										 "many_variables", &mesh, true);
-
-        std::vector<std::string> variable_names;
-        variable_names.push_back("V");
-        variable_names.push_back("I_ks");
-        variable_names.push_back("I_kr");
-        variable_names.push_back("I_Ca_tot");
-        variable_names.push_back("I_tot");
-        variable_names.push_back("I_Na_tot");
-
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        for (unsigned i=0; i<variable_names.size(); i++)
-        {
-            // Compare the results files
-            FileComparison(test_output_directory + "/" + output_dir + "/output/many_variables_"
-                           + variable_names[i] + ".dat",
-                           "heart/test/data/many_variables/many_variables_"
-                           + variable_names[i] + ".dat").CompareFiles();
-        }
-
-        // Compare the time information file
-        FileComparison(test_output_directory + output_dir + "/output/many_variables_times.info",
-                       "heart/test/data/many_variables/many_variables_times.info").CompareFiles();
-    }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
     void TestCmguiConversionLotsOfVariables() throw(Exception)
