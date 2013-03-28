@@ -57,26 +57,40 @@ import os
     Returns the value of the final time step
 """
 def QueryVtuFile(inputFileName, nameTimePair):
-    last_time = 0
+    last_times = {}
     for line in fileinput.input(inputFileName):
        match = nameTimePair.search(line)
        if (match):
+         var_name = match.group(1)
          time_step = int(match.group(2))
-         # Either 
-         #  all the data for a time_step comes together so time goes 0 0 0 1 1 1 2 2 2 ...
-         #  all the data for VarA comes together 0 1 2 3 ... then VarB etc.
-         if ( time_step != last_time ):
-             assert( time_step == last_time + 1 or time_step == 0)
-             last_time = time_step
-    return time_step
+         if var_name in last_times.keys():
+             #We have seen this variable before so it must be the next time step
+             assert(time_step == last_times[var_name] + 1)
+         else:
+             #This is a new variable
+             assert(time_step == 0)
+         last_times[var_name] = time_step
+    max_time=max( last_times.values() )
+    assert(max_time == time_step) 
+    
+    #Reverse the dictionary so that we can return all the variables which have a given number of time steps
+    last_times_reverse = {}
+    for var in last_times.keys():
+        time = last_times[var]
+        if time in last_times_reverse.keys():
+            last_times_reverse[time].append(var)
+        else:
+            last_times_reverse[time] = [var]
+        
+    return last_times_reverse
 
 """
 Convert from one .vtu file to another adding time step annotations
 nameTimePair is a regular expression
 lastTimeStep is calculated during an earlier pass (QueryVtuFile)
 """
-def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep):
-    print'Reading from', inputFileName, 'and writing to', outputFileName
+def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep, expectedVariableNames):
+    #print'--Reading from', inputFileName, 'and writing to', outputFileName
     timevalues = range(0, lastTimeStep+1, 1)
     header_mode = True
     out_fp = file(outputFileName, 'w')
@@ -94,9 +108,12 @@ def AnnotateVtuFile(inputFileName, nameTimePair, outputFileName, lastTimeStep):
         if (match):
             var_name = match.group(1)
             time_step_name = match.group(2)
-            #Strip the prefix of zeros from the time_step
-            time_step = str(int(time_step_name))
-            line = line.replace(  '_'+time_step_name+'\"', '\" TimeStep=\"'+time_step+'\" ')
+            if var_name in expectedVariableNames:
+                #Strip the prefix of zeros from the time_step
+                time_step = str(int(time_step_name))
+                line = line.replace(  '_'+time_step_name+'\"', '\" TimeStep=\"'+time_step+'\" ')
+            else:
+                line = ""
         # Line (possibly amended) gets written to the new file
         out_fp.write(line)
 
@@ -139,9 +156,13 @@ if __name__ == "__main__":
     name_time_pair = re.compile('Name=\"(.*)_([0-9]{6})\"')
     
     # Check the time steps in the vtu file and query for the final time step 
-    last_time_step = QueryVtuFile(input_name, name_time_pair)
+    last_time_steps = QueryVtuFile(input_name, name_time_pair)
     #Write a copy of the file but with annotations
-    AnnotateVtuFile(input_name, name_time_pair, output_name, last_time_step)
+    for last_time_step in last_time_steps.keys():
+        my_output_name = output_name
+        if (last_time_step != max(last_time_steps.keys()) ):
+            my_output_name = output_name[:-4]+"_"+"".join(last_time_steps[last_time_step])+".vtu"
+        AnnotateVtuFile(input_name, name_time_pair, my_output_name, last_time_step, last_time_steps[last_time_step])
     
     if (pvtu_mode):
         #Remove path and suffix to get the expected base name for chunks
@@ -153,7 +174,9 @@ if __name__ == "__main__":
         num_chunks = RenameChunks(output_name, in_base_name, out_base_name)
         for chunk in range(0, num_chunks):
             suffix = '_'+str(chunk)+'.vtu'
-            AnnotateVtuFile(in_base_path+suffix, name_time_pair, out_base_path+suffix, last_time_step)
+            assert(len(last_time_steps.keys()) == 1 ) #Todo this is getting a bit too complicated
+            for last_time_step in last_time_steps.keys():
+                AnnotateVtuFile(in_base_path+suffix, name_time_pair, out_base_path+suffix, last_time_step, last_time_steps[last_time_step])
         
         
 

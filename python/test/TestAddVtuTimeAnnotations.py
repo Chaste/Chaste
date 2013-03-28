@@ -83,5 +83,8 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
         output_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'bidomain2d_with_apd_map_output.vtu')
         rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)
         self.assertEqual(rc, 0)
-        #1660TODO self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/output/Dummy.vtu'))
+        self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/output/bidomain2d_with_apd_map_output.vtu'))
+        #Extra file from post-processing_map_output_Apd_90_minus_30_Map.
+        output_post_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'bidomain2d_with_apd_map_output_Apd_90_minus_30_Map.vtu')
+        self.assertTrue(filecmp.cmp(output_post_vtu,'python/test/data/output/bidomain2d_with_apd_map_output_Apd_90_minus_30_Map.vtu'))
         
