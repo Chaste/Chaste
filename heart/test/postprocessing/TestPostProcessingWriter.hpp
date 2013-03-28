@@ -512,11 +512,25 @@ public:
         // Read VTK file & check it doesn't cause any problems.
         VtkMeshReader<2,2> vtk_reader(output_dir.GetAbsolutePath() + "/SimulationResults.vtu");
 
-        ///\todo #1660 load up and check APD data.
-//        std::vector<double> apd_data;
-//
-//        //This will currently fail as the APD map data is not yet written to the VTK file.
-//        vtk_reader.GetPointData("ApdMap", apd_data);
+        // Load up and check APD data.
+        std::vector<double> apd_data;
+
+        // APD90 map - all zeros since nothing recorded after such a short simulation.
+        // See TestLongPostprocessing for one with some data in it.
+        vtk_reader.GetPointData("Apd_90_minus_30_Map_000000", apd_data);
+        TS_ASSERT_EQUALS(apd_data.size(), 221u);
+        for (unsigned i=0; i<apd_data.size(); i++)
+        {
+            TS_ASSERT_DELTA(apd_data[i], 0.0, 1e-9);
+        }
+
+        // and APD50 map
+        vtk_reader.GetPointData("Apd_50_minus_30_Map_000000", apd_data);
+        TS_ASSERT_EQUALS(apd_data.size(), 221u);
+        for (unsigned i=0; i<apd_data.size(); i++)
+        {
+            TS_ASSERT_DELTA(apd_data[i], 0.0, 1e-9);
+        }
 #else
         std::cout << "VTK is not installed / Chaste is not configured to use it, this test didn't do anything.\n";
 #endif

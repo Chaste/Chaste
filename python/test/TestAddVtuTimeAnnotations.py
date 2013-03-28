@@ -77,3 +77,11 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
         self.assertTrue(filecmp.cmp(output_base_name+'_0.vtu','python/test/data/output/MonodomainAddingAnnotations_0.vtu'))
         self.assertTrue(filecmp.cmp(output_base_name+'_1.vtu','python/test/data/output/MonodomainAddingAnnotations_1.vtu'))
         
+    def TestAddingVtuAnnotationsBidomainWithApdMap_Fails(self):
+        #The script returns a file that seg faults in Paraview
+        original_vtu = 'python/test/data/input/bidomain2d_with_apd_map.vtu'
+        output_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'bidomain2d_with_apd_map_output.vtu')
+        rc = os.system('python/utils/AddVtuTimeAnnotations.py ' + original_vtu + ' ' + output_vtu)
+        self.assertEqual(rc, 0)
+        #1660TODO self.assertTrue(filecmp.cmp(output_vtu,'python/test/data/output/Dummy.vtu'))
+        

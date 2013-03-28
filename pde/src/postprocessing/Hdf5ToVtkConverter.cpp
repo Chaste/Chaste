@@ -55,18 +55,8 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
 {
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
 
-	///\todo #1660 at present this converter is hardcoded to work with "Data" using the below statement
-	while (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
-	{
-		bool next_open = this->MoveOntoNextDataset();
-		if (!next_open)
-		{
-			NEVER_REACHED;
-		}
-	}
-
 	// Write mesh in a suitable form for VTK
-	FileFinder test_output("",RelativeTo::ChasteTestOutput);
+	FileFinder test_output("", RelativeTo::ChasteTestOutput);
     std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
 
     VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> vtk_writer(output_directory, rFileBaseName, false);
@@ -105,48 +95,55 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
 
     Vec data = p_factory->CreateVec();
 
-    unsigned num_timesteps = this->mpReader->GetUnlimitedDimensionValues().size();
-
-    // Loop over time steps
-    for (unsigned time_step=0; time_step<num_timesteps; time_step++)
+    do // Loop over datasets via MoveOntoNextDataset method in the abstract class
     {
-        // Loop over variables
-        for (unsigned variable=0; variable<this->mNumVariables; variable++)
+        // Make sure that we are never trying to write from an incomplete HDF5 dataset.
+        assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());
+
+        unsigned num_timesteps = this->mpReader->GetUnlimitedDimensionValues().size();
+
+        // Loop over time steps
+        for (unsigned time_step=0; time_step<num_timesteps; time_step++)
         {
-            std::string variable_name = this->mpReader->GetVariableNames()[variable];
-
-            // Gets variable at this time step from HDF5 archive
-            this->mpReader->GetVariableOverNodes(data, variable_name, time_step);
-
-            std::vector<double> data_for_vtk;
-            data_for_vtk.resize(num_nodes);
-            std::ostringstream variable_point_data_name;
-            variable_point_data_name << variable_name << "_" << std::setw(6) << std::setfill('0') << time_step;
-
-            if (parallelVtk)
+            // Loop over variables
+            for (unsigned variable=0; variable<this->mNumVariables; variable++)
             {
-                // Parallel VTU files
-                double *p_data;
-                VecGetArray(data, &p_data);
-                for (unsigned index=0; index<num_nodes; index++)
+                std::string variable_name = this->mpReader->GetVariableNames()[variable];
+
+                // Gets variable at this time step from HDF5 archive
+                this->mpReader->GetVariableOverNodes(data, variable_name, time_step);
+
+                std::vector<double> data_for_vtk;
+                data_for_vtk.resize(num_nodes);
+                std::ostringstream variable_point_data_name;
+                variable_point_data_name << variable_name << "_" << std::setw(6) << std::setfill('0') << time_step;
+
+                if (parallelVtk)
                 {
-                    data_for_vtk[index]  = p_data[index];
+                    // Parallel VTU files
+                    double *p_data;
+                    VecGetArray(data, &p_data);
+                    for (unsigned index=0; index<num_nodes; index++)
+                    {
+                        data_for_vtk[index]  = p_data[index];
+                    }
+                    VecRestoreArray(data, &p_data);
                 }
-                VecRestoreArray(data, &p_data);
-            }
-            else
-            {
-                // One VTU file
-                ReplicatableVector repl_data(data);
-                for (unsigned index=0; index<num_nodes; index++)
+                else
                 {
-                    data_for_vtk[index] = repl_data[index];
+                    // One VTU file
+                    ReplicatableVector repl_data(data);
+                    for (unsigned index=0; index<num_nodes; index++)
+                    {
+                        data_for_vtk[index] = repl_data[index];
+                    }
                 }
+                // Add this variable into the node "point" data
+                vtk_writer.AddPointData(variable_point_data_name.str(), data_for_vtk);
             }
-            // Add this variable into the node "point" data
-            vtk_writer.AddPointData(variable_point_data_name.str(), data_for_vtk);
         }
     }
+    while ( this->MoveOntoNextDataset() );
 
     // Tidy up
     PetscTools::Destroy(data);

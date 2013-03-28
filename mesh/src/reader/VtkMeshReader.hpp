@@ -74,9 +74,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  *  VtkMeshReader
  *
- *  Reads a mesh from VTK .vtu format (that's an XML-based, data compressed unstructured mesh)
+ *  Reads a mesh (and data) from VTK .vtu format (that's an XML-based, data compressed unstructured mesh)
  */
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VtkMeshReader : public AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>
 {

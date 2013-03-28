@@ -126,12 +126,15 @@ public:
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
         // These lines make postprocessing fast or slow.
-        //HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 1);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 0.01);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 10); // Leads to 10MB VTK file
+        //HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_time_step, pde_time_step, 0.01); // Leads to 1GB VTK file
 
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.4*conductivity_scale*1.171, 1.4*conductivity_scale*1.171));
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400.0); // 1/cm
         HeartConfig::Instance()->SetCapacitance(1.0); // uF/cm^2
+#ifdef CHASTE_VTK
+        HeartConfig::Instance()->SetVisualizeWithVtk();
+#endif
 
         std::vector<std::pair<double,double> > apds_requested;
         apds_requested.push_back(std::pair<double, double>(90,-30)); //repolarisation percentage and threshold
