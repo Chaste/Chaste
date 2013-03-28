@@ -273,7 +273,18 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
         extra_message += "minus_";
         threshold = -threshold;
     }
-    filename_stream << "UpstrokeTimeMap" << extra_message << threshold;
+    // if threshold is a decimal eg: because using phenomenological model
+    if (threshold - floor(threshold) > 1e-8)
+    {
+    	std::stringstream nopoint;
+    	// give the answer to 2dp
+    	nopoint << floor(threshold) << "pt" << floor(threshold*100)-(floor(threshold)*100);
+    	filename_stream << "UpstrokeTimeMap" << extra_message << nopoint.str();
+    }
+    else
+    {
+    	filename_stream << "UpstrokeTimeMap" << extra_message << threshold;
+    }
 
     WriteOutputDataToHdf5(output_data, filename_stream.str(), "msec");
 }

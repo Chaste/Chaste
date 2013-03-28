@@ -192,6 +192,8 @@ public:
 		std::vector<double> upstroke_time_map;
 		upstroke_time_map.push_back(-70.0);
 		upstroke_time_map.push_back( 20.0);
+		upstroke_time_map.push_back(  0.4);
+		upstroke_time_map.push_back( -0.4);
 		HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_time_map);
 
 		std::vector<double> upstroke_velocity_map;
