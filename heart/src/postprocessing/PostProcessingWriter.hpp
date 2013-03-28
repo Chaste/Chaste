@@ -231,6 +231,20 @@ private:
 							   const std::string& rUnlimitedVariableName = "PaceNumber",
 							   const std::string& rUnlimitedVariableUnit = "dimensionless");
 
+    /**
+     * Convert a string with numbers in it into alphanumeric plus underscores.
+     *
+     * e.g.
+     * 20 -> "_20"
+     * -20 -> "_minus_20"
+     * 30.2 -> "_30pt20"
+     * -11.238 -> "_minus_11pt23" (always does decimals to (floor) 2d.p.)
+     *
+     * @param threshold  A numerical threshold which may contain minuses or a decimal point.
+     * @return  A string version of the number without minuses or decimal points.
+     */
+    std::string ConvertToHdf5FriendlyString(double threshold);
+
 };
 
 #endif /*POSTPROCESSINGWRITER_HPP_*/

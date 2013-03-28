@@ -234,15 +234,11 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repola
 
     // HDF5 shouldn't have minus signs in the data names..
     std::stringstream hdf5_dataset_name;
-    std::string extra_message = "_";
-    if (threshold < 0.0)
-    {
-        extra_message += "minus_";
-        threshold = -threshold;
-    }
-    hdf5_dataset_name << "Apd_" << repolarisationPercentage << extra_message << threshold << "_Map";
+    hdf5_dataset_name << "Apd_" << repolarisationPercentage;
 
-	WriteOutputDataToHdf5(local_output_data, hdf5_dataset_name.str(), "msec");
+    WriteOutputDataToHdf5(local_output_data,
+	                      hdf5_dataset_name.str() + ConvertToHdf5FriendlyString(threshold) + "_Map",
+	                      "msec");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -266,27 +262,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
         output_data.push_back(upstroke_times);
     }
 
-    std::stringstream filename_stream;
-    std::string extra_message = "_";
-    if (threshold < 0.0)
-    {
-        extra_message += "minus_";
-        threshold = -threshold;
-    }
-    // if threshold is a decimal eg: because using phenomenological model
-    if (threshold - floor(threshold) > 1e-8)
-    {
-    	std::stringstream nopoint;
-    	// give the answer to 2dp
-    	nopoint << floor(threshold) << "pt" << floor(threshold*100)-(floor(threshold)*100);
-    	filename_stream << "UpstrokeTimeMap" << extra_message << nopoint.str();
-    }
-    else
-    {
-    	filename_stream << "UpstrokeTimeMap" << extra_message << threshold;
-    }
-
-    WriteOutputDataToHdf5(output_data, filename_stream.str(), "msec");
+    WriteOutputDataToHdf5(output_data,
+                          "UpstrokeTimeMap" + ConvertToHdf5FriendlyString(threshold),
+                          "msec");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -310,16 +288,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteMaxUpstrokeVelocityMap(d
         output_data.push_back(upstroke_velocities);
     }
 
-    std::stringstream filename_stream;
-    std::string extra_message = "_";
-    if (threshold < 0.0)
-    {
-        extra_message += "minus_";
-        threshold = -threshold;
-    }
-    filename_stream << "MaxUpstrokeVelocityMap" << extra_message << threshold;
-
-    WriteOutputDataToHdf5(output_data, filename_stream.str(), "mV_per_msec");
+    WriteOutputDataToHdf5(output_data,
+                          "MaxUpstrokeVelocityMap" + ConvertToHdf5FriendlyString(threshold),
+                          "mV_per_msec");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -397,16 +368,34 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
         output_data.push_back(output_item);
     }
 
-    std::stringstream filename_stream;
+    WriteGenericFile(output_data,
+                     "AboveThresholdDepolarisations" + ConvertToHdf5FriendlyString(threshold) +
+                     ".dat");
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::string PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::ConvertToHdf5FriendlyString(double threshold)
+{
+    std::stringstream dataset_stream;
     std::string extra_message = "_";
     if (threshold < 0.0)
     {
         extra_message += "minus_";
         threshold = -threshold;
     }
-    filename_stream << "AboveThresholdDepolarisations" << extra_message << threshold << ".dat";
 
-    WriteGenericFile(output_data, filename_stream.str());
+    // if threshold is a decimal eg: because using phenomenological model
+    if (threshold - floor(threshold) > 1e-8)
+    {
+        // give the answer to 2dp
+        dataset_stream << extra_message << floor(threshold) << "pt" << floor(threshold*100)-(floor(threshold)*100);
+    }
+    else
+    {
+        dataset_stream << extra_message << threshold;
+    }
+
+    return dataset_stream.str();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
