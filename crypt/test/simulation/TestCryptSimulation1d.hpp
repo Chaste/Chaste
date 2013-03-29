@@ -280,7 +280,7 @@ public:
         simulator.Solve();
 
         // There should be 34 cells at the end of the simulation
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 34u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 37u);
 
         // Work out where the previous test wrote its files
         OutputFileHandler handler("Crypt1dWithCells", false);
@@ -441,7 +441,7 @@ public:
         simulator.Solve();
 
         // There should be 34 cells at the end of the simulation
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 30u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 31u);
 
         // Work out where the previous test wrote its files
         OutputFileHandler output_file_handler("Crypt1dWithCellsAndGrowth", false);

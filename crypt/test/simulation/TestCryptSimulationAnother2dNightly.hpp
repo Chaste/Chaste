@@ -176,7 +176,7 @@ public:
 
         // There should be this number of cells left after this amount of time
         // (we have lost two rows of 7 but had a bit of birth too)
-        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 85u);
+        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 84u);
     }
 
     void TestMonolayerWithCutoffPointAndNoGhosts() throw (Exception)

@@ -219,8 +219,8 @@ public:
 
             // The numbers for the G1 durations below are taken from the first three
             // random numbers generated
-            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 4.36075);
-            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 1.78877);
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 3.19525);
+            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 2.18569);
             CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
         }
 
@@ -236,7 +236,7 @@ public:
         for (unsigned i=0; i< num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
-            CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 4.1324);
+            CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 3.86076);
         }
     }
 
@@ -284,8 +284,8 @@ public:
 
             // The numbers for the G1 durations below are taken from the first three
             // random numbers generated
-            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 9.68038);
-            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 2.78877);
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 9.09763);
+            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 3.18569);
             CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
         }
 
@@ -297,7 +297,7 @@ public:
         for (unsigned i=0; i< num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
-            CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 15.5662);
+            CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 15.4304);
         }
     }
 
@@ -904,7 +904,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "StochasticOxygenBasedCellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
-        double random_number_test = 0.0;
+        double random_number_test;
 
         {
             // We must set up SimulationTime to avoid memory leaks
@@ -920,7 +920,7 @@ public:
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->SetCurrentHypoxiaOnsetTime(3.1);
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->GenerateStochasticG2Duration();
 
-            TS_ASSERT_DELTA(p_model->GetG2Duration(), 5.1122, 1e-4);
+            TS_ASSERT_DELTA(p_model->GetG2Duration(), 2.7219, 1e-4);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -945,7 +945,7 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_DELTA(p_model2->GetG2Duration(), 5.1122, 1e-4);
+            TS_ASSERT_DELTA(p_model2->GetG2Duration(), 2.7219, 1e-4);
 
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetHypoxicConcentration(), 0.8, 1e-6);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetQuiescentConcentration(), 0.7, 1e-6);

@@ -36,7 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef RANDOMNUMBERGENERATORS_HPP_
 #define RANDOMNUMBERGENERATORS_HPP_
 
+#include <sstream>
 #include <boost/shared_ptr.hpp>
+#include <boost/random.hpp>
 
 #include "ChasteSerialization.hpp"
 #include "SerializableSingleton.hpp"
@@ -49,30 +51,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class RandomNumberGenerator : public SerializableSingleton<RandomNumberGenerator>
 {
 private:
+    /** The main random number generator **/
+    boost::mt19937 mMersenneTwisterGenerator;
 
-    /** The random number generator seed. */
-    int mSeed;
+    /** An adaptor to a unit interval distribution */
+    boost::variate_generator<boost::mt19937& ,  boost::uniform_real<> > mGenerateUnitReal;
 
-    /** The number of times the random number generator has been called. */
-    long unsigned mTimesCalled;
+    /** An adaptor to a standard normal distribution*/
+    boost::variate_generator<boost::mt19937& ,  boost::normal_distribution<> > mGenerateStandardNormal;
 
     /** Pointer to the single instance. */
     static RandomNumberGenerator* mpInstance;
-
-    /** Working memory for the normal random number calculations. */
-    double mWorkingMem1;
-
-    /** Working memory for the normal random number calculations. */
-    double mWorkingMem2;
-
-    /** Working memory for the normal random number calculations. */
-    double mWorkingMemW;
-
-    /** Stored normal random number (we generate two at once). */
-    double mRandNum2;
-
-    /** Whether to use the stored random number next. */
-    bool mUseLastNum;
 
     friend class boost::serialization::access;
     /**
@@ -87,10 +76,16 @@ private:
     template<class Archive>
     void save(Archive & archive, const unsigned int version) const
     {
-        archive & mSeed;
-        archive & mTimesCalled;
-        archive & mUseLastNum;
-        archive & mRandNum2;
+        std::stringstream rng_internals;
+        rng_internals << mMersenneTwisterGenerator;
+        std::string rng_internals_string = rng_internals.str();
+        archive & rng_internals_string;
+
+        std::stringstream normal_internals;
+        const boost::normal_distribution<>& r_normal_dist = mGenerateStandardNormal.distribution();
+        normal_internals << r_normal_dist;
+        std::string normal_internals_string = normal_internals.str();
+        archive & normal_internals_string;
     }
 
     /**
@@ -105,22 +100,15 @@ private:
     template<class Archive>
     void load(Archive & archive, const unsigned int version)
     {
-        archive & mSeed;
-        archive & mTimesCalled;
-        archive & mUseLastNum;
-        archive & mRandNum2;
+    	std::string rng_internals_string;
+    	archive & rng_internals_string;
+    	std::stringstream rng_internals(rng_internals_string);
+    	rng_internals >> mMersenneTwisterGenerator;
 
-        // Reset the random number generator to use the correct seed
-        srandom(mSeed);
-
-        /*
-         * Call it the correct number of times to put it in the same state
-         * as it used to be.
-         */
-        for (long unsigned i=0; i<mTimesCalled; i++)
-        {
-            random();
-        }
+        std::string normal_internals_string;
+        archive & normal_internals_string;
+        std::stringstream normal_internals(normal_internals_string);
+        normal_internals >> mGenerateStandardNormal.distribution();
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -135,10 +123,6 @@ protected:
 public:
 
     /**
-     * Uses a ranf() call and an approximation to the inverse PDF of the
-     * normal distribution to generate an accurate estimate of a normally
-     * distributed random number. Adapted from the algorithm outlined at
-     * http://home.online.no/~pjacklam/notes/invnorm/#Pseudo_code_for_rational_approximation
      *
      * @return a random number from the normal distribution with mean 0
      * and standard distribution 1.
@@ -150,30 +134,29 @@ public:
      * mean and standard deviation.
      *
      * @param mean the mean of the normal distribution from which the random number is drawn
-     * @param sd the standard deviation of the normal distribution from which the random number is drawn
+     * @param stdDev the standard deviation of the normal distribution from which the random number is drawn
      */
-    double NormalRandomDeviate(double mean, double sd);
+    double NormalRandomDeviate(double mean, double stdDev);
 
     /**
-     * @return Generate a uniform random number in (0,1).
+     * @return Generate a uniform random number in (0,1].
      */
     double ranf();
 
     /**
      * @return Generate a random number modulo base (i.e. an integer
-     * within the range 0,..,base-1),
+     * within the range [0, base) == [0,1,..,base-1] ).
      *
-     * @param base the order of the field of positive integers from which the random number is drawn
+     * @param base the order of the field of positive integers from which the random number is drawn.  This should be no greater than INT_MAX
      */
     unsigned randMod(unsigned base);
-
 
     /**
      * Produce a permutation of the integers and non-empty std::vector, using the Knuth-algorithm
      * (also called the Fisher-Yates algorithm), a linear time unbiased method.
      * The values are shuffled in place.
      *
-     * @param rValues  the intial values and the output permutation of shuffled values.  Must be non-empty
+     * @param rValues  the initial values and the output permutation of shuffled values.  Must be non-empty
      */
 
     template <class T>
@@ -223,7 +206,7 @@ public:
      *
      * @param seed the new seed
      */
-    void Reseed(int seed);
+    void Reseed(unsigned seed);
 };
 
 #endif /*RANDOMNUMBERGENERATORS_HPP_*/

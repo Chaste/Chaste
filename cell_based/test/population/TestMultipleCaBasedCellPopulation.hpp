@@ -434,8 +434,9 @@ public:
         // Test that the initial cell is still in the same place
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_1), initial_cell_index);
 
-        // Test the location of the new cell - should go to 17 with this random seed.
-        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), 17u);
+        // Test the location of the new cell - should go to 13 with this random seed.
+        unsigned lattice_site = 13u;
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), lattice_site);
 
         // Test that the population size is now 2
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
@@ -445,7 +446,7 @@ public:
         AbstractCellPopulation<2>::Iterator cell_iter_2 = cell_population.Begin();
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), initial_cell_index);
         ++cell_iter_2;
-        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), 17u);
+        TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), lattice_site);
 
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumElements(),0u);
 

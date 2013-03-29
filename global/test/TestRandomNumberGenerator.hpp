@@ -64,31 +64,32 @@ public:
                 break;
             }
         }
-        TS_ASSERT_EQUALS(period_srand, 2147483647U /*2^31-1*/);
+        //period of rand and random will be about 2^31-1 == INT_MAX ~= UINT_MAX/2
+        TS_ASSERT_LESS_THAN_EQUALS(2147483647U /*2^31-1*/, period_srand);
+        TS_ASSERT_LESS_THAN_EQUALS((unsigned)INT_MAX, period_srand);
+        TS_ASSERT_LESS_THAN_EQUALS(period_srand, UINT_MAX);
 
-        srandom(0);
-        first = random();
-        unsigned period_srandom;
-        for (period_srandom=0; ; period_srandom++)
+
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+        double double_first = p_gen->ranf();
+
+        unsigned period_class;
+        for (period_class=0; ; period_class++)
         {
-            if (random() == first)
+            if (p_gen->ranf() == double_first)
             {
                 break;
             }
         }
-        TS_ASSERT_EQUALS(period_srandom, 2147483647U /*2^31-1*/);
+        RandomNumberGenerator::Destroy();
+        //The main point of this class is to see whether the underlying generator has exactly the period of srand
+        TS_ASSERT_DIFFERS(period_class, period_srand);
     }
 
-    void TestRandomNumbers()
+    void TestRandomNumbersCreation()
     {
-        srandom(0);
-        ran1 = (double)random()/RAND_MAX;
-
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-        double ran2 = p_gen->ranf();
-        TS_ASSERT_DELTA(ran1, ran2, 1e-7);
-
+        ran1 = p_gen->ranf();
         RandomNumberGenerator::Destroy();
     }
 
@@ -102,7 +103,7 @@ public:
     }
 
 
-    void TestOtherRandomStuffDestroysRandomSequence()
+    void TestOtherRandomStuffDoesNotDestroyRandomSequence()
     {
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -111,26 +112,26 @@ public:
         double ran2 = p_gen->ranf();
         TS_ASSERT_DELTA(ran1, ran2, 1e-7);
 
-        //Now reseed, do something else random and then get "the first" random number
+        // Now reseed, do something else random and then get "the first" random number
         p_gen->Reseed(0);
         std::vector<unsigned> some_vector(10);
         std::random_shuffle(some_vector.begin(), some_vector.end());
         double ran3 = p_gen->ranf();
-        TS_ASSERT_DIFFERS(ran1, ran3);
+        TS_ASSERT_DELTA(ran1, ran3, 1e-7);
 
-        //Again - with rand()
+        // Again - with rand()
         p_gen->Reseed(0);
         rand();
         double ran4 = p_gen->ranf();
-        TS_ASSERT_DIFFERS(ran1, ran4);
+        TS_ASSERT_DELTA(ran1, ran4, 1e-7);
 
-        //Again - with random()
+        // Again - with random()
         p_gen->Reseed(0);
-        random();
+        // random(); // removed as this is not present on Windows.
         double ran5 = p_gen->ranf();
-        TS_ASSERT_DIFFERS(ran1, ran5);
+        TS_ASSERT_DELTA(ran1, ran5, 1e-7);
 
-        //Again - with nothing
+        // Again - with nothing
         p_gen->Reseed(0);
         double ran6 = p_gen->ranf();
         TS_ASSERT_DELTA(ran1, ran6, 1e-7);
@@ -141,15 +142,18 @@ public:
 
     void TestDifferentRandomSeed()
     {
-        srandom(36);
-        ran1 = (double)random()/RAND_MAX;
 
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-        p_gen->Reseed(36);
-
-
+        p_gen->Reseed(0);
         double ran2 = p_gen->ranf();
-        TS_ASSERT_DELTA(ran1, ran2, 1e-7);
+
+        p_gen->Reseed(36);
+        double ran3 = p_gen->ranf();
+        TS_ASSERT_DIFFERS(ran2, ran3);
+
+        p_gen->Reseed(36);
+        double ran4 = p_gen->ranf();
+        TS_ASSERT_DELTA(ran4, ran3, 1e-7);
 
         RandomNumberGenerator::Destroy();
     }
@@ -166,21 +170,19 @@ public:
         {
             // Save random number generator
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-            p_gen->Reseed(7); // This gives us full coverage
+            p_gen->Reseed(7);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            for (unsigned i=0; i<5; i++)
+            // Generate some random numbers before archiving
+            for (unsigned i=0; i<11; i++)
             {
-                p_gen->ranf();
+				p_gen->ranf();
+				p_gen->randMod(1 + 3*i);
+				p_gen->StandardNormalRandomDeviate();
+				p_gen->NormalRandomDeviate(0.5, 0.1);
             }
-
-            // A few extra calls before archiving
-            p_gen->ranf();
-            p_gen->randMod(3);
-            p_gen->StandardNormalRandomDeviate();
-            p_gen->NormalRandomDeviate(0.5, 0.1);
 
             SerializableSingleton<RandomNumberGenerator>* const p_wrapper = p_gen->GetSerializationWrapper();
             output_arch << p_wrapper;
@@ -191,19 +193,15 @@ public:
                 output_arch << p_wrapper_copy;
             }
 
-            // Generator saved here - record the next 10 numbers
-            for (unsigned i=0; i<10; i++)
+            // Generator saved here - record the next 11 uniform numbers
+            for (unsigned i=0; i<11; i++)
             {
                 double random = p_gen->ranf();
                 generated_numbers.push_back(random);
             }
 
-            /*
-             * Record some numbers from the normal distribution too.
-             * We generate quite a few for coverage of the three cases
-             * in RandomNumberGenerator::StandardNormalRandomDeviate().
-             */
-            for (unsigned i=0; i<10; i++)
+            // Record some numbers from the normal distribution too.
+            for (unsigned i=0; i<11; i++)
             {
                 double random = p_gen->NormalRandomDeviate(0.5, 0.1);
                 generated_numbers.push_back(random);
@@ -215,10 +213,11 @@ public:
         // Restore
         {
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-            p_gen->Reseed(25); // any old seed
+            p_gen->Reseed(25); // any old seed, different from that above
             for (unsigned i=0; i<7; i++) // generate some numbers
             {
                 p_gen->ranf();
+                p_gen->NormalRandomDeviate(0.5, 0.1);
             }
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -248,7 +247,7 @@ public:
             for (unsigned i=0; i<generated_numbers.size(); i++)
             {
                 double random;
-                if (i<10)
+                if (i<11)
                 {
                     random = p_gen->ranf();
                 }
@@ -256,7 +255,7 @@ public:
                 {
                     random = p_gen->NormalRandomDeviate(0.5, 0.1);
                 }
-                TS_ASSERT_DELTA(random,generated_numbers[i],1e-7);
+                TS_ASSERT_DELTA(random, generated_numbers[i], 1e-12);
             }
 
             RandomNumberGenerator::Destroy();
@@ -285,7 +284,7 @@ public:
             TS_ASSERT_EQUALS(found, true);
         }
 
-        unsigned num_trials = 100000;
+        unsigned num_trials = 1000000;
         c_matrix<unsigned,5,5> results = zero_matrix<unsigned>(5,5);
 
         for (unsigned trial=0; trial<num_trials; trial++)
@@ -302,6 +301,7 @@ public:
                 }
             }
         }
+
         for (unsigned i=0; i<5; i++)
         {
             for (unsigned j=0; j<5; j++)
@@ -311,10 +311,10 @@ public:
 
                 /*
                  * This test could fail with very low probability (just rerun).
-                 * We accept 0.19 to 0.21 (note, usually in 0.199 to 0.201 with
-                 * a million trials (we use 10^5 trials))
+                 *
+                 * We accept 0.199 to 0.201 with a million trials.
                  */
-                TS_ASSERT_DELTA(prob, 0.2, 1e-2);
+                TS_ASSERT_DELTA(prob, 0.2, 1e-3);
             }
         }
     }
@@ -350,6 +350,39 @@ public:
         std::vector<boost::shared_ptr<unsigned> > just_empty;
         p_gen->Shuffle(just_empty);
     }
+
+    void TestReproducibilityAcrossPlatforms()
+    {
+        // This test checks that the underlying RNG is the doing the same thing on your operating system.
+    	RandomNumberGenerator::Destroy();
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+        p_gen->Reseed(42);
+
+        TS_ASSERT_DELTA(p_gen->ranf(), 0.3745, 1e-4);
+
+        std::vector<unsigned> empty_perm_for_shuffle;
+        p_gen->Shuffle(10, empty_perm_for_shuffle);
+
+        TS_ASSERT_EQUALS(empty_perm_for_shuffle[0], 3u);
+        TS_ASSERT_EQUALS(empty_perm_for_shuffle[5], 5u);
+
+        TS_ASSERT_EQUALS(p_gen->randMod(999), 40u);
+        TS_ASSERT_EQUALS(p_gen->randMod(999), 832u);
+        TS_ASSERT_DELTA(p_gen->ranf(), 0.0580, 1e-4);
+
+        TS_ASSERT_EQUALS(p_gen->randMod(6), 0u);
+        TS_ASSERT_EQUALS(p_gen->randMod(6), 3u);
+        TS_ASSERT_DELTA(p_gen->ranf(), 0.3337, 1e-4);
+
+        for (unsigned i=0; i<1000; i++)
+        {
+            p_gen->StandardNormalRandomDeviate();
+        }
+        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.9870, 1e-4);
+        TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.8389, 1e-4);
+
+    }
+
 };
 
 #endif /*TESTRANDOMNUMBERGENERATOR_HPP_*/

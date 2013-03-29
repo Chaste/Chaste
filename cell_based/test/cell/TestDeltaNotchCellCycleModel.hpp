@@ -106,8 +106,8 @@ public:
             p_simulation_time->IncrementTimeOneStep();
 
             // The numbers for the G1 durations below are taken from the first three random numbers generated
-            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 4.36075);
-            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 2.78877);
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 3.19525);
+            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 3.18569);
             CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
         }
 

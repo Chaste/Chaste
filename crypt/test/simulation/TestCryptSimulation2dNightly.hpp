@@ -130,8 +130,8 @@ public:
 
         unsigned number_of_cells = crypt.GetNumRealCells();
         unsigned number_of_nodes = p_mesh->GetNumNodes();
-        TS_ASSERT_EQUALS(number_of_cells, 63u);
-        TS_ASSERT_EQUALS(number_of_nodes, 147u);
+        TS_ASSERT_EQUALS(number_of_cells, 61u);
+        TS_ASSERT_EQUALS(number_of_nodes, 145u);
 
         std::set<unsigned> ghost_indices = crypt.GetGhostNodeIndices();
         TS_ASSERT_EQUALS(number_of_cells + ghost_indices.size(), number_of_nodes);
@@ -139,7 +139,7 @@ public:
         std::vector<unsigned> cell_type_count = crypt.GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 6u);   // Stem
-        TS_ASSERT_EQUALS(cell_type_count[1], 23u);  // Transit
+        TS_ASSERT_EQUALS(cell_type_count[1], 21u);  // Transit
         TS_ASSERT_EQUALS(cell_type_count[2], 34u);  // Differentiated
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
     }
@@ -184,8 +184,8 @@ public:
 
         unsigned number_of_cells = crypt.GetNumRealCells();
         unsigned number_of_nodes = p_mesh->GetNumNodes();
-        TS_ASSERT_EQUALS(number_of_cells, 68u);
-        TS_ASSERT_EQUALS(number_of_nodes, 152u);
+        TS_ASSERT_EQUALS(number_of_cells, 69u);
+        TS_ASSERT_EQUALS(number_of_nodes, 153u);
 
         std::set<unsigned> ghost_indices = crypt.GetGhostNodeIndices();
         TS_ASSERT_EQUALS(number_of_cells + ghost_indices.size(), number_of_nodes);
@@ -193,12 +193,12 @@ public:
         std::vector<unsigned> cell_type_count = crypt.GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count[0], 0u);   // Stem
-        TS_ASSERT_EQUALS(cell_type_count[1], 32u);  // Transit
+        TS_ASSERT_EQUALS(cell_type_count[1], 33u);  // Transit
         TS_ASSERT_EQUALS(cell_type_count[2], 36u);  // Differentiated
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
 
         TS_ASSERT_EQUALS(crypt.GetVoronoiTessellation()->GetNumElements(), number_of_nodes);
-        TS_ASSERT_EQUALS(crypt.GetVoronoiTessellation()->GetNumNodes(), 278u);
+        TS_ASSERT_EQUALS(crypt.GetVoronoiTessellation()->GetNumNodes(), 280u);
     }
 
     /**
@@ -358,8 +358,8 @@ public:
         unsigned number_of_cells = crypt.GetNumRealCells();
         unsigned number_of_nodes = crypt.rGetMesh().GetNumNodes();
 
-        TS_ASSERT_EQUALS(number_of_cells, 85u);
-        TS_ASSERT_EQUALS(number_of_nodes, 133u);
+        TS_ASSERT_EQUALS(number_of_cells, 87u);
+        TS_ASSERT_EQUALS(number_of_nodes, 135u);
     }
 
     void TestCrypt2DPeriodicWntNightly() throw (Exception)
@@ -412,11 +412,11 @@ public:
         unsigned number_of_nodes = crypt.rGetMesh().GetNumNodes();
 #ifdef CHASTE_CVODE
         // divisions occur marginally earlier with CVODE
-        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 95u);
-        TS_ASSERT_EQUALS(number_of_nodes, 143u);
+        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 99u);
+        TS_ASSERT_EQUALS(number_of_nodes, 147u);
 #else
-        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 94u);
-        TS_ASSERT_EQUALS(number_of_nodes, 142u);
+        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 99u);
+        TS_ASSERT_EQUALS(number_of_nodes, 147u);
 #endif //CHASTE_CVODE
 
         // Tidy up

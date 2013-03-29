@@ -224,7 +224,7 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[1],diffusion_parameter*delta_t/2.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[2],diffusion_parameter*delta_t/4.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[3],diffusion_parameter*delta_t/2.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[4],1.0 - 3.0 * diffusion_parameter*delta_t, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[4],1.0 - 3.0 * diffusion_parameter*delta_t, 2e-2);
         TS_ASSERT_DELTA(probability_of_occupation[5],diffusion_parameter*delta_t/2.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[6],diffusion_parameter*delta_t/4.0, 1e-2);
         TS_ASSERT_DELTA(probability_of_occupation[7],diffusion_parameter*delta_t/2.0, 1e-2);
@@ -272,10 +272,10 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 17u); ///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 12u); ///\todo #2066 Check this!
 
         // Test no deaths and some births
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 15u); ///\todo #2066 Check this!
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 10u); ///\todo #2066 Check this!
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
         // Now remove the update rules and check that only birth happens when the simulator runs again
@@ -283,8 +283,9 @@ public:
         simulator.SetEndTime(50);
         simulator.Solve();
 
-        // Check that the same number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 17u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 20u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 22u);
 
 #ifdef CHASTE_VTK
         // Test that the VTK writer has produced a file
@@ -642,7 +643,7 @@ public:
         CellPtr p_cell = *(simulator.rGetCellPopulation().Begin());
         c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(p_cell);
         TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
-        TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(cell_location[1], 3.0, 1e-4);
     }
 
     void TestSave() throw (Exception)

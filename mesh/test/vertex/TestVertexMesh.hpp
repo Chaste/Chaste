@@ -1236,8 +1236,8 @@ public:
         TS_ASSERT_DELTA(short_axis(0)*short_axis(0)+short_axis(1)*short_axis(1), 1.0, 1e-6);
 
         // This is the same as seeding the random axis
-        TS_ASSERT_DELTA(short_axis(0), 0.8401, 1e-4);
-        TS_ASSERT_DELTA(short_axis(1), 0.5422, 1e-4);
+        TS_ASSERT_DELTA(short_axis(0), 0.5488, 1e-4);
+        TS_ASSERT_DELTA(short_axis(1), 0.8359, 1e-4);
     }
 
     void TestGetElongationShapeFactorOfElement()

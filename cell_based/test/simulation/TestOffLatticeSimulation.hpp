@@ -268,11 +268,12 @@ public:
         simulator.Solve();
 
         // Check that the number of nodes is equal to the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(),
+                         simulator.rGetCellPopulation().GetNumRealCells());
 
         // For coverage of these 'Get' functions
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 17u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 20u);
 
         // Note that this test used to take an extra time step
         TS_ASSERT_EQUALS(SimulationTime::Instance()->GetTime(), 0.5);
@@ -329,14 +330,15 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         //Check that the correct number of cells are killed
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
+        unsigned num_deaths = 6u; // sensitive to changes in random number generation
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed
         simulator.RemoveAllCellKillers();
         simulator.SetEndTime(1.0);
 
         simulator.Solve();
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 7u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
     }
 
     /**

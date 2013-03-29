@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "VertexElement.hpp"
-#include "RandomNumberGenerator.hpp"
 #include <cassert>
 
 

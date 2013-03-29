@@ -57,8 +57,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSimpleCellCycleModelsForCrypt : public AbstractCellBasedTestSuite
 {
 private:
-    static const double mFirstRandomNumber = 3.11227;
-    static const double mSecondRandomNumber = 1.65468;
+    static const double mFirstRandomNumber = 0.721992;  // 3.11227;
+    static const double mSecondRandomNumber = 1.59526;  // 1.65468;
+    static const double mThirdRandomNumber = 1.58154;   // 2.60806;
+    static const double mFourthRandomNumber = 0.117421; // 2.64101;
+    static const double mFifthRandomNumber = 0.422089;  // 1.28792;
 
 public:
 
@@ -136,7 +139,7 @@ public:
         // The numbers for the G1 durations are taken from
         // the first two random numbers generated
         double new_g1_duration = mSecondRandomNumber;
-        double new_g1_duration2 = 2.60806;
+        double new_g1_duration2 = mThirdRandomNumber;
         for (unsigned i=0; i<num_timesteps/3; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
@@ -170,9 +173,9 @@ public:
         TS_ASSERT_EQUALS(p_cycle_model->ReadyToDivide(), false);
 
         // The numbers for the G1 durations are taken from
-        // the first two random numbers generated
-        new_g1_duration = 2.64101;
-        new_g1_duration2 = 1.28792;
+        // the next two random numbers generated
+        new_g1_duration = mFourthRandomNumber;
+        new_g1_duration2 = mFifthRandomNumber;
 
         for (unsigned i=0; i<num_timesteps/3; i++)
         {

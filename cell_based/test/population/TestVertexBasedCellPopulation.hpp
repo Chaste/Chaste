@@ -569,11 +569,12 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), old_num_elements+1);
 
         // Check the location of the new nodes
-        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[0], 2.4721, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 1.7481, 1e-4);
+        // (sensitive to changes in random number generation)
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[0], 2.2748, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 1.8620, 1e-4);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[0], 1.5278, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], 1.1386, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[0], 1.7251, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], 1.0247, 1e-4);
 
         // Now test the nodes in each element
         for (unsigned i=0; i<cell_population.GetNumElements(); i++)

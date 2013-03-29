@@ -261,7 +261,7 @@ public:
             }
         }
 
-        TS_ASSERT_EQUALS(counter, 17u);
+        TS_ASSERT_EQUALS(counter, 28u);
 
         // Test that LabelAllCellsAsHealthy sets all cells back to be UNLABELLED wild type cells
         crypt_statistics.LabelAllCellsAsHealthy();
@@ -316,10 +316,10 @@ public:
         std::vector<bool> labelled = crypt_statistics.AreCryptSectionCellsLabelled(crypt_section);
 
         // Test that the vector of booleans corresponds with a visualisation of the data -
-        // only the first cell had been labelled
+        // only the first few cells at the base of the crypt have been labelled
         for (unsigned vector_index=0; vector_index<labelled.size(); vector_index++)
         {
-            if (vector_index == 0)
+            if (vector_index == 2u || vector_index == 3u || vector_index == 4u)
             {
                 TS_ASSERT_EQUALS(labelled[vector_index], true);
             }

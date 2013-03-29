@@ -454,7 +454,7 @@ public:
         unsigned number_of_nodes = crypt.rGetMesh().GetNumNodes();
 
         TS_ASSERT_EQUALS(number_of_nodes, ghost_cells.size());
-        TS_ASSERT_EQUALS(number_of_cells, cells_across*cells_up+1u);  // 6 cells in a row*12 rows + 1 birth
+        TS_ASSERT_EQUALS(number_of_cells, cells_across*cells_up);  // 6 cells in a row*12 rows
         TS_ASSERT_EQUALS(number_of_nodes, number_of_cells+thickness_of_ghost_layer*2*cells_across);
 
         // Coverage of exceptions (after main test to avoid problems with SimulationTime).
@@ -478,7 +478,11 @@ public:
         double crypt_width = 5.0;
         unsigned thickness_of_ghost_layer = 0;
 
-        CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
+        CylindricalHoneycombMeshGenerator generator(cells_across,
+                                                    cells_up,
+                                                    thickness_of_ghost_layer,
+                                                    crypt_width/cells_across);
+
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
         double crypt_length = cells_up*(sqrt(3)/2)*crypt_width/cells_across;
 
@@ -795,7 +799,7 @@ public:
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
         simulator.SetOutputDirectory("Crypt2DPeriodicStandardResult");
-        simulator.SetEndTime(0.25);
+        simulator.SetEndTime(0.275);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -811,18 +815,18 @@ public:
         // These cells just divided and have been gradually moving apart.
         // These results are from time 0.25, which is also tested below
         // after a save and a load. (See #420, #479.)
-        std::vector<double> node_28_location = simulator.GetNodeLocation(28);
-        TS_ASSERT_DELTA(node_28_location[0], 3.7875, 1e-4);
-        TS_ASSERT_DELTA(node_28_location[1], 0.0, 1e-4);
+        std::vector<double> node_40_location = simulator.GetNodeLocation(40);
+        TS_ASSERT_DELTA(node_40_location[0], 3.90836, 1e-4);
+        TS_ASSERT_DELTA(node_40_location[1], 1.61809, 1e-4);
 
         std::vector<double> node_120_location = simulator.GetNodeLocation(120);
-        TS_ASSERT_DELTA(node_120_location[0], 4.2035, 1e-4);
-        TS_ASSERT_DELTA(node_120_location[1], 0.1033, 1e-4);
+        TS_ASSERT_DELTA(node_120_location[0], 4.09164, 1e-4);
+        TS_ASSERT_DELTA(node_120_location[1], 1.84601, 1e-4);
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(28)), 1.0, 1e-9);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(120)), 0.9900, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(40)),  0.8442, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(120)), 0.8223, 1e-4);
         WntConcentration<2>::Destroy();
 
         // Check writing of Voronoi data
@@ -920,28 +924,28 @@ public:
         CompareMeshes(&r_mesh1, &r_mesh2);
 
         // Run a bit further...
-        p_simulator2->SetEndTime(0.25);
+        p_simulator2->SetEndTime(0.275);
 
         // Run simulation
         p_simulator2->Solve();
 
         // These cells just divided and have been gradually moving apart.
-        // These results are from time 0.25 in the StandardResult test above.
-        std::vector<double> node_28_location = p_simulator2->GetNodeLocation(28);
-        TS_ASSERT_DELTA(node_28_location[0], 3.7875, 1e-4);
-        TS_ASSERT_DELTA(node_28_location[1], 0.0, 1e-4);
+        // These results are from time 0.275 in the StandardResult test above.
+        std::vector<double> node_40_location = p_simulator2->GetNodeLocation(40);
+        TS_ASSERT_DELTA(node_40_location[0], 3.90836, 1e-4);
+        TS_ASSERT_DELTA(node_40_location[1], 1.61809, 1e-4);
 
         std::vector<double> node_120_location = p_simulator2->GetNodeLocation(120);
-        TS_ASSERT_DELTA(node_120_location[0], 4.2035, 1e-4);
-        TS_ASSERT_DELTA(node_120_location[1], 0.1033, 1e-4);
+        TS_ASSERT_DELTA(node_120_location[0], 4.09164, 1e-4);
+        TS_ASSERT_DELTA(node_120_location[1], 1.84601, 1e-4);
 
         // Test WntConcentration was set up correctly
         TS_ASSERT_EQUALS(WntConcentration<2>::Instance()->IsWntSetUp(), true);
 
         // Test the WntConcentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetCellPopulation().GetCellUsingLocationIndex(28)), 1.0, 1e-9);
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetCellPopulation().GetCellUsingLocationIndex(120)), 0.9900, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetCellPopulation().GetCellUsingLocationIndex(40)), 0.8442, 1e-4);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(p_simulator2->rGetCellPopulation().GetCellUsingLocationIndex(120)), 0.8223, 1e-4);
 
         // Tidy up
         delete p_simulator1;
@@ -1196,8 +1200,8 @@ public:
         unsigned number_of_nodes = crypt.rGetMesh().GetNumNodes();
 
         TS_ASSERT_EQUALS(number_of_nodes,ghost_cells.size());
-        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 76u);
-        TS_ASSERT_EQUALS(number_of_nodes, 124u);
+        TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 75u);
+        TS_ASSERT_EQUALS(number_of_nodes, 123u);
     }
 
     void TestAddCellKiller() throw (Exception)
@@ -1473,7 +1477,7 @@ public:
         CryptSimulation2d simulator(crypt);
 
         simulator.SetOutputDirectory("Crypt2DRandomDeathNonPeriodic");
-        simulator.SetEndTime(0.5);
+        simulator.SetEndTime(0.35);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -1486,7 +1490,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // There should be no cells left at this time
+        // There should be one cell left at this time
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 1u);
     }
 
@@ -1621,13 +1625,13 @@ public:
         // Each cell count has now been computed since WriteCellResultsToFiles() has been called
         std::vector<unsigned> cell_mutation_state_count3 = simulator.rGetCellPopulation().GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_state_count3.size(), 4u);
-        TS_ASSERT_EQUALS(cell_mutation_state_count3[0], 14u);
+        TS_ASSERT_EQUALS(cell_mutation_state_count3[0], 13u);
         TS_ASSERT_EQUALS(cell_mutation_state_count3[1], 1u);
         TS_ASSERT_EQUALS(cell_mutation_state_count3[2], 1u);
         TS_ASSERT_EQUALS(cell_mutation_state_count3[3], 1u);
 
         p_registry = simulator.rGetCellPopulation().GetCellPropertyRegistry();
-        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 14u);
+        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 13u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcOneHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 1u);
@@ -1637,24 +1641,24 @@ public:
         std::vector<unsigned> cell_type_count3 = crypt.GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_type_count3.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count3[0], 4u);
-        TS_ASSERT_EQUALS(cell_type_count3[1], 13u);
+        TS_ASSERT_EQUALS(cell_type_count3[1], 12u);
         TS_ASSERT_EQUALS(cell_type_count3[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count3[3], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count3 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count3.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count3[0], 0u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count3[1], 1u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count3[2], 7u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count3[3], 7u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count3[4], 2u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count3[1], 2u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count3[2], 6u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count3[3], 8u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count3[4], 0u);
 
         // Save the simulation
         CellBasedSimulationArchiver<2, CryptSimulation2d>::Save(&simulator);
 
         // Check the original simulation's counts haven't changed
         p_registry = simulator.rGetCellPopulation().GetCellPropertyRegistry();
-        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 14u);
+        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 13u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcOneHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 1u);
@@ -1667,7 +1671,7 @@ public:
 
         // Check the original simulation's counts haven't changed
         p_registry = simulator.rGetCellPopulation().GetCellPropertyRegistry();
-        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 14u);
+        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 13u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcOneHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 1u);
@@ -1678,13 +1682,13 @@ public:
         // (so that simulations which quit when a certain population is removed don't stop too soon)
         std::vector<unsigned> cell_mutation_state_count4 = p_simulator->rGetCellPopulation().GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_state_count4.size(), 4u);
-        TS_ASSERT_EQUALS(cell_mutation_state_count4[0], 14u);
+        TS_ASSERT_EQUALS(cell_mutation_state_count4[0], 13u);
         TS_ASSERT_EQUALS(cell_mutation_state_count4[1], 1u);
         TS_ASSERT_EQUALS(cell_mutation_state_count4[2], 1u);
         TS_ASSERT_EQUALS(cell_mutation_state_count4[3], 1u);
 
         p_registry = p_simulator->rGetCellPopulation().GetCellPropertyRegistry();
-        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 14u);
+        TS_ASSERT_EQUALS(p_registry->Get<WildTypeCellMutationState>()->GetCellCount(), 13u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcOneHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<ApcTwoHitCellMutationState>()->GetCellCount(), 1u);
         TS_ASSERT_EQUALS(p_registry->Get<BetaCateninOneHitCellMutationState>()->GetCellCount(), 1u);
@@ -1694,17 +1698,17 @@ public:
         std::vector<unsigned> cell_type_count4 = crypt.GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_type_count4.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count4[0], 4u);
-        TS_ASSERT_EQUALS(cell_type_count4[1], 13u);
+        TS_ASSERT_EQUALS(cell_type_count4[1], 12u);
         TS_ASSERT_EQUALS(cell_type_count4[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count4[3], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count4 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count4.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count4[0], 0u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count4[1], 1u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count4[2], 7u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count4[3], 7u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count4[4], 2u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count4[1], 2u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count4[2], 6u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count4[3], 8u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count4[4], 0u);
 
         // Run simulation for a further time
         p_simulator->SetEndTime(2.0);
@@ -1729,17 +1733,17 @@ public:
         std::vector<unsigned> cell_type_count5 = p_simulator->rGetCellPopulation().GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_type_count5.size(), 4u);
         TS_ASSERT_EQUALS(cell_type_count5[0], 4u);
-        TS_ASSERT_EQUALS(cell_type_count5[1], 13u);
+        TS_ASSERT_EQUALS(cell_type_count5[1], 12u);
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
 
         std::vector<unsigned> cell_cycle_phase_count5 = p_simulator->rGetCellPopulation().rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count5.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count5[0], 0u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count5[1], 3u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count5[2], 5u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count5[3], 6u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count5[4], 6u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count5[1], 1u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count5[2], 6u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count5[3], 5u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count5[4], 8u);
 
         // Tidy up
         delete p_simulator;

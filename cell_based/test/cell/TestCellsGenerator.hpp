@@ -187,9 +187,9 @@ public:
         }
 
         // Test exact random numbers as test re-seeds random number generator.
-        TS_ASSERT_DELTA(cells[0]->GetBirthTime(), -4.7325, 1e-4);
-        TS_ASSERT_DELTA(cells[1]->GetBirthTime(), -9.5812, 1e-4);
-        TS_ASSERT_DELTA(cells[2]->GetBirthTime(), -2.3706, 1e-4);
+        TS_ASSERT_DELTA(cells[0]->GetBirthTime(), -7.1141, 1e-4);
+        TS_ASSERT_DELTA(cells[1]->GetBirthTime(), -10.1311, 1e-4);
+        TS_ASSERT_DELTA(cells[2]->GetBirthTime(), -10.2953, 1e-4);
     }
 
     void TestGenerateBasicRandomWithFixedDurationGenerationBasedCellCycleModelandVertexCells() throw(Exception)
@@ -217,9 +217,9 @@ public:
         }
 
         // Test exact random numbers as test re-seeds random number generator.
-        TS_ASSERT_DELTA(cells[0]->GetBirthTime(), -4.7325, 1e-4);
-        TS_ASSERT_DELTA(cells[1]->GetBirthTime(), -9.5812, 1e-4);
-        TS_ASSERT_DELTA(cells[2]->GetBirthTime(), -2.3706, 1e-4);
+        TS_ASSERT_DELTA(cells[0]->GetBirthTime(), -7.1141, 1e-4);
+        TS_ASSERT_DELTA(cells[1]->GetBirthTime(), -10.1311, 1e-4);
+        TS_ASSERT_DELTA(cells[2]->GetBirthTime(), -10.2953, 1e-4);
     }
 };
 

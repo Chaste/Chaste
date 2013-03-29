@@ -331,7 +331,8 @@ public:
 
             TS_ASSERT_EQUALS(num_cells, 8u);
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
-            TS_ASSERT_DELTA(p_simulator->rGetCellPopulation().GetNode(23)->rGetLocation()[2], mLocationGhosts, 1e-6);
+            TS_ASSERT_DELTA(p_simulator->rGetCellPopulation().GetNode(23)->rGetLocation()[2],
+                            mLocationGhosts, 1e-6);
 
             delete p_simulator;
         }
@@ -340,14 +341,15 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
 
         {
-            // Without ghost nodes - all 65 are real cells
+            // Without ghost nodes - all 64 are real cells
             OffLatticeSimulation<3>* p_simulator = CellBasedSimulationArchiver<3, OffLatticeSimulation<3> >::Load("TestGhostNodesSpheroidSimulation3DNoGhosts", 0.1);
             unsigned num_cells = p_simulator->rGetCellPopulation().GetNumRealCells();
 
-            TS_ASSERT_EQUALS(num_cells, 65u);
+            TS_ASSERT_EQUALS(num_cells, 64u);
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
             CellPtr p_cell = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23u);
-            TS_ASSERT_DELTA(p_simulator->rGetCellPopulation().GetNode(23)->rGetLocation()[2], mLocationWithoutGhosts, 1e-6);
+            TS_ASSERT_DELTA(p_simulator->rGetCellPopulation().GetNode(23)->rGetLocation()[2],
+                            mLocationWithoutGhosts, 1e-6);
             TS_ASSERT(!p_simulator->GetUpdateCellPopulationRule());
 
             delete p_simulator;

@@ -105,7 +105,9 @@ public:
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulation");
-        simulator.SetEndTime(1.0);
+
+        // No need to go for long, don't want any birth or regular grid will be disrupted.
+        simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -181,7 +183,8 @@ public:
 
         simulator.Solve();
 
-        // Check that the radii of all the cells are correct (cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2)
+        // Check that the radii of all the cells are correct
+        // (cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2)
         if (PetscTools::AmMaster())
         {
             TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
@@ -190,12 +193,12 @@ public:
             TS_ASSERT_DELTA(p_mesh->GetNode(3*PetscTools::GetNumProcs())->GetRadius(), 1.0, 1e-6);
 
             // Check the separation of some node pairs
-            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(PetscTools::GetNumProcs())->rGetLocation()), 3.0, 1e-1);
-            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2*PetscTools::GetNumProcs())->rGetLocation()), 3.0, 1e-1);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(PetscTools::GetNumProcs())->rGetLocation()), 2.9710, 1e-1);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2*PetscTools::GetNumProcs())->rGetLocation()), 4.7067, 1e-1);
             TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3*PetscTools::GetNumProcs())->rGetLocation()), 2.0, 1e-1);
         }
 
-        // Avoid memory leak
+        // Clean up memory
         delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -254,7 +257,7 @@ public:
 
         // Check the separation of some node pairs
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 3.0, 1e-1);
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.70670, 1e-1);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
 
         // Now set all the Radi to 0.5 Note this could be done inside a cell cycle model.
@@ -276,10 +279,10 @@ public:
 
         // Check the separation of some node pairs
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 4.0, 1e-3);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.0, 1e-3);
+        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 6.9282, 1e-3);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 4.0, 1e-3);
 
-        // Avoid memory leak
+        // Clean up memory
         delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -386,19 +389,22 @@ public:
         simulator.Solve();
 
         // Check some results
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 17u);
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 20u);
 
         std::vector<double> node_8_location = simulator.GetNodeLocation(8);
-        TS_ASSERT_DELTA(node_8_location[0], 3.4931, 1e-4);
-        TS_ASSERT_DELTA(node_8_location[1], 1.0062, 1e-4);
+        TS_ASSERT_DELTA(node_8_location[0], 3.4729, 1e-4);
+        TS_ASSERT_DELTA(node_8_location[1], 1.0051, 1e-4);
 
-        std::vector<double> node_5_location = simulator.GetNodeLocation(11);
-        TS_ASSERT_DELTA(node_5_location[0], 1.0840, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 1.7208, 1e-4);
+        std::vector<double> node_3_location = simulator.GetNodeLocation(3);
+        TS_ASSERT_DELTA(node_3_location[0], 2.9895, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[1], 0.3105, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
     }
+
+    double mNode3x, mNode4x, mNode3y, mNode4y; // To preserve locations between the below test and test load.
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
@@ -442,13 +448,18 @@ public:
         simulator.Solve();
 
         // Check some results
+        mNode3x = 3.0454;
+        mNode3y = 0.0000;
+        mNode4x = 4.0468;
+        mNode4y = 0.0101;
+
         std::vector<double> node_3_location = simulator.GetNodeLocation(3);
-        TS_ASSERT_DELTA(node_3_location[0], 2.8705, 1e-4);
-        TS_ASSERT_DELTA(node_3_location[1], 0.0243, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[0], mNode3x, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[1], mNode3y, 1e-4);
 
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 3.8353, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 0.0167, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], mNode4x, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], mNode4y, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -524,14 +535,14 @@ public:
         p_simulator2->SetEndTime(2.5);
         p_simulator2->Solve();
 
-        // These results are from time 2.5 in TestStandardResultForArchivingTestBelow()
+        // These results are from time 2.5 in TestStandardResultForArchivingTestBelow() (above!)
         std::vector<double> node_3_location = p_simulator2->GetNodeLocation(3);
-        TS_ASSERT_DELTA(node_3_location[0], 2.8705, 1e-4);
-        TS_ASSERT_DELTA(node_3_location[1], 0.0243, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[0], mNode3x, 1e-4);
+        TS_ASSERT_DELTA(node_3_location[1], mNode3y, 1e-4);
 
         std::vector<double> node_4_location = p_simulator2->GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 3.8353, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 0.0167, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], mNode4x, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], mNode4y, 1e-4);
 
         // Tidy up
         delete p_simulator1;

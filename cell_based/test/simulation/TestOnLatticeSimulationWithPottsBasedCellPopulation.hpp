@@ -263,11 +263,11 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 20u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 18u);
 
         // Test no births or deaths
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 12u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 14u);
     }
 
     void TestPottsMonolayerWithBirth() throw (Exception)
@@ -304,10 +304,10 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 3u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 2u);
 
         // Test no deaths and some births
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 2u);
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
@@ -494,10 +494,10 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 3u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 2u);
 
         // Test no deaths and some births
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 2u);
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 1u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
     }
 
@@ -570,6 +570,8 @@ public:
  #endif //CHASTE_VTK
     }
 
+    c_vector<unsigned, 6> mNodes; // TO check after save and load.
+
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
@@ -606,15 +608,21 @@ public:
         // Check some results
         PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(0u);
         TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), 34u);
-        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), 24u);
-        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), 32u);
+        mNodes[0] = 33;
+        mNodes[1] = 36;
+        mNodes[2] = 63;
+        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), mNodes[0]);
+        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), mNodes[1]);
+        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), mNodes[2]);
 
+        mNodes[3] = 55;
+        mNodes[4] = 83;
+        mNodes[5] = 94;
         PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&simulator.rGetCellPopulation())->GetElement(1u);
         TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), 46u);
-        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), 69u);
-        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), 25u);
+        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), mNodes[3]);
+        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), mNodes[4]);
+        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), mNodes[5]);
     }
 
     void TestSave() throw (Exception)
@@ -676,15 +684,15 @@ public:
         // These results are from time 20.0 in TestStandardResultForArchivingTestsBelow()
         PottsElement<2>* element_0 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(0u);
         TS_ASSERT_EQUALS(element_0->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), 34u);
-        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), 24u);
-        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), 32u);
+        TS_ASSERT_EQUALS(element_0->GetNode(0)->GetIndex(), mNodes[0]);
+        TS_ASSERT_EQUALS(element_0->GetNode(8)->GetIndex(), mNodes[1]);
+        TS_ASSERT_EQUALS(element_0->GetNode(15)->GetIndex(), mNodes[2]);
 
         PottsElement<2>* element_1 = static_cast <PottsBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetElement(1u);
         TS_ASSERT_EQUALS(element_1->GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), 46u);
-        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), 69u);
-        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), 25u);
+        TS_ASSERT_EQUALS(element_1->GetNode(0)->GetIndex(), mNodes[3]);
+        TS_ASSERT_EQUALS(element_1->GetNode(8)->GetIndex(), mNodes[4]);
+        TS_ASSERT_EQUALS(element_1->GetNode(15)->GetIndex(), mNodes[5]);
 
         // Tidy up
         delete p_simulator1;

@@ -563,7 +563,7 @@ public:
         Node<3>* p_node35 = mesh.GetNode(35);
         Node<3>* p_node219 = mesh.GetNode(219);
         Node<3>* p_node319 = mesh.GetNode(319);
-        RandomNumberGenerator::Instance();
+
         mesh.PermuteNodes();
 
         TS_ASSERT_EQUALS(mesh.GetNode(0)->GetIndex(), 0u);
@@ -571,14 +571,14 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNode(125)->GetIndex(), 125u);
         TS_ASSERT_EQUALS(mesh.GetNode(273)->GetIndex(), 273u);
 
-        TS_ASSERT_EQUALS(p_node0->GetIndex(), 89u);
-        TS_ASSERT_EQUALS(p_node121->GetIndex(), 192u);
-        TS_ASSERT_EQUALS(p_node125->GetIndex(), 299u);
-        TS_ASSERT_EQUALS(p_node273->GetIndex(), 254u);
-        TS_ASSERT_EQUALS(p_node357->GetIndex(), 0u);
-        TS_ASSERT_EQUALS(p_node35->GetIndex(), 121u);
-        TS_ASSERT_EQUALS(p_node219->GetIndex(), 125u);
-        TS_ASSERT_EQUALS(p_node319->GetIndex(), 273u);
+        TS_ASSERT_EQUALS(p_node0->GetIndex(),   344u);
+        TS_ASSERT_EQUALS(p_node121->GetIndex(), 193u);
+        TS_ASSERT_EQUALS(p_node125->GetIndex(), 203u);
+        TS_ASSERT_EQUALS(p_node273->GetIndex(), 266u);
+        TS_ASSERT_EQUALS(p_node357->GetIndex(),   6u);
+        TS_ASSERT_EQUALS(p_node35->GetIndex(),  188u);
+        TS_ASSERT_EQUALS(p_node219->GetIndex(), 199u);
+        TS_ASSERT_EQUALS(p_node319->GetIndex(), 160u);
         TS_ASSERT_EQUALS(mesh.GetNode(p_node0->GetIndex()), p_node0);
         TS_ASSERT_EQUALS(mesh.GetNode(p_node121->GetIndex()), p_node121);
         TS_ASSERT_EQUALS(mesh.GetNode(p_node125->GetIndex()), p_node125);
@@ -587,7 +587,6 @@ public:
         TS_ASSERT_DELTA(volume, mesh.GetVolume(), 1e-7);
         TS_ASSERT_DELTA(surface, mesh.GetSurfaceArea(), 1e-7);
 
-        RandomNumberGenerator::Destroy();
     }
 
     void TestConstructRectangleStagger() throw(Exception)

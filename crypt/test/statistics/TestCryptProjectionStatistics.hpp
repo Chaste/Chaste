@@ -151,11 +151,11 @@ public:
 
         TS_ASSERT_EQUALS(test_section2.size(), labelled_cells.size());
 
-        // Three of these cells are labelled - at nodes 327, 375, 399
+        // Two of these cells are labelled - at nodes 399, 421
         for (unsigned i=0; i<test_section2.size(); i++)
         {
             unsigned node_index = crypt.GetLocationIndexUsingCell(test_section2[i]);
-            if (node_index == 327u || node_index == 375u || node_index == 399u )
+            if (node_index == 399u || node_index == 421u )
             {
                 TS_ASSERT_EQUALS(labelled_cells[i], true);
             }

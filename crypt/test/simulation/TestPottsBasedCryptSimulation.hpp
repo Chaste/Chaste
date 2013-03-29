@@ -137,11 +137,11 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 55u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 59u);
 
         // Test number of births or deaths
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 11u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 6u);
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 14u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 5u);
     }
 
     void TestPottsCryptWithGenerationBasedCellCycleModel() throw (Exception)
@@ -185,11 +185,11 @@ public:
         simulator.Solve();
 
         // Check the number of cells
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 64u);
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 65u);
 
         // Test number of births or deaths
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 32u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 18u);
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 35u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 20u);
     }
 
 };

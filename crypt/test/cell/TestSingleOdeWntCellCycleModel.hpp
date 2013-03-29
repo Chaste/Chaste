@@ -56,11 +56,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSingleOdeWntCellCycleModel : public AbstractCellBasedTestSuite
 {
 private:
-    static const double mFirstRandomNumber = 3.11227;
-    static const double mSecondRandomNumber = 1.65468;
-    static const double mThirdRandomNumber = 2.60806;
-    static const double mFourthRandomNumber = 2.64101;
-    static const double mFifthRandomNumber = 1.28792;
+    // Just update these if random number generation changes (error messages will show new values)
+    static const double mFirstRandomNumber = 0.721992;  // 3.11227;
+    static const double mSecondRandomNumber = 1.59526;  // 1.65468;
+    static const double mThirdRandomNumber = 1.58154;   // 2.60806;
+    static const double mFourthRandomNumber = 0.117421; // 2.64101;
+    static const double mFifthRandomNumber = 0.422089;  // 1.28792;
 
 public:
 
@@ -104,7 +105,7 @@ public:
         double steady_beta_cat_at_wnt_equals_1 = p_cycle_model->GetBetaCateninConcentration();
 
 #ifdef CHASTE_CVODE
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.8487, 1e-4);
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4351, 1e-4);
 #else
         TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.8622, 1e-4);
 #endif
@@ -183,7 +184,7 @@ public:
 
         TS_ASSERT_DELTA(91.6693, p_cycle_model->GetBetaCateninConcentration(), 1e-3);
 #ifdef CHASTE_CVODE
-        TS_ASSERT_DELTA(358.6849, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
+        TS_ASSERT_DELTA(354.3185, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
 #else
         TS_ASSERT_DELTA(358.5624, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
 #endif

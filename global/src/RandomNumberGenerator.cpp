@@ -33,28 +33,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <cmath>
-#include <ctime>
-#include <cstdlib>
-#include <cassert>
-#include <iostream>
-#include <vector>
-
+#include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
 RandomNumberGenerator* RandomNumberGenerator::mpInstance = NULL;
 
 RandomNumberGenerator::RandomNumberGenerator()
-    : mSeed(0),
-      mTimesCalled(0),
-      mWorkingMem1(0),
-      mWorkingMem2(0),
-      mWorkingMemW(0),
-      mRandNum2(0),
-      mUseLastNum(false)
+    : mMersenneTwisterGenerator(0u),
+      mGenerateUnitReal(mMersenneTwisterGenerator, boost::uniform_real<>()),
+      mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
 {
     assert(mpInstance == NULL); // Ensure correct serialization
-    srandom(mSeed);
 }
 
 RandomNumberGenerator* RandomNumberGenerator::Instance()
@@ -77,26 +66,58 @@ void RandomNumberGenerator::Destroy()
 
 unsigned RandomNumberGenerator::randMod(unsigned base)
 {
-    mTimesCalled++;
-    return (random()%base);
+	assert(base > 0u);
+	/*
+	 * The contents of this method are copied out of
+	 * boost/include/boost/random/uniform_smallint.hpp lines 235 - 255
+	 * as of v 1.48 (preserved at least as far as 1.51).
+	 * to make sure we get the same
+	 * result on earlier versions of boost.
+     *
+	 * It was then simplified as we know '_min' is zero, '_max' is 'base-1u'
+	 * and all the types are unsigneds.
+	 */
+
+    // equivalent to (eng() - eng.min()) % (_max - _min + 1) + _min,
+    // but guarantees no overflow.
+    unsigned base_range =
+        boost::random::detail::subtract<unsigned>()((mMersenneTwisterGenerator.max)(), (mMersenneTwisterGenerator.min)());
+    unsigned val =
+        boost::random::detail::subtract<unsigned>()(mMersenneTwisterGenerator(), (mMersenneTwisterGenerator.min)());
+
+    return (val % base);
+
+    if (base - 1u >= base_range)
+    {
+    	// This was in the original boost file for when '_min' is large, but here it is zero so
+    	// we shouldn't ever reach this.
+    	NEVER_REACHED;
+        //return val;
+    }
+//    else
+//    {
+//        return (val % base);
+//    }
 }
 
 double RandomNumberGenerator::ranf()
 {
-    mTimesCalled++;
-    return (double)random() / RAND_MAX;
+    return mGenerateUnitReal();
 }
 
-double RandomNumberGenerator::NormalRandomDeviate(double mean, double sd)
+double  RandomNumberGenerator::StandardNormalRandomDeviate()
 {
-    return sd * StandardNormalRandomDeviate() + mean;
+    return mGenerateStandardNormal();
 }
 
-void RandomNumberGenerator::Reseed(int seed)
+double RandomNumberGenerator::NormalRandomDeviate(double mean, double stdDev)
 {
-    mSeed = seed;
-    srandom(mSeed);
-    mTimesCalled = 0;
+    return stdDev * StandardNormalRandomDeviate() + mean;
+}
+
+void RandomNumberGenerator::Reseed(unsigned seed)
+{
+    mMersenneTwisterGenerator.seed(seed);
 }
 
 void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues)
@@ -117,43 +138,3 @@ void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues
     }
 }
 
-double  RandomNumberGenerator::StandardNormalRandomDeviate()
-{
-    /**
-     * This little method implements the Box-Mueller/Marsaglia polar
-     * method for getting normally distributed variables from uniform
-     * ones.
-     *
-     * G.E.P. Box and Mervin E. Muller,
-     * A Note on the Generation of Random Normal Deviates,
-     * The Annals of Mathematical Statistics (1958),
-     * Vol. 29, No. 2 pp. 610–611
-     *
-     * doi:10.1214/aoms/1177706645
-     *
-     * as given on
-     * http://en.wikipedia.org/wiki/Marsaglia_polar_method
-     * on 29/11/10
-     */
-
-    if (mUseLastNum) /* We use value generated at the previous call */
-    {
-        mUseLastNum = false;
-        return mRandNum2;
-    }
-    else
-    {
-        mUseLastNum = true;
-        do
-        {
-            mWorkingMem1 = 2.0 * this->ranf() - 1.0;
-            mWorkingMem2 = 2.0 * this->ranf() - 1.0;
-            mWorkingMemW = mWorkingMem1 * mWorkingMem1 + mWorkingMem2 * mWorkingMem2;
-        }
-        while ( mWorkingMemW >= 1.0 );
-
-        mWorkingMemW = sqrt((-2.0*log(mWorkingMemW))/mWorkingMemW);
-        mRandNum2 = mWorkingMem2*mWorkingMemW;
-        return mWorkingMem1*mWorkingMemW;
-    }
-}

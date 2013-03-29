@@ -208,12 +208,6 @@ public:
      */
     void TestWithStochasticWntCellCycleModel() throw(Exception)
     {
-//        double first_random_num = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
-//        double second_random_num = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
-//        double third_random_num = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
-//        RandomNumberGenerator::Instance()->Reseed(0);
-
-
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         unsigned num_steps = 101;
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(50.0, num_steps+1);
@@ -231,9 +225,9 @@ public:
         p_wnt_cell->InitialiseCellCycleModel();
 
         // These are the first three normal random with mean of usual G2 Duration (4hrs), s.d. 0.9 and this seed (0)
-        double SG2MDuration1 = p_cell_model->GetSDuration() + 5.00104 + p_cell_model->GetMDuration();
-        double SG2MDuration2 = p_cell_model->GetSDuration() + 3.68921 + p_cell_model->GetMDuration();
-        double SG2MDuration3 = p_cell_model->GetSDuration() + 4.54725 + p_cell_model->GetMDuration();
+        double SG2MDuration1 = p_cell_model->GetSDuration() + 2.98536 + p_cell_model->GetMDuration();
+        double SG2MDuration2 = p_cell_model->GetSDuration() + 3.63573 + p_cell_model->GetMDuration();
+        double SG2MDuration3 = p_cell_model->GetSDuration() + 3.62339 + p_cell_model->GetMDuration();
         double g1_duration = 5.971;
 
         for (unsigned i=0; i<num_steps/2; i++)

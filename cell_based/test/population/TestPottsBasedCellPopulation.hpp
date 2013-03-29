@@ -329,10 +329,11 @@ public:
         cell_population.AddUpdateRule(p_volume_constraint_update_rule);
 
         // Commence lattice sweeping, updating where necessary
+        // (Sensitive to changes in random number generation)
         cell_population.UpdateCellLocations(1.0);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
-        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 1u);
-        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 7u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 5u);
     }
 
     void TestUpdateCellLocationsRandomly()
@@ -365,9 +366,10 @@ public:
         cell_population.UpdateCellLocations(1.0);
 
         // Note that these results differ to those in the above test due to extra random numbers being called
+        // (Sensitive to changes in random number generation)
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
-        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 2u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetElement(1)->GetNumNodes(), 4u);
     }
 
     ///\todo implement this test (#1666)

@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MutableVertexMesh.hpp"
-#include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"

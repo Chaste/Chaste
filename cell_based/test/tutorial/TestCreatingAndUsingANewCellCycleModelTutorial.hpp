@@ -295,7 +295,7 @@ public:
 
             /* The numbers for the G1 duration below is taken from the first
              * random number generated: */
-            CheckReadyToDivideAndPhaseIsUpdated(p_my_model, 1.18892);
+            CheckReadyToDivideAndPhaseIsUpdated(p_my_model, 2.35762);
         }
 
         /* Lastly, we briefly test that archiving of {{{MyCellCycleModel}}} has

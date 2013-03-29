@@ -160,7 +160,7 @@ public:
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 9u);
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 2u);
 
         // Avoid memory leaks
         delete p_mesh;
@@ -233,7 +233,7 @@ public:
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),14u);
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),9u);
     }
 
     void TestMeshBasedSimulationWithGhostNodesAndContactInhibition()
@@ -305,9 +305,7 @@ public:
          }
 
          // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         // 8 on 64-bit, 7 on 32-bit...
-         TS_ASSERT_LESS_THAN_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 8u);
-         TS_ASSERT_LESS_THAN_EQUALS(7u, cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount());
+         TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 12u);
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
@@ -460,7 +458,7 @@ public:
         delete p_simulator;
 
         // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
         Warnings::QuietDestroy();
     }
 };

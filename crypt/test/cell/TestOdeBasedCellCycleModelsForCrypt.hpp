@@ -801,7 +801,7 @@ public:
         //
         // A StochasticWntCellCycleModel does this:
         // divides at the same time with a random normal distribution
-        // for the SG2M time (default 10) in this case 5.00104 + 6
+        // for the SG2M time (default 10) in this case 2.84979 + 6
 
         // Test progress through the cell cycle
         for (unsigned i=0; i<num_timesteps; i++)
@@ -810,7 +810,7 @@ public:
             double time = p_simulation_time->GetTime();
             bool result = p_cell_model->ReadyToDivide();
 
-            if (time < 5.971 + 5.00104 + 6) // G1 + G2 + S/M
+            if (time < 5.971 + 2.84979 + 6) // G1 + G2 + S/M
             {
                 TS_ASSERT_EQUALS(result, false);
             }
@@ -1143,7 +1143,7 @@ public:
 
             // Check - stochastic should divide at 16.97
             // Wnt should divide at 15.971
-            while (p_simulation_time->GetTime() < 15.0)
+            while (p_simulation_time->GetTime() < 14.0)
             {
                 p_simulation_time->IncrementTimeOneStep();
             }
@@ -1151,21 +1151,22 @@ public:
             TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->ReadyToDivide(), false);
 
-            while (p_simulation_time->GetTime() < 16.0)
+            while (p_simulation_time->GetTime() < 15.0)
             {
                 p_simulation_time->IncrementTimeOneStep();
             }
 
-            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), false); // only for stochastic
-            TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->ReadyToDivide(), true);
+            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), true);
+            TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->ReadyToDivide(), false);
 
             while (p_simulation_time->GetTime() < 17.0)
             {
                 p_simulation_time->IncrementTimeOneStep();
             }
 
-            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), true);
+            TS_ASSERT_EQUALS(p_stoc_cell->GetCellCycleModel()->ReadyToDivide(), true); // only for stochastic
             TS_ASSERT_EQUALS(p_wnt_cell->GetCellCycleModel()->ReadyToDivide(), true);
+
 
             TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetBirthTime(), 0.0, 1e-12);
             TS_ASSERT_DELTA(p_stoc_cell->GetCellCycleModel()->GetAge(), 17.0, 1e-12);
