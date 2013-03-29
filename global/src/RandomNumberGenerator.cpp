@@ -78,14 +78,17 @@ unsigned RandomNumberGenerator::randMod(unsigned base)
 	 * and all the types are unsigneds.
 	 */
 
+#if BOOST_VERSION < 103700
+    unsigned base_range =(mMersenneTwisterGenerator.max)() - (mMersenneTwisterGenerator.min)();
+    unsigned val = mMersenneTwisterGenerator() - (mMersenneTwisterGenerator.min)();
+#else
     // equivalent to (eng() - eng.min()) % (_max - _min + 1) + _min,
     // but guarantees no overflow.
     unsigned base_range =
         boost::random::detail::subtract<unsigned>()((mMersenneTwisterGenerator.max)(), (mMersenneTwisterGenerator.min)());
     unsigned val =
         boost::random::detail::subtract<unsigned>()(mMersenneTwisterGenerator(), (mMersenneTwisterGenerator.min)());
-
-    return (val % base);
+#endif
 
     if (base - 1u >= base_range)
     {
@@ -94,10 +97,10 @@ unsigned RandomNumberGenerator::randMod(unsigned base)
     	NEVER_REACHED;
         //return val;
     }
-//    else
-//    {
-//        return (val % base);
-//    }
+    else
+    {
+        return (val % base);
+    }
 }
 
 double RandomNumberGenerator::ranf()
