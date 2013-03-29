@@ -55,8 +55,8 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(const FileFinder&
 {
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
 
-	// Write mesh in a suitable form for VTK
-	FileFinder test_output("", RelativeTo::ChasteTestOutput);
+    // Write mesh in a suitable form for VTK
+    FileFinder test_output("", RelativeTo::ChasteTestOutput);
     std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
 
     VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> vtk_writer(output_directory, rFileBaseName, false);

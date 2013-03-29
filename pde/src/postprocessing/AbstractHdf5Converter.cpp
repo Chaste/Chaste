@@ -41,16 +41,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Operator function to be called by H5Literate [HDF5 1.8.x] or H5Giterate [HDF5 1.6.x] (in TestListingDatasetsInAnHdf5File).
  */
 herr_t op_func (hid_t loc_id,
-		        const char *name,
+                const char *name,
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-		        const H5L_info_t *info,
+                const H5L_info_t *info,
 #endif
                 void *operator_data);
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(const FileFinder& rInputDirectory,
-																	 const std::string& rFileBaseName,
+                                                                     const std::string& rFileBaseName,
                                                                      AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                                      const std::string& rSubdirectoryName,
                                                                      unsigned precision)
@@ -61,13 +61,13 @@ AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(const FileF
       mRelativeSubdirectory(rSubdirectoryName),
       mPrecision(precision)
 {
-	GenerateListOfDatasets(mrH5Folder, mFileBaseName);
+    GenerateListOfDatasets(mrH5Folder, mFileBaseName);
 
     // Create new directory in which to store everything
-	FileFinder sub_directory(mRelativeSubdirectory, mrH5Folder);
+    FileFinder sub_directory(mRelativeSubdirectory, mrH5Folder);
     mpOutputFileHandler = new OutputFileHandler(sub_directory, false);
 
-	MoveOntoNextDataset();
+    MoveOntoNextDataset();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -122,21 +122,21 @@ std::string AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GetSubdirectory()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
 {
-	// If we are already at the end just return false.
-	if (mDatasetNames.size() == mOpenDatasetIndex+1u)
-	{
-		return false;
-	}
+    // If we are already at the end just return false.
+    if (mDatasetNames.size() == mOpenDatasetIndex+1u)
+    {
+        return false;
+    }
 
-	// If we haven't read anything yet, start at the beginning, otherwise increment by one.
-	if (mOpenDatasetIndex==UNSIGNED_UNSET)
-	{
-		mOpenDatasetIndex = 0u;
-	}
-	else
-	{
-		mOpenDatasetIndex++;
-	}
+    // If we haven't read anything yet, start at the beginning, otherwise increment by one.
+    if (mOpenDatasetIndex==UNSIGNED_UNSET)
+    {
+        mOpenDatasetIndex = 0u;
+    }
+    else
+    {
+        mOpenDatasetIndex++;
+    }
 
     // Store directory, mesh and filenames and create the reader
     mpReader.reset(new Hdf5DataReader(mrH5Folder, mFileBaseName, mDatasetNames[mOpenDatasetIndex]));
@@ -152,54 +152,54 @@ bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
     }
     WriteInfoFile();
 
-	return true;
+    return true;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const FileFinder& rH5Folder,
-		                                                                  const std::string& rFileName)
+                                                                          const std::string& rFileName)
 {
-	/*
-	 * Open file.
-	 */
-	std::string file_name = rH5Folder.GetAbsolutePath() + rFileName + ".h5";
-	hid_t file = H5Fopen(file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+    /*
+     * Open file.
+     */
+    std::string file_name = rH5Folder.GetAbsolutePath() + rFileName + ".h5";
+    hid_t file = H5Fopen(file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-	/*
-	 * Begin HDF5 iteration, calls a method that populates mDatasetNames.
-	 */
+    /*
+     * Begin HDF5 iteration, calls a method that populates mDatasetNames.
+     */
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-	//std::cout << "HDF5 1.8.x or above detected.\n";
-	H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &mDatasetNames);
+    //std::cout << "HDF5 1.8.x or above detected.\n";
+    H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &mDatasetNames);
 #else
-	//std::cout << "HDF5 1.6.x  detected.\n";
-	H5Giterate(file, "/", NULL, op_func, &mDatasetNames);
+    //std::cout << "HDF5 1.6.x  detected.\n";
+    H5Giterate(file, "/", NULL, op_func, &mDatasetNames);
 #endif
 
-	H5Fclose(file);
+    H5Fclose(file);
 
-	// Remove datasets that end in "_Unlimited", as these are paired up with other ones!
-	std::string ending = "_Unlimited";
+    // Remove datasets that end in "_Unlimited", as these are paired up with other ones!
+    std::string ending = "_Unlimited";
 
-	// Strip off the independent variables from the list
-	std::vector<std::string>::iterator iter;
-	for (iter = mDatasetNames.begin(); iter != mDatasetNames.end(); )
-	{
-		// If the dataset name is "Time" OR ...
-		// it is longer than the ending we are looking for ("_Unlimited") ...
-		// ... AND it ends with the string we are looking for,
-		// then erase it.
-		if ( (*(iter) == "Time") ||
-		     ( ( iter->length() > ending.length() ) &&
-		       ( 0 == iter->compare(iter->length() - ending.length(), ending.length(), ending) ) ) )
-	    {
-	        iter = mDatasetNames.erase(iter);
-	    }
-	    else
-	    {
-	        ++iter;
-	    }
-	}
+    // Strip off the independent variables from the list
+    std::vector<std::string>::iterator iter;
+    for (iter = mDatasetNames.begin(); iter != mDatasetNames.end(); )
+    {
+        // If the dataset name is "Time" OR ...
+        // it is longer than the ending we are looking for ("_Unlimited") ...
+        // ... AND it ends with the string we are looking for,
+        // then erase it.
+        if ( (*(iter) == "Time") ||
+             ( ( iter->length() > ending.length() ) &&
+               ( 0 == iter->compare(iter->length() - ending.length(), ending.length(), ending) ) ) )
+        {
+            iter = mDatasetNames.erase(iter);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
 }
 
 /*
@@ -213,54 +213,54 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
  */
 herr_t op_func (hid_t loc_id, const char *name,
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-		        const H5L_info_t *info,
+                const H5L_info_t *info,
 #endif
-			    void *operator_data)
+                void *operator_data)
 {
-	std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
+    std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
 
-	/*
-	 * Get type of the object and display its name and type.
-	 * The name of the object is passed to this function by
-	 * the Library.
-	 */
+    /*
+     * Get type of the object and display its name and type.
+     * The name of the object is passed to this function by
+     * the Library.
+     */
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-	H5O_info_t infobuf;
-	H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
-	switch (infobuf.type)
-	{
-//		  case H5O_TYPE_GROUP:
-//			  printf ("  Group: %s\n", name);
-//			  break;
-		case H5O_TYPE_DATASET:
-			p_dataset_names->push_back(name);
-			break;
-//		  case H5O_TYPE_NAMED_DATATYPE:
-//		      printf ("  Datatype: %s\n", name);
-//			  break;
+    H5O_info_t infobuf;
+    H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
+    switch (infobuf.type)
+    {
+//          case H5O_TYPE_GROUP:
+//              printf ("  Group: %s\n", name);
+//              break;
+        case H5O_TYPE_DATASET:
+            p_dataset_names->push_back(name);
+            break;
+//          case H5O_TYPE_NAMED_DATATYPE:
+//              printf ("  Datatype: %s\n", name);
+//              break;
 #else // HDF5 1.6.x
-	H5G_stat_t statbuf;
-	H5Gget_objinfo (loc_id, name, 0, &statbuf);
-	switch (statbuf.type)
-	{
+    H5G_stat_t statbuf;
+    H5Gget_objinfo (loc_id, name, 0, &statbuf);
+    switch (statbuf.type)
+    {
 //        case H5G_GROUP:
 //            printf ("  Group: %s\n", name);
 //            break;
-		case H5G_DATASET:
-			//printf ("  Dataset: %s\n", name);
-			p_dataset_names->push_back(name);
-			break;
+        case H5G_DATASET:
+            //printf ("  Dataset: %s\n", name);
+            p_dataset_names->push_back(name);
+            break;
 //        case H5G_TYPE:
 //            printf ("  Datatype: %s\n", name);
 //            break;
 #endif
-		default:
-			NEVER_REACHED;
-			// If you ever do reach here, it means that an HDF5 file you are trying to convert contains
-			// something other than a 'Dataset', which is the usual data structure we write out in Chaste.
-			// The above commented out lines should help you figure out what it is, and how it got there.
-	}
-	return 0;
+        default:
+            NEVER_REACHED;
+            // If you ever do reach here, it means that an HDF5 file you are trying to convert contains
+            // something other than a 'Dataset', which is the usual data structure we write out in Chaste.
+            // The above commented out lines should help you figure out what it is, and how it got there.
+    }
+    return 0;
 }
 
 

@@ -924,13 +924,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
 //      Hdf5ToMeshalyzerConverter<DIM,DIM> meshalyzer_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
 //                                                              "voltage", mpElectricsMesh,
-//															    HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
-//																HeartConfig::Instance()->GetVisualizerOutputPrecision() );
+//                                                                HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
+//                                                                HeartConfig::Instance()->GetVisualizerOutputPrecision() );
 
         // convert output to CMGUI format
         Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
-        		                                      "voltage", mpElectricsMesh, mHasBath,
-        		                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                                      "voltage", mpElectricsMesh, mHasBath,
+                                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Write mesh in a suitable form for meshalyzer
         //std::string output_directory =  mOutputDirectory + "/electrics/output";

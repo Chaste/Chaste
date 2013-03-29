@@ -52,39 +52,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class NumericFileComparison : public AbstractFileComparison
 {
 private:
-	/**
-	 * Read the next token in the file as a double.
-	 *
-	 * If we detect a comment skip the line.
-	 * If we detect a word assign the value A_WORD.
-	 * If we find nothing to read assign  NOTHING_TO_READ.
-	 *
-	 * @param pFile  The file from which to attempt to read a double.
-	 * @param rData  The double to assign a value to.
-	 */
-	void ReadNextToken(std::ifstream* pFile, double& rData)
-	{
-		if (!(*pFile>>rData))
-		{
-			// Cannot read the next token from file as a number, so try a word instead
-			std::string word;
-			pFile->clear(); // reset the "failbit"
-			if (*pFile >> word)
-			{
-				rData = A_WORD;
-				if (word == "#" || word == "!")
-				{
-					// Ignore comment (up to 1024 characters until newline)
-					pFile->ignore(1024, '\n');
-				}
-			}
-			else
-			{
-				pFile->clear(); // reset the "failbit"
-				rData = NOTHING_TO_READ;
-			}
-		}
-	}
+    /**
+     * Read the next token in the file as a double.
+     *
+     * If we detect a comment skip the line.
+     * If we detect a word assign the value A_WORD.
+     * If we find nothing to read assign  NOTHING_TO_READ.
+     *
+     * @param pFile  The file from which to attempt to read a double.
+     * @param rData  The double to assign a value to.
+     */
+    void ReadNextToken(std::ifstream* pFile, double& rData)
+    {
+        if (!(*pFile>>rData))
+        {
+            // Cannot read the next token from file as a number, so try a word instead
+            std::string word;
+            pFile->clear(); // reset the "failbit"
+            if (*pFile >> word)
+            {
+                rData = A_WORD;
+                if (word == "#" || word == "!")
+                {
+                    // Ignore comment (up to 1024 characters until newline)
+                    pFile->ignore(1024, '\n');
+                }
+            }
+            else
+            {
+                pFile->clear(); // reset the "failbit"
+                rData = NOTHING_TO_READ;
+            }
+        }
+    }
 
 public:
 
@@ -147,8 +147,8 @@ public:
 
         do
         {
-        	ReadNextToken(mpFile1, data1);
-        	ReadNextToken(mpFile2, data2);
+            ReadNextToken(mpFile1, data1);
+            ReadNextToken(mpFile2, data2);
             bool ok = CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol);
             if (!ok)
             {

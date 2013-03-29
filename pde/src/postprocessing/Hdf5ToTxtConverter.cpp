@@ -49,7 +49,7 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder&
                                                                AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "txt_output", 0u)
 {
-	// Make sure that we are never trying to write from an incomplete data HDF5 file
+    // Make sure that we are never trying to write from an incomplete data HDF5 file
     assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());
 
     FileFinder output_directory(this->mRelativeSubdirectory,rInputDirectory);

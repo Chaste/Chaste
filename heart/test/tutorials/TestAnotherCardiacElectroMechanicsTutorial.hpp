@@ -241,8 +241,8 @@ public:
          */
         FileFinder test_output_folder("TestCardiacElectroMechanicsWithMef/electrics", RelativeTo::ChasteTestOutput);
         Hdf5ToMeshalyzerConverter<2,2> converter(test_output_folder, "voltage",
-        		                                 &electrics_mesh, false,
-        		                                 HeartConfig::Instance()->GetVisualizerOutputPrecision());
+                                                 &electrics_mesh, false,
+                                                 HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         /* Some other notes. If you want to apply time-dependent traction boundary conditions, this is possible by
          * specifying the traction in functional form - see solid mechanics tutorials. Similarly, more natural

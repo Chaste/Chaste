@@ -48,12 +48,12 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
 {
 
-	std::string filename = "";
-	if (this->mDatasetNames[this->mOpenDatasetIndex] == "Data")
-	{
-		filename += this->mFileBaseName + "_";
-	}
-	filename += type + ".dat";
+    std::string filename = "";
+    if (this->mDatasetNames[this->mOpenDatasetIndex] == "Data")
+    {
+        filename += this->mFileBaseName + "_";
+    }
+    filename += type + ".dat";
 
     out_stream p_file = out_stream(NULL);
     if (PetscTools::AmMaster())
@@ -106,20 +106,20 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(cons
                                                                             unsigned precision)
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "output", precision)
 {
-	do
-	{
-		std::vector<std::string> variable_names = this->mpReader->GetVariableNames();
-		for (unsigned i=0; i<variable_names.size(); i++)
-		{
-			Write(variable_names[i]);
-		}
-	}
-	while ( this->MoveOntoNextDataset() );
+    do
+    {
+        std::vector<std::string> variable_names = this->mpReader->GetVariableNames();
+        for (unsigned i=0; i<variable_names.size(); i++)
+        {
+            Write(variable_names[i]);
+        }
+    }
+    while ( this->MoveOntoNextDataset() );
 
     // Now we might call this class more than once, so we don't always need to write the mesh out.
     // so check to see if it is there already.
-	FileFinder test_output("",RelativeTo::ChasteTestOutput);
-	std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
+    FileFinder test_output("",RelativeTo::ChasteTestOutput);
+    std::string output_directory = rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
     FileFinder mesh_file(output_directory + "/" + rFileBaseName + "_mesh.pts", RelativeTo::ChasteTestOutput);
 
     if (!mesh_file.IsFile())

@@ -50,9 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Operator function to be called by H5Literate [HDF5 1.8.x] or H5Giterate [HDF5 1.6.x] (in TestListingDatasetsInAnHdf5File).
  */
 herr_t op_func (hid_t loc_id,
-		        const char *name,
+                const char *name,
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-		        const H5L_info_t *info,
+                const H5L_info_t *info,
 #endif
                 void *operator_data);
 
@@ -630,44 +630,44 @@ public:
     }
 
     void TestListingDatasetsInAnHdf5File() throw (Exception)
-	{
-		/*
-		 * Open file.
-		 */
-		hid_t file = H5Fopen ("mesh/test/data/vtk_extending/SimulationResults.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+    {
+        /*
+         * Open file.
+         */
+        hid_t file = H5Fopen ("mesh/test/data/vtk_extending/SimulationResults.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-		/*
-		 * Make an object for us to store the dataset names in.
-		 */
-		std::vector<std::string> dataset_names;
+        /*
+         * Make an object for us to store the dataset names in.
+         */
+        std::vector<std::string> dataset_names;
 
-		/*
-		 * Begin iteration.
-		 */
+        /*
+         * Begin iteration.
+         */
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-    	std::cout << "HDF5 1.8.x or above detected.\n";
-		herr_t status = H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &dataset_names);
+        std::cout << "HDF5 1.8.x or above detected.\n";
+        herr_t status = H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, NULL, op_func, &dataset_names);
 #else
-		std::cout << "HDF5 1.6.x  detected.\n";
-		herr_t status = H5Giterate(file, "/", NULL, op_func, &dataset_names);
+        std::cout << "HDF5 1.6.x  detected.\n";
+        herr_t status = H5Giterate(file, "/", NULL, op_func, &dataset_names);
 #endif
 
-		/*
-		 * Close and release resources.
-		 */
-		TS_ASSERT_EQUALS(status, 0);
-		status = H5Fclose (file);
-		TS_ASSERT_EQUALS(status, 0);
+        /*
+         * Close and release resources.
+         */
+        TS_ASSERT_EQUALS(status, 0);
+        status = H5Fclose (file);
+        TS_ASSERT_EQUALS(status, 0);
 
-		/*
-		 * Check that all the datasets have been listed correctly.
-		 */
-		TS_ASSERT_EQUALS(dataset_names.size(), 4u);
-		TS_ASSERT_EQUALS(dataset_names[0], "Apd_60_minus_30_Map");
-		TS_ASSERT_EQUALS(dataset_names[1], "Apd_60_minus_30_Map_Unlimited" );
-		TS_ASSERT_EQUALS(dataset_names[2], "Data");
-		TS_ASSERT_EQUALS(dataset_names[3], "Data_Unlimited");
-	}
+        /*
+         * Check that all the datasets have been listed correctly.
+         */
+        TS_ASSERT_EQUALS(dataset_names.size(), 4u);
+        TS_ASSERT_EQUALS(dataset_names[0], "Apd_60_minus_30_Map");
+        TS_ASSERT_EQUALS(dataset_names[1], "Apd_60_minus_30_Map_Unlimited" );
+        TS_ASSERT_EQUALS(dataset_names[2], "Data");
+        TS_ASSERT_EQUALS(dataset_names[3], "Data_Unlimited");
+    }
 };
 
 
@@ -680,52 +680,52 @@ public:
  ************************************************************/
 herr_t op_func (hid_t loc_id, const char *name,
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-		        const H5L_info_t *info,
+                const H5L_info_t *info,
 #endif
-			    void *operator_data)
+                void *operator_data)
 {
-	std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
+    std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
 
-	/*
-	 * Get type of the object and display its name and type.
-	 * The name of the object is passed to this function by
-	 * the Library.
-	 */
+    /*
+     * Get type of the object and display its name and type.
+     * The name of the object is passed to this function by
+     * the Library.
+     */
 #if H5_VERS_MAJOR >= 1 && H5_VERS_MINOR >=8
-	H5O_info_t infobuf;
-	H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
-	switch (infobuf.type)
-	{
-//		  case H5O_TYPE_GROUP:
-//			  printf ("  Group: %s\n", name);
-//			  break;
-		case H5O_TYPE_DATASET:
-			p_dataset_names->push_back(name);
-			break;
-//		  case H5O_TYPE_NAMED_DATATYPE:
-//		      printf ("  Datatype: %s\n", name);
-//			  break;
+    H5O_info_t infobuf;
+    H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
+    switch (infobuf.type)
+    {
+//          case H5O_TYPE_GROUP:
+//              printf ("  Group: %s\n", name);
+//              break;
+        case H5O_TYPE_DATASET:
+            p_dataset_names->push_back(name);
+            break;
+//          case H5O_TYPE_NAMED_DATATYPE:
+//              printf ("  Datatype: %s\n", name);
+//              break;
 #else // HDF5 1.6.x
-	H5G_stat_t statbuf;
-	H5Gget_objinfo (loc_id, name, 0, &statbuf);
-	switch (statbuf.type)
-	{
+    H5G_stat_t statbuf;
+    H5Gget_objinfo (loc_id, name, 0, &statbuf);
+    switch (statbuf.type)
+    {
 //        case H5G_GROUP:
 //            printf ("  Group: %s\n", name);
 //            break;
-		case H5G_DATASET:
-			//printf ("  Dataset: %s\n", name);
-			p_dataset_names->push_back(name);
-			break;
+        case H5G_DATASET:
+            //printf ("  Dataset: %s\n", name);
+            p_dataset_names->push_back(name);
+            break;
 //        case H5G_TYPE:
 //            printf ("  Datatype: %s\n", name);
 //            break;
 #endif
-		default:
-			EXCEPTION("File includes HDF5 object that it shouldn't.");
-	}
+        default:
+            EXCEPTION("File includes HDF5 object that it shouldn't.");
+    }
 
-	return 0;
+    return 0;
 }
 
 #endif /*TESTHDF5READER_HPP_*/

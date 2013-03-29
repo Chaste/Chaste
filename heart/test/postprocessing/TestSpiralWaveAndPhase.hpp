@@ -217,7 +217,7 @@ public:
     {
         // Write out voltage (just for fun, to compare with phase plot).
         Hdf5ToMeshalyzerConverter<2,2> converter1(FileFinder("SpiralWaveAndPhase", RelativeTo::ChasteTestOutput),
-        										  "results", mpMesh, true);
+                                                  "results", mpMesh, true);
 
         // Check the phase file is written correctly.
         {

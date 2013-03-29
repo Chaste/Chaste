@@ -47,7 +47,7 @@ void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vecto
 {
     this->ClearBoxCollection();
 
-    this->mpBoxCollection = new DistributedBoxCollection<2>(cutOffLength, domainSize, true);	// Only difference is that this "true" makes the boxes periodic.
+    this->mpBoxCollection = new DistributedBoxCollection<2>(cutOffLength, domainSize, true);    // Only difference is that this "true" makes the boxes periodic.
     this->mpBoxCollection->SetupLocalBoxesHalfOnly();
 
     this->AddNodesToBoxes();

@@ -325,10 +325,10 @@ public:
         // Nodes 0-9 should not been renumbered so are still particles.
         // the particle at node 80 is now at 79 as node 27 was deleted..
         for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-        		node_iter != p_mesh->GetNodeIteratorEnd();
-        		++node_iter)
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-        	unsigned index = node_iter->GetIndex();
+            unsigned index = node_iter->GetIndex();
             // True (ie should be a particle) if i<10 or i==79, else false
             TS_ASSERT_EQUALS(cell_population_with_particles.IsParticle(index), ((index<10)||(index==80)));
         }

@@ -160,16 +160,16 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::~PostProcessingWriter()
 {
-	delete mpDataReader;
+    delete mpDataReader;
     delete mpCalculator;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const std::vector<std::vector<double> >& rDataPayload,
-																		 const std::string& rDatasetName,
-																		 const std::string& rDatasetUnit,
-																		 const std::string& rUnlimitedVariableName,
-																		 const std::string& rUnlimitedVariableUnit)
+                                                                         const std::string& rDatasetName,
+                                                                         const std::string& rDatasetUnit,
+                                                                         const std::string& rUnlimitedVariableName,
+                                                                         const std::string& rUnlimitedVariableUnit)
 {
     DistributedVectorFactory* p_factory = mrMesh.GetDistributedVectorFactory();
     FileFinder test_output("", RelativeTo::ChasteTestOutput);
@@ -230,15 +230,15 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteApdMapFile(double repolarisationPercentage, double threshold)
 {
-	std::vector<std::vector<double> > local_output_data = mpCalculator->CalculateAllActionPotentialDurationsForNodeRange(repolarisationPercentage, mLo, mHi, threshold);
+    std::vector<std::vector<double> > local_output_data = mpCalculator->CalculateAllActionPotentialDurationsForNodeRange(repolarisationPercentage, mLo, mHi, threshold);
 
     // HDF5 shouldn't have minus signs in the data names..
     std::stringstream hdf5_dataset_name;
     hdf5_dataset_name << "Apd_" << repolarisationPercentage;
 
     WriteOutputDataToHdf5(local_output_data,
-	                      hdf5_dataset_name.str() + ConvertToHdf5FriendlyString(threshold) + "_Map",
-	                      "msec");
+                          hdf5_dataset_name.str() + ConvertToHdf5FriendlyString(threshold) + "_Map",
+                          "msec");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -448,18 +448,18 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, const std::string& rFileName)
 {
-	///\todo #1660 this whole method to be removed.
-	// At present there are no cmgui-format postprocessing maps,
-	// we just use meshalyzer format so that something is generated.
+    ///\todo #1660 this whole method to be removed.
+    // At present there are no cmgui-format postprocessing maps,
+    // we just use meshalyzer format so that something is generated.
 
-	if ( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() )
-	{
-		WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
+    if ( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() )
+    {
+        WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
     }
 
     if ( HeartConfig::Instance()->GetVisualizeWithCmgui() )
     {
-    	WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
+        WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
     }
 }
 

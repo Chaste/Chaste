@@ -649,10 +649,10 @@ void Hdf5DataWriter::EndDefineMode()
 
         // Create the unlimited dimension dataset
 
-    	// * Files post r18257 (inc. Release 3.2 onwards) use "<DatasetName>_Unlimited" for "<DatasetName>"'s
-    	//   unlimited variable,
-    	//   - a new attribute "Name" has been added to the Unlimited Dataset to allow it to assign
-    	//     any name to the unlimited variable. Which can then be easily read by Hdf5DataReader.
+        // * Files post r18257 (inc. Release 3.2 onwards) use "<DatasetName>_Unlimited" for "<DatasetName>"'s
+        //   unlimited variable,
+        //   - a new attribute "Name" has been added to the Unlimited Dataset to allow it to assign
+        //     any name to the unlimited variable. Which can then be easily read by Hdf5DataReader.
 
         mUnlimitedDatasetId = H5Dcreate(mFileId, (mDatasetName + "_Unlimited").c_str(), H5T_NATIVE_DOUBLE, time_filespace, time_cparms);
 
