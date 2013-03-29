@@ -124,6 +124,18 @@ private:
      */
     unsigned AddNode(Node<DIM>* pNewNode);
 
+    /**
+     * Add a moved cell to this process along with its node.
+     * @param pCell the pointer to the cell that is to be added.
+     * @param pNode the pointer to the node that is to be added.
+     */
+    void AddMovedCell(CellPtr pCell, Node<DIM>* pNode);
+
+    /**
+     * Delete a cell and its associated node that have moved off this process.
+     * @param pCell the pointer to the cell that has moved off this process.
+     */
+    void DeleteMovedCell(CellPtr pCell);
 
 protected:
 

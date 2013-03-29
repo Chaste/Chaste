@@ -635,6 +635,33 @@ public:
         }
     }
 
+    void TestCleanDeleteAndAddNode()    throw(Exception)
+    {
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.0, 1.6));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        unsigned num_initial_nodes = mesh.GetNumNodes();
+
+        if (PetscTools::AmMaster())
+        {
+            mesh.DeleteMovedNode(0);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_nodes -1);
+            TS_ASSERT(mesh.mDeletedGlobalNodeIndices.empty());
+            TS_ASSERT(mesh.mDeletedNodeIndices.size() == 1u);
+
+            mesh.AddMovedNode(new Node<2>(1));
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_nodes);
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(1), 0u);
+            TS_ASSERT(mesh.mDeletedNodeIndices.size() == 0u);
+        }
+
+
+    }
+
     void TestArchiving() throw(Exception)
     {
         EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.

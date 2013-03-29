@@ -69,7 +69,6 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
       mUseVariableRadii(false) // will be set by serialize() method
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
-    // No Validate() because the cells are not associated with the cell population yet in archiving
 }
 
 template<unsigned DIM>
@@ -219,7 +218,7 @@ unsigned NodeBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 {
-    return mpNodesOnlyMesh->GetNumAllNodes();
+    return mpNodesOnlyMesh->GetNumNodes();
 }
 
 template<unsigned DIM>
@@ -230,10 +229,6 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 template<unsigned DIM>
 std::set< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rGetNodePairs()
 {
-//    if (mNodePairs.empty())
-//    {
-//        EXCEPTION("No node pairs set up, rGetNodePairs probably called before Update");
-//    }
     return mNodePairs;
 }
 
@@ -612,6 +607,34 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
 
     // Return pointer to new cell
     return p_created_cell;
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, Node<DIM>* pNode)
+{
+    // Create a new node
+    mpNodesOnlyMesh->AddMovedNode(pNode);
+
+    // Update cells vector
+    this->mCells.push_back(pCell);
+
+    // Update mappings between cells and location indices
+    this->AddCellUsingLocationIndex(pNode->GetIndex(), pCell);
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::DeleteMovedCell(CellPtr pCell)
+{
+    unsigned location_index = this->GetLocationIndexUsingCell(pCell);
+
+    mpNodesOnlyMesh->DeleteMovedNode(location_index);
+
+    // Update mappings between cells and location indices
+    this->mCellLocationMap.erase((pCell).get());
+    this->mLocationCellMap.erase(location_index);
+
+    // Update vector of cells
+    this->mCells.remove(pCell);
 }
 
 template<unsigned DIM>

@@ -166,6 +166,13 @@ private:
       */
      void UpdateNodeIndices();
 
+     /**
+      * Add pNewNode to the mesh maintaining its current global index. Called by AddNode and AddMovedNode
+      *
+      * @param pNewNode the new node to add to this mesh.
+      */
+     void AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode);
+
 protected:
 
     /**
@@ -287,11 +294,23 @@ public:
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
     /**
+     * Add a node to this process that has moved from another process.
+     */
+    void AddMovedNode(Node<SPACE_DIM>* pMovedNode);
+
+    /**
      * Overridden DeleteNode() method.
      *
      * @param index is the index of the node to be deleted
      */
     void DeleteNode(unsigned index);
+
+    /**
+     * Make a clean delete of a node that has moved off this process.
+     *
+     * @param index the global index of the node moving off this process.
+     */
+    void DeleteMovedNode(unsigned index);
 
     /**
      * Set the value of mMinimumNodeDomainBoundarySeparation

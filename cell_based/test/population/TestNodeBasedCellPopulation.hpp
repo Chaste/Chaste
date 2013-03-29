@@ -1253,6 +1253,48 @@ public:
             delete p_cell_population;
         }
     }
+
+    void TestAddAndRemoveMovedCell()    throw (Exception)
+    {
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 0.0, 1.0));
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        if (PetscTools::AmMaster())
+        {
+            unsigned num_initial_cells = cell_population.GetNumNodes();
+
+            boost::shared_ptr<AbstractCellProperty> p_state(new WildTypeCellMutationState);
+            boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_state, p_model));
+
+            Node<2>* p_node = new Node<2>(PetscTools::GetNumProcs() * (num_initial_cells + 1), false, 0.0, 0.5);
+            cell_population.AddMovedCell(p_cell, p_node);
+
+            TS_ASSERT_EQUALS(cell_population.GetNumNodes(), num_initial_cells +1);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_cells + 1);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_cell), PetscTools::GetNumProcs() * (num_initial_cells + 1));
+
+            // Now delete the first cell
+            cell_population.DeleteMovedCell(cells[0]);
+
+            TS_ASSERT_EQUALS(cell_population.GetNumNodes(), num_initial_cells);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_cells);
+            //TS_ASSERT_THROWS_THIS(cell_population.GetLocationIndexUsingCell(cells[0]), "");
+        }
+    }
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATION_HPP_*/

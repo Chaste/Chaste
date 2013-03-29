@@ -203,15 +203,13 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
 }
 
 template<unsigned SPACE_DIM>
-unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
+void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 {
     if(!mpBoxCollection->IsOwned(pNewNode))
     {
         EXCEPTION("Trying to add node to process " << PetscTools::GetMyRank() << " which doesn't belong on this process.");
     }
 
-    unsigned fresh_global_index = GetNextAvailableIndex();
-    pNewNode->SetIndex(fresh_global_index);
     unsigned location_in_nodes_vector = 0;
 
     if (this->mDeletedNodeIndices.empty())
@@ -230,12 +228,27 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
     this->mAddedNodes = true;
 
     // Update mNodesMapping
-    mNodesMapping[fresh_global_index] = location_in_nodes_vector;
+    mNodesMapping[pNewNode->GetIndex()] = location_in_nodes_vector;
 
     // Then update cell radius to default.
     pNewNode->SetRadius(0.5);
+}
+
+template<unsigned SPACE_DIM>
+unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
+{
+    unsigned fresh_global_index = GetNextAvailableIndex();
+    pNewNode->SetIndex(fresh_global_index);
+
+    AddNodeWithFixedIndex(pNewNode);
 
     return fresh_global_index;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(Node<SPACE_DIM>* pMovedNode)
+{
+    AddNodeWithFixedIndex(pMovedNode);
 }
 
 template<unsigned SPACE_DIM>
@@ -251,6 +264,15 @@ void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
     this->mNodes[local_index]->MarkAsDeleted();
     this->mDeletedNodeIndices.push_back(local_index);
     mDeletedGlobalNodeIndices.push_back(index);
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::DeleteMovedNode(unsigned index)
+{
+    DeleteNode(index);
+
+    // Remove index from deleted indices, as moved indices must not be re-used.
+    mDeletedGlobalNodeIndices.pop_back();
 }
 
 template<unsigned SPACE_DIM>
