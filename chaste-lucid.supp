@@ -373,6 +373,15 @@
    fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
    fun:_ZN17vtkDataCompressor10UncompressEPKhmPhm
 }
+{
+   VTK ZLib with fewer inits
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:uncompress
+   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
+   fun:_ZN16vtkXMLDataParser9ReadBlockEjPh
+}
 
 # CVODE
 #######
