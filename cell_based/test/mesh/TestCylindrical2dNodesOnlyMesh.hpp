@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "Cylindrical2dNodesOnlyMesh.hpp"
 #include "ArchiveOpener.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestCylindrical2dNodesOnlyMesh : public CxxTest::TestSuite
 {
@@ -51,6 +52,8 @@ public:
 
     void TestMeshGetWidth()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -83,6 +86,8 @@ public:
 
     void TestGetVectorFromAtoB() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -125,6 +130,8 @@ public:
 
     void TestSetNodeLocationForCylindricalMesh() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -163,6 +170,8 @@ public:
 
     void TestAddNode() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -171,6 +180,10 @@ public:
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // ReMesh to make the box collection big enough to accommodate new nodes.
+        NodeMap map(p_mesh->GetMaximumNodeIndex());
+        p_mesh->ReMesh(map);
 
         // Choose a node on the left boundary
         ChastePoint<2> point = p_mesh->GetNode(4)->GetPoint();
@@ -214,6 +227,8 @@ public:
 
     void TestConstuctingBoxCollection() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
+
         double cut_off = 0.5;
 
         /*
@@ -234,12 +249,12 @@ public:
         // Call SetupBoxCollection method not called unless EnlargeBOxCollection is called
         c_vector<double, 2*2> domain_size;
         domain_size[0]=-2.0;
-        domain_size[1]=2.0;
+        domain_size[1]=2.5;
         domain_size[2]=-2.0;
-        domain_size[3]=2.0;
+        domain_size[3]=2.5;
         p_mesh->SetUpBoxCollection(cut_off,domain_size);
 
-        BoxCollection<2>* p_box_collection = p_mesh->mpBoxCollection;
+        DistributedBoxCollection<2>* p_box_collection = p_mesh->mpBoxCollection;
 
         TS_ASSERT(p_box_collection != NULL);
 
@@ -263,6 +278,8 @@ public:
     // NB This checks that periodicity is maintained through archiving...
     void TestArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "cylindrical_nodes_only_mesh_base.arch";
         ArchiveLocationInfo::SetMeshFilename("cylindrical_nodes_only_mesh");

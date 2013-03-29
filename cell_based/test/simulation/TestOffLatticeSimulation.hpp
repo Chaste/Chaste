@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOffLatticeSimulation : public AbstractCellBasedTestSuite
 {
@@ -87,6 +88,8 @@ public:
 
     void TestOutputNodeVelocitiesAndDivisionLocations() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -152,6 +155,8 @@ public:
 
     void TestOutputNodeVelocitiesWithGhostNodes() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh with a surrounding layer of ghost nodes
         HoneycombMeshGenerator generator(3, 3, 1);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -224,6 +229,8 @@ public:
      */
     void TestOffLatticeSimulationWithCellDeath() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -276,6 +283,8 @@ public:
      */
     void TestOffLatticeSimulationWithMultipleCellKillers() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -335,6 +344,8 @@ public:
      */
     void TestOffLatticeSimulationWithMultipleForces() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -394,6 +405,8 @@ public:
      */
     void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    //    Cell population output doesn't work in parallel.
+
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -487,6 +500,8 @@ public:
      */
     void TestOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    //    Cell population output doesn't work in parallel.
+
         // Load Mesh
         TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
         MutableMesh<2,3> mesh;
@@ -528,6 +543,8 @@ public:
      */
     void TestOffLatticeSimulationWithPeriodicMesh() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         int cells_up = 6;
         int cells_across = 6;
@@ -569,6 +586,8 @@ public:
      */
     void TestOffLatticeSimulationWithMultipleCellBoundaryConditions() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -623,6 +642,8 @@ public:
 
     void TestOffLatticeSimulationWithStoppingEvent() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -734,6 +755,8 @@ public:
 
     void TestApoptosisSpringLengths() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         unsigned num_cells_depth = 2;
         unsigned num_cells_width = 2;
 
@@ -824,6 +847,8 @@ public:
 
     void TestOffLatticeSimulationParameterOutputMethods() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -881,6 +906,7 @@ public:
      */
     void Test1dOffLatticeSimulation() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    ///\todo This test will not run in parallel until #2365 is complete.
         // Create mesh
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;
@@ -926,6 +952,8 @@ public:
 
     void TestSettingEndTimeIssue() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 1);
 
         HoneycombMeshGenerator generator(2, 2, 0);
@@ -953,6 +981,8 @@ public:
 
     void TestCellProliferativeTypeCounts() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();

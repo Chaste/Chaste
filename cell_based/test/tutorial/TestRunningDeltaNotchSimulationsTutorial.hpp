@@ -86,6 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
+#include "PetscSetupAndFinalize.hpp"
 /*
  * The next header file defines a simple stochastic cell-cycle model that includes the functionality
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
@@ -119,6 +120,9 @@ public:
      */
     void TestVertexBasedMonolayerWithDeltaNotch() throw (Exception)
     {
+        /** We include the next line because Vertex simulations cannot be run in parallel */
+        EXIT_IF_PARALLEL;
+
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(5, 5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -202,6 +206,10 @@ public:
      */
     void TestNodeBasedMonolayerWithDeltaNotch() throw (Exception)
     {
+        /** We include the next line because HoneycombMeshGenerator, used in this test, is not
+         *  yet implemented in parallel. */
+        EXIT_IF_PARALLEL;
+
         /*
          * Most of the code in this test is the same as in the previous test,
          * except we now create a 'nodes-only mesh' and {{{NodeBasedCellPopulation}}}.

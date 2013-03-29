@@ -59,6 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -132,6 +134,8 @@ public:
     // Test get centroid
     void TestGetCentroidOfCellPopulation() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
         unsigned num_cells_depth = 2;
         unsigned num_cells_width = 2;
@@ -225,6 +229,8 @@ public:
 
     void TestGetDampingConstant()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
@@ -288,6 +294,8 @@ public:
 
     void TestAreaBasedDampingConstant()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
@@ -389,6 +397,8 @@ public:
 
     void TestDivideLongSprings()
     {
+        EXIT_IF_PARALLEL;    // Cannot read cell populations in parallel.
+
         // Create a simple mesh
         TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
         MutableMesh<2,3> mesh;
@@ -699,6 +709,8 @@ public:
 
     void TestCellPopulationWritersIn2d()
     {
+        EXIT_IF_PARALLEL;    // Cannot write cell populations in parallel.
+
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -824,6 +836,8 @@ public:
 
     void TestCellPopulationWritersIn3d()
     {
+        EXIT_IF_PARALLEL;    // Cannot write cell populations in parallel.
+
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -1241,6 +1255,8 @@ public:
 
     void TestIsCellAssociatedWithADeletedLocation() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
         // Create a simple mesh
         HoneycombMeshGenerator generator(4, 4, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();

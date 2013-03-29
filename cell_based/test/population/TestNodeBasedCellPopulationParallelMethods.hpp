@@ -69,19 +69,19 @@ private:
         AbstractCellBasedTestSuite::setUp();
 
         std::vector<Node<3>* > nodes;
-        nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0 + (double)PetscTools::GetMyRank()));
+        for (unsigned i=0; i<PetscTools::GetNumProcs(); i++)
+        {
+            nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5+(double)i));
+        }
 
         mpNodesOnlyMesh = new NodesOnlyMesh<3>;
-        mpNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.5);
-
-        std::vector<unsigned> location_indices;
-        location_indices.push_back(mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex());
+        mpNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mpNodesOnlyMesh->GetNumNodes());
 
-        mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpNodesOnlyMesh, cells, location_indices);
+        mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpNodesOnlyMesh, cells);
 
         delete nodes[0];
     }
@@ -97,7 +97,7 @@ public:
 
     void TestGetCellAndNodePair() throw (Exception)
     {
-    	unsigned node_index = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
+        unsigned node_index = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
 
         std::pair<CellPtr, Node<3>* > pair = mpNodeBasedCellPopulation->GetCellNodePair(node_index);
 
@@ -105,6 +105,7 @@ public:
 
         CellPtr p_returned_cell = pair.first;
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetLocationIndexUsingCell(p_returned_cell), node_index);
+
     }
 
     void TestAddNodeAndCellsToSend() throw (Exception)

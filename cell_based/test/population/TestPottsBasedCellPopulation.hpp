@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
@@ -396,6 +398,8 @@ public:
 
     void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
+        EXIT_IF_PARALLEL;    // Copying in parallel uses parallel NodesOnlyMesh and will therefore cause unexpected errors.
+
         // Resetting the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 

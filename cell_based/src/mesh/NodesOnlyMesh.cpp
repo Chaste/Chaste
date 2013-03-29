@@ -64,21 +64,24 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 
     Clear();
 
+    SetUpBoxCollection(rNodes);
+
     for (unsigned i=0; i<rNodes.size(); i++)
     {
-        assert(!rNodes[i]->IsDeleted());
-        c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
+        if (mpBoxCollection->IsOwned(rNodes[i]))
+        {
+            assert(!rNodes[i]->IsDeleted());
+            c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
 
-        Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(GetNextAvailableIndex(), location);
-        p_node_copy->SetRadius(0.5);    // Default value.
+            Node<SPACE_DIM>* p_node_copy = new Node<SPACE_DIM>(GetNextAvailableIndex(), location);
+            p_node_copy->SetRadius(0.5);    // Default value.
 
-        this->mNodes.push_back(p_node_copy);
+            this->mNodes.push_back(p_node_copy);
 
-        // Update the node map
-        mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
+            // Update the node map
+            mNodesMapping[p_node_copy->GetIndex()] = this->mNodes.size()-1;
+        }
     }
-
-    SetUpBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
@@ -121,13 +124,24 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetMaximumNodeIndex()
 {
-	return std::max(mIndexCounter, this->GetNumAllNodes()) * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
+    return std::max(mIndexCounter, this->GetNumAllNodes()) * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
 }
 
 template<unsigned SPACE_DIM>
 double NodesOnlyMesh<SPACE_DIM>::GetMaximumInteractionDistance()
 {
     return mMaximumInteractionDistance;
+}
+
+template<unsigned SPACE_DIM>
+double NodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) const
+{
+    double local_width = AbstractMesh<SPACE_DIM, SPACE_DIM>::GetWidth(rDimension);
+    double global_width;
+
+    MPI_Allreduce(&local_width, &global_width, 1, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
+
+    return global_width;
 }
 
 template<unsigned SPACE_DIM>
@@ -141,7 +155,7 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 {
-	map.ResetToIdentity();
+    map.ResetToIdentity();
 
     RemoveDeletedNodes(map);
 
@@ -164,6 +178,8 @@ void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
         if ((*node_iter)->IsDeleted())
         {
             map.SetDeleted((*node_iter)->GetIndex());
+
+            mNodesMapping.erase((*node_iter)->GetIndex());
 
             // Free memory before erasing the pointer from the list of nodes.
             delete (*node_iter);
@@ -189,22 +205,27 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 {
-	unsigned fresh_global_index = GetNextAvailableIndex();
-	pNewNode->SetIndex(fresh_global_index);
-	unsigned location_in_nodes_vector = 0;
+    if(!mpBoxCollection->IsOwned(pNewNode))
+    {
+        EXCEPTION("Trying to add node to process " << PetscTools::GetMyRank() << " which doesn't belong on this process.");
+    }
 
-	if (this->mDeletedNodeIndices.empty())
-	{
-		this->mNodes.push_back(pNewNode);
-		location_in_nodes_vector = this->mNodes.size() - 1;
-	}
-	else
-	{
-		location_in_nodes_vector = this->mDeletedNodeIndices.back();
-		this->mDeletedNodeIndices.pop_back();
-		delete this->mNodes[location_in_nodes_vector];
-		this->mNodes[location_in_nodes_vector] = pNewNode;
-	}
+    unsigned fresh_global_index = GetNextAvailableIndex();
+    pNewNode->SetIndex(fresh_global_index);
+    unsigned location_in_nodes_vector = 0;
+
+    if (this->mDeletedNodeIndices.empty())
+    {
+        this->mNodes.push_back(pNewNode);
+        location_in_nodes_vector = this->mNodes.size() - 1;
+    }
+    else
+    {
+        location_in_nodes_vector = this->mDeletedNodeIndices.back();
+        this->mDeletedNodeIndices.pop_back();
+        delete this->mNodes[location_in_nodes_vector];
+        this->mNodes[location_in_nodes_vector] = pNewNode;
+    }
 
     this->mAddedNodes = true;
 
@@ -220,14 +241,16 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::DeleteNode(unsigned index)
 {
-    if (this->mNodes[index]->IsDeleted())
+    if (this->GetNode(index)->IsDeleted())
     {
         EXCEPTION("Trying to delete a deleted node");
     }
 
-    this->mNodes[index]->MarkAsDeleted();
-    this->mDeletedNodeIndices.push_back(index);
-    mNodesMapping.erase(index);
+    unsigned local_index = SolveNodeMapping(index);
+
+    this->mNodes[local_index]->MarkAsDeleted();
+    this->mDeletedNodeIndices.push_back(local_index);
+    mDeletedGlobalNodeIndices.push_back(index);
 }
 
 template<unsigned SPACE_DIM>
@@ -241,15 +264,30 @@ void NodesOnlyMesh<SPACE_DIM>::SetMinimumNodeDomainBoundarySeparation(double sep
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
 {
-    unsigned counter = mIndexCounter;
-    mIndexCounter++;
-    return counter * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
+    unsigned index;
+
+    if(!this->mDeletedGlobalNodeIndices.empty())
+    {
+        index = this->mDeletedGlobalNodeIndices.back();
+        this->mDeletedGlobalNodeIndices.pop_back();
+    }
+    else
+    {
+        unsigned counter = mIndexCounter;
+        mIndexCounter++;
+        index = counter * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
+    }
+
+    return index;
 }
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
 {
     assert(mpBoxCollection);
+
+    unsigned num_local_rows = mpBoxCollection->GetNumLocalRows();
+    unsigned new_local_rows = num_local_rows + (unsigned)(PetscTools::AmTopMost()) + (unsigned)(PetscTools::AmMaster());
 
     c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
     c_vector<double, 2*SPACE_DIM> new_domain_size;
@@ -260,7 +298,7 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
         new_domain_size[2*d+1] = current_domain_size[2*d+1] + mMaximumInteractionDistance;
     }
 
-    SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size);
+    SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size, new_local_rows);
 }
 
 template<unsigned SPACE_DIM>
@@ -268,7 +306,7 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
 {
     assert(mpBoxCollection);
 
-    bool is_any_node_close = false;
+    int is_local_node_close = 0;
     c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
 
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
@@ -281,17 +319,21 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         {
             if (location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation))
             {
-                is_any_node_close = true;
+                is_local_node_close = 1;
                 break;
             }
         }
-        if (is_any_node_close)
+        if (is_local_node_close)
         {
             break;  // Saves checking every node if we find one close to the boundary.
         }
     }
 
-    return is_any_node_close;
+    // Synchronise between processes.
+    int is_any_node_close = 0;
+    MPI_Allreduce(&is_local_node_close, &is_any_node_close, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
+
+    return (is_any_node_close > 0);
 }
 
 template<unsigned SPACE_DIM>
@@ -305,11 +347,11 @@ void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection()
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_DIM>* >& rNodes)
 {
     ClearBoxCollection();
 
-    ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox();
+    ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox(rNodes);
 
     c_vector<double, 2*SPACE_DIM> domain_size;
     for (unsigned i=0; i < SPACE_DIM; i++)
@@ -318,16 +360,23 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection()
         domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i];
     }
 
+    // Make the domain size divisible by mMaximumInterationDistance.
+    for (unsigned i=0; i < SPACE_DIM; i++)
+    {
+        domain_size[2*i+1] = domain_size[2*i] + (1 + floor((domain_size[2*i+1] - domain_size[2*i]) / mMaximumInteractionDistance)) * mMaximumInteractionDistance;
+    }
+
     SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize)
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, unsigned numLocalRows)
 {
      ClearBoxCollection();
 
-     mpBoxCollection = new BoxCollection<SPACE_DIM>(cutOffLength, domainSize);
+     mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, false, numLocalRows);
      mpBoxCollection->SetupLocalBoxesHalfOnly();
+     mpBoxCollection->SetupHaloBoxes();
 }
 
 template<unsigned SPACE_DIM>
@@ -348,7 +397,7 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
 {
     if (!mpBoxCollection)
      {
-          SetUpBoxCollection();
+          SetUpBoxCollection(this->mNodes);
      }
 
     // Remove node pointers from boxes in BoxCollection.
@@ -365,13 +414,13 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_DIM, SPACE_DIM>& rMeshReader)
 {
-	TetrahedralMesh<SPACE_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
+    TetrahedralMesh<SPACE_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
 
-	// Set the correct global node indices
-	for (unsigned i=0; i<this->mNodes.size(); i++)
-	{
-		this->mNodes[i]->SetIndex(GetNextAvailableIndex());
-	}
+    // Set the correct global node indices
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        this->mNodes[i]->SetIndex(GetNextAvailableIndex());
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -61,6 +61,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -94,6 +96,8 @@ public:
 
     void TestOnLatticeSimulationExceptions()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create a simple tetrahedral mesh
         HoneycombMeshGenerator generator(3, 3, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -139,6 +143,8 @@ public:
 
     void TestPottsMonolayerWithNoBirthOrDeath() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -185,6 +191,8 @@ public:
 
     void TestPottsMonolayerWithNonRandomSweep() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -216,6 +224,8 @@ public:
 
     void TestPottsMonolayerWithDeath() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(16, 4, 4, 24, 8, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -262,6 +272,8 @@ public:
 
     void TestPottsMonolayerWithBirth() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -301,6 +313,8 @@ public:
 
     void TestPottsMonolayerCellSorting() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(30, 4, 4, 30, 4, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -364,6 +378,8 @@ public:
 
     void TestPottsSpheroidWithNoBirthOrDeath() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 3D PottsMesh
         PottsMeshGenerator<3> generator(10, 2, 2, 10, 2, 2, 10, 2, 2);
         PottsMesh<3>* p_mesh = generator.GetMesh();
@@ -402,6 +418,8 @@ public:
 
     void TestPottsChemotaxis() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 3D PottsMesh
         PottsMeshGenerator<3> generator(12, 1, 2, 6, 1, 2, 6, 1, 2, false, true, true, true);
         PottsMesh<3>* p_mesh = generator.GetMesh();
@@ -443,6 +461,8 @@ public:
 
     void TestRandomIterationOverUpdateRules() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(8, 1, 4, 10, 1, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -483,6 +503,8 @@ public:
 
     void TestPottsSpheroidCellSorting() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 3D PottsMesh
         unsigned domain_size = 10;
         unsigned element_number = 4;
@@ -550,6 +572,8 @@ public:
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -595,6 +619,8 @@ public:
 
     void TestSave() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(10, 1, 4, 10, 1, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
@@ -630,6 +656,8 @@ public:
 
     void TestLoad() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
         // Load the simulation from the TestSave() method above and run it from 10.0 to 15.0
         OnLatticeSimulation<2>* p_simulator1;
         p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithPottsBasedCellPopulationSaveAndLoad", 10.0);

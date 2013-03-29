@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 /**
  * This test suite covers any PDE classes defined in cell_based/src/population/pdes.
  */
@@ -94,7 +96,7 @@ public:
 
     void TestSimpleUniformSourcePdeArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "SimpleUniformSourcePde.arch";

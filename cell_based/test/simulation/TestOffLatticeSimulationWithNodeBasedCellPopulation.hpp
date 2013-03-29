@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "SmartPointers.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellBasedTestSuite
 {
@@ -81,6 +82,8 @@ public:
      */
     void TestSimpleMonolayer() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
         // Create a simple mesh
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
@@ -138,6 +141,8 @@ public:
      */
     void TestSimpleMonolayerWithDifferentRadii() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
+
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
@@ -146,8 +151,11 @@ public:
         p_mesh->ConstructNodesWithoutMesh(nodes, 5.0);    // Large cut off as larger cells.
 
         // Modify the radii of the cells
-        p_mesh->GetNode(0)->SetRadius(1.0);
-        p_mesh->GetNode(1)->SetRadius(2.0);
+        if (PetscTools::AmMaster())
+        {
+            p_mesh->GetNode(0)->SetRadius(1.0);
+            p_mesh->GetNode(PetscTools::GetNumProcs())->SetRadius(2.0);
+        }
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -174,15 +182,18 @@ public:
         simulator.Solve();
 
         // Check that the radii of all the cells are correct (cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2)
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 1.0, 1e-6);
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(PetscTools::GetNumProcs())->GetRadius(), 2.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(2*PetscTools::GetNumProcs())->GetRadius(), 2.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(3*PetscTools::GetNumProcs())->GetRadius(), 1.0, 1e-6);
 
-        // Check the separation of some node pairs
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 3.0, 1e-1);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
+            // Check the separation of some node pairs
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(PetscTools::GetNumProcs())->rGetLocation()), 3.0, 1e-1);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2*PetscTools::GetNumProcs())->rGetLocation()), 3.0, 1e-1);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3*PetscTools::GetNumProcs())->rGetLocation()), 2.0, 1e-1);
+        }
 
         // Avoid memory leak
         delete p_mesh;
@@ -197,6 +208,8 @@ public:
      */
     void TestSimpleMonolayerWithVariableRadii() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
+
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
@@ -276,6 +289,8 @@ public:
 
     void TestSimulationWithBoxes() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -333,6 +348,8 @@ public:
      */
     void TestCellDeath() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -375,9 +392,9 @@ public:
         TS_ASSERT_DELTA(node_8_location[0], 3.4931, 1e-4);
         TS_ASSERT_DELTA(node_8_location[1], 1.0062, 1e-4);
 
-        std::vector<double> node_4_location = simulator.GetNodeLocation(4);
-        TS_ASSERT_DELTA(node_4_location[0], 1.0840, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], 1.7208, 1e-4);
+        std::vector<double> node_5_location = simulator.GetNodeLocation(11);
+        TS_ASSERT_DELTA(node_5_location[0], 1.0840, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 1.7208, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -385,6 +402,8 @@ public:
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -438,6 +457,8 @@ public:
     // Testing Save
     void TestSave() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -485,6 +506,8 @@ public:
     // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Cell based archiving doesn't work in parallel.
+
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 1.0
         OffLatticeSimulation<2>* p_simulator1;
@@ -521,6 +544,8 @@ public:
     */
     void TestMovementThreshold() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
+
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
@@ -582,11 +607,16 @@ public:
 
         simulator.UpdateCellLocationsAndTopology();
 
-        for (unsigned i=0; i<2; i++)
+        if (PetscTools::AmMaster())
         {
-            for (unsigned d=0; d<2; d++)
+            for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                    node_iter != p_mesh->GetNodeIteratorEnd();
+                    ++node_iter)
             {
-                TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[d], 0.0, 1e-15);
+                for (unsigned d=0; d<2; d++)
+                {
+                    TS_ASSERT_DELTA(node_iter->rGetAppliedForce()[d], 0.0, 1e-15);
+                }
             }
         }
 

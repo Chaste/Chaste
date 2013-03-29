@@ -56,9 +56,6 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
       mOutputCellAges(false),
       mOutputCellVolumes(false)
 {
-    // There must be at least one cell
-    assert(!mCells.empty());
-
     // To avoid double-counting problems, clear the passed-in cells vector
     rCells.clear();
 

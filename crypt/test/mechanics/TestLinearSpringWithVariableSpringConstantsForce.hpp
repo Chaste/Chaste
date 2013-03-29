@@ -54,12 +54,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestLinearSpringWithVariableSpringConstantsForce : public AbstractCellBasedTestSuite
 {
 public:
 
     void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCellsSimulationNoGhostsFails()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         double crypt_length = 1.1*12.0*sqrt(3)/2.0;
       //This one is going to throw because the ghost layers haven't been set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
@@ -96,8 +100,11 @@ public:
         WntConcentration<2>::Destroy();
         SimulationTime::Destroy();
     }
+
     void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCellsSimulationWithGhosts()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         double crypt_length = 1.1*12.0*sqrt(3)/2.0;
         //Do it again, but with ghost layers set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 2, 1.1);
@@ -138,6 +145,8 @@ public:
 
     void TestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCells()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         double crypt_length = 1.1*12.0*sqrt(3)/2.0;
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
@@ -179,6 +188,8 @@ public:
 
     void TestGeneralisedLinearSpringForceWithEdgeLengthBasedSpring() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Set up the simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -348,6 +359,8 @@ public:
 
     void TestGeneralisedLinearSpringForceWithEdgeBasedSpringsOnPeriodicMesh() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Set up the simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
@@ -531,6 +544,8 @@ public:
 
     void TestGeneralisedLinearSpringForceWithSpringConstantsForApoptoticCells()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Set up stretched cell population
         HoneycombMeshGenerator generator(4, 4, 0, 2.0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -703,13 +718,15 @@ public:
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, num_nodes);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
         // Test that LinearSpringWithVariableSpringConstantsForce throws the correct exception

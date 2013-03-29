@@ -75,12 +75,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestVolumeTrackedOffLatticeSimulation : public AbstractCellBasedTestSuite
 {
 public:
 
     void TestNodeBasedSimulationWithContactInhibition()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         HoneycombMeshGenerator generator(5, 5, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
@@ -164,6 +168,8 @@ public:
 
     void TestMeshBasedSimulationWithContactInhibition()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         HoneycombMeshGenerator generator(3, 3);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -232,6 +238,8 @@ public:
 
     void TestMeshBasedSimulationWithGhostNodesAndContactInhibition()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+
         // Create a simple mesh
         HoneycombMeshGenerator generator(3, 3, 3);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -304,6 +312,8 @@ public:
 
     void TestVertexBasedSimulationWithContactInhibition()
     {
+        EXIT_IF_PARALLEL;    // Output in cell-based simulations doesn't work in parallel. ///\todo #2356
+
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -343,32 +353,32 @@ public:
 
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-         // Run simulation
-         simulator.Solve();
+        // Run simulation
+        simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData at the first timestep
-         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-              cell_iter != cell_population.End();
-              ++cell_iter)
-         {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
-         }
+        // Test that the volumes of the cells are correct in CellData at the first timestep
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+          cell_iter != cell_population.End();
+          ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+        }
 
-         simulator.SetEndTime(2.0);
+        simulator.SetEndTime(2.0);
 
-         // Run simulation
-         simulator.Solve();
+        // Run simulation
+        simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData at the end time
-         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-              cell_iter != cell_population.End();
-              ++cell_iter)
-         {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
-         }
+        // Test that the volumes of the cells are correct in CellData at the end time
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+          cell_iter != cell_population.End();
+          ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+        }
 
-         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),8u);
+        // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(),8u);
     }
 
     void TestVolumeTrackedOffLatticeSimulationArchiving() throw (Exception)

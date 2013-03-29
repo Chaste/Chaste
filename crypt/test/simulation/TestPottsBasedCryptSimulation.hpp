@@ -68,6 +68,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestPottsBasedCryptSimulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -90,6 +92,8 @@ public:
 
     void TestPottsCryptWithSimpleWntCellCycleModel() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
+
         double crypt_length = 40;
 
         // Create a simple 2D PottsMesh
@@ -142,6 +146,8 @@ public:
 
     void TestPottsCryptWithGenerationBasedCellCycleModel() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel.
+
         double crypt_length = 40;
 
         // Create a simple 2D PottsMesh

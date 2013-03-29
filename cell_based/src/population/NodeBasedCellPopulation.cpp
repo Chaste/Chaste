@@ -273,6 +273,20 @@ double NodeBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
+c_vector<double, DIM> NodeBasedCellPopulation<DIM>::GetSizeOfCellPopulation()
+{
+    c_vector<double, DIM> local_size = AbstractCellPopulation<DIM, DIM>::GetSizeOfCellPopulation();
+    c_vector<double, DIM> global_size;
+
+    for (unsigned i=0; i<DIM; i++)
+    {
+        MPI_Allreduce(&local_size[i], &global_size[i], 1, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
+    }
+
+    return global_size;
+}
+
+template<unsigned DIM>
 std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
     // Check the mNodeNeighbours has been set up correctly

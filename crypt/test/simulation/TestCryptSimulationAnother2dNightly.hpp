@@ -84,6 +84,8 @@ public:
      */
     void TestSloughingCellKillerOnNonPeriodicCrypt() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         unsigned cells_across = 6;
         double domain_width = (double)cells_across-1.0;
         unsigned cells_up = 12;
@@ -121,6 +123,8 @@ public:
 
     void TestSloughingDeathWithPeriodicMesh() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         unsigned cells_across = 7;
         unsigned cells_up = 12;
         double crypt_width = 6.0;
@@ -177,6 +181,8 @@ public:
 
     void TestMonolayerWithCutoffPointAndNoGhosts() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         unsigned num_cells_depth = 11;
         unsigned num_cells_width = 6;
         //double crypt_length = num_cells_depth - 1.0;
@@ -213,6 +219,8 @@ public:
     */
     void TestResultsFileForLongerCryptSimulation() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Set output directory
         std::string output_directory = "TestResultsFileForLongerCryptSimulation";
 

@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ArchiveOpener.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestNodesOnlyMesh : public CxxTest::TestSuite
 {
@@ -67,19 +68,23 @@ public:
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
+        unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), 8u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), num_nodes);
 
         // Check that the nodes mapping is set up correctly
-        for (unsigned i=0; i<nodes.size(); i++)
+        if (PetscTools::AmMaster())
         {
-            TS_ASSERT(!(p_mesh->mNodesMapping.find(i) == p_mesh->mNodesMapping.end()));
-            TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(i), p_mesh->mNodesMapping[i]);
+            for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
+            {
+                TS_ASSERT(!(p_mesh->mNodesMapping.find(i) == p_mesh->mNodesMapping.end()));
+                TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(i), p_mesh->mNodesMapping[i]);
+            }
         }
 
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8), " does not belong to process ");
+        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8*PetscTools::GetNumProcs() + PetscTools::GetMyRank() + 1), " does not belong to process ");
 
         // Avoid memory leak
         delete p_mesh;
@@ -143,30 +148,32 @@ public:
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, cut_off);
 
-        BoxCollection<3>* p_box_collection = mesh.mpBoxCollection;
+        DistributedBoxCollection<3>* p_box_collection = mesh.mpBoxCollection;
 
         TS_ASSERT(p_box_collection != NULL);
 
-        // 5x5x1 box collection
-        TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), 25u);
+        // 5x5xnum_procs box collection
+        unsigned num_boxes = 5*5*PetscTools::GetNumProcs();
+        TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), num_boxes);
 
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(0)), 10u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(1)), 4u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(2)), 22u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(mesh.GetNode(3)), 24u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(nodes[0]), 10u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(nodes[1]), 4u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(nodes[2]), 22u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(nodes[3]), 24u);
 
         mesh.EnlargeBoxCollection();
 
-        BoxCollection<3>* p_new_collection = mesh.mpBoxCollection;
+        DistributedBoxCollection<3>* p_new_collection = mesh.mpBoxCollection;
 
-        // 7x7x3 box collection
-        TS_ASSERT_EQUALS(p_new_collection->GetNumBoxes(), 147u);
+        // 7x7xnum_procs box collection
+        num_boxes = 7*7* (2 + PetscTools::GetNumProcs());
+        TS_ASSERT_EQUALS(p_new_collection->GetNumBoxes(), num_boxes);
 
         // The "old" boxes should be in the same spatial position.
-        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(0)), 71u);
-        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(1)), 61u);
-        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(2)), 87u);
-        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(mesh.GetNode(3)), 89u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(nodes[0]), 71u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(nodes[1]), 61u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(nodes[2]), 87u);
+        TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(nodes[3]), 89u);
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -192,7 +199,7 @@ public:
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, cut_off);
 
-        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16u);
+        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16*PetscTools::GetNumProcs());
 
         bool enlarge = mesh.IsANodeCloseToDomainBoundary();
 
@@ -220,6 +227,8 @@ public:
 
     void TestMovingNodesInBoxCollection() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // This wont work until nodes can be re-assigned on re-mesh. #2260
+
         double cut_off = 0.5;
 
         /*
@@ -237,13 +246,17 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, cut_off);
 
         // 4 x 4 x 1 collection
-        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16u);
+        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16*PetscTools::GetNumProcs());
 
         // Test what happens if nodes move in initial collection.
-        c_vector<double, 3> initial_location = mesh.GetNode(0)->rGetLocation();
-        c_vector<double, 3> translation = scalar_vector<double>(3, -2.0*cut_off);
-        ChastePoint<3> new_point(initial_location + translation);
-        mesh.GetNode(0)->SetPoint(new_point);
+        AbstractMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        if ( node_iter != mesh.GetNodeIteratorEnd())
+        {
+            c_vector<double, 3> initial_location = node_iter->rGetLocation();
+            c_vector<double, 3> translation = scalar_vector<double>(3, -2.0*cut_off);
+            ChastePoint<3> new_point(initial_location + translation);
+            node_iter->SetPoint(new_point);
+        }
 
         NodeMap map(4);
         TS_ASSERT_THROWS_NOTHING(mesh.ReMesh(map));
@@ -272,7 +285,8 @@ public:
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 8u);
+        unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
 
         p_mesh->Clear();
 
@@ -301,10 +315,11 @@ public:
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u);
+        unsigned num_boxes = PetscTools::AmMaster() ? 5 : 0;
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_boxes);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), 5u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), num_boxes);
 
         // Avoid memory leak
         delete p_mesh;
@@ -346,44 +361,30 @@ public:
         {
             if(PetscTools::GetMyRank() == 0)
             {
-                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 12u);
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 6u);
             }
             else if(PetscTools::GetMyRank() == 1)
             {
-                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 13u);
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 7u);
             }
             else if(PetscTools::GetMyRank() == 2)
             {
-                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 14u);
+                TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 2u);
             }
         }
 
-//        // Delete some nodes and make sure that their global indices become available.
-//        if(mesh.GetNodeOwnership(0))
-//        {
-//            mesh.DeleteNode(0);
-//            TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), 0u);
-//        }
-//        else // Covers an exception
-//        {
-//            TS_ASSERT_THROWS_CONTAINS(mesh.GetNode(0), "Requested node 0 does not belong to processor ");
-//        }
-//
-//        if(mesh.GetNodeOwnership(1))
-//        {
-//            mesh.DeleteNode(1);
-//            unsigned next_index = mesh.GetNextAvailableIndex();
-//            TS_ASSERT((next_index == 0u) || ( next_index == 1u) );
-//        }
-//
-//        // Delete a node as if it moves off this process, and make sure its global index is not available
-//        if(mesh.GetNodeOwnership(2))
-//        {
-//            mesh.DeleteMovedNode(2);
-//            TS_ASSERT(mesh.GetNextAvailableIndex() != 1u);
-//        }
+        // Delete some nodes and make sure that their global indices become available.
+        if(mesh.mpBoxCollection->IsOwned(nodes[0]))
+        {
+            mesh.DeleteNode(PetscTools::GetMyRank());
+            TS_ASSERT_EQUALS(mesh.GetNextAvailableIndex(), PetscTools::GetMyRank());
+        }
+        else // Covers an exception
+        {
+            TS_ASSERT_THROWS_CONTAINS(mesh.GetNode(0), "Requested node 0 does not belong to process ");
+        }
 
-        //Clean up
+        // Clean up
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -392,6 +393,7 @@ public:
 
     void TestWriteNodesWithoutMeshUsingVtk()
     {
+        EXIT_IF_PARALLEL;    // Cannot write to file yet in parallel.
  #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::vector<Node<3>*> nodes;
@@ -450,6 +452,7 @@ public:
 
     void TestWriteNodesWithoutMesh()
     {
+        EXIT_IF_PARALLEL;    // Cannot write to file yet in parallel.
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
@@ -474,23 +477,25 @@ public:
         }
     }
 
-    void TestGetSetMethods()
+    void TestGetSetRadiusMethods()
     {
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
 
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        p_mesh->GetNode(0)->SetRadius(1.0);
-        p_mesh->GetNode(1)->SetRadius(2.0);
+        if (PetscTools::AmMaster())
+        {
+            p_mesh->GetNode(0)->SetRadius(1.0);
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+
+        }
 
         // Avoid memory leak
         delete p_mesh;
+
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -508,15 +513,37 @@ public:
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        // Test add node
-        p_mesh->AddNode(new Node<2>(2, true, 0.0, 1.0));//This node pointer is added to the mesh and deleted by the destructor
+        if (PetscTools::IsSequential())
+        {
+            // Test add node
+            p_mesh->AddNode(new Node<2>(2, true, 0.0, 0.25)); // This node pointer is added to the mesh and deleted by the destructor
 
-        unsigned num_nodes = 3;
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
-        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.5, 1e-4);
+            unsigned num_nodes = 3;
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
+            TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.5, 1e-4);
 
-        // Cover an exception.
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->GetNode(3)->SetRadius(1.0), " does not belong to process ");
+            // Cover an exception.
+            TS_ASSERT_THROWS_CONTAINS(p_mesh->GetNode(3)->SetRadius(1.0), " does not belong to process ");
+        }
+        else
+        {
+        	if (PetscTools::GetMyRank() == 0)
+        	{
+        		TS_ASSERT_THROWS_CONTAINS(p_mesh->AddNode(new Node<2>(2, true, 0.0, 2.0)), " which doesn't belong on this process.");
+        	}
+            if (PetscTools::GetMyRank() == 1)
+            {
+                p_mesh->AddNode(new Node<2>(2, true, 0.0, 2.0)); // This node pointer is added to the mesh and deleted by the destructor
+            }
+
+            unsigned num_nodes = PetscTools::AmMaster() ? 2 : ((PetscTools::GetMyRank() == 1) ? 1 : 0);
+            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
+
+            if (PetscTools::GetMyRank() == 1)
+            {
+                TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 0.5, 1e-4);
+            }
+        }
 
         // Avoid memory leak
         delete p_mesh;
@@ -543,83 +570,75 @@ public:
         mesh.ReMesh(node_map);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 0u);
 
+        // Set radii of cells from 1 to 8
+        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+            node_iter->SetRadius(node_index+1);
+        }
+
+        // Delete from interior
+        unsigned node_index;
+        if (mesh.mpBoxCollection->IsOwned(nodes[0]))
+        {
+            AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+            node_index = node_iter->GetIndex();
+
+            TS_ASSERT_DELTA(mesh.GetNode(node_index)->GetRadius(), (double)(node_index+1), 1e-4);
+            mesh.DeleteNode(node_index);
+            TS_ASSERT_THROWS_THIS(mesh.DeleteNode(node_index), "Trying to delete a deleted node");
+        }
+
+        // Global node indices should stay the same after remesh
+        NodeMap map(mesh.GetMaximumNodeIndex());
+        mesh.ReMesh(map);
+
+        if (PetscTools::AmMaster())
+        {
+            TS_ASSERT(map.IsDeleted(node_index));
+            TS_ASSERT_EQUALS(map.GetNewIndex(1), 1u);
+            TS_ASSERT_EQUALS(map.GetNewIndex(2), 2u);
+            TS_ASSERT_EQUALS(map.GetNewIndex(3), 3u);
+            TS_ASSERT_EQUALS(map.GetNewIndex(4), 4u);
+            TS_ASSERT_EQUALS(map.GetNewIndex(5), 5u);
+            TS_ASSERT_EQUALS(map.GetNewIndex(7), 7u);
+
+            // But local indices (the location in mNodes) should change).
+            unsigned base_index = PetscTools::GetNumProcs();
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(base_index), 0u);
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(2*base_index), 1u);
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(3*base_index), 2u);
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(4*base_index), 3u);
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(5*base_index), 4u);
+            TS_ASSERT_EQUALS(mesh.SolveNodeMapping(6*base_index), 5u);
+        }
+
+        TS_ASSERT_THROWS_CONTAINS(mesh.SolveNodeMapping(0), " does not belong to process ");
+
+        if (PetscTools::AmMaster())
+        {
+            unsigned base_index = PetscTools::GetNumProcs();
+            TS_ASSERT_DELTA(mesh.GetNode(base_index)->GetRadius(),   (double)base_index + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(2*base_index)->GetRadius(), (double)2*base_index + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(3*base_index)->GetRadius(), (double)3*base_index + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(4*base_index)->GetRadius(), (double)4*base_index + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(5*base_index)->GetRadius(), (double)5*base_index + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(6*base_index)->GetRadius(), (double)6*base_index + 1.0, 1e-4);
+        }
+
         // Free memory - the constructor does a deep copy of its input
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
         }
-
-        // Set radii of cells from 1 to 8
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            mesh.GetNode(i)->SetRadius(i+1);
-        }
-
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 8u);
-
-        // Delete from interior
-        TS_ASSERT_DELTA(mesh.GetNode(6)->GetRadius(), 7.0, 1e-4);
-        mesh.DeleteNode(6);
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
-
-        // Delete from edge
-        mesh.DeleteNode(1);
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
-
-        // Delete from corner
-        TS_ASSERT_DELTA(mesh.GetNode(3)->GetRadius(), 4.0, 1e-4);
-        mesh.DeleteNode(3);
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
-
-        // Deleting a deleted node should throw an exception
-        TS_ASSERT_THROWS_THIS(mesh.DeleteNode(3),"Trying to delete a deleted node");
-
-        /*
-         * Check that the cell radii are updated correctly when a new cell
-         * is added using the most recently deleted index.
-         * (Index 3 is at the back of the deleted nodes list and is thus the one to be reused.)
-         */
-        mesh.AddNode(new Node<2>(0, true, 6.0, 6.0)); // This node pointer is added to the mesh and deleted by the destructor
-
-        // Has the node been put in the correct place
-        TS_ASSERT_EQUALS(mesh.SolveNodeMapping(8), 3u);
-
-        // Check the most recently deleted node now has the correct cell radius
-        TS_ASSERT_DELTA(mesh.GetNode(8)->GetRadius(), 0.5, 1e-4);
-
-
-        // Global node indices should stay the same after remesh
-        NodeMap map(8);
-        mesh.ReMesh(map);
-        TS_ASSERT_EQUALS(map.GetNewIndex(0), 0u);
-        TS_ASSERT(map.IsDeleted(1));
-        TS_ASSERT_EQUALS(map.GetNewIndex(2), 2u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(3), 3u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(4), 4u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(5), 5u);
-        TS_ASSERT(map.IsDeleted(6));
-        TS_ASSERT_EQUALS(map.GetNewIndex(7), 7u);
-
-        // But local indices (the location in mNodes) should change).
-        TS_ASSERT_EQUALS(mesh.SolveNodeMapping(0), 0u);
-		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(2), 1u);
-		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(8), 2u);
-		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(4), 3u);
-		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(5), 4u);
-		TS_ASSERT_EQUALS(mesh.SolveNodeMapping(7), 5u);
-
-		TS_ASSERT_THROWS_THIS(mesh.SolveNodeMapping(6), "Requested node 6 does not belong to process 0");
-
-        TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.0, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetNode(2)->GetRadius(), 3.0, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetNode(8)->GetRadius(), 0.5, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetNode(4)->GetRadius(), 5.0, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetNode(5)->GetRadius(), 6.0, 1e-4);
-        TS_ASSERT_DELTA(mesh.GetNode(7)->GetRadius(), 8.0, 1e-4);
     }
 
     void TestArchiving() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.
+
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "nodes_only_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("nodes_only_mesh");
@@ -689,6 +708,8 @@ public:
 
     void TestArchiveNodesOnlyMeshWithNodeAttributes() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    ///\todo parallel archiving not yet possible.
+
         FileFinder archive_dir("archive_mutable_mesh", RelativeTo::ChasteTestOutput);
         std::string archive_file = "mutable_mesh_with_attributes.arch";
 

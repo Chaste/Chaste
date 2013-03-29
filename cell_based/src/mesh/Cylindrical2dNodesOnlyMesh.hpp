@@ -39,9 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "BoxCollection.hpp"
 #include "NodesOnlyMesh.hpp"
-
 
 /**
  * A subclass of NodesOnlyMesh<2> for a rectangular mesh with
@@ -95,8 +93,9 @@ public:
      *
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
+     * @param numLocalRows the number of rows of the collection that this process should own.
      */
-    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize);
+    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, unsigned numLocalRows = PETSC_DECIDE);
 
     /**
      * Overridden GetVectorFromAtoB() method.

@@ -52,13 +52,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestBuskeForces : public AbstractCellBasedTestSuite
 {
 public:
 
     void TestBuskeAdhesiveForceMethods() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -134,7 +136,7 @@ public:
 
     void TestBuskeElasticForceMethods() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -211,7 +213,7 @@ public:
 
     void TestBuskeMixedForceMethods() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -276,7 +278,7 @@ public:
 
     void TestBuskeCompressionForceMethods() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -355,9 +357,12 @@ public:
 
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 2.5);
-        p_mesh->GetNode(0)->SetRadius(1.0);
-        p_mesh->GetNode(1)->SetRadius(1.0);
-        p_mesh->GetNode(2)->SetRadius(1.0);
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            node_iter->SetRadius(1.0);
+        }
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -371,9 +376,11 @@ public:
         // Create force
         BuskeCompressionForce<2> buske_compression_force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
         buske_compression_force.AddForceContribution(cell_population);
@@ -381,12 +388,18 @@ public:
         // Test forces on nodes
 
         // This node should only move in the x-direction
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], -0.6514, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 0.2894, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], -0.2894, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.2894, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.2894, 1e-4);
+        if (PetscTools::AmMaster())    // All cells should start on the master.
+        {
+            unsigned zero_node_index = 0;
+            unsigned first_node_index = PetscTools::GetNumProcs();
+            unsigned second_node_index = 2 * PetscTools::GetNumProcs();
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_node_index)->rGetAppliedForce()[0], -0.6514, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_node_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(first_node_index)->rGetAppliedForce()[0], 0.2894, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(first_node_index)->rGetAppliedForce()[1], -0.2894, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(second_node_index)->rGetAppliedForce()[0], 0.2894, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(second_node_index)->rGetAppliedForce()[1], 0.2894, 1e-4);
+        }
 
         // Avoid memory leak
         delete p_mesh;

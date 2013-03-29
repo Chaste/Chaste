@@ -54,6 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestMultipleCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
@@ -288,6 +290,8 @@ public:
 
     void TestWriteResultsToFileAndOutputCellPopulationParameters()
     {
+        EXIT_IF_PARALLEL;    // We cannot currently write to file in parallel.
+
         // Reset the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 

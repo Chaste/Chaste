@@ -60,12 +60,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestCryptProjectionForce : public AbstractCellBasedTestSuite
 {
 public:
 
     void TestCryptProjectionForceMethods() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
+
         // Create a mesh
         unsigned num_cells_width = 10;
         unsigned num_cells_depth = 10;
@@ -242,6 +246,8 @@ public:
      */
     void TestCryptProjectionForceWithWntBasedChemotaxis() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
+
         double crypt_length = 22.0;
 
         // Create a mesh
@@ -328,6 +334,8 @@ public:
 
     void TestCryptProjectionForceWithArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
+
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "crypt_projection_spring_system.arch";
 
@@ -454,6 +462,8 @@ public:
 
     void TestForceCollection() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesnt work in parallel.
+
         unsigned cells_across = 7;
         unsigned cells_up = 5;
         unsigned thickness_of_ghost_layer = 3;
@@ -556,13 +566,15 @@ public:
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, num_nodes);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
         // Test that CryptProjectionForce throws the correct exception

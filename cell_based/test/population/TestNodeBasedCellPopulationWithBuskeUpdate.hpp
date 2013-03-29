@@ -59,6 +59,8 @@ class TestNodeBasedCellPopulationWithBuskeUpdate : public AbstractCellBasedTestS
 public:
     void TestMethods()
     {
+        EXIT_IF_PARALLEL;    // NodeBasedCellPopulationWithBuskeUpdate doesn't work in parallel.
+
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         MutableMesh<2,2> generating_mesh;
@@ -84,11 +86,11 @@ public:
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
 
         for (NodesOnlyMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-        		node_iter != p_mesh->GetNodeIteratorEnd();
-        		++node_iter)
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-        	unsigned node_index = node_iter->GetIndex();
-        	unsigned i = p_mesh->SolveNodeMapping(node_index);
+            unsigned node_index = node_iter->GetIndex();
+            unsigned i = p_mesh->SolveNodeMapping(node_index);
 
             c_vector<double, 2> force;
             old_posns[i][0] = node_iter->rGetLocation()[0];
@@ -108,8 +110,8 @@ public:
 
         // Check that node locations were correctly updated
         for (NodesOnlyMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-        		node_iter != p_mesh->GetNodeIteratorEnd();
-        		++node_iter)
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
             unsigned i = p_mesh->SolveNodeMapping(node_iter->GetIndex());
             TS_ASSERT_DELTA(node_iter->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
@@ -140,7 +142,7 @@ public:
 
     void TestArchivingCellPopulation() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // Cell-based archiving doesn't yet work in parallel.
+        EXIT_IF_PARALLEL;    // Cell-based archiving doesn't yet work in parallel.
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "node_based_cell_population.arch";

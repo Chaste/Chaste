@@ -50,9 +50,11 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
         std::set<unsigned> location_indices;
         std::set<unsigned> particle_indices;
 
-        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
+                node_iter != rMesh.GetNodeIteratorEnd();
+                ++node_iter)
         {
-            node_indices.insert(this->GetNode(i)->GetIndex());
+            node_indices.insert(node_iter->GetIndex());
         }
         for (unsigned i=0; i<locationIndices.size(); i++)
         {

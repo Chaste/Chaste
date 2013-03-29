@@ -70,11 +70,11 @@ MultipleCaBasedCellPopulation<DIM>::MultipleCaBasedCellPopulation(PottsMesh<DIM>
     else
     {
         // Create a set of node indices corresponding to empty sites.
-    	// Note iterating over mCells is OK as it has the same order as location indices at this point (its just coppied from rCells)
-    	std::list<CellPtr>::iterator it = this->mCells.begin();
-		for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
-		{
-			assert(i<locationIndices.size());
+        // Note iterating over mCells is OK as it has the same order as location indices at this point (its just coppied from rCells)
+        std::list<CellPtr>::iterator it = this->mCells.begin();
+        for (unsigned i=0; it != this->mCells.end(); ++it, ++i)
+        {
+            assert(i<locationIndices.size());
             if (!IsSiteAvailable(locationIndices[i],*it))
             {
                 EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
@@ -112,8 +112,8 @@ std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 template<unsigned DIM>
 bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index, CellPtr pCell)
 {
-	// TODO this is where to deal with carrying capacity
-	return (mAvailableSpaces[index] != 0);
+    // TODO this is where to deal with carrying capacity
+    return (mAvailableSpaces[index] != 0);
 }
 
 template<unsigned DIM>
@@ -217,39 +217,39 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     std::vector<double> neighbouring_node_propensities;
     std::vector<unsigned> neighbouring_node_indices_vector;
 
-	double total_propensity = 0.0;
+    double total_propensity = 0.0;
 
-	for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-			neighbour_iter != neighbouring_node_indices.end();
-		 ++neighbour_iter)
-	{
-		neighbouring_node_indices_vector.push_back(*neighbour_iter);
+    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            neighbour_iter != neighbouring_node_indices.end();
+         ++neighbour_iter)
+    {
+        neighbouring_node_indices_vector.push_back(*neighbour_iter);
 
-		double propensity_dividing_into_neighbour = EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+        double propensity_dividing_into_neighbour = EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
 
-		if (!IsSiteAvailable(*neighbour_iter, pParentCell))
-		{
-			propensity_dividing_into_neighbour = 0.0;
-		}
-		neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
-		total_propensity += propensity_dividing_into_neighbour;
-	}
+        if (!IsSiteAvailable(*neighbour_iter, pParentCell))
+        {
+            propensity_dividing_into_neighbour = 0.0;
+        }
+        neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
+        total_propensity += propensity_dividing_into_neighbour;
+    }
 
-	assert(total_propensity>0); // if this trips the cell cant divided so need to include this in the IsSiteAvailable method
+    assert(total_propensity>0); // if this trips the cell cant divided so need to include this in the IsSiteAvailable method
 
-	for(unsigned i = 0; i< num_neighbours; i++)
-	{
-		neighbouring_node_propensities[i] /= total_propensity;
-	}
+    for(unsigned i = 0; i< num_neighbours; i++)
+    {
+        neighbouring_node_propensities[i] /= total_propensity;
+    }
 
-	 // Sample random number to specify which move to make
-	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-	double random_number = p_gen->ranf();
+     // Sample random number to specify which move to make
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+    double random_number = p_gen->ranf();
 
-	double total_probability = 0.0;
-	unsigned daughter_node_index = UNSIGNED_UNSET;
+    double total_probability = 0.0;
+    unsigned daughter_node_index = UNSIGNED_UNSET;
 
-	unsigned counter;
+    unsigned counter;
     for (counter=0; counter < num_neighbours; counter++)
     {
 
@@ -278,10 +278,10 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
 
 template<unsigned DIM>
 double MultipleCaBasedCellPopulation<DIM>:: EvaluateDivisionPropensity(unsigned currentNodeIndex,
-																	   unsigned targetNodeIndex,
-																	   CellPtr pCell)
+                                                                       unsigned targetNodeIndex,
+                                                                       CellPtr pCell)
 {
-	return 1.0;
+    return 1.0;
 }
 
 template<unsigned DIM>

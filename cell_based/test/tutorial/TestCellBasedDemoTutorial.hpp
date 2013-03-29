@@ -76,6 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 #include "AdhesionPottsUpdateRule.hpp"
 #include "CellsGenerator.hpp"

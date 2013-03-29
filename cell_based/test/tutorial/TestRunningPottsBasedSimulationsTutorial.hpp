@@ -68,6 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 /* The remaining header files define classes that will be used in the cell population
  * simulation test. We have encountered some of these header files in previous cell-based
@@ -106,6 +107,9 @@ public:
      */
     void TestMonolayer() throw(Exception)
     {
+        /** The next line is needed because we cannot currently run Potts simulations in parallel. */
+        EXIT_IF_PARALLEL;
+
         /* First, we generate a Potts mesh. To create a {{{PottsMesh}}}, we can use
          * the {{{PottsMeshGenerator}}}. This generates a regular square-shaped mesh,
          * in which all elements are the same size.
@@ -215,6 +219,9 @@ public:
      */
     void TestPottsMonolayerCellSorting() throw (Exception)
     {
+        /** The next line is needed because we cannot currently run Potts simulations in parallel. */
+        EXIT_IF_PARALLEL;
+
         /* First, we generate a Potts mesh. To create a {{{PottsMesh}}}, we can use
          * the {{{PottsMeshGenerator}}}. This generates a regular square-shaped mesh,
          * in which all elements are the same size.
@@ -298,6 +305,9 @@ public:
      */
     void TestPottsSpheroidCellSorting() throw (Exception)
     {
+        /** The next line is needed because we cannot currently run Potts simulations in parallel. */
+        EXIT_IF_PARALLEL;
+
         /* First, we generate a Potts mesh. To create a {{{PottsMesh}}}, we can use
          * the {{{PottsMeshGenerator}}}. This generates a regular square-shaped mesh,
          * in which all elements are the same size.

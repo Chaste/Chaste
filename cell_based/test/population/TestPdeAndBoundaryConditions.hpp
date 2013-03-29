@@ -318,7 +318,7 @@ public:
     void TestWithAveragedSourcePde() throw(Exception)
     {
         // Set up cell population
-        EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -404,7 +404,7 @@ public:
     void TestWithVolumeDependentAveragedSourcePdeSetupSourceTermsWithoutMap() throw(Exception)
     {
         // Set up cell population
-        EXIT_IF_PARALLEL; //HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();

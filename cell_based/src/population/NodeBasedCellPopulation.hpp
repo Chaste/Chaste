@@ -286,6 +286,13 @@ public:
     double GetWidth(const unsigned& rDimension);
 
     /**
+     * Overridden GetSizeOfCellPopulation to work in parallel.
+     *
+     * @return the size of the cell population.
+     */
+    c_vector<double, DIM> GetSizeOfCellPopulation();
+
+    /**
      * Overridden GetNeighbouringNodeIndices() method.
      *
      * Only returns nodes that are strictly touching each other.

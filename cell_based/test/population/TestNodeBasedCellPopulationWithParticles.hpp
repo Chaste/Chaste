@@ -56,6 +56,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestNodeBasedCellPopulationWithParticles : public AbstractCellBasedTestSuite
 {
 public:
@@ -66,6 +68,8 @@ public:
      */
     void TestValidateNodeBasedCellPopulationWithParticles() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         // Create a simple mesh
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;
@@ -122,6 +126,8 @@ public:
     // Test with particles, checking that the Iterator doesn't loop over particles
     void TestNodeBasedCellPopulationWithParticlesSetup() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         unsigned num_cells_depth = 11;
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
@@ -193,6 +199,8 @@ public:
 
     void TestCellPopulationIteratorWithNoCells() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
@@ -254,6 +262,8 @@ public:
 
     void TestRemoveDeadCellsAndReMeshWithParticles()
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
@@ -314,10 +324,13 @@ public:
 
         // Nodes 0-9 should not been renumbered so are still particles.
         // the particle at node 80 is now at 79 as node 27 was deleted..
-        for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+        		node_iter != p_mesh->GetNodeIteratorEnd();
+        		++node_iter)
         {
+        	unsigned index = node_iter->GetIndex();
             // True (ie should be a particle) if i<10 or i==79, else false
-            TS_ASSERT_EQUALS(cell_population_with_particles.IsParticle(i), ((i<10)||(i==80)));
+            TS_ASSERT_EQUALS(cell_population_with_particles.IsParticle(index), ((index<10)||(index==80)));
         }
 
         // Finally, check the cells node indices have updated
@@ -326,10 +339,10 @@ public:
         std::set<unsigned> expected_node_indices;
         for (unsigned i=0; i<cell_population_with_particles.GetNumRealCells(); i++)
         {
-        	if (i!=27)
-        	{
-        		expected_node_indices.insert(i+10);
-        	}
+            if (i!=27)
+            {
+                expected_node_indices.insert(i+10);
+            }
         }
         expected_node_indices.insert(79);
         // Get actual cell node indices
@@ -352,6 +365,8 @@ public:
 
     void TestAddAndRemoveAndAddWithOutUpdate()
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
@@ -429,6 +444,8 @@ public:
 
     void TestUpdateNodeLocations() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         HoneycombMeshGenerator generator(3, 3, 1);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
@@ -580,6 +597,8 @@ public:
 
     void TestCellPopulationWritersIn3dWithParticles() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -684,8 +703,10 @@ public:
         }
     }
 
-     void TestArchivingCellPopulation() throw (Exception)
+    void TestArchivingCellPopulation() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "node_based_cell_population_with_particles.arch";
         ArchiveLocationInfo::SetMeshFilename("node_based_cell_population_with_particles_mesh");

@@ -54,6 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestOffLatticeSimulationWithBuskeForces : public AbstractCellBasedTestSuite
 {
 private:
@@ -80,7 +82,7 @@ public:
      */
     void TestSimpleMonolayerWithBuskeAdhesiveForce() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -137,7 +139,7 @@ public:
      */
     void TestSimpleMonolayerWithBuskeElasticForce() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -193,7 +195,7 @@ public:
      */
     void TestSimpleMonolayerWithBuskeCompressionForce() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         unsigned num_cells_depth = 5;
@@ -253,7 +255,7 @@ public:
      */
     void TestAllBuskeForces() throw (Exception)
     {
-        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);

@@ -64,12 +64,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestForces : public AbstractCellBasedTestSuite
 {
 public:
 
     void TestGeneralisedLinearSpringForceMethods() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         unsigned cells_across = 7;
         unsigned cells_up = 5;
         unsigned thickness_of_ghost_layer = 3;
@@ -563,6 +567,8 @@ public:
 
     void TestChemotacticForceMethods() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         unsigned cells_across = 7;
         unsigned cells_up = 5;
 
@@ -675,9 +681,11 @@ public:
 
         RepulsionForce<2> repulsion_force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
         repulsion_force.AddForceContribution(cell_population);
 
@@ -685,57 +693,67 @@ public:
          * First two cells repel each other and second 2 cells are too far apart.
          * The radius of the cells is the default value, 0.5.
          */
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], -34.5387, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 34.5387, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        // Tests the calculation of the force with different cell radii
-        p_mesh->GetNode(0)->SetRadius(10);
-        p_mesh->GetNode(1)->SetRadius(10);
-        p_mesh->GetNode(2)->SetRadius(10);
-
-        // Reset the vector of node forces
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        if (PetscTools::AmMaster())    // All cells in this test lie on the master process.
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            unsigned zero_index = 0;
+            unsigned one_index = PetscTools::GetNumProcs();
+            unsigned two_index = 2*PetscTools::GetNumProcs();
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], -34.5387, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], 34.5387, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            // Tests the calculation of the force with different cell radii
+            p_mesh->GetNode(zero_index)->SetRadius(10);
+            p_mesh->GetNode(one_index)->SetRadius(10);
+            p_mesh->GetNode(two_index)->SetRadius(10);
+
+            // Reset the vector of node forces
+            for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                    node_iter != p_mesh->GetNodeIteratorEnd();
+                    ++node_iter)
+            {
+                node_iter->ClearAppliedForce();
+            }
+
+            repulsion_force.AddForceContribution(cell_population);
+
+            // All cells repel each other
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+            // Tests the calculation of the force with different cell radii
+            p_mesh->GetNode(zero_index)->SetRadius(0.2);
+            p_mesh->GetNode(one_index)->SetRadius(0.2);
+            p_mesh->GetNode(two_index)->SetRadius(0.2);
+
+            // Reset the vector of node forces
+            for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                    node_iter != p_mesh->GetNodeIteratorEnd();
+                    ++node_iter)
+            {
+                node_iter->ClearAppliedForce();
+            }
+
+            repulsion_force.AddForceContribution(cell_population);
+
+            /*
+             * First two cells repel each other and second 2 cells are too far apart.
+             * The overlap is -0.3 and the spring stiffness is the default value 15.0.
+             */
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
-
-        repulsion_force.AddForceContribution(cell_population);
-
-        // All cells repel each other
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        // Tests the calculation of the force with different cell radii
-        p_mesh->GetNode(0)->SetRadius(0.2);
-        p_mesh->GetNode(1)->SetRadius(0.2);
-        p_mesh->GetNode(2)->SetRadius(0.2);
-
-        // Reset the vector of node forces
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            cell_population.GetNode(i)->ClearAppliedForce();
-        }
-
-        repulsion_force.AddForceContribution(cell_population);
-
-        /*
-         * First two cells repel each other and second 2 cells are too far apart.
-         * The overlap is -0.3 and the spring stiffness is the default value 15.0.
-         */
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(2)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -1346,7 +1364,7 @@ public:
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, num_nodes);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -1393,9 +1411,11 @@ public:
         // Create force law object
         DiffusionForce<1> diffusion_force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (AbstractMesh<1,1>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
         // Compute forces on nodes
@@ -1450,31 +1470,36 @@ public:
         // Create force law object
         DiffusionForce<2> force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
-        // Loop over time iterations
-        double variance = 0.0;
-        unsigned num_iterations = 1000;
-        for (unsigned i=0; i<num_iterations; i++)
+        if (p_mesh->GetNumNodes() > 0)
         {
-            // Re-initialize the force on node zero
-            cell_population.GetNode(0)->ClearAppliedForce();
+            // Loop over time iterations
+            double variance = 0.0;
+            unsigned num_iterations = 1000;
+            for (unsigned i=0; i<num_iterations; i++)
+            {
+                // Re-initialize the force on node zero
+                p_mesh->GetNodeIteratorBegin()->ClearAppliedForce();
 
-            // Compute forces on nodes
-            force.AddForceContribution(cell_population);
+                // Compute forces on nodes
+                force.AddForceContribution(cell_population);
 
-            // Calculate the variance
-            variance += pow(norm_2(cell_population.GetNode(0)->rGetAppliedForce()),2);
+                // Calculate the variance
+                variance += pow(norm_2(p_mesh->GetNodeIteratorBegin()->rGetAppliedForce()),2);
+            }
+
+            double correct_diffusion_coefficient =
+                    1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * p_mesh->GetNodeIteratorBegin()->GetRadius() );
+            unsigned dim = 2;
+            variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(variance, 1.0, 1e-1);
         }
-
-        double correct_diffusion_coefficient =
-                1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.GetNode(0)->GetRadius() );
-        unsigned dim = 2;
-        variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
-        TS_ASSERT_DELTA(variance, 1.0, 1e-1)
 
         // Avoid memory leak
         delete p_mesh;
@@ -1514,32 +1539,38 @@ public:
         // Create force law object
         DiffusionForce<3> force;
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (AbstractMesh<3,3>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
         double variance = 0.0;
 
         // Loop over time iterations
-        unsigned num_iterations = 1000;
-        for (unsigned i=0; i<num_iterations; i++)
+        if (p_mesh->GetNumNodes() > 0)
         {
-            // Re-initialize the force on node zero
-            cell_population.GetNode(0)->ClearAppliedForce();
+            unsigned num_iterations = 1000;
+            for (unsigned i=0; i<num_iterations; i++)
+            {
+                // Re-initialize the force on node zero
+                p_mesh->GetNodeIteratorBegin()->ClearAppliedForce();
 
-            // Compute forces on nodes
-            force.AddForceContribution(cell_population);
+                // Compute forces on nodes
+                force.AddForceContribution(cell_population);
 
-            // Calculate the variance
-            variance += pow(norm_2(cell_population.GetNode(0)->rGetAppliedForce()),2);
+                // Calculate the variance
+                variance += pow(norm_2(p_mesh->GetNodeIteratorBegin()->rGetAppliedForce()),2);
+            }
+
+
+            double correct_diffusion_coefficient =
+                            1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * p_mesh->GetNodeIteratorBegin()->GetRadius() );
+            unsigned dim = 3;
+            variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(variance, 1.0, 1e-1);
         }
-
-        double correct_diffusion_coefficient =
-                        1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * cell_population.GetNode(0)->GetRadius() );
-        unsigned dim = 3;
-        variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
-        TS_ASSERT_DELTA(variance, 1.0, 1e-1)
 
         // Avoid memory leak
         delete p_mesh;

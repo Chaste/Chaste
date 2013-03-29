@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractCellBasedTestSuite
 {
@@ -76,6 +77,8 @@ public:
 
     void Test3dNodeBasedRestrictedToSphere() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
+
         // Create mesh
         std::vector<Node<3>*> nodes;
 
@@ -137,6 +140,8 @@ public:
 
     void Test3dNodeBasedPlaneBoundary() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
+
         // Create mesh
         std::vector<Node<3>*> nodes;
 

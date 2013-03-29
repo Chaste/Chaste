@@ -90,6 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 /*
  * == Defining the cell property class ==
@@ -343,6 +344,10 @@ public:
      */
     void TestOffLatticeSimulationWithMotileCellProperty() throw(Exception)
     {
+        /** We include the next line because HoneycombMeshGenerator, used in this test, is not
+         *  yet implemented in parallel. */
+        EXIT_IF_PARALLEL;
+
         /* We use the {{{HoneycombMeshGenerator}}} to create a honeycomb mesh covering a
          * circular domain of given radius, and use this to generate a {{{NodesOnlyMesh}}}
          * as follows. */

@@ -811,62 +811,62 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
 
                 if (distance_between_nodes > cutoffLength)
                 {
-                	if (p_node_a->GetIndex() < p_node_b->GetIndex())
-                	{
-                		std::pair<unsigned, unsigned> long_edge(p_node_a->GetIndex(),p_node_b->GetIndex());
-                		long_edges.insert(long_edge);
-                	}
-                	else
-                	{
-                		std::pair<unsigned, unsigned> long_edge(p_node_b->GetIndex(),p_node_a->GetIndex());
-                		long_edges.insert(long_edge);
-                	}
+                    if (p_node_a->GetIndex() < p_node_b->GetIndex())
+                    {
+                        std::pair<unsigned, unsigned> long_edge(p_node_a->GetIndex(),p_node_b->GetIndex());
+                        long_edges.insert(long_edge);
+                    }
+                    else
+                    {
+                        std::pair<unsigned, unsigned> long_edge(p_node_b->GetIndex(),p_node_a->GetIndex());
+                        long_edges.insert(long_edge);
+                    }
                 }
             }
         }
 
         if (long_edges.size() > 0) //Split the edges in decreasing order.
         {
-        	while (long_edges.size() > 0)
-        	{
-        		double longest_edge = 0.0;
-        		std::set<std::pair<unsigned, unsigned> >::iterator longest_edge_iter;
+            while (long_edges.size() > 0)
+            {
+                double longest_edge = 0.0;
+                std::set<std::pair<unsigned, unsigned> >::iterator longest_edge_iter;
 
-        		//Find the longest edge in the set and split it
-        		for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = long_edges.begin();
-        		         edge_iter != long_edges.end();
-        		         ++edge_iter)
-				{
-					unsigned node_a_global_index = edge_iter->first;
-					unsigned node_b_global_index = edge_iter->second;
+                //Find the longest edge in the set and split it
+                for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = long_edges.begin();
+                         edge_iter != long_edges.end();
+                         ++edge_iter)
+                {
+                    unsigned node_a_global_index = edge_iter->first;
+                    unsigned node_b_global_index = edge_iter->second;
 
-					double distance_between_nodes = this->GetDistanceBetweenNodes(node_a_global_index, node_b_global_index);
+                    double distance_between_nodes = this->GetDistanceBetweenNodes(node_a_global_index, node_b_global_index);
 
-					if (distance_between_nodes > longest_edge)
-					{
-						longest_edge = distance_between_nodes;
-						longest_edge_iter = edge_iter;
-					}
-				}
-        		assert(longest_edge >0);
+                    if (distance_between_nodes > longest_edge)
+                    {
+                        longest_edge = distance_between_nodes;
+                        longest_edge_iter = edge_iter;
+                    }
+                }
+                assert(longest_edge >0);
 
-				c_vector<unsigned, 3> new_node_index = SplitEdge(this->GetNode(longest_edge_iter->first), this->GetNode(longest_edge_iter->second));
+                c_vector<unsigned, 3> new_node_index = SplitEdge(this->GetNode(longest_edge_iter->first), this->GetNode(longest_edge_iter->second));
 
-				c_vector<unsigned, 5> node_set;
-				node_set(0) = new_node_index[0];
-				node_set(1) = longest_edge_iter->first;
-				node_set(2) = longest_edge_iter->second;
-				node_set(3) = new_node_index[1];
-				node_set(4) = new_node_index[2];
-				history.push_back(node_set);
+                c_vector<unsigned, 5> node_set;
+                node_set(0) = new_node_index[0];
+                node_set(1) = longest_edge_iter->first;
+                node_set(2) = longest_edge_iter->second;
+                node_set(3) = new_node_index[1];
+                node_set(4) = new_node_index[2];
+                history.push_back(node_set);
 
-				// Delete pair from set
-				long_edges.erase(*longest_edge_iter);
-        	}
+                // Delete pair from set
+                long_edges.erase(*longest_edge_iter);
+            }
         }
         else
         {
-        	long_edge_exists = false;
+            long_edge_exists = false;
         }
     }
 

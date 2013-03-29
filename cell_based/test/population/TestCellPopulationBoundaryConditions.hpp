@@ -59,6 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveLocationInfo.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 /**
  * This class contains tests for methods on classes inheriting from AbstractCellPopulationBoundaryCondition.
  */
@@ -68,6 +70,8 @@ public:
 
     void TestPlaneBoundaryConditionWithNodeBasedCellPopulation() throw(Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -286,7 +290,11 @@ public:
         TS_ASSERT_DELTA(bc_3d.rGetCentreOfSphere()[1], centre_3d(1), 1e-4);
         TS_ASSERT_DELTA(bc_3d.GetRadiusOfSphere(), 0.4, 1e-4);
 
-        TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), false);
+        // If there are any cells on this process, this should return false
+        if (p_mesh_3d->GetNumNodes() > 0)
+        {
+            TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), false);
+        }
 
         // Store the location of each node prior to imposing the boundary condition
         std::map<Node<3>*, c_vector<double,3> > old_locations;
@@ -357,8 +365,9 @@ public:
 
     void TestArchivingOfSphereGeometryBoundaryCondition() throw (Exception)
     {
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,
-1);
+        EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
+
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         TetrahedralMesh<2,2> generating_mesh;

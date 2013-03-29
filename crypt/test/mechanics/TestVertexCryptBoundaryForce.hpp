@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 class TestVertexCryptBoundaryForce : public AbstractCellBasedTestSuite
 {
@@ -145,13 +146,15 @@ public:
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, num_nodes);
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
         NodeBasedCellPopulation<2> non_vertex_cell_population(*p_mesh, cells);
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                node_iter != p_mesh->GetNodeIteratorEnd();
+                ++node_iter)
         {
-            non_vertex_cell_population.GetNode(i)->ClearAppliedForce();
+            node_iter->ClearAppliedForce();
         }
 
         // Test that VertexCryptBoundaryForce throws the correct exception

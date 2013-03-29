@@ -40,7 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
 
-#include "BoxCollection.hpp"
+#include "PetscTools.hpp"
+#include "DistributedBoxCollection.hpp"
 #include "MutableMesh.hpp"
 
 /**
@@ -94,6 +95,9 @@ private:
     /** A minimum separation to maintain between nodes and the boundary of mpBoxCollection. */
     double mMinimumNodeDomainBoundarySeparation;
 
+    /** A list of the global index of nodes that have been deleted from this process */
+    std::vector<unsigned> mDeletedGlobalNodeIndices;
+
     /**
      * Calculate the next unique global index available on this
      * process. Uses a hashing function to ensure that a unique
@@ -134,13 +138,16 @@ private:
      *
      * @param cutOffLength the cut off length for node neighbours
      * @param domainSize the size of the domain containing the nodes.
+     * @param numLocalRows the number of rows that should be owned by this process.
      */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize);
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, unsigned numLocalRows = PETSC_DECIDE);
 
      /**
       * Set up a box collection by calculating the correct domain size from the node locations
+      *
+      * @param rNodes the nodes that will be contained in the box collection.
       */
-     void SetUpBoxCollection();
+     void SetUpBoxCollection(const std::vector<Node<SPACE_DIM>* >& rNodes);
 
      /**
       * Clear the old box collection and set up a new one if necessary.
@@ -165,7 +172,7 @@ protected:
      * A pointer to a box collection. Used to calculate neighbourhood information
      * for nodes in the mesh.
      */
-    BoxCollection<SPACE_DIM>* mpBoxCollection;
+    DistributedBoxCollection<SPACE_DIM>* mpBoxCollection;
 
     /**
      * Iterate through each node and add it to its appropriate box.
@@ -245,6 +252,14 @@ public:
      * @return mMaxInteractionDistance
      */
     double GetMaximumInteractionDistance();
+
+    /**
+     * Overridden GetWidth method to work in parallel.
+     *
+     * @param rDimension the dimension along which to get the width.
+     * @return the width.
+     */
+    double GetWidth(const unsigned& rDimension) const;
 
     /**
      * Calculate pairs of nodes using the BoxCollection

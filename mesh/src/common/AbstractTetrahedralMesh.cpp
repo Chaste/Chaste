@@ -133,7 +133,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNumVertices() const
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetMaximumNodeIndex()
 {
-	return this->GetNumAllNodes();
+    return this->GetNumAllNodes();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

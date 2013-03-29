@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
-	: mDomainSize(domainSize),
-	  mBoxWidth(boxWidth),
-	  mIsPeriodicInX(isPeriodicInX),
-	  mAreLocalBoxesSet(false),
-	  mFudge(5e-14)
+    : mDomainSize(domainSize),
+      mBoxWidth(boxWidth),
+      mIsPeriodicInX(isPeriodicInX),
+      mAreLocalBoxesSet(false),
+      mFudge(5e-14)
 {
     // Periodicity only works in 2d and in serial.
     if (isPeriodicInX)
@@ -60,18 +60,31 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         }
     }
 
+    mNumBoxesEachDirection = scalar_vector<unsigned>(DIM, 0u);
+
     // Calculate the number of boxes in each direction.
     for (unsigned i=0; i<DIM; i++)
     {
-        mNumBoxesEachDirection(i) = (unsigned) floor((mDomainSize(2*i+1) - mDomainSize(2*i))/mBoxWidth + mFudge);
+        double counter = mDomainSize(2*i);
+        while (counter + mFudge < mDomainSize(2*i+1))
+        {
+            mNumBoxesEachDirection(i)++;
+            counter += mBoxWidth;
+        }
     }
 
+    // Make sure there are enough boxes for the number of processes.
+    if (mNumBoxesEachDirection(DIM-1) < PetscTools::GetNumProcs())
+    {
+        mDomainSize[2*DIM - 1] += (PetscTools::GetNumProcs() - mNumBoxesEachDirection(DIM-1))*mBoxWidth;
+        mNumBoxesEachDirection(DIM-1) = PetscTools::GetNumProcs();
+    }
     mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
     mNumBoxesInAFace = 1;
     for (unsigned i=1; i<DIM; i++)
     {
-    	mNumBoxesInAFace *= mNumBoxesEachDirection(i-1);
+        mNumBoxesInAFace *= mNumBoxesEachDirection(i-1);
     }
 
     unsigned num_boxes = mNumBoxesInAFace * (mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow());
@@ -82,11 +95,11 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     c_vector<double, 2*DIM> arbitrary_location;
     for (unsigned i=0; i<num_boxes; i++)
     {
-    	Box<DIM> new_box(arbitrary_location);
-    	mBoxes.push_back(new_box);	// The location of the Boxes doesn't matter.
+        Box<DIM> new_box(arbitrary_location);
+        mBoxes.push_back(new_box);    // The location of the Boxes doesn't matter.
 
-    	unsigned global_index = mMinBoxIndex + i;
-    	mBoxesMapping[global_index] = mBoxes.size() - 1;
+        unsigned global_index = mMinBoxIndex + i;
+        mBoxesMapping[global_index] = mBoxes.size() - 1;
     }
 
     mNumBoxes = mNumBoxesInAFace * mNumBoxesEachDirection(DIM-1);
@@ -119,7 +132,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     {
         for (unsigned i=0; i < mNumBoxesInAFace; i++)
         {
-        	c_vector<double, 2*DIM> arbitrary_location;
+            c_vector<double, 2*DIM> arbitrary_location;
             Box<DIM> new_box(arbitrary_location);
             mHaloBoxes.push_back(new_box);
 
@@ -134,7 +147,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     {
         for (unsigned i=0; i< mNumBoxesInAFace; i++)
         {
-        	c_vector<double, 2*DIM> arbitrary_location;
+            c_vector<double, 2*DIM> arbitrary_location;
             Box<DIM> new_box(arbitrary_location);
             mHaloBoxes.push_back(new_box);
 
@@ -171,6 +184,12 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
             mHaloNodesRight.insert((*iter)->GetIndex());
         }
     }
+}
+
+template<unsigned DIM>
+unsigned DistributedBoxCollection<DIM>::GetNumLocalRows() const
+{
+    return mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow();
 }
 
 template<unsigned DIM>
@@ -227,10 +246,15 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
     }
 
     // Compute the containing box index in each dimension
-    c_vector<unsigned, DIM> containing_box_indices;
+    c_vector<unsigned, DIM> containing_box_indices = scalar_vector<unsigned>(DIM, 0u);
     for (unsigned i=0; i<DIM; i++)
     {
-        containing_box_indices[i] = (unsigned) floor((rLocation[i] - mDomainSize(2*i) + mFudge)/mBoxWidth);
+        double box_counter = mDomainSize(2*i);
+        while (!((box_counter + mBoxWidth) > rLocation[i] + mFudge))
+        {
+            containing_box_indices[i]++;
+            box_counter += mBoxWidth;
+        }
     }
 
     // Use these to compute the index of the containing box
@@ -309,7 +333,7 @@ unsigned DistributedBoxCollection<DIM>::GetNumLocalBoxes()
 }
 
 template<unsigned DIM>
-c_vector<double, 2*DIM> DistributedBoxCollection<DIM>::GetDomainSize() const
+c_vector<double, 2*DIM> DistributedBoxCollection<DIM>::rGetDomainSize() const
 {
     return mDomainSize;
 }
@@ -925,6 +949,14 @@ std::set<unsigned> DistributedBoxCollection<DIM>::GetLocalBoxes(unsigned boxInde
 }
 
 template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::IsOwned(Node<DIM>* pNode)
+{
+    unsigned index = CalculateContainingBox(pNode);
+
+    return GetBoxOwnership(index);
+}
+
+template<unsigned DIM>
 void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();
@@ -984,23 +1016,23 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
                      ++node_iter)
                 {
                     // Get the index of the other node
-                    unsigned other_i = (*node_iter)->GetIndex();
+                    unsigned other_node_index = (*node_iter)->GetIndex();
 
                     // If we're in the same box, then take care not to store the node pair twice
                     if (*box_iter == box_index)
                     {
-                        if (other_i > node_index)
+                        if (other_node_index > node_index)
                         {
                             rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
-                            rNodeNeighbours[node_index].insert(other_i);
-                            rNodeNeighbours[other_i].insert(node_index);
+                            rNodeNeighbours[node_index].insert(other_node_index);
+                            rNodeNeighbours[other_node_index].insert(node_index);
                         }
                     }
                     else
                     {
-                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[node_index], (*node_iter)));
-                        rNodeNeighbours[node_index].insert(other_i);
-                        rNodeNeighbours[other_i].insert(node_index);
+                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
+                        rNodeNeighbours[node_index].insert(other_node_index);
+                        rNodeNeighbours[other_node_index].insert(node_index);
                     }
                 }
             }

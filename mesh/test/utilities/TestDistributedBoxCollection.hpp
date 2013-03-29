@@ -718,6 +718,7 @@ public:
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.GetBoxOwnership(box_index))
             {
+                box_collection.IsOwned(nodes[i]);
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
         }
@@ -1014,6 +1015,7 @@ public:
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.GetBoxOwnership(box_index))
             {
+                TS_ASSERT(box_collection.IsOwned(nodes[i]));
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
         }
@@ -1296,10 +1298,10 @@ public:
 
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-        	if (box_collection.GetBoxOwnership(i) )
-        	{
-        		TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
-        	}
+            if (box_collection.GetBoxOwnership(i) )
+            {
+                TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
+            }
         }
 
         for (unsigned i=0; i<points.size(); i++)
@@ -1348,6 +1350,9 @@ public:
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.GetBoxOwnership(box_index))
             {
+                // Check the box collection knows which nodes it should own.
+                TS_ASSERT(box_collection.IsOwned(nodes[i]));
+
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
             // Add as a halo if appropriate.
@@ -1769,8 +1774,8 @@ public:
              TS_ASSERT_EQUALS(num_boxes, p_box_collection->GetNumBoxes());
              for (unsigned i=0; i<3; i++)
              {
-                 TS_ASSERT_EQUALS(0.0, p_box_collection->GetDomainSize()[2*i]);
-                 TS_ASSERT_EQUALS(4.8, p_box_collection->GetDomainSize()[2*i+1]);
+                 TS_ASSERT_EQUALS(0.0, p_box_collection->rGetDomainSize()[2*i]);
+                 TS_ASSERT_EQUALS(4.8, p_box_collection->rGetDomainSize()[2*i+1]);
              }
 
              delete p_box_collection;

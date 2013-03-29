@@ -171,6 +171,11 @@ public:
     void UpdateHaloBoxes();
 
     /**
+     * @return the number of local rows / faces (2d, 3d) of boxes owned.
+     */
+    unsigned GetNumLocalRows() const;
+
+    /**
      * Get whether the box with global index globalIndex is owned by this process.
      *
      * @param globalIndex the global index of the box.
@@ -244,7 +249,7 @@ public:
      *
      * @return mDomainSize
      */
-    c_vector<double, 2*DIM> GetDomainSize() const;
+    c_vector<double, 2*DIM> rGetDomainSize() const;
 
     /**
      * Return whether the local boxes have been set up or not. Used in serialisation.
@@ -287,6 +292,14 @@ public:
      * @return the set containing the indices of boxes local to box boxIndex.
      */
     std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
+
+    /**
+     * Calculate whether the node pNode is owned based on its location.
+     *
+     * @return whether the node is owned.
+     * @param pNode the node to test.
+     */
+    bool IsOwned(Node<DIM>* pNode);
 
     /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
@@ -332,7 +345,7 @@ inline void save_construct_data(
         bool are_boxes_set = t->GetAreLocalBoxesSet();
         ar << are_boxes_set;
 
-        c_vector<double, 2*DIM> domain_size = t->GetDomainSize();
+        c_vector<double, 2*DIM> domain_size = t->rGetDomainSize();
 
         for (unsigned i=0; i<2*DIM; i++)
         {

@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* The following header is usually included in all cell-based test suites. It enables us to write tests where the {{{SimulationTime}}} is handled automatically and simplifies the tests.*/
 #include "AbstractCellBasedTestSuite.hpp"
-
+#include "PetscSetupAndFinalize.hpp"
 /* The remaining header files define classes that will be used in the cell population
  * simulation test. We encountered some of these header files in
  * UserTutorials/RunningMeshBasedSimulations. */
@@ -108,6 +108,9 @@ public:
      */
     void TestMonolayer() throw(Exception)
     {
+        /** The next line is needed because HoneycombMeshGenerator is not designed to be run in parallel */
+        EXIT_IF_PARALLEL;
+
         /* We no longer need to set up the start time as this is fone in the {{{AbstractCellBasedTestSuite}}}.
          * The first thing we do is generate a nodes only mesh. To do this we first create a {{{MutableMesh}}}
          * to use as a generating mesh.
@@ -187,6 +190,9 @@ public:
      */
     void TestSpheroid() throw(Exception)
     {
+        /** The next line is needed because we cannot currently run node based simulations in parallel. */
+        EXIT_IF_PARALLEL;
+
         /*
          * First, we generate a nodes only mesh. This time we specify the nodes manually by first
          * creating a vector of nodes. */
@@ -237,7 +243,6 @@ public:
             delete nodes[i];
         }
         delete p_mesh;
-
     }
 
     /*
@@ -258,6 +263,9 @@ public:
      */
     void TestOnSurfaceOfSphere() throw(Exception)
     {
+        /** The next line is needed because we cannot currently run node based simulations in parallel. */
+        EXIT_IF_PARALLEL;
+
         /*
          * We begin with exactly the same code as the previous test: we create a cell population
          * from a mesh and vector of cells, and use this in turn to create

@@ -221,10 +221,10 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
 
     // Write cell data to file
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-    		node_iter != this->mrMesh.GetNodeIteratorEnd();
-    		++node_iter)
+            node_iter != this->mrMesh.GetNodeIteratorEnd();
+            ++node_iter)
     {
-    	unsigned node_index = node_iter->GetIndex();
+        unsigned node_index = node_iter->GetIndex();
 
         // Hack that covers the case where the node is associated with a cell that has just been killed (#1129)
         bool node_corresponds_to_dead_cell = false;

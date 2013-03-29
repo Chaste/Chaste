@@ -66,6 +66,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "FileComparison.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestCryptSimulation2dWithMeshBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
@@ -131,6 +133,8 @@ public:
 
     void TestCryptSimulation2dExceptions()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create a simple mesh
         int num_cells_depth = 5;
         int num_cells_width = 5;
@@ -175,6 +179,8 @@ public:
      */
     void Test2DSpringSystem() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Cannot write NodesOnlyMesh to file in parallel yet #2365
+
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -235,6 +241,8 @@ public:
 
     void TestWithMultipleCellKillers() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
        unsigned cells_across = 7;
        unsigned cells_up = 11;
        unsigned thickness_of_ghost_layer = 4;
@@ -307,6 +315,8 @@ public:
 
     void TestUpdatePositions() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         HoneycombMeshGenerator generator(3, 3, 1);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -390,6 +400,8 @@ public:
 
     void Test2DCylindrical() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -454,6 +466,8 @@ public:
 
     void Test2DCylindricalMultipleDivisions() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create a log of this test
         LogFile* p_log_file = LogFile::Instance();
         p_log_file->Set(2, "Crypt2DCylindricalMultipleDivisions");
@@ -541,6 +555,8 @@ public:
      */
     void TestVisualizerOutput() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Work out where one of the previous tests wrote its files
         OutputFileHandler handler("Crypt2DCylindricalMultipleDivisions", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
@@ -565,6 +581,8 @@ public:
      */
     void TestWithWntDependentCells() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         double crypt_length = 22.0;
         unsigned cells_across = 6;
@@ -621,6 +639,8 @@ public:
     // A better check that the loaded mesh is the same as that saved
     void TestMeshSurvivesSaveLoad() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         double crypt_length = 22.0;
         unsigned cells_across = 6;
@@ -684,6 +704,8 @@ public:
     // A check that save and load works when a Voronoi tessellation is involved
     void TestMeshSurvivesSaveLoadWithVoronoiTessellation() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         double crypt_length = 22.0;
         unsigned cells_across = 6;
@@ -741,6 +763,8 @@ public:
 
     void TestStandardResultForArchivingTestsBelow() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -813,6 +837,8 @@ public:
     // Testing Save
     void TestSave() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -868,6 +894,8 @@ public:
     // Testing Load (based on previous two tests)
     void TestLoad() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // Cell-based archiving doesn't work in parallel.
+
         // Load the simulation from the TestSave method above and
         // run it from 0.1 to 0.2
         CryptSimulation2d* p_simulator1;
@@ -934,6 +962,8 @@ public:
      */
     void TestWntCellsCannotMoveAcrossYEqualsZero() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         double crypt_length = 22.0;
         unsigned cells_across = 2;
@@ -1047,6 +1077,8 @@ public:
 
     void TestCellIdOutput() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Resetting the Maximum cell Id to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
@@ -1106,6 +1138,8 @@ public:
     // good testing of the periodic boundaries though... [comment no longer valid?]
     void TestWithTysonNovakCells() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -1168,6 +1202,8 @@ public:
 
     void TestAddCellKiller() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Create mesh
         double crypt_length = 9.3;
 
@@ -1205,6 +1241,8 @@ public:
 
     void TestCalculateCellDivisionVectorConfMesh() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Make a parent node
         c_vector<double,2> location;
         location[0] = 1.0;
@@ -1241,6 +1279,8 @@ public:
 
     void TestCalculateCellDivisionVectorConfMeshStemCell() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Make a parent node
         c_vector<double,2> location;
         location[0] = 1.0;
@@ -1282,6 +1322,8 @@ public:
 
     void TestCalculateCellDivisionVectorCylindricalMesh() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Make a mesh
         c_vector<double,2> location;
         location[0] = 1.0;
@@ -1311,6 +1353,8 @@ public:
 
     void TestCalculateCellDivisionVectorCylindricalMeshStemCell() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Make a mesh
         c_vector<double,2> location;
         location[0] = 1.0;
@@ -1346,6 +1390,8 @@ public:
     // Short test which sets mNoBirth for coverage
     void TestNoBirth() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         std::string output_directory = "Crypt2DCylindricalNoBirth";
         double crypt_length = 22.0;
 
@@ -1402,6 +1448,8 @@ public:
     // Test death on a non-periodic mesh. Note that birth does occur too.
     void TestRandomDeathOnNonPeriodicCrypt() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 2;
         unsigned cells_up = 1;
@@ -1444,6 +1492,8 @@ public:
 
     void TestUsingJiggledBottomSurface()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
@@ -1492,6 +1542,8 @@ public:
      */
     void TestCellCountInitialization()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
@@ -1695,6 +1747,8 @@ public:
 
     void TestWriteBetaCatenin() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 5;
         unsigned cells_up = 4;
@@ -1749,6 +1803,8 @@ public:
 
     void TestCryptSimulation2DParameterOutput() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         unsigned cells_across = 6;
         unsigned cells_up = 12;
@@ -1793,6 +1849,8 @@ public:
 
     void TestAncestorCryptSimulations() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         std::string output_directory = "AncestorCrypt";
         double crypt_length = 22.0;
 
@@ -1874,6 +1932,8 @@ public:
 
     void noTestGeneralisedLinearSpringForceWithSpringConstantsForIngeBCatCells()
     {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
         // Create mesh
         double crypt_length = 1.1*12.0*sqrt(3)/2.0;
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
