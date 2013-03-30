@@ -302,6 +302,15 @@ public:
     bool IsOwned(Node<DIM>* pNode);
 
     /**
+     * Get the process that should own this node.
+     * Currently only returns +/-1 of this process so assumes nodes don't move too far.
+     *
+     * @param pNode the node to be tested
+     * @return the ID of the process that should own the node.
+     */
+    unsigned GetProcessOwningNode(Node<DIM>* pNode);
+
+    /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
      *  local box to the box containing the first node. **Note: the user still has to check that the node
      *  pairs are less than the cut-off distance apart.** The pairs are checked so that index1 < index2,

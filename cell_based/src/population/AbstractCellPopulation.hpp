@@ -547,6 +547,11 @@ public:
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();
 
     /**
+     * Update the ownership of cell in a parallel cell-based simulation.
+     */
+    virtual void UpdateCellProcessLocation();
+
+    /**
      * Use an output file handler to create output files for visualizer and post-processing.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored

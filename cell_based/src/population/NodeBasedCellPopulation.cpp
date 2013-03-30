@@ -623,18 +623,18 @@ void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::DeleteMovedCell(CellPtr pCell)
+void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
 {
-    unsigned location_index = this->GetLocationIndexUsingCell(pCell);
+    CellPtr p_cell = this->GetCellUsingLocationIndex(index);
 
-    mpNodesOnlyMesh->DeleteMovedNode(location_index);
+    mpNodesOnlyMesh->DeleteMovedNode(index);
 
     // Update mappings between cells and location indices
-    this->mCellLocationMap.erase((pCell).get());
-    this->mLocationCellMap.erase(location_index);
+    this->mCellLocationMap.erase((p_cell).get());
+    this->mLocationCellMap.erase(index);
 
     // Update vector of cells
-    this->mCells.remove(pCell);
+    this->mCells.remove(p_cell);
 }
 
 template<unsigned DIM>
@@ -682,6 +682,69 @@ void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendLeft(unsigned nodeIndex)
     std::pair<CellPtr, Node<DIM>*> pair = GetCellNodePair(nodeIndex);
 
     mCellsToSendLeft.insert(pair);
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::AddReceivedCells()
+{
+    if (!PetscTools::AmMaster())
+    {
+        for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvLeft->begin();
+                iter != mpCellsRecvLeft->end();
+                ++iter)
+        {
+            AddMovedCell((*iter).first, (*iter).second);
+        }
+    }
+    if (!PetscTools::AmTopMost())
+    {
+        for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvRight->begin();
+                iter != mpCellsRecvRight->end();
+                ++iter)
+        {
+            AddMovedCell((*iter).first, (*iter).second);
+        }
+    }
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
+{
+    mpNodesOnlyMesh->CalculateNodesOutsideLocalDomain();
+
+    std::vector<unsigned> nodes_to_send_right = mpNodesOnlyMesh->GetNodesToSendRight();
+    for (std::vector<unsigned>::iterator iter = nodes_to_send_right.begin();
+            iter != nodes_to_send_right.end();
+            ++iter)
+    {
+        AddNodeAndCellToSendRight(*iter);
+    }
+
+    std::vector<unsigned> nodes_to_send_left = mpNodesOnlyMesh->GetNodesToSendLeft();
+    for (std::vector<unsigned>::iterator iter = nodes_to_send_left.begin();
+            iter != nodes_to_send_left.end();
+            ++iter)
+    {
+        AddNodeAndCellToSendLeft(*iter);
+    }
+
+    SendCellsToNeighbourProcesses();
+
+    for (std::vector<unsigned>::iterator iter = nodes_to_send_right.begin();
+            iter != nodes_to_send_right.end();
+            ++iter)
+    {
+        DeleteMovedCell(*iter);
+    }
+
+    for (std::vector<unsigned>::iterator iter = nodes_to_send_left.begin();
+            iter != nodes_to_send_left.end();
+            ++iter)
+    {
+        DeleteMovedCell(*iter);
+    }
+
+    AddReceivedCells();
 }
 
 /////////////////////////////////////////////////////////////////////////////

@@ -957,6 +957,24 @@ bool DistributedBoxCollection<DIM>::IsOwned(Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
+unsigned DistributedBoxCollection<DIM>::GetProcessOwningNode(Node<DIM>* pNode)
+{
+    unsigned box_index = CalculateContainingBox(pNode);
+    unsigned containing_process = PetscTools::GetMyRank();
+
+    if (box_index > mMaxBoxIndex)
+    {
+        containing_process++;
+    }
+    else if (box_index < mMinBoxIndex)
+    {
+        containing_process--;
+    }
+
+    return containing_process;
+}
+
+template<unsigned DIM>
 void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();

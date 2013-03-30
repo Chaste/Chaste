@@ -368,6 +368,11 @@ c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetC
     return mCentroid;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
+{
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //                             Output methods                               //
 //////////////////////////////////////////////////////////////////////////////

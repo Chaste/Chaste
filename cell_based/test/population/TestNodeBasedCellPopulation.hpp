@@ -1288,7 +1288,7 @@ public:
             TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_cell), PetscTools::GetNumProcs() * (num_initial_cells + 1));
 
             // Now delete the first cell
-            cell_population.DeleteMovedCell(cells[0]);
+            cell_population.DeleteMovedCell(0);
 
             TS_ASSERT_EQUALS(cell_population.GetNumNodes(), num_initial_cells);
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_cells);

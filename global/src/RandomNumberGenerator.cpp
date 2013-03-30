@@ -66,17 +66,17 @@ void RandomNumberGenerator::Destroy()
 
 unsigned RandomNumberGenerator::randMod(unsigned base)
 {
-	assert(base > 0u);
-	/*
-	 * The contents of this method are copied out of
-	 * boost/include/boost/random/uniform_smallint.hpp lines 235 - 255
-	 * as of v 1.48 (preserved at least as far as 1.51).
-	 * to make sure we get the same
-	 * result on earlier versions of boost.
+    assert(base > 0u);
+    /*
+     * The contents of this method are copied out of
+     * boost/include/boost/random/uniform_smallint.hpp lines 235 - 255
+     * as of v 1.48 (preserved at least as far as 1.51).
+     * to make sure we get the same
+     * result on earlier versions of boost.
      *
-	 * It was then simplified as we know '_min' is zero, '_max' is 'base-1u'
-	 * and all the types are unsigneds.
-	 */
+     * It was then simplified as we know '_min' is zero, '_max' is 'base-1u'
+     * and all the types are unsigneds.
+     */
 
 #if BOOST_VERSION < 103700
     unsigned base_range =(mMersenneTwisterGenerator.max)() - (mMersenneTwisterGenerator.min)();
@@ -92,9 +92,9 @@ unsigned RandomNumberGenerator::randMod(unsigned base)
 
     if (base - 1u >= base_range)
     {
-    	// This was in the original boost file for when '_min' is large, but here it is zero so
-    	// we shouldn't ever reach this.
-    	NEVER_REACHED;
+        // This was in the original boost file for when '_min' is large, but here it is zero so
+        // we shouldn't ever reach this.
+        NEVER_REACHED;
         //return val;
     }
     else

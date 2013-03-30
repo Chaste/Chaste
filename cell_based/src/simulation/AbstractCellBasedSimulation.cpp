@@ -404,6 +404,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // Update cell locations and topology
         UpdateCellLocationsAndTopology();
 
+        // Update the assignment of cells to processes.
+        mrCellPopulation.UpdateCellProcessLocation();
+
         // Increment simulation time here, so results files look sensible
         p_simulation_time->IncrementTimeOneStep();
 

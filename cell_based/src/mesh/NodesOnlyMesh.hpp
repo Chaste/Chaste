@@ -98,6 +98,12 @@ private:
     /** A list of the global index of nodes that have been deleted from this process */
     std::vector<unsigned> mDeletedGlobalNodeIndices;
 
+    /** A list of nodes that need to moved to the right hand process */
+    std::vector<unsigned> mNodesToSendRight;
+
+    /** A list of nodes that need to moved to the right hand process */
+    std::vector<unsigned> mNodesToSendLeft;
+
     /**
      * Calculate the next unique global index available on this
      * process. Uses a hashing function to ensure that a unique
@@ -286,6 +292,21 @@ public:
     void ReMesh(NodeMap& rMap);
 
     /**
+     * Work out which nodes lie outside the local domain and add their indices to the vectors NodesToSendLeft and NodesToSendRight.
+     */
+    void CalculateNodesOutsideLocalDomain();
+
+    /**
+     * @return mNodesToSendLeft
+     */
+    std::vector<unsigned> GetNodesToSendLeft();
+
+    /**
+     * @return mNodesToSendRight
+     */
+    std::vector<unsigned> GetNodesToSendRight();
+
+    /**
      * Overridden AddNode() method.
      *
      * @param pNewNode  pointer to the new node
@@ -295,6 +316,7 @@ public:
 
     /**
      * Add a node to this process that has moved from another process.
+     * @param pMovedNode the node to add to this mesh
      */
     void AddMovedNode(Node<SPACE_DIM>* pMovedNode);
 

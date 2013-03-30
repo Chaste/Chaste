@@ -100,10 +100,10 @@ private:
     template<class Archive>
     void load(Archive & archive, const unsigned int version)
     {
-    	std::string rng_internals_string;
-    	archive & rng_internals_string;
-    	std::stringstream rng_internals(rng_internals_string);
-    	rng_internals >> mMersenneTwisterGenerator;
+        std::string rng_internals_string;
+        archive & rng_internals_string;
+        std::stringstream rng_internals(rng_internals_string);
+        rng_internals >> mMersenneTwisterGenerator;
 
         std::string normal_internals_string;
         archive & normal_internals_string;

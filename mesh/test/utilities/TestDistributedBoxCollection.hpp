@@ -719,6 +719,8 @@ public:
             if (box_collection.GetBoxOwnership(box_index))
             {
                 box_collection.IsOwned(nodes[i]);
+                TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
+
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
         }
@@ -1016,6 +1018,8 @@ public:
             if (box_collection.GetBoxOwnership(box_index))
             {
                 TS_ASSERT(box_collection.IsOwned(nodes[i]));
+                TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
+
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }
         }
@@ -1352,6 +1356,7 @@ public:
             {
                 // Check the box collection knows which nodes it should own.
                 TS_ASSERT(box_collection.IsOwned(nodes[i]));
+                TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
 
                 box_collection.rGetBox(box_index).AddNode(nodes[i]);
             }

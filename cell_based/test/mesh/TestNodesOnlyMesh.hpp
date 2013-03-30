@@ -658,8 +658,54 @@ public:
             TS_ASSERT_EQUALS(mesh.SolveNodeMapping(1), 0u);
             TS_ASSERT(mesh.mDeletedNodeIndices.size() == 0u);
         }
+    }
 
+    void TestGetNodesOutsideLocalDomain()   throw (Exception)
+    {
+        if (PetscTools::GetNumProcs() > 1)
+        {
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.0, 1.6));
 
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+            if (PetscTools::AmMaster())
+            {
+                c_vector<double, 2> new_location = zero_vector<double>(2);
+                new_location[1] = 1.7;
+                ChastePoint<2> new_point(new_location);
+
+                mesh.GetNode(0)->SetPoint(new_point);
+            }
+            if (PetscTools::GetMyRank() == 1)
+            {
+                c_vector<double, 2> new_location = zero_vector<double>(2);
+                new_location[1] = 0.5;
+                ChastePoint<2> new_point(new_location);
+
+                mesh.GetNode(1)->SetPoint(new_point);
+            }
+
+            mesh.CalculateNodesOutsideLocalDomain();
+
+            std::vector<unsigned> nodes_left = mesh.GetNodesToSendLeft();
+            std::vector<unsigned> nodes_right = mesh.GetNodesToSendRight();
+
+            if (PetscTools::AmMaster())
+            {
+                TS_ASSERT(nodes_left.empty());
+                TS_ASSERT_EQUALS(nodes_right.size(), 1u);
+                TS_ASSERT_EQUALS(nodes_right[0], 0u);
+            }
+            if (PetscTools::GetMyRank()==1)
+            {
+                TS_ASSERT(nodes_right.empty());
+                TS_ASSERT_EQUALS(nodes_left.size(), 1u);
+                TS_ASSERT_EQUALS(nodes_left[0], 1u);
+            }
+        }
     }
 
     void TestArchiving() throw(Exception)

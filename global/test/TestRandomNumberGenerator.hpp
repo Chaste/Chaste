@@ -178,10 +178,10 @@ public:
             // Generate some random numbers before archiving
             for (unsigned i=0; i<11; i++)
             {
-				p_gen->ranf();
-				p_gen->randMod(1 + 3*i);
-				p_gen->StandardNormalRandomDeviate();
-				p_gen->NormalRandomDeviate(0.5, 0.1);
+                p_gen->ranf();
+                p_gen->randMod(1 + 3*i);
+                p_gen->StandardNormalRandomDeviate();
+                p_gen->NormalRandomDeviate(0.5, 0.1);
             }
 
             SerializableSingleton<RandomNumberGenerator>* const p_wrapper = p_gen->GetSerializationWrapper();
@@ -354,7 +354,7 @@ public:
     void TestReproducibilityAcrossPlatforms()
     {
         // This test checks that the underlying RNG is the doing the same thing on your operating system.
-    	RandomNumberGenerator::Destroy();
+        RandomNumberGenerator::Destroy();
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(42);
 

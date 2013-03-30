@@ -133,9 +133,9 @@ private:
 
     /**
      * Delete a cell and its associated node that have moved off this process.
-     * @param pCell the pointer to the cell that has moved off this process.
+     * @param index the location of the cell to be deleted
      */
-    void DeleteMovedCell(CellPtr pCell);
+    void DeleteMovedCell(unsigned index);
 
 protected:
 
@@ -354,6 +354,16 @@ public:
      * @return the pair.
      */
     std::pair<CellPtr, Node<DIM>*> GetCellNodePair(unsigned nodeIndex);
+
+    /**
+     * Add the contents of mpCellsRecvRight and mpCellsRecvLeft to the local population.
+     */
+    void AddReceivedCells();
+
+    /**
+     * Update which process each cell is owned by.
+     */
+    virtual void UpdateCellProcessLocation();
 
     /**
      * Add the node and cell with index nodeIndex to the list of cells to send

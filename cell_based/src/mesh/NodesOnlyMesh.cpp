@@ -203,6 +203,46 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
 }
 
 template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
+{
+    mNodesToSendRight.clear();
+    mNodesToSendLeft.clear();
+
+    c_vector<double, 2*SPACE_DIM> domain_size = mpBoxCollection->rGetDomainSize();
+
+    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+            node_iter != this->GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        unsigned owning_process = mpBoxCollection->GetProcessOwningNode(&(*node_iter));
+        if (owning_process == PetscTools::GetMyRank())
+        {
+            // Do nothing.
+        }
+        else if (owning_process == PetscTools::GetMyRank() + 1)
+        {
+            mNodesToSendRight.push_back(node_iter->GetIndex());
+        }
+        else if (owning_process == PetscTools::GetMyRank() - 1)
+        {
+            mNodesToSendLeft.push_back(node_iter->GetIndex());
+        }
+    }
+}
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetNodesToSendLeft()
+{
+    return mNodesToSendLeft;
+}
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetNodesToSendRight()
+{
+    return mNodesToSendRight;
+}
+
+template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 {
     if(!mpBoxCollection->IsOwned(pNewNode))
