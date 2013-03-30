@@ -43,7 +43,7 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
     assert(width > 0.0);
 }
 
-void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, unsigned numLocalRows)
+void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows)
 {
     this->ClearBoxCollection();
 

@@ -146,7 +146,7 @@ private:
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows that should be owned by this process.
      */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, unsigned numLocalRows = PETSC_DECIDE);
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE);
 
      /**
       * Set up a box collection by calculating the correct domain size from the node locations

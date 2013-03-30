@@ -95,7 +95,7 @@ public:
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows of the collection that this process should own.
      */
-    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, unsigned numLocalRows = PETSC_DECIDE);
+    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows = PETSC_DECIDE);
 
     /**
      * Overridden GetVectorFromAtoB() method.

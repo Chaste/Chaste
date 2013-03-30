@@ -348,8 +348,8 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
 {
     assert(mpBoxCollection);
 
-    unsigned num_local_rows = mpBoxCollection->GetNumLocalRows();
-    unsigned new_local_rows = num_local_rows + (unsigned)(PetscTools::AmTopMost()) + (unsigned)(PetscTools::AmMaster());
+    int num_local_rows = mpBoxCollection->GetNumLocalRows();
+    int new_local_rows = num_local_rows + (int)(PetscTools::AmTopMost()) + (int)(PetscTools::AmMaster());
 
     c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
     c_vector<double, 2*SPACE_DIM> new_domain_size;
@@ -432,7 +432,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, unsigned numLocalRows)
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows)
 {
      ClearBoxCollection();
 
