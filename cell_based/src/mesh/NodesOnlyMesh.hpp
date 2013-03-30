@@ -299,12 +299,33 @@ public:
     /**
      * @return mNodesToSendLeft
      */
-    std::vector<unsigned> GetNodesToSendLeft();
+    std::vector<unsigned>& rGetNodesToSendLeft();
 
     /**
      * @return mNodesToSendRight
      */
-    std::vector<unsigned> GetNodesToSendRight();
+    std::vector<unsigned>& rGetNodesToSendRight();
+
+    /**
+     * @return the indices of halo nodes on the right.
+     */
+    std::vector<unsigned>& rGetHaloNodesToSendRight();
+
+    /**
+     * @return the indices of halo nodes on the left.
+     */
+    std::vector<unsigned>& rGetHaloNodesToSendLeft();
+
+    /**
+     * Add a node as a temporary halo node on this process
+     * @param pNewNode a pointer to the new node to add.
+     */
+    void AddHaloNode(Node<SPACE_DIM>* pNewNode);
+
+    /**
+     * Delete all the halo nodes on this process.
+     */
+    void ClearHaloNodes();
 
     /**
      * Overridden AddNode() method.

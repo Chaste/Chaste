@@ -231,15 +231,27 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
 }
 
 template<unsigned SPACE_DIM>
-std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetNodesToSendLeft()
+std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetNodesToSendLeft()
 {
     return mNodesToSendLeft;
 }
 
 template<unsigned SPACE_DIM>
-std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetNodesToSendRight()
+std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetNodesToSendRight()
 {
     return mNodesToSendRight;
+}
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetHaloNodesToSendRight()
+{
+	return mpBoxCollection->rGetHaloNodesRight();
+}
+
+template<unsigned SPACE_DIM>
+std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetHaloNodesToSendLeft()
+{
+	return mpBoxCollection->rGetHaloNodesLeft();
 }
 
 template<unsigned SPACE_DIM>
@@ -272,6 +284,25 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 
     // Then update cell radius to default.
     pNewNode->SetRadius(0.5);
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(Node<SPACE_DIM>* pNewNode)
+{
+	mHaloNodes.push_back(pNewNode);
+	mHaloNodesMapping[pNewNode->GetIndex()] = mHaloNodes.size() - 1;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::ClearHaloNodes()
+{
+	for (unsigned i=0; i<mHaloNodes.size(); i++)
+	{
+		delete mHaloNodes[i];
+	}
+	mHaloNodes.clear();
+
+	mHaloNodesMapping.clear();
 }
 
 template<unsigned SPACE_DIM>

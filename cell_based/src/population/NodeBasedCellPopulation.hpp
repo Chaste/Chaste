@@ -74,9 +74,7 @@ private:
     /** Whether to delete the nodes-only mesh (taken in one of the constructors, defaults to false). */
     bool mDeleteMesh;
 
-    /**
-     * Whether or not to have cell radii updated from CellData defaults to false.
-     */
+    /** Whether or not to have cell radii updated from CellData defaults to false.*/
     bool mUseVariableRadii;
 
     /** The cells to send to the right process */
@@ -93,6 +91,15 @@ private:
 
     /** The tag used to send and recieve cell information */
     static const unsigned mCellCommunicationTag = 123;
+
+	/** Pointers to halo cells */
+	std::vector<CellPtr> mHaloCells;
+
+	/** Map location indices back to halo cells */
+	std::map<unsigned, CellPtr> mLocationHaloCellMap;
+
+	/** Map halo cells back to location indices */
+	std::map<CellPtr, unsigned> mHaloCellLocationMap;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -136,6 +143,51 @@ private:
      * @param index the location of the cell to be deleted
      */
     void DeleteMovedCell(unsigned index);
+
+    /**
+     * Send and receive halo nodes with neighbours and populate memory structures to store them
+     */
+    void RefreshHaloCells();
+
+    /**
+     * Add the node and cell with index nodeIndex to the list of cells to send
+     * to the process right.
+     *
+     * @param nodeIndex the index of the node and cell to send.
+     */
+    void AddNodeAndCellToSendRight(unsigned nodeIndex);
+
+    /**
+     * Add the node and cell with index nodeIndex to the list of cells to send
+     * to the process left.
+     *
+     * @param nodeIndex the index of the node and cell to send.
+     */
+    void AddNodeAndCellToSendLeft(unsigned nodeIndex);
+
+    /**
+     * Add a collection of cells to send right
+     * @param cellLocationIndices the list of location indices of cells to send.
+     */
+    void AddCellsToSendRight(std::vector<unsigned>& cellLocationIndices);
+
+    /**
+     * Add a collection of cells to send left
+     * @param cellLocationIndices the list of location indices of cells to send.
+     */
+    void AddCellsToSendLeft(std::vector<unsigned>& cellLocationIndices);
+
+    /**
+     * Add halo cells to the halo structure on this process.
+     */
+    void AddReceivedHaloCells();
+
+    /**
+     * Add a single halo cell with its node to the halo structures on this process.
+     * @param pCell the cell to add.
+     * @param pNode the node to add.
+     */
+    void AddHaloCell(CellPtr pCell, Node<DIM>* pNode);
 
 protected:
 
@@ -364,23 +416,6 @@ public:
      * Update which process each cell is owned by.
      */
     virtual void UpdateCellProcessLocation();
-
-    /**
-     * Add the node and cell with index nodeIndex to the list of cells to send
-     * to the process right.
-     *
-     * @param nodeIndex the index of the node and cell to send.
-     */
-    void AddNodeAndCellToSendRight(unsigned nodeIndex);
-
-    /**
-     * Add the node and cell with index nodeIndex to the list of cells to send
-     * to the process left.
-     *
-     * @param nodeIndex the index of the node and cell to send.
-     */
-    void AddNodeAndCellToSendLeft(unsigned nodeIndex);
-
 };
 
 #include "SerializationExportWrapper.hpp"

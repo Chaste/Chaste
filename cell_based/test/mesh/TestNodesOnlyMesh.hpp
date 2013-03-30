@@ -660,6 +660,28 @@ public:
         }
     }
 
+    void TestHaloNodes()	throw (Exception)
+	{
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.0, 1.6));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        mesh.AddHaloNode(new Node<2>(3, false));
+
+        TS_ASSERT_EQUALS(mesh.mHaloNodes.size(), 1u);
+        TS_ASSERT_EQUALS(mesh.mHaloNodesMapping[3], 0u);
+
+        mesh.ClearHaloNodes();
+
+        TS_ASSERT_EQUALS(mesh.mHaloNodes.size(), 0u);
+
+        delete nodes[0];
+        delete nodes[1];
+	}
+
     void TestGetNodesOutsideLocalDomain()   throw (Exception)
     {
         if (PetscTools::GetNumProcs() > 1)
@@ -690,8 +712,8 @@ public:
 
             mesh.CalculateNodesOutsideLocalDomain();
 
-            std::vector<unsigned> nodes_left = mesh.GetNodesToSendLeft();
-            std::vector<unsigned> nodes_right = mesh.GetNodesToSendRight();
+            std::vector<unsigned> nodes_left = mesh.rGetNodesToSendLeft();
+            std::vector<unsigned> nodes_right = mesh.rGetNodesToSendRight();
 
             if (PetscTools::AmMaster())
             {

@@ -167,9 +167,17 @@ public:
             {
                 // Move node to the next location.
                 c_vector<double, 3> new_location = zero_vector<double>(3);
-                new_location[2] = 1.5;
+                new_location[2] = 1.6;
                 ChastePoint<3> point(new_location);
                 mpNodesOnlyMesh->GetNode(0)->SetPoint(point);
+            }
+            if (PetscTools::GetMyRank() == 1)
+            {
+                // Move node to the next location.
+                c_vector<double, 3> new_location = zero_vector<double>(3);
+                new_location[2] = 0.5;
+                ChastePoint<3> point(new_location);
+                mpNodesOnlyMesh->GetNode(1)->SetPoint(point);
             }
 #if BOOST_VERSION < 103700
         TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
@@ -179,22 +187,46 @@ public:
 
             if (PetscTools::AmMaster())
             {
-                TS_ASSERT_EQUALS(mpNodesOnlyMesh->GetNumNodes(), 0u);
-                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetNumRealCells(), 0u);
+                TS_ASSERT_EQUALS(mpNodesOnlyMesh->GetNumNodes(), 1u);
+                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetNumRealCells(), 1u);
             }
             if (PetscTools::GetMyRank() == 1)
             {
-                TS_ASSERT_EQUALS(mpNodesOnlyMesh->GetNumNodes(), 2u);
-                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetNumRealCells(), 2u);
+                TS_ASSERT_EQUALS(mpNodesOnlyMesh->GetNumNodes(), 1u);
+                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetNumRealCells(), 1u);
 
                 AbstractMesh<3,3>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
-                TS_ASSERT_DELTA(node_iter->rGetLocation()[2], 1.5, 1e-4);
-                ++node_iter;
-                TS_ASSERT_DELTA(node_iter->rGetLocation()[2], 1.5, 1e-4);
+                TS_ASSERT_DELTA(node_iter->rGetLocation()[2], 1.6, 1e-4);
             }
 #endif
         }
     }
+
+    void TestRefreshHaloCells()	throw (Exception)
+	{
+#if BOOST_VERSION < 103700
+        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
+                              "Parallel cell-based Chaste requires Boost >= 1.37");
+#else
+    	// Set up the halo boxes and nodes.
+    	mpNodeBasedCellPopulation->Update();
+
+    	// Send and receive halo nodes.
+       	mpNodeBasedCellPopulation->RefreshHaloCells();
+
+       	if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
+       	{
+       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
+       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
+       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+       	}
+       	else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
+       	{
+       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
+       	}
+#endif
+
+	}
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONPARALLELMETHODS_HPP_*/

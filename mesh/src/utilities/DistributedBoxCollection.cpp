@@ -169,7 +169,7 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
                 iter!=this->rGetBox(mHalosLeft[i]).rGetNodesContained().end();
                 iter++)
         {
-            mHaloNodesLeft.insert((*iter)->GetIndex());
+            mHaloNodesLeft.push_back((*iter)->GetIndex());
         }
     }
 
@@ -181,7 +181,7 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
                 iter!=this->rGetBox(mHalosRight[i]).rGetNodesContained().end();
                 iter++)
         {
-            mHaloNodesRight.insert((*iter)->GetIndex());
+            mHaloNodesRight.push_back((*iter)->GetIndex());
         }
     }
 }
@@ -975,13 +975,13 @@ unsigned DistributedBoxCollection<DIM>::GetProcessOwningNode(Node<DIM>* pNode)
 }
 
 template<unsigned DIM>
-std::set<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesRight()
+std::vector<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesRight()
 {
 	return mHaloNodesRight;
 }
 
 template<unsigned DIM>
-std::set<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesLeft()
+std::vector<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesLeft()
 {
 	return mHaloNodesLeft;
 }

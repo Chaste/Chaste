@@ -69,10 +69,10 @@ private:
     std::vector<unsigned> mHalosLeft;
 
     /** Set of Nodes that are halos of adjacent right process, but lie locally */
-    std::set<unsigned> mHaloNodesRight;
+    std::vector<unsigned> mHaloNodesRight;
 
     /** Set of Nodes that are halos of adjacent left process, but lie locally */
-    std::set<unsigned> mHaloNodesLeft;
+    std::vector<unsigned> mHaloNodesLeft;
 
     /** Map of global to local indices of boxes. **/
     std::map<unsigned, unsigned> mBoxesMapping;
@@ -310,12 +310,12 @@ public:
     /**
      * @return mHaloNodesRight the list of nodes that are close to the right boundary
      */
-    std::set<unsigned>& rGetHaloNodesRight();
+    std::vector<unsigned>& rGetHaloNodesRight();
 
     /**
      * @return mHaloNodesRight the list of nodes that are close to the left boundary
      */
-    std::set<unsigned>& rGetHaloNodesLeft();
+    std::vector<unsigned>& rGetHaloNodesLeft();
 
     /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
