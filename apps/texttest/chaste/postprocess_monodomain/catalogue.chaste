@@ -85,3 +85,5 @@ The following new files/directories were created:
 ------------ChasteParameters.xml
 ------------ConductionVelocityFromNode10_times.info
 ------------ConductionVelocityFromNode20_times.info
+------------MaxUpstrokeVelocityMap_minus_30_times.info
+------------UpstrokeTimeMap_minus_30_times.info
