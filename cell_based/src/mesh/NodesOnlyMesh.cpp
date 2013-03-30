@@ -471,6 +471,8 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
     }
 
      AddNodesToBoxes();
+
+     mpBoxCollection->UpdateHaloBoxes();
 }
 
 template<unsigned SPACE_DIM>

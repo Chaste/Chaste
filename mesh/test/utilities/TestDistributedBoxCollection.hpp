@@ -93,11 +93,11 @@ private:
 
         if (!PetscTools::AmTopMost())
         {
-            TS_ASSERT_EQUALS(box_collection.mHaloNodesRight.size(), pow(3, DIM-1));
+            TS_ASSERT_EQUALS(box_collection.rGetHaloNodesRight().size(), pow(3, DIM-1));
         }
         if (!PetscTools::AmMaster())
         {
-            TS_ASSERT_EQUALS(box_collection.mHaloNodesLeft.size(), pow(3, DIM-1));
+            TS_ASSERT_EQUALS(box_collection.rGetHaloNodesLeft().size(), pow(3, DIM-1));
         }
 
         // Tidy up.

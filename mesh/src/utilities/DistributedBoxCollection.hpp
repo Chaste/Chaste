@@ -68,9 +68,6 @@ private:
     /** A vector of the global indices of boxes, owned by this process, but on a boundary with left process. */
     std::vector<unsigned> mHalosLeft;
 
-    /** A set of nodes that are on neighbouring processes */
-    std::set<Node<DIM>* > mHaloNodes;
-
     /** Set of Nodes that are halos of adjacent right process, but lie locally */
     std::set<unsigned> mHaloNodesRight;
 
@@ -309,6 +306,16 @@ public:
      * @return the ID of the process that should own the node.
      */
     unsigned GetProcessOwningNode(Node<DIM>* pNode);
+
+    /**
+     * @return mHaloNodesRight the list of nodes that are close to the right boundary
+     */
+    std::set<unsigned>& rGetHaloNodesRight();
+
+    /**
+     * @return mHaloNodesRight the list of nodes that are close to the left boundary
+     */
+    std::set<unsigned>& rGetHaloNodesLeft();
 
     /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
