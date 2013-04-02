@@ -1,6 +1,7 @@
-4 3 1 1
-0 0.0 1.0 0.0 75 1
-1 0.0 0.0 0.0 50 0
-2 -1.0 -1.0 0.0 25 1
-3 1.0 -1.0 0.0 25 1
-# Hand coded
+4 3 2 1
+0 0.0 1.0 0.0 75 2 1
+1 0.0 0.0 0.0 50 1 0
+2	-1.0	-1.0	0.0	25	0	1
+3	1.0	-1.0	0.0	25	0	1
+# Hand coded. Note that the first 3 lines are purposely delimited by tabs and the last two
+# by spaces to check the VentilationGeometry's ability to handle mixed delimiters
