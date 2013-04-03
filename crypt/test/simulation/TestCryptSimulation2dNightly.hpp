@@ -130,17 +130,30 @@ public:
 
         unsigned number_of_cells = crypt.GetNumRealCells();
         unsigned number_of_nodes = p_mesh->GetNumNodes();
-        TS_ASSERT_EQUALS(number_of_cells, 61u);
-        TS_ASSERT_EQUALS(number_of_nodes, 145u);
+
+        /// \future This test is really fragile - gets different answers with Intel and Gcc compilers
+
+        // 61 <= number_of_cells <= 63
+        TS_ASSERT_LESS_THAN_EQUALS(number_of_cells, 63u);
+        TS_ASSERT_LESS_THAN_EQUALS(61u, number_of_cells);
+        // 145 <= number_of_nodes <= 147
+        TS_ASSERT_LESS_THAN_EQUALS(number_of_nodes, 147u);
+        TS_ASSERT_LESS_THAN_EQUALS(145u, number_of_nodes);
 
         std::set<unsigned> ghost_indices = crypt.GetGhostNodeIndices();
         TS_ASSERT_EQUALS(number_of_cells + ghost_indices.size(), number_of_nodes);
 
         std::vector<unsigned> cell_type_count = crypt.GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_type_count.size(), 4u);
+
         TS_ASSERT_EQUALS(cell_type_count[0], 6u);   // Stem
-        TS_ASSERT_EQUALS(cell_type_count[1], 21u);  // Transit
-        TS_ASSERT_EQUALS(cell_type_count[2], 34u);  // Differentiated
+
+        TS_ASSERT_LESS_THAN_EQUALS(cell_type_count[1], 22u); // 21 <= Transit <= 22
+        TS_ASSERT_LESS_THAN_EQUALS(21u, cell_type_count[1]);
+
+        TS_ASSERT_LESS_THAN_EQUALS(cell_type_count[2], 35u); // 34 <= Differentiated <= 35
+        TS_ASSERT_LESS_THAN_EQUALS(34u, cell_type_count[2]);
+
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
     }
 
