@@ -492,23 +492,23 @@ public:
             // Check the stimulus now has the properties of the one archived above.
             TS_ASSERT_DELTA(p_zero->GetStimulus(0.0), 0.0, 1e-9);
 
-            TS_ASSERT_DELTA(p_simple->GetStimulus(0.0), 0.0, 1e-9);
+            TS_ASSERT_DELTA(p_simple->GetStimulus(0.0),   0.0, 1e-9);
             TS_ASSERT_DELTA(p_simple->GetStimulus(100.1), 1.0, 1e-9);
             TS_ASSERT_DELTA(p_simple->GetStimulus(100.6), 0.0, 1e-9);
 
-            TS_ASSERT_DELTA(p_regular->GetStimulus(0.0), 0.0, 1e-9);
-            TS_ASSERT_DELTA(p_regular->GetStimulus(100.1), 1.0, 1e-9);
-            TS_ASSERT_DELTA(p_regular->GetStimulus(100.6), 0.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular->GetStimulus(0.0),    0.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular->GetStimulus(100.1),  1.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular->GetStimulus(100.6),  0.0, 1e-9);
             TS_ASSERT_DELTA(p_regular->GetStimulus(1100.1), 1.0, 1e-9);
             TS_ASSERT_DELTA(p_regular->GetStimulus(1100.6), 0.0, 1e-9);
 
-            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(0.0), 0.0, 1e-9);
-            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(100.24), 1.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(0.0),     0.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(100.24),  1.0, 1e-9);
             TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(100.26), -1.0, 1e-9);
-            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(100.6), 0.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(100.6),   0.0, 1e-9);
             TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(1100.24), 1.0, 1e-9);
-            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(1100.26), -1.0, 1e-9);
-            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(1100.6), 0.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(1100.26),-1.0, 1e-9);
+            TS_ASSERT_DELTA(p_regular_zero_net->GetStimulus(1100.6),  0.0, 1e-9);
 
             TimeStepper t(0,10,1);
             SimpleStimulus r1(2,1,0);

@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "DistributedVector.hpp"
-#include "ArchiveOpener.hpp"
 #include "HeartConfig.hpp"
 
 class TestElectrodes : public CxxTest::TestSuite
