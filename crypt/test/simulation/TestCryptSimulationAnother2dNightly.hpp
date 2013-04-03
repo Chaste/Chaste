@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "Version.hpp"
 
 class TestCryptSimulationAnother2dNightly : public AbstractCellBasedTestSuite
 {
@@ -296,11 +297,22 @@ public:
         OutputFileHandler handler(output_directory, false);
         std::string results_dir = handler.GetOutputDirectoryFullPath() + "results_from_time_0";
 
-        NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements");
-        TS_ASSERT(comp_ele.CompareFiles(1e-15));
-        FileComparison( results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizelements").CompareFiles();
+        /// \future This test is ridiculously fragile to changes in compiler, so much so that its results
+        /// need to be compared with different stored results
+        /// (only slight differences in t=0.083333 that seem to iron out in subsequent steps).
+        std::string element_file = "results.vizelements";
+        std::string node_file = "results.viznodes";
+        if (std::string(ChasteBuildInfo::GetCompilerType())=="intel")
+        {
+        	node_file += "_intel";
+        	element_file += "_intel";
+        }
 
-        NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.viznodes");
+        NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/" + element_file);
+        TS_ASSERT(comp_ele.CompareFiles(1e-15));
+        FileComparison( results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/" + element_file).CompareFiles();
+
+        NumericFileComparison comp_nodes(results_dir + "/results.viznodes", "crypt/test/data/TestResultsFileForLongerCryptSimulation/" + node_file);
         TS_ASSERT(comp_nodes.CompareFiles(1e-15));
 
         NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "crypt/test/data/TestResultsFileForLongerCryptSimulation/results.vizcelltypes");
