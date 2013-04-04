@@ -3074,7 +3074,13 @@ http://www.CellML.org/
       </math>
    </component>
    <component name="sodium_dynamics">
-      <variable name="Na_i" units="millimolar" initial_value="8.604" public_interface="out"/>
+      <variable name="Na_i" units="millimolar" initial_value="8.604" public_interface="out" cmeta:id="cytosolic_sodium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_sodium_concentration">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_sodium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="Na_o" units="millimolar" initial_value="140" public_interface="out"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in"/>

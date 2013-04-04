@@ -3375,7 +3375,13 @@ gto,slow = 0.11;   % mS/uF"
    <component name="Na">
       <variable name="time" units="ms" public_interface="in"/>
       <variable name="wca" units="mV_per_uM" public_interface="in"/>
-      <variable name="Na_i" units="mM" initial_value="11.441712311614" public_interface="out"/>
+      <variable name="Na_i" units="mM" initial_value="11.441712311614" public_interface="out" cmeta:id="cytosolic_sodium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_sodium_concentration">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_sodium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="xina" units="nA_per_nF" public_interface="in"/>
       <variable name="xiNaK" units="nA_per_nF" public_interface="in"/>
       <variable name="xiNaCa" units="nA_per_nF" public_interface="in"/>
