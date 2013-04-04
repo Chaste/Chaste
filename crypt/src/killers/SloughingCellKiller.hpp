@@ -94,6 +94,11 @@ public:
     SloughingCellKiller(AbstractCellPopulation<DIM>* pCrypt, double sloughHeight, bool sloughSides=false, double sloughWidth = 10.0);
 
     /**
+     * Destructor
+     */
+    virtual ~SloughingCellKiller(){};
+
+    /**
      * @return mSloughSides.
      */
     bool GetSloughSides() const;
