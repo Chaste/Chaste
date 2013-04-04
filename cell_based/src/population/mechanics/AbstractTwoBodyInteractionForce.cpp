@@ -94,7 +94,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
             spring_iterator.GetNodeA()->AddAppliedForceContribution(force);
         }
     }
-    else// This is a NodeBasedCellPopulation
+    else	// This is a NodeBasedCellPopulation
     {
 
         AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);

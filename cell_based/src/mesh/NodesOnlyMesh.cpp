@@ -115,6 +115,27 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
     mIndexCounter = 0;
 }
 
+template <unsigned SPACE_DIM>
+Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) const
+{
+	Node<SPACE_DIM>* p_node;
+
+	std::map<unsigned, unsigned>::const_iterator node_position = mHaloNodesMapping.find(index);
+
+	if (node_position != mHaloNodesMapping.end())
+	{
+		p_node = mHaloNodes[node_position->second];
+	}
+	else
+	{
+		p_node = this->GetNode(index);
+	}
+
+	assert(p_node != NULL);
+
+	return p_node;
+}
+
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
 {

@@ -120,7 +120,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
 template<unsigned DIM>
 Node<DIM>* NodeBasedCellPopulation<DIM>::GetNode(unsigned index)
 {
-    return this->mrMesh.GetNode(index);
+    return mpNodesOnlyMesh->GetNodeOrHaloNode(index);
 }
 
 template<unsigned DIM>

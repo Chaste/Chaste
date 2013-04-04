@@ -249,6 +249,15 @@ public:
     unsigned SolveNodeMapping(unsigned index) const;
 
     /**
+     * Overridden method to get node or halo node from the mesh
+     *
+     * @param index the global index of the node.
+     *
+     * @return a pointer to the node.
+     */
+    Node<SPACE_DIM>* GetNodeOrHaloNode(unsigned index) const;
+
+    /**
      * @return the local number of nodes that are actually in use.
      * Does not include halo nodes.
      */
