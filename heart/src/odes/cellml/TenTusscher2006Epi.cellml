@@ -2626,7 +2626,13 @@ http://www.CellML.org/
       </math>
    </component>
    <component name="calcium_dynamics">
-      <variable name="Ca_i" units="millimolar" initial_value="0.000126" public_interface="out"/>
+      <variable name="Ca_i" units="millimolar" initial_value="0.000126" public_interface="out" cmeta:id="cytosolic_calcium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_calcium_concentration">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="Ca_o" units="millimolar" initial_value="2" public_interface="out"/>
       <variable name="Ca_SR" units="millimolar" initial_value="3.64"/>
       <variable name="Ca_ss" units="millimolar" initial_value="0.00036" public_interface="out"/>
@@ -3134,7 +3140,13 @@ http://www.CellML.org/
       </math>
    </component>
    <component name="potassium_dynamics">
-      <variable name="K_i" units="millimolar" initial_value="136.89" public_interface="out"/>
+      <variable name="K_i" units="millimolar" initial_value="136.89" public_interface="out" cmeta:id="cytosolic_potassium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#cytosolic_potassium_concentration">
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_potassium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="K_o" units="millimolar" initial_value="5.4" public_interface="out"/>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in" cmeta:id="K_F"/>
