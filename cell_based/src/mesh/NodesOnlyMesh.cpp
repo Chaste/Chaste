@@ -504,6 +504,15 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodesToBoxes()
           unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
           mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
      }
+
+     // Add halo nodes
+     for (typename std::vector<Node<SPACE_DIM>* >::iterator halo_node_iter = mHaloNodes.begin();
+    		 halo_node_iter != mHaloNodes.end();
+    		 ++halo_node_iter)
+     {
+         unsigned box_index = mpBoxCollection->CalculateContainingBox(*halo_node_iter);
+         mpBoxCollection->rGetBox(box_index).AddNode(*halo_node_iter);
+     }
 }
 
 template<unsigned SPACE_DIM>
