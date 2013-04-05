@@ -97,9 +97,30 @@ gto,slow = 0.11;   % mS/uF"
       <variable name="R" units="J_per_moleK" initial_value="8.314472"/>
       <variable name="T" units="kelvin" initial_value="308"/>
       <variable name="F" units="coulomb_per_mmole" initial_value="96.4853415" public_interface="out"/>
-      <variable name="K_o" units="mM" initial_value="5.4" public_interface="out"/>
-      <variable name="Ca_o" units="mM" initial_value="1.8" public_interface="out"/>
-      <variable name="Na_o" units="mM" initial_value="136" public_interface="out"/>
+      <variable name="K_o" units="mM" initial_value="5.4" public_interface="out" cmeta:id="extracellular_potassium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#extracellular_potassium_concentration">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_potassium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
+      <variable name="Ca_o" units="mM" initial_value="1.8" public_interface="out" cmeta:id="extracellular_calcium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#extracellular_calcium_concentration">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_calcium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
+      <variable name="Na_o" units="mM" initial_value="136" public_interface="out" cmeta:id="extracellular_sodium_concentration">
+         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#extracellular_sodium_concentration">
+               <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_sodium_concentration"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="FonRT" units="per_mV" public_interface="out"/>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply>

@@ -2633,7 +2633,14 @@ http://www.CellML.org/
          </rdf:Description>
         </rdf:RDF>
       </variable>
-      <variable name="Ca_o" units="millimolar" initial_value="2" public_interface="out"/>
+      <variable name="Ca_o" units="millimolar" initial_value="2" public_interface="out" cmeta:id="extracellular_calcium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#extracellular_calcium_concentration">
+            <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_calcium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="Ca_SR" units="millimolar" initial_value="3.64"/>
       <variable name="Ca_ss" units="millimolar" initial_value="0.00036" public_interface="out"/>
       <variable name="i_rel" units="millimolar_per_millisecond"/>
@@ -3087,7 +3094,14 @@ http://www.CellML.org/
          </rdf:Description>
         </rdf:RDF>
       </variable>
-      <variable name="Na_o" units="millimolar" initial_value="140" public_interface="out"/>
+      <variable name="Na_o" units="millimolar" initial_value="140" public_interface="out" cmeta:id="extracellular_sodium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#extracellular_sodium_concentration">
+            <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_sodium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in"/>
       <variable name="Cm" units="microF_per_cm2" public_interface="in"/>
@@ -3147,7 +3161,14 @@ http://www.CellML.org/
          </rdf:Description>
         </rdf:RDF>
       </variable>
-      <variable name="K_o" units="millimolar" initial_value="5.4" public_interface="out"/>
+      <variable name="K_o" units="millimolar" initial_value="5.4" public_interface="out" cmeta:id="extracellular_potassium_concentration">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+         <rdf:Description rdf:about="#extracellular_potassium_concentration">
+            <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+            <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#extracellular_potassium_concentration"/>
+         </rdf:Description>
+        </rdf:RDF>
+      </variable>      
       <variable name="time" units="millisecond" public_interface="in"/>
       <variable name="F" units="coulomb_per_millimole" public_interface="in" cmeta:id="K_F"/>
       <variable name="Cm" units="microF_per_cm2" public_interface="in"/>
