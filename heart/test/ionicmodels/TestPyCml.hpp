@@ -58,9 +58,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991BackwardEuler.hpp"
 #include "LuoRudy1991.hpp"
 
-#include "TenTusscher2006Epi.hpp"
-#include "TenTusscher2006EpiOpt.hpp"
-#include "TenTusscher2006EpiBackwardEuler.hpp"
+#include "DiFrancescoNoble1985.hpp"
+#include "DiFrancescoNoble1985Opt.hpp"
+#include "DiFrancescoNoble1985BackwardEuler.hpp"
 
 // Note: only using the optimised model, to test linking with chaste_libs=0!
 #include "NobleVargheseKohlNoble1998aOpt.hpp"
@@ -482,22 +482,20 @@ public:
         boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         // Normal model
-        CellTenTusscher2006EpiFromCellML normal(p_solver, p_stimulus);
-        normal.UseCellMLDefaultStimulus();
+        CellDiFrancescoNoble1985FromCellML normal(p_solver, p_stimulus);
         CheckCai(normal, false);
 
         // Optimised model
-        CellTenTusscher2006EpiFromCellMLOpt opt(p_solver, p_stimulus);
-        opt.UseCellMLDefaultStimulus();
+        CellDiFrancescoNoble1985FromCellMLOpt opt(p_solver, p_stimulus);
         CheckCai(opt, false);
 
         // Backward Euler model
-        CellTenTusscher2006EpiFromCellMLBackwardEuler be(p_solver, p_stimulus);
-        be.UseCellMLDefaultStimulus();
+        CellDiFrancescoNoble1985FromCellMLBackwardEuler be(p_solver, p_stimulus);
         CheckCai(be, false);
 
         // N98
         CellNobleVargheseKohlNoble1998aFromCellMLOpt n98opt(p_solver, p_stimulus);
+        n98opt.UseCellMLDefaultStimulus();
         CheckCai(n98opt, false);
     }
 };
