@@ -658,6 +658,12 @@ public:
             TS_ASSERT_EQUALS(mesh.SolveNodeMapping(1), 0u);
             TS_ASSERT(mesh.mDeletedNodeIndices.size() == 0u);
         }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestHaloNodes()	throw (Exception)

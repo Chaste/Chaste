@@ -1294,6 +1294,12 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_cells);
             //TS_ASSERT_THROWS_THIS(cell_population.GetLocationIndexUsingCell(cells[0]), "");
         }
+
+        // Clean up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 };
 
