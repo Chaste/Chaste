@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdlib>
 
-#include "PetscSetupAndFinalize.hpp"
+#include "FakePetscSetup.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 
@@ -57,6 +57,41 @@ public:
         std::string chaste_build_root(ChasteBuildRootDir());
         TS_ASSERT_EQUALS(GetCurrentWorkingDirectory() + "/", chaste_build_root);
     }
+
+    void TestDivideOneByZero() throw(Exception)
+    {
+        double one = 1.0;
+        double zero = 0.0;
+        double ans;
+#ifdef TEST_FOR_FPE
+// If we are testing for divide-by-zero, then this will throw an exception
+        //TS_ASSERT_THROWS_ANYTHING(ans = one / zero);
+        ans=zero*one;//otherwise compiler would complain
+        ans=ans*zero;//otherwise compiler would complain
+#else
+// If we aren't testing for it, then there will be no exception
+        TS_ASSERT_THROWS_NOTHING(ans = one / zero);
+        double negative_infinity=std::numeric_limits<double>::infinity();
+        TS_ASSERT_EQUALS(ans, negative_infinity);
+#endif
+    }
+
+    void TestDivideZeroByZero() throw(Exception)
+    {
+        double zero = 0.0;
+        double ans;
+#ifdef TEST_FOR_FPE
+// If we are testing for divide-by-zero, then this will throw an exception
+        //TS_ASSERT_THROWS_ANYTHING(ans = zero / zero);
+        ans=zero;//otherwise compiler would complain
+        ans=ans*zero;//otherwise compiler would complain
+#else
+// If we aren't testing for it, then there will be no exception
+        TS_ASSERT_THROWS_NOTHING(ans = zero / zero);
+        TS_ASSERT(std::isnan(ans));
+#endif
+    }
+
 };
 
 #endif /*_TESTCWD_HPP_*/

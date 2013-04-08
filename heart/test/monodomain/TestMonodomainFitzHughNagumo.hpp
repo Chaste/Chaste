@@ -40,17 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
-#include <petscvec.h>
-#include <vector>
-
-
-#include "PetscSetupAndFinalize.hpp"
 #include "AbstractCardiacCellFactory.hpp"
-
 #include "SimpleStimulus.hpp"
-
 #include "FitzHughNagumo1961OdeSystem.hpp"
 #include "ReplicatableVector.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 
 class FhnEdgeStimulusCellFactory : public AbstractCardiacCellFactory<2>

@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OrthotropicConductivityTensors.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include <petsc.h>
+#include "PetscSetupAndFinalize.hpp"
 
 
 // cell factory for creating 2 cells with both intra and extracellular stimuli
@@ -187,7 +187,7 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_2mm_12_elements", cp::media_type::NoFibreOrientation);
 
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        
+
         // METIS_LIBRARY partition ensures that we have never own all the elements (even when there are as few as 2 processes)
         // DUMB and PARMETIS_LIBRARY may allow single process to see all the elements because it's a very small mesh
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);

@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ColumnDataReader.hpp"
 #include "Exception.hpp"
 #include <cassert>
-
-using namespace std;
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestColumnDataReaderWriter : public CxxTest::TestSuite
 {
@@ -57,8 +57,8 @@ private:
     {
         bool matching = true;
 
-        ifstream testfile(testfileName.c_str(),ios::in);
-        ifstream goodfile(goodfileName.c_str(),ios::in);
+        std::ifstream testfile(testfileName.c_str(), std::ios::in);
+        std::ifstream goodfile(goodfileName.c_str(), std::ios::in);
         std::string teststring;
         std::string goodstring;
 

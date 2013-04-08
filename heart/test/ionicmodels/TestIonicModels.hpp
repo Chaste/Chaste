@@ -86,8 +86,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Maleckar2008.hpp"
 #include "ArchiveLocationInfo.hpp"
 
-#include "PetscTools.hpp" //No PETSc here -- this is just to double-check
-
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 // Note: RunOdeSolverWithIonicModel(), CheckCellModelResults(), CompareCellModelResults()
 // are defined in RunAndCheckIonicModels.hpp

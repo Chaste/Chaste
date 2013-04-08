@@ -90,7 +90,7 @@ public:
         time_t cached_start = std::clock();
         {
             TetrahedralMesh<3,3> mesh;
-            mesh.ConstructCuboid(25,25,25);
+            mesh.ConstructCuboid(30,30,30);
             cached_mem_usage = GetMemoryUsage();
         }
         time_t cached_finish = std::clock();
@@ -101,7 +101,7 @@ public:
         time_t non_cached_start = std::clock();
         {
             NonCachedTetrahedralMesh<3,3> mesh;
-            mesh.ConstructCuboid(25,25,25);
+            mesh.ConstructCuboid(30,30,30);
             non_cached_mem_usage = GetMemoryUsage();
         }
         time_t non_cached_finish = std::clock();

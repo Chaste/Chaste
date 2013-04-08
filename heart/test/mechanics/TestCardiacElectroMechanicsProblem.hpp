@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "BidomainProblem.hpp"
 #include "PlaneStimulusCellFactory.hpp"
-#include <petscvec.h>
-#include "PetscSetupAndFinalize.hpp"
 #include "CardiacElectroMechProbRegularGeom.hpp"
 #include "LuoRudy1991.hpp"
 #include "NonlinearElasticityTools.hpp"
@@ -50,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5DataReader.hpp"
 #include "NashHunterPoleZeroLaw.hpp"
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 // cell factory which stimulates everything at once
 class EntirelyStimulatedTissueCellFactory : public AbstractCardiacCellFactory<2>

@@ -45,6 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // We use a c_matrix for a bit of storage.  It's rather naughty using a linalg header
 // here, but since it doesn't have a corresponding .cpp file we get away with it!
 #include "UblasMatrixInclude.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 
 class TestRandomNumberGenerator : public CxxTest::TestSuite
 {

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "FileComparison.hpp"
 
-// The header file below must be included in any TEST(!) that uses Petsc
+// The header file below must be included in any TEST(!) that uses PETSc
 #include "PetscSetupAndFinalize.hpp"
 
 class TestNodeBasedCellPopulationWithBuskeUpdate : public AbstractCellBasedTestSuite

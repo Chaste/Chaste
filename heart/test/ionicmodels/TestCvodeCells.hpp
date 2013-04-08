@@ -57,6 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSystemInformation.hpp"
 #include "VectorHelperFunctions.hpp"
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 #ifdef CHASTE_CVODE
 
 class ExceptionalCell : public AbstractCvodeCell

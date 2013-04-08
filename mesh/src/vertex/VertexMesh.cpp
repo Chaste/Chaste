@@ -1080,7 +1080,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
 
             // Calculate the perpendicular distance from the plane of the face to the chosen apex
             c_vector<double, SPACE_DIM> base_to_apex = GetVectorFromAtoB(p_face->GetNodeLocation(0), pyramid_apex);
-            double perpendicular_distance = inner_prod(base_to_apex, unit_normal);
+            double perpendicular_distance = fabs(inner_prod(base_to_apex, unit_normal));
 
             // Calculate the area of the face
             double face_area = GetAreaOfFace(p_face);

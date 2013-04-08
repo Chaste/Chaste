@@ -124,6 +124,7 @@ public:
         //TS_ASSERT_THROWS_ANYTHING(ans = one / zero);
         ans = zero*one;//otherwise compiler would complain
         TS_ASSERT_EQUALS(ans, zero);
+        ans=ans*zero;//otherwise compiler would complain
 #else
 // If we aren't testing for it, then there will be no exception
         TS_ASSERT_THROWS_NOTHING(ans = one / zero);
@@ -141,6 +142,7 @@ public:
         //TS_ASSERT_THROWS_ANYTHING(ans = zero / zero);
         ans = zero;//otherwise compiler would complain
         TS_ASSERT_EQUALS(ans, zero);
+        ans=ans*zero;//otherwise compiler would complain
 #else
 // If we aren't testing for it, then there will be no exception
         TS_ASSERT_THROWS_NOTHING(ans = zero / zero);

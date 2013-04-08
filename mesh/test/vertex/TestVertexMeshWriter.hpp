@@ -49,6 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 // Cut out the strstream deprecated warning for now (gcc4.3)
 #include <vtkVersion.h>

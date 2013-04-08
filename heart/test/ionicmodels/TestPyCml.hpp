@@ -70,6 +70,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991CvodeOpt.hpp"
 #endif // CHASTE_CVODE
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 class TestPyCml : public CxxTest::TestSuite
 {
     template<typename VECTOR_TYPE>

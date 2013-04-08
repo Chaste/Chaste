@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 #include "OdeLinearSystemSolver.hpp"
 
-// The header file below must be included in any test that uses Petsc
+// The header file below must be included in any test that uses PETSc
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOdeLinearSystemSolver : public CxxTest::TestSuite
@@ -71,6 +71,7 @@ public:
         Vec initial_condition = PetscTools::CreateAndSetVec(2, 0.0);
         PetscVecTools::SetElement(initial_condition, 0, 10.0);
         PetscVecTools::SetElement(initial_condition, 1, 11.0);
+        PetscVecTools::Finalise(initial_condition);
 
         solver.SetInitialConditionVector(initial_condition);
 
@@ -120,6 +121,7 @@ public:
         Vec initial_condition = PetscTools::CreateAndSetVec(2, 0.0);
         PetscVecTools::SetElement(initial_condition, 0, 10.0);
         PetscVecTools::SetElement(initial_condition, 1, 11.0);
+        PetscVecTools::Finalise(initial_condition);
 
         solver.SetInitialConditionVector(initial_condition);
 
@@ -183,6 +185,7 @@ public:
         PetscVecTools::SetElement(initial_condition, 1, 11.0);
         PetscVecTools::SetElement(initial_condition, 2, 12.0);
         PetscVecTools::SetElement(initial_condition, 3, 13.0);
+        PetscVecTools::Finalise(initial_condition);
 
         solver.SetInitialConditionVector(initial_condition);
 

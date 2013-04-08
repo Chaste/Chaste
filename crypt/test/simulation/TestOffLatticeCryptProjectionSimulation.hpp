@@ -60,6 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "StochasticWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestOffLatticeCryptProjectionSimulation : public AbstractCellBasedTestSuite
 {

@@ -47,6 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "TimeStepper.hpp"
 #include "OutputFileHandler.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 
 class TestTimeStepper : public CxxTest::TestSuite
 {
