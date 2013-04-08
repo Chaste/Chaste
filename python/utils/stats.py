@@ -102,7 +102,7 @@ def print_header():
     """Print a TSV header line corresponding to the output of print_stats."""
     print '#rev\ttime (weeks)\tsrc_files\tsrc_loc\ttest_files\ttests_loc\ttest_suites\ttests\ttotal_loc\tdate'
 
-def run():
+def run(startRev):
     """Do the processing."""
     svn_revision = os.popen("svnversion").read().strip()
     if (svn_revision[-1] == 'M'):
@@ -124,19 +124,29 @@ def run():
     sys.stdout.flush()
 
     step = 10
-    start = 10
-    for rev in range(start,last_revision,step):
+    for rev in range(startRev,last_revision,step):
         os.system('svn up --non-interactive -r '+str(rev)+' > /dev/null')
         print_stats()
         sys.stdout.flush()
 
 if __name__ == '__main__':
-    run()
+ start_rev = 10
+ if len(sys.argv) > 1:
+     start_rev = int(sys.argv[1])
+     start_rev -= start_rev%10
+ print '# Start revision =', start_rev
+ run(start_rev)
 
-# Cut'n'paste for gnuplot:
-#
-# set xlabel 'weeks'                                                                                                                    
-# set term png                                                                                                                          
-# set out 'loc.png'                                                                                                                     
-# plot 'nohup.out' u 2:4  w l title 'lines of source', 'nohup.out' u 2:6 w l title 'lines of tests', 'nohup.out' u 2:9 w l title 'total'
-# exit      
+""" Cut'n'paste for gnuplot:
+
+*****************
+NB: 
+SEE notforrelease/docs/loc.gnu 
+*****************
+
+set xlabel 'weeks'                                                                                                                    
+set term png                                                                                                                          
+set out 'loc.png'                                                                                                                     
+plot 'loc.txt' u 2:4  w l title 'lines of source', 'loc.txt' u 2:6 w l title 'lines of tests', 'loc.txt' u 2:9 w l title 'total'
+exit      
+"""
