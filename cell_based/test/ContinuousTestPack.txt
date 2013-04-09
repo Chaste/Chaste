@@ -28,6 +28,7 @@ odes/TestTysonNovak2001OdeSystem.hpp
 population/TestCellBasedPdeHandler.hpp
 population/TestCellBasedPdes.hpp
 population/TestCellPopulationBoundaryConditions.hpp
+population/TestCellPopulationWriters.hpp
 population/TestCellKillers.hpp
 population/TestCellwiseDataGradient.hpp
 population/TestDiscreteSystemForceCalculator.hpp
