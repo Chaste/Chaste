@@ -44,6 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 class TestCylindricalHoneycombVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
