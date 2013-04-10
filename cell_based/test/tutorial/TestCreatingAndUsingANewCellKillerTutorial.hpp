@@ -79,6 +79,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "SmartPointers.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 /*
  * == Defining the cell killer class ==
  *

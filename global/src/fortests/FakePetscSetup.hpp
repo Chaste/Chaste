@@ -83,7 +83,12 @@ class PetscSetup : public CxxTest::GlobalFixture
 {
 public:
 
-    /** Standard setup method for PETSc. */
+    /** Run the standard setup method for PETSc, but then take it down again.
+     * Only the process with PETSc rank zero continues beyond setUpWorld(); the others
+     * exit gracefully
+     *
+     * @return true (by CxxTest convention)
+     */
     bool setUpWorld()
     {
         // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
@@ -128,12 +133,7 @@ public:
 
         return true;
     }
-    bool tearDownWorld()
-    {
-        return true;
-    }
 };
 
-static PetscSetup thisSetup;
 
 #endif //_PETSCSETUPANDFINALIZE_HPP_
