@@ -92,14 +92,14 @@ private:
     /** The tag used to send and recieve cell information */
     static const unsigned mCellCommunicationTag = 123;
 
-	/** Pointers to halo cells */
-	std::vector<CellPtr> mHaloCells;
+    /** Pointers to halo cells */
+    std::vector<CellPtr> mHaloCells;
 
-	/** Map location indices back to halo cells */
-	std::map<unsigned, CellPtr> mLocationHaloCellMap;
+    /** Map location indices back to halo cells */
+    std::map<unsigned, CellPtr> mLocationHaloCellMap;
 
-	/** Map halo cells back to location indices */
-	std::map<CellPtr, unsigned> mHaloCellLocationMap;
+    /** Map halo cells back to location indices */
+    std::map<CellPtr, unsigned> mHaloCellLocationMap;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;

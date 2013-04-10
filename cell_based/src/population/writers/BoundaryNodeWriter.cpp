@@ -32,17 +32,17 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "NodeLocationWriter.hpp"
+#include "BoundaryNodeWriter.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter(std::string directory)
+BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter(std::string directory)
     : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
 {
-    this->mFileName = "results.viznodes";
+    this->mFileName = "results.vizboundarynodes";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     this->WriteTimeStamp();
 
@@ -52,12 +52,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
     {
         if (!node_iter->IsDeleted())
         {
-            const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
-
-            for (unsigned i=0; i<SPACE_DIM; i++)
-            {
-                *this->mpOutStream << position[i] << " ";
-            }
+            *this->mpOutStream << node_iter->IsBoundaryNode() << " ";
         }
     }
 
@@ -65,7 +60,13 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes< SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -73,7 +74,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<S
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -81,7 +82,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -89,13 +90,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopula
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-    VisitAnyPopulation(pCellPopulation);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -103,7 +98,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -111,7 +106,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -119,7 +114,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -127,6 +122,6 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
 }
 
 // Explicit instantiation
-template class NodeLocationWriter<1,1>;
-template class NodeLocationWriter<2,2>;
-template class NodeLocationWriter<3,3>;
+template class BoundaryNodeWriter<1,1>;
+template class BoundaryNodeWriter<2,2>;
+template class BoundaryNodeWriter<3,3>;

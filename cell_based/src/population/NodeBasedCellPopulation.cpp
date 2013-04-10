@@ -710,7 +710,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
 {
-	mpNodesOnlyMesh->CalculateNodesOutsideLocalDomain();
+    mpNodesOnlyMesh->CalculateNodesOutsideLocalDomain();
 
     std::vector<unsigned> nodes_to_send_right = mpNodesOnlyMesh->rGetNodesToSendRight();
     AddCellsToSendRight(nodes_to_send_right);
@@ -740,15 +740,15 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::RefreshHaloCells()
 {
-	mHaloCells.clear();
-	mHaloCellLocationMap.clear();
-	mLocationHaloCellMap.clear();
+    mHaloCells.clear();
+    mHaloCellLocationMap.clear();
+    mLocationHaloCellMap.clear();
 
-	std::vector<unsigned> halos_to_send_right = mpNodesOnlyMesh->rGetHaloNodesToSendRight();
-	AddCellsToSendRight(halos_to_send_right);
+    std::vector<unsigned> halos_to_send_right = mpNodesOnlyMesh->rGetHaloNodesToSendRight();
+    AddCellsToSendRight(halos_to_send_right);
 
-	std::vector<unsigned> halos_to_send_left = mpNodesOnlyMesh->rGetHaloNodesToSendLeft();
-	AddCellsToSendLeft(halos_to_send_left);
+    std::vector<unsigned> halos_to_send_left = mpNodesOnlyMesh->rGetHaloNodesToSendLeft();
+    AddCellsToSendLeft(halos_to_send_left);
 
     SendCellsToNeighbourProcesses();
 
@@ -758,23 +758,23 @@ void NodeBasedCellPopulation<DIM>::RefreshHaloCells()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddCellsToSendRight(std::vector<unsigned>& cellLocationIndices)
 {
-	mCellsToSendRight.clear();
+    mCellsToSendRight.clear();
 
-	for (unsigned i=0; i < cellLocationIndices.size(); i++)
-	{
-		AddNodeAndCellToSendRight(cellLocationIndices[i]);
-	}
+    for (unsigned i=0; i < cellLocationIndices.size(); i++)
+    {
+        AddNodeAndCellToSendRight(cellLocationIndices[i]);
+    }
 }
 
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddCellsToSendLeft(std::vector<unsigned>& cellLocationIndices)
 {
-	mCellsToSendLeft.clear();
+    mCellsToSendLeft.clear();
 
-	for (unsigned i=0; i < cellLocationIndices.size(); i++)
-	{
-		AddNodeAndCellToSendLeft(cellLocationIndices[i]);
-	}
+    for (unsigned i=0; i < cellLocationIndices.size(); i++)
+    {
+        AddNodeAndCellToSendLeft(cellLocationIndices[i]);
+    }
 }
 
 template<unsigned DIM>
@@ -803,13 +803,13 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, Node<DIM>* pNode)
 {
-	mHaloCells.push_back(pCell);
+    mHaloCells.push_back(pCell);
 
-	mpNodesOnlyMesh->AddHaloNode(pNode);
+    mpNodesOnlyMesh->AddHaloNode(pNode);
 
-	mHaloCellLocationMap[pCell] = pNode->GetIndex();
+    mHaloCellLocationMap[pCell] = pNode->GetIndex();
 
-	mLocationHaloCellMap[pNode->GetIndex()] = pCell;
+    mLocationHaloCellMap[pNode->GetIndex()] = pCell;
 }
 
 /////////////////////////////////////////////////////////////////////////////

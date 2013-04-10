@@ -32,9 +32,12 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#ifndef BOUNDARYNODEWRITER_HPP_
+#define BOUNDARYNODEWRITER_HPP_
+
 #include "OutputFileHandler.hpp"
 #include "AbstractCellPopulation.hpp"
-
 #include "AbstractCellPopulationWriter.hpp"
 
 #include <string>
@@ -43,19 +46,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A class written using the visitor pattern for writing node location from a cell population to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class NodeLocationWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class BoundaryNodeWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
-
 public:
 
     /**
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-    NodeLocationWriter(std::string directory);
+    BoundaryNodeWriter(std::string directory);
 
     /**
-     * Visit any population and write the data. This is the same structure for any popoulation.
+     * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the population to visit.
      */
@@ -117,3 +119,5 @@ public:
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
+
+#endif /*BOUNDARYNODEWRITER_HPP_*/

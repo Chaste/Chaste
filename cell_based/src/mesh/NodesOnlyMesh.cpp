@@ -118,22 +118,22 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 template <unsigned SPACE_DIM>
 Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) const
 {
-	Node<SPACE_DIM>* p_node;
+    Node<SPACE_DIM>* p_node;
 
-	std::map<unsigned, unsigned>::const_iterator node_position = mHaloNodesMapping.find(index);
+    std::map<unsigned, unsigned>::const_iterator node_position = mHaloNodesMapping.find(index);
 
-	if (node_position != mHaloNodesMapping.end())
-	{
-		p_node = mHaloNodes[node_position->second];
-	}
-	else
-	{
-		p_node = this->GetNode(index);
-	}
+    if (node_position != mHaloNodesMapping.end())
+    {
+        p_node = mHaloNodes[node_position->second];
+    }
+    else
+    {
+        p_node = this->GetNode(index);
+    }
 
-	assert(p_node != NULL);
+    assert(p_node != NULL);
 
-	return p_node;
+    return p_node;
 }
 
 template<unsigned SPACE_DIM>
@@ -266,13 +266,13 @@ std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetNodesToSendRight()
 template<unsigned SPACE_DIM>
 std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetHaloNodesToSendRight()
 {
-	return mpBoxCollection->rGetHaloNodesRight();
+    return mpBoxCollection->rGetHaloNodesRight();
 }
 
 template<unsigned SPACE_DIM>
 std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetHaloNodesToSendLeft()
 {
-	return mpBoxCollection->rGetHaloNodesLeft();
+    return mpBoxCollection->rGetHaloNodesLeft();
 }
 
 template<unsigned SPACE_DIM>
@@ -310,20 +310,20 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(Node<SPACE_DIM>* pNewNode)
 {
-	mHaloNodes.push_back(pNewNode);
-	mHaloNodesMapping[pNewNode->GetIndex()] = mHaloNodes.size() - 1;
+    mHaloNodes.push_back(pNewNode);
+    mHaloNodesMapping[pNewNode->GetIndex()] = mHaloNodes.size() - 1;
 }
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ClearHaloNodes()
 {
-	for (unsigned i=0; i<mHaloNodes.size(); i++)
-	{
-		delete mHaloNodes[i];
-	}
-	mHaloNodes.clear();
+    for (unsigned i=0; i<mHaloNodes.size(); i++)
+    {
+        delete mHaloNodes[i];
+    }
+    mHaloNodes.clear();
 
-	mHaloNodesMapping.clear();
+    mHaloNodesMapping.clear();
 }
 
 template<unsigned SPACE_DIM>
@@ -507,8 +507,8 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodesToBoxes()
 
      // Add halo nodes
      for (typename std::vector<Node<SPACE_DIM>* >::iterator halo_node_iter = mHaloNodes.begin();
-    		 halo_node_iter != mHaloNodes.end();
-    		 ++halo_node_iter)
+             halo_node_iter != mHaloNodes.end();
+             ++halo_node_iter)
      {
          unsigned box_index = mpBoxCollection->CalculateContainingBox(*halo_node_iter);
          mpBoxCollection->rGetBox(box_index).AddNode(*halo_node_iter);

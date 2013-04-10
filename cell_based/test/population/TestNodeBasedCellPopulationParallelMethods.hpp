@@ -201,31 +201,31 @@ public:
         }
     }
 
-    void TestRefreshHaloCells()	throw (Exception)
-	{
+    void TestRefreshHaloCells()    throw (Exception)
+    {
 #if BOOST_VERSION < 103700
         TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
                               "Parallel cell-based Chaste requires Boost >= 1.37");
 #else
-    	// Set up the halo boxes and nodes.
-    	mpNodeBasedCellPopulation->Update();
+        // Set up the halo boxes and nodes.
+        mpNodeBasedCellPopulation->Update();
 
-    	// Send and receive halo nodes.
-       	mpNodeBasedCellPopulation->RefreshHaloCells();
+        // Send and receive halo nodes.
+           mpNodeBasedCellPopulation->RefreshHaloCells();
 
-       	if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
-       	{
-       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
-       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
-       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
-       	}
-       	else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
-       	{
-       		TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
-       	}
+           if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
+           {
+               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
+               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
+               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+           }
+           else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
+           {
+               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
+           }
 #endif
 
-	}
+    }
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONPARALLELMETHODS_HPP_*/

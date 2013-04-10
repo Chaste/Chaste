@@ -666,8 +666,8 @@ public:
         }
     }
 
-    void TestHaloNodes()	throw (Exception)
-	{
+    void TestHaloNodes()    throw (Exception)
+    {
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 0.0, 1.6));
@@ -686,7 +686,7 @@ public:
 
         delete nodes[0];
         delete nodes[1];
-	}
+    }
 
     void TestGetNodesOutsideLocalDomain()   throw (Exception)
     {
@@ -736,30 +736,30 @@ public:
         }
     }
 
-    void TestAddAndGetHaloNodes()	throw (Exception)
-	{
-    	std::vector<Node<2>* > nodes;
-    	nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+    void TestAddAndGetHaloNodes()    throw (Exception)
+    {
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
 
-    	NodesOnlyMesh<2> mesh;
-    	mesh.ConstructNodesWithoutMesh(nodes, 1.0);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.0);
 
-    	unsigned num_original_nodes = mesh.GetNumNodes();
-    	mesh.AddHaloNode(new Node<2>(10, false, 0.0, 1.0));
+        unsigned num_original_nodes = mesh.GetNumNodes();
+        mesh.AddHaloNode(new Node<2>(10, false, 0.0, 1.0));
 
-    	TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_original_nodes);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_original_nodes);
 
-    	if (num_original_nodes > 0)
-    	{
-    		TS_ASSERT_EQUALS(mesh.GetNode(0), mesh.GetNodeOrHaloNode(0));
-    	}
-    	TS_ASSERT_EQUALS(mesh.mHaloNodes.size(), 1u);
-    	TS_ASSERT_THROWS_NOTHING(mesh.GetNodeOrHaloNode(10));
-    	TS_ASSERT_EQUALS(mesh.GetNodeOrHaloNode(10)->GetIndex(), 10u);
-    	TS_ASSERT_DELTA(mesh.GetNodeOrHaloNode(10)->rGetLocation()[1], 1.0, 1e-4);
+        if (num_original_nodes > 0)
+        {
+            TS_ASSERT_EQUALS(mesh.GetNode(0), mesh.GetNodeOrHaloNode(0));
+        }
+        TS_ASSERT_EQUALS(mesh.mHaloNodes.size(), 1u);
+        TS_ASSERT_THROWS_NOTHING(mesh.GetNodeOrHaloNode(10));
+        TS_ASSERT_EQUALS(mesh.GetNodeOrHaloNode(10)->GetIndex(), 10u);
+        TS_ASSERT_DELTA(mesh.GetNodeOrHaloNode(10)->rGetLocation()[1], 1.0, 1e-4);
 
-    	delete nodes[0];
-	}
+        delete nodes[0];
+    }
 
     void TestArchiving() throw(Exception)
     {

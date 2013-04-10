@@ -32,19 +32,22 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "OutputFileHandler.hpp"
-#include "AbstractCellPopulation.hpp"
+
+#ifndef CELLMUTATIONSTATESWRITER_HPP_
+#define CELLMUTATIONSTATESWRITER_HPP_
 
 #include "AbstractCellPopulationWriter.hpp"
-
-#include <string>
 
 /**
  * A class written using the visitor pattern for writing node location from a cell population to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class NodeLocationWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class CellMutationStatesWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
+private:
+
+    /** Whether the header line of a file has been written */
+    bool mHasHeaderBeenWritten;
 
 public:
 
@@ -52,14 +55,21 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-    NodeLocationWriter(std::string directory);
+    CellMutationStatesWriter(std::string directory);
 
     /**
-     * Visit any population and write the data. This is the same structure for any popoulation.
+     * A general method for writing to any population
      *
-     * @param pCellPopulation a pointer to the population to visit.
+     * @param pCellPopulation the population to write.
      */
-    void VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Write the header of the output file. //\ todo pull up to abstract class e.g. 'WriterWithHeader'
+     *
+     * @param pCellPopulation the population to write.
+     */
+    void WriteHeader(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
@@ -117,3 +127,5 @@ public:
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
+
+#endif /*CELLMUTATIONSTATESWRITER_HPP_*/
