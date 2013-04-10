@@ -757,6 +757,8 @@ public:
     	TS_ASSERT_THROWS_NOTHING(mesh.GetNodeOrHaloNode(10));
     	TS_ASSERT_EQUALS(mesh.GetNodeOrHaloNode(10)->GetIndex(), 10u);
     	TS_ASSERT_DELTA(mesh.GetNodeOrHaloNode(10)->rGetLocation()[1], 1.0, 1e-4);
+
+    	delete nodes[0];
 	}
 
     void TestArchiving() throw(Exception)
