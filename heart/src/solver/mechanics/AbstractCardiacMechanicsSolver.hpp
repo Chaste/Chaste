@@ -353,7 +353,8 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
      mOdeTimestep(DBL_MAX),
      mrElectroMechanicsProblemDefinition(rProblemDefinition)
 {
-
+    // This fails for a couple of cardiac mechanics solver tests, but not for the 'real' simulations.
+    //assert(mContractionModelName==mrElectroMechanicsProblemDefinition.GetContractionModel());
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
