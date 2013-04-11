@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 
-#include "FakePetscSetup.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestCellPopulationWriters : public AbstractCellBasedTestSuite
 {
@@ -69,6 +69,8 @@ public:
 
     void TestNodeLocationWriter() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // NodeBasedCellPopulation
         std::vector<Node<3>* > nodes;
         nodes.push_back(new Node<3>(0, false));
@@ -114,6 +116,8 @@ public:
 
     void TestBoundaryNodeWriter()    throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
@@ -158,6 +162,8 @@ public:
 
     void TestCellPopulationElementWriter()    throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -198,6 +204,8 @@ public:
 
     void TestWriteCellMutationStates()    throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
