@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
-#include <unistd.h>
+#include <unistd.h> //For chdir()
 #include <iostream>
 
 #include "Exception.hpp"

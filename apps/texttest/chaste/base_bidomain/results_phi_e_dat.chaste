@@ -177922,7 +177922,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -2e-08
 -3e-08
 -3e-08
--3e-08
+-2e-08
 -2e-08
 -2e-08
 -3e-08
@@ -177942,7 +177942,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -1e-08
 -2e-08
 -3e-08
--3e-08
+-2e-08
 -2e-08
 -2e-08
 -2e-08
@@ -379701,4 +379701,4 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 8.85922
 8.85922
 8.85922
-# Created by Chaste version 3.1.17957 on Fri, 25 Jan 2013 09:59:25 +0000.  Chaste was built on Fri, 25 Jan 2013 09:54:52 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=48:49; jink=17831M; jmpf=17163:17174; papers=exported.
+# Created by Chaste version 3.1.18374 (with uncommitted modifications) on Thu, 11 Apr 2013 11:44:27 +0000.  Chaste was built on Tue, 19 Mar 2013 17:40:43 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_3, shared libraries.  Checked-out project versions: Eikonal=49; papers=18344M.
