@@ -41,10 +41,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 
+// Writers
 #include "NodeLocationWriter.hpp"
 #include "BoundaryNodeWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+#include "VertexSwapWriters.hpp"
+
+// Files to create populations
+#include "HoneycombVertexMeshGenerator.hpp"
+#include "PottsMeshGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -54,12 +65,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-
-#include "HoneycombVertexMeshGenerator.hpp"
-#include "PottsMeshGenerator.hpp"
-
-#include "CellsGenerator.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -114,7 +119,7 @@ public:
         delete nodes[1];
     }
 
-    void TestBoundaryNodeWriter()    throw (Exception)
+    void TestBoundaryNodeWriter() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -249,6 +254,203 @@ public:
         mutation_states_writer.CloseFile();
 
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestWriteCellMutationStates/cellmutationstates_twice.dat").CompareFiles();
+    }
+
+    void TestWritePopulationCellProliferativeTypesCount()         throw (Exception)
+	{
+    	EXIT_IF_PARALLEL;
+
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
+        MutableMesh<3,3> mesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+        cell_population.SetOutputCellProliferativeTypes(true);
+        cell_population.SetOutputCellCyclePhases(true);
+
+        std::string output_directory = "TestWriteCellProlifertiveTypesCount";
+		OutputFileHandler output_file_handler(output_directory, false);
+
+		std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+		/*
+		 * Write cell proliferative types count
+		 */
+
+		// Create a cell proliferative types writer and write the files.
+		CellProliferativeTypesCountWriter<3,3> types_count_writer(output_directory);
+
+		types_count_writer.OpenOutputFile();
+
+		types_count_writer.Visit(&cell_population);
+
+		types_count_writer.CloseFile();
+
+		FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes.dat").CompareFiles();
+
+		// Make sure we can append to files.
+		types_count_writer.OpenOutputFileForAppend();
+
+		types_count_writer.Visit(&cell_population);
+
+		types_count_writer.CloseFile();
+
+		FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes_twice.dat").CompareFiles();
+
+		cell_population.CreateOutputFiles(output_directory, true);
+
+		for (AbstractCellPopulation<3,3>::Iterator cell_iter = cell_population.Begin();
+						cell_iter != cell_population.End();
+						++cell_iter)
+		{
+				cell_population.GenerateCellResults(*cell_iter);
+		}
+
+		/*
+		 * Write cell cycle phases count file.
+		 */
+		// Create a node location writer and write the files.
+		CellProliferativePhasesCountWriter<3,3> phases_count_writer(output_directory);
+
+		phases_count_writer.OpenOutputFile();
+
+		phases_count_writer.Visit(&cell_population);
+
+		phases_count_writer.CloseFile();
+
+		FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/cellcyclephases.dat").CompareFiles();
+
+		// Make sure we can append to files.
+		phases_count_writer.OpenOutputFileForAppend();
+
+		phases_count_writer.Visit(&cell_population);
+
+		phases_count_writer.CloseFile();
+
+		FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/cellcyclephases_twice.dat").CompareFiles();
+	}
+
+    void TestWriteVoronoiData() throw (Exception)
+	{
+        EXIT_IF_PARALLEL;
+
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
+        MutableMesh<3,3> mesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+        cell_population.CreateVoronoiTessellation();
+
+        std::string output_directory = "TestWriteVoronoiFile";
+		OutputFileHandler output_file_handler(output_directory, false);
+
+		std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+		VoronoiDataWriter<3,3> voronoi_writer(output_directory);
+
+		voronoi_writer.OpenOutputFile();
+
+		voronoi_writer.Visit(&cell_population);
+
+		voronoi_writer.CloseFile();
+
+		FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestWriteVoronoiFile/voronoi.dat").CompareFiles();
+
+		// Make sure we can append to files.
+		voronoi_writer.OpenOutputFileForAppend();
+
+		voronoi_writer.Visit(&cell_population);
+
+		voronoi_writer.CloseFile();
+
+		FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestWriteVoronoiFile/voronoi_twice.dat").CompareFiles();
+	}
+
+    void TestVertexSwapsWriter()    throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple vertex-based mesh
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        std::string output_directory = "TestWriteVertexSwaps";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        /**
+         * T3 Swaps
+         */
+        VertexT1SwapLocationsWriter<2,2> t1_swaps_writer(output_directory);
+
+        t1_swaps_writer.OpenOutputFile();
+
+        t1_swaps_writer.Visit(&cell_population);
+
+        t1_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestWriteVertexSwaps/T1SwapLocations.dat").CompareFiles();
+
+        // Make sure we can append to files.
+        t1_swaps_writer.OpenOutputFileForAppend();
+
+        t1_swaps_writer.Visit(&cell_population);
+
+        t1_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestWriteVertexSwaps/T1SwapLocations_twice.dat").CompareFiles();
+
+        /**
+         * T3 Swaps
+         */
+        VertexT3SwapLocationsWriter<2,2> t3_swaps_writer(output_directory);
+
+        t3_swaps_writer.OpenOutputFile();
+
+        t3_swaps_writer.Visit(&cell_population);
+
+        t3_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestWriteVertexSwaps/T3SwapLocations.dat").CompareFiles();
+
+        // Make sure we can append to files.
+        t3_swaps_writer.OpenOutputFileForAppend();
+
+        t3_swaps_writer.Visit(&cell_population);
+
+        t3_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestWriteVertexSwaps/T3SwapLocations_twice.dat").CompareFiles();
     }
 };
 
