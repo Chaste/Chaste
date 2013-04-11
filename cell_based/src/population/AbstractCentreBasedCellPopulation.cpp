@@ -211,14 +211,6 @@ bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsParticle(unsig
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResultsAndWriteToFiles()
 {
-    // Set up cell cycle phase counter
-    unsigned num_cell_cycle_phases = this->mCellCyclePhaseCount.size();
-    std::vector<unsigned> cell_cycle_phase_counter(num_cell_cycle_phases);
-    for (unsigned i=0; i<num_cell_cycle_phases; i++)
-    {
-        cell_cycle_phase_counter[i] = 0;
-    }
-
     // Write cell data to file
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
             node_iter != this->mrMesh.GetNodeIteratorEnd();
@@ -248,12 +240,12 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResu
             }
             else
             {
-                this->GenerateCellResults(this->GetCellUsingLocationIndex(node_index), cell_cycle_phase_counter);
+                this->GenerateCellResults(this->GetCellUsingLocationIndex(node_index));
             }
         }
     }
 
-    this->WriteCellResultsToFiles(cell_cycle_phase_counter);
+    this->WriteCellResultsToFiles();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

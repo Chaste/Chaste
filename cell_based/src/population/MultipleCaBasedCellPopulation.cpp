@@ -490,22 +490,14 @@ double MultipleCaBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
 {
-    // Set up cell cycle phase counter
-    unsigned num_cell_cycle_phases = this->mCellCyclePhaseCount.size();
-    std::vector<unsigned> cell_cycle_phase_counter(num_cell_cycle_phases);
-    for (unsigned i=0; i<num_cell_cycle_phases; i++)
-    {
-        cell_cycle_phase_counter[i] = 0;
-    }
-
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
-        this->GenerateCellResults(*cell_iter, cell_cycle_phase_counter);
+        this->GenerateCellResults(*cell_iter);
     }
 
-    this->WriteCellResultsToFiles(cell_cycle_phase_counter);
+    this->WriteCellResultsToFiles();
 }
 
 template<unsigned DIM>

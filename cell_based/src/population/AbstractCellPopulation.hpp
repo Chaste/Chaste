@@ -561,6 +561,11 @@ public:
                                    bool cleanOutputDirectory);
 
     /**
+     * Clear the counters used for cell population output.
+     */
+    void ResetCellCounters();
+
+    /**
      * Write results from the current cell population state to output files.
      */
     virtual void WriteResultsToFiles();
@@ -579,9 +584,8 @@ public:
      * Generate results for a given cell in the current cell population state to output files.
      *
      * @param pCell pointer to the cell
-     * @param rCellCyclePhaseCounter cell cycle phase counter
      */
-    virtual void GenerateCellResults(CellPtr pCell, std::vector<unsigned>& rCellCyclePhaseCounter);
+    virtual void GenerateCellResults(CellPtr pCell);
 
     /**
      * Write the current volume of each cell to file.
@@ -593,9 +597,8 @@ public:
     /**
      * Write the current state of each cell to output files.
      *
-     * @param rCellCyclePhaseCounter cell cycle phase counter
      */
-    void WriteCellResultsToFiles(std::vector<unsigned>& rCellCyclePhaseCounter);
+    void WriteCellResultsToFiles();
 
     /**
      * Close any output files.

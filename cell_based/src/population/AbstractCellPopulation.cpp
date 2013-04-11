@@ -507,7 +507,16 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr pCell, std::vector<unsigned>& rCellCyclePhaseCounter)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ResetCellCounters()
+{
+    for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
+    {
+        mCellCyclePhaseCount[i] = 0;
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr pCell)
 {
     unsigned location_index = this->GetLocationIndexUsingCell(pCell);
 
@@ -515,23 +524,23 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
 
     if (mOutputCellCyclePhases)
     {
-        // Update rCellCyclePhaseCounter
+        // Update mCellCyclePhaseCount
         switch (pCell->GetCellCycleModel()->GetCurrentCellCyclePhase())
         {
             case G_ZERO_PHASE:
-                rCellCyclePhaseCounter[0]++;
+                mCellCyclePhaseCount[0]++;
                 break;
             case G_ONE_PHASE:
-                rCellCyclePhaseCounter[1]++;
+                mCellCyclePhaseCount[1]++;
                 break;
             case S_PHASE:
-                rCellCyclePhaseCounter[2]++;
+                mCellCyclePhaseCount[2]++;
                 break;
             case G_TWO_PHASE:
-                rCellCyclePhaseCounter[3]++;
+                mCellCyclePhaseCount[3]++;
                 break;
              case M_PHASE:
-                rCellCyclePhaseCounter[4]++;
+                 mCellCyclePhaseCount[4]++;
                 break;
             default:
                 NEVER_REACHED;
@@ -614,7 +623,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults(CellPtr
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles(std::vector<unsigned>& rCellCyclePhaseCounter)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles()
 {
     if (mOutputResultsForChasteVisualizer)
     {
@@ -659,8 +668,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteCellResultsToFiles(std
     {
         for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
         {
-            mCellCyclePhaseCount[i] = rCellCyclePhaseCounter[i];
-            *mpCellCyclePhasesFile << rCellCyclePhaseCounter[i] << "\t";
+            *mpCellCyclePhasesFile << mCellCyclePhaseCount[i] << "\t";
         }
         *mpCellCyclePhasesFile << "\n";
 
@@ -764,6 +772,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
     {
         WriteCellVolumeResultsToFile();
     }
+
+    ResetCellCounters();
 
     GenerateCellResultsAndWriteToFiles();
 
