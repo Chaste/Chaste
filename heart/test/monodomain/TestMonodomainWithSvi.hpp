@@ -126,7 +126,7 @@ public:
         {
             p_cell =  new CellLuoRudy1991FromCellMLCvode(this->mpSolver, this->mpZeroStimulus);
         }
-        p_cell->SetMinimalReset(true);
+        //p_cell->SetMinimalReset(true); // This is now done by AbstractCardiacCellFactory for any AbstractCvodeCell.
         p_cell->SetTolerances(1e-5,1e-7);
         return p_cell;
     }

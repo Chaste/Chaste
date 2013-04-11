@@ -182,7 +182,7 @@ public:
             p_cell = new CellShannon2004FromCellMLCvode(p_empty_solver,
                                                         this->mpZeroStimulus);
         }
-        p_cell->SetMinimalReset(true);
+        // p_cell->SetMinimalReset(true); // This is now done by AbstractCardiacCellFactory for any AbstractCvodeCell.
         p_cell->SetTolerances(1e-4,1e-6); // NB These defaulted to different values in CvodeAdaptor.
         return p_cell;
     }

@@ -128,10 +128,10 @@ public:
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */
     VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
-                      std::vector<CellPtr>& rCells,
-                      bool deleteMesh=false,
-                      bool validate=true,
-                      const std::vector<unsigned> locationIndices=std::vector<unsigned>());
+                              std::vector<CellPtr>& rCells,
+                              bool deleteMesh=false,
+                              bool validate=true,
+                              const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
      * Constructor for use by the de-serializer.
@@ -253,7 +253,9 @@ public:
      * @param pParentCell pointer to a parent cell (if required)
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr());
+    CellPtr AddCell(CellPtr pNewCell,
+                    const c_vector<double,DIM>& rCellDivisionVector,
+                    CellPtr pParentCell=CellPtr());
 
     /**
      * Remove all cells labelled as dead.

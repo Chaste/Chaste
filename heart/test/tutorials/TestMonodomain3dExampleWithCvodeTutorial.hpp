@@ -140,15 +140,6 @@ public:
             p_cell = new CellLuoRudy1991FromCellMLCvode(p_empty_solver, mpZeroStimulus);
         }
         /*
-         * This next command tells CVODE that the solver does not need to be re-initialised
-         * between calls to Solve(), which occur at every PDE timestep.
-         *
-         * '''NB:''' it is very important to call this to get a decent speedup, otherwise
-         * the code deletes and re-allocates CVODE memory on each step, losing information
-         * about the solver state.
-         */
-        p_cell->SetMinimalReset(true);
-        /*
          * We can also set the tolerances of the ODE solver (in this case,
          * the method is just setting them to the same as the default, but is shown for completeness).
          *

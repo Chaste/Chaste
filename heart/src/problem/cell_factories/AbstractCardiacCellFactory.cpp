@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacCellFactory.hpp"
 #include "FakeBathCell.hpp"
+#include "AbstractCvodeCell.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateCardiacCellForNode(
@@ -46,7 +47,14 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
     }
     else
     {
-        return CreateCardiacCellForTissueNode(nodeIndex);
+        AbstractCardiacCellInterface* p_cell = CreateCardiacCellForTissueNode(nodeIndex);
+#ifdef CHASTE_CVODE
+        if (dynamic_cast<AbstractCvodeCell*>(p_cell))
+        {
+            static_cast<AbstractCvodeCell*>(p_cell)->SetMinimalReset(true);
+        }
+#endif // CHASTE_CVODE
+        return p_cell;
     }
 }
 

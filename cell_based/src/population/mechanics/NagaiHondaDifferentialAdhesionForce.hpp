@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for
  * the formation of epithelial tissues", Philosophical Magazine Part B
  * 81:699-719) to include differential adhesion between normal and
- * labelled cells. To include differntial adhesion we override the
+ * labelled cells. To include differential adhesion we override the
  * GetAdhesionParameter() method.
  *
  * Each of the model parameter member variables are rescaled such that

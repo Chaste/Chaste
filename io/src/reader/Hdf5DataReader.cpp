@@ -388,9 +388,12 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
 
         double* p_petsc_vector;
         VecGetArray(data, &p_petsc_vector);
-        herr_t err;
-        err=H5Dread(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, H5P_DEFAULT, p_petsc_vector);
-        assert(err==0);
+
+        herr_t err = H5Dread(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, H5P_DEFAULT, p_petsc_vector);
+        if (err!=0)
+        {
+            NEVER_REACHED;
+        }
         VecRestoreArray(data, &p_petsc_vector);
 
         H5Sclose(hyperslab_space);
