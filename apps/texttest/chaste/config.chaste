@@ -99,10 +99,10 @@ size_of_h5:stat -c %b
 results_h5:h5dump
 results_bi_h5:h5dump
 # (After h5dump) some HDF5 file results are piped through a filter to round to a certain number of decimal places
-results_h5:$TEXTTEST_CHECKOUT/python/infra/RoundResultsFiles.py 8
+results_h5:$TEXTTEST_CHECKOUT/python/infra/RoundResultsFiles.py 7
 # Some external voltage results are filtered to round to a certain number of decimal places
 results_phi_e_dat:cat
-results_phi_e_dat:$TEXTTEST_CHECKOUT/python/infra/RoundResultsFiles.py 8
+results_phi_e_dat:$TEXTTEST_CHECKOUT/python/infra/RoundResultsFiles.py 7
 AbstractCardiacProblem_mSolution_h5:h5dump
 
 [checkout_location]

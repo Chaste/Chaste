@@ -1,5 +1,5 @@
 Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  8  decimal places.
+This means that all floating point numbers have been rounded to  7  decimal places.
 0
 0
 0
@@ -3611,7 +3611,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 0.956441
 1.03618
 1.01748
-6.634e-05
+6.63e-05
 -0.012031
 1.01954
 1.0195
@@ -3642,10 +3642,10 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 0.126966
 1.32447
 -0.0889748
--0.00935167
+-0.0093517
 0.0114525
 1.35059
--0.00146701
+-0.001467
 -0.222276
 1.30241
 -0.0298717
@@ -3714,7 +3714,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 1.00734
 1.03135
 1.01946
--0.00840635
+-0.0084063
 0.130188
 1.28266
 0.967536
@@ -4633,7 +4633,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -10.0863
 -0.0798166
 -11.6239
--0.00953818
+-0.0095382
 -9.66828
 -9.38287
 1.69084
@@ -4754,7 +4754,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -9.9105
 1.61638
 -11.503
-0.00963389
+0.0096339
 1.35165
 -11.1621
 1.34978
@@ -4785,7 +4785,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 1.4305
 -0.417819
 -0.095741
--0.00879252
+-0.0087925
 1.42475
 1.79547
 1.40873
@@ -5516,7 +5516,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 3.07409
 0.410151
 3.17632
--0.00982065
+-0.0098207
 0.0910698
 0.19613
 3.23084
@@ -5862,7 +5862,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 2.98784
 2.94667
 0.0172299
--0.00505158
+-0.0050516
 2.95059
 2.9505
 2.95129
@@ -6145,7 +6145,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -22.581
 -23.0544
 3.57021
-0.00528328
+0.0052833
 -23.0192
 2.94704
 0.0985068
@@ -6264,7 +6264,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 3.36156
 0.0071113
 3.79257
-0.00743125
+0.0074313
 3.95869
 -0.622686
 -0.439953
@@ -17239,7 +17239,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 3.38019
 3.41447
 3.41154
-0.00477187
+0.0047719
 3.88502
 3.4064
 3.38689
@@ -17894,7 +17894,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -19.2936
 -20.7282
 -20.459
-0.00157603
+0.001576
 -20.1167
 -15.8788
 2.27058
@@ -18607,7 +18607,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 3.60385
 3.60904
 4.24284
--0.00010519
+-0.0001052
 4.3161
 3.4304
 3.60672
@@ -18640,7 +18640,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -4.4283
 3.37794
 -5.47839
-0.00643978
+0.0064398
 -17.9054
 -19.8465
 -19.2992
@@ -19526,7 +19526,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 3.77922
 3.8172
 -9.71932
-0.00903269
+0.0090327
 -14.606
 3.18245
 3.85209
@@ -24075,7 +24075,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 4.37709
 4.37396
 4.37728
-0.00772277
+0.0077228
 -0.67699
 -15.9989
 -16.0784
@@ -24207,7 +24207,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -16.694
 4.83148
 4.69337
-0.00922889
+0.0092289
 -14.4828
 -18.7102
 4.45796
@@ -24541,7 +24541,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 4.70424
 -4.59548
 -10.6925
--0.00192077
+-0.0019208
 -13.4795
 -9.5911
 4.72395
@@ -25469,7 +25469,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 0.969929
 5.11183
 -12.2844
-0.00565734
+0.0056573
 -16.363
 2.38805
 3.47598
@@ -27716,7 +27716,7 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 4.47267
 -11.6731
 -14.4074
--0.00452399
+-0.004524
 4.9984
 -11.5801
 -0.428751
@@ -37875,4 +37875,4 @@ This means that all floating point numbers have been rounded to  8  decimal plac
 -11.4026
 4.21131
 4.21106
-# Created by Chaste version 3.1.17957 on Fri, 25 Jan 2013 10:00:49 +0000.  Chaste was built on Fri, 25 Jan 2013 09:54:52 +0000 by machine (uname) 'Linux chaste-bob 2.6.24-28-server #1 SMP Fri Feb 11 18:08:32 UTC 2011 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=48:49; jink=17831M; jmpf=17163:17174; papers=exported.
+# Created by Chaste version 3.1.18374 (with uncommitted modifications) on Thu, 11 Apr 2013 14:52:45 +0000.  Chaste was built on Tue, 19 Mar 2013 17:40:43 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_3, shared libraries.  Checked-out project versions: Eikonal=49; papers=18344M.

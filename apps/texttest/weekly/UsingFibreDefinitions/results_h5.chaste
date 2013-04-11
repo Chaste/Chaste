@@ -1,6 +1,6 @@
 Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  8  decimal places.
-HDF5 "/home/jmpf/.texttest/tmp/chaste.11Apr135738.33999/chaste/UsingFibreDefinitions/ChasteResults/SimulationResults.h5" {
+This means that all floating point numbers have been rounded to  7  decimal places.
+HDF5 "/home/jmpf/.texttest/tmp/chaste.11Apr151545.56775/chaste/UsingFibreDefinitions/ChasteResults/SimulationResults.h5" {
 GROUP "/" {
    DATASET "ConductionVelocityFromNode200" {
       DATATYPE  H5T_IEEE_F64LE
@@ -185,8 +185,8 @@ GROUP "/" {
       (0,176,0): 0.0243872,
       (0,177,0): 0.0201184,
       (0,178,0): 0.0142857,
-      (0,179,0): 0.00714286,
-      (0,180,0): 0.00883883,
+      (0,179,0): 0.0071429,
+      (0,180,0): 0.0088388,
       (0,181,0): 0.0120711,
       (0,182,0): 0.0142259,
       (0,183,0): 0.0169777,
@@ -207,7 +207,7 @@ GROUP "/" {
       (0,198,0): 0,
       (0,199,0): 0,
       (0,200,0): 0,
-      (0,201,0): 0.00714286,
+      (0,201,0): 0.0071429,
       (0,202,0): 0.0111111,
       (0,203,0): 0.0136364,
       (0,204,0): 0.0166667,
@@ -457,7 +457,7 @@ GROUP "/" {
             }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.1.18374 (with uncommitted modifications) on Thu, 11 Apr 2013 12:57:40 +0000.  Chaste was built on Tue, 19 Mar 2013 17:40:43 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_3, shared libraries.  Checked-out project versions: Eikonal=49; papers=18344M.
+         (0): "Created by Chaste version 3.1.18374 (with uncommitted modifications) on Thu, 11 Apr 2013 14:15:48 +0000.  Chaste was built on Tue, 19 Mar 2013 17:40:43 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_3, shared libraries.  Checked-out project versions: Eikonal=49; papers=18344M.
            "
          }
       }
@@ -23017,7 +23017,7 @@ GROUP "/" {
             }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.1.18374 (with uncommitted modifications) on Thu, 11 Apr 2013 12:57:38 +0000.  Chaste was built on Tue, 19 Mar 2013 17:40:43 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_3, shared libraries.  Checked-out project versions: Eikonal=49; papers=18344M.
+         (0): "Created by Chaste version 3.1.18374 (with uncommitted modifications) on Thu, 11 Apr 2013 14:15:46 +0000.  Chaste was built on Tue, 19 Mar 2013 17:40:43 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_3, shared libraries.  Checked-out project versions: Eikonal=49; papers=18344M.
            "
          }
       }
