@@ -73,7 +73,16 @@ void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::WriteTimeStamp()
     *mpOutStream << SimulationTime::Instance()->GetTime() << "\t";
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
+{
+	*mpOutStream << "\n";
+}
+
 // Explicit instantiation
 template class AbstractCellPopulationWriter<1,1>;
+template class AbstractCellPopulationWriter<1,2>;
 template class AbstractCellPopulationWriter<2,2>;
+template class AbstractCellPopulationWriter<1,3>;
+template class AbstractCellPopulationWriter<2,3>;
 template class AbstractCellPopulationWriter<3,3>;

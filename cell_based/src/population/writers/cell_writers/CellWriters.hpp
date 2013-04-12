@@ -65,7 +65,6 @@ public:
     {
     	*this->mpOutStream << pCell->GetCellProliferativeType()->GetColour() << " ";
     }
-
 };
 
 /** A class written using the visitor pattern for writing cell ages to file. */

@@ -48,8 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
-
 #include <string>
+
+template<unsigned SPACE_DIM>
+class NodeBasedCellPopualtion;
 
 /**
  * A class written using the visitor pattern for writing node location from a cell population to file.
@@ -102,11 +104,16 @@ public:
     void WriteTimeStamp();
 
     /**
+     * Add a newline character to the stream.
+     */
+    void WriteNewline();
+
+    /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the mesh based cell population population to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.

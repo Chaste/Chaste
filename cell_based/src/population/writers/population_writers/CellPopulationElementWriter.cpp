@@ -42,7 +42,7 @@ CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE
     // Write element data to file
@@ -92,8 +92,8 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
     // Write element data to file
     this->WriteTimeStamp();
 
-    for (typename MutableMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorBegin();
-         elem_iter != static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorEnd();
+    for (typename MutableMesh<SPACE_DIM,SPACE_DIM>::ElementIterator elem_iter = static_cast<MutableMesh<SPACE_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorBegin();
+         elem_iter != static_cast<MutableMesh<SPACE_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorEnd();
          ++elem_iter)
     {
         bool element_contains_dead_cells_or_deleted_nodes = false;
@@ -119,7 +119,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
         }
         if (!element_contains_dead_cells_or_deleted_nodes)
         {
-            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+            for (unsigned i=0; i<SPACE_DIM+1; i++)
             {
                 *this->mpOutStream << elem_iter->GetNodeGlobalIndex(i) << " ";
             }
@@ -195,5 +195,8 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
 
 // Explicit instantiation
 template class CellPopulationElementWriter<1,1>;
+template class CellPopulationElementWriter<1,2>;
 template class CellPopulationElementWriter<2,2>;
+template class CellPopulationElementWriter<1,3>;
+template class CellPopulationElementWriter<2,3>;
 template class CellPopulationElementWriter<3,3>;

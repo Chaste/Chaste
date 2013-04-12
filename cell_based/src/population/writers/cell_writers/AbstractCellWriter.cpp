@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "AbstractCellWriter.hpp"
+#include "AbstractCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(std::string directory)
@@ -75,5 +76,8 @@ void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::WriteTimeStamp()
 
 // Explicit instantiation
 template class AbstractCellWriter<1,1>;
+template class AbstractCellWriter<1,2>;
 template class AbstractCellWriter<2,2>;
+template class AbstractCellWriter<1,3>;
+template class AbstractCellWriter<2,3>;
 template class AbstractCellWriter<3,3>;

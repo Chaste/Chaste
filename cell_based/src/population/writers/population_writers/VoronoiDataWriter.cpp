@@ -42,7 +42,7 @@ VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter(std::string directo
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     assert(SPACE_DIM==2 || SPACE_DIM==3);
     VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
@@ -81,13 +81,13 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWit
 {
 #define COVERAGE_IGNORE	// Covered by the case above.
     assert(SPACE_DIM==2 || SPACE_DIM==3);
-    VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
+    VertexMesh<SPACE_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
 
     // Write time to file
     this->WriteTimeStamp();
 
     // Loop over elements of voronoi_tesselation
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
+    for (typename VertexMesh<SPACE_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
          elem_iter != voronoi_tesselation->GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -145,5 +145,8 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<
 
 // Explicit instantiation
 template class VoronoiDataWriter<1,1>;
+template class VoronoiDataWriter<1,2>;
 template class VoronoiDataWriter<2,2>;
+template class VoronoiDataWriter<1,3>;
+template class VoronoiDataWriter<2,3>;
 template class VoronoiDataWriter<3,3>;

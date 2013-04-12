@@ -44,20 +44,29 @@ CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePha
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-        this->WriteTimeStamp();
-        std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
+#define COVERAGE_IGNORE
+	this->WriteTimeStamp();
+	std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
 
     for (unsigned i=0; i < phases_count.size(); i++)
     {
         *this->mpOutStream << phases_count[i] << "\t";
     }
     *this->mpOutStream << "\n";
+#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-	VisitAnyPopulation(pCellPopulation);
+    this->WriteTimeStamp();
+    std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
+
+	for (unsigned i=0; i < phases_count.size(); i++)
+	{
+		*this->mpOutStream << phases_count[i] << "\t";
+	}
+	*this->mpOutStream << "\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -118,5 +127,8 @@ void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBas
 
 // Explicit instantiation
 template class CellProliferativePhasesCountWriter<1,1>;
+template class CellProliferativePhasesCountWriter<1,2>;
 template class CellProliferativePhasesCountWriter<2,2>;
+template class CellProliferativePhasesCountWriter<1,3>;
+template class CellProliferativePhasesCountWriter<2,3>;
 template class CellProliferativePhasesCountWriter<3,3>;

@@ -32,8 +32,13 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#ifndef NODELOCATIONWRITER_HPP_
+#define NODELOCATIONWRITER_HPP_
+
 #include "OutputFileHandler.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 #include "AbstractCellPopulationWriter.hpp"
 
@@ -45,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class NodeLocationWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
-
 public:
 
     /**
@@ -59,14 +63,14 @@ public:
      *
      * @param pCellPopulation a pointer to the population to visit.
      */
-    void VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the mesh based cell population population to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
@@ -117,3 +121,5 @@ public:
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
+
+#endif /* NODELOCATIONWRITER_HPP_ */

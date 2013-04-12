@@ -91,7 +91,7 @@ public:
 	 *
 	 * @param pCellPopulation a pointer to the mesh based cell population population to visit.
 	 */
-	virtual void Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+	virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 	{
 	}
 
@@ -150,6 +150,7 @@ public:
     }
 };
 
+/** Writer for T1 swap locations.*/
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexT1SwapLocationsWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
@@ -195,7 +196,7 @@ public:
 	 *
 	 * @param pCellPopulation a pointer to the mesh based cell population population to visit.
 	 */
-	virtual void Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+	virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
     }
 

@@ -42,7 +42,25 @@ BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter(std::string direc
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    this->WriteTimeStamp();
+
+    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+            node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        if (!node_iter->IsDeleted())
+        {
+            *this->mpOutStream << node_iter->IsBoundaryNode() << " ";
+        }
+    }
+
+    *this->mpOutStream << "\n";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     this->WriteTimeStamp();
 
@@ -60,13 +78,7 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-    VisitAnyPopulation(pCellPopulation);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes< SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
@@ -123,5 +135,8 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
 
 // Explicit instantiation
 template class BoundaryNodeWriter<1,1>;
+template class BoundaryNodeWriter<1,2>;
 template class BoundaryNodeWriter<2,2>;
+template class BoundaryNodeWriter<1,3>;
+template class BoundaryNodeWriter<2,3>;
 template class BoundaryNodeWriter<3,3>;

@@ -59,18 +59,11 @@ public:
     VoronoiDataWriter(std::string directory);
 
     /**
-     * Visit any population and write the data. This is the same structure for any popoulation.
-     *
-     * @param pCellPopulation a pointer to the population to visit.
-     */
-    void VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
-
-    /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the mesh based cell population population to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.

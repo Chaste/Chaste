@@ -44,7 +44,8 @@ CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeType
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-        this->WriteTimeStamp();
+#define COVERAGE_IGNORE
+	this->WriteTimeStamp();
 
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
 
@@ -53,12 +54,21 @@ void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulati
         *this->mpOutStream << proliferative_type_count[i] << "\t";
     }
     *this->mpOutStream << "\n";
+#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    VisitAnyPopulation(pCellPopulation);
+	this->WriteTimeStamp();
+
+    std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
+
+    for (unsigned i=0; i<proliferative_type_count.size(); i++)
+    {
+        *this->mpOutStream << proliferative_type_count[i] << "\t";
+    }
+    *this->mpOutStream << "\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -119,5 +129,8 @@ void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBase
 
 // Explicit instantiation
 template class CellProliferativeTypesCountWriter<1,1>;
+template class CellProliferativeTypesCountWriter<1,2>;
 template class CellProliferativeTypesCountWriter<2,2>;
+template class CellProliferativeTypesCountWriter<1,3>;
+template class CellProliferativeTypesCountWriter<2,3>;
 template class CellProliferativeTypesCountWriter<3,3>;

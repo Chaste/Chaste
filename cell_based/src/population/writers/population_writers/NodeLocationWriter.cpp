@@ -42,7 +42,30 @@ NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter(std::string direc
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    this->WriteTimeStamp();
+
+    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+            node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        if (!node_iter->IsDeleted())
+        {
+            const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
+
+            for (unsigned i=0; i<SPACE_DIM; i++)
+            {
+                *this->mpOutStream << position[i] << " ";
+            }
+        }
+    }
+
+    *this->mpOutStream << "\n";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     this->WriteTimeStamp();
 
@@ -65,18 +88,10 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
 {
 #define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
+	VisitAnyPopulation(pCellPopulation);
 #undef COVERAGE_IGNORE
 }
 
@@ -128,5 +143,8 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
 
 // Explicit instantiation
 template class NodeLocationWriter<1,1>;
+template class NodeLocationWriter<1,2>;
 template class NodeLocationWriter<2,2>;
+template class NodeLocationWriter<1,3>;
+template class NodeLocationWriter<2,3>;
 template class NodeLocationWriter<3,3>;

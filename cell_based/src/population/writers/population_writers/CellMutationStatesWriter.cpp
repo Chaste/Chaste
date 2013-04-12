@@ -64,14 +64,13 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abstra
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
+	pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
     *this->mpOutStream << "Time\t ";
 
     const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
         pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
 
-    std::vector<unsigned> cell_mutation_state_count;
     for (unsigned i=0; i<r_cell_properties.size(); i++)
     {
         if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
@@ -85,11 +84,38 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
+    if (!mHasHeaderBeenWritten)
+    {
+    	pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
+
+        *this->mpOutStream << "Time\t ";
+
+        const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
+            pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
+
+        for (unsigned i=0; i<r_cell_properties.size(); i++)
+        {
+            if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
+            {
+                *this->mpOutStream << r_cell_properties[i]->GetIdentifier() << "\t ";
+            }
+        }
+        *this->mpOutStream << "\n";
+
+        mHasHeaderBeenWritten = true;
+    }
+
+    this->WriteTimeStamp();
+
+    std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
+
+    for (unsigned i=0; i<mutation_state_count.size(); i++)
+    {
+        *this->mpOutStream << mutation_state_count[i] << "\t";
+    }
+    *this->mpOutStream << "\n";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -148,5 +174,8 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopu
 
 // Explicit instantiation
 template class CellMutationStatesWriter<1,1>;
+template class CellMutationStatesWriter<1,2>;
 template class CellMutationStatesWriter<2,2>;
+template class CellMutationStatesWriter<1,3>;
+template class CellMutationStatesWriter<2,3>;
 template class CellMutationStatesWriter<3,3>;
