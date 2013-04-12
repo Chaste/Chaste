@@ -297,6 +297,22 @@ public:
     void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
+     * A virtual method to accept a cell population writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationWriter the population writer.
+     */
+    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter);
+
+    /**
+     * A virtual method to accept a cell writer so it can
+     * write data from this object to file.
+     *
+     * @param pCellWriter the population writer.
+     */
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
+
+    /**
      * Overridden CreateOutputFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored

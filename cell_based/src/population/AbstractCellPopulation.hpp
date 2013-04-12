@@ -73,6 +73,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellData.hpp"
 #include "AbstractMesh.hpp"
 
+/** Forward declaration of cell population writers. */
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulationWriter;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellWriter;
 /**
  * An abstract facade class encapsulating a cell population.
  *
@@ -569,6 +572,22 @@ public:
      * Write results from the current cell population state to output files.
      */
     virtual void WriteResultsToFiles();
+
+    /**
+     * A virtual method to accept a cell population writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationWriter the population writer.
+     */
+    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pPopulationWriter)=0;
+
+    /**
+     * A virtual method to accept a cell writer so it can
+     * write data from this object to file.
+     *
+     * @param pCellWriter the population writer.
+     */
+    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter)=0;
 
     /**
      * Write the current time and node results to output files.

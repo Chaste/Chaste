@@ -322,6 +322,22 @@ public:
     void OutputCellPopulationParameters(out_stream& rParamsFile);
 
     /**
+     * A virtual method to accept a cell population writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationWriter the population writer.
+     */
+    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter);
+
+    /**
+     * A virtual method to accept a cell writer so it can
+     * write data from this object to file.
+     *
+     * @param pCellWriter the population writer.
+     */
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
+
+    /**
      * @return the maximum interaction distance between cells, defined in NodesOnlyMesh.
      */
     double GetMechanicsCutOffLength();

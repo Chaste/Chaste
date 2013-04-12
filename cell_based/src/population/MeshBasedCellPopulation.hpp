@@ -315,6 +315,22 @@ public:
     void WriteResultsToFiles();
 
     /**
+     * A virtual method to accept a cell population writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationWriter the population writer.
+     */
+    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pPopulationWriter);
+
+    /**
+     * A virtual method to accept a cell writer so it can
+     * write data from this object to file.
+     *
+     * @param pCellWriter the population writer.
+     */
+    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter);
+
+    /**
      * Overridden Update(bool hasHadBirthsOrDeaths) method.
      * Fixes up the mappings between cells and nodes.
      *

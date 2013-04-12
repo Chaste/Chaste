@@ -427,6 +427,16 @@ void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
 }
 
 template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+{
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
+{
+}
+
+template<unsigned DIM>
 double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Get the vertex element index corresponding to this cell

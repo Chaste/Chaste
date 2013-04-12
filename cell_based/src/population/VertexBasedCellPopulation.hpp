@@ -304,6 +304,22 @@ public:
     void WriteResultsToFiles();
 
     /**
+     * A virtual method to accept a cell population writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationWriter the population writer.
+     */
+    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter);
+
+    /**
+     * A virtual method to accept a cell writer so it can
+     * write data from this object to file.
+     *
+     * @param pCellWriter the population writer.
+     */
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
+
+    /**
      * Write the current index and location (of the centre) of each element in mrMesh, as well as the ID and
      * the area (in 2D) or volume (in 3D) of its corresponding cell, to mpCellVolumesFile.
      */

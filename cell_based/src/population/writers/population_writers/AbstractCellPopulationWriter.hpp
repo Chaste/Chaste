@@ -50,9 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 
-template<unsigned SPACE_DIM>
-class NodeBasedCellPopualtion;
-
 /**
  * A class written using the visitor pattern for writing node location from a cell population to file.
  */

@@ -42,6 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
+#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellWriter.hpp"
+
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
 {
@@ -385,6 +388,17 @@ void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
         }
     }
     *mpVizElementsFile << "\n";
+}
+
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+{
+}
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
+{
 }
 
 template<unsigned DIM>

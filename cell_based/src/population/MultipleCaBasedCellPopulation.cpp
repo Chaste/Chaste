@@ -39,6 +39,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
+
+// Needed to write population data to file.
+#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellWriter.hpp"
+
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
@@ -405,6 +410,16 @@ bool MultipleCaBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(Ce
 
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
+{
+}
+
+template<unsigned DIM>
+void MultipleCaBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+{
+}
+
+template<unsigned DIM>
+void MultipleCaBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
 {
 }
 
