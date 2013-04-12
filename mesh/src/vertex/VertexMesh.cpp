@@ -992,6 +992,7 @@ void VertexMesh<3,3>::ConstructFromMeshReader(AbstractMeshReader<3,3>& rMeshRead
                         break;
                     }
                 }
+                UNUSED_OPT(face_added);
                 assert(face_added == true);
             }
         }

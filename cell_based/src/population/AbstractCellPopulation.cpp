@@ -1003,7 +1003,8 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
          ++cell_iter)
     {
         c_vector<double,SPACE_DIM> cell_location = GetLocationOfCellCentre(*cell_iter);
-        c_vector<double,SPACE_DIM> displacement = centre - cell_location;
+        c_vector<double,SPACE_DIM> displacement;
+        displacement = centre - cell_location;
 
         for (unsigned i=0; i<SPACE_DIM; i++)
         {

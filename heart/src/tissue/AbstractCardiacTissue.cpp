@@ -625,6 +625,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                                MPI_DOUBLE,
                                receive_from, 0,
                                PETSC_COMM_WORLD, &status);
+            UNUSED_OPT(ret);
             assert ( ret == MPI_SUCCESS);
 
             // Unpack

@@ -389,6 +389,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                                    MPI_DOUBLE,
                                    receive_from, 0,
                                    PETSC_COMM_WORLD, &status);
+                UNUSED_OPT(ret);
                 assert ( ret == MPI_SUCCESS );
             }
 
@@ -463,6 +464,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                                    MPI_DOUBLE,
                                    receive_from, 0,
                                    PETSC_COMM_WORLD, &status);
+                UNUSED_OPT(ret);
                 assert ( ret == MPI_SUCCESS );
 
             // Unpack

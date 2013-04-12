@@ -336,7 +336,8 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             // Find the location of the intersection
             double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
 
-            c_vector<double, SPACE_DIM> moved_centroid = position_a + this->GetVectorFromAtoB(position_a, centroid); // allow for periodicity and other metrics
+            c_vector<double, SPACE_DIM> moved_centroid;
+            moved_centroid = position_a + this->GetVectorFromAtoB(position_a, centroid); // allow for periodicity and other metrics
 
             double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
                             -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
@@ -1730,7 +1731,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     }
 
     // Create new node at centroid of element which will be a boundary node if any of the existing nodes was on the boundary.
-    c_vector<double, SPACE_DIM> new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
+    c_vector<double, SPACE_DIM> new_node_location;
+    new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(GetNumNodes(), new_node_location, is_node_on_boundary));
     Node<SPACE_DIM>* p_new_node = this->GetNode(new_node_global_index);
 
@@ -2037,7 +2039,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             // Move original node
             pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
-            c_vector<double, SPACE_DIM> new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+            c_vector<double, SPACE_DIM> new_node_location;
+            new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
             // Add new node which will always be a boundary node
             unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
@@ -2174,7 +2177,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
-                    c_vector<double, SPACE_DIM> new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+                    c_vector<double, SPACE_DIM> new_node_location;
+                    new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
                     // Add new node which will always be a boundary node
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
@@ -2219,7 +2223,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
-                     c_vector<double, SPACE_DIM> new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+                    c_vector<double, SPACE_DIM> new_node_location;
+                    new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
                     // Add new node which will always be a boundary node
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
@@ -2304,7 +2309,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
-                    c_vector<double, SPACE_DIM> new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+                    c_vector<double, SPACE_DIM> new_node_location;
+                    new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
                     // Add new node which will always be a boundary node
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
@@ -2349,7 +2355,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
-                    c_vector<double, SPACE_DIM> new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+                    c_vector<double, SPACE_DIM> new_node_location;
+                    new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
                     // Add new node which will always be a boundary node
                     unsigned new_node_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_location[0], new_node_location[1]));
@@ -2405,8 +2412,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                 pNode->rGetModifiableLocation() = intersection;
                 pNode->SetAsBoundaryNode(false);
 
-                c_vector<double, SPACE_DIM> new_node_1_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
-                c_vector<double, SPACE_DIM> new_node_2_location = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+                c_vector<double, SPACE_DIM> new_node_1_location;
+                new_node_1_location = intersection - mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+                c_vector<double, SPACE_DIM> new_node_2_location;
+                new_node_2_location = intersection + mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
                 // Add new nodes which will always be boundary nodes
                 unsigned new_node_1_global_index = this->AddNode(new Node<SPACE_DIM>(0, true, new_node_1_location[0], new_node_1_location[1]));

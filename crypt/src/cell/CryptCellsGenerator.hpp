@@ -147,10 +147,8 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
          * doesn't understand the <2,2> and thinks that it is being passed two arguments.
          */
         bool is_vertex_mesh = (dynamic_cast<VertexMesh<2,2>*>(pMesh));
-        if (!is_vertex_mesh)
-        {
-            NEVER_REACHED;
-        }
+        UNUSED_OPT(is_vertex_mesh);
+        assert(is_vertex_mesh);
         mesh_size = static_cast<VertexMesh<2,2>*>(pMesh)->GetNumElements();
         rCells.reserve(mesh_size);
     }
@@ -185,10 +183,8 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
              * doesn't understand the <2,2> and thinks that it is being passed two arguments.
              */
             bool is_vertex_mesh = (dynamic_cast<VertexMesh<2,2>*>(pMesh));
-            if (!is_vertex_mesh)
-            {
-                NEVER_REACHED;
-            }
+            UNUSED_OPT(is_vertex_mesh);
+            assert(is_vertex_mesh);
             y = dynamic_cast<VertexMesh<2,2>*>(pMesh)->GetCentroidOfElement(i)[1];
         }
 

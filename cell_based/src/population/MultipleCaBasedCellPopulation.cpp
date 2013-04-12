@@ -597,7 +597,8 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         number_of_cells_at_site[location_index]++;
         assert(number_of_cells_at_site[location_index]<=mLatticeCarryingCapacity);
 
-        c_vector<double, DIM> coords = this->mrMesh.GetNode(location_index)->rGetLocation();
+        c_vector<double, DIM> coords;
+        coords = this->mrMesh.GetNode(location_index)->rGetLocation();
 
         // Move the coordinate slightly so that we can visualise all cells in a lattice site if there is more than one per site
         if (mLatticeCarryingCapacity > 1)

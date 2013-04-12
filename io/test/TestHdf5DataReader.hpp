@@ -126,6 +126,7 @@ private:
          * Write the data to the dataset using default transfer properties.
          */
         status = H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+        UNUSED_OPT(status);
         assert(status==0);
 
         /*

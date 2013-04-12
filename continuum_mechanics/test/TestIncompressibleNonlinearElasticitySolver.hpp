@@ -1111,8 +1111,8 @@ public:
         std::vector<double> soln_normal;
         std::vector<double> soln_reordered;
 
-        double end_residual_norm_normal;
-        double end_residual_norm_reordered;
+        double end_residual_norm_normal =0.0;
+        double end_residual_norm_reordered = 0.0;
 
         for(unsigned run=0; run<2; run++)
         {

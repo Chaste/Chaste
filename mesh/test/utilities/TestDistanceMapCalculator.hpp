@@ -81,7 +81,8 @@ public:
         {
             try
             {
-                c_vector<double, 1> node = parallel_mesh.GetNode(index)->rGetLocation(); //throws if not owned
+                c_vector<double, 1> node;
+                node = parallel_mesh.GetNode(index)->rGetLocation(); //throws if not owned
                 TS_ASSERT_DELTA(distances_serial[index], node(0), 1e-12);
                 TS_ASSERT_DELTA(distances_parallel[index], node(0), 1e-12);
             }

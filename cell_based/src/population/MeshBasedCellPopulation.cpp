@@ -1173,6 +1173,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
             res = false;
         }
     }
+    UNUSED_OPT(res);
     assert(res);
 #undef COVERAGE_IGNORE
 

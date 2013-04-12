@@ -427,7 +427,8 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
             node_iter != this->GetNodeIteratorEnd();
             ++node_iter)
     {
-        c_vector<double, SPACE_DIM> location = node_iter->rGetLocation();
+        c_vector<double, SPACE_DIM> location;
+        location = node_iter->rGetLocation();
 
         for (unsigned d=0; d < SPACE_DIM; d++)
         {

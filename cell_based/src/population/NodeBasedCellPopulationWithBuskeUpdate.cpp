@@ -147,8 +147,10 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
         }
 
         // Add current positions to initial_conditions and RHS vector
-        c_vector<double, DIM> current_location = this->GetNode(global_node_index)->rGetLocation();
-        c_vector<double, DIM> forces = this->GetNode(global_node_index)->rGetAppliedForce();
+        c_vector<double, DIM> current_location ;
+        current_location = this->GetNode(global_node_index)->rGetLocation();
+        c_vector<double, DIM> forces;
+        forces = this->GetNode(global_node_index)->rGetAppliedForce();
 
         for (unsigned i=0; i<DIM; i++)
         {

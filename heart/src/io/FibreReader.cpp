@@ -174,7 +174,8 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
 
     if(checkOrthogonality)
     {
-        c_matrix<double,DIM,DIM>  temp = prod(trans(rFibreMatrix),rFibreMatrix);
+        c_matrix<double,DIM,DIM>  temp;
+        temp = prod(trans(rFibreMatrix),rFibreMatrix);
         // check temp is equal to the identity
         for(unsigned i=0; i<DIM; i++)
         {

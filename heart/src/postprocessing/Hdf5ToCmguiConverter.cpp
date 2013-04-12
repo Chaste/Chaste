@@ -144,10 +144,8 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
     while (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
     {
         bool next_open = this->MoveOntoNextDataset();
-        if (!next_open)
-        {
-            NEVER_REACHED;
-        }
+        UNUSED_OPT(next_open);
+        assert(next_open);
     }
 
     // Write the node data out

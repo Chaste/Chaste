@@ -156,6 +156,7 @@ public:
                 some_node_depolarised = true;
             }
         }
+        UNUSED_OPT(some_node_depolarised);
         assert(some_node_depolarised);
     }
 };

@@ -343,12 +343,13 @@ private:
             size_second_cell = p_extended_problem->GetExtendedBidomainTissue()->rGetSecondCellsDistributed().size();
             size_extrastim = p_extended_problem->GetExtendedBidomainTissue()->rGetExtracellularStimulusDistributed().size();
         }
-        int mpi_ret_1 = MPI_Allreduce(&size_first_cell, &global_size_first_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        int mpi_ret_2 = MPI_Allreduce(&size_second_cell, &global_size_second_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        int mpi_ret_3 = MPI_Allreduce(&size_extrastim, &global_size_extrastim, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        assert(mpi_ret_1 == MPI_SUCCESS);
-        assert(mpi_ret_2 == MPI_SUCCESS);
-        assert(mpi_ret_3 == MPI_SUCCESS);
+        int mpi_ret = MPI_Allreduce(&size_first_cell, &global_size_first_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        UNUSED_OPT(mpi_ret);
+        assert(mpi_ret == MPI_SUCCESS);
+        mpi_ret = MPI_Allreduce(&size_second_cell, &global_size_second_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        assert(mpi_ret == MPI_SUCCESS);
+        mpi_ret = MPI_Allreduce(&size_extrastim, &global_size_extrastim, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        assert(mpi_ret == MPI_SUCCESS);
 
         unsigned number_of_nodes = p_problem->GetTissue()->pGetMesh()->GetNumNodes();
         TS_ASSERT_EQUALS(global_size_first_cell, number_of_nodes);
@@ -463,12 +464,13 @@ private:
             size_second_cell = p_extended_problem->GetExtendedBidomainTissue()->rGetSecondCellsDistributed().size();
             size_extrastim = p_extended_problem->GetExtendedBidomainTissue()->rGetExtracellularStimulusDistributed().size();
         }
-        int mpi_ret_1 = MPI_Allreduce(&size_first_cell, &global_size_first_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        int mpi_ret_2 = MPI_Allreduce(&size_second_cell, &global_size_second_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        int mpi_ret_3 = MPI_Allreduce(&size_extrastim, &global_size_extrastim, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        assert(mpi_ret_1 == MPI_SUCCESS);
-        assert(mpi_ret_2 == MPI_SUCCESS);
-        assert(mpi_ret_3 == MPI_SUCCESS);
+        int mpi_ret = MPI_Allreduce(&size_first_cell, &global_size_first_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        UNUSED_OPT(mpi_ret);
+        assert(mpi_ret == MPI_SUCCESS);
+        mpi_ret = MPI_Allreduce(&size_second_cell, &global_size_second_cell, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        assert(mpi_ret == MPI_SUCCESS);
+        mpi_ret = MPI_Allreduce(&size_extrastim, &global_size_extrastim, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        assert(mpi_ret == MPI_SUCCESS);
 
         unsigned number_of_nodes = p_problem->GetTissue()->pGetMesh()->GetNumNodes();
         TS_ASSERT_EQUALS(global_size_first_cell, number_of_nodes);

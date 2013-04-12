@@ -217,6 +217,7 @@ void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionI
     }
 
     int mpi_ret = MPI_Allreduce(&local_left_area, &mLeftElectrodeArea, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    UNUSED_OPT(mpi_ret);
     assert(mpi_ret == MPI_SUCCESS);
 
     mpi_ret = MPI_Allreduce(&local_right_area, &mRightElectrodeArea, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);

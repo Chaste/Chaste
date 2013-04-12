@@ -15837,6 +15837,8 @@ void tetgenmesh::bowatinsertsite(point bp,face* splitseg,int n,list** sublists,
   face *apsegshs, *pbsegshs;
   face apseg, pbseg, checkseg;
   point pa, pb, pc;
+  pa=NULL;
+  pb=NULL;
   REAL attrib, volume;
   int idx, i, j, k;
 
@@ -21588,6 +21590,7 @@ bool tetgenmesh::scoutfront(triface* front, triface* idfront, list* newtetlist)
 
   // Search a tet having vertex a.
   loc = preciselocate(pa, idfront, (long) newtetlist->len());
+  loc=loc;//UNUSED_OPT(loc);
   assert(loc == ONVERTEX);
   recenttet = *idfront;
   // Search a tet having edge ab.
@@ -21769,6 +21772,7 @@ bool tetgenmesh::identifyfronts(list* frontlist, list* misfrontlist,
           }
         }
         assert((frontlist->len() + 1) == len);
+        len=len;//UNUSED_OPT(len);
         // Glue f and f1 together.
         gluefronts(&front, &front1);
       } else {
@@ -22859,6 +22863,7 @@ void tetgenmesh::formcavity(list* missingshlist, list* crossedgelist,
     }
     orgori = orient3d(torg, tdest, tapex, org(starttet));
     destori = orient3d(torg, tdest, tapex, dest(starttet));
+    destori = destori; //UNUSED_OPT(destori);
 #ifdef SELF_CHECK
     assert(orgori * destori < 0.0);
 #endif

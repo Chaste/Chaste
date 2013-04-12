@@ -526,6 +526,9 @@ class Profile(GccDebug):
     def __init__(self, *args, **kwargs):
         GccDebug.__init__(self, *args, **kwargs)
         self._cc_flags.extend(['-O2', '-pg']) 
+        # Array bounds checking is available in -O2 optimization and above
+        # Tetgen code produces a couple of issues, but g++ sometimes gives false negatives.
+        self._cc_flags.append('-Wno-array-bounds')
         self._link_flags.append('-pg')
         self._test_packs = ['Profile']
         self.build_dir = 'profile'
@@ -555,6 +558,9 @@ class GoogleProfile(GccDebug):
     def __init__(self, *args, **kwargs):
         GccDebug.__init__(self, *args, **kwargs)
         self._cc_flags.append('-O3')
+        # Array bounds checking is available in -O2 optimization and above
+        # Tetgen code produces a couple of issues, but g++ sometimes gives false negatives.
+        self._cc_flags.append('-Wno-array-bounds')
         self._link_flags.append('-lprofiler')
         self._test_packs = ['Profile']
         self.build_dir = 'google_profile'

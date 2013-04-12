@@ -124,6 +124,7 @@ public:
                 invalid = false;
             }
         }
+        UNUSED_OPT(invalid);
         assert(!invalid);
 
         PetscTools::Destroy(voltage_coarse);

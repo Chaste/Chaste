@@ -244,7 +244,8 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
-                c_vector<double, SPACE_DIM> position  = rNodes[index]->rGetLocation();
+                c_vector<double, SPACE_DIM> position;
+                position = rNodes[index]->rGetLocation();
 
                 // Update max/min
                 for (unsigned i=0; i<SPACE_DIM; i++)
