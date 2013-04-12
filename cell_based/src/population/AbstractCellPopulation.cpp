@@ -931,6 +931,20 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetOutputCellVolumes()
 ///////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pWriter)
+{
+    //\ todo Check that we don't already have a writer of type pWriter.
+    mCellPopulationWriters.push_back(pWriter);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pWriter)
+{
+    //\ todo Check that we don't already have a writer of type pWriter.
+    mCellWriters.push_back(pWriter);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVisualizer(bool outputResultsForChasteVisualizer)
 {
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;

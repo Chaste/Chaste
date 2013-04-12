@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "VertexSwapWriters.hpp"
+#include "CellWriters.hpp"
 
 // Files to create populations
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -451,6 +452,31 @@ public:
         t3_swaps_writer.CloseFile();
 
         FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestWriteVertexSwaps/T3SwapLocations_twice.dat").CompareFiles();
+    }
+
+    void TestAddWritersToAPopulation() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // NodeBasedCellPopulation
+        std::vector<Node<3>* > nodes;
+        nodes.push_back(new Node<3>(0, false));
+        nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
+
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
+        generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+
+        CellPopulationElementWriter<3,3> writer("output");
+        cell_population.AddPopulationWriter(&writer);
+
+        CellIdWriter<3,3> id_writer("output_directory");
+        cell_population.AddCellWriter(&id_writer);
     }
 };
 

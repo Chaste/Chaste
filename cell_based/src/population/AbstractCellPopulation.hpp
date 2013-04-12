@@ -207,6 +207,12 @@ protected:
     /** Whether to write the cell volumes (in 3D) or areas (in 2D) to a file. */
     bool mOutputCellVolumes;
 
+    /** A list of cell writers */
+    std::vector<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* > mCellWriters;
+
+    /** A list of cell writers */
+    std::vector<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* > mCellPopulationWriters;
+
     /**
      * Check consistency of our internal data structures.
      *
@@ -685,6 +691,20 @@ public:
      * @return mOutputCellVolumes
      */
     bool GetOutputCellVolumes();
+
+    /**
+     * Add a cell population writer to the population
+     *
+     * @param pWriter a boost_shared_ptr to the writer to add.
+     */
+    void AddPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pWriter);
+
+    /**
+     * Add a cell writer to the population
+     *
+     * @param pWriter a boost_shared_ptr to the writer to add.
+     */
+    void AddCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pWriter);
 
     /**
      * Set mOutputResultsForChasteVisualizer.
