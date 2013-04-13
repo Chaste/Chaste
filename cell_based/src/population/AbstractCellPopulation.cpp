@@ -565,6 +565,11 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
         }
     }
 
+    for (unsigned i=0; i<mCellWriters.size(); i++)
+    {
+        mCellWriters[i]->WriteNewline();
+    }
+
     // VTK can only be written in 2 or 3 dimensions
     if (SPACE_DIM > 1)
     {

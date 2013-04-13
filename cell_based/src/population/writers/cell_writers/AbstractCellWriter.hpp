@@ -92,6 +92,11 @@ public:
     void WriteTimeStamp();
 
     /**
+     * Write a newline character to the file.
+     */
+    void WriteNewline();
+
+    /**
      * Visit a cell and write its data.
      *
      * @param pCell the cell to write
