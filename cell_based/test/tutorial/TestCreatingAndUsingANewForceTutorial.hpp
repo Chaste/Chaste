@@ -84,6 +84,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 
+/* This header ensures that this test is only run on one process, since it doesn't support parallel execution. */
+#include "FakePetscSetup.hpp"
+
 /*
  * EMPTYLINE
  *

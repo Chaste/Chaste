@@ -53,6 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RungeKuttaFehlbergIvpOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
 
+#include "FakePetscSetup.hpp"
+
 /**
  * This class contains tests for Alarcon2004OxygenBasedCellCycleOdeSystem,
  * a system of ODEs that are used by the cell-cycle model

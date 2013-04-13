@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
 
+#include "FakePetscSetup.hpp"
+
 /**
  * This class consists of a single test - a 2D Potts-based cell population
  * simulation of 100 cells with differential adhesion and no birth or death.
