@@ -74,9 +74,6 @@ private:
     /** The carrying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
-    /** Results file for cell locations. */
-    out_stream mpVizLocationsFile;
-
     /** The update rules used to determine the new location of the cells. */
     std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
@@ -309,8 +306,9 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
+     * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell);
 
     /**
      * Overridden CreateOutputFiles() method.
@@ -321,32 +319,12 @@ public:
     void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
 
     /**
-     * Overridden CloseOutputFiles() method.
-     */
-    void CloseOutputFiles();
-
-    /**
-     * Overridden WriteResultsToFiles() method.
-     */
-    void WriteResultsToFiles();
-
-    /**
-     * Overridden WriteCellVolumeResultsToFile() method.
-     */
-    void WriteCellVolumeResultsToFile();
-
-    /**
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell boost shared pointer to a cell
      * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
-
-    /**
-     * Overridden GenerateCellResultsAndWriteToFiles() method.
-     */
-    virtual void GenerateCellResultsAndWriteToFiles();
 
     /**
      * Overridden GetWidth() method.

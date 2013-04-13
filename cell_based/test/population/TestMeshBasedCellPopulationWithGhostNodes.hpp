@@ -826,6 +826,7 @@ public:
         std::string output_directory = "TestCellPopulationWritersIn3dWithGhostNodes";
         OutputFileHandler output_file_handler(output_directory, false);
         cell_population.CreateOutputFiles(output_directory, false);
+        cell_population.OpenWritersFiles();
         cell_population.WriteResultsToFiles();
         cell_population.CloseOutputFiles();
 

@@ -63,7 +63,26 @@ public:
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
-    	*this->mpOutStream << pCell->GetCellProliferativeType()->GetColour() << " ";
+        unsigned colour = pCell->GetCellProliferativeType()->GetColour();
+
+        // Set colour dependent on cell mutation state
+        if (!pCell->GetMutationState()->IsType<WildTypeCellMutationState>())
+        {
+            colour = pCell->GetMutationState()->GetColour();
+        }
+        if (pCell->HasCellProperty<CellLabel>())
+        {
+            CellPropertyCollection collection = pCell->rGetCellPropertyCollection().GetProperties<CellLabel>();
+            boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+            colour = p_label->GetColour();
+        }
+        if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())
+        {
+            // For any type of cell set the colour to this if it is undergoing apoptosis
+            colour = APOPTOSIS_COLOUR;
+        }
+
+    	*this->mpOutStream << colour << " ";
     }
 };
 
@@ -311,6 +330,7 @@ public:
             {
                     *this->mpOutStream << centre_location[i] << " ";
             }
+
             *this->mpOutStream << volume << " ";
     	}
     }

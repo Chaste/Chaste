@@ -248,11 +248,13 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
 {
+    pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
+void NodeBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
 {
+    pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned DIM>
@@ -431,43 +433,6 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     }
 
     return cell_volume;
-}
-
-template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
-{
-    assert(DIM==2 || DIM==3);
-
-    // Write time to file
-    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
-
-    // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Write node index to file
-        *(this->mpCellVolumesFile) << node_index << " ";
-
-        // Write cell ID to file
-        *(this->mpCellVolumesFile) << cell_iter->GetCellId() << " ";
-
-        // Write node location to file
-        c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
-        for (unsigned i=0; i<DIM; i++)
-        {
-            *(this->mpCellVolumesFile) << node_location[i] << " ";
-        }
-
-        // Write cell volume (in 3D) or area (in 2D) to file
-        double cell_volume = this->GetVolumeOfCell(*cell_iter);
-        *(this->mpCellVolumesFile) << cell_volume << " ";
-    }
-
-    *(this->mpCellVolumesFile) << "\n";
 }
 
 template<unsigned DIM>

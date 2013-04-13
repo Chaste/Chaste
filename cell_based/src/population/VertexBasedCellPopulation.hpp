@@ -71,15 +71,6 @@ private:
      */
     MutableVertexMesh<DIM, DIM>* mpMutableVertexMesh;
 
-    /** Results file for elements. */
-    out_stream mpVizElementsFile;
-
-    /** Results file for locations of T1Swaps. */
-    out_stream mpT1SwapLocationsFile;
-
-    /** Results file for locations of T3Swaps. */
-    out_stream mpT3SwapLocationsFile;
-
     /** Whether to output the locations of T1Swaps and T3Swaps to files. Defaults to true. */
     bool mOutputCellRearrangementLocations;
 
@@ -293,15 +284,6 @@ public:
      * @param cleanOutputDirectory  whether to delete the contents of the output directory prior to output file creation
      */
     void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
-    /**
-     * Overridden CloseOutputFiles() method.
-     */
-    void CloseOutputFiles();
-
-    /**
-     * Overridden WriteResultsToFiles() method.
-     */
-    void WriteResultsToFiles();
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -316,14 +298,9 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
+     * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
-
-    /**
-     * Write the current index and location (of the centre) of each element in mrMesh, as well as the ID and
-     * the area (in 2D) or volume (in 3D) of its corresponding cell, to mpCellVolumesFile.
-     */
-    void WriteCellVolumeResultsToFile();
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -332,11 +309,6 @@ public:
      * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
-
-    /**
-     * Overridden GenerateCellResultsAndWriteToFiles() method.
-     */
-    virtual void GenerateCellResultsAndWriteToFiles();
 
     /**
      * @return mOutputCellRearrangementLocations

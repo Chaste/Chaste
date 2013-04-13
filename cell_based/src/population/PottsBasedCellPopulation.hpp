@@ -88,9 +88,6 @@ private:
      */
     MutableMesh<DIM,DIM>* mpMutableMesh;
 
-    /** Results file for elements. */
-    out_stream mpVizElementsFile;
-
     /** The update rules used to determine the new location of the cells. */
     std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > mUpdateRuleCollection;
 
@@ -293,11 +290,6 @@ public:
     void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
 
     /**
-     * Overridden CloseOutputFiles() method.
-     */
-    void CloseOutputFiles();
-
-    /**
      * Overridden WriteResultsToFiles() method.
      */
     void WriteResultsToFiles();
@@ -315,13 +307,9 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
+     * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
-
-    /**
-     * Overridden WriteCellVolumeResultsToFile() method.
-     */
-    void WriteCellVolumeResultsToFile();
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -330,11 +318,6 @@ public:
      * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
-
-    /**
-     * Overridden GenerateCellResultsAndWriteToFiles() method.
-     */
-    virtual void GenerateCellResultsAndWriteToFiles();
 
     /**
      * Overridden GetWidth() method.

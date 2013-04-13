@@ -135,42 +135,6 @@ protected:
     /** Population centroid */
     c_vector<double, SPACE_DIM> mCentroid;
 
-    /** Results file for node visualization */
-    out_stream mpVizNodesFile;
-
-    /** Results file for cell visualization */
-    out_stream mpVizCellProliferativeTypesFile;
-
-    /** Results file for cell visualization */
-    out_stream mpVizCellProliferativePhasesFile;
-
-    /** Results file for cell mutation states */
-    out_stream mpCellMutationStatesFile;
-
-    /** Results file for cell ancestors */
-    out_stream mpVizCellAncestorsFile;
-
-    /** Results file for cell types */
-    out_stream mpCellProliferativeTypesFile;
-
-    /** Results file for cell cycle phases */
-    out_stream mpCellCyclePhasesFile;
-
-    /** Results file for cell variables */
-    out_stream mpCellVariablesFile;
-
-    /** Results file for cell ages */
-    out_stream mpCellAgesFile;
-
-    /** Results file for logged cell data. */
-    out_stream mpCellIdFile;
-
-    /** Results file for cell volume (in 3D) or area (in 2D) data. */
-    out_stream mpCellVolumesFile;
-
-    /** Results file for boundary nodes. */
-    out_stream mpVizBoundaryNodesFile;
-
     /** A cache of where the results are going (used for VTK writer). */
     std::string mDirPath;
 
@@ -416,11 +380,6 @@ public:
     void SetCellAncestorsToLocationIndices();
 
     /**
-     * Write cell ID data to mpCellIdFile.
-     */
-    void WriteCellIdDataToFile();
-
-    /**
      * Loops over cells and makes a list of the ancestors that
      * are part of the cell population.
      *
@@ -570,6 +529,11 @@ public:
                                    bool cleanOutputDirectory);
 
     /**
+     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending)
+     */
+    void OpenWritersFiles();
+
+    /**
      * Clear the counters used for cell population output.
      */
     void ResetCellCounters();
@@ -592,38 +556,14 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
+     * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter)=0;
+    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter, CellPtr pCell)=0;
 
     /**
-     * Write the current time and node results to output files.
+     * Generate results for all cells in the current cell population.
      */
-    virtual void WriteTimeAndNodeResultsToFiles();
-
-    /**
-     * Calls GenerateCellResults() on each cell then calls WriteCellResultsToFiles().
-     */
-    virtual void GenerateCellResultsAndWriteToFiles()=0;
-
-    /**
-     * Generate results for a given cell in the current cell population state to output files.
-     *
-     * @param pCell pointer to the cell
-     */
-    virtual void GenerateCellResults(CellPtr pCell);
-
-    /**
-     * Write the current volume of each cell to file.
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     */
-    virtual void WriteCellVolumeResultsToFile()=0;
-
-    /**
-     * Write the current state of each cell to output files.
-     *
-     */
-    void WriteCellResultsToFiles();
+    virtual void GenerateCellResults();
 
     /**
      * Close any output files.

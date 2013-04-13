@@ -820,7 +820,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
-
+        cell_population.OpenWritersFiles();
         cell_population.WriteResultsToFiles();
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
@@ -855,6 +855,7 @@ public:
         TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // For coverage
+        cell_population.OpenWritersFiles();
         TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
 
         // Test that the cell population parameters are output correctly

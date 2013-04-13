@@ -967,6 +967,7 @@ public:
         node_based_cell_population.SetCellAncestorsToLocationIndices();
 
         TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CreateOutputFiles(output_directory, false));
+        node_based_cell_population.OpenWritersFiles();
 
         node_based_cell_population.WriteResultsToFiles();
 
@@ -1059,6 +1060,7 @@ public:
         cell_population.SetOutputCellAncestors(true);
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
+        cell_population.OpenWritersFiles();
 
         cell_population.WriteResultsToFiles();
 
@@ -1126,6 +1128,7 @@ public:
         node_based_cell_population.SetOutputCellCyclePhases(true);
 
         node_based_cell_population.CreateOutputFiles(output_directory, false);
+        node_based_cell_population.OpenWritersFiles();
         node_based_cell_population.WriteResultsToFiles();
         node_based_cell_population.CloseOutputFiles();
 

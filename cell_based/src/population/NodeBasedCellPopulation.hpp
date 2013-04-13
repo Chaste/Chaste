@@ -207,11 +207,6 @@ protected:
 private:
 
     /**
-     * Overridden WriteCellVolumeResultsToFile() method.
-     */
-    void WriteCellVolumeResultsToFile();
-
-    /**
      * Overridden WriteVtkResultsToFile() method.
      */
     void WriteVtkResultsToFile();
@@ -334,8 +329,9 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
+     * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter);
+    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell);
 
     /**
      * @return the maximum interaction distance between cells, defined in NodesOnlyMesh.

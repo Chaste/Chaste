@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
+#include "CellPopulationElementWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -332,73 +333,27 @@ void PottsBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirect
 {
     AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
-    OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
-    mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::CloseOutputFiles()
-{
-    AbstractCellPopulation<DIM>::CloseOutputFiles();
-    mpVizElementsFile->close();
+    this->AddPopulationWriter(new CellPopulationElementWriter<DIM,DIM>(rDirectory));
 }
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
 {
-    AbstractCellPopulation<DIM>::WriteResultsToFiles();
-
     CreateElementTessellation(); // To be used to output to the visualizer
 
-    SimulationTime* p_time = SimulationTime::Instance();
-
-    // Write element data to file
-    *mpVizElementsFile << p_time->GetTime() << "\t";
-
-    // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
-         ++cell_iter)
-    {
-        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-        bool elem_corresponds_to_dead_cell = false;
-
-        if (this->IsCellAttachedToLocationIndex(elem_index))
-        {
-            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
-        }
-
-        // Write node data to file
-        if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
-        {
-            PottsElement<DIM>* p_element = mpPottsMesh->GetElement(elem_index);
-
-            unsigned num_nodes_in_element = p_element->GetNumNodes();
-
-            // First write the number of Nodes belonging to this PottsElement
-            *mpVizElementsFile << num_nodes_in_element << " ";
-
-            // Then write the global index of each Node in this element
-            for (unsigned i=0; i<num_nodes_in_element; i++)
-            {
-                *mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
-            }
-        }
-    }
-    *mpVizElementsFile << "\n";
+    AbstractCellPopulation<DIM>::WriteResultsToFiles();
 }
-
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
 {
+    pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
+void PottsBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
 {
+    pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned DIM>
@@ -411,64 +366,6 @@ double PottsBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     double cell_volume = mpPottsMesh->GetVolumeOfElement(elem_index);
 
     return cell_volume;
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
-{
-    // Write time to file
-    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
-
-    // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-        bool elem_corresponds_to_dead_cell = false;
-
-        if (this->IsCellAttachedToLocationIndex(elem_index))
-        {
-            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
-        }
-
-        // Write node data to file
-        if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
-        {
-           // Write element index to file
-            *(this->mpCellVolumesFile) << elem_index << " ";
-
-            // Write cell ID to file
-            unsigned cell_index = cell_iter->GetCellId();
-            *(this->mpCellVolumesFile) << cell_index << " ";
-
-            // Write centroid location to file
-            c_vector<double, DIM> centroid_location = mpPottsMesh->GetCentroidOfElement(elem_index);
-
-            *(this->mpCellVolumesFile) << centroid_location[0] << " ";
-            *(this->mpCellVolumesFile) << centroid_location[1] << " ";
-
-            // Write cell volume (in 3D) or area (in 2D) to file
-            double cell_volume = this->GetVolumeOfCell(*cell_iter);
-            *(this->mpCellVolumesFile) << cell_volume << " ";
-        }
-    }
-    *(this->mpCellVolumesFile) << "\n";
-}
-
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
-{
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        this->GenerateCellResults(*cell_iter);
-    }
-
-    this->WriteCellResultsToFiles();
 }
 
 template<unsigned DIM>

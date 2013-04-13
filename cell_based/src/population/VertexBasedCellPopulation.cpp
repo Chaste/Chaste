@@ -38,6 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 
+// Cell writer definitions
+#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellWriter.hpp"
+#include "VertexSwapWriters.hpp"
+#include "CellPopulationElementWriter.hpp"
+
 template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
                                           std::vector<CellPtr>& rCells,
@@ -346,94 +352,15 @@ void VertexBasedCellPopulation<DIM>::Validate()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::WriteResultsToFiles()
-{
-    AbstractOffLatticeCellPopulation<DIM>::WriteResultsToFiles();
-
-    SimulationTime* p_time = SimulationTime::Instance();
-
-    if (mOutputCellRearrangementLocations)
-    {
-        // Write locations of T1Swaps to file
-        *mpT1SwapLocationsFile << p_time->GetTime() << "\t";
-        std::vector< c_vector<double, DIM> > t1_swap_locations = mpMutableVertexMesh->GetLocationsOfT1Swaps();
-        *mpT1SwapLocationsFile << t1_swap_locations.size() << "\t";
-        for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
-        {
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *mpT1SwapLocationsFile << t1_swap_locations[index][i] << "\t";
-            }
-        }
-        *mpT1SwapLocationsFile << "\n";
-    }
-    mpMutableVertexMesh->ClearLocationsOfT1Swaps();
-
-    if (mOutputCellRearrangementLocations)
-    {
-        // Write locations of T3Swaps to file
-        *mpT3SwapLocationsFile << p_time->GetTime() << "\t";
-        std::vector< c_vector<double, DIM> > t3_swap_locations = mpMutableVertexMesh->GetLocationsOfT3Swaps();
-        *mpT3SwapLocationsFile << t3_swap_locations.size() << "\t";
-        for (unsigned index = 0;  index < t3_swap_locations.size(); index++)
-        {
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *mpT3SwapLocationsFile << t3_swap_locations[index][i] << "\t";
-            }
-        }
-        *mpT3SwapLocationsFile << "\n";
-    }
-    mpMutableVertexMesh->ClearLocationsOfT3Swaps();
-
-    if (this->mOutputResultsForChasteVisualizer)
-    {
-        // Write element data to file
-        *mpVizElementsFile << p_time->GetTime() << "\t";
-
-        // Loop over cells and find associated elements so in the same order as the cells in output files
-        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-             cell_iter != this->mCells.end();
-             ++cell_iter)
-        {
-            unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
-    
-            // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-            bool elem_corresponds_to_dead_cell = false;
-    
-            if (this->IsCellAttachedToLocationIndex(elem_index))
-            {
-                elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
-            }
-    
-            // Write element data to file
-            if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
-            {
-                VertexElement<DIM, DIM>* p_element = mpMutableVertexMesh->GetElement(elem_index);
-                unsigned num_nodes_in_element = p_element->GetNumNodes();
-    
-                // First write the number of Nodes belonging to this VertexElement
-                *mpVizElementsFile << num_nodes_in_element << " ";
-    
-                // Then write the global index of each Node in this element
-                for (unsigned i=0; i<num_nodes_in_element; i++)
-                {
-                    *mpVizElementsFile << p_element->GetNodeGlobalIndex(i) << " ";
-                }
-            }
-        }
-        *mpVizElementsFile << "\n";
-    }
-}
-
-template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
 {
+    pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
+void VertexBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
 {
+    pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned DIM>
@@ -446,54 +373,6 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(elem_index);
 
     return cell_volume;
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
-{
-    assert(DIM == 2);
-
-    // Write time to file
-    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
-
-    // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-        bool elem_corresponds_to_dead_cell = false;
-
-        if (this->IsCellAttachedToLocationIndex(elem_index))
-        {
-            elem_corresponds_to_dead_cell = this->GetCellUsingLocationIndex(elem_index)->IsDead();
-        }
-
-        // Write node data to file
-        if (!(GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
-        {
-            // Write element index to file
-            *(this->mpCellVolumesFile) << elem_index << " ";
-
-            // Write cell ID to file
-            unsigned cell_index = (*cell_iter)->GetCellId();
-            *(this->mpCellVolumesFile) << cell_index << " ";
-
-            // Write location of element centroid to file
-            c_vector<double, DIM> centre_location = GetLocationOfCellCentre(*cell_iter);
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *(this->mpCellVolumesFile) << centre_location[i] << " ";
-            }
-
-            // Write cell volume (in 3D) or area (in 2D) to file
-            double cell_volume = this->GetVolumeOfCell(*cell_iter);
-            *(this->mpCellVolumesFile) << cell_volume << " ";
-        }
-    }
-    *(this->mpCellVolumesFile) << "\n";
 }
 
 template<unsigned DIM>
@@ -633,46 +512,15 @@ void VertexBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirec
 {
     AbstractOffLatticeCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
-    OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
-
     if (this->mOutputResultsForChasteVisualizer)
     {
-        mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
+        this->AddPopulationWriter(new CellPopulationElementWriter<DIM, DIM>(rDirectory));
     }
     if (mOutputCellRearrangementLocations)
     {
-        mpT1SwapLocationsFile = output_file_handler.OpenOutputFile("T1SwapLocations.dat");
-        mpT3SwapLocationsFile = output_file_handler.OpenOutputFile("T3SwapLocations.dat");
+        this->AddPopulationWriter(new VertexT1SwapLocationsWriter<DIM, DIM>(rDirectory));
+        this->AddPopulationWriter(new VertexT3SwapLocationsWriter<DIM, DIM>(rDirectory));
     }
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::CloseOutputFiles()
-{
-    AbstractOffLatticeCellPopulation<DIM>::CloseOutputFiles();
-
-    if (this->mOutputResultsForChasteVisualizer)
-    {
-        mpVizElementsFile->close();
-    }
-    if (mOutputCellRearrangementLocations)
-    {
-        mpT1SwapLocationsFile->close();
-        mpT3SwapLocationsFile->close();
-    }
-}
-
-template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
-{
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        this->GenerateCellResults(*cell_iter);
-    }
-
-    this->WriteCellResultsToFiles();
 }
 
 template<unsigned DIM>

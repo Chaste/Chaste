@@ -132,15 +132,6 @@ protected:
      */
     std::map<std::pair<unsigned,unsigned>, double> mSpringRestLengths;
 
-    /** Results file for elements. */
-    out_stream mpVizElementsFile;
-
-    /** Results file for Voronoi data. */
-    out_stream mpVoronoiFile;
-
-    /** Results file for cell population volume (in 3D) or area (in 2D) data. */
-    out_stream mpCellPopulationVolumesFile;
-
     /** Whether to use a viscosity that is linear in the cell area, rather than constant. */
     bool mUseAreaBasedDampingConstant;
 
@@ -305,14 +296,9 @@ public:
     void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
 
     /**
-     * Overridden CloseOutputFiles() method.
-     */
-    void CloseOutputFiles();
-
-    /**
      * Overridden WriteResultsToFiles() method.
      */
-    void WriteResultsToFiles();
+    virtual void WriteResultsToFiles();
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -327,8 +313,9 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
+     * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter);
+    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter, CellPtr pCell);
 
     /**
      * Overridden Update(bool hasHadBirthsOrDeaths) method.
@@ -373,24 +360,6 @@ public:
      * Overridden WriteVtkResultsToFile() method.
      */
     virtual void WriteVtkResultsToFile();
-
-    /**
-     * Write the current index and location of each node in mrMesh (including ghost nodes),
-     * as well as the area and perimeter (in 2D) or volume and surface area (in 3D)
-     * of its corresponding element in mpVoronoiTessellation, to mpVoronoiFile.
-     */
-    void WriteVoronoiResultsToFile();
-
-    /**
-     * Write the current total area (in 2D) or volume (in 3D) of mrMesh, and of the set of
-     * apoptotic cells in the cell population (using mpVoronoiTessellation), to mpCellPopulationVolumesFile.
-     */
-    void WriteCellPopulationVolumeResultsToFile();
-
-    /**
-     * Overridden WriteCellVolumeResultsToFile() method.
-     */
-    void WriteCellVolumeResultsToFile();
 
     /**
      * Overridden GetVolumeOfCell() method.

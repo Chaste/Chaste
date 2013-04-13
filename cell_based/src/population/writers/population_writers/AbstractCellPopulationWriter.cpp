@@ -52,9 +52,9 @@ void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::CloseFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile(bool cleanOutputDirectory)
+void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile()
 {
-    OutputFileHandler output_file_handler(mDirectory, cleanOutputDirectory);
+    OutputFileHandler output_file_handler(mDirectory, false);
 
     mpOutStream = output_file_handler.OpenOutputFile(mFileName);
 }

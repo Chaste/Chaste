@@ -336,7 +336,7 @@ public:
         // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
         TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
-
+        cell_population.OpenWritersFiles();
         cell_population.WriteResultsToFiles();
         TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
 

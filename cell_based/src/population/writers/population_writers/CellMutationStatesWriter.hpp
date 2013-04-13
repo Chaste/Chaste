@@ -38,9 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationWriter.hpp"
 
-/**
- * A class written using the visitor pattern for writing node location from a cell population to file.
- */
+/** A class written using the visitor pattern for writing cell mutations states from a cell population to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellMutationStatesWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {

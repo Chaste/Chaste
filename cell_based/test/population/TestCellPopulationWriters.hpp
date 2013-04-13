@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "VertexSwapWriters.hpp"
+#include "CellPopulationAreaWriter.hpp"
 #include "CellWriters.hpp"
 
 // Files to create populations
@@ -310,12 +311,7 @@ public:
 
 		cell_population.CreateOutputFiles(output_directory, true);
 
-		for (AbstractCellPopulation<3,3>::Iterator cell_iter = cell_population.Begin();
-						cell_iter != cell_population.End();
-						++cell_iter)
-		{
-				cell_population.GenerateCellResults(*cell_iter);
-		}
+        cell_population.GenerateCellResults();
 
 		/*
 		 * Write cell cycle phases count file.
@@ -454,6 +450,52 @@ public:
         FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestWriteVertexSwaps/T3SwapLocations_twice.dat").CompareFiles();
     }
 
+    void TestCellPopulationAreaWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
+        MutableMesh<3,3> mesh(nodes);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+        cell_population.CreateVoronoiTessellation();
+
+        std::string output_directory = "TestWriteCellPopulationAreas";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        CellPopulationAreaWriter<3,3> area_writer(output_directory);
+
+        area_writer.OpenOutputFile();
+
+        area_writer.Visit(&cell_population);
+
+        area_writer.CloseFile();
+
+        FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestWriteCellPopulationAreas/cellpopulationareas.dat").CompareFiles();
+
+        // Make sure we can append to files.
+        area_writer.OpenOutputFileForAppend();
+
+        area_writer.Visit(&cell_population);
+
+        area_writer.CloseFile();
+
+        FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestWriteCellPopulationAreas/cellpopulationareas_twice.dat").CompareFiles();
+    }
+
     void TestAddWritersToAPopulation() throw (Exception)
     {
         EXIT_IF_PARALLEL;
@@ -472,11 +514,14 @@ public:
 
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
-        CellPopulationElementWriter<3,3> writer("output");
-        cell_population.AddPopulationWriter(&writer);
+        cell_population.AddPopulationWriter(new CellPopulationElementWriter<3,3>("output"));
 
-        CellIdWriter<3,3> id_writer("output_directory");
-        cell_population.AddCellWriter(&id_writer);
+        cell_population.AddCellWriter(new CellIdWriter<3,3>("output_directory"));
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 };
 

@@ -78,10 +78,8 @@ public:
 
     /**
      * Open the out stream for writing
-     *
-     * @param cleanOutputDirectory whether to clean the output directory before writing.
      */
-    virtual void OpenOutputFile(bool cleanOutputDirectory = true);
+    virtual void OpenOutputFile();
 
     /**
      * Open the out stream for appending.
@@ -100,7 +98,6 @@ public:
      * @param pCellPopulation a pointer to the cell population owning the cell.
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
-
 };
 
 #endif /*ABSTRACTCELLWRITER_HPP_*/

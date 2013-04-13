@@ -335,6 +335,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     OutputFileHandler output_file_handler(results_directory+"/", true);
 
     mrCellPopulation.CreateOutputFiles(results_directory+"/", false);
+    mrCellPopulation.OpenWritersFiles();
 
     if (mOutputDivisionLocations)
     {

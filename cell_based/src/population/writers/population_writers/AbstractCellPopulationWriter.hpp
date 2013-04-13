@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 /**
- * A class written using the visitor pattern for writing node location from a cell population to file.
+ * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellPopulationWriter
@@ -85,10 +85,8 @@ public:
 
     /**
      * Open the out stream for writing
-     *
-     * @param cleanOutputDirectory whether to clean the output directory before writing.
      */
-    virtual void OpenOutputFile(bool cleanOutputDirectory = true);
+    virtual void OpenOutputFile();
 
     /**
      * Open the out stream for appending.

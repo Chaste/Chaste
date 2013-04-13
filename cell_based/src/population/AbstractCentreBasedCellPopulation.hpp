@@ -204,16 +204,6 @@ public:
     virtual double GetDampingConstant(unsigned nodeIndex);
 
     /**
-     * Overridden GenerateCellResultsAndWriteToFiles() method.
-     */
-    virtual void GenerateCellResultsAndWriteToFiles();
-
-    /**
-     * Overridden WriteTimeAndNodeResultsToFiles() method.
-     */
-    virtual void WriteTimeAndNodeResultsToFiles();
-
-    /**
      * Find if a given node is a ghost node. The method always returns false
      * but is overridden in MeshBasedCellPopulationWithGhostNodes.
      *

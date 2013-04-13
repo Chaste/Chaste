@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed to write population data to file.
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
+#include "CellWriters.hpp"
 
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
@@ -416,11 +417,13 @@ void MultipleCaBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
 {
+    pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter)
+void MultipleCaBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
 {
+    pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned DIM>
@@ -428,71 +431,7 @@ void MultipleCaBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rD
 {
     AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
-    OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
-    mpVizLocationsFile = output_file_handler.OpenOutputFile("results.vizlocations");
-}
-
-template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::CloseOutputFiles()
-{
-    AbstractCellPopulation<DIM>::CloseOutputFiles();
-    mpVizLocationsFile->close();
-}
-
-template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::WriteResultsToFiles()
-{
-    AbstractCellPopulation<DIM>::WriteResultsToFiles();
-
-    SimulationTime* p_time = SimulationTime::Instance();
-
-    // Write location data to file
-    *mpVizLocationsFile << p_time->GetTime() << "\t";
-
-    // Loop over cells and find associated nodes so in the same order as the cells in output files
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
-         ++cell_iter)
-    {
-        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Write the index of the of Node the cell is associated with.
-        *mpVizLocationsFile << node_index << " ";
-    }
-    *mpVizLocationsFile << "\n";
-}
-
-template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::WriteCellVolumeResultsToFile()
-{
-    // Write time to file
-    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
-
-    // Loop over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        // Get the index of the corresponding node in mrMesh and write to file
-        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-        *(this->mpCellVolumesFile) << node_index << " ";
-
-        // Get cell ID and write to file
-        unsigned cell_index = cell_iter->GetCellId();
-        *(this->mpCellVolumesFile) << cell_index << " ";
-
-        // Get node location and write to file
-        c_vector<double, DIM> node_location = this->GetNode(node_index)->rGetLocation();
-        for (unsigned i=0; i<DIM; i++)
-        {
-            *(this->mpCellVolumesFile) << node_location[i] << " ";
-        }
-
-        // Write cell volume (in 3D) or area (in 2D) to file
-        double cell_volume = this->GetVolumeOfCell(*cell_iter);
-        *(this->mpCellVolumesFile) << cell_volume << " ";
-    }
-    *(this->mpCellVolumesFile) << "\n";
+    this->AddCellWriter(new CellLocationWriter<DIM, DIM>(rDirectory));
 }
 
 template<unsigned DIM>
@@ -500,19 +439,6 @@ double MultipleCaBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     double cell_volume = 1.0;
     return cell_volume;
-}
-
-template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::GenerateCellResultsAndWriteToFiles()
-{
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
-    {
-        this->GenerateCellResults(*cell_iter);
-    }
-
-    this->WriteCellResultsToFiles();
 }
 
 template<unsigned DIM>

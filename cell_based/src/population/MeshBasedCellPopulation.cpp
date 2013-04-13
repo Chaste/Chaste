@@ -44,6 +44,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
+#include "CellWriters.hpp"
+#include "CellPopulationElementWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
@@ -454,33 +458,15 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOutputFiles(const std
 {
     AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
-    OutputFileHandler output_file_handler(rDirectory, cleanOutputDirectory);
-    mpVizElementsFile = output_file_handler.OpenOutputFile("results.vizelements");
+    this->AddPopulationWriter(new CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
 
     if (mOutputVoronoiData)
     {
-        mpVoronoiFile = output_file_handler.OpenOutputFile("voronoi.dat");
+        this->AddPopulationWriter(new VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
     }
     if (mOutputCellPopulationVolumes)
     {
-        mpCellPopulationVolumesFile = output_file_handler.OpenOutputFile("cellpopulationareas.dat");
-    }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CloseOutputFiles()
-{
-    AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CloseOutputFiles();
-
-    mpVizElementsFile->close();
-
-    if (mOutputVoronoiData)
-    {
-        mpVoronoiFile->close();
-    }
-    if (mOutputCellPopulationVolumes)
-    {
-        mpCellPopulationVolumesFile->close();
+        this->AddPopulationWriter(new CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
     }
 }
 
@@ -489,71 +475,23 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles()
 {
     if (SimulationTime::Instance()->GetTimeStepsElapsed() == 0 && this->mpVoronoiTessellation == NULL)
     {
-        TessellateIfNeeded();//Update isn't run on time-step zero
+        TessellateIfNeeded(); //Update isn't run on time-step zero
     }
 
     AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles();
-
-    // Write element data to file
-    *mpVizElementsFile << SimulationTime::Instance()->GetTime() << "\t";
-
-    for (typename MutableMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).GetElementIteratorBegin();
-         elem_iter != static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        bool element_contains_dead_cells_or_deleted_nodes = false;
-
-        // Hack that covers the case where the element contains a node that is associated with a cell that has just been killed (#1129)
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
-        {
-            unsigned node_index = elem_iter->GetNodeGlobalIndex(i);
-
-            if (this->GetNode(node_index)->IsDeleted())
-            {
-                element_contains_dead_cells_or_deleted_nodes = true;
-                break;
-            }
-            else if (this->IsCellAttachedToLocationIndex(node_index))
-            {
-                if (this->GetCellUsingLocationIndex(node_index)->IsDead())
-                {
-                    element_contains_dead_cells_or_deleted_nodes = true;
-                    break;
-                }
-            }
-        }
-        if (!element_contains_dead_cells_or_deleted_nodes)
-        {
-            for (unsigned i=0; i<ELEMENT_DIM+1; i++)
-            {
-                *mpVizElementsFile << elem_iter->GetNodeGlobalIndex(i) << " ";
-            }
-        }
-    }
-    *mpVizElementsFile << "\n";
-
-    // Write data to file.
-    if (mOutputVoronoiData)
-    {
-        WriteVoronoiResultsToFile();
-    }
-    if (mOutputCellPopulationVolumes)
-    {
-        WriteCellPopulationVolumeResultsToFile();
-    }
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pPopulationWriter)
 {
+    pPopulationWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter, CellPtr pCell)
 {
+    pCellWriter->VisitCell(pCell, this);
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
@@ -783,82 +721,6 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVoronoiResultsToFile()
-{
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-    assert(mpVoronoiTessellation != NULL);
-    // Write time to file
-    *mpVoronoiFile << SimulationTime::Instance()->GetTime() << " ";
-
-    // Loop over elements of mpVoronoiTessellation
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
-         elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Get index of this element in mpVoronoiTessellation
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-        // Write node index and location to file
-        *mpVoronoiFile << node_index << " ";
-        c_vector<double, SPACE_DIM> node_location = this->GetNode(node_index)->rGetLocation();
-        for (unsigned i=0; i<SPACE_DIM; i++)
-        {
-            *mpVoronoiFile << node_location[i] << " ";
-        }
-
-        double cell_volume = mpVoronoiTessellation->GetVolumeOfElement(elem_index);
-        double cell_surface_area = mpVoronoiTessellation->GetSurfaceAreaOfElement(elem_index);
-        *mpVoronoiFile << cell_volume << " " << cell_surface_area << " ";
-    }
-    *mpVoronoiFile << "\n";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteCellPopulationVolumeResultsToFile()
-{
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-
-    // Write time to file
-    *mpCellPopulationVolumesFile << SimulationTime::Instance()->GetTime() << " ";
-    assert (this->mpVoronoiTessellation != NULL);
-
-    // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
-    double total_area = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).GetVolume();
-    double apoptotic_area = 0.0;
-
-    // Loop over elements of mpVoronoiTessellation
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
-         elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Get index of this element in mpVoronoiTessellation
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-        // Discount ghost nodes
-        if (!this->IsGhostNode(node_index))
-        {
-            // Get the cell corresponding to this node
-            CellPtr p_cell =  this->GetCellUsingLocationIndex(node_index);
-
-            // Only bother calculating the area/volume of apoptotic cells
-            bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
-            if (cell_is_apoptotic)
-            {
-                double cell_volume = mpVoronoiTessellation->GetVolumeOfElement(elem_index);
-                apoptotic_area += cell_volume;
-            }
-        }
-    }
-    *mpCellPopulationVolumesFile << total_area << " " << apoptotic_area << "\n";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Ensure that the Voronoi tessellation exists
@@ -886,57 +748,6 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
     }
 
     return cell_volume;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteCellVolumeResultsToFile()
-{
-    assert (mpVoronoiTessellation != NULL);
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-
-    // Write time to file
-    *(this->mpCellVolumesFile) << SimulationTime::Instance()->GetTime() << " ";
-
-    ///\todo It would be simpler to merely iterate over the cell population here
-
-    // Loop over elements of mpVoronoiTessellation
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
-         elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Get index of this element in mpVoronoiTessellation
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-        // Discount ghost nodes
-        if (!this->IsGhostNode(node_index))
-        {
-            // Write node index to file
-            *(this->mpCellVolumesFile) << node_index << " ";
-
-            // Get the cell corresponding to this node
-            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
-
-            // Write cell ID to file
-            unsigned cell_index = p_cell->GetCellId();
-            *(this->mpCellVolumesFile) << cell_index << " ";
-
-            // Write node location to file
-            c_vector<double, SPACE_DIM> node_location = this->GetNode(node_index)->rGetLocation();
-            for (unsigned i=0; i<SPACE_DIM; i++)
-            {
-                *(this->mpCellVolumesFile) << node_location[i] << " ";
-            }
-
-            // Write cell volume (in 3D) or area (in 2D) to file
-            double cell_volume = this->GetVolumeOfCell(p_cell);
-            *(this->mpCellVolumesFile) << cell_volume << " ";
-        }
-    }
-    *(this->mpCellVolumesFile) << "\n";
-
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

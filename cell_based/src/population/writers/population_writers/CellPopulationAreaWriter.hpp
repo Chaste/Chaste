@@ -33,28 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef VORONOIDATAWRITER_HPP_
-#define VORONOIDATAWRITER_HPP_
-
-#include "OutputFileHandler.hpp"
-#include "AbstractCellPopulation.hpp"
+#ifndef CELLPOPULATIONAREAWRITER_HPP_
+#define CELLPOPULATIONAREAWRITER_HPP_
 
 #include "AbstractCellPopulationWriter.hpp"
 
-#include <string>
-
-/** A class written using the visitor pattern for writing voronoi data from a cell population to file.*/
+/**
+ * A class written using the visitor pattern for writing cell population volume data to file.
+ * Used by MeshBasedCellPopulation.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class VoronoiDataWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class CellPopulationAreaWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
-
 public:
 
     /**
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-    VoronoiDataWriter(std::string directory);
+    CellPopulationAreaWriter(std::string directory);
 
     /**
      * Visit the population and write the data.
@@ -113,4 +110,4 @@ public:
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
-#endif /*VORONOIDATAWRITER_HPP_*/
+#endif /*CELLPOPULATIONAREAWRITER_HPP_*/
