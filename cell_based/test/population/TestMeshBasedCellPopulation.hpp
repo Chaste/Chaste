@@ -834,37 +834,6 @@ public:
         }
     }
 
-    void noTestFailingTest()
-    {
-        // Set up SimulationTime (needed if VTK is used)
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-
-        // Create a simple 3D mesh
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
-
-        // Set up cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        // Create cell population
-        MeshBasedCellPopulation<3> cell_population(mesh, cells);
-
-        cell_population.CreateVoronoiTessellation();
-
-        TS_ASSERT(cell_population.GetNumRealCells() > 0u);
-
-        double volume;
-        volume = cell_population.GetVolumeOfCell(*(cell_population.Begin()));    // This throws an exception.
-        std::cout << volume << "\n";
-    }
-
     void TestCellPopulationWritersIn3d()
     {
         EXIT_IF_PARALLEL;    // Cannot write cell populations in parallel.
@@ -893,6 +862,9 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
+
+        // Check that infinite area is returned if this is a boundary cell.
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(0)), DBL_MAX, 1e-2);
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3-3");
 

@@ -304,12 +304,15 @@ public:
     	c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
     	double volume = pCellPopulation->GetVolumeOfCell(pCell);
 
-    	*this->mpOutStream << location_index << " " << cell_id << " ";
-    	for (unsigned i=0; i<SPACE_DIM; i++)
+    	if (volume < DBL_MAX)   // Only write cells with finite volume (avoids a case for boundary cells in MeshBasedCellPopulation)
     	{
-    			*this->mpOutStream << centre_location[i] << " ";
+            *this->mpOutStream << location_index << " " << cell_id << " ";
+            for (unsigned i=0; i<SPACE_DIM; i++)
+            {
+                    *this->mpOutStream << centre_location[i] << " ";
+            }
+            *this->mpOutStream << volume << " ";
     	}
-    	*this->mpOutStream << volume << " ";
     }
 };
 

@@ -870,11 +870,20 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
     // Get the node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
 
-    // Get the element index of the Voronoi tessellation corresponding to this node index
-    unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
+    // Try to get the element index of the Voronoi tessellation corresponding to this node index
+    double cell_volume;
+    try
+    {
+        unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
 
-    // Get the cell's volume from the Voronoi tessellation
-    double cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
+        // Get the cell's volume from the Voronoi tessellation
+        cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
+    }
+    catch (Exception& e)
+    {
+        // If it doesn't exist this must be a boundary cell, so return infinite volume.
+        cell_volume = DBL_MAX;
+    }
 
     return cell_volume;
 }
