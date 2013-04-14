@@ -42,11 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellMutationStatesWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
-private:
-
-    /** Whether the header line of a file has been written */
-    bool mHasHeaderBeenWritten;
-
 public:
 
     /**
@@ -56,18 +51,16 @@ public:
     CellMutationStatesWriter(std::string directory);
 
     /**
+     * Write the header to file
+     */
+    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+
+    /**
      * A general method for writing to any population
      *
      * @param pCellPopulation the population to write.
      */
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Write the header of the output file. //\ todo pull up to abstract class e.g. 'WriterWithHeader'
-     *
-     * @param pCellPopulation the population to write.
-     */
-    void WriteHeader(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.

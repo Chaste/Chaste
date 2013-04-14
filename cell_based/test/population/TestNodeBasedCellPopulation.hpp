@@ -888,6 +888,75 @@ public:
         delete p_mesh;
     }
 
+    void TestNodeBasedCellPopulationOutputInParallel() throw (Exception)
+    {
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a simple mesh
+        std::vector<Node<2>* > nodes;
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes.push_back(new Node<2>(i, false, 0.0, 0.75*i));
+        }
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->SetBirthTime(0.0);
+        }
+
+        // Create a cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
+
+        node_based_cell_population.Update(); // so cell neighbours are calculated
+
+        node_based_cell_population.SetOutputCellMutationStates(true);
+        node_based_cell_population.SetOutputCellIdData(true);
+        node_based_cell_population.SetOutputCellProliferativeTypes(true);
+        node_based_cell_population.SetOutputCellCyclePhases(true);
+        node_based_cell_population.SetOutputCellAges(true);
+        node_based_cell_population.SetOutputCellVolumes(true);
+        node_based_cell_population.SetOutputCellAncestors(true);
+
+        // Test set methods
+        std::string output_directory = "TestNodeBasedCellPopulationWritersParallel";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CreateOutputFiles(output_directory, false));
+        node_based_cell_population.OpenWritersFiles();
+
+        node_based_cell_population.WriteResultsToFiles();
+
+        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CloseOutputFiles());
+
+        // Compare output with saved files of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellmutationstates.dat").CompareFiles();
+
+        // Cell ages and volumes file differs because it writes the global index of the node to file, which is different depending on how many processes there are.
+        //FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellages.dat").CompareFiles();
+        //FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+
+    }
+
     void TestNodeBasedCellPopulationOutputWriters2d()
     {
         EXIT_IF_PARALLEL;    // Population writers dont work in parallel yet.

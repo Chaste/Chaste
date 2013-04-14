@@ -44,29 +44,29 @@ CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeType
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-	this->WriteTimeStamp();
-
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
 
-    for (unsigned i=0; i<proliferative_type_count.size(); i++)
+    if (PetscTools::AmMaster())
     {
-        *this->mpOutStream << proliferative_type_count[i] << "\t";
+        for (unsigned i=0; i<proliferative_type_count.size(); i++)
+        {
+            *this->mpOutStream << proliferative_type_count[i] << "\t";
+        }
     }
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-	this->WriteTimeStamp();
-
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
 
-    for (unsigned i=0; i<proliferative_type_count.size(); i++)
+    if (PetscTools::AmMaster())
     {
-        *this->mpOutStream << proliferative_type_count[i] << "\t";
+        for (unsigned i=0; i<proliferative_type_count.size(); i++)
+        {
+            *this->mpOutStream << proliferative_type_count[i] << "\t";
+        }
     }
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

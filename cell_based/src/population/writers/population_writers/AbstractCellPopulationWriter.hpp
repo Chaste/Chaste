@@ -62,6 +62,11 @@ public:
     AbstractCellPopulationWriter(std::string directory);
 
     /**
+     * Write the header to file
+     */
+    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+
+    /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the mesh based cell population population to visit.

@@ -40,6 +40,11 @@ AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationWrit
 {
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+}
+
 // Explicit instantiation
 template class AbstractCellPopulationWriter<1,1>;
 template class AbstractCellPopulationWriter<1,2>;

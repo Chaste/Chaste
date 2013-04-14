@@ -44,8 +44,6 @@ NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter(std::string direc
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    this->WriteTimeStamp();
-
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
             node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
             ++node_iter)
@@ -60,15 +58,11 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
             }
         }
     }
-
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    this->WriteTimeStamp();
-
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
             node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
             ++node_iter)
@@ -83,8 +77,6 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
             }
         }
     }
-
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

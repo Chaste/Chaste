@@ -1576,6 +1576,7 @@ public:
         crypt.SetOutputCellMutationStates(true);
         crypt.SetOutputCellProliferativeTypes(true);
         crypt.SetOutputCellCyclePhases(true);
+        crypt.GenerateCellResults();
 
         // Each cell count has been initialized to the correct size and computed
         std::vector<unsigned> cell_mutation_state_count1 = crypt.GetCellMutationStateCount();
@@ -1606,7 +1607,7 @@ public:
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[1], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[2], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[3], 0u);
-        TS_ASSERT_EQUALS(cell_cycle_phase_count1[4], 0u);
+        TS_ASSERT_EQUALS(cell_cycle_phase_count1[4], 16u);
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
@@ -1680,6 +1681,7 @@ public:
 
         // In the loaded simulation, we want the various cell counts to be saved
         // (so that simulations which quit when a certain population is removed don't stop too soon)
+        p_simulator->rGetCellPopulation().GenerateCellResults();
         std::vector<unsigned> cell_mutation_state_count4 = p_simulator->rGetCellPopulation().GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_state_count4.size(), 4u);
         TS_ASSERT_EQUALS(cell_mutation_state_count4[0], 13u);

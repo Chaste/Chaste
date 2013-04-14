@@ -44,8 +44,6 @@ BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter(std::string direc
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    this->WriteTimeStamp();
-
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
             node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
             ++node_iter)
@@ -55,15 +53,11 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
             *this->mpOutStream << node_iter->IsBoundaryNode() << " ";
         }
     }
-
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    this->WriteTimeStamp();
-
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
             node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
             ++node_iter)
@@ -73,8 +67,6 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
             *this->mpOutStream << node_iter->IsBoundaryNode() << " ";
         }
     }
-
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

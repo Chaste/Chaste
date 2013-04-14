@@ -47,9 +47,6 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<EL
     assert(SPACE_DIM==2 || SPACE_DIM==3);
     VertexMesh<ELEMENT_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
 
-    // Write time to file
-    this->WriteTimeStamp();
-
     // Loop over elements of voronoi_tesselation
     for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
          elem_iter != voronoi_tesselation->GetElementIteratorEnd();
@@ -73,7 +70,6 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<EL
         double cell_surface_area = voronoi_tesselation->GetSurfaceAreaOfElement(elem_index);
         *this->mpOutStream << cell_volume << " " << cell_surface_area << " ";
     }
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -102,7 +102,11 @@ public:
 
         location_writer.OpenOutputFile();
 
+        location_writer.WriteTimeStamp();
+
         location_writer.Visit(&cell_population);
+
+        location_writer.WriteNewline();
 
         location_writer.CloseFile();
 
@@ -111,7 +115,11 @@ public:
         // Make sure we can append to files.
         location_writer.OpenOutputFileForAppend();
 
+        location_writer.WriteTimeStamp();
+
         location_writer.Visit(&cell_population);
+
+        location_writer.WriteNewline();
 
         location_writer.CloseFile();
 
@@ -151,7 +159,11 @@ public:
 
         boundary_writer.OpenOutputFile();
 
+        boundary_writer.WriteTimeStamp();
+
         boundary_writer.Visit(&cell_population);
+
+        boundary_writer.WriteNewline();
 
         boundary_writer.CloseFile();
 
@@ -160,7 +172,11 @@ public:
         // Make sure we can append to files.
         boundary_writer.OpenOutputFileForAppend();
 
+        boundary_writer.WriteTimeStamp();
+
         boundary_writer.Visit(&cell_population);
+
+        boundary_writer.WriteNewline();
 
         boundary_writer.CloseFile();
 
@@ -193,7 +209,11 @@ public:
 
         element_writer.OpenOutputFile();
 
+        element_writer.WriteTimeStamp();
+
         element_writer.Visit(&cell_population);
+
+        element_writer.WriteNewline();
 
         element_writer.CloseFile();
 
@@ -202,7 +222,11 @@ public:
         // Make sure we can append to files.
         element_writer.OpenOutputFileForAppend();
 
+        element_writer.WriteTimeStamp();
+
         element_writer.Visit(&cell_population);
+
+        element_writer.WriteNewline();
 
         element_writer.CloseFile();
 
@@ -232,6 +256,7 @@ public:
         // Create cell population
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
         cell_population.SetOutputCellMutationStates(true);
+        cell_population.GenerateCellResults();
 
         std::string output_directory = "TestWriteCellMutationStates";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -242,7 +267,13 @@ public:
 
         mutation_states_writer.OpenOutputFile();
 
+        mutation_states_writer.WriteHeader(&cell_population);
+
+        mutation_states_writer.WriteTimeStamp();
+
         mutation_states_writer.Visit(&cell_population);
+
+        mutation_states_writer.WriteNewline();
 
         mutation_states_writer.CloseFile();
 
@@ -251,7 +282,11 @@ public:
         // Make sure we can append to files.
         mutation_states_writer.OpenOutputFileForAppend();
 
+        mutation_states_writer.WriteTimeStamp();
+
         mutation_states_writer.Visit(&cell_population);
+
+        mutation_states_writer.WriteNewline();
 
         mutation_states_writer.CloseFile();
 
@@ -279,6 +314,7 @@ public:
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellCyclePhases(true);
+        cell_population.GenerateCellResults();
 
         std::string output_directory = "TestWriteCellProlifertiveTypesCount";
 		OutputFileHandler output_file_handler(output_directory, false);
@@ -294,7 +330,11 @@ public:
 
 		types_count_writer.OpenOutputFile();
 
+		types_count_writer.WriteTimeStamp();
+
 		types_count_writer.Visit(&cell_population);
+
+        types_count_writer.WriteNewline();
 
 		types_count_writer.CloseFile();
 
@@ -303,15 +343,17 @@ public:
 		// Make sure we can append to files.
 		types_count_writer.OpenOutputFileForAppend();
 
+        types_count_writer.WriteTimeStamp();
+
 		types_count_writer.Visit(&cell_population);
+
+        types_count_writer.WriteNewline();
 
 		types_count_writer.CloseFile();
 
 		FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes_twice.dat").CompareFiles();
 
 		cell_population.CreateOutputFiles(output_directory, true);
-
-        cell_population.GenerateCellResults();
 
 		/*
 		 * Write cell cycle phases count file.
@@ -321,7 +363,11 @@ public:
 
 		phases_count_writer.OpenOutputFile();
 
+		phases_count_writer.WriteTimeStamp();
+
 		phases_count_writer.Visit(&cell_population);
+
+        phases_count_writer.WriteNewline();
 
 		phases_count_writer.CloseFile();
 
@@ -330,7 +376,11 @@ public:
 		// Make sure we can append to files.
 		phases_count_writer.OpenOutputFileForAppend();
 
+        phases_count_writer.WriteTimeStamp();
+
 		phases_count_writer.Visit(&cell_population);
+
+        phases_count_writer.WriteNewline();
 
 		phases_count_writer.CloseFile();
 
@@ -367,7 +417,11 @@ public:
 
 		voronoi_writer.OpenOutputFile();
 
+		voronoi_writer.WriteTimeStamp();
+
 		voronoi_writer.Visit(&cell_population);
+
+        voronoi_writer.WriteNewline();
 
 		voronoi_writer.CloseFile();
 
@@ -376,7 +430,11 @@ public:
 		// Make sure we can append to files.
 		voronoi_writer.OpenOutputFileForAppend();
 
+        voronoi_writer.WriteTimeStamp();
+
 		voronoi_writer.Visit(&cell_population);
+
+        voronoi_writer.WriteNewline();
 
 		voronoi_writer.CloseFile();
 
@@ -406,13 +464,17 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         /**
-         * T3 Swaps
+         * T1 Swaps
          */
         VertexT1SwapLocationsWriter<2,2> t1_swaps_writer(output_directory);
 
         t1_swaps_writer.OpenOutputFile();
 
+        t1_swaps_writer.WriteTimeStamp();
+
         t1_swaps_writer.Visit(&cell_population);
+
+        t1_swaps_writer.WriteNewline();
 
         t1_swaps_writer.CloseFile();
 
@@ -421,7 +483,11 @@ public:
         // Make sure we can append to files.
         t1_swaps_writer.OpenOutputFileForAppend();
 
+        t1_swaps_writer.WriteTimeStamp();
+
         t1_swaps_writer.Visit(&cell_population);
+
+        t1_swaps_writer.WriteNewline();
 
         t1_swaps_writer.CloseFile();
 
@@ -434,7 +500,11 @@ public:
 
         t3_swaps_writer.OpenOutputFile();
 
+        t3_swaps_writer.WriteTimeStamp();
+
         t3_swaps_writer.Visit(&cell_population);
+
+        t3_swaps_writer.WriteNewline();
 
         t3_swaps_writer.CloseFile();
 
@@ -443,7 +513,11 @@ public:
         // Make sure we can append to files.
         t3_swaps_writer.OpenOutputFileForAppend();
 
+        t3_swaps_writer.WriteTimeStamp();
+
         t3_swaps_writer.Visit(&cell_population);
+
+        t3_swaps_writer.WriteNewline();
 
         t3_swaps_writer.CloseFile();
 
@@ -480,7 +554,11 @@ public:
 
         area_writer.OpenOutputFile();
 
+        area_writer.WriteTimeStamp();
+
         area_writer.Visit(&cell_population);
+
+        area_writer.WriteNewline();
 
         area_writer.CloseFile();
 
@@ -489,7 +567,11 @@ public:
         // Make sure we can append to files.
         area_writer.OpenOutputFileForAppend();
 
+        area_writer.WriteTimeStamp();
+
         area_writer.Visit(&cell_population);
+
+        area_writer.WriteNewline();
 
         area_writer.CloseFile();
 

@@ -36,60 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::CellMutationStatesWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory),
-      mHasHeaderBeenWritten(false)
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
 {
     this->mFileName = "cellmutationstates.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    if (!mHasHeaderBeenWritten)
+    if (PetscTools::AmMaster())
     {
-        WriteHeader(pCellPopulation);
-    }
-
-    this->WriteTimeStamp();
-
-    std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
-
-    for (unsigned i=0; i<mutation_state_count.size(); i++)
-    {
-        *this->mpOutStream << mutation_state_count[i] << "\t";
-    }
-
-    this->WriteNewline();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-	pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
-
-    *this->mpOutStream << "Time\t ";
-
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
-        pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
-
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
-    {
-        if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
-        {
-            *this->mpOutStream << r_cell_properties[i]->GetIdentifier() << "\t ";
-        }
-    }
-    this->WriteNewline();
-
-    mHasHeaderBeenWritten = true;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
-{
-    if (!mHasHeaderBeenWritten)
-    {
-    	pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
+        pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
         *this->mpOutStream << "Time\t ";
 
@@ -104,19 +61,35 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
             }
         }
         this->WriteNewline();
-
-        mHasHeaderBeenWritten = true;
     }
+}
 
-    this->WriteTimeStamp();
-
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+{
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
-    for (unsigned i=0; i<mutation_state_count.size(); i++)
+    if (PetscTools::AmMaster())
     {
-        *this->mpOutStream << mutation_state_count[i] << "\t";
+        for (unsigned i=0; i<mutation_state_count.size(); i++)
+        {
+            *this->mpOutStream << mutation_state_count[i] << "\t";
+        }
     }
-    this->WriteNewline();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
+
+    if (PetscTools::AmMaster())
+    {
+        for (unsigned i=0; i<mutation_state_count.size(); i++)
+        {
+            *this->mpOutStream << mutation_state_count[i] << "\t";
+        }
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeBasedCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "SmartPointers.hpp"
+#include "PetscTools.hpp"
 
 // Writers
 #include "NodeLocationWriter.hpp"
@@ -184,23 +185,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
     {
         EXCEPTION("Call SetOutputCellMutationStates(true) before using this function");
     }
-
-    // An ordering must be specified for cell mutation states and cell proliferative types
-    SetDefaultCellMutationStateAndProliferativeTypeOrdering();
-
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
-        mpCellPropertyRegistry->rGetAllCellProperties();
-
-    std::vector<unsigned> cell_mutation_state_count;
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
-    {
-        if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
-        {
-            cell_mutation_state_count.push_back(r_cell_properties[i]->GetCellCount());
-        }
-    }
-
-    return cell_mutation_state_count;
+    return mCellMutationStateCount;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -210,23 +195,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
     {
         EXCEPTION("Call SetOutputCellProliferativeTypes(true) before using this function");
     }
-
-    // An ordering must be specified for cell mutation states and cell proliferative types
-    SetDefaultCellMutationStateAndProliferativeTypeOrdering();
-
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
-        mpCellPropertyRegistry->rGetAllCellProperties();
-
-    std::vector<unsigned> cell_proliferative_type_count;
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
-    {
-        if (r_cell_properties[i]->IsSubType<AbstractCellProliferativeType>())
-        {
-            cell_proliferative_type_count.push_back(r_cell_properties[i]->GetCellCount());
-        }
-    }
-
-    return cell_proliferative_type_count;
+    return mCellProliferativeTypesCount;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -488,10 +457,24 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles()
     for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
     {
         mCellPopulationWriters[i]->OpenOutputFile();
+        mCellPopulationWriters[i]->WriteHeader(this);
     }
     for (unsigned i=0; i<mCellWriters.size(); i++)
     {
         mCellWriters[i]->OpenOutputFile();
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFilesForAppend()
+{
+    for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+    {
+        mCellPopulationWriters[i]->OpenOutputFileForAppend();
+    }
+    for (unsigned i=0; i<mCellWriters.size(); i++)
+    {
+        mCellWriters[i]->OpenOutputFileForAppend();
     }
 }
 
@@ -502,6 +485,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ResetCellCounters()
     {
         mCellCyclePhaseCount[i] = 0;
     }
+    mCellProliferativeTypesCount.clear();
+    mCellMutationStateCount.clear();
+
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -536,6 +522,75 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
             }
         }
     }
+
+    // Reduce results onto all processes.
+    if (PetscTools::IsParallel() && mOutputCellCyclePhases)
+    {
+        std::vector<unsigned> phase_counts(mCellCyclePhaseCount.size(), 0u);
+
+        for (unsigned i=0; i<phase_counts.size(); i++)
+        {
+            MPI_Allreduce(&mCellCyclePhaseCount[i], &phase_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        }
+
+        mCellCyclePhaseCount = phase_counts;
+    }
+
+    /*
+     * Calculate proliferative types count.
+     */
+
+    // An ordering must be specified for cell mutation states and cell proliferative types
+    SetDefaultCellMutationStateAndProliferativeTypeOrdering();
+
+    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
+        mpCellPropertyRegistry->rGetAllCellProperties();
+
+    for (unsigned i=0; i<r_cell_properties.size(); i++)
+    {
+        if (r_cell_properties[i]->IsSubType<AbstractCellProliferativeType>())
+        {
+            mCellProliferativeTypesCount.push_back(r_cell_properties[i]->GetCellCount());
+        }
+    }
+
+    // Reduce results onto all processes.
+    if (PetscTools::IsParallel())
+    {
+        std::vector<unsigned> types_counts(mCellProliferativeTypesCount.size(), 0u);
+
+        for (unsigned i=0; i<types_counts.size(); i++)
+        {
+            MPI_Allreduce(&mCellProliferativeTypesCount[i], &types_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        }
+
+        mCellProliferativeTypesCount = types_counts;
+    }
+
+    /**
+     * Calculate mutationstates count.
+     */
+
+    for (unsigned i=0; i<r_cell_properties.size(); i++)
+    {
+        if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
+        {
+            mCellMutationStateCount.push_back(r_cell_properties[i]->GetCellCount());
+        }
+    }
+
+    // Reduce results onto all processes.
+    if (PetscTools::IsParallel())
+    {
+        std::vector<unsigned> mutation_counts(mCellMutationStateCount.size(), 0u);
+
+        for (unsigned i=0; i<mutation_counts.size(); i++)
+        {
+            MPI_Allreduce(&mCellMutationStateCount[i], &mutation_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+        }
+
+        mCellMutationStateCount = mutation_counts;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -545,33 +600,66 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
 
     GenerateCellResults();
 
-    for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+    PetscTools::BeginRoundRobin();
     {
-        AcceptPopulationWriter(mCellPopulationWriters[i]);
-    }
+        OpenWritersFilesForAppend();
 
-    for (unsigned i=0; i<mCellWriters.size(); i++)
-    {
-        mCellWriters[i]->WriteTimeStamp();
-    }
+        // The master writes time stamps.
+        if (PetscTools::AmMaster())
+        {
+            for (unsigned i=0; i<mCellWriters.size(); i++)
+            {
+                mCellWriters[i]->WriteTimeStamp();
+            }
+            for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+            {
+                mCellPopulationWriters[i]->WriteTimeStamp();
+            }
+        }
 
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-            cell_iter != this->End();
-            ++cell_iter)
-    {
+        // Every process writes to file.
+        for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+        {
+            AcceptPopulationWriter(mCellPopulationWriters[i]);
+        }
+        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+                cell_iter != this->End();
+                ++cell_iter)
+        {
+            for (unsigned i=0; i<mCellWriters.size(); i++)
+            {
+                AcceptCellWriter(mCellWriters[i], *cell_iter);
+            }
+        }
+
+        // The top-most adds a newline
+        if (PetscTools::AmTopMost())
+        {
+            for (unsigned i=0; i<mCellWriters.size(); i++)
+            {
+                mCellWriters[i]->WriteNewline();
+            }
+            for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+            {
+                mCellPopulationWriters[i]->WriteNewline();
+            }
+        }
+
+        // Then the files are closed.
+        for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+        {
+            mCellPopulationWriters[i]->CloseFile();
+        }
         for (unsigned i=0; i<mCellWriters.size(); i++)
         {
-            AcceptCellWriter(mCellWriters[i], *cell_iter);
+            mCellWriters[i]->CloseFile();
         }
     }
+    PetscTools::EndRoundRobin();
 
-    for (unsigned i=0; i<mCellWriters.size(); i++)
-    {
-        mCellWriters[i]->WriteNewline();
-    }
-
-    // VTK can only be written in 2 or 3 dimensions
-    if (SPACE_DIM > 1)
+    // VTK can only be written in 2 or 3 dimensions.
+    // VTK can only be written sequentially (//\ todo on #2365)
+    if (SPACE_DIM > 1 && PetscTools::IsSequential())
     {
          WriteVtkResultsToFile();
     }

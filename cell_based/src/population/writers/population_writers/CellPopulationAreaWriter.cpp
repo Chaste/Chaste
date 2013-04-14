@@ -47,9 +47,6 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
 {
     assert(SPACE_DIM==2 || SPACE_DIM==3);
 
-    // Write time to file
-    this->WriteTimeStamp();
-
     VertexMesh<ELEMENT_DIM, SPACE_DIM>* voronoi_tessellation = pCellPopulation->GetVoronoiTessellation();
 
     assert (voronoi_tessellation != NULL);
@@ -84,7 +81,7 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
             }
         }
     }
-    *this->mpOutStream << total_area << " " << apoptotic_area << "\n";
+    *this->mpOutStream << total_area << " " << apoptotic_area;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

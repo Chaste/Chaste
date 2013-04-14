@@ -44,9 +44,6 @@ CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    // Write element data to file
-    this->WriteTimeStamp();
-
     for (typename MutableMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorBegin();
          elem_iter != static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorEnd();
          ++elem_iter)
@@ -80,7 +77,6 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
             }
         }
     }
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -101,8 +97,6 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    this->WriteTimeStamp();
-
     // Loop over cells and find associated elements so in the same order as the cells in output files
     for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
          cell_iter != pCellPopulation->End();
@@ -134,7 +128,6 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
             }
         }
     }
-    this->WriteNewline();
 }
 
 // Explicit instantiation

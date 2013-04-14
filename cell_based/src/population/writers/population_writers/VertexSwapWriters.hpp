@@ -78,7 +78,6 @@ public:
 				*this->mpOutStream << t3_swap_locations[index][i] << "\t";
 			}
 		}
-		this->WriteNewline();
 
 		pCellPopulation->rGetMesh().ClearLocationsOfT3Swaps();
 	}
@@ -155,7 +154,6 @@ public:
                 *this->mpOutStream << t1_swap_locations[index][i] << "\t";
             }
         }
-        this->WriteNewline();
 
         pCellPopulation->rGetMesh().ClearLocationsOfT1Swaps();
     }

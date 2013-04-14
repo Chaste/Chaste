@@ -132,6 +132,12 @@ protected:
     /** Current cell cycle phase counts */
     std::vector<unsigned> mCellCyclePhaseCount;
 
+    /** Current cell proliferative types count */
+    std::vector<unsigned> mCellProliferativeTypesCount;
+
+    /** Current cell mutation states count */
+    std::vector<unsigned> mCellMutationStateCount;
+
     /** Population centroid */
     c_vector<double, SPACE_DIM> mCentroid;
 
@@ -532,6 +538,11 @@ public:
      * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending)
      */
     void OpenWritersFiles();
+
+    /**
+     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing
+     */
+    void OpenWritersFilesForAppend();
 
     /**
      * Clear the counters used for cell population output.
