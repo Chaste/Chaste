@@ -33,64 +33,68 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_
-#define CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_
+#ifndef ABSTRACTCELLBASEDWRITER_HPP_
+#define ABSTRACTCELLBASEDWRITER_HPP_
 
-#include "AbstractCellPopulationWriter.hpp"
+#include "OutputFileHandler.hpp"
+#include <string>
 
-/** A class written using the visitor pattern for writing the number of cells of each proliferative type to file. */
+/**
+ * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellProliferativeTypesCountWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class AbstractCellBasedWriter
 {
+private:
+
+    /** The directory in which to write the file. */
+    std::string mDirectory;
+
+protected:
+
+    /** The name of node location files */
+    std::string mFileName;
+
+    /** An output stream for writing data */
+    out_stream mpOutStream;
+
 public:
 
     /**
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-    CellProliferativeTypesCountWriter(std::string directory);
+    AbstractCellBasedWriter(std::string directory);
 
     /**
-     * A general method for writing to any population
-     *
-     * @param pCellPopulation the population to write.
+     * A virtual destructor
      */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual ~AbstractCellBasedWriter();
 
     /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
+     * Close the stream file
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void CloseFile();
 
     /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
+     * Open the out stream for writing
      */
-    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void OpenOutputFile();
 
     /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
+     * Open the out stream for appending.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    void OpenOutputFileForAppend();
 
     /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the potts based cell population population to visit.
+     * Write the current time stamp to the file.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    void WriteTimeStamp();
 
     /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the vertex based cell population population to visit.
+     * Add a newline character to the stream.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    void WriteNewline();
 };
 
-#endif /*CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_*/
+#endif /*ABSTRACTCELLBASEDWRITER_HPP_*/

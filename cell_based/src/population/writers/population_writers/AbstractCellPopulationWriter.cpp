@@ -36,47 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationWriter(std::string directory)
-    : mDirectory(directory)
+    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(directory)
 {
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::~AbstractCellPopulationWriter()
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::CloseFile()
-{
-    mpOutStream->close();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile()
-{
-    OutputFileHandler output_file_handler(mDirectory, false);
-
-    mpOutStream = output_file_handler.OpenOutputFile(mFileName);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend()
-{
-    OutputFileHandler output_file_handler(mDirectory, false);
-
-    mpOutStream = output_file_handler.OpenOutputFile(mFileName, std::ios::app);
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::WriteTimeStamp()
-{
-    *mpOutStream << SimulationTime::Instance()->GetTime() << "\t";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
-{
-	*mpOutStream << "\n";
 }
 
 // Explicit instantiation

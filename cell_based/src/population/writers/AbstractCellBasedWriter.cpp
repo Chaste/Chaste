@@ -32,71 +32,58 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "CellProliferativeTypesCountWriter.hpp"
+#include "AbstractCellBasedWriter.hpp"
+#include "SimulationTime.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesCountWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter(std::string directory)
+    : mDirectory(directory)
 {
-    this->mFileName = "celltypes.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::~AbstractCellBasedWriter()
 {
-	this->WriteTimeStamp();
-
-    std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
-
-    for (unsigned i=0; i<proliferative_type_count.size(); i++)
-    {
-        *this->mpOutStream << proliferative_type_count[i] << "\t";
-    }
-    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::CloseFile()
 {
-	this->WriteTimeStamp();
-
-    std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
-
-    for (unsigned i=0; i<proliferative_type_count.size(); i++)
-    {
-        *this->mpOutStream << proliferative_type_count[i] << "\t";
-    }
-    this->WriteNewline();
+    mpOutStream->close();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile()
 {
-    VisitAnyPopulation(pCellPopulation);
+    OutputFileHandler output_file_handler(mDirectory, false);
+
+    mpOutStream = output_file_handler.OpenOutputFile(mFileName);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend()
 {
-    VisitAnyPopulation(pCellPopulation);
+    OutputFileHandler output_file_handler(mDirectory, false);
+
+    mpOutStream = output_file_handler.OpenOutputFile(mFileName, std::ios::app);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteTimeStamp()
 {
-    VisitAnyPopulation(pCellPopulation);
+    *mpOutStream << SimulationTime::Instance()->GetTime() << "\t";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
 {
-    VisitAnyPopulation(pCellPopulation);
+	*mpOutStream << "\n";
 }
 
 // Explicit instantiation
-template class CellProliferativeTypesCountWriter<1,1>;
-template class CellProliferativeTypesCountWriter<1,2>;
-template class CellProliferativeTypesCountWriter<2,2>;
-template class CellProliferativeTypesCountWriter<1,3>;
-template class CellProliferativeTypesCountWriter<2,3>;
-template class CellProliferativeTypesCountWriter<3,3>;
+template class AbstractCellBasedWriter<1,1>;
+template class AbstractCellBasedWriter<1,2>;
+template class AbstractCellBasedWriter<2,2>;
+template class AbstractCellBasedWriter<1,3>;
+template class AbstractCellBasedWriter<2,3>;
+template class AbstractCellBasedWriter<3,3>;

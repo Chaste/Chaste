@@ -66,13 +66,6 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
-     */
-    virtual void Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Visit the population and write the data.
-     *
      * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
      */
     virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
@@ -83,20 +76,6 @@ public:
      * @param pCellPopulation a pointer to the node based cell population population to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
-     */
-    virtual void Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation);
-
-    /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
-     */
-    virtual void Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.

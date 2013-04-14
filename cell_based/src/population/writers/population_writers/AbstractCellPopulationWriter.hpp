@@ -36,15 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLPOPULATIONWRITER_HPP_
 #define ABSTRACTCELLPOPULATIONWRITER_HPP_
 
-#include "OutputFileHandler.hpp"
+#include "AbstractCellBasedWriter.hpp"
 
 // All cell populations
 #include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "MultipleCaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
-#include "NodeBasedCellPopulationWithParticles.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -54,21 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractCellPopulationWriter
+class AbstractCellPopulationWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
 {
-private:
-
-    /** The directory in which to write the file. */
-    std::string mDirectory;
-
-protected:
-
-    /** The name of node location files */
-    std::string mFileName;
-
-    /** An output stream for writing data */
-    out_stream mpOutStream;
-
 public:
 
     /**
@@ -77,45 +61,12 @@ public:
      */
     AbstractCellPopulationWriter(std::string directory);
 
-    /** A virtual destructor */
-    virtual ~AbstractCellPopulationWriter();
-
-    /** Close the stream file */
-    void CloseFile();
-
-    /**
-     * Open the out stream for writing
-     */
-    virtual void OpenOutputFile();
-
-    /**
-     * Open the out stream for appending.
-     */
-    void OpenOutputFileForAppend();
-
-    /**
-     * Write the current time stamp to the file.
-     */
-    void WriteTimeStamp();
-
-    /**
-     * Add a newline character to the stream.
-     */
-    void WriteNewline();
-
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the mesh based cell population population to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
-
-    /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
-     */
-    virtual void Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
@@ -130,20 +81,6 @@ public:
      * @param pCellPopulation a pointer to the node based cell population population to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
-
-    /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
-     */
-    virtual void Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)=0;
-
-    /**
-     * Visit the population and write the data.
-     *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
-     */
-    virtual void Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.

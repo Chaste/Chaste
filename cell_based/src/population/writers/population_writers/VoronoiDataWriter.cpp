@@ -73,44 +73,7 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<EL
         double cell_surface_area = voronoi_tesselation->GetSurfaceAreaOfElement(elem_index);
         *this->mpOutStream << cell_volume << " " << cell_surface_area << " ";
     }
-    *this->mpOutStream << "\n";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE	// Covered by the case above.
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-    VertexMesh<SPACE_DIM,SPACE_DIM>* voronoi_tesselation = pCellPopulation->GetVoronoiTessellation();
-
-    // Write time to file
-    this->WriteTimeStamp();
-
-    // Loop over elements of voronoi_tesselation
-    for (typename VertexMesh<SPACE_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tesselation->GetElementIteratorBegin();
-         elem_iter != voronoi_tesselation->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Get index of this element in voronoi_tesselation
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = voronoi_tesselation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-        // Write node index and location to file
-        *this->mpOutStream << node_index << " ";
-        c_vector<double, SPACE_DIM> node_location = pCellPopulation->GetNode(node_index)->rGetLocation();
-        for (unsigned i=0; i<SPACE_DIM; i++)
-        {
-            *this->mpOutStream << node_location[i] << " ";
-        }
-
-        double cell_volume = voronoi_tesselation->GetVolumeOfElement(elem_index);
-        double cell_surface_area = voronoi_tesselation->GetSurfaceAreaOfElement(elem_index);
-        *this->mpOutStream << cell_volume << " " << cell_surface_area << " ";
-    }
-    *this->mpOutStream << "\n";
-#undef COVERAGE_IGNORE
+    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -120,16 +83,6 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulat
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
 {
 }
 

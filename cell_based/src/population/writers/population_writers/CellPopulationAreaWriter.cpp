@@ -45,7 +45,6 @@ CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter(std::
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE
     assert(SPACE_DIM==2 || SPACE_DIM==3);
 
     // Write time to file
@@ -86,54 +85,6 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
         }
     }
     *this->mpOutStream << total_area << " " << apoptotic_area << "\n";
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-
-    // Write time to file
-    this->WriteTimeStamp();
-
-    VertexMesh<SPACE_DIM, SPACE_DIM>* voronoi_tessellation = pCellPopulation->GetVoronoiTessellation();
-
-    assert (voronoi_tessellation != NULL);
-
-    // Don't use the Voronoi tessellation to calculate the total area of the mesh because it gives huge areas for boundary cells
-    double total_area = static_cast<MutableMesh<SPACE_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetVolume();
-    double apoptotic_area = 0.0;
-
-    // Loop over elements of mpVoronoiTessellation
-    for (typename VertexMesh<SPACE_DIM,SPACE_DIM>::VertexElementIterator elem_iter = voronoi_tessellation->GetElementIteratorBegin();
-         elem_iter != voronoi_tessellation->GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        // Get index of this element in mpVoronoiTessellation
-        unsigned elem_index = elem_iter->GetIndex();
-
-        // Get the index of the corresponding node in mrMesh
-        unsigned node_index = voronoi_tessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-        // Discount ghost nodes
-        if (!pCellPopulation->IsGhostNode(node_index))
-        {
-            // Get the cell corresponding to this node
-            CellPtr p_cell =  pCellPopulation->GetCellUsingLocationIndex(node_index);
-
-            // Only bother calculating the area/volume of apoptotic cells
-            bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
-            if (cell_is_apoptotic)
-            {
-                double cell_volume = voronoi_tessellation->GetVolumeOfElement(elem_index);
-                apoptotic_area += cell_volume;
-            }
-        }
-    }
-    *this->mpOutStream << total_area << " " << apoptotic_area << "\n";
-#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -143,16 +94,6 @@ void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCell
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
 {
 }
 

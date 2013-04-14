@@ -61,7 +61,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCell
         }
     }
 
-    *this->mpOutStream << "\n";
+    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -84,23 +84,13 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
         }
     }
 
-    *this->mpOutStream << "\n";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-	VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
+    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -110,35 +100,15 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
 }
 
 // Explicit instantiation

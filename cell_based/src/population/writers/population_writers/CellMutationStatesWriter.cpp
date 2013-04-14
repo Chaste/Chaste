@@ -58,7 +58,8 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abstra
     {
         *this->mpOutStream << mutation_state_count[i] << "\t";
     }
-    *this->mpOutStream << "\n";
+
+    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -78,7 +79,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellP
             *this->mpOutStream << r_cell_properties[i]->GetIdentifier() << "\t ";
         }
     }
-    *this->mpOutStream << "\n";
+    this->WriteNewline();
 
     mHasHeaderBeenWritten = true;
 }
@@ -102,7 +103,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
                 *this->mpOutStream << r_cell_properties[i]->GetIdentifier() << "\t ";
             }
         }
-        *this->mpOutStream << "\n";
+        this->WriteNewline();
 
         mHasHeaderBeenWritten = true;
     }
@@ -115,15 +116,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
     {
         *this->mpOutStream << mutation_state_count[i] << "\t";
     }
-    *this->mpOutStream << "\n";
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
+    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -135,41 +128,19 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCell
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
-    VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE    //\ todo remove this when integrated with cell population.    #2183
     VisitAnyPopulation(pCellPopulation);
-#undef COVERAGE_IGNORE
 }
 
 // Explicit instantiation

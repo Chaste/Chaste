@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLWRITER_HPP_
 #define ABSTRACTCELLWRITER_HPP_
 
-#include "OutputFileHandler.hpp"
+#include "AbstractCellBasedWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 
 #include "Cell.hpp"
@@ -44,24 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 /**
- * A class written using the visitor pattern for writing node location from a cell population to file.
+ * An abstract class for a writer that visits individual cells of a population and writes their data.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractCellWriter
+class AbstractCellWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
 {
-private:
-
-    /** The directory in which to write the file. */
-    std::string mDirectory;
-
-protected:
-
-    /** The name of node location files */
-    std::string mFileName;
-
-    /** An output stream for writing data */
-    out_stream mpOutStream;
-
 public:
 
     /**
@@ -69,32 +56,6 @@ public:
      * @param directory the path to the directory in to which this class should write.
      */
     AbstractCellWriter(std::string directory);
-
-    /** A virtual destructor */
-    virtual ~AbstractCellWriter();
-
-    /** Close the stream file */
-    void CloseFile();
-
-    /**
-     * Open the out stream for writing
-     */
-    virtual void OpenOutputFile();
-
-    /**
-     * Open the out stream for appending.
-     */
-    void OpenOutputFileForAppend();
-
-    /**
-     * Write the current time stamp to the file.
-     */
-    void WriteTimeStamp();
-
-    /**
-     * Write a newline character to the file.
-     */
-    void WriteNewline();
 
     /**
      * Visit a cell and write its data.

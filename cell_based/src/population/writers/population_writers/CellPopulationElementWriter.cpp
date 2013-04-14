@@ -44,7 +44,6 @@ CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-#define COVERAGE_IGNORE
     // Write element data to file
     this->WriteTimeStamp();
 
@@ -81,52 +80,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
             }
         }
     }
-    *this->mpOutStream << "\n";
-#undef COVERAGE_IGNORE
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulationWithGhostNodes<SPACE_DIM>* pCellPopulation)
-{
-#define COVERAGE_IGNORE
-    // Write element data to file
-    this->WriteTimeStamp();
-
-    for (typename MutableMesh<SPACE_DIM,SPACE_DIM>::ElementIterator elem_iter = static_cast<MutableMesh<SPACE_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorBegin();
-         elem_iter != static_cast<MutableMesh<SPACE_DIM,SPACE_DIM>&>((pCellPopulation->rGetMesh())).GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        bool element_contains_dead_cells_or_deleted_nodes = false;
-
-        // Hack that covers the case where the element contains a node that is associated with a cell that has just been killed (#1129)
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
-        {
-            unsigned node_index = elem_iter->GetNodeGlobalIndex(i);
-
-            if (pCellPopulation->GetNode(node_index)->IsDeleted())
-            {
-                element_contains_dead_cells_or_deleted_nodes = true;
-                break;
-            }
-            else if (pCellPopulation->IsCellAttachedToLocationIndex(node_index))
-            {
-                if (pCellPopulation->GetCellUsingLocationIndex(node_index)->IsDead())
-                {
-                    element_contains_dead_cells_or_deleted_nodes = true;
-                    break;
-                }
-            }
-        }
-        if (!element_contains_dead_cells_or_deleted_nodes)
-        {
-            for (unsigned i=0; i<SPACE_DIM+1; i++)
-            {
-                *this->mpOutStream << elem_iter->GetNodeGlobalIndex(i) << " ";
-            }
-        }
-    }
-    *this->mpOutStream << "\n";
-#undef COVERAGE_IGNORE
+    this->WriteNewline();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -136,16 +90,6 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedC
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithBuskeUpdate<SPACE_DIM>* pCellPopulation)
-{
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulationWithParticles<SPACE_DIM>* pCellPopulation)
 {
 }
 
@@ -190,7 +134,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
             }
         }
     }
-    *this->mpOutStream << "\n";
+    this->WriteNewline();
 }
 
 // Explicit instantiation
