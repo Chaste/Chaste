@@ -108,7 +108,7 @@ double RandomNumberGenerator::ranf()
     return mGenerateUnitReal();
 }
 
-double  RandomNumberGenerator::StandardNormalRandomDeviate()
+double RandomNumberGenerator::StandardNormalRandomDeviate()
 {
     return mGenerateStandardNormal();
 }
@@ -116,6 +116,14 @@ double  RandomNumberGenerator::StandardNormalRandomDeviate()
 double RandomNumberGenerator::NormalRandomDeviate(double mean, double stdDev)
 {
     return stdDev * StandardNormalRandomDeviate() + mean;
+}
+
+double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
+{
+    boost::gamma_distribution<> gd(shape);
+    boost::variate_generator<boost::mt19937& , boost::gamma_distribution<> > var_gamma(mMersenneTwisterGenerator, gd);
+
+    return scale*var_gamma();;
 }
 
 void RandomNumberGenerator::Reseed(unsigned seed)
@@ -140,4 +148,3 @@ void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues
         rValues[k] = temp;
     }
 }
-

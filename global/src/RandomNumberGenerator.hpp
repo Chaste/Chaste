@@ -51,14 +51,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class RandomNumberGenerator : public SerializableSingleton<RandomNumberGenerator>
 {
 private:
-    /** The main random number generator **/
+    /** The main random number generator. **/
     boost::mt19937 mMersenneTwisterGenerator;
 
-    /** An adaptor to a unit interval distribution */
-    boost::variate_generator<boost::mt19937& ,  boost::uniform_real<> > mGenerateUnitReal;
+    /** An adaptor to a unit interval distribution. */
+    boost::variate_generator<boost::mt19937& , boost::uniform_real<> > mGenerateUnitReal;
 
-    /** An adaptor to a standard normal distribution*/
-    boost::variate_generator<boost::mt19937& ,  boost::normal_distribution<> > mGenerateStandardNormal;
+    /** An adaptor to a standard normal distribution. */
+    boost::variate_generator<boost::mt19937& , boost::normal_distribution<> > mGenerateStandardNormal;
 
     /** Pointer to the single instance. */
     static RandomNumberGenerator* mpInstance;
@@ -144,6 +144,14 @@ public:
     double ranf();
 
     /**
+     * @return Generate a random number from a gamma distribution with specified shape and scale parameters.
+     *
+     * @param shape the shape parameter of the gamma distribution from which the random number is drawn
+     * @param scale the scale parameter of the gamma distribution from which the random number is drawn
+     */
+    double GammaRandomDeviate(double shape, double scale);
+
+    /**
      * @return Generate a random number modulo base (i.e. an integer
      * within the range [0, base) == [0,1,..,base-1] ).
      *
@@ -158,7 +166,6 @@ public:
      *
      * @param rValues  the initial values and the output permutation of shuffled values.  Must be non-empty
      */
-
     template <class T>
     void Shuffle(std::vector<boost::shared_ptr<T> >& rValues)
     {
@@ -176,6 +183,7 @@ public:
             rValues[k] = temp;
         }
     }
+
     /**
      * Produce a permutation of the integers 0,1,..,num-1, using the Knuth-algorithm
      * (also called the Fisher-Yates algorithm), a linear time unbiased method.

@@ -33,35 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTSIMPLECELLCYCLEMODEL_HPP_
-#define ABSTRACTSIMPLECELLCYCLEMODEL_HPP_
+#ifndef GAMMADISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
+#define GAMMADISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_
 
-#include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-#include <boost/serialization/base_object.hpp>
-
-#include "AbstractCellCycleModel.hpp"
+#include "AbstractSimpleCellCycleModel.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
- * This class contains all the functionality shared by 'simple' cell-cycle models,
- * where the duration of each cell cycle phase is determined when the cell-cycle
- * model is created. Note that whether or not the cell should actually divide may
- * still depend on further conditions in subclasses; for example, the cell may only
- * divide if the local concentration of a signalling molecule is sufficiently high/
- *
- * This class of cell-cycle models is distinct from 'ODE-based' cell-cycle models,
- * where the duration of one or more cell cycle phases are evaluated 'on the fly'
- * as the cell ages, according to a system of ordinary differential equations (ODEs)
- * governing (for example) the concentrations of key intracellular proteins.
+ * A stochastic cell-cycle model where cells keep dividing with a stochastic G1 duration
+ * drawn from a gamma distribution with specified shape and scale parameters.
  */
-class AbstractSimpleCellCycleModel : public AbstractCellCycleModel
+class GammaDistributedStochasticDurationCellCycleModel : public AbstractSimpleCellCycleModel
 {
+    friend class TestSimpleCellCycleModels;
+
 private:
+
+    /** The shape parameter of the gamma distribution. This must be a positive real number. */
+    double mShape;
+
+    /** The scale parameter of the gamma distribution. This must be a positive real number. */
+    double mScale;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model.
+     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -69,57 +66,67 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellCycleModel>(*this);
+        archive & boost::serialization::base_object<AbstractSimpleCellCycleModel>(*this);
+
+        // Make sure the RandomNumberGenerator singleton gets saved too
+        SerializableSingleton<RandomNumberGenerator>* p_wrapper = RandomNumberGenerator::Instance()->GetSerializationWrapper();
+        archive & p_wrapper;
+
+        archive & mShape;
+        archive & mScale;
     }
-
-protected:
-
-    /**
-     * Subclasses can override this function if they wish, this just
-     * allocates the default values for each of the different cell
-     * types' G1 durations as defined in AbstractCellCycleModel.
-     */
-    virtual void SetG1Duration();
 
 public:
 
     /**
-     * Default constructor - creates an AbstractSimpleCellCycleModel.
+     * Constructor.
      */
-    AbstractSimpleCellCycleModel();
+    GammaDistributedStochasticDurationCellCycleModel();
 
     /**
-     * Destructor.
+     * Overridden SetG1Duration().
      */
-    virtual ~AbstractSimpleCellCycleModel();
-
-    /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    void SetG1Duration();
 
     /**
-     * Default UpdateCellCyclePhase() method for a simple cell-cycle model.
+     * Overridden builder method to create new copies of this cell-cycle model.
+     */
+    AbstractCellCycleModel* CreateCellCycleModel();
+
+    /**
+     * Set mShape.
      *
-     * Can be overridden if they should do something more subtle.
+     * @param shape the value of the shape parameter
      */
-    virtual void UpdateCellCyclePhase();
+    void SetShape(double shape);
 
     /**
-     * Set the new cell's G1 duration once it has been created after division.
-     * The duration will be based on cell type.
+     * Set mScale.
+     *
+     * @param scaler the value of the scale parameter
      */
-    void InitialiseDaughterCell();
-
-    /** See AbstractCellCycleModel::Initialise() */
-    virtual void Initialise();
+    void SetScale(double scale);
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Get mShape.
+     */
+    double GetShape();
+
+    /**
+     * Get mScale.
+     */
+    double GetScale();
+
+    /**
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
-CLASS_IS_ABSTRACT(AbstractSimpleCellCycleModel)
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+CHASTE_CLASS_EXPORT(GammaDistributedStochasticDurationCellCycleModel)
 
-#endif /*ABSTRACTSIMPLECELLCYCLEMODEL_HPP_*/
+#endif /* GAMMADISTRIBUTEDSTOCHASTICDURATIONCELLCYCLEMODEL_HPP_ */

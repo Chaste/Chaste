@@ -42,12 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
+
 // We use a c_matrix for a bit of storage.  It's rather naughty using a linalg header
 // here, but since it doesn't have a corresponding .cpp file we get away with it!
 #include "UblasMatrixInclude.hpp"
+
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
-
 
 class TestRandomNumberGenerator : public CxxTest::TestSuite
 {
@@ -67,11 +68,11 @@ public:
                 break;
             }
         }
-        //period of rand and random will be about 2^31-1 == INT_MAX ~= UINT_MAX/2
+
+        // Period of rand and random will be about 2^31-1 == INT_MAX ~= UINT_MAX/2
         TS_ASSERT_LESS_THAN_EQUALS(2147483647U /*2^31-1*/, period_srand);
         TS_ASSERT_LESS_THAN_EQUALS((unsigned)INT_MAX, period_srand);
         TS_ASSERT_LESS_THAN_EQUALS(period_srand, UINT_MAX);
-
 
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         double double_first = p_gen->ranf();
@@ -85,7 +86,8 @@ public:
             }
         }
         RandomNumberGenerator::Destroy();
-        //The main point of this class is to see whether the underlying generator has exactly the period of srand
+
+        // The main point of this class is to see whether the underlying generator has exactly the period of srand
         TS_ASSERT_DIFFERS(period_class, period_srand);
     }
 
@@ -105,12 +107,11 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
-
     void TestOtherRandomStuffDoesNotDestroyRandomSequence()
     {
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
-        //First reseed and get the first random number (as above)
+        // First reseed and get the first random number (as above)
         p_gen->Reseed(0);
         double ran2 = p_gen->ranf();
         TS_ASSERT_DELTA(ran1, ran2, 1e-7);
@@ -140,12 +141,10 @@ public:
         TS_ASSERT_DELTA(ran1, ran6, 1e-7);
 
         RandomNumberGenerator::Destroy();
-
     }
 
     void TestDifferentRandomSeed()
     {
-
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(0);
         double ran2 = p_gen->ranf();
@@ -243,10 +242,7 @@ public:
                 TS_ASSERT_EQUALS(p_gen, RandomNumberGenerator::Instance());
             }
 
-            /*
-             * Random Number generator restored.
-             * Check it generates the same numbers as the one we saved.
-             */
+            // Random Number generator restored; now check it generates the same numbers as the one we saved
             for (unsigned i=0; i<generated_numbers.size(); i++)
             {
                 double random;
@@ -278,7 +274,7 @@ public:
             bool found = false;
             for (unsigned j=0; j<shuffled_results.size(); j++)
             {
-                if (shuffled_results[j]==i)
+                if (shuffled_results[j] == i)
                 {
                     found = true;
                     break;
@@ -325,15 +321,17 @@ public:
     void TestGenericShuffle()
     {
         const unsigned test_size = 10;
-        RandomNumberGenerator* p_gen= RandomNumberGenerator::Instance();
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
         p_gen->Reseed(0);
-        //Make an empty vector and put it through the unsigned version of shuffle
+
+        // Make an empty vector and put it through the unsigned version of shuffle
         std::vector<unsigned> empty_perm_for_shuffle;
         p_gen->Shuffle(test_size, empty_perm_for_shuffle);
 
         p_gen->Reseed(0);
-        //Make an identity permutation vector and put it through the generic version of shuffle
+
+        // Make an identity permutation vector and put it through the generic version of shuffle
         std::vector<boost::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
         for (unsigned i=0; i<test_size; i++)
         {
@@ -342,21 +340,19 @@ public:
         }
         p_gen->Shuffle(identity_perm_for_shuffle);
 
-
-
         for (unsigned i=0; i<test_size; i++)
         {
             TS_ASSERT_EQUALS(empty_perm_for_shuffle[i], *identity_perm_for_shuffle[i]);
         }
 
-        //Cover null case
+        // Cover null case
         std::vector<boost::shared_ptr<unsigned> > just_empty;
         p_gen->Shuffle(just_empty);
     }
 
     void TestReproducibilityAcrossPlatforms()
     {
-        // This test checks that the underlying RNG is the doing the same thing on your operating system.
+        // This test checks that the underlying RNG is the doing the same thing on your operating system
         RandomNumberGenerator::Destroy();
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
         p_gen->Reseed(42);
@@ -383,9 +379,19 @@ public:
         }
         TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.9870, 1e-4);
         TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.8389, 1e-4);
-
     }
 
+    void TestGammaRandomDeviate()
+    {
+        RandomNumberGenerator::Destroy();
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+        p_gen->Reseed(5);
+
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 1.0), 0.2510, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(2.0, 1.0), 1.3033, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 3.5595, 1e-4);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(3.5, 2.9), 12.6437, 1e-4);
+    }
 };
 
 #endif /*TESTRANDOMNUMBERGENERATOR_HPP_*/

@@ -47,10 +47,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 /**
- * This class contains all the things common to standard cell cycle
- * ODE models for intracellular protein concentrations (along the lines
- * of Tyson & Novak), such as solving the ODEs until a stopping condition
- * is met.
+ * This class contains all the functionality shared by 'ODE-based' cell-cycle models,
+ * where the duration of one or more cell cycle phases are evaluated 'on the fly'
+ * as the cell ages, according to a system of ordinary differential equations (ODEs)
+ * governing (for example) the concentrations of key intracellular proteins. To
+ * determine when cell division should occur, one or more stopping conditions for
+ * this ODE system may be specified.
+ *
+ * This class of cell-cycle models is distinct from 'simple' cell-cycle models, where
+ * the duration of each cell cycle phase is determined when the cell-cycle model is
+ * created.
  */
 class AbstractOdeBasedCellCycleModel : public AbstractCellCycleModel, public CellCycleModelOdeHandler
 {

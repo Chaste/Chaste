@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2012, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,21 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "StochasticDurationCellCycleModel.hpp"
+#include "GammaDistributedStochasticDurationCellCycleModel.hpp"
 #include "Exception.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
-StochasticDurationCellCycleModel::StochasticDurationCellCycleModel()
-    : AbstractSimpleCellCycleModel()
+GammaDistributedStochasticDurationCellCycleModel::GammaDistributedStochasticDurationCellCycleModel()
+    : AbstractSimpleCellCycleModel(),
+      mShape(DOUBLE_UNSET),
+      mScale(DOUBLE_UNSET)
 {
 }
 
-AbstractCellCycleModel* StochasticDurationCellCycleModel::CreateCellCycleModel()
+AbstractCellCycleModel* GammaDistributedStochasticDurationCellCycleModel::CreateCellCycleModel()
 {
     // Create a new cell-cycle model
-    StochasticDurationCellCycleModel* p_model = new StochasticDurationCellCycleModel();
+    GammaDistributedStochasticDurationCellCycleModel* p_model = new GammaDistributedStochasticDurationCellCycleModel();
 
     /*
      * Set each member variable of the new cell-cycle model that inherits
@@ -73,21 +75,19 @@ AbstractCellCycleModel* StochasticDurationCellCycleModel::CreateCellCycleModel()
     p_model->SetSDuration(mSDuration);
     p_model->SetG2Duration(mG2Duration);
     p_model->SetMDuration(mMDuration);
+    p_model->SetShape(mShape);
+    p_model->SetScale(mScale);
 
     return p_model;
 }
 
-void StochasticDurationCellCycleModel::SetG1Duration()
+void GammaDistributedStochasticDurationCellCycleModel::SetG1Duration()
 {
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+         || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
-        mG1Duration = GetStemCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[0,2]
+        // Generate a gamma random number with mShape and mScale
+        mG1Duration = RandomNumberGenerator::Instance()->GammaRandomDeviate(mShape, mScale);
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
@@ -99,12 +99,34 @@ void StochasticDurationCellCycleModel::SetG1Duration()
     }
 }
 
-void StochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void GammaDistributedStochasticDurationCellCycleModel::SetShape(double shape)
 {
-    // No new parameters to output, so just call method on direct parent class
+    mShape = shape;
+}
+
+void GammaDistributedStochasticDurationCellCycleModel::SetScale(double scale)
+{
+    mScale = scale;
+}
+
+double GammaDistributedStochasticDurationCellCycleModel::GetShape()
+{
+    return mShape;
+}
+
+double GammaDistributedStochasticDurationCellCycleModel::GetScale()
+{
+    return mScale;
+}
+
+void GammaDistributedStochasticDurationCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<Shape>" << mShape << "</Shape>\n";
+    *rParamsFile << "\t\t\t<Scale>" << mScale << "</Scale>\n";
+
     AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-CHASTE_CLASS_EXPORT(StochasticDurationCellCycleModel)
+CHASTE_CLASS_EXPORT(GammaDistributedStochasticDurationCellCycleModel)

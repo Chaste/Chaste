@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
+#include "GammaDistributedStochasticDurationCellCycleModel.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "SimpleOxygenBasedCellCycleModel.hpp"
 #include "StochasticOxygenBasedCellCycleModel.hpp"
@@ -249,12 +250,12 @@ public:
 
         StochasticDurationCellCycleModel* p_stem_model = new StochasticDurationCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_stem_model->SetStemCellG1Duration(8.0);
 
         StochasticDurationCellCycleModel* p_transit_model = new StochasticDurationCellCycleModel;
 
-        // Change G1 Duration for this model
+        // Change G1 duration for this model
         p_stem_model->SetTransitCellG1Duration(8.0);
 
         StochasticDurationCellCycleModel* p_diff_model = new StochasticDurationCellCycleModel;
@@ -302,6 +303,65 @@ public:
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_hepa_one_model, 15.4304);
         }
+    }
+
+    void TestGammaDistributedStochasticDurationCellCycleModel() throw(Exception)
+    {
+        TS_ASSERT_THROWS_NOTHING(GammaDistributedStochasticDurationCellCycleModel cell_model);
+
+        MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
+
+        GammaDistributedStochasticDurationCellCycleModel* p_stem_model = new GammaDistributedStochasticDurationCellCycleModel;
+        p_stem_model->SetShape(3.517);
+        p_stem_model->SetScale(2.986);
+
+        TS_ASSERT_DELTA(p_stem_model->GetShape(), 3.517, 1e-4);
+        TS_ASSERT_DELTA(p_stem_model->GetScale(), 2.986, 1e-4);
+
+        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
+        p_stem_cell->SetCellProliferativeType(p_stem_type);
+        p_stem_cell->InitialiseCellCycleModel();
+
+        GammaDistributedStochasticDurationCellCycleModel* p_transit_model = new GammaDistributedStochasticDurationCellCycleModel;
+        p_transit_model->SetShape(3.5);
+        p_transit_model->SetScale(2.9);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
+        p_transit_cell->SetCellProliferativeType(p_transit_type);
+        p_transit_cell->InitialiseCellCycleModel();
+
+        GammaDistributedStochasticDurationCellCycleModel* p_diff_model = new GammaDistributedStochasticDurationCellCycleModel;
+        p_diff_model->SetShape(3.5);
+        p_diff_model->SetScale(2.9);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellPtr p_diff_cell(new Cell(p_healthy_state, p_diff_model));
+        p_diff_cell->SetCellProliferativeType(p_diff_type);
+        p_diff_cell->InitialiseCellCycleModel();
+
+        TS_ASSERT_DELTA(p_stem_model->GetG1Duration(), 3.6104, 1e-4);
+        TS_ASSERT_DELTA(p_transit_model->GetG1Duration(), 3.8511, 1e-4);
+        TS_ASSERT_EQUALS(p_diff_model->GetG1Duration(), DBL_MAX);
+
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(14.0, 100);
+        for (unsigned i=0; i<100; i++)
+        {
+            p_simulation_time->IncrementTimeOneStep();
+
+            // The numbers for the G1 durations below are taken from the first three random numbers generated
+            CheckReadyToDivideAndPhaseIsUpdated(p_stem_model, 3.61046);
+            CheckReadyToDivideAndPhaseIsUpdated(p_transit_model, 3.8511);
+            CheckReadyToDivideAndPhaseIsUpdated(p_diff_model, 132);  // any old number
+        }
+
+        // Check that cell division correctly resets the cell cycle phase
+        TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
+        GammaDistributedStochasticDurationCellCycleModel* p_stem_model2 = static_cast <GammaDistributedStochasticDurationCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+        CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
+        p_stem_cell2->SetCellProliferativeType(p_stem_type);
+        p_stem_cell2->InitialiseCellCycleModel();
+        TS_ASSERT_EQUALS(p_stem_model2->GetCurrentCellCyclePhase(), M_PHASE);
     }
 
     void TestSimpleOxygenBasedCellCycleModel() throw(Exception)
@@ -749,7 +809,7 @@ public:
 
             input_arch >> p_model2;
 
-            // Check private data has been restored correctly.
+            // Check private data has been restored correctly
             TS_ASSERT_DELTA(p_model2->GetBirthTime(), -1.0, 1e-12);
             TS_ASSERT_DELTA(p_model2->GetAge(), 1.0, 1e-12);
             TS_ASSERT_EQUALS(p_model2->GetCurrentCellCyclePhase(), M_PHASE);
@@ -847,6 +907,57 @@ public:
             input_arch >> p_model2;
 
             TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+
+            // Avoid memory leaks
+            delete p_model2;
+       }
+    }
+
+    void TestArchiveGammaDistributedStochasticDurationCellCycleModel()
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GammaDistributedStochasticDurationCellCycleModel.arch";
+
+        // We will also test that the random number generator is archived correctly
+        double random_number_test = 0.0;
+
+        {
+            // We must set up SimulationTime to avoid memory leaks
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
+
+            // As usual, we archive via a pointer to the most abstract class possible
+            AbstractCellCycleModel* const p_model = new GammaDistributedStochasticDurationCellCycleModel;
+            static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model)->SetShape(2.45);
+            static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model)->SetScale(13.42);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_model;
+
+            delete p_model;
+            SimulationTime::Destroy();
+
+           random_number_test = RandomNumberGenerator::Instance()->ranf();
+           RandomNumberGenerator::Destroy();
+        }
+
+        {
+            // We must set SimulationTime::mStartTime here to avoid tripping an assertion
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            AbstractCellCycleModel* p_model2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_model2;
+
+            TS_ASSERT_DELTA(RandomNumberGenerator::Instance()->ranf(), random_number_test, 1e-6);
+
+            // Check private data has been restored correctly
+            TS_ASSERT_DELTA(static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model2)->GetShape(), 2.45, 1e-12);
+            TS_ASSERT_DELTA(static_cast<GammaDistributedStochasticDurationCellCycleModel*>(p_model2)->GetScale(), 13.42, 1e-12);
 
             // Avoid memory leaks
             delete p_model2;
@@ -1111,6 +1222,24 @@ public:
         {
             FileFinder generated_file = output_file_handler.FindFile("contact_inhibition_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestCellCycleModels/contact_inhibition_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with GammaDistributedStochasticDurationCellCycleModel
+        GammaDistributedStochasticDurationCellCycleModel gamma_cell_cycle_model;
+        gamma_cell_cycle_model.SetShape(0.85);
+        gamma_cell_cycle_model.SetScale(1.23);
+        TS_ASSERT_EQUALS(gamma_cell_cycle_model.GetIdentifier(), "GammaDistributedStochasticDurationCellCycleModel");
+
+        out_stream gamma_parameter_file = output_file_handler.OpenOutputFile("gamma_results.parameters");
+        gamma_cell_cycle_model.OutputCellCycleModelParameters(gamma_parameter_file);
+        gamma_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("gamma_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestCellCycleModels/gamma_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
