@@ -718,7 +718,18 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         }
 
         // Set ksp and pc types
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+        if (mKspType == "chebychev")
+        {
+            KSPSetType(mKspSolver, "chebyshev");
+        }
+        else
+        {
+            KSPSetType(mKspSolver, mKspType.c_str());
+        }
+#else
         KSPSetType(mKspSolver, mKspType.c_str());
+#endif
         KSPGetPC(mKspSolver, &prec);
 
         // Turn off pre-conditioning if the system size is very small
@@ -854,7 +865,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             // Set Chebyshev solver and max/min eigenvalues
             assert(mKspType == "chebychev");
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
-            KSPSetType(mKspSolver, "chebyshev"); ///\todo #2130 Check the new spelling works
+            KSPSetType(mKspSolver, "chebyshev");
             KSPChebyshevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
 #else
             KSPSetType(mKspSolver, mKspType.c_str());
@@ -1088,10 +1099,11 @@ Vec LinearSystem::Solve(Vec lhsGuess)
                 delete[] c_eig;
 
                 assert(mKspType == "chebychev");
-                KSPSetType(mKspSolver, mKspType.c_str());
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
+                KSPSetType(mKspSolver, "chebyshev");
                 KSPChebyshevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
 #else
+                KSPSetType(mKspSolver, mKspType.c_str());
                 KSPChebychevSetEigenvalues(mKspSolver, mEigMax, mEigMin);
 #endif
                 KSPSetComputeEigenvalues(mKspSolver, PETSC_FALSE);

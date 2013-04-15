@@ -208,11 +208,6 @@ void BidomainProblem<DIM>::WriteInfo(double time)
 
     double v_max, v_min, phi_max, phi_min;
 
-    ///\todo #2130 - defensive code can probably be removed
-    PetscInt block;
-    VecGetBlockSize( this->mSolution, &block );
-    assert(block == 2);
-
     VecStrideMax( this->mSolution, 0, PETSC_NULL, &v_max );
     VecStrideMin( this->mSolution, 0, PETSC_NULL, &v_min );
 
