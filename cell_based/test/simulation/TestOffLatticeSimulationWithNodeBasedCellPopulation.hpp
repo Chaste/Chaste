@@ -143,8 +143,6 @@ public:
      */
     void TestSimpleMonolayerWithDifferentRadii() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
-
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
@@ -211,8 +209,6 @@ public:
      */
     void TestSimpleMonolayerWithVariableRadii() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
-
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0,  false,  0.0, 0.0));
@@ -227,8 +223,11 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         // Store the radius of the cells in Cell Data
-        cells[0]->GetCellData()->SetItem("Radius", 1.0);
-        cells[1]->GetCellData()->SetItem("Radius", 2.0);
+        if (PetscTools::AmMaster())
+        {
+            cells[0]->GetCellData()->SetItem("Radius", 1.0);
+            cells[1]->GetCellData()->SetItem("Radius", 2.0);
+        }
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
@@ -250,38 +249,42 @@ public:
         simulator.Solve();
 
         // Check the Radii of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 2.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 1.0, 1e-6);
-
-        // Check the separation of some node pairs
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.70670, 1e-1);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
-
-        // Now set all the Radi to 0.5 Note this could be done inside a cell cycle model.
-        for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        // This testing is designed for sequential code.
+        if (PetscTools::IsSequential())
         {
-            cell_iter->GetCellData()->SetItem("Radius",2.0);
+            TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 2.0, 1e-6);
+            TS_ASSERT_DELTA(p_mesh->GetNode(3)->GetRadius(), 1.0, 1e-6);
+
+            // Check the separation of some node pairs
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 3.0, 1e-1);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.70670, 1e-1);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
+
+
+            // Now set all the Radi to 0.5 Note this could be done inside a cell cycle model.
+            for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+                 cell_iter != simulator.rGetCellPopulation().End();
+                 ++cell_iter)
+            {
+                cell_iter->GetCellData()->SetItem("Radius",2.0);
+            }
+
+            simulator.SetEndTime(12.0);
+            simulator.Solve();
+
+
+            for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
+            {
+                TS_ASSERT_DELTA(p_mesh->GetNode(i)->GetRadius(), 2.0, 1e-6);
+            }
+
+            // Check the separation of some node pairs
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 4.0, 1e-3);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 6.9282, 1e-3);
+            TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 4.0, 1e-3);
         }
-
-        simulator.SetEndTime(12.0);
-        simulator.Solve();
-
-
-        for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
-        {
-            TS_ASSERT_DELTA(p_mesh->GetNode(i)->GetRadius(), 2.0, 1e-6);
-        }
-
-        // Check the separation of some node pairs
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()), 4.0, 1e-3);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 6.9282, 1e-3);
-        TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 4.0, 1e-3);
-
         // Clean up memory
         delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
@@ -550,12 +553,11 @@ public:
     }
 
     /**
-    * Create a simulation of a NodeBasedCellPopulation to test movement threshold.
-    *
-    */
+     * Create a simulation of a NodeBasedCellPopulation to test movement threshold.
+     */
     void TestMovementThreshold() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
+        EXIT_IF_PARALLEL;   // This test doesn't work in parallel because only one process will throw.
 
         // Creates nodes and mesh
         std::vector<Node<2>*> nodes;

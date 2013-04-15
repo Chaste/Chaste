@@ -77,8 +77,6 @@ public:
 
     void Test3dNodeBasedRestrictedToSphere() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
-
         // Create mesh
         std::vector<Node<3>*> nodes;
 

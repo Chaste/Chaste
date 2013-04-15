@@ -908,7 +908,6 @@ public:
      */
     void Test1dOffLatticeSimulation() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    ///\todo This test will not run in parallel until #2365 is complete.
         // Create mesh
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
         MutableMesh<1,1> mesh;

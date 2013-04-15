@@ -557,6 +557,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
     // Reduce results onto all processes.
     if (PetscTools::IsParallel())
     {
+        // Make sure the vector on each process has the same size
+        unsigned local_size = mCellProliferativeTypesCount.size();
+        unsigned global_size;
+
+        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        mCellProliferativeTypesCount.resize(global_size, 0u);
+
         std::vector<unsigned> types_counts(mCellProliferativeTypesCount.size(), 0u);
 
         for (unsigned i=0; i<types_counts.size(); i++)
@@ -570,7 +577,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
     /**
      * Calculate mutationstates count.
      */
-
     for (unsigned i=0; i<r_cell_properties.size(); i++)
     {
         if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
@@ -582,6 +588,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
     // Reduce results onto all processes.
     if (PetscTools::IsParallel())
     {
+        // Make sure the vector on each process has the same size
+        unsigned local_size = mCellMutationStateCount.size();
+        unsigned global_size;
+
+        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        mCellMutationStateCount.resize(global_size, 0u);
+
         std::vector<unsigned> mutation_counts(mCellMutationStateCount.size(), 0u);
 
         for (unsigned i=0; i<mutation_counts.size(); i++)
@@ -591,6 +604,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
 
         mCellMutationStateCount = mutation_counts;
     }
+
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
