@@ -435,6 +435,14 @@ public:
         // Tidy up
         WntConcentration<2>::Destroy();
 
+        /*
+         * HOW_TO_TAG Cell Based/Simulation
+         * Time various aspects of a cell-based simulation using
+           #include "CellBasedEventHandler.hpp" 
+           and
+           CellBasedEventHandler::Enable();  
+         */
+                                
         CellBasedEventHandler::Headings();
         CellBasedEventHandler::Report();
     }
