@@ -54,8 +54,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractTetrahedralMeshWriter.hpp"
 #include "Version.hpp"
 
-#include "NodesOnlyMesh.hpp"
+
 #include <map>
+
+// Forward declaration prevents circular include chain
+template<unsigned SPACE_DIM>
+class NodesOnlyMesh;
 
 /**
  *  VtkMeshWriter
