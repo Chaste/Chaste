@@ -437,14 +437,18 @@ public:
 
         /*
          * HOW_TO_TAG Cell Based/Simulation
-         * Time various aspects of a cell-based simulation using
-           #include "CellBasedEventHandler.hpp" 
-           and
-           CellBasedEventHandler::Enable();  
+         * Time various aspects of a cell-based simulation using CellBasedEventHandler.
+           
+           Do not forget 
+            #include "CellBasedEventHandler.hpp" 
+           and to call 
+            CellBasedEventHandler::Enable(); 
+           at the top of the test.
          */
                                 
         CellBasedEventHandler::Headings();
         CellBasedEventHandler::Report();
+        CellBasedEventHandler::Disable();
     }
 
     /**
