@@ -347,7 +347,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
 
-    if (mWriteParallelFiles)
+    if (mWriteParallelFiles && this->mpDistributedMesh != NULL)
     {
         // In parallel, the vector we pass will only contain the values from the privately owned nodes.
         // To get the values from the halo nodes (which will be inserted at the end of the vector we need to
@@ -539,13 +539,14 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
 {
     //Have we got a parallel mesh?
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    mpNodesOnlyMesh = dynamic_cast<NodesOnlyMesh<SPACE_DIM>* >(&rMesh);
 
-    if (this->mpDistributedMesh == NULL)
+    if (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL)
     {
         EXCEPTION("Cannot write parallel files using a sequential mesh");
     }
 
-    if ( PetscTools::IsSequential())
+    if (PetscTools::IsSequential())
     {
         return;     // mWriteParallelFiles is not set sequentially (so we don't set up data exchange machinery)
     }
@@ -567,17 +568,19 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
     }
 
     // Halo nodes
-    for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
-            halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
-            ++halo_iter)
+    if (this->mpDistributedMesh)
     {
-        mGlobalToNodeIndexMap[(*halo_iter)->GetIndex()] = index;
-        index++;
+        for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
+                halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
+                ++halo_iter)
+        {
+            mGlobalToNodeIndexMap[(*halo_iter)->GetIndex()] = index;
+            index++;
+        }
+
+        //Calculate the halo exchange so that node-wise payloads can be communicated
+        this->mpDistributedMesh->CalculateNodeExchange( mNodesToSendPerProcess, mNodesToReceivePerProcess );
     }
-
-    //Calculate the halo exchange so that node-wise payloads can be communicated
-    this->mpDistributedMesh->CalculateNodeExchange( mNodesToSendPerProcess, mNodesToReceivePerProcess );
-
 }
 
 ///\todo #1322 Mesh should be const
@@ -590,7 +593,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
 
-    if ( PetscTools::IsSequential() || !mWriteParallelFiles || this->mpDistributedMesh == NULL )
+    if ( PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == NULL && mpNodesOnlyMesh == NULL) )
     {
         AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFilesUsingMesh( rMesh,keepOriginalElementIndexing );
     }
@@ -611,12 +614,15 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
         }
 
         // Halo nodes
-        for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
-                halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
-                ++halo_iter)
+        if (this->mpDistributedMesh)
         {
-            c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
-            p_pts->InsertNextPoint(current_item[0], current_item[1], (SPACE_DIM==3)?current_item[2]:0.0);
+            for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
+                    halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
+                    ++halo_iter)
+            {
+                c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
+                p_pts->InsertNextPoint(current_item[0], current_item[1], (SPACE_DIM==3)?current_item[2]:0.0);
+            }
         }
 
         mpVtkUnstructedMesh->SetPoints(p_pts);

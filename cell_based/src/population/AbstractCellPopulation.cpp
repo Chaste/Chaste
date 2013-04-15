@@ -658,8 +658,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
     PetscTools::EndRoundRobin();
 
     // VTK can only be written in 2 or 3 dimensions.
-    // VTK can only be written sequentially (//\ todo on #2365)
-    if (SPACE_DIM > 1 && PetscTools::IsSequential())
+    if (SPACE_DIM > 1)
     {
          WriteVtkResultsToFile();
     }

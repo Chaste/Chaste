@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractTetrahedralMeshWriter.hpp"
 #include "Version.hpp"
 
+#include "NodesOnlyMesh.hpp"
 #include <map>
 
 /**
@@ -76,6 +77,7 @@ private:
     std::vector<std::vector<unsigned> > mNodesToSendPerProcess; /**< Used to communicate node-wise halo data */
     std::vector<std::vector<unsigned> > mNodesToReceivePerProcess;  /**< Used to communicate node-wise halo data */
 
+    NodesOnlyMesh<SPACE_DIM>* mpNodesOnlyMesh;  /** A pointer to a mesh, created by dynamic cast */
 
     /**
      * A VTK mesh data structure.

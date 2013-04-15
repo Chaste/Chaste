@@ -442,6 +442,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+    mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
     unsigned num_nodes = GetNumNodes();
     std::vector<double> cell_types(num_nodes);
@@ -451,13 +452,17 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::vector<double> cell_cycle_phases(num_nodes);
     std::vector<double> cell_radii(num_nodes);
     std::vector<std::vector<double> > cellwise_data;
+    std::vector<double> rank(num_nodes);
 
     unsigned num_cell_data_items = 0;
     std::vector<std::string> cell_data_names;
 
     // We assume that the first cell is representative of all cells
-    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    if (num_nodes > 0)
+    {
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    }
 
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
@@ -471,9 +476,11 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
          ++cell_iter)
     {
         // Get the node index corresponding to this cell
-        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-        Node<DIM>* p_node = this->GetNode(node_index);
+        Node<DIM>* p_node = this->GetNode(global_index);
+
+        unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
         if (this->mOutputCellAncestors)
         {
@@ -520,7 +527,11 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         {
             cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
+
+        rank[node_index] = (PetscTools::GetMyRank());
     }
+
+    mesh_writer.AddPointData("Process rank", rank);
 
     if (this->mOutputCellProliferativeTypes)
     {
