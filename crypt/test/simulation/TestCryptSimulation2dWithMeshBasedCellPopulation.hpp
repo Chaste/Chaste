@@ -179,7 +179,7 @@ public:
      */
     void Test2DSpringSystem() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // Cannot write NodesOnlyMesh to file in parallel yet #2365
+        EXIT_IF_PARALLEL;    // Writing mesh based in parallel causes duplicated results.
 
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
         MutableMesh<2,2> mesh;
