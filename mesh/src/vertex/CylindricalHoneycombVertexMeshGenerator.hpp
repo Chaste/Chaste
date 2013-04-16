@@ -56,7 +56,7 @@ public:
     /**
      * Constructor.
      *
-     * @param numElementsAcross  The number of columns of elements in the mesh
+     * @param numElementsAcross  The number of columns of elements in the mesh. This MUST be an even number.
      * @param numElementsUp  The number of rows of elements in the mesh
      * @param isFlatBottom  Whether to enforce a flat bottom to the mesh (defaults to false)
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangement (defaults to 0.01)

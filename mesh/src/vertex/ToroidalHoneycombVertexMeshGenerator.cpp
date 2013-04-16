@@ -43,8 +43,8 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
     // numElementsAcross and numElementsUp must be even for toroidal meshes
     assert(numElementsAcross > 1);
     assert(numElementsUp > 1);
-    assert(numElementsAcross%2 == 0);
-    assert(numElementsUp%2 == 0);
+    assert(numElementsAcross%2 == 0);///\todo This should be an exception
+    assert(numElementsUp%2 == 0);///\todo This should be an exception
 
     assert(cellRearrangementThreshold > 0.0);
     assert(t2Threshold > 0.0);
