@@ -468,7 +468,6 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                         }
                     }
 
-
                     mLocalBoxes.push_back(local_boxes);
                 }
                 break;

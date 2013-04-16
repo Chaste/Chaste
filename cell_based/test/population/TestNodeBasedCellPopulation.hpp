@@ -955,6 +955,7 @@ public:
             delete nodes[i];
         }
 
+        delete p_mesh;
     }
 
     void TestNodeBasedCellPopulationOutputWriters2d()

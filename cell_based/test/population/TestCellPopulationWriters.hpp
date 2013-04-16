@@ -353,8 +353,6 @@ public:
 
 		FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes_twice.dat").CompareFiles();
 
-		cell_population.CreateOutputFiles(output_directory, true);
-
 		/*
 		 * Write cell cycle phases count file.
 		 */
@@ -596,9 +594,16 @@ public:
 
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
-        cell_population.AddPopulationWriter(new CellPopulationElementWriter<3,3>("output"));
+        CellPopulationElementWriter<3,3>* p_elem_writer = new CellPopulationElementWriter<3,3>("output");
 
-        cell_population.AddCellWriter(new CellIdWriter<3,3>("output_directory"));
+        cell_population.AddPopulationWriter(p_elem_writer);
+
+        CellIdWriter<3,3>* p_cell_writer = new CellIdWriter<3,3>("output_directory");
+
+        cell_population.AddCellWriter(p_cell_writer);
+
+        delete p_elem_writer;
+        delete p_cell_writer;
 
         for (unsigned i=0; i<nodes.size(); i++)
         {

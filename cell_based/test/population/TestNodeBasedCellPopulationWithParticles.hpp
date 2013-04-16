@@ -409,7 +409,7 @@ public:
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(0);
 
-        c_vector<double,2> new_location;
+        c_vector<double,2> new_location = zero_vector<double>(2);
         new_location[0] = 0.3433453454443;
         new_location[0] = 0.3435346344234;
         cell_population.AddCell(p_new_cell, new_location, cells[0] /*random choice of parent*/);
@@ -430,7 +430,7 @@ public:
         p_new_cell2->SetCellProliferativeType(p_stem_type);
         p_new_cell2->SetBirthTime(0);
 
-        c_vector<double,2> new_location2;
+        c_vector<double,2> new_location2 = zero_vector<double>(2);
         new_location2[0] = 0.6433453454443;
         new_location2[0] = 0.6435346344234;
         cell_population.AddCell(p_new_cell2, new_location2, cells[1] /*random choice of parent*/);

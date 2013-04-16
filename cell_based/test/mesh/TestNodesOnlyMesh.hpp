@@ -745,7 +745,8 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.0);
 
         unsigned num_original_nodes = mesh.GetNumNodes();
-        mesh.AddHaloNode(new Node<2>(10, false, 0.0, 1.0));
+        Node<2>* p_halo_node = new Node<2>(10, false, 0.0, 1.0);
+        mesh.AddHaloNode(p_halo_node);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_original_nodes);
 
@@ -759,6 +760,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNodeOrHaloNode(10)->rGetLocation()[1], 1.0, 1e-4);
 
         delete nodes[0];
+        delete p_halo_node;
     }
 
     void TestArchiving() throw(Exception)
