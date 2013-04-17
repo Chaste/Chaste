@@ -176,6 +176,20 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
 
     if (concreteMove)
     {
+        for (typename Node<SPACE_DIM>::ContainingBoundaryElementIterator it = this->mNodes[index]->ContainingBoundaryElementsBegin();
+             it != this->mNodes[index]->ContainingBoundaryElementsEnd();
+             ++it)
+        {
+            try
+            {
+                this->GetBoundaryElement(*it)->CalculateWeightedDirection(this->mBoundaryElementWeightedDirections[ (*it) ],
+                                                                    this->mBoundaryElementJacobianDeterminants[ (*it) ]);
+            }
+            catch (Exception e)
+            {
+                EXCEPTION("Moving node caused a boundary element to have a non-positive Jacobian determinant");
+            }
+        }
         for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[index]->ContainingElementsBegin();
              it != this->mNodes[index]->ContainingElementsEnd();
              ++it)
@@ -205,20 +219,6 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
                     EXCEPTION("Moving node caused an subspace element to change direction");
                 }
 
-            }
-        }
-        for (typename Node<SPACE_DIM>::ContainingBoundaryElementIterator it = this->mNodes[index]->ContainingBoundaryElementsBegin();
-             it != this->mNodes[index]->ContainingBoundaryElementsEnd();
-             ++it)
-        {
-            try
-            {
-                this->GetBoundaryElement(*it)->CalculateWeightedDirection(this->mBoundaryElementWeightedDirections[ (*it) ],
-                                                                    this->mBoundaryElementJacobianDeterminants[ (*it) ]);
-            }
-            catch (Exception e)
-            {
-                EXCEPTION("Moving node caused a boundary element to have a non-positive Jacobian determinant");
             }
         }
     }

@@ -231,6 +231,7 @@ for src_file in src_files:
                             (src_line_stripped.startswith('virtual ') and src_line_stripped.endswith('(')) or
                             (src_line_stripped.startswith('catch ') and #Line is catch (...)
                              src_line_stripped[-1] == ')') or
+                            src_line_stripped.startswith('class ') or
                             #Method definition (possibly). Currently overlaps with previous 'catch' ignore
                             (len(src_line_stripped) > 0 and
                              (src_line_stripped[-1] == ')' or src_line_stripped.endswith(') const')))

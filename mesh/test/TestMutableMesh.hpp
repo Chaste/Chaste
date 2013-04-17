@@ -393,7 +393,7 @@ public:
         // Nudge too far
         point.SetCoordinate(2, 1.0);
         TS_ASSERT_THROWS_THIS(mesh.SetNode(interior_node_index, point),
-                "Moving node caused an element to have a non-positive Jacobian determinant");
+                "Moving node caused a boundary element to have a non-positive Jacobian determinant");
 
         // Put it back
         point.SetCoordinate(2, 0.75);
