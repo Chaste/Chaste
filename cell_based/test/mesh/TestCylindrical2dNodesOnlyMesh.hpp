@@ -182,8 +182,7 @@ public:
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // ReMesh to make the box collection big enough to accommodate new nodes.
-        NodeMap map(p_mesh->GetMaximumNodeIndex());
-        p_mesh->ReMesh(map);
+        p_mesh->ResizeBoxCollection();
 
         // Choose a node on the left boundary
         ChastePoint<2> point = p_mesh->GetNode(4)->GetPoint();

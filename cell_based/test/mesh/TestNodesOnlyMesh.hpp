@@ -261,6 +261,8 @@ public:
         NodeMap map(4);
         TS_ASSERT_THROWS_NOTHING(mesh.ReMesh(map));
 
+        mesh.ResizeBoxCollection();
+
         // 10 x 10 x 7
         TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 700u);
 

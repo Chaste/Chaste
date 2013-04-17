@@ -156,11 +156,6 @@ private:
      void SetUpBoxCollection(const std::vector<Node<SPACE_DIM>* >& rNodes);
 
      /**
-      * Clear the old box collection and set up a new one if necessary.
-      */
-     void UpdateBoxCollection();
-
-     /**
       * Remove all nodes marked as deleted.
       *
       * @param map the NodeMap to record which nodes have been removed.
@@ -186,11 +181,6 @@ protected:
      * for nodes in the mesh.
      */
     DistributedBoxCollection<SPACE_DIM>* mpBoxCollection;
-
-    /**
-     * Iterate through each node and add it to its appropriate box.
-     */
-    void AddNodesToBoxes();
 
     /**
      * Clear the BoxCollection
@@ -299,6 +289,27 @@ public:
      * with the new mesh. It should have the same size as mNodes.
      */
     void ReMesh(NodeMap& rMap);
+
+    /**
+     * Clear the old box collection and set up a new one if necessary.
+     */
+    void UpdateBoxCollection();
+
+    /**
+     * Check whether any nodes are close to the edge of the box collection and increase
+     * the size of it if necessary.
+     */
+    void ResizeBoxCollection();
+
+    /**
+     * Iterate through each node and add it to its appropriate box.
+     */
+    void AddNodesToBoxes();
+
+    /**
+     * Iterate through each halo node and add it to its appropriate box.
+     */
+    void AddHaloNodesToBoxes();
 
     /**
      * Work out which nodes lie outside the local domain and add their indices to the vectors NodesToSendLeft and NodesToSendRight.

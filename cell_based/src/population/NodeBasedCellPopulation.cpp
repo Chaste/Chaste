@@ -137,6 +137,12 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     NodeMap map(mpNodesOnlyMesh->GetMaximumNodeIndex());
     mpNodesOnlyMesh->ReMesh(map);
 
+    mpNodesOnlyMesh->UpdateBoxCollection();
+
+    RefreshHaloCells();
+
+    mpNodesOnlyMesh->AddHaloNodesToBoxes();
+
     if (!map.IsIdentityMap())
     {
         UpdateParticlesAfterReMesh(map);
@@ -698,6 +704,8 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
 {
+    mpNodesOnlyMesh->ResizeBoxCollection();
+
     mpNodesOnlyMesh->CalculateNodesOutsideLocalDomain();
 
     std::vector<unsigned> nodes_to_send_right = mpNodesOnlyMesh->rGetNodesToSendRight();

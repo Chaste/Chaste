@@ -186,8 +186,6 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
     UpdateNodeIndices();
 
     this->SetMeshHasChangedSinceLoading();
-
-    UpdateBoxCollection();
 }
 
 template<unsigned SPACE_DIM>
@@ -505,15 +503,19 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodesToBoxes()
           unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
           mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
      }
+}
 
-     // Add halo nodes
-     for (typename std::vector<Node<SPACE_DIM>* >::iterator halo_node_iter = mHaloNodes.begin();
-             halo_node_iter != mHaloNodes.end();
-             ++halo_node_iter)
-     {
-         unsigned box_index = mpBoxCollection->CalculateContainingBox(*halo_node_iter);
-         mpBoxCollection->rGetBox(box_index).AddNode(*halo_node_iter);
-     }
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::AddHaloNodesToBoxes()
+{
+    // Add halo nodes
+    for (typename std::vector<Node<SPACE_DIM>* >::iterator halo_node_iter = mHaloNodes.begin();
+            halo_node_iter != mHaloNodes.end();
+            ++halo_node_iter)
+    {
+        unsigned box_index = mpBoxCollection->CalculateContainingBox(*halo_node_iter);
+        mpBoxCollection->rGetHaloBox(box_index).AddNode(*halo_node_iter);
+    }
 }
 
 template<unsigned SPACE_DIM>
@@ -527,14 +529,18 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
     // Remove node pointers from boxes in BoxCollection.
     mpBoxCollection->EmptyBoxes();
 
+    AddNodesToBoxes();
+
+    mpBoxCollection->UpdateHaloBoxes();
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::ResizeBoxCollection()
+{
     while (IsANodeCloseToDomainBoundary())
     {
         EnlargeBoxCollection();
     }
-
-     AddNodesToBoxes();
-
-     mpBoxCollection->UpdateHaloBoxes();
 }
 
 template<unsigned SPACE_DIM>

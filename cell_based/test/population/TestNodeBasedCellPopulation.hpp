@@ -214,11 +214,14 @@ public:
         r_node_pairs.clear();
 
         // Set a new cut-off
-        p_mesh->Clear();
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1e-3);
+        if (PetscTools::IsSequential()) // This causes nodes to jump to different process in parallel.
+        {
+            p_mesh->Clear();
+            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1e-3);
 
-        cell_population.Update();
-        TS_ASSERT(cell_population.rGetNodePairs().empty());
+            cell_population.Update();
+            TS_ASSERT(cell_population.rGetNodePairs().empty());
+        }
 
         // Avoid memory leak
         delete p_mesh;
