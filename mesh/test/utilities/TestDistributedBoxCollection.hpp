@@ -73,6 +73,7 @@ private:
         DistributedBoxCollection<DIM> box_collection(box_width, domain_size);
         box_collection.SetupHaloBoxes();
 
+
         // Put a node in each local box.
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
@@ -86,6 +87,10 @@ private:
                     node_location[d] = (locations[2*d+1] + locations[2*d]) / 2.0;
                 }
                 box_collection.rGetBox(i).AddNode(new Node<DIM>(i, node_location));
+            }
+            if (box_collection.GetHaloBoxOwnership(i))
+            {
+                TS_ASSERT_THROWS_NOTHING(box_collection.rGetHaloBox(i));
             }
         }
 
@@ -1363,7 +1368,7 @@ public:
             // Add as a halo if appropriate.
             if (box_collection.GetHaloBoxOwnership(box_index))
             {
-                box_collection.mHaloBoxes[box_collection.mHaloBoxesMapping[box_index]].AddNode(nodes[i]);
+                box_collection.rGetHaloBox(box_index).AddNode(nodes[i]);
             }
         }
 

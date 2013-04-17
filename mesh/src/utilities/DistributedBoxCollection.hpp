@@ -228,6 +228,13 @@ public:
     Box<DIM>& rGetBox(unsigned boxIndex);
 
     /**
+     * Get a halo box.
+     * @param boxIndex the index of the box to return
+     * @return a reference to the halo box.
+     */
+    Box<DIM>& rGetHaloBox(unsigned boxIndex);
+
+    /**
      * Get the number of boxes.
      *
      * @return mNumBoxes

@@ -321,6 +321,16 @@ Box<DIM>& DistributedBoxCollection<DIM>::rGetBox(unsigned boxIndex)
 }
 
 template<unsigned DIM>
+Box<DIM>& DistributedBoxCollection<DIM>::rGetHaloBox(unsigned boxIndex)
+{
+    assert(GetHaloBoxOwnership(boxIndex));
+
+    unsigned local_index = mHaloBoxesMapping.find(boxIndex)->second;
+
+    return mHaloBoxes[local_index];
+}
+
+template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::GetNumBoxes()
 {
     return mNumBoxes;
