@@ -214,6 +214,7 @@ void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
 {
+    mNodesMapping.clear();
     for (unsigned location_in_vector=0; location_in_vector < this->mNodes.size(); location_in_vector++)
     {
         unsigned global_index = this->mNodes[location_in_vector]->GetIndex();
@@ -226,8 +227,6 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
 {
     mNodesToSendRight.clear();
     mNodesToSendLeft.clear();
-
-    c_vector<double, 2*SPACE_DIM> domain_size = mpBoxCollection->rGetDomainSize();
 
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
             node_iter != this->GetNodeIteratorEnd();
@@ -537,6 +536,11 @@ void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ResizeBoxCollection()
 {
+    if (!mpBoxCollection)
+    {
+        SetUpBoxCollection(this->mNodes);
+    }
+
     while (IsANodeCloseToDomainBoundary())
     {
         EnlargeBoxCollection();

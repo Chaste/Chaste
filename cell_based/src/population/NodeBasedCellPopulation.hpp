@@ -268,6 +268,15 @@ public:
     unsigned GetNumNodes();
 
     /**
+     * Overridden method from AbstractCellPopulation so that we can access halo cells
+     * through this method.
+     *
+     * @param index the global index of the node assocaited with a cell
+     * @return the (set of) cells to which the node is attached.
+     */
+    virtual CellPtr GetCellUsingLocationIndex(unsigned index);
+
+    /**
      * Overridden GetNode() method.
      *
      * @param index global index of the specified node

@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "Exception.hpp"
+#include "PetscTools.hpp"
 
 class CellId;
 
@@ -78,7 +79,10 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellProperty>(*this);
         archive & mCellId;
-        archive & mMaxCellId;
+        if (!PetscTools::IsParallel())	// This is to avoid changing the static i.d. in parallel simulations
+        {
+        	archive & mMaxCellId;      	
+        }		
     }
 
 public:

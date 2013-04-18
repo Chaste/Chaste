@@ -158,7 +158,7 @@ public:
 #endif
     }
 
-    void TestUpdateCellProcessLocation()    throw (Exception)
+    void TestUpdateCellProcessLocation() throw (Exception)
     {
         if (PetscTools::GetNumProcs() > 1)
         {
@@ -201,7 +201,7 @@ public:
         }
     }
 
-    void TestRefreshHaloCells()    throw (Exception)
+    void TestRefreshHaloCells() throw (Exception)
     {
 #if BOOST_VERSION < 103700
         TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
@@ -224,7 +224,25 @@ public:
                TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
            }
 #endif
+    }
 
+    void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)
+    {
+        Node<3>* p_node = new Node<3>(10, false, 0.0, 0.0, 0.0);
+
+        // Create a cell.
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_type);
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+
+        CellPtr p_cell(new Cell(p_state, p_model));
+
+        mpNodeBasedCellPopulation->AddHaloCell(p_cell, p_node);
+
+        TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->GetCellUsingLocationIndex(10));
+        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetCellUsingLocationIndex(10), p_cell);
+
+        delete p_node;
     }
 };
 

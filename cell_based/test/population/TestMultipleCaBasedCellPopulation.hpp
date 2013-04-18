@@ -183,6 +183,8 @@ public:
      */
     void TestMultipleCellExceptions() throw (Exception)
     {
+        EXIT_IF_PARALLEL;   // Cell IDs are set differently in parallel
+
         // Reset the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 

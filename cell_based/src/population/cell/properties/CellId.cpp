@@ -50,7 +50,7 @@ CellId::~CellId()
 
 void CellId::AssignCellId()
 {
-    mCellId = mMaxCellId;
+    mCellId = PetscTools::GetNumProcs() * mMaxCellId + PetscTools::GetMyRank();
     mMaxCellId++;
 }
 

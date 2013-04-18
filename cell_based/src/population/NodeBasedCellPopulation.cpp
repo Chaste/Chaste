@@ -134,6 +134,8 @@ void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>&
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
+    UpdateCellProcessLocation();    // Only do this if one process has had births or deaths?
+
     NodeMap map(mpNodesOnlyMesh->GetMaximumNodeIndex());
     mpNodesOnlyMesh->ReMesh(map);
 
@@ -227,6 +229,20 @@ template<unsigned DIM>
 unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 {
     return mpNodesOnlyMesh->GetNumNodes();
+}
+
+template<unsigned DIM>
+CellPtr NodeBasedCellPopulation<DIM>::GetCellUsingLocationIndex(unsigned index)
+{
+    std::map<unsigned, CellPtr>::iterator iter = mLocationHaloCellMap.find(index);
+    if (iter != mLocationHaloCellMap.end())
+    {
+        return iter->second;
+    }
+    else
+    {
+        return AbstractCellPopulation<DIM, DIM>::GetCellUsingLocationIndex(index);
+    }
 }
 
 template<unsigned DIM>
@@ -736,6 +752,8 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::RefreshHaloCells()
 {
+	mpNodesOnlyMesh->ClearHaloNodes();
+
     mHaloCells.clear();
     mHaloCellLocationMap.clear();
     mLocationHaloCellMap.clear();

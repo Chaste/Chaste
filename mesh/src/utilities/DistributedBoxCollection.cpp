@@ -118,6 +118,10 @@ void DistributedBoxCollection<DIM>::EmptyBoxes()
     {
         mBoxes[i].ClearNodes();
     }
+    for (unsigned i=0; i<mHaloBoxes.size(); i++)
+    {
+    	mHaloBoxes[i].ClearNodes();
+    }
 }
 
 template<unsigned DIM>

@@ -403,7 +403,7 @@ public:
      *
      * @return the cell.
      */
-    CellPtr GetCellUsingLocationIndex(unsigned index);
+    virtual CellPtr GetCellUsingLocationIndex(unsigned index);
 
     /**
      * Get the set of cells corresponding to a given location index.
