@@ -114,6 +114,22 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(AbstractM
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::~AbstractCellPopulation()
 {
+    DeleteWriters();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::DeleteWriters()
+{
+    for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+    {
+        delete mCellPopulationWriters[i];
+    }
+    for (unsigned i=0; i<mCellWriters.size(); i++)
+    {
+        delete mCellWriters[i];
+    }
+    mCellPopulationWriters.clear();
+    mCellWriters.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -363,6 +379,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 {
     mDirPath = rDirectory;
 
+    // Destroy any writers that are already open.
+    DeleteWriters();
+
     if (mOutputResultsForChasteVisualizer)
     {
         AddPopulationWriter(new NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
@@ -430,19 +449,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
     {
         mCellWriters[i]->CloseFile();
     }
-
-    // Tidy up the writers.
-    for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
-    {
-        delete mCellPopulationWriters[i];
-    }
-    for (unsigned i=0; i<mCellWriters.size(); i++)
-    {
-        delete mCellWriters[i];
-    }
-    mCellPopulationWriters.clear();
-    mCellWriters.clear();
-
 
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";

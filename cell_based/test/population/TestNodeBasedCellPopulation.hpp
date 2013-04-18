@@ -933,7 +933,7 @@ public:
         std::string output_directory = "TestNodeBasedCellPopulationWritersParallel";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CreateOutputFiles(output_directory, false));
+        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CreateOutputFiles(output_directory, true));
         node_based_cell_population.OpenWritersFiles();
 
         node_based_cell_population.WriteResultsToFiles();

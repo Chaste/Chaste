@@ -229,6 +229,11 @@ public:
     virtual ~AbstractCellPopulation();
 
     /**
+     * Delete the pointers to cell population writers. Used in the destructor.
+     */
+    void DeleteWriters();
+
+    /**
      * Initialise each cell's cell-cycle model.
      */
     void InitialiseCells();

@@ -602,9 +602,7 @@ public:
 
         cell_population.AddCellWriter(p_cell_writer);
 
-        delete p_elem_writer;
-        delete p_cell_writer;
-
+        // Tidy up. Writers are deleted by the population destructor.
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
