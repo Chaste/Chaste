@@ -81,7 +81,8 @@ private:
     std::vector<std::vector<unsigned> > mNodesToSendPerProcess; /**< Used to communicate node-wise halo data */
     std::vector<std::vector<unsigned> > mNodesToReceivePerProcess;  /**< Used to communicate node-wise halo data */
 
-    NodesOnlyMesh<SPACE_DIM>* mpNodesOnlyMesh;  /** A pointer to a mesh, created by dynamic cast */
+    /** A pointer to a NodesOnlyMesh to write to file, created by dynamic cast */
+    NodesOnlyMesh<SPACE_DIM>* mpNodesOnlyMesh;
 
     /**
      * A VTK mesh data structure.

@@ -52,6 +52,8 @@ public:
 
     /**
      * Write the header to file
+     * @param pCellPopulation a pointer to the population to be written.
+     *
      */
     virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 

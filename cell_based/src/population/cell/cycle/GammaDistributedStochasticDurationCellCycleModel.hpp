@@ -90,6 +90,7 @@ public:
 
     /**
      * Overridden builder method to create new copies of this cell-cycle model.
+     * @return a pointer to the GammaDistributedStochasticDurationCellCycleModel created.
      */
     AbstractCellCycleModel* CreateCellCycleModel();
 
@@ -101,19 +102,19 @@ public:
     void SetShape(double shape);
 
     /**
-     * Set mScale.
+     * @return mScale.
      *
-     * @param scaler the value of the scale parameter
+     * @param scale the value of the scale parameter
      */
     void SetScale(double scale);
 
     /**
-     * Get mShape.
+     * @return mShape.
      */
     double GetShape();
 
     /**
-     * Get mScale.
+     * @return mScale.
      */
     double GetScale();
 
