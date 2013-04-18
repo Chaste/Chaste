@@ -421,8 +421,8 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                  * A PETSc Vec is a pointer, so we *don't* need to free the memory if it is
                  * freed somewhere else (e.g. in the destructor). If this is a resumed solution
                  * we set initial_condition = mSolution earlier. mSolution is going to be
-                 * cleaned up in the constructor. So, only PetscTools::Destroy( initial_condition when
-                 * it is not equal to mSolution (see #1695).
+                 * cleaned up in the constructor. So, only PetscTools::Destroy( initial_condition ) when
+                 * it is not equal to mSolution.
                  */
                 PetscTools::Destroy(initial_condition);
             }
@@ -502,10 +502,20 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                  * freed somewhere else (e.g. in the destructor). Later, in this while loop
                  * we will set initial_condition = mSolution (or, if this is a resumed solution
                  * it may also have been done when initial_condition was created). mSolution
-                 * is going to be cleaned up in the destructor. So, only PetscTools::Destroy(
+                 * is going to be cleaned up in the destructor. So, only PetscTools::Destroy()
                  * initial_condition when it is not equal to mSolution (see #1695).
                  */
+#define COVERAGE_IGNORE
+                /*
+                 * scons build=_hostconfig,petsc=2-3 heart/test/monodomain/TestMonodomainWithTimeAdaptivity.hpp
+                 *
+                 * The following line of code is coverage by PETSc 2.3.2 when an exception is triggered in
+                 * TestMonodomainWithTimeAdaptivity::TestWithChebyshevAndFixedIterations()
+                 *
+                 * The exception is "Chebyshev with fixed number of iterations is known to be broken in PETSc <= 2.3.2"
+                 */
                 PetscTools::Destroy(initial_condition);
+#undef COVERAGE_IGNORE
             }
 
             // Re-throw
