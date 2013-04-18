@@ -55,7 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
 
-#include "FakePetscSetup.hpp"
+// Needed for NodesOnlyMesh.
+#include "PetscSetupAndFinalize.hpp"
 
 /**
  * This class consists of a single test - a 2D Potts-based cell population
@@ -70,6 +71,8 @@ public:
 
     void TestPottsMonolayerCellSorting() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(60, 10, 4, 60, 10, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();

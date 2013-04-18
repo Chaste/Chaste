@@ -56,7 +56,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 
-#include "FakePetscSetup.hpp"
+// Needed for NodesOnlyMesh
+#include "PetscSetupAndFinalize.hpp"
 
 /**
  * This class consists of a single test, in which a 2D model
@@ -73,6 +74,8 @@ public:
 
     void TestRepresentativeSimulationForProfiling() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
 
