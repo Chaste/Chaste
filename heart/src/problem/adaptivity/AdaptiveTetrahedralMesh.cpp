@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-
+#define COVERAGE_IGNORE /// \todo #2367 We no longer test adaptivity library
 #ifdef CHASTE_ADAPTIVITY
 
 #include "AdaptiveTetrahedralMesh.hpp"
@@ -418,3 +418,4 @@ void AdaptiveTetrahedralMesh::MakeVerbose(bool verbose)
 }
 
 #endif // CHASTE_ADAPTIVITY
+#undef COVERAGE_IGNORE /// \todo #2367 We no longer test adaptivity library
