@@ -89,6 +89,7 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
                          "This run threw an exception.  Check convergence results\n");
+        Warnings::Instance()->QuietDestroy();
     }
 
     void Test1DPdeTime() throw(Exception)
@@ -152,7 +153,7 @@ public:
         HeartConfig::Instance()->Reset();
     }
 
-    void xxTestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance() throw(Exception)
+    void TestSpaceConvergenceBidomainIn1DWithAbsoluteTolerance() throw(Exception)
     {
         // Zero pivot detected in Cholesky factorisation for mesh 1. This is not an error and it may always happen when using bjacobi with singular systems.
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
