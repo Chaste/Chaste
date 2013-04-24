@@ -104,6 +104,13 @@ private:
     /** A list of nodes that need to moved to the right hand process */
     std::vector<unsigned> mNodesToSendLeft;
 
+    /**A list of flags showing which initial nodes passed to ConstructNodesWithoutMesh
+     * were created on this process */
+    std::vector<bool> mLocalInitialNodes;
+
+    /** A variable to keep track of added node indices so we know the largest on this process */
+    unsigned mMaxAddedNodeIndex;
+
     /**
      * Calculate the next unique global index available on this
      * process. Uses a hashing function to ensure that a unique
@@ -223,6 +230,11 @@ public:
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
      */
     void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance);
+
+    /**
+     * @return whether each initial nodes is owned by this process.
+     */
+    std::vector<bool>& rGetInitiallyOwnedNodes();
 
     /**
      * Overridden Clear() method for NodesOnlyMesh.

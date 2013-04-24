@@ -54,10 +54,12 @@ class NodeBasedCellPopulation : public AbstractCentreBasedCellPopulation<DIM>
     friend class TestNodeBasedCellPopulationParallelMethods;
     friend class TestBoxCollection;
 
-private:
+protected:
 
     /** Static cast of the mesh from AbstractCellPopulation. */
     NodesOnlyMesh<DIM>* mpNodesOnlyMesh;
+
+private:
 
     /** Vector of minimal spatial positions in each dimension. */
     c_vector<double, DIM> mMinSpatialPositions;

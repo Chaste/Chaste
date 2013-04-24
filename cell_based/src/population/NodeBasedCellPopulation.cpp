@@ -134,9 +134,9 @@ void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>&
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    UpdateCellProcessLocation();    // Only do this if one process has had births or deaths?
+    UpdateCellProcessLocation();
 
-    NodeMap map(mpNodesOnlyMesh->GetMaximumNodeIndex());
+    NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
     mpNodesOnlyMesh->ReMesh(map);
 
     mpNodesOnlyMesh->UpdateBoxCollection();

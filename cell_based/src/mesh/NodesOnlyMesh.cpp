@@ -43,6 +43,7 @@ NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
           mMaximumInteractionDistance(1.0),
           mIndexCounter(0u),
           mMinimumNodeDomainBoundarySeparation(1.0),
+          mMaxAddedNodeIndex(0u),
           mpBoxCollection(NULL)
 {
 }
@@ -66,10 +67,14 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 
     SetUpBoxCollection(rNodes);
 
+    mLocalInitialNodes.resize(rNodes.size(), false);
+
     for (unsigned i=0; i<rNodes.size(); i++)
     {
         if (mpBoxCollection->IsOwned(rNodes[i]))
         {
+        	mLocalInitialNodes[i] = true;
+
             assert(!rNodes[i]->IsDeleted());
             c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
 
@@ -88,6 +93,12 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes, maxInteractionDistance);
+}
+
+template<unsigned SPACE_DIM>
+std::vector<bool>& NodesOnlyMesh<SPACE_DIM>::rGetInitiallyOwnedNodes()
+{
+	return mLocalInitialNodes;
 }
 
 template<unsigned SPACE_DIM>
@@ -145,7 +156,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
 template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetMaximumNodeIndex()
 {
-    return std::max(mIndexCounter, this->GetNumAllNodes()) * PetscTools::GetNumProcs() + PetscTools::GetMyRank();
+    return std::max(mIndexCounter* PetscTools::GetNumProcs() + PetscTools::GetMyRank(), mMaxAddedNodeIndex);
 }
 
 template<unsigned SPACE_DIM>
@@ -296,6 +307,8 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
     }
 
     this->mAddedNodes = true;
+
+    mMaxAddedNodeIndex = (pNewNode->GetIndex() > mMaxAddedNodeIndex) ? pNewNode->GetIndex() : mMaxAddedNodeIndex;
 
     // Update mNodesMapping
     mNodesMapping[pNewNode->GetIndex()] = location_in_nodes_vector;
