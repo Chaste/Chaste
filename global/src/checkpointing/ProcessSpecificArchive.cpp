@@ -37,6 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
 #include "ProcessSpecificArchive.hpp"
 
 /** The process-specific output archive */
@@ -49,4 +52,16 @@ boost::archive::text_oarchive* ProcessSpecificArchive<boost::archive::text_oarch
 /** \cond */
 template <>
 boost::archive::text_iarchive* ProcessSpecificArchive<boost::archive::text_iarchive>::mpArchive = NULL;
+/**\endcond */
+
+/** The process-specific output archive */
+/** \cond */
+template <>
+boost::archive::binary_oarchive* ProcessSpecificArchive<boost::archive::binary_oarchive>::mpArchive = NULL;
+/**\endcond */
+
+/** The process-specific input archive */
+/** \cond */
+template <>
+boost::archive::binary_iarchive* ProcessSpecificArchive<boost::archive::binary_iarchive>::mpArchive = NULL;
 /**\endcond */

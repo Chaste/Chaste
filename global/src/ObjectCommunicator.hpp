@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _OBJECTCOMMUNICATOR_HPP_
 
 // Serialisation headers - must come first
-#include "CheckpointArchiveTypes.hpp"
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 #include "PetscTools.hpp" // For MPI methods
 
@@ -108,8 +109,8 @@ template<typename CLASS>
 void ObjectCommunicator<CLASS>::SendObject(CLASS* const pObject, unsigned destinationProcess, unsigned tag)
 {
     // Create an output archive
-    std::stringstream ss;
-    boost::archive::text_oarchive output_arch(ss);
+    std::ostringstream ss(std::ios::binary);
+    boost::archive::binary_oarchive output_arch(ss);
 
     output_arch << pObject;
 
@@ -122,7 +123,8 @@ void ObjectCommunicator<CLASS>::SendObject(CLASS* const pObject, unsigned destin
     // Send archive data
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Send(send_buf, string_length, MPI_CHAR, destinationProcess, tag, PETSC_COMM_WORLD);
+    MPI_Send(send_buf, string_length, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD);
+
 }
 
 template<typename CLASS>
@@ -132,14 +134,14 @@ CLASS* ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProcess, unsigned ta
     MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &status);
 
     char* recv_string = new char[string_length];
-    MPI_Recv(recv_string, string_length, MPI_CHAR, sourceProcess , tag, PETSC_COMM_WORLD, &status);
+    MPI_Recv(recv_string, string_length, MPI_BYTE, sourceProcess , tag, PETSC_COMM_WORLD, &status);
 
     // Extract a proper object from the buffer
-    std::stringstream ss;
+    std::istringstream ss(std::ios::binary);
     ss.rdbuf()->pubsetbuf(recv_string, string_length);
 
     CLASS* p_recv_object;
-    boost::archive::text_iarchive input_arch(ss);
+    boost::archive::binary_iarchive input_arch(ss);
 
     input_arch >> p_recv_object;
 
@@ -150,8 +152,8 @@ template<typename CLASS>
 CLASS* ObjectCommunicator<CLASS>::SendRecvObject(CLASS* const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status)
 {
     // Create an output archive
-    std::stringstream oss;
-    boost::archive::text_oarchive output_arch(oss);
+    std::ostringstream oss(std::ios::binary);
+    boost::archive::binary_oarchive output_arch(oss);
 
     output_arch << pSendObject;
 
@@ -167,14 +169,14 @@ CLASS* ObjectCommunicator<CLASS>::SendRecvObject(CLASS* const pSendObject, unsig
 
     // Send archive data
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Sendrecv(send_buf, send_string_length, MPI_CHAR, destinationProcess, sendTag, recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
+    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
 
     // Extract received object
-    std::istringstream iss;
+    std::istringstream iss(std::ios::binary);
     iss.rdbuf()->pubsetbuf(recv_string, recv_string_length);
 
     CLASS* p_recv_object;
-    boost::archive::text_iarchive input_arch(iss);
+    boost::archive::binary_iarchive input_arch(iss);
 
     input_arch >> p_recv_object;
 
