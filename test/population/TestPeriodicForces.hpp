@@ -61,7 +61,6 @@ private:
 
     MutableMesh<3,3>* Make3dMesh(unsigned width=3, unsigned height=3, unsigned depth=3)
     {
-
         /*          _ _ _ _ _
          *        /        /|
          *       /        / |
