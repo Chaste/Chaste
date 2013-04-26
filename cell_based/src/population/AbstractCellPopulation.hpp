@@ -740,6 +740,15 @@ public:
     virtual bool IsRoomToDivide(CellPtr pCell);
 
     /**
+     * @return a pair of indices ordered by node index.
+     * Used by the rest length routines.
+     *
+     * @param index1 a node index
+     * @param index2 a node index
+     */
+    std::pair<unsigned,unsigned> CreateOrderedPair(unsigned index1, unsigned index2);
+
+    /**
      * Iterator class allows one to iterate over cells in the cell population.
      * Dereferencing the iterator will give you the current cell.
      * There are also methods to get the node representing this cell,

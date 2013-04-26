@@ -51,8 +51,8 @@ CryptStatistics::CryptStatistics(MeshBasedCellPopulation<2>& rCrypt)
 
 std::vector<CellPtr> CryptStatistics::GetCryptSection(double yTop, double xBottom, double xTop, bool periodic)
 {
+    double crypt_width = mrCrypt.rGetMesh().GetWidth(0);
 
-    double crypt_width = mrCrypt.rGetMesh().GetWidth(0u);
     // Fill in the default values - in a sequential manner
     if (xBottom == DBL_MAX)
     {
@@ -73,8 +73,7 @@ std::vector<CellPtr> CryptStatistics::GetCryptSection(double yTop, double xBotto
         periodic = false;
     }
 
-    // Loop over cells and add to the store if they are within a cell's radius of the
-    // specified line
+    // Loop over cells and add to the store if they are within a cell's radius of the specified line
     for (AbstractCellPopulation<2>::Iterator cell_iter = mrCrypt.Begin();
          cell_iter != mrCrypt.End();
          ++cell_iter)

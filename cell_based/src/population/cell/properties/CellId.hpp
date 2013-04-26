@@ -79,10 +79,10 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellProperty>(*this);
         archive & mCellId;
-        if (!PetscTools::IsParallel())	// This is to avoid changing the static i.d. in parallel simulations
+        if (!PetscTools::IsParallel()) // This is to avoid changing the static i.d. in parallel simulations
         {
-        	archive & mMaxCellId;      	
-        }		
+            archive & mMaxCellId;
+        }
     }
 
 public:

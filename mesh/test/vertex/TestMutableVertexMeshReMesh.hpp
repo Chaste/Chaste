@@ -670,11 +670,11 @@ public:
     }
 
     /*
-     * This tests that T1Swaps rearrange to form a Triangular element for a T2 Swap
+     * This tests that T1 swaps rearrange to form a triangular element for a T2 swap
      */
     void TestPrepareForT2Swap() throw(Exception)
     {
-        // Make 8 nodes to assign to four elements
+        // Make eight nodes to assign to four elements
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, -1.0, -1.0));
         nodes.push_back(new Node<2>(1, false,  1.0, -1.0));
@@ -686,7 +686,7 @@ public:
         nodes.push_back(new Node<2>(7, false, -0.1,  0.1));
 
         /*
-         *  Make Four trapezium elements with a central square element out of these nodes
+         *  Make four trapezium elements and a central square element.
          *  _______
          * |\  2  /|
          * | \___/ |
@@ -697,8 +697,6 @@ public:
          * |/_____\|
          *
          */
-
-        // Create elements
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3, nodes_elem_4;
         unsigned node_indices_elem_0[4] = {0, 1, 5, 4};
         unsigned node_indices_elem_1[4] = {1, 2, 6, 5};
@@ -1945,7 +1943,7 @@ public:
         }
     }
 
-    void TestT3SwapForNeighboringElements()
+    void TestT3SwapForNeighbouringElements()
     {
         /*
          * Make a small mesh consisting of 4 elements:
@@ -2070,7 +2068,7 @@ public:
         }
     }
 
-    void TestT3SwapForNeighboringElementsWithTwoCommonNodes()
+    void TestT3SwapForNeighbouringElementsWithTwoCommonNodes()
     {
         /*
          * Make a small mesh consisting of 4 elements:
@@ -2735,10 +2733,9 @@ public:
             point.SetCoordinate(1u, 0.7);
             vertex_mesh.SetNode(4, point);
 
-            // Merge intersection to maintain non overlaping elements
+            // Merge intersection to maintain non overlapping elements
             vertex_mesh.SetCheckForInternalIntersections(true);
             vertex_mesh.CheckForIntersections();
-
 
             // Test moved nodes are in the correct place
             TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);
@@ -2835,10 +2832,9 @@ public:
             point.SetCoordinate(1u, 0.7);
             vertex_mesh.SetNode(5, point);
 
-            // Merge intersection to maintain non overlaping elements
+            // Merge intersection to maintain non overlapping elements
             vertex_mesh.SetCheckForInternalIntersections(true);
             vertex_mesh.CheckForIntersections();
-
 
             // Test moved nodes are in the correct place
             TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.4, 1e-8);

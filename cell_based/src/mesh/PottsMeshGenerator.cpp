@@ -266,7 +266,6 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                 {
                     if (available_neighbours[i])
                     {
-
                         assert(moore_neighbour_indices_vector[i] < nodes.size());
                         moore_neighbours[node_index].insert(moore_neighbour_indices_vector[i]);
                     }
@@ -275,7 +274,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             }
             case 3:
             {
-                assert(DIM ==3 );
+                assert(DIM ==3);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *                      FRONT           BACK

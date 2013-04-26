@@ -134,7 +134,6 @@ public:
         ColumnDataWriter writer("TysonNovak", "TysonNovak");
         if (PetscTools::AmMaster()) // if master process
         {
-
             int step_per_row = 1;
             int time_var_id = writer.DefineUnlimitedDimension("Time", "s");
 

@@ -154,7 +154,6 @@ template<>
 VertexMesh<2,2>::VertexMesh(TetrahedralMesh<2,2>& rMesh, bool isPeriodic)
     : mpDelaunayMesh(&rMesh)
 {
-
     //Note  !isPeriodic is not used except through polymorphic calls in rMesh
 
     // Reset member variables and clear mNodes, mFaces and mElements
@@ -415,7 +414,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentre
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1, unsigned elementIndex2)
 {
-    assert(SPACE_DIM==2);
+    assert(SPACE_DIM == 2);
 
     std::set<unsigned> node_indices_1;
     for (unsigned i=0; i<mElements[elementIndex1]->GetNumNodes(); i++)
@@ -435,7 +434,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
 
     if (shared_nodes.size() == 1)
     {
-        //It's possible that these two elements are actually infinite but are on the edge of the domain
+        // It's possible that these two elements are actually infinite but are on the edge of the domain
         EXCEPTION("Elements "<< elementIndex1 <<" and  "<< elementIndex2<< " share only one node.");
     }
     assert(shared_nodes.size() == 2);
@@ -443,10 +442,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
     unsigned index1 = *(shared_nodes.begin());
     unsigned index2 = *(++(shared_nodes.begin()));
 
-    c_vector<double, SPACE_DIM> node1_location = this->mNodes[index1]->rGetLocation();
-    c_vector<double, SPACE_DIM> node2_location = this->mNodes[index2]->rGetLocation();
-
-    double edge_length = norm_2(GetVectorFromAtoB(node1_location, node2_location));
+    double edge_length = this->GetDistanceBetweenNodes(index1, index2);
     return edge_length;
 }
 
@@ -637,7 +633,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfElement(unsigned index)
 {
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-    unsigned num_nodes_in_element = p_element->GetNumNodes();
+    unsigned num_nodes = p_element->GetNumNodes();
 
     c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
 
@@ -650,28 +646,20 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
         break;
         case 2:
         {
-            c_vector<double, 2> transformed_centroid = zero_vector<double>(2);
-            c_vector<double, 2> first_node_location = p_element->GetNodeLocation(0);
-            c_vector<double, SPACE_DIM> this_node_location;
-            c_vector<double, SPACE_DIM> next_node_location;
-            c_vector<double, 2> this_transformed_node_location;
-            c_vector<double, 2> next_transformed_node_location;
-
             double temp_centroid_x = 0;
             double temp_centroid_y = 0;
 
-            for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
-            {
-                // Find locations of current node and anticlockwise node
-                this_node_location = p_element->GetNodeLocation(local_index);
-                next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
+            c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+            c_vector<double, SPACE_DIM> this_transformed_node_location = zero_vector<double>(SPACE_DIM);
 
-                /*
-                 * In order to calculate the centroid we map the origin to (x[0],y[0])
-                 * then use GetVectorFromAtoB() to get node coordinates
-                 */
-                this_transformed_node_location = GetVectorFromAtoB(first_node_location, this_node_location);
-                next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
+			/*
+			 * In order to calculate the centroid we map the origin to (x[0],y[0])
+			 * then use GetVectorFromAtoB() to get node coordinates.
+			 */
+            for (unsigned local_index=0; local_index<num_nodes; local_index++)
+            {
+                c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes);
+                c_vector<double, 2> next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
 
                 double this_x = this_transformed_node_location[0];
                 double this_y = this_transformed_node_location[1];
@@ -680,11 +668,14 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
 
                 temp_centroid_x += (this_x + next_x)*(this_x*next_y - this_y*next_x);
                 temp_centroid_y += (this_y + next_y)*(this_x*next_y - this_y*next_x);
+
+                this_transformed_node_location = next_transformed_node_location;
             }
 
             double vertex_area = GetVolumeOfElement(index);
             double centroid_coefficient = 1.0/(6.0*vertex_area);
 
+            c_vector<double, SPACE_DIM> transformed_centroid = zero_vector<double>(SPACE_DIM);
             transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
             transformed_centroid(1) = centroid_coefficient*temp_centroid_y;
         
@@ -693,11 +684,11 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
         break;
         case 3:
         {
-            for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+            for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
                 centroid += p_element->GetNodeLocation(local_index);
             }
-            centroid /= ((double) num_nodes_in_element);
+            centroid /= ((double) num_nodes);
         }
         break;
         default:
@@ -1043,20 +1034,16 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
     if (SPACE_DIM == 2)
     {
         c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+        c_vector<double, SPACE_DIM> this_transformed_node_location = zero_vector<double>(SPACE_DIM);
 
-        unsigned num_nodes_in_element = p_element->GetNumNodes();
-
-        for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+		/*
+		 * In order to calculate the area we map the origin to (x[0],y[0])
+		 * then use GetVectorFromAtoB() to get node coordiantes
+		 */
+        unsigned num_nodes = p_element->GetNumNodes();
+        for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
-            // Find locations of current node and anticlockwise node
-            c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(local_index);
-            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes_in_element);
-
-            /*
-             * In order to calculate the area we map the origin to (x[0],y[0])
-             * then use GetVectorFromAtoB() to get node coordiantes
-             */
-            c_vector<double, SPACE_DIM> this_transformed_node_location = GetVectorFromAtoB(first_node_location, this_node_location);
+            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes);
             c_vector<double, SPACE_DIM> next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
 
             double this_x = this_transformed_node_location[0];
@@ -1065,6 +1052,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
             double next_y = next_transformed_node_location[1];
 
             element_volume += 0.5*(this_x*next_y - next_x*this_y);
+
+            this_transformed_node_location = next_transformed_node_location;
         }
     }
     else
@@ -1107,12 +1096,12 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
     double surface_area = 0.0;
     if (SPACE_DIM == 2)
     {
-        unsigned num_nodes_in_element = p_element->GetNumNodes();
-        for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+        unsigned num_nodes = p_element->GetNumNodes();
+        for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
             // Find locations of current node and anticlockwise node
             unsigned this_node_index = p_element->GetNodeGlobalIndex(local_index);
-            unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_element);
+            unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index+1)%num_nodes);
 
             surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
         }
@@ -1254,7 +1243,7 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
     assert(SPACE_DIM == 2);
 
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-    unsigned num_nodes_in_element = p_element->GetNumNodes();
+    unsigned num_nodes = p_element->GetNumNodes();
     c_vector<double, 2> centroid = GetCentroidOfElement(index);
 
     c_vector<double, 3> moments = zero_vector<double>(3);
@@ -1262,10 +1251,10 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
     unsigned node_1;
     unsigned node_2;
 
-    for (unsigned local_index=0; local_index<num_nodes_in_element; local_index++)
+    for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
         node_1 = local_index;
-        node_2 = (local_index+1)%num_nodes_in_element;
+        node_2 = (local_index+1)%num_nodes;
 
         // Original position of nodes
         c_vector<double, 2> original_pos_1 = p_element->GetNodeLocation(node_1);
@@ -1275,24 +1264,17 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
         c_vector<double, 2> pos_1 = this->GetVectorFromAtoB(centroid, original_pos_1);
         c_vector<double, 2> pos_2 = this->GetVectorFromAtoB(centroid, original_pos_2);
 
-        // Note these formulae require the polygon to be centered on the origin
+        // Note these formulae require the polygon to be centred at the origin
         double a = pos_1(0)*pos_2(1)-pos_2(0)*pos_1(1);
 
         // Ixx
-        moments(0) += (  pos_1(1)*pos_1(1)
-                       + pos_1(1)*pos_2(1)
-                       + pos_2(1)*pos_2(1) ) * a;
+        moments(0) += (pos_1(1)*pos_1(1) + pos_1(1)*pos_2(1) + pos_2(1)*pos_2(1) ) * a;
 
         // Iyy
-        moments(1) += (  pos_1(0)*pos_1(0)
-                       + pos_1(0)*pos_2(0)
-                       + pos_2(0)*pos_2(0) ) * a;
+        moments(1) += (pos_1(0)*pos_1(0) + pos_1(0)*pos_2(0) + pos_2(0)*pos_2(0)) * a;
 
         // Ixy
-        moments(2) += (  pos_1(0)*pos_2(1)
-                       + 2*pos_1(0)*pos_1(1)
-                       + 2*pos_2(0)*pos_2(1)
-                       + pos_2(0)*pos_1(1) ) * a;
+        moments(2) += (pos_1(0)*pos_2(1) + 2*pos_1(0)*pos_1(1) + 2*pos_2(0)*pos_2(1) + pos_2(0)*pos_1(1)) * a;
     }
 
     moments(0) /= 12;
@@ -1378,7 +1360,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeG
 
     unsigned num_nodes_in_element = pElement->GetNumNodes();
 
-    // We add an extra localIndex-1 in the line below as otherwise this term can be negative, which breaks the % operator
+    // We add an extra num_nodes_in_element-1 in the line below as otherwise this term can be negative, which breaks the % operator
     unsigned previous_local_index = (num_nodes_in_element+localIndex-1)%num_nodes_in_element;
 
     unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);

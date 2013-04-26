@@ -247,12 +247,12 @@ public:
     /**
      * Find the solution of one of the PDEs at a point in space
      *
-     * @param Point the position in space
-     * @param variable the dependent variable of the PDE whose solution you want to find
+     * @param rPoint the position in space
+     * @param rVariable the dependent variable of the PDE whose solution you want to find
      *
      * @return the solution of the required PDE at the given point.
      */
-    double GetPdeSolutionAtPoint(c_vector<double,DIM> Point, std::string variable);
+    double GetPdeSolutionAtPoint(const c_vector<double,DIM>& rPoint, const std::string& rVariable);
 
     /**
      * Find the index of the coarse mesh element containing a given cell.

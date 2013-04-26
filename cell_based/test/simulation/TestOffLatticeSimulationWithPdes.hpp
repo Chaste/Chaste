@@ -830,7 +830,6 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
@@ -1307,7 +1306,6 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);

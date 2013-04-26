@@ -77,7 +77,7 @@ void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteTimeStamp()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
 {
-	*mpOutStream << "\n";
+    *mpOutStream << "\n";
 }
 
 // Explicit instantiation

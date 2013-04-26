@@ -107,13 +107,8 @@ unsigned Cylindrical2dNodesOnlyMesh::AddNode(Node<2>* pNewNode)
 
 c_vector<double, 2> Cylindrical2dNodesOnlyMesh::GetVectorFromAtoB(const c_vector<double, 2>& rLocation1, const c_vector<double, 2>& rLocation2)
 {
-    c_vector<double, 2> location1 = rLocation1;
-    c_vector<double, 2> location2 = rLocation2;
-
-    location1[0] = fmod(location1[0], mWidth);
-    location2[0] = fmod(location2[0], mWidth);
-
-    c_vector<double, 2> vector = location2 - location1;
+    c_vector<double, 2> vector = rLocation2 - rLocation1;
+    vector[0] = fmod(vector[0], mWidth);
 
     /*
      * Handle the cylindrical condition here: if the points are more

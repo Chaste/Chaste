@@ -119,7 +119,6 @@ public:
 
     void TestSimulationTestDoesNotRunOver()
     {
-
         SimulationTime* p_simulation_time = SimulationTime :: Instance();
         p_simulation_time->SetStartTime(0.0);
 

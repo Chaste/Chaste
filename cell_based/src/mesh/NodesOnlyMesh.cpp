@@ -73,7 +73,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
     {
         if (mpBoxCollection->IsOwned(rNodes[i]))
         {
-        	mLocalInitialNodes[i] = true;
+            mLocalInitialNodes[i] = true;
 
             assert(!rNodes[i]->IsDeleted());
             c_vector<double, SPACE_DIM> location = rNodes[i]->rGetLocation();
@@ -98,7 +98,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPAC
 template<unsigned SPACE_DIM>
 std::vector<bool>& NodesOnlyMesh<SPACE_DIM>::rGetInitiallyOwnedNodes()
 {
-	return mLocalInitialNodes;
+    return mLocalInitialNodes;
 }
 
 template<unsigned SPACE_DIM>

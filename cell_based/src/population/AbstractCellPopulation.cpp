@@ -903,6 +903,26 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
     return max_distance_from_centre;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOrderedPair(unsigned index1, unsigned index2)
+{
+    assert(index1 != index2);
+
+    std::pair<unsigned, unsigned> ordered_pair;
+
+    if (index1 < index2)
+    {
+        ordered_pair.first = index1;
+        ordered_pair.second = index2;
+    }
+    else
+    {
+        ordered_pair.first = index2;
+        ordered_pair.second = index1;
+    }
+    return ordered_pair;
+}
+
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////

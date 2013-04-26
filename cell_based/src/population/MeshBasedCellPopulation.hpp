@@ -594,16 +594,6 @@ public:
      *  @param indexB index of second node in pair
      */
     double GetRestLength(unsigned indexA, unsigned indexB);
-
-    /**
-     * @return a pair of indices ordered by node index.
-     * Used by the rest length routines.
-     *
-     * @param index1 a node index
-     * @param index2 a node index
-     */
-    std::pair<unsigned,unsigned> CreateOrderedPair(unsigned index1, unsigned index2);
-
 };
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 

@@ -294,8 +294,8 @@ public:
     }
 
     void TestWritePopulationCellProliferativeTypesCount()         throw (Exception)
-	{
-    	EXIT_IF_PARALLEL;
+    {
+        EXIT_IF_PARALLEL;
 
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
@@ -317,76 +317,76 @@ public:
         cell_population.GenerateCellResults();
 
         std::string output_directory = "TestWriteCellProlifertiveTypesCount";
-		OutputFileHandler output_file_handler(output_directory, false);
+        OutputFileHandler output_file_handler(output_directory, false);
 
-		std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-		/*
-		 * Write cell proliferative types count
-		 */
+        /*
+         * Write cell proliferative types count
+         */
 
-		// Create a cell proliferative types writer and write the files.
-		CellProliferativeTypesCountWriter<3,3> types_count_writer(output_directory);
+        // Create a cell proliferative types writer and write the files.
+        CellProliferativeTypesCountWriter<3,3> types_count_writer(output_directory);
 
-		types_count_writer.OpenOutputFile();
-
-		types_count_writer.WriteTimeStamp();
-
-		types_count_writer.Visit(&cell_population);
-
-        types_count_writer.WriteNewline();
-
-		types_count_writer.CloseFile();
-
-		FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes.dat").CompareFiles();
-
-		// Make sure we can append to files.
-		types_count_writer.OpenOutputFileForAppend();
+        types_count_writer.OpenOutputFile();
 
         types_count_writer.WriteTimeStamp();
 
-		types_count_writer.Visit(&cell_population);
+        types_count_writer.Visit(&cell_population);
 
         types_count_writer.WriteNewline();
 
-		types_count_writer.CloseFile();
+        types_count_writer.CloseFile();
 
-		FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes_twice.dat").CompareFiles();
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes.dat").CompareFiles();
 
-		/*
-		 * Write cell cycle phases count file.
-		 */
-		// Create a node location writer and write the files.
-		CellProliferativePhasesCountWriter<3,3> phases_count_writer(output_directory);
+        // Make sure we can append to files.
+        types_count_writer.OpenOutputFileForAppend();
 
-		phases_count_writer.OpenOutputFile();
+        types_count_writer.WriteTimeStamp();
 
-		phases_count_writer.WriteTimeStamp();
+        types_count_writer.Visit(&cell_population);
 
-		phases_count_writer.Visit(&cell_population);
+        types_count_writer.WriteNewline();
 
-        phases_count_writer.WriteNewline();
+        types_count_writer.CloseFile();
 
-		phases_count_writer.CloseFile();
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/celltypes_twice.dat").CompareFiles();
 
-		FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/cellcyclephases.dat").CompareFiles();
+        /*
+         * Write cell cycle phases count file.
+         */
+        // Create a node location writer and write the files.
+        CellProliferativePhasesCountWriter<3,3> phases_count_writer(output_directory);
 
-		// Make sure we can append to files.
-		phases_count_writer.OpenOutputFileForAppend();
+        phases_count_writer.OpenOutputFile();
 
         phases_count_writer.WriteTimeStamp();
 
-		phases_count_writer.Visit(&cell_population);
+        phases_count_writer.Visit(&cell_population);
 
         phases_count_writer.WriteNewline();
 
-		phases_count_writer.CloseFile();
+        phases_count_writer.CloseFile();
 
-		FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/cellcyclephases_twice.dat").CompareFiles();
-	}
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/cellcyclephases.dat").CompareFiles();
+
+        // Make sure we can append to files.
+        phases_count_writer.OpenOutputFileForAppend();
+
+        phases_count_writer.WriteTimeStamp();
+
+        phases_count_writer.Visit(&cell_population);
+
+        phases_count_writer.WriteNewline();
+
+        phases_count_writer.CloseFile();
+
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestWriteCellProlifertiveTypesCount/cellcyclephases_twice.dat").CompareFiles();
+    }
 
     void TestWriteVoronoiData() throw (Exception)
-	{
+    {
         EXIT_IF_PARALLEL;
 
         std::vector<Node<3>*> nodes;
@@ -407,37 +407,37 @@ public:
         cell_population.CreateVoronoiTessellation();
 
         std::string output_directory = "TestWriteVoronoiFile";
-		OutputFileHandler output_file_handler(output_directory, false);
+        OutputFileHandler output_file_handler(output_directory, false);
 
-		std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-		VoronoiDataWriter<3,3> voronoi_writer(output_directory);
+        VoronoiDataWriter<3,3> voronoi_writer(output_directory);
 
-		voronoi_writer.OpenOutputFile();
-
-		voronoi_writer.WriteTimeStamp();
-
-		voronoi_writer.Visit(&cell_population);
-
-        voronoi_writer.WriteNewline();
-
-		voronoi_writer.CloseFile();
-
-		FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestWriteVoronoiFile/voronoi.dat").CompareFiles();
-
-		// Make sure we can append to files.
-		voronoi_writer.OpenOutputFileForAppend();
+        voronoi_writer.OpenOutputFile();
 
         voronoi_writer.WriteTimeStamp();
 
-		voronoi_writer.Visit(&cell_population);
+        voronoi_writer.Visit(&cell_population);
 
         voronoi_writer.WriteNewline();
 
-		voronoi_writer.CloseFile();
+        voronoi_writer.CloseFile();
 
-		FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestWriteVoronoiFile/voronoi_twice.dat").CompareFiles();
-	}
+        FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestWriteVoronoiFile/voronoi.dat").CompareFiles();
+
+        // Make sure we can append to files.
+        voronoi_writer.OpenOutputFileForAppend();
+
+        voronoi_writer.WriteTimeStamp();
+
+        voronoi_writer.Visit(&cell_population);
+
+        voronoi_writer.WriteNewline();
+
+        voronoi_writer.CloseFile();
+
+        FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestWriteVoronoiFile/voronoi_twice.dat").CompareFiles();
+    }
 
     void TestVertexSwapsWriter()    throw (Exception)
     {

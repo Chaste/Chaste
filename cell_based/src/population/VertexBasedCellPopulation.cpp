@@ -645,20 +645,9 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
             (*p_elem_file) << tetrahedral_elem_index++ << "\t" << node_0_index << "\t" << node_1_index << "\t" << node_2_index << std::endl;
 
             // Add edges to the set if they are not already present
-            std::pair<unsigned, unsigned> edge_0;
-            bool node_0_index_lower_than_node_1_index = (node_0_index < node_1_index);
-            edge_0.first = node_0_index_lower_than_node_1_index ? node_0_index : node_1_index;
-            edge_0.second = node_0_index_lower_than_node_1_index ? node_1_index : node_0_index;
-
-            std::pair<unsigned, unsigned> edge_1;
-            bool node_1_index_lower_than_node_2_index = (node_1_index < node_2_index);
-            edge_1.first = node_1_index_lower_than_node_2_index ? node_1_index : node_2_index;
-            edge_1.second = node_1_index_lower_than_node_2_index ? node_2_index : node_1_index;
-
-            std::pair<unsigned, unsigned> edge_2;
-            bool node_2_index_lower_than_node_0_index = (node_2_index < node_0_index);
-            edge_2.first = node_2_index_lower_than_node_0_index ? node_2_index : node_0_index;
-            edge_2.second = node_2_index_lower_than_node_0_index ? node_0_index : node_2_index;
+            std::pair<unsigned, unsigned> edge_0 = this->CreateOrderedPair(node_0_index, node_1_index);
+            std::pair<unsigned, unsigned> edge_1 = this->CreateOrderedPair(node_1_index, node_2_index);
+            std::pair<unsigned, unsigned> edge_2 = this->CreateOrderedPair(node_2_index, node_0_index);
 
             tetrahedral_edges.insert(edge_0);
             tetrahedral_edges.insert(edge_1);

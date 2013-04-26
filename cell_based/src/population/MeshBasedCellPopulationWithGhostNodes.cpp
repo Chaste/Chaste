@@ -186,7 +186,6 @@ c_vector<double, DIM> MeshBasedCellPopulationWithGhostNodes<DIM>::CalculateForce
     unit_difference = this->mrMesh.GetVectorFromAtoB(node_a_location, node_b_location);
 
     double distance_between_nodes = norm_2(unit_difference);
-
     unit_difference /= distance_between_nodes;
 
     double rest_length = 1.0;

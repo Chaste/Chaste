@@ -112,8 +112,10 @@ protected:
                            bool placeOriginalElementBelow=false);
 
     /**
-     * Helper method for ReMesh to check if any neighbouring nodes in an element are within the mCellRearrangementThreshold
-     * and perform any T1Swaps if required
+     * Helper method for ReMesh().
+     *
+     * This method checks if any neighbouring nodes in an element are within the mCellRearrangementThreshold
+     * and are not contained in any triangular elements, and if so the method calls IdentifySwapType().
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
      *
@@ -181,7 +183,7 @@ protected:
     void PerformT1Swap(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned>& rElementsContainingNodes);
 
     /**
-     * Helper method for ReMesh to perform an element swap to fix overlaping elements
+     * Helper method for ReMesh to perform an element swap to fix overlapping elements
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
      *

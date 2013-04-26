@@ -337,93 +337,93 @@ public:
     }
 
     void TestArchivingOfPdeHandlerOnCuboid() throw(Exception)
-	{
-		EXIT_IF_PARALLEL;
+    {
+        EXIT_IF_PARALLEL;
 
-		FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-		std::string archive_file = "CellBasedPdeHandlerOnCuboid.arch";
-		ArchiveLocationInfo::SetMeshFilename("pde_handler_mesh");
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "CellBasedPdeHandlerOnCuboid.arch";
+        ArchiveLocationInfo::SetMeshFilename("pde_handler_mesh");
 
-		{
-			// Create a cell population
-			HoneycombMeshGenerator generator(2, 2, 0);
-			MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-			NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-			p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        {
+            // Create a cell population
+            HoneycombMeshGenerator generator(2, 2, 0);
+            MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+            p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
-			std::vector<CellPtr> cells;
-			CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-			cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-			NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-			// Create a PDE handler object using this cell population
-			CellBasedPdeHandlerOnCuboid<2>* const p_pde_handler = new CellBasedPdeHandlerOnCuboid<2>(&cell_population);
+            // Create a PDE handler object using this cell population
+            CellBasedPdeHandlerOnCuboid<2>* const p_pde_handler = new CellBasedPdeHandlerOnCuboid<2>(&cell_population);
 
-			// Set member variables for testing
-			p_pde_handler->SetWriteAverageRadialPdeSolution("averaged quantity", 5, true);
-			p_pde_handler->SetImposeBcsOnCoarseBoundary(false);
+            // Set member variables for testing
+            p_pde_handler->SetWriteAverageRadialPdeSolution("averaged quantity", 5, true);
+            p_pde_handler->SetImposeBcsOnCoarseBoundary(false);
 
-			// Set up PDE and pass to handler
-			AveragedSourcePde<2> pde(cell_population, -0.1);
-			ConstBoundaryCondition<2> bc(1.0);
-			PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-			pde_and_bc.SetDependentVariableName("averaged quantity");
-			p_pde_handler->AddPdeAndBc(&pde_and_bc);
+            // Set up PDE and pass to handler
+            AveragedSourcePde<2> pde(cell_population, -0.1);
+            ConstBoundaryCondition<2> bc(1.0);
+            PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+            pde_and_bc.SetDependentVariableName("averaged quantity");
+            p_pde_handler->AddPdeAndBc(&pde_and_bc);
 
-			// Test UseCoarsePdeMesh() again
-			ChastePoint<2> lower(0.0, 0.0);
-			ChastePoint<2> upper(9.0, 9.0);
-			ChasteCuboid<2> cuboid(lower, upper);
-			p_pde_handler->UseCoarsePdeMesh(3.0, cuboid, true);
+            // Test UseCoarsePdeMesh() again
+            ChastePoint<2> lower(0.0, 0.0);
+            ChastePoint<2> upper(9.0, 9.0);
+            ChasteCuboid<2> cuboid(lower, upper);
+            p_pde_handler->UseCoarsePdeMesh(3.0, cuboid, true);
 
-			// Create an output archive
-			ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-			boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+            // Create an output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-			// Archive object
-			SimulationTime* p_simulation_time = SimulationTime::Instance();
-			p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, 11);
-			(*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
-			(*p_arch) << p_pde_handler;
+            // Archive object
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, 11);
+            (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
+            (*p_arch) << p_pde_handler;
 
-			// Tidy up
-			SimulationTime::Destroy();
-			delete p_pde_handler;
-			delete p_mesh;
-		}
+            // Tidy up
+            SimulationTime::Destroy();
+            delete p_pde_handler;
+            delete p_mesh;
+        }
 
-		{
-			CellBasedPdeHandlerOnCuboid<2>* p_pde_handler;
+        {
+            CellBasedPdeHandlerOnCuboid<2>* p_pde_handler;
 
-			// Create an input archive
-			ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-			boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-			// Restore object from the archive
-			SimulationTime* p_simulation_time = SimulationTime::Instance();
-			(*p_arch) >> *p_simulation_time;
-			(*p_arch) >> p_pde_handler;
+            // Restore object from the archive
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            (*p_arch) >> *p_simulation_time;
+            (*p_arch) >> p_pde_handler;
 
-			// Test that the member variables were archived correctly
-			TS_ASSERT_EQUALS(p_pde_handler->mpCellPopulation->GetNumRealCells(), 4u);
-			TS_ASSERT_EQUALS(p_pde_handler->GetWriteAverageRadialPdeSolution(), true);
-			TS_ASSERT_EQUALS(p_pde_handler->GetWriteDailyAverageRadialPdeSolution(), true);
-			TS_ASSERT_EQUALS(p_pde_handler->GetImposeBcsOnCoarseBoundary(), false);
-			TS_ASSERT_EQUALS(p_pde_handler->GetNumRadialIntervals(), 5u);
-			TS_ASSERT_EQUALS(p_pde_handler->mAverageRadialSolutionVariableName, "averaged quantity");
+            // Test that the member variables were archived correctly
+            TS_ASSERT_EQUALS(p_pde_handler->mpCellPopulation->GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(p_pde_handler->GetWriteAverageRadialPdeSolution(), true);
+            TS_ASSERT_EQUALS(p_pde_handler->GetWriteDailyAverageRadialPdeSolution(), true);
+            TS_ASSERT_EQUALS(p_pde_handler->GetImposeBcsOnCoarseBoundary(), false);
+            TS_ASSERT_EQUALS(p_pde_handler->GetNumRadialIntervals(), 5u);
+            TS_ASSERT_EQUALS(p_pde_handler->mAverageRadialSolutionVariableName, "averaged quantity");
 
-			///\todo we currently do not archive mpCoarsePdeMesh - consider doing this (#1891)
-			TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == NULL);
+            ///\todo we currently do not archive mpCoarsePdeMesh - consider doing this (#1891)
+            TS_ASSERT(p_pde_handler->GetCoarsePdeMesh() == NULL);
 
-			TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection.size(), 1u);
-			TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection[0]->IsNeumannBoundaryCondition(), false);
+            TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection.size(), 1u);
+            TS_ASSERT_EQUALS(p_pde_handler->mPdeAndBcCollection[0]->IsNeumannBoundaryCondition(), false);
 
-			// Tidy up
-			delete p_pde_handler->mpCellPopulation;
-			delete p_pde_handler;
-		}
-	}
+            // Tidy up
+            delete p_pde_handler->mpCellPopulation;
+            delete p_pde_handler;
+        }
+    }
 
     void TestUseCoarsePdeMesh() throw(Exception)
     {

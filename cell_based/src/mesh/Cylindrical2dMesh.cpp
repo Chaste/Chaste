@@ -471,13 +471,8 @@ c_vector<double, 2> Cylindrical2dMesh::GetVectorFromAtoB(const c_vector<double, 
 {
     assert(mWidth > 0.0);
 
-    c_vector<double, 2> location1 = rLocation1;
-    c_vector<double, 2> location2 = rLocation2;
-
-    location1[0] = fmod(location1[0], mWidth);
-    location2[0] = fmod(location2[0], mWidth);
-
-    c_vector<double, 2> vector = location2 - location1;
+    c_vector<double, 2> vector = rLocation2 - rLocation1;
+    vector[0] = fmod(vector[0], mWidth);
 
     /*
      * Handle the cylindrical condition here: if the points are more
@@ -630,7 +625,6 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     {
         if (temp_right_hand_side_elements.size() == 2 && temp_left_hand_side_elements.size() == 2)
         {
-
             if (temp_right_hand_side_elements.size() == 2)
             {
                 // Use the right hand side meshing and map to left

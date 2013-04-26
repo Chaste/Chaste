@@ -86,7 +86,6 @@ protected:
      *
      * @param index the global index of the node
      * @return local index
-     *
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
@@ -248,20 +247,6 @@ public:
      * Delete mNodes and mElements.
      */
     virtual void Clear();
-
-    /**
-     * Overridden GetVectorFromAtoB() method. Returns a vector between two points in space.
-     *
-     * If the mesh is being used to represent a Voronoi tessellation, and mpDelaunayMesh
-     * is not NULL, then use that to compute GetVectorFromAtoB.
-     *
-     * @param rLocationA a c_vector of coordinates
-     * @param rLocationB a c_vector of coordinates
-     *
-     * @return c_vector from location A to location B.
-     */
-    virtual c_vector<double, DIM> GetVectorFromAtoB(const c_vector<double, DIM>& rLocationA,
-                                                    const c_vector<double, DIM>& rLocationB);
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of a PottsElement.

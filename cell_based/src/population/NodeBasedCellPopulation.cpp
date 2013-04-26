@@ -700,8 +700,8 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
     if (!PetscTools::AmMaster())
     {
         for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvLeft->begin();
-                iter != mpCellsRecvLeft->end();
-                ++iter)
+             iter != mpCellsRecvLeft->end();
+             ++iter)
         {
             AddMovedCell((*iter).first, (*iter).second);
         }
@@ -709,8 +709,8 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
     if (!PetscTools::AmTopMost())
     {
         for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvRight->begin();
-                iter != mpCellsRecvRight->end();
-                ++iter)
+             iter != mpCellsRecvRight->end();
+             ++iter)
         {
             AddMovedCell((*iter).first, (*iter).second);
         }
@@ -733,15 +733,15 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
     SendCellsToNeighbourProcesses();
 
     for (std::vector<unsigned>::iterator iter = nodes_to_send_right.begin();
-            iter != nodes_to_send_right.end();
-            ++iter)
+         iter != nodes_to_send_right.end();
+         ++iter)
     {
         DeleteMovedCell(*iter);
     }
 
     for (std::vector<unsigned>::iterator iter = nodes_to_send_left.begin();
-            iter != nodes_to_send_left.end();
-            ++iter)
+         iter != nodes_to_send_left.end();
+         ++iter)
     {
         DeleteMovedCell(*iter);
     }
@@ -752,7 +752,7 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::RefreshHaloCells()
 {
-	mpNodesOnlyMesh->ClearHaloNodes();
+    mpNodesOnlyMesh->ClearHaloNodes();
 
     mHaloCells.clear();
     mHaloCellLocationMap.clear();

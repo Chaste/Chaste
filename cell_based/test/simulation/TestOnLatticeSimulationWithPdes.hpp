@@ -222,7 +222,6 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
@@ -464,18 +463,18 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-        	c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
 
-        	if (cell_location[1] < 1e-6 || cell_location[1] > 9 - 1e-6)
-        	{
-        		TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_dirichlet"),1.0, 1e-2);
-        		TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.5, 1e-2);
-        	}
-        	else
-        	{
-        		TS_ASSERT_LESS_THAN(1.0,cell_iter->GetCellData()->GetItem("nutrient_dirichlet"));
-        		TS_ASSERT_LESS_THAN(0.5,cell_iter->GetCellData()->GetItem("nutrient_neumann"));
-        	}
+            if (cell_location[1] < 1e-6 || cell_location[1] > 9 - 1e-6)
+            {
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_dirichlet"),1.0, 1e-2);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.5, 1e-2);
+            }
+            else
+            {
+                TS_ASSERT_LESS_THAN(1.0,cell_iter->GetCellData()->GetItem("nutrient_dirichlet"));
+                TS_ASSERT_LESS_THAN(0.5,cell_iter->GetCellData()->GetItem("nutrient_neumann"));
+            }
         }
     }
 

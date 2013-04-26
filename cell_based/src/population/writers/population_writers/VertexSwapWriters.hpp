@@ -51,70 +51,70 @@ class VertexT3SwapLocationsWriter : public AbstractCellPopulationWriter<ELEMENT_
 public:
 
     /**
-     * Default constructor
+     * Default constructor.
+     *
      * @param directory the path to the directory in to which this class should write.
      */
-	VertexT3SwapLocationsWriter(std::string directory)
-		:        AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "T3SwapLocations.dat";
-	}
+    VertexT3SwapLocationsWriter(std::string directory)
+        : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "T3SwapLocations.dat";
+    }
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the vertex based cell population population to visit.
      */
-	virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-	{
-		std::vector< c_vector<double, SPACE_DIM> > t3_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT3Swaps();
+    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    {
+        std::vector< c_vector<double, SPACE_DIM> > t3_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT3Swaps();
 
-		*this->mpOutStream << t3_swap_locations.size() << "\t";
-		for (unsigned index = 0;  index < t3_swap_locations.size(); index++)
-		{
-			for (unsigned i=0; i<SPACE_DIM; i++)
-			{
+        *this->mpOutStream << t3_swap_locations.size() << "\t";
+        for (unsigned index = 0;  index < t3_swap_locations.size(); index++)
+        {
+            for (unsigned i=0; i<SPACE_DIM; i++)
+            {
+                *this->mpOutStream << t3_swap_locations[index][i] << "\t";
+            }
+        }
 
-				*this->mpOutStream << t3_swap_locations[index][i] << "\t";
-			}
-		}
-
-		pCellPopulation->rGetMesh().ClearLocationsOfT3Swaps();
-	}
+        pCellPopulation->rGetMesh().ClearLocationsOfT3Swaps();
+    }
 
     /**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the mesh based cell population population to visit.
-	 */
-	virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
-	{
-	}
-
-	/**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
-	 */
-	virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
+     */
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
     }
 
-	/**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the node based cell population population to visit.
-	 */
-	virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    /**
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
+     */
+    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
     }
 
-	/**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the potts based cell population population to visit.
-	 */
-	virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    /**
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the node based cell population population to visit.
+     */
+    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    {
+    }
+
+    /**
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the potts based cell population population to visit.
+     */
+    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
     }
 };
@@ -130,11 +130,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	VertexT1SwapLocationsWriter(std::string directory)
-			:        AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-			this->mFileName = "T1SwapLocations.dat";
-	}
+    VertexT1SwapLocationsWriter(std::string directory)
+        : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+            this->mFileName = "T1SwapLocations.dat";
+    }
 
     /**
      * Visit the population and write the data.
@@ -150,7 +150,6 @@ public:
         {
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
-
                 *this->mpOutStream << t1_swap_locations[index][i] << "\t";
             }
         }
@@ -159,38 +158,38 @@ public:
     }
 
     /**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the mesh based cell population population to visit.
-	 */
-	virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
+     */
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
     }
 
-	/**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
-	 */
-	virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    /**
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
+     */
+    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
     }
 
-	/**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the node based cell population population to visit.
-	 */
-	virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    /**
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the node based cell population population to visit.
+     */
+    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
     }
 
-	/**
-	 * Visit the population and write the data.
-	 *
-	 * @param pCellPopulation a pointer to the potts based cell population population to visit.
-	 */
-	virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+    /**
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the potts based cell population population to visit.
+     */
+    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
     }
 };

@@ -188,14 +188,6 @@ c_vector<double, DIM> PottsMesh<DIM>::GetCentroidOfElement(unsigned index)
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> PottsMesh<DIM>::GetVectorFromAtoB(const c_vector<double, DIM>& rLocationA, const c_vector<double, DIM>& rLocationB)
-{
-    c_vector<double, DIM> vector = AbstractMesh<DIM, DIM>::GetVectorFromAtoB(rLocationA, rLocationB);
-
-    return vector;
-}
-
-template<unsigned DIM>
 double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
     PottsElement<DIM>* p_element = GetElement(index);

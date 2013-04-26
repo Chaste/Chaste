@@ -304,8 +304,8 @@ public:
         std::string node_file = "results.viznodes";
         if (std::string(ChasteBuildInfo::GetCompilerType())=="intel")
         {
-        	node_file += "_intel";
-        	element_file += "_intel";
+            node_file += "_intel";
+            element_file += "_intel";
         }
 
         NumericFileComparison comp_ele(results_dir + "/results.vizelements", "crypt/test/data/TestResultsFileForLongerCryptSimulation/" + element_file);

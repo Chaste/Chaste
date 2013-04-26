@@ -49,11 +49,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellProliferativeTypesWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "results.vizcelltypes";
-	}
+    CellProliferativeTypesWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "results.vizcelltypes";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -82,7 +82,7 @@ public:
             colour = APOPTOSIS_COLOUR;
         }
 
-    	*this->mpOutStream << colour << " ";
+        *this->mpOutStream << colour << " ";
     }
 };
 
@@ -96,11 +96,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellAgesWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "cellages.dat";
-	}
+    CellAgesWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "cellages.dat";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -136,11 +136,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellAncestorWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-			this->mFileName = "results.vizancestors";
-	}
+    CellAncestorWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+            this->mFileName = "results.vizancestors";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -154,7 +154,7 @@ public:
         if (ancestor == UNSIGNED_UNSET)
         {
             // Set the file to -1 to mark this case.
-    		ancestor = 1;
+            ancestor = 1;
             *this->mpOutStream << "-";
         }
         *this->mpOutStream << ancestor << " ";
@@ -171,11 +171,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellIdWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-			this->mFileName = "loggedcell.dat";
-	}
+    CellIdWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+            this->mFileName = "loggedcell.dat";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -207,11 +207,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellLocationWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "results.vizlocations";
-	}
+    CellLocationWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "results.vizlocations";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -221,9 +221,9 @@ public:
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
-    	unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+        unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
 
-    	*this->mpOutStream << location_index << " ";
+        *this->mpOutStream << location_index << " ";
     }
 };
 
@@ -237,11 +237,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellProliferativePhasesWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "results.vizcellphases";
-	}
+    CellProliferativePhasesWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "results.vizcellphases";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -251,7 +251,7 @@ public:
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
-    	*this->mpOutStream << pCell->GetCellCycleModel()->GetCurrentCellCyclePhase() << " ";
+        *this->mpOutStream << pCell->GetCellCycleModel()->GetCurrentCellCyclePhase() << " ";
     }
 };
 
@@ -265,11 +265,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellVariablesWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "cellvariables.dat";
-	}
+    CellVariablesWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "cellvariables.dat";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -279,18 +279,18 @@ public:
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
-    	if (dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))
-    	{
-    		// Write location index corresponding to cell
-    		*this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
+        if (dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))
+        {
+            // Write location index corresponding to cell
+            *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
 
-    		// Write cell variables
-    		std::vector<double> proteins = (static_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))->GetProteinConcentrations();
-    		for (unsigned i=0; i<proteins.size(); i++)
-    		{
-    				*this->mpOutStream << proteins[i] << " ";
-    		}
-    	}
+            // Write cell variables
+            std::vector<double> proteins = (static_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))->GetProteinConcentrations();
+            for (unsigned i=0; i<proteins.size(); i++)
+            {
+                    *this->mpOutStream << proteins[i] << " ";
+            }
+        }
     }
 };
 
@@ -304,11 +304,11 @@ public:
      * Default constructor
      * @param directory the path to the directory in to which this class should write.
      */
-	CellVolumesWriter(std::string directory)
-		: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
-	{
-		this->mFileName = "cellareas.dat";
-	}
+    CellVolumesWriter(std::string directory)
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    {
+        this->mFileName = "cellareas.dat";
+    }
 
     /**
      * Visit a cell and write its data.
@@ -318,13 +318,13 @@ public:
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
-    	unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
-    	unsigned cell_id = pCell->GetCellId();
-    	c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-    	double volume = pCellPopulation->GetVolumeOfCell(pCell);
+        unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+        unsigned cell_id = pCell->GetCellId();
+        c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
+        double volume = pCellPopulation->GetVolumeOfCell(pCell);
 
-    	if (volume < DBL_MAX)   // Only write cells with finite volume (avoids a case for boundary cells in MeshBasedCellPopulation)
-    	{
+        if (volume < DBL_MAX)   // Only write cells with finite volume (avoids a case for boundary cells in MeshBasedCellPopulation)
+        {
             *this->mpOutStream << location_index << " " << cell_id << " ";
             for (unsigned i=0; i<SPACE_DIM; i++)
             {
@@ -332,7 +332,7 @@ public:
             }
 
             *this->mpOutStream << volume << " ";
-    	}
+        }
     }
 };
 

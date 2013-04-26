@@ -86,9 +86,8 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DI
                 Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
                 double signed_distance = inner_prod(cell_location - mPointOnPlane, mNormalToPlane);
-                if ( signed_distance > 0.0)
+                if (signed_distance > 0.0)
                 {
-
                     // For the closest point on the plane we travel from cell_location the signed_distance in the direction of -mNormalToPlane
                     c_vector<double, DIM> nearest_point = cell_location - signed_distance*mNormalToPlane;
                     p_node->rGetModifiableLocation() = nearest_point;

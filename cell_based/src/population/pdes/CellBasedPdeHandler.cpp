@@ -738,7 +738,7 @@ void CellBasedPdeHandler<DIM>::WriteAverageRadialPdeSolution(double time)
 }
 
 template<unsigned DIM>
-double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> point, std::string variable)
+double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(const c_vector<double,DIM>& rPoint, const std::string& rVariable)
 {
     double solution_at_point = 0.0;
 
@@ -747,7 +747,7 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> poin
     // Loop over elements of mPdeAndBcCollection to find correct PDE
     for (unsigned i=0; i<mPdeAndBcCollection.size(); i++)
     {
-        if (mPdeAndBcCollection[i]->rGetDependentVariableName() == variable)
+        if (mPdeAndBcCollection[i]->rGetDependentVariableName() == rVariable)
         {
             pde_index = i;
             break;
@@ -755,17 +755,16 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> poin
     }
     if (pde_index == UINT_MAX)
     {
-        EXCEPTION("Tried to get the solution of a variable name: " + variable + ". There is no PDE with that variable.");
+        EXCEPTION("Tried to get the solution of a variable name: " + rVariable + ". There is no PDE with that variable.");
     }
     PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
-
 
     Element<DIM,DIM>* p_containing_element;
 
     if (mpCoarsePdeMesh != NULL)
     {
-        // find PDE element containing point
-        unsigned elem_index = mpCoarsePdeMesh->GetContainingElementIndex(ChastePoint<DIM>(point));
+        // Find PDE element containing point
+        unsigned elem_index = mpCoarsePdeMesh->GetContainingElementIndex(ChastePoint<DIM>(rPoint));
         p_containing_element = mpCoarsePdeMesh->GetElement(elem_index);
     }
     else // Tetrahedral mesh
@@ -773,7 +772,7 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> poin
         // If not using a coarse PDE mesh, we must be using a MeshBasedCellPopulation
         TetrahedralMesh<DIM,DIM>* p_tetrahedral_mesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(mpCellPopulation)->rGetMesh());
 
-        unsigned elem_index = p_tetrahedral_mesh->GetContainingElementIndex(ChastePoint<DIM>(point));
+        unsigned elem_index = p_tetrahedral_mesh->GetContainingElementIndex(ChastePoint<DIM>(rPoint));
         p_containing_element = p_tetrahedral_mesh->GetElement(elem_index);
     }
 
@@ -781,7 +780,7 @@ double CellBasedPdeHandler<DIM>::GetPdeSolutionAtPoint(c_vector<double,DIM> poin
     if (p_pde_and_bc->GetSolution())
     {
         ReplicatableVector solution_repl(p_pde_and_bc->GetSolution());
-        c_vector<double,DIM+1> weights = p_containing_element->CalculateInterpolationWeights(point);
+        c_vector<double,DIM+1> weights = p_containing_element->CalculateInterpolationWeights(rPoint);
         for (unsigned i=0; i<DIM+1; i++)
         {
             double nodal_value = solution_repl[p_containing_element->GetNodeGlobalIndex(i)];

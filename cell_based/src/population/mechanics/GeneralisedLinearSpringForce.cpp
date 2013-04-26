@@ -78,8 +78,8 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     c_vector<double, SPACE_DIM> node_b_location = p_node_b->rGetLocation();
 
     // Get the node radii for a NodeBasedCellPopulation
-    double node_a_radius=0.0;
-    double node_b_radius=0.0;
+    double node_a_radius = 0.0;
+    double node_b_radius = 0.0;
 
     if (dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation))
     {
@@ -96,7 +96,6 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
      * periodic boundary in Cylindrical2dMesh).
      */
     unit_difference = rCellPopulation.rGetMesh().GetVectorFromAtoB(node_a_location, node_b_location);
-
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);

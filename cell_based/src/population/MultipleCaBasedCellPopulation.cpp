@@ -258,16 +258,15 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
     unsigned counter;
     for (counter=0; counter < num_neighbours; counter++)
     {
-
         total_probability += neighbouring_node_propensities[counter];
         if (total_probability >= random_number)
         {
-            //Divide the parent cell to this neighbour location
+            // Divide the parent cell to this neighbour location
             daughter_node_index = neighbouring_node_indices_vector[counter];
             break;
         }
     }
-    // This loop should always break as sum(neighbouring_node_propensities)=1.
+    // This loop should always break as sum(neighbouring_node_propensities) = 1
 
     assert(daughter_node_index != UNSIGNED_UNSET);
     assert(daughter_node_index < this->mrMesh.GetNumNodes());

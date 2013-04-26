@@ -510,7 +510,6 @@ public:
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
-
             // This time check the * operator
             unsigned element_index = (*iter).GetIndex();
             TS_ASSERT_EQUALS(counter+1, element_index); // assumes the iterator will give elements 0,1..,N in that order

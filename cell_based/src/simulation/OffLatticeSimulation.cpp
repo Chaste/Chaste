@@ -102,13 +102,11 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
     // Clear all forces
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
-            node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         node_iter->ClearAppliedForce();
     }
-
-/**\todo Is it faster to preallocate and have forces as a member variable? see #1890**/
 
     // Now add force contributions from each AbstractForce
     for (typename std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mForceCollection.begin();
@@ -254,10 +252,9 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
      * e.g. in the case of immotile cells)
      */
     std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
-
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
-            node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         old_node_locations[&(*node_iter)] = (node_iter)->rGetLocation();
     }

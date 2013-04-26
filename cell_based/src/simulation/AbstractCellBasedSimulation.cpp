@@ -295,10 +295,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         EXCEPTION("SetEndTime has not yet been called.");
     }
 
-    /*Note that mDt is used here for "ideal time step".  If this step doesn't divide the time remaining then
-     * a *different* time step will be taken by the time-stepper.  The real time-step (used in the SimulationTime
-     * singleton is currently not available to this class!
-     * Should we over-write the value of mDt, or should we change this behaviour? \todo #2159
+    /*
+     * Note that mDt is used here for "ideal time step". If this step doesn't divide the time remaining
+     * then a *different* time step will be taken by the time-stepper. The real time-step (used in the
+     * SimulationTime singleton) is currently not available to this class.
+     *
+     * \todo Should we over-write the value of mDt, or change this behaviour? (see #2159)
      */
     unsigned num_time_steps = (unsigned) ((mEndTime-current_time)/mDt+0.5);
     if (current_time > 0) // use the reset function if necessary
@@ -356,25 +358,31 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
             *this->mpVizSetupFile << "PDE \n";
         }
 
-        // If any PDEs have been defined, solve them here before updating cells and store their solution in results files.
-        // This also initializes the relevant CellData. NOTE that this works as the PDEs are elliptic
+        /*
+         * If any PDEs have been defined, solve them here before updating cells and store
+         * their solution in results files. This also initializes the relevant CellData.
+         * NOTE that this works as the PDEs are elliptic.
+         */
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::PDE);
         mpCellBasedPdeHandler->SolvePdeAndWriteResultsToFile(this->mSamplingTimestepMultiple);
         CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
     }
 
-
     SetupSolve();
 
-    // Age the cells to the correct time. Note that cells are created with
-    // negative birth times so that some are initially almost ready to divide.
+    /*
+     * Age the cells to the correct time. Note that cells are created with
+     * negative birth times so that some are initially almost ready to divide.
+     */
     LOG(1, "Setting up cells...");
     for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
     {
-        // We don't use the result; this call is just to force the cells to age
-        // to the current time running their cell-cycle models to get there
+        /*
+         * We don't use the result; this call is just to force the cells to age
+         * to the current time running their cell-cycle models to get there.
+         */
         cell_iter->ReadyToDivide();
     }
     LOG(1, "\tdone\n");
@@ -388,11 +396,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     }
 
     mrCellPopulation.WriteResultsToFiles();
-
     OutputSimulationSetup();
-
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
-
 
     // Enter main time loop
     while (!( p_simulation_time->IsFinished() || StoppingEventHasOccurred() ) )
@@ -435,8 +440,11 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     LOG(1, "--END TIME = " << p_simulation_time->GetTime() << "\n");
 
-    // Carry out a final update so that cell population is coherent with new cell positions.
-    // NB cell birth/death still need to be checked because they may be spatially-dependent.
+    /*
+     * Carry out a final update so that cell population is coherent with new cell positions.
+     * Note that cell birth and death still need to be checked because they may be spatially
+     * dependent.
+     */
     UpdateCellPopulation();
 
     // If any PDEs have been defined, close the results files storing their solution
