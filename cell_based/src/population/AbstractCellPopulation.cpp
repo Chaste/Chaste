@@ -616,66 +616,69 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles()
 {
-    ResetCellCounters();
-
-    GenerateCellResults();
-
-    PetscTools::BeginRoundRobin();
+    if (!(mCellWriters.empty() && mCellPopulationWriters.empty()))
     {
-        OpenWritersFilesForAppend();
+        ResetCellCounters();
 
-        // The master writes time stamps.
-        if (PetscTools::AmMaster())
+        GenerateCellResults();
+
+        PetscTools::BeginRoundRobin();
         {
-            for (unsigned i=0; i<mCellWriters.size(); i++)
+            OpenWritersFilesForAppend();
+
+            // The master writes time stamps.
+            if (PetscTools::AmMaster())
             {
-                mCellWriters[i]->WriteTimeStamp();
+                for (unsigned i=0; i<mCellWriters.size(); i++)
+                {
+                    mCellWriters[i]->WriteTimeStamp();
+                }
+                for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+                {
+                    mCellPopulationWriters[i]->WriteTimeStamp();
+                }
             }
+
+            // Every process writes to file.
             for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
             {
-                mCellPopulationWriters[i]->WriteTimeStamp();
+                AcceptPopulationWriter(mCellPopulationWriters[i]);
             }
-        }
-
-        // Every process writes to file.
-        for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
-        {
-            AcceptPopulationWriter(mCellPopulationWriters[i]);
-        }
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-                cell_iter != this->End();
-                ++cell_iter)
-        {
-            for (unsigned i=0; i<mCellWriters.size(); i++)
+            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+                    cell_iter != this->End();
+                    ++cell_iter)
             {
-                AcceptCellWriter(mCellWriters[i], *cell_iter);
+                for (unsigned i=0; i<mCellWriters.size(); i++)
+                {
+                    AcceptCellWriter(mCellWriters[i], *cell_iter);
+                }
             }
-        }
 
-        // The top-most adds a newline
-        if (PetscTools::AmTopMost())
-        {
-            for (unsigned i=0; i<mCellWriters.size(); i++)
+            // The top-most adds a newline
+            if (PetscTools::AmTopMost())
             {
-                mCellWriters[i]->WriteNewline();
+                for (unsigned i=0; i<mCellWriters.size(); i++)
+                {
+                    mCellWriters[i]->WriteNewline();
+                }
+                for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
+                {
+                    mCellPopulationWriters[i]->WriteNewline();
+                }
             }
+
+            // Then the files are closed.
             for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
             {
-                mCellPopulationWriters[i]->WriteNewline();
+                mCellPopulationWriters[i]->CloseFile();
+            }
+            for (unsigned i=0; i<mCellWriters.size(); i++)
+            {
+                mCellWriters[i]->CloseFile();
             }
         }
-
-        // Then the files are closed.
-        for (unsigned i=0; i<mCellPopulationWriters.size(); i++)
-        {
-            mCellPopulationWriters[i]->CloseFile();
-        }
-        for (unsigned i=0; i<mCellWriters.size(); i++)
-        {
-            mCellWriters[i]->CloseFile();
-        }
+        PetscTools::EndRoundRobin();
     }
-    PetscTools::EndRoundRobin();
 
     // VTK can only be written in 2 or 3 dimensions.
     if (SPACE_DIM > 1)
