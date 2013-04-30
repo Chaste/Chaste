@@ -612,7 +612,7 @@ T SecondInvariant(const c_matrix<T, 2, 2>& rM)
  * Caveat: if there are zero eigenvalues they are ignored.
  * It's the smallest magnitude non-zero real eigenvalue which is used.
  *
- * @param rA 3x3 matrix is question
+ * @param rA 3x3 matrix is question.  This should be symmetric and positive definite.
  * @return 3-vector corresponding to right-eigenvector in question
  */
 c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA);

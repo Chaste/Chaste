@@ -341,26 +341,26 @@ public:
          * sudo apt-get install libatlas3gf-sse
          */
         c_matrix<double, 3, 3> A;
-        A(0,0) = 2.4;
+        A(0,0) = 22.4;
         A(0,1) = 5;
-        A(0,2) = 5;
+        A(0,2) = 6;
         A(1,0) = 5;
         A(1,1) = 6;
         A(1,2) = 7;
         A(2,0) = 6;
-        A(2,1) = 8;
+        A(2,1) = 7;
         A(2,2) = 9;
 
-        double smallest_eigenvalue = -0.0096002162399060342324;
+        double smallest_eigenvalue = 0.3403300709235;
 
         c_vector<double, 3> eigenvector;
 
         eigenvector = CalculateEigenvectorForSmallestNonzeroEigenvalue(A);
 
         /*
-         * It's important that eigenvector is non-zero. If eigenvector has been
+         * It's important to check that eigenvector is non-zero. If eigenvector has been
          * zero-initialised and CalculateEigenvectorForSmallestNonzeroEigenvalue
-         * does *nothing* then Au=lambda.u for any lambda.
+         * did *nothing* then Au=lambda.u for any lambda.
          */
         double norm_of_eigenvector = norm_2(eigenvector);
         double delta = 1e-12;
@@ -372,6 +372,39 @@ public:
         TS_ASSERT_DELTA( a_times_eigenvector[0], smallest_eigenvalue*eigenvector[0], delta);
         TS_ASSERT_DELTA( a_times_eigenvector[1], smallest_eigenvalue*eigenvector[1], delta);
         TS_ASSERT_DELTA( a_times_eigenvector[2], smallest_eigenvalue*eigenvector[2], delta);
+
+        //Diagonal matrix with eigenvalues 10.0, -0.5 and 0.0
+        //Associated eigenvectors are x, y and z
+        c_matrix<double, 3, 3> singular;
+        singular(0,0) = 10.0;
+        singular(0,1) = 0.0;
+        singular(0,2) = 0.0;
+        singular(1,0) = 0.0;
+        singular(1,1) = 0.0;
+        singular(1,2) = 0.0;
+        singular(2,0) = 0.0;
+        singular(2,1) = 0.0;
+        singular(2,2) = 0.5;
+
+        eigenvector = CalculateEigenvectorForSmallestNonzeroEigenvalue(singular);
+        TS_ASSERT_DELTA( 0.0, eigenvector[0], delta);
+        TS_ASSERT_DELTA( 0.0, eigenvector[1], delta);
+        TS_ASSERT_DELTA( 1.0, eigenvector[2], delta);
+
+        c_matrix<double, 3, 3> non_symmetric;
+        non_symmetric(0,0) = 0.0;
+        non_symmetric(0,1) = 0.0;
+        non_symmetric(0,2) = 0.0;
+        non_symmetric(1,0) = 0.0;
+        non_symmetric(1,1) = 10.0;
+        non_symmetric(1,2) = 0.0;
+        non_symmetric(2,0) = 0.0;
+        non_symmetric(2,1) = -100.0;
+        non_symmetric(2,2) = 0.5;
+
+        TS_ASSERT_THROWS_THIS(CalculateEigenvectorForSmallestNonzeroEigenvalue(non_symmetric),
+                              "Matrix should be symmetric");
+
     }
 };
 
