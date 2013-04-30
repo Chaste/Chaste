@@ -980,7 +980,7 @@ public:
     /**
      *  Same as TestSolveWithNonZeroBoundaryConditions()
      *  but using sliding boundary conditions, in order to test
-     *  that sliding boundary conditions are implemented correcty
+     *  that sliding boundary conditions are implemented correctly
      *
      *  Choosing the deformation x=X/lambda, y=lambda*Y, with a
      *  Mooney-Rivlin material, then
@@ -1292,10 +1292,6 @@ public:
                 solver.rGetCurrentSolution()[3*iter->GetIndex()+2] =  2*c1*lambda*lambda;
             }
         }
-
-        /* HOW_TO_TAG Continuum mechanics
-         * Get or output stresses during a solve
-         */
 
         // get the solver to save the stresses on each element (averaged over quad point stresses)
         solver.SetComputeAverageStressPerElementDuringSolve();
