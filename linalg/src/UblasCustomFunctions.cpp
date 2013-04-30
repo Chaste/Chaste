@@ -126,67 +126,65 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
     c_matrix<double,3,3> copy_A(rA);
     //Eigenvalue 1
     c_vector<double, 3> eigenvec1 = scalar_vector<double>(3, 1.0);
-    double eigen, norm;
-    //Eigenvector
-    eigen=DBL_MAX;
-    norm=0.0;
-    while (fabs(eigen - norm) >DBL_EPSILON) //Machine precision
-    {
-        eigen = norm;
-        eigenvec1 = prod(copy_A, eigenvec1);
-        norm = norm_2(eigenvec1);
-        eigenvec1 /= norm;
-    }
-    double eigen1 = eigen;
+
+    double eigen1 = CalculateMaxEigenpair(copy_A, eigenvec1);
 
     // Take out maximum eigenpair
     c_matrix<double, 3, 3> wielandt_reduce_first_vector = identity_matrix<double>(3,3);
     wielandt_reduce_first_vector -= outer_prod(eigenvec1, eigenvec1);
     copy_A = prod(wielandt_reduce_first_vector, copy_A);
 
-    //Eigenvalue 2
-    //Eigenvector
-    eigen=DBL_MAX;
-    norm=0.0;
     c_vector<double, 3> eigenvec2 = scalar_vector<double>(3, 1.0);
-    while (fabs(eigen - norm) >DBL_EPSILON) //Machine precision
-    {
-        eigen = norm;
-        eigenvec2 = prod(copy_A, eigenvec2);
-        norm = norm_2(eigenvec2);
-        eigenvec2 /= norm;
-    }
-    double eigen2 = eigen;
+    double eigen2 = CalculateMaxEigenpair(copy_A, eigenvec2);
 
-    // Take out maximum eigenpair
+    // Take out maximum (second) eigenpair
     c_matrix<double, 3, 3> wielandt_reduce_second_vector = identity_matrix<double>(3,3);
     wielandt_reduce_second_vector -= outer_prod(eigenvec2, eigenvec2);
     copy_A = prod(wielandt_reduce_second_vector, copy_A);
-    //Eigenvalue 3
-    //Eigenvector
-    eigen=DBL_MAX;
-    norm=0.0;
+
     c_vector<double, 3> eigenvec3 = scalar_vector<double>(3, 1.0);
-    while (fabs(eigen - norm) >DBL_EPSILON) //Machine precision
-    {
-        eigen = norm;
-        eigenvec3 = prod(copy_A, eigenvec3);
-        norm = norm_2(eigenvec3);
-        eigenvec3 /= norm;
-    }
+    double eigen3 = CalculateMaxEigenpair(copy_A, eigenvec3);
+
     //Check that we can do as well as LAPACK geev
-    if (eigen >= DBL_EPSILON)
+    if (eigen3 >= DBL_EPSILON)
     {
-        assert(CompareDoubles::WithinAbsoluteTolerance(eigen, min_eigenvalue, 4*DBL_EPSILON));
+        assert(CompareDoubles::WithinAbsoluteTolerance(eigen3, min_eigenvalue, 4*DBL_EPSILON));
+        //eigenvec3;
     }
     else if (eigen2>=DBL_EPSILON)
     {
         assert(CompareDoubles::WithinAbsoluteTolerance(eigen2, min_eigenvalue, 4*DBL_EPSILON));
+        eigenvec3 = eigenvec2;
     }
     else
     {
         assert(CompareDoubles::WithinAbsoluteTolerance(eigen1, min_eigenvalue, 4*DBL_EPSILON));
+        eigenvec3 = eigenvec1;
     }
+    //We either got what LAPACK got or we got its negation
+    assert( norm_2(eigenvec3 - output) < 10*DBL_EPSILON || norm_2(eigenvec3 + output) < 10*DBL_EPSILON);
+
 
     return output;
 }
+
+double CalculateMaxEigenpair(c_matrix<double, 3, 3>& rA, c_vector<double, 3>& rEigenvector)
+{
+    double norm = 0.0;
+    double step = DBL_MAX;
+    while (step > DBL_EPSILON) //Machine precision
+    {
+        c_vector<double, 3> old_value(rEigenvector);
+        rEigenvector = prod(rA, rEigenvector);
+        norm = norm_2(rEigenvector);
+        rEigenvector /= norm;
+        if (norm < DBL_EPSILON)
+        {
+            //We don't care about a zero eigenvector, so don't polish it
+            break;
+        }
+        step = norm_inf(rEigenvector-old_value);
+    }
+    return norm;
+}
+

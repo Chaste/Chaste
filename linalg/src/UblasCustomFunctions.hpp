@@ -617,7 +617,15 @@ T SecondInvariant(const c_matrix<T, 2, 2>& rM)
  */
 c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA);
 
-//COMMON VECTOR FUNCTIONS
+/**
+ * Helper function to get maximum eigenpair from a 3x3 matrix by the power method
+ * @param rA 3x3 matrix is question.
+ * @param rEigenVector a guess eigenvector which will be refined
+ * @return the maximum eigenvalue
+ */
+double CalculateMaxEigenpair(c_matrix<double, 3, 3>& rA, c_vector<double, 3>& rEigenvector);
+
+                             //COMMON VECTOR FUNCTIONS
 
 /**
  * This is a cross-product aka vector-product, only implemented for 3-vectors.
