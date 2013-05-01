@@ -332,14 +332,6 @@ public:
 
     void TestEigenVectorValueCalculation() throw(Exception)
     {
-        /**
-         * \todo FATAL ERROR on Lapack call
-         * On some versions of Ubuntu this test (and a cardiac test) which use a Lapack
-         * call to calculate the Eigenvectors of a small matrix may SEGFAULT with a
-         * fatal error.
-         * This may be resolved by adding a suitable Atlas package e.g.
-         * sudo apt-get install libatlas3gf-sse
-         */
         c_matrix<double, 3, 3> A;
         A(0,0) = 22.4;
         A(0,1) = 5;

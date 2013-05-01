@@ -49,13 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 
-#include "petsc.h"
-#include "petscblaslapack.h"
-//Promote universal LAPACK name if it's an old version of PETSc
-#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-#define LAPACKgeev_ LAgeev_
-#endif
-
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
@@ -607,7 +600,7 @@ T SecondInvariant(const c_matrix<T, 2, 2>& rM)
 }
 
 /**
- * Use LAPACK functionality to find the eigenvector corresponding
+ * Find the eigenvector corresponding
  * real eigenvalue which is smallest in magnitude.
  * Caveat: if there are zero eigenvalues they are ignored.
  * It's the smallest magnitude non-zero real eigenvalue which is used.

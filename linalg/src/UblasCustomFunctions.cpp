@@ -66,61 +66,8 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
     {
         EXCEPTION("Matrix should be symmetric");
     }
-    PetscBLASInt info;
-    c_vector<PetscReal, 3> eigenvalues_real_part;
-    c_vector<PetscReal, 3> eigenvalues_imaginary_part;
-    c_vector<PetscScalar, 4*3 > workspace;
-    c_matrix<PetscScalar, 3, 3> right_eigenvalues;
 
-    char dont_compute_left_evectors = 'N';
-    char compute_right_evectors = 'V';
-
-    PetscBLASInt matrix_size = 3;
-    PetscBLASInt matrix_ld = matrix_size;
-    PetscBLASInt workspace_size = 4*matrix_size;
-
-    c_matrix<PetscScalar, 3, 3> a_transpose;
-    noalias(a_transpose) = trans(rA);
-
-    // PETSc alias for dgeev or dgeev_
-    LAPACKgeev_(&dont_compute_left_evectors, &compute_right_evectors,
-                &matrix_size, a_transpose.data(), &matrix_ld,
-                eigenvalues_real_part.data(), eigenvalues_imaginary_part.data(),
-                NULL, &matrix_ld,
-                right_eigenvalues.data(), &matrix_ld,
-                workspace.data(), &workspace_size,
-                &info);
-    assert(info==0);
-
-    // If this fails a complex eigenvalue was found
-    assert(norm_2(eigenvalues_imaginary_part) < DBL_EPSILON);
-
-    unsigned index_of_smallest = UINT_MAX;
-    double min_eigenvalue = DBL_MAX;
-
-    for (unsigned i=0; i<3; i++)
-    {
-        double eigen_magnitude = fabs(eigenvalues_real_part(i));
-        if (eigen_magnitude < min_eigenvalue && eigen_magnitude >= DBL_EPSILON)
-        {
-            // A zero eigenvalue is ignored
-            min_eigenvalue = eigen_magnitude;
-            index_of_smallest = i;
-        }
-        //Check for positive semi-definite
-        assert(eigenvalues_real_part(i) > -DBL_EPSILON);
-    }
-    assert (min_eigenvalue != DBL_MAX);
-    assert (index_of_smallest != UINT_MAX);
-    assert (min_eigenvalue >= DBL_EPSILON);
-
-    c_vector<double, 3> output;
-    output(0) = right_eigenvalues(index_of_smallest, 0);
-    output(1) = right_eigenvalues(index_of_smallest, 1);
-    output(2) = right_eigenvalues(index_of_smallest, 2);
-
-    //--- AT THIS POINT WE COULD RETURN THE EIGENVECTOR. ---
-    // Find the eigenvector by brute-force power method.
+    // Find the eigenvector by brute-force using the power method.
     // We can't use the inverse method, because the matrix might be singular
 
     c_matrix<double,3,3> copy_A(rA);
@@ -145,27 +92,18 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
     c_vector<double, 3> eigenvec3 = scalar_vector<double>(3, 1.0);
     double eigen3 = CalculateMaxEigenpair(copy_A, eigenvec3);
 
-    //Check that we can do as well as LAPACK geev
+    //Look backwards through the eigenvalues, checking that they are non-zero
     if (eigen3 >= DBL_EPSILON)
     {
-        assert(CompareDoubles::WithinAbsoluteTolerance(eigen3, min_eigenvalue, 4*DBL_EPSILON));
-        //eigenvec3;
+        return eigenvec3;
     }
-    else if (eigen2>=DBL_EPSILON)
+    if (eigen2 >= DBL_EPSILON)
     {
-        assert(CompareDoubles::WithinAbsoluteTolerance(eigen2, min_eigenvalue, 4*DBL_EPSILON));
-        eigenvec3 = eigenvec2;
+        return eigenvec2;
     }
-    else
-    {
-        assert(CompareDoubles::WithinAbsoluteTolerance(eigen1, min_eigenvalue, 4*DBL_EPSILON));
-        eigenvec3 = eigenvec1;
-    }
-    //We either got what LAPACK got or we got its negation
-    assert( norm_2(eigenvec3 - output) < 10*DBL_EPSILON || norm_2(eigenvec3 + output) < 10*DBL_EPSILON);
-
-
-    return output;
+    UNUSED_OPT(eigen1);
+    assert( eigen1 > DBL_EPSILON);
+    return eigenvec1;
 }
 
 double CalculateMaxEigenpair(c_matrix<double, 3, 3>& rA, c_vector<double, 3>& rEigenvector)
