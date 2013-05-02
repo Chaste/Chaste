@@ -254,8 +254,6 @@ public:
 
     void TestCardiacSimulationPostprocessMonodomain() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-        ///\todo #1660 It is essential that his test SHOULD run in parallel
         // Fox2002BackwardEuler cell model
         // run a bidomain simulation
         CardiacSimulation simulation("heart/test/data/xml/postprocess_monodomain_short.xml");
