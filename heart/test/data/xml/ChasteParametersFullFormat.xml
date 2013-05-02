@@ -373,7 +373,7 @@
 		<!-- How to integrate the ionic current term (defaults to no) -->
 		<UseStateVariableInterpolation>yes</UseStateVariableInterpolation>
 		
-		<!-- Optional.  These parameters are for use with a particular adaptivity library -->
+		<!-- Optional/Deprecated.  These parameters were for use with a particular adaptivity library -->
 		<AdaptivityParameters target_error="2.0" sigma="0.01" max_edge_length="0.04" min_edge_length="0.005" gradation="1.3" max_nodes="1000" num_sweeps="5" />
 	</Numerical>
 	

@@ -1,4 +1,3 @@
-bidomain/TestAdaptiveBidomainProblem.hpp
 bidomain/TestBidomainDistributedMesh.hpp
 bidomain/TestBidomainTissue.hpp
 bidomain/TestBidomainProblem.hpp
@@ -48,7 +47,6 @@ postprocessing/TestPseudoEcgCalculator.hpp
 postprocessing/TestSpiralWaveAndPhase.hpp
 postprocessing/TestVoltageInterpolaterOntoMechanicsMesh.hpp
 TestAbstractPurkinjeCellFactory.hpp
-TestAdaptiveTetrahedralMesh.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
 TestCheckpointing.hpp

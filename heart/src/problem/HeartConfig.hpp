@@ -556,44 +556,10 @@ public:
 
     // Adaptivity
     /**
+     * Adaptivity is now deprecated.  This method now gives a warning before returning true.
      * @return true if there is an adaptivity section
      */
     bool IsAdaptivityParametersPresent() const;
-
-    /**
-     * @return value of target error used in adaptivity
-     */
-    double GetTargetErrorForAdaptivity() const;
-
-    /**
-     * @return value of sigma used in adaptivity
-     */
-    double GetSigmaForAdaptivity() const;
-
-    /**
-     * @return maximum edge length in mesh after an adapt
-     */
-    double GetMaxEdgeLengthForAdaptivity() const;
-
-    /**
-     * @return minimum edge length in mesh after an adapt
-     */
-    double GetMinEdgeLengthForAdaptivity() const;
-
-    /**
-     * @return value of gradation used in adaptivity
-     */
-    double GetGradationForAdaptivity() const;
-
-    /**
-     * @return maximum number of nodes in mesh after an adapt
-     */
-    unsigned GetMaxNodesForAdaptivity() const;
-
-    /**
-     * @return number of adaptive sweeps through mesh during adaptivity
-     */
-    unsigned GetNumberOfAdaptiveSweeps() const;
 
     // Post processing
     /**
@@ -1028,69 +994,6 @@ public:
      * @param meshPartioningMethod  a string from {"dumb", "metis", "parmetis", "petsc"}
      */
     void SetMeshPartitioning(const char* meshPartioningMethod);
-
-    /**
-     * Set the parameters to be used during mesh adaptation.
-     *
-     * @param targetError  is the target error passed to the adaptivity library
-     * @param sigma  is the value of sigma passed to the adaptivity library
-     * @param maxEdgeLength  is the maximum edge length permitted in the adapted mesh
-     * @param minEdgeLength  is the minimum edge length permitted in the adapted mesh
-     * @param gradation  is the value of gradation passed to the adaptivity library
-     * @param maxNodes  is the maximum number of nodes permitted in the adapted mesh
-     * @param numSweeps  is the number of adaptive sweeps through the mesh performed by the adaptivity library
-     */
-    void SetAdaptivityParameters(double targetError, double sigma, double maxEdgeLength, double minEdgeLength,
-                                 double gradation, unsigned maxNodes, unsigned numSweeps );
-
-    /**
-     * Set the target error to be used during mesh adaptation.
-     *
-     * @param targetError  is the target error passed to the adaptivity library
-     */
-    void SetTargetErrorForAdaptivity(double targetError);
-
-    /**
-     * Set the value of sigma to be used during mesh adaptation.
-     *
-     * @param sigma  is the value of sigma passed to the adaptivity library
-     */
-    void SetSigmaForAdaptivity(double sigma);
-
-    /**
-     * Set the maximum edge length to be used during mesh adaptation.
-     *
-     * @param maxEdgeLength  is the maximum edge length permitted in the adapted mesh
-     */
-    void SetMaxEdgeLengthForAdaptivity(double maxEdgeLength);
-
-    /**
-     * Set the minimum edge length to be used during mesh adaptation.
-     *
-     * @param minEdgeLength  is the minimum edge length permitted in the adapted mesh
-     */
-    void SetMinEdgeLengthForAdaptivity(double minEdgeLength);
-
-    /**
-     * Set the gradation to be used during mesh adaptation.
-     *
-     * @param gradation  is the gradation passed to the adaptivity library
-     */
-    void SetGradationForAdaptivity(double gradation);
-
-    /**
-     * Set the maximum number of nodes to be used during mesh adaptation.
-     *
-     * @param maxNodes  is the maximum number of nodes permitted in the adapted mesh
-     */
-    void SetMaxNodesForAdaptivity(unsigned maxNodes);
-
-    /**
-     * Set the number of adaptive sweeps to be used during mesh adaptation.
-     *
-     * @param numSweeps  is the number of adaptive sweeps through the mesh performed by the adaptivity library
-     */
-    void SetNumberOfAdaptiveSweeps(unsigned numSweeps);
 
     /** Set the parameters of the apd map requested
      *

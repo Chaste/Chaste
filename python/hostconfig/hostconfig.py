@@ -410,6 +410,7 @@ def OptionalLibraryDefines():
     Work out what optional libraries have been asked for,
     and return the appropriate #define names, as a list.
     """
+    # Todo #2367 take out adaptivity, and replace with warning/error?
     possible_flags = {'cvode': 'CHASTE_CVODE', 'vtk': 'CHASTE_VTK', 'adaptivity': 'CHASTE_ADAPTIVITY', 'gmsh': 'CHASTE_GMSH'}
     actual_flags = []
     if getattr(conf, 'use_cvode', False):

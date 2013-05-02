@@ -267,12 +267,6 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 #else
     output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
 #endif
-
-#ifdef CHASTE_ADAPTIVITY
-    output << "\t\t\t<Adaptivity>yes</Adaptivity>\n";
-#else
-    output << "\t\t\t<Adaptivity>no</Adaptivity>\n";
-#endif
     output << "\t\t</Optional>\n";
 
     output << "\t</Libraries>\n";

@@ -1447,8 +1447,11 @@ public:
             TS_ASSERT_DELTA(HeartConfig::Instance()->GetAbsoluteTolerance(), 1e-5, 1e-12);
             TS_ASSERT_EQUALS(strcmp(HeartConfig::Instance()->GetKSPSolver(), "cg"), 0);
             TS_ASSERT_EQUALS(strcmp(HeartConfig::Instance()->GetKSPPreconditioner(), "none"), 0);
+            //Test the deprecated line in full-format
             TS_ASSERT(HeartConfig::Instance()->IsAdaptivityParametersPresent());
-            TS_ASSERT_EQUALS(HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 0.0);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Use of the Adaptivity library is deprecated");
+            Warnings::QuietDestroy();
             TS_ASSERT(HeartConfig::Instance()->IsPostProcessingRequested());
             TS_ASSERT(HeartConfig::Instance()->IsApdMapsRequested());
             std::vector<std::pair<double,double> > apd_maps;
@@ -1889,88 +1892,6 @@ public:
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithVtk() );
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithParallelVtk() );
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVisualizerOutputPrecision(), 16u);
-    }
-
-    void TestAdaptivityVariables() throw (Exception)
-    {
-        // Defaults file doesn't have the AdaptivityParameters element
-        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
-
-        // Parameters file which doesn't specify AdaptivityParameters
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
-
-        // Read the user parameters directly - again element missing
-        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
-
-        // Get methods throw an exception
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetTargetErrorForAdaptivity() );
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetSigmaForAdaptivity() );
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetMaxEdgeLengthForAdaptivity() );
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetMinEdgeLengthForAdaptivity() );
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetGradationForAdaptivity() );
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetMaxNodesForAdaptivity() );
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->GetNumberOfAdaptiveSweeps() );
-
-        // Parameters file that does specify AdaptivityParameters
-        HeartConfig::Reset();
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersFullFormat.xml");
-
-        // Verify that the element is present
-        TS_ASSERT( HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
-
-        // Get methods
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 2.0, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetSigmaForAdaptivity(), 0.01, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMaxEdgeLengthForAdaptivity(), 0.04, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMinEdgeLengthForAdaptivity(), 0.005, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetGradationForAdaptivity(), 1.3, 1e-6 );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetMaxNodesForAdaptivity(), 1000u );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetNumberOfAdaptiveSweeps(), 5u );
-
-        // Set methods
-        HeartConfig::Instance()->SetAdaptivityParameters(0.1, 0.5, 0.3, 0.01, 2.0, 100, 7);
-
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 0.1, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetSigmaForAdaptivity(), 0.5, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMaxEdgeLengthForAdaptivity(), 0.3, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMinEdgeLengthForAdaptivity(), 0.01, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetGradationForAdaptivity(), 2.0, 1e-6 );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetMaxNodesForAdaptivity(), 100u );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetNumberOfAdaptiveSweeps(), 7u );
-
-        HeartConfig::Instance()->SetTargetErrorForAdaptivity(1.0);
-        HeartConfig::Instance()->SetSigmaForAdaptivity(0.02);
-        HeartConfig::Instance()->SetMaxEdgeLengthForAdaptivity(0.1);
-        HeartConfig::Instance()->SetMinEdgeLengthForAdaptivity(0.001);
-        HeartConfig::Instance()->SetGradationForAdaptivity(1.5);
-        HeartConfig::Instance()->SetMaxNodesForAdaptivity(1000000u);
-        HeartConfig::Instance()->SetNumberOfAdaptiveSweeps(3);
-
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 1.0, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetSigmaForAdaptivity(), 0.02, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMaxEdgeLengthForAdaptivity(), 0.1, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMinEdgeLengthForAdaptivity(), 0.001, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetGradationForAdaptivity(), 1.5, 1e-6 );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetMaxNodesForAdaptivity(), (unsigned)1e6 );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetNumberOfAdaptiveSweeps(), 3u );
-
-        TS_ASSERT_THROWS_ANYTHING( HeartConfig::Instance()->SetMinEdgeLengthForAdaptivity(1.0); );
-
-        // Verify that if AdaptivityParameters element is not present then we can create it
-        HeartConfig::Reset();
-        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteEmpty.xml");
-
-        TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
-        HeartConfig::Instance()->SetAdaptivityParameters(0.1, 0.5, 0.3, 0.01, 2.0, 100, 7);
-        TS_ASSERT( HeartConfig::Instance()->mpParameters->Numerical().AdaptivityParameters().present() );
-
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetTargetErrorForAdaptivity(), 0.1, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetSigmaForAdaptivity(), 0.5, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMaxEdgeLengthForAdaptivity(), 0.3, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetMinEdgeLengthForAdaptivity(), 0.01, 1e-6 );
-        TS_ASSERT_DELTA( HeartConfig::Instance()->GetGradationForAdaptivity(), 2.0, 1e-6 );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetMaxNodesForAdaptivity(), 100u );
-        TS_ASSERT_EQUALS( HeartConfig::Instance()->GetNumberOfAdaptiveSweeps(), 7u );
     }
 
     // See #1807
