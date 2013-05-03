@@ -613,7 +613,7 @@ c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<dou
 /**
  * Helper function to get maximum eigenpair from a 3x3 matrix by the power method
  * @param rA 3x3 matrix is question.
- * @param rEigenVector a guess eigenvector which will be refined
+ * @param rEigenvector a guess eigenvector which will be refined
  * @return the maximum eigenvalue
  */
 double CalculateMaxEigenpair(c_matrix<double, 3, 3>& rA, c_vector<double, 3>& rEigenvector);
