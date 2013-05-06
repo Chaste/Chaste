@@ -1526,7 +1526,7 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point2, 0), true);
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point2, 0), 0u);
 
-        // A point on a non-horizontal edge
+        // A point on the left edge
         c_vector<double, 2> test_point3;
         test_point3[0] = 0.0;
         test_point3[1] = 0.5;
@@ -1534,34 +1534,48 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point3, 0), true);
         TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point3, 0), 3u);
 
-        // A point on a horizontal edge
+        // A point on the right edge
         c_vector<double, 2> test_point4;
-        test_point4[0] = 0.5;
-        test_point4[1] = 0.0;
+        test_point4[0] = 1.0;
+        test_point4[1] = 0.5;
 
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point4, 0), false);
 
-        // A point just inside the element
+        // A point on the bottom edge
         c_vector<double, 2> test_point5;
-        test_point5[0] = 0.999;
-        test_point5[1] = 0.998;
+        test_point5[0] = 0.5;
+        test_point5[1] = 0.0;
 
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point5, 0), true);
-        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point5, 0), 1u);
 
-        // A point just outside the element
+        // A point on the top edge
         c_vector<double, 2> test_point6;
-        test_point6[0] = 1.001;
-        test_point6[1] = 0.5;
+        test_point6[0] = 0.5;
+        test_point6[1] = 1.0;
 
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point6, 0), false);
 
-        // A point coinciding with a vertex
+        // A point just inside the element
         c_vector<double, 2> test_point7;
-        test_point7[0] = 1.0;
-        test_point7[1] = 1.0;
+        test_point7[0] = 0.999;
+        test_point7[1] = 0.998;
 
-        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point7, 0), false);
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point7, 0), true);
+        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point7, 0), 1u);
+
+        // A point just outside the element
+        c_vector<double, 2> test_point8;
+        test_point8[0] = 1.001;
+        test_point8[1] = 0.5;
+
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point8, 0), false);
+
+        // A point coinciding with a vertex
+        c_vector<double, 2> test_point9;
+        test_point9[0] = 1.0;
+        test_point9[1] = 1.0;
+
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point9, 0), false);
     }
 
     void TestPerformT3Swap()
@@ -1728,7 +1742,7 @@ public:
     void TestPerformT3SwapExceptions() throw(Exception)
     {
         {
-            /* Create 3 joined triangular elements intesecting at a node inside a square element
+            /* Create 3 joined triangular elements intersecting at a node inside a square element
              *  ______
              * |      |   /|
              * |      |  /_|
@@ -1824,8 +1838,8 @@ public:
 
             // Move node 3  so that it overlaps element 2 across an internal edge
             ChastePoint<2> point = mesh.GetNode(3)->GetPoint();
-            point.SetCoordinate(0u, 0.5);
-            point.SetCoordinate(1u, -0.1);
+            point.SetCoordinate(0, 0.5);
+            point.SetCoordinate(1, -0.1);
             mesh.SetNode(3, point);
 
             TS_ASSERT_DELTA(mesh.GetNode(3)->rGetLocation()[0], 0.5, 1e-4);
@@ -2677,7 +2691,7 @@ public:
     void TestPerformIntersectionSwap() throw(Exception)
     {
         {
-            //Make 6 nodes to assign to 4 elements.
+            // Make 6 nodes to assign to 4 elements
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
@@ -2774,9 +2788,9 @@ public:
             TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 2.3062, 1e-4);
         }
 
-        // do other way round for coverage
+        // Do other way round for coverage
         {
-            //Make 6 nodes to assign to 4 elements.
+            // Make 6 nodes to assign to 4 elements
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 1.0, 0.0));

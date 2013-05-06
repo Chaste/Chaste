@@ -652,10 +652,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
             c_vector<double, SPACE_DIM> this_transformed_node_location = zero_vector<double>(SPACE_DIM);
 
-			/*
-			 * In order to calculate the centroid we map the origin to (x[0],y[0])
-			 * then use GetVectorFromAtoB() to get node coordinates.
-			 */
+            /*
+             * In order to calculate the centroid we map the origin to (x[0],y[0])
+             * then use GetVectorFromAtoB() to get node coordinates.
+             */
             for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
                 c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes);
@@ -1036,10 +1036,10 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
         c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
         c_vector<double, SPACE_DIM> this_transformed_node_location = zero_vector<double>(SPACE_DIM);
 
-		/*
-		 * In order to calculate the area we map the origin to (x[0],y[0])
-		 * then use GetVectorFromAtoB() to get node coordiantes
-		 */
+        /*
+         * In order to calculate the area we map the origin to (x[0],y[0])
+         * then use GetVectorFromAtoB() to get node coordinates.
+         */
         unsigned num_nodes = p_element->GetNumNodes();
         for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
@@ -1097,13 +1097,13 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
     if (SPACE_DIM == 2)
     {
         unsigned num_nodes = p_element->GetNumNodes();
+        unsigned this_node_index = p_element->GetNodeGlobalIndex(0);
         for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
-            // Find locations of current node and anticlockwise node
-            unsigned this_node_index = p_element->GetNodeGlobalIndex(local_index);
             unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index+1)%num_nodes);
 
             surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
+            this_node_index = next_node_index;
         }
     }
     else
@@ -1121,68 +1121,71 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 //////////////////////////////////////////////////////////////////////
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
-
+#include "Debug.hpp"
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2); // only works in 2D at present
+    assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
 
-    // Initialise boolean
-    bool element_includes_point = false;
-
-    // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
-    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses
-    c_vector<double, SPACE_DIM> first_vertex = p_element->GetNodeLocation(0);
+    // Initialise boolean
+    bool element_includes_point = true;
 
-    c_vector<double, SPACE_DIM> test_point = GetVectorFromAtoB(first_vertex, rTestPoint);
+    unsigned winding_number = 0;
+
+    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+    c_vector<double, SPACE_DIM> test_point = this->GetVectorFromAtoB(first_node_location, rTestPoint);
+    c_vector<double, SPACE_DIM> this_node_location = zero_vector<double>(SPACE_DIM);
 
     // Loop over edges of the element
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
-        // Get the end points of this edge
-        // Remap to the origin to allow alternative distance metrics to be used in subclasses
-        c_vector<double, SPACE_DIM> vertexA = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation(local_index));
-        c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index+1)%num_nodes));
+        c_vector<double, SPACE_DIM> untransformed_vector = p_element->GetNodeLocation((local_index+1)%num_nodes);
+        c_vector<double, SPACE_DIM> next_node_location = this->GetVectorFromAtoB(first_node_location, untransformed_vector);
 
-        // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
-        c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
-        c_vector<double, SPACE_DIM> vector_b_to_point = GetVectorFromAtoB(vertexB, test_point);
-        c_vector<double, SPACE_DIM> vector_a_to_b = GetVectorFromAtoB(vertexA, vertexB);
-
-        // Pathological case - test point coincides with vertexA or vertexB
-        if (    (norm_2(vector_a_to_point) < DBL_EPSILON)
-             || (norm_2(vector_b_to_point) < DBL_EPSILON) )
+        // If this edge is crossing upward...
+        if (this_node_location[1] <= test_point[1])
         {
-            return false;
-        }
-
-        // Pathological case - ray coincides with horizontal edge
-        if ( (fabs(vector_a_to_b[1]) < DBL_EPSILON) &&
-             (fabs(vector_a_to_point[1]) < DBL_EPSILON) &&
-             (fabs(vector_b_to_point[1]) < DBL_EPSILON) )
-        {
-            if ( (vector_a_to_point[0]>0) != (vector_b_to_point[0]>0) )
+            if (next_node_location[1] > test_point[1])
             {
-                return false;
+                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
+                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+
+                // ...and the test point is to the left of the edge...
+                if (is_left > DBL_EPSILON)
+                {
+                    // ...then there is a valid upward edge-ray intersection to the right of the test point
+                    winding_number++;
+                }
             }
         }
-
-        // Non-pathological case
-        // A and B on different sides of the line y = test_point[1]
-        if ( (vertexA[1] > test_point[1]) != (vertexB[1] > test_point[1]) )
+        else
         {
-            // intersection of y=test_point[1] and vector_a_to_b is on the right of test_point
-            if (test_point[0] < vertexA[0] + vector_a_to_b[0]*vector_a_to_point[1]/vector_a_to_b[1])
+            // ...otherwise, if the edge is crossing downward
+            if (next_node_location[1] <= test_point[1])
             {
-                element_includes_point = !element_includes_point;
+                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
+                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+
+                // ...and the test point is to the right of the edge...
+                if (is_left < -DBL_EPSILON)
+                {
+                    // ...then there is a valid downward edge-ray intersection to the right of the test point
+                    winding_number--;
+                }
             }
         }
+        this_node_location = next_node_location;
     }
+
+    if (winding_number == 0)
+    {
+        element_includes_point = false;
+    }
+
     return element_includes_point;
 }
 
@@ -1242,29 +1245,25 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
 {
     assert(SPACE_DIM == 2);
 
+    // Define helper variables
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
     unsigned num_nodes = p_element->GetNumNodes();
-    c_vector<double, 2> centroid = GetCentroidOfElement(index);
-
     c_vector<double, 3> moments = zero_vector<double>(3);
 
-    unsigned node_1;
-    unsigned node_2;
+    c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(index);
+    c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(0);
+    c_vector<double, SPACE_DIM> pos_1 = this->GetVectorFromAtoB(centroid, this_node_location);
 
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
-        node_1 = local_index;
-        node_2 = (local_index+1)%num_nodes;
+        unsigned next_index = (local_index+1)%num_nodes;
+        c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation(next_index);
+        c_vector<double, SPACE_DIM> pos_2 = this->GetVectorFromAtoB(centroid, next_node_location);
 
-        // Original position of nodes
-        c_vector<double, 2> original_pos_1 = p_element->GetNodeLocation(node_1);
-        c_vector<double, 2> original_pos_2 = p_element->GetNodeLocation(node_2);
-
-        // Node position so centered on origin
-        c_vector<double, 2> pos_1 = this->GetVectorFromAtoB(centroid, original_pos_1);
-        c_vector<double, 2> pos_2 = this->GetVectorFromAtoB(centroid, original_pos_2);
-
-        // Note these formulae require the polygon to be centred at the origin
+        /*
+         * In order to calculate the moments we map the origin to the centroid
+         * then use GetVectorFromAtoB() to get node coordinates.
+         */
         double a = pos_1(0)*pos_2(1)-pos_2(0)*pos_1(1);
 
         // Ixx
@@ -1275,6 +1274,8 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
 
         // Ixy
         moments(2) += (pos_1(0)*pos_2(1) + 2*pos_1(0)*pos_1(1) + 2*pos_2(0)*pos_2(1) + pos_2(0)*pos_1(1)) * a;
+
+        pos_1 = pos_2;
     }
 
     moments(0) /= 12;
@@ -1312,8 +1313,16 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
     {
         if (moments(2) == 0.0)
         {
-            short_axis(0) = (moments(0) < moments(1)) ? 0.0 : 1.0;
-            short_axis(1) = (moments(0) < moments(1)) ? 1.0 : 0.0;
+            if (moments(0) < moments(1))
+            {
+                short_axis(0) = 0.0;
+                short_axis(1) = 1.0;
+            }
+            else
+            {
+                short_axis(0) = 1.0;
+                short_axis(1) = 0.0;
+            }
         }
         else
         {

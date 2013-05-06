@@ -133,13 +133,17 @@ protected:
     /**
      * Test whether a given point lies inside a given element.
      *
-     * We use a ray-casting algorithm, which relies on the following result:
-     * if the point in question is not on the boundary of the element, then
-     * the number of intersections is an even number if the point is outside,
-     * and it is odd if inside.
+     * We use a winding number test, which counts the number of times the
+     * polygon associated with the element winds around the given point.
+     * The point is outside only when this "winding number" vanishes;
+     * otherwise, the point is inside.
      *
-     * Currently the method is coded 'strictly', such that points lying on
-     * an edge or at a vertex are considered to lie outside the element.
+     * One must decide whether a point on the polygon's boundary is inside
+     * or outside: we adopt the standard convention that a point on a left
+     * or bottom edge is inside, and a point on a right or top edge is outside.
+     * This way, if two distinct polygons share a common boundary segment,
+     * then a point on that segment will be in one polygon or the other, but
+     * not both at the same time.
      *
      * @param rTestPoint the point to test
      * @param elementIndex global index of the element in the mesh
