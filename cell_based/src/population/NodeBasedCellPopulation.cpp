@@ -52,9 +52,7 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       bool validate)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mUseVariableRadii(false),
-      mpCellsRecvRight(NULL),
-      mpCellsRecvLeft(NULL)
+      mUseVariableRadii(false)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 
@@ -620,7 +618,7 @@ CellPtr NodeBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<d
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, Node<DIM>* pNode)
+void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
 {
     // Create a new node
     mpNodesOnlyMesh->AddMovedNode(pNode);
@@ -647,33 +645,49 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
     this->mCells.remove(p_cell);
 }
 
+/*
+ * This null deleter is for the next method, SendCellsToNeighbourProcesses so we can make a
+ * shared_ptr copy of mCellsToSendx without it actually being deleted when the pointer goes out of scope.
+ * We need a shared pointer to send it because ObjectCommunicator only sends/recvs shared pointers to
+ * avoid memory management problems.
+ */
+struct null_deleter
+{
+    void operator()(void const *) const
+    {
+    }
+};
+
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 {
 #if BOOST_VERSION < 103700
     EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
 #else // BOOST_VERSION >= 103700
-    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>*> > > communicator;
+    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>* > > > communicator;
     MPI_Status status;
 
     if(!PetscTools::AmTopMost())
     {
-        mpCellsRecvRight = communicator.SendRecvObject(&mCellsToSendRight, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
+        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        mpCellsRecvRight = communicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
     }
     if(!PetscTools::AmMaster())
     {
-        mpCellsRecvLeft = communicator.SendRecvObject(&mCellsToSendLeft, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
+        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        mpCellsRecvLeft = communicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
 #endif
 }
 
 template<unsigned DIM>
-std::pair<CellPtr, Node<DIM>*> NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
+std::pair<CellPtr, Node<DIM>* > NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
 {
     Node<DIM>* p_node = this->GetNode(nodeIndex);
+
     CellPtr p_cell = this->GetCellUsingLocationIndex(nodeIndex);
 
-    std::pair<CellPtr, Node<DIM>*> new_pair(p_cell, p_node);
+    std::pair<CellPtr, Node<DIM>* > new_pair(p_cell, p_node);
 
     return new_pair;
 }
@@ -681,7 +695,7 @@ std::pair<CellPtr, Node<DIM>*> NodeBasedCellPopulation<DIM>::GetCellNodePair(uns
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendRight(unsigned nodeIndex)
 {
-    std::pair<CellPtr, Node<DIM>*> pair = GetCellNodePair(nodeIndex);
+    std::pair<CellPtr, Node<DIM>* > pair = GetCellNodePair(nodeIndex);
 
     mCellsToSendRight.insert(pair);
 }
@@ -689,7 +703,7 @@ void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendRight(unsigned nodeIndex)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendLeft(unsigned nodeIndex)
 {
-    std::pair<CellPtr, Node<DIM>*> pair = GetCellNodePair(nodeIndex);
+    std::pair<CellPtr, Node<DIM>* > pair = GetCellNodePair(nodeIndex);
 
     mCellsToSendLeft.insert(pair);
 }
@@ -699,20 +713,23 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
 {
     if (!PetscTools::AmMaster())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvLeft->begin();
+        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
              iter != mpCellsRecvLeft->end();
              ++iter)
         {
-            AddMovedCell((*iter).first, (*iter).second);
+            // Make a shared pointer to the node to make sure it is correctly deleted.
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            AddMovedCell(iter->first, p_node);
         }
     }
     if (!PetscTools::AmTopMost())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvRight->begin();
+        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
              iter != mpCellsRecvRight->end();
              ++iter)
         {
-            AddMovedCell((*iter).first, (*iter).second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            AddMovedCell(iter->first, p_node);
         }
     }
 }
@@ -796,26 +813,29 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 {
     if (!PetscTools::AmMaster())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvLeft->begin();
+        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
                 iter != mpCellsRecvLeft->end();
                 ++iter)
         {
-            AddHaloCell((*iter).first, (*iter).second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            AddHaloCell(iter->first, p_node);
+
         }
     }
     if (!PetscTools::AmTopMost())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>*> >::iterator iter = mpCellsRecvRight->begin();
+        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
                 iter != mpCellsRecvRight->end();
                 ++iter)
         {
-            AddHaloCell((*iter).first, (*iter).second);
+            boost::shared_ptr<Node<DIM> > p_node(iter->second);
+            AddHaloCell(iter->first, p_node);
         }
     }
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, Node<DIM>* pNode)
+void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode)
 {
     mHaloCells.push_back(pCell);
 

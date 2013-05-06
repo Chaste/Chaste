@@ -78,7 +78,7 @@ private:
     }
 
     /** Vector of pointer to halo nodes used by this process. */
-    std::vector<Node<SPACE_DIM>* > mHaloNodes;
+    std::vector<boost::shared_ptr<Node<SPACE_DIM> > > mHaloNodes;
 
     /** Nodes less than mMaximumInteractionDistance are neighbours. */
     double mMaximumInteractionDistance;
@@ -350,9 +350,9 @@ public:
 
     /**
      * Add a node as a temporary halo node on this process
-     * @param pNewNode a pointer to the new node to add.
+     * @param pNewNode a shared pointer to the new node to add.
      */
-    void AddHaloNode(Node<SPACE_DIM>* pNewNode);
+    void AddHaloNode(boost::shared_ptr<Node<SPACE_DIM> > pNewNode);
 
     /**
      * Delete all the halo nodes on this process.
@@ -371,7 +371,7 @@ public:
      * Add a node to this process that has moved from another process.
      * @param pMovedNode the node to add to this mesh
      */
-    void AddMovedNode(Node<SPACE_DIM>* pMovedNode);
+    void AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > pMovedNode);
 
     /**
      * Overridden DeleteNode() method.

@@ -135,7 +135,7 @@ Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) con
 
     if (node_position != mHaloNodesMapping.end())
     {
-        p_node = mHaloNodes[node_position->second];
+        p_node = mHaloNodes[node_position->second].get();
     }
     else
     {
@@ -318,7 +318,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(Node<SPACE_DIM>* pNewNode)
+void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(boost::shared_ptr<Node<SPACE_DIM> > pNewNode)
 {
     mHaloNodes.push_back(pNewNode);
     mHaloNodesMapping[pNewNode->GetIndex()] = mHaloNodes.size() - 1;
@@ -327,10 +327,6 @@ void NodesOnlyMesh<SPACE_DIM>::AddHaloNode(Node<SPACE_DIM>* pNewNode)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ClearHaloNodes()
 {
-    for (unsigned i=0; i<mHaloNodes.size(); i++)
-    {
-        delete mHaloNodes[i];
-    }
     mHaloNodes.clear();
 
     mHaloNodesMapping.clear();
@@ -348,9 +344,33 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(Node<SPACE_DIM>* pMovedNode)
+void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > pMovedNode)
 {
-    AddNodeWithFixedIndex(pMovedNode);
+    // Make a deep copy of this node pointer so that it isn't accidentally deleted.
+    unsigned index = pMovedNode->GetIndex();
+    c_vector<double, SPACE_DIM> location = pMovedNode->rGetLocation();
+
+    Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(index, location);
+
+    if (pMovedNode->HasNodeAttributes())
+    {
+        double radius = pMovedNode->GetRadius();
+        p_node->SetRadius(radius);
+
+        unsigned region = pMovedNode->GetRegion();
+        p_node->SetRegion(region);
+
+        bool is_particle = pMovedNode->IsParticle();
+        p_node->SetIsParticle(is_particle);
+
+        for (unsigned i=0; i<pMovedNode->GetNumNodeAttributes(); i++)
+        {
+            double attribute = pMovedNode->rGetNodeAttributes()[i];
+            p_node->AddNodeAttribute(attribute);
+        }
+    }
+
+    AddNodeWithFixedIndex(p_node);
 }
 
 template<unsigned SPACE_DIM>
@@ -521,12 +541,12 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddHaloNodesToBoxes()
 {
     // Add halo nodes
-    for (typename std::vector<Node<SPACE_DIM>* >::iterator halo_node_iter = mHaloNodes.begin();
+    for (typename std::vector<boost::shared_ptr<Node<SPACE_DIM> > >::iterator halo_node_iter = mHaloNodes.begin();
             halo_node_iter != mHaloNodes.end();
             ++halo_node_iter)
     {
-        unsigned box_index = mpBoxCollection->CalculateContainingBox(*halo_node_iter);
-        mpBoxCollection->rGetHaloBox(box_index).AddNode(*halo_node_iter);
+        unsigned box_index = mpBoxCollection->CalculateContainingBox((*halo_node_iter).get());
+        mpBoxCollection->rGetHaloBox(box_index).AddNode((*halo_node_iter).get());
     }
 }
 

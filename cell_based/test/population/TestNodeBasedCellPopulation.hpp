@@ -1356,7 +1356,7 @@ public:
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
 
-            Node<2>* p_node = new Node<2>(PetscTools::GetNumProcs() * (num_initial_cells + 1), false, 0.0, 0.5);
+            boost::shared_ptr<Node<2> > p_node(new Node<2>(PetscTools::GetNumProcs() * (num_initial_cells + 1), false, 0.0, 0.5));
             cell_population.AddMovedCell(p_cell, p_node);
 
             TS_ASSERT_EQUALS(cell_population.GetNumNodes(), num_initial_cells +1);

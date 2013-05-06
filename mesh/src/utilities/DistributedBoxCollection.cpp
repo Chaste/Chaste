@@ -120,7 +120,7 @@ void DistributedBoxCollection<DIM>::EmptyBoxes()
     }
     for (unsigned i=0; i<mHaloBoxes.size(); i++)
     {
-    	mHaloBoxes[i].ClearNodes();
+        mHaloBoxes[i].ClearNodes();
     }
 }
 
@@ -990,13 +990,13 @@ unsigned DistributedBoxCollection<DIM>::GetProcessOwningNode(Node<DIM>* pNode)
 template<unsigned DIM>
 std::vector<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesRight()
 {
-	return mHaloNodesRight;
+    return mHaloNodesRight;
 }
 
 template<unsigned DIM>
 std::vector<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesLeft()
 {
-	return mHaloNodesLeft;
+    return mHaloNodesLeft;
 }
 
 template<unsigned DIM>

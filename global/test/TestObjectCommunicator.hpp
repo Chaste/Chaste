@@ -61,7 +61,6 @@ public:
         if (PetscTools::AmMaster())
         {
             // Create a simple class to send
-
             std::vector<double> doubles(3);
             doubles[0] = 1.1;
             doubles[1] = 1.2;
@@ -71,34 +70,34 @@ public:
             bools[0] = true;
             bools[1] = true;
 
-            ClassOfSimpleVariables i(42,"hello",doubles,bools);
+            boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
 
             // Send the class
             for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
             {
                 // Arguments are object, destination, tag
-                communicator.SendObject(&i, p, 123);
+                communicator.SendObject(p_new_class, p, 123);
             }
 
         }
         else
         {
-            ClassOfSimpleVariables* j;
+            boost::shared_ptr<ClassOfSimpleVariables> p_recv_class;
 
-            j = communicator.RecvObject(0, 123, status);
+            p_recv_class = communicator.RecvObject(0, 123, status);
 
             // Check that the values are correct
-            TS_ASSERT_EQUALS(j->GetNumber(),42);
-            TS_ASSERT_EQUALS(j->GetString(),"hello");
-            TS_ASSERT_EQUALS(j->GetVectorOfDoubles().size(),3u);
-            TS_ASSERT_EQUALS(j->GetVectorOfBools().size(),2u);
+            TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
+            TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
 
-            TS_ASSERT_DELTA(j->GetVectorOfDoubles()[0],1.1,1e-12);
-            TS_ASSERT_DELTA(j->GetVectorOfDoubles()[1],1.2,1e-12);
-            TS_ASSERT_DELTA(j->GetVectorOfDoubles()[2],1.3,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
-            TS_ASSERT_EQUALS(j->GetVectorOfBools()[0],true);
-            TS_ASSERT_EQUALS(j->GetVectorOfBools()[1],true);
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
 
         }
     }
@@ -121,12 +120,12 @@ public:
             bools[0] = true;
             bools[1] = true;
 
-            ClassOfSimpleVariables i(42,"hello",doubles,bools);
+            boost::shared_ptr<ClassOfSimpleVariables> p_send_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
 
-            ClassOfSimpleVariables* p_class;
+            boost::shared_ptr<ClassOfSimpleVariables> p_class(new ClassOfSimpleVariables);
 
             // Arguments are object, destination, tag
-            p_class = communicator.SendRecvObject(&i, 1-PetscTools::GetMyRank(), 123, 1-PetscTools::GetMyRank(), 123, status);
+            p_class = communicator.SendRecvObject(p_send_class, 1-PetscTools::GetMyRank(), 123, 1-PetscTools::GetMyRank(), 123, status);
 
             // Check that the values are correct
             TS_ASSERT_EQUALS(p_class->GetNumber(),42);

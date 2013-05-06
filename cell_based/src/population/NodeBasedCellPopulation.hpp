@@ -80,16 +80,16 @@ private:
     bool mUseVariableRadii;
 
     /** The cells to send to the right process */
-    std::set<std::pair<CellPtr, Node<DIM>*> > mCellsToSendRight;
+    std::set<std::pair<CellPtr, Node<DIM>* > > mCellsToSendRight;
 
     /** The cells to send to the left process */
-    std::set<std::pair<CellPtr, Node<DIM>*> > mCellsToSendLeft;
+    std::set<std::pair<CellPtr, Node<DIM>* > > mCellsToSendLeft;
 
-    /** A pointer to the cells received from the right process */
-    std::set<std::pair<CellPtr, Node<DIM>*> >* mpCellsRecvRight;
+    /** A shared pointer to the cells received from the right process */
+    boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvRight;
 
     /** A pointer to the cells received from the left process */
-    std::set<std::pair<CellPtr, Node<DIM>*> >* mpCellsRecvLeft;
+    boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvLeft;
 
     /** The tag used to send and recieve cell information */
     static const unsigned mCellCommunicationTag = 123;
@@ -138,7 +138,7 @@ private:
      * @param pCell the pointer to the cell that is to be added.
      * @param pNode the pointer to the node that is to be added.
      */
-    void AddMovedCell(CellPtr pCell, Node<DIM>* pNode);
+    void AddMovedCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode);
 
     /**
      * Delete a cell and its associated node that have moved off this process.
@@ -189,7 +189,7 @@ private:
      * @param pCell the cell to add.
      * @param pNode the node to add.
      */
-    void AddHaloCell(CellPtr pCell, Node<DIM>* pNode);
+    void AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode);
 
 protected:
 
@@ -428,7 +428,7 @@ public:
      * @param nodeIndex the global index of the node.
      * @return the pair.
      */
-    std::pair<CellPtr, Node<DIM>*> GetCellNodePair(unsigned nodeIndex);
+    std::pair<CellPtr, Node<DIM>* > GetCellNodePair(unsigned nodeIndex);
 
     /**
      * Add the contents of mpCellsRecvRight and mpCellsRecvLeft to the local population.

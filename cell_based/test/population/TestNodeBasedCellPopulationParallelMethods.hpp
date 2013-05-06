@@ -82,7 +82,10 @@ private:
 
         mpNodeBasedCellPopulation = new NodeBasedCellPopulation<3>(*mpNodesOnlyMesh, cells);
 
-        delete nodes[0];
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void tearDown()
@@ -104,7 +107,6 @@ public:
 
         CellPtr p_returned_cell = pair.first;
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetLocationIndexUsingCell(p_returned_cell), node_index);
-
     }
 
     void TestAddNodeAndCellsToSend() throw (Exception)
@@ -228,7 +230,7 @@ public:
 
     void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)
     {
-        Node<3>* p_node = new Node<3>(10, false, 0.0, 0.0, 0.0);
+        boost::shared_ptr<Node<3> > p_node(new Node<3>(10, false, 0.0, 0.0, 0.0));
 
         // Create a cell.
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -241,8 +243,6 @@ public:
 
         TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->GetCellUsingLocationIndex(10));
         TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetCellUsingLocationIndex(10), p_cell);
-
-        delete p_node;
     }
 };
 
