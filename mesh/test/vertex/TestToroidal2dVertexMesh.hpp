@@ -587,8 +587,8 @@ public:
 
         // A point outside the element due to periodicity
         c_vector<double, 2> test_point2;
-        test_point1[0] = 3.0;
-        test_point1[1] = 1.0;
+        test_point2[0] = 3.0;
+        test_point2[1] = 1.0;
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point2, 0), false);
 
         // Another point outside the element due to periodicity
