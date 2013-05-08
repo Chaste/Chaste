@@ -51,60 +51,121 @@ CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 template<unsigned DIM>
 BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
 {
+	// Not using the inputs as theres only one BCS
     assert(DIM==2);
 
     BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
 
 
-    // Not using the inputs as theres only one BCS
-    AbstractBoundaryCondition<DIM>* p_bc = pPdeAndBc->GetBoundaryCondition();
+    // Use these 2 vectors to define whats happening on the top right bottom and left boundaries
 
-    ConstBoundaryCondition<DIM> bc_left(0.0);
-    ConstBoundaryCondition<DIM> bc_right(0.5);
-    ConstBoundaryCondition<DIM> bc_top(1.0);
-    ConstBoundaryCondition<DIM> bc_bottom(-1.0);
+    // Specify which sides are neuman boundaries
+    c_vector<bool,4> are_neumann_boundaries;
+    are_neumann_boundaries[0] = false; // Top
+    are_neumann_boundaries[1] = true;  // Right
+    are_neumann_boundaries[2] = false; // Bottom
+    are_neumann_boundaries[3] = true;  // Left
 
-    ChasteCuboid<DIM> cuboid = pMesh->CalculateBoundingBox();
-
-    double left = cuboid.rGetLowerCorner()[0];
-    double bottom = cuboid.rGetLowerCorner()[1];
-    double right = cuboid.rGetUpperCorner()[0];
-    double top = cuboid.rGetUpperCorner()[1];
-
-
-    // If on right or left apply Neuman BCS
-    for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = pMesh->GetBoundaryElementIteratorBegin();
-         elem_iter != pMesh->GetBoundaryElementIteratorEnd();
-         ++elem_iter)
-    {
-        if ( ((*elem_iter)->GetNodeLocation(0)[0] < (left+1e-6) ) &&  ((*elem_iter)->GetNodeLocation(1)[0] < (left+1e-6) ))
-        {
-            bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
-        }
-        if ( ((*elem_iter)->GetNodeLocation(0)[0] > (right-1e-6) ) &&  ((*elem_iter)->GetNodeLocation(1)[0] > (right-1e-6) ))
-        {
-            bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
-        }
-    }
+    // Specify the value of the boundary condition on each boundary
+    c_vector<double,4> boundary_condition_values;
+    boundary_condition_values[0] = 1.0; // Top
+    boundary_condition_values[1] = 1.0; // Right
+    boundary_condition_values[2] = 1.0; // Bottom
+    boundary_condition_values[3] = 1.0; // Left
 
 
-    // If on Top or bottom then apply Dirichlet BCS
-    for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = pMesh->GetBoundaryNodeIteratorBegin();
-         node_iter != pMesh->GetBoundaryNodeIteratorEnd();
-         ++node_iter)
-    {
-        double y = (*node_iter)->GetPoint()[1];
+    ConstBoundaryCondition<DIM>* p_bc_top = new ConstBoundaryCondition<DIM>(boundary_condition_values[0]);
+	ConstBoundaryCondition<DIM>* p_bc_right = new ConstBoundaryCondition<DIM>(boundary_condition_values[1]);
+	ConstBoundaryCondition<DIM>* p_bc_bottom = new ConstBoundaryCondition<DIM>(boundary_condition_values[2]);
+	ConstBoundaryCondition<DIM>* p_bc_left = new ConstBoundaryCondition<DIM>(boundary_condition_values[3]);
 
-        if (y<bottom+1e-6)
-        {
-            bcc.AddDirichletBoundaryCondition(*node_iter, p_bc);
-        }
-        if (y>top-1e-6)
-        {
-            bcc.AddDirichletBoundaryCondition(*node_iter, p_bc);
-        }
+	ChasteCuboid<DIM> cuboid = pMesh->CalculateBoundingBox();
 
-    }
+	double left = cuboid.rGetLowerCorner()[0];
+	double bottom = cuboid.rGetLowerCorner()[1];
+	double right = cuboid.rGetUpperCorner()[0];
+	double top = cuboid.rGetUpperCorner()[1];
+	double fudge_factor = 1e-6;
+
+
+	// Apply Neumann Boundaries
+	for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = pMesh->GetBoundaryElementIteratorBegin();
+		 elem_iter != pMesh->GetBoundaryElementIteratorEnd();
+		 ++elem_iter)
+	{
+		double x_1 = (*elem_iter)->GetNodeLocation(0)[0];
+		double y_1 = (*elem_iter)->GetNodeLocation(0)[1];
+		double x_2 = (*elem_iter)->GetNodeLocation(1)[0];
+		double y_2 = (*elem_iter)->GetNodeLocation(1)[1];
+
+		if (are_neumann_boundaries[0]) // Top is Neumann Boundary
+		{
+			if ( (y_1  > (top-fudge_factor) ) &&  (y_2 > (top-fudge_factor) ))
+			{
+				bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_top);
+			}
+		}
+		if (are_neumann_boundaries[1]) // Right is Neumann Boundary
+		{
+			if ( (x_1  > (right-fudge_factor) ) &&  (x_2 > (right-fudge_factor) ))
+			{
+				bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_right);
+			}
+		}
+		if (are_neumann_boundaries[2]) // Bottom is Neumann Boundary
+		{
+			if ( (y_1  < (bottom+fudge_factor) ) &&  (y_2 < (bottom+fudge_factor) ))
+			{
+				bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_bottom);
+			}
+		}
+		if (are_neumann_boundaries[3]) // Left is Neumann Boundary
+		{
+			if ( (x_1  > (left+fudge_factor) ) &&  (x_2 < (left+fudge_factor) ))
+			{
+				bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_left);
+			}
+		}
+	}
+
+
+	// Apply dirichlet Boundaries
+	for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = pMesh->GetBoundaryNodeIteratorBegin();
+		 node_iter != pMesh->GetBoundaryNodeIteratorEnd();
+		 ++node_iter)
+	{
+		double x = (*node_iter)->GetPoint()[0];
+		double y = (*node_iter)->GetPoint()[1];
+
+		if (!are_neumann_boundaries[0]) // Top is Dirichlet Boundary
+		{
+			if (y > top-fudge_factor)
+			{
+				bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_top);
+			}
+		}
+		if (!are_neumann_boundaries[1]) // Right is Dirichlet Boundary
+		{
+			if (x > right-fudge_factor)
+			{
+				bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_right);
+			}
+		}
+		if (!are_neumann_boundaries[2]) // Bottom is Dirichlet Boundary
+		{
+			if (y < bottom+fudge_factor)
+			{
+				bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_bottom);
+			}
+		}
+		if (!are_neumann_boundaries[3]) // Left is Dirichlet Boundary
+		{
+			if (x < left+fudge_factor)
+			{
+				bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_left);
+			}
+		}
+	}
 
     return bcc;
 }

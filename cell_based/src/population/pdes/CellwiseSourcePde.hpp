@@ -67,6 +67,8 @@ private:
        archive & mCoefficient;
     }
 
+protected:
+
     /** The cell population member. */
     AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 

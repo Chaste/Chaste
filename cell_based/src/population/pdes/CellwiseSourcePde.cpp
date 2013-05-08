@@ -74,14 +74,17 @@ double CellwiseSourcePde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Nod
 {
     double coefficient = 0.0;
 
-    CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
+    if (mrCellPopulation.IsCellAttachedToLocationIndex(rNode.GetIndex()))
+	{
+		CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
 
-    bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
+		bool cell_is_apoptotic = p_cell->HasCellProperty<ApoptoticCellProperty>();
 
-    if (!cell_is_apoptotic)
-    {
-        coefficient = mCoefficient;
-    }
+		if (!cell_is_apoptotic)
+		{
+			coefficient = mCoefficient;
+		}
+	}
 
     return coefficient;
 }

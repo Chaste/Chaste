@@ -342,6 +342,7 @@ public:
         }
     }
 
+    // In this test there are only 50 cells but 100 lattice sites.
     void TestMultipleCaBasedWithCellwiseSourcePde() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -353,10 +354,10 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 100);
+        cells_generator.GenerateBasic(cells, 50);
 
         std::vector<unsigned> location_indices;
-        for(unsigned i=0; i<100; i++)
+        for(unsigned i=0; i<50; i++)
         {
             location_indices.push_back(i);
         }
@@ -385,7 +386,15 @@ public:
                 node_iter != p_mesh->GetNodeIteratorEnd();
                 ++node_iter)
         {
-            TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
+        	if (node_iter->GetIndex()<50)
+            {
+        		TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
+            }
+        	else
+        	{
+        		// No cell attached
+        		TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), 0.0, 1e-3);
+        	}
         }
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);
@@ -408,6 +417,9 @@ public:
     }
 
 
+    /*
+     * Note only solves one PDE
+     */
     void TestMultipleCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -436,21 +448,15 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        // Set up 2 PDEs (one with dirichlet and one with Neumann BCS) and pass to simulation via handler (zero uptake to check analytic solution)
-        // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
-        AveragedSourcePde<2> pde_1(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc_1(1.0);
-        PdeAndBoundaryConditions<2> pde_and_bc_1(&pde_1, &bc_1, false);
-        pde_and_bc_1.SetDependentVariableName("nutrient_dirichlet");
+        // Set up a PDEs (with mixed conditions and pass to simulation via handler (zero uptake to check analytic solution)
+        AveragedSourcePde<2> pde(cell_population, 0.0);
+        ConstBoundaryCondition<2> bc(1.0);
+        PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("nutrient");
 
-        AveragedSourcePde<2> pde_2(cell_population, 0.0);
-        ConstBoundaryCondition<2> bc_2(0.5);
-        PdeAndBoundaryConditions<2> pde_and_bc_2(&pde_2, &bc_2, true);
-        pde_and_bc_2.SetDependentVariableName("nutrient_neumann");
 
         CellBasedPdeHandlerOnCuboid<2> pde_handler(&cell_population);
-        pde_handler.AddPdeAndBc(&pde_and_bc_1);
-        pde_handler.AddPdeAndBc(&pde_and_bc_2);
+        pde_handler.AddPdeAndBc(&pde_and_bc);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
 
         simulator.SetCellBasedPdeHandler(&pde_handler);
@@ -467,13 +473,11 @@ public:
 
             if (cell_location[1] < 1e-6 || cell_location[1] > 9 - 1e-6)
             {
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_dirichlet"),1.0, 1e-2);
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.5, 1e-2);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"),1.0, 1e-2);
             }
             else
             {
-                TS_ASSERT_LESS_THAN(1.0,cell_iter->GetCellData()->GetItem("nutrient_dirichlet"));
-                TS_ASSERT_LESS_THAN(0.5,cell_iter->GetCellData()->GetItem("nutrient_neumann"));
+                TS_ASSERT_LESS_THAN(1.0,cell_iter->GetCellData()->GetItem("nutrient"));
             }
         }
     }
