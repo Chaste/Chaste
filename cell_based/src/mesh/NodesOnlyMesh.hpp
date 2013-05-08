@@ -146,15 +146,6 @@ private:
      */
     bool IsANodeCloseToDomainBoundary();
 
-    /**
-     * Set up the box collection. Overridden in subclasses to implement periodicity.
-     *
-     * @param cutOffLength the cut off length for node neighbours
-     * @param domainSize the size of the domain containing the nodes.
-     * @param numLocalRows the number of rows that should be owned by this process.
-     */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE);
-
      /**
       * Set up a box collection by calculating the correct domain size from the node locations
       *
@@ -193,6 +184,22 @@ protected:
      * Clear the BoxCollection
      */
     void ClearBoxCollection();
+
+    /**
+     * Set up the box collection. Overridden in subclasses to implement periodicity.
+     *
+     * @param cutOffLength the cut off length for node neighbours
+     * @param domainSize the size of the domain containing the nodes.
+     * @param numLocalRows the number of rows that should be owned by this process.
+     */
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE);
+
+
+     /**
+      * Get a pointer to the box collection
+      * @return mpBoxCollection
+      */
+     DistributedBoxCollection<SPACE_DIM>* GetBoxCollection();
 
 public:
 
@@ -271,6 +278,13 @@ public:
      * @return the maximum node index.
      */
     virtual unsigned GetMaximumNodeIndex();
+
+    /**
+     * Set the maximum node interaction distance
+     *
+     * @param maxDistance the new maximum distance
+     */
+    void SetMaximumInteractionDistance(double maxDistance);
 
     /**
      * @return mMaxInteractionDistance

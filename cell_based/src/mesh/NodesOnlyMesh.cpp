@@ -126,6 +126,12 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
     mIndexCounter = 0;
 }
 
+template<unsigned SPACE_DIM>
+DistributedBoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
+{
+	return mpBoxCollection;
+}
+
 template <unsigned SPACE_DIM>
 Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) const
 {
@@ -157,6 +163,12 @@ template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetMaximumNodeIndex()
 {
     return std::max(mIndexCounter* PetscTools::GetNumProcs() + PetscTools::GetMyRank(), mMaxAddedNodeIndex);
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetMaximumInteractionDistance(double maxDistance)
+{
+	mMaximumInteractionDistance = maxDistance;
 }
 
 template<unsigned SPACE_DIM>
