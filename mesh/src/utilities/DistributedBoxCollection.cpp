@@ -54,11 +54,14 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     ///\todo Consider adapting domain size to the width of the boxes.
     for (unsigned i=0; i<DIM; i++)
     {
-        if (!Divides(boxWidth, (domainSize[2*i+1]-domainSize[2*i])))
+        double r = fmod((domainSize[2*i+1]-domainSize[2*i]), boxWidth);
+        if (r > 0.0)
         {
-            EXCEPTION("The domainSize must be divisible by the boxWidth in each coordinate");
+            domainSize[2*i+1] += boxWidth - r;
         }
     }
+
+    mDomainSize = domainSize;
 
     mNumBoxesEachDirection = scalar_vector<unsigned>(DIM, 0u);
 

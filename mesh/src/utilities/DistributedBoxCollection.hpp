@@ -404,6 +404,11 @@ inline void load_construct_data(
         domain_size[i] = coordinate;
     }
 
+    // Shrink the domain size slightly so we get the correct size on construction
+    for (unsigned i=0; i<DIM; i++)
+    {
+        domain_size[2*i+1] -= 1e-14;
+    }
     double cut_off;
     ar >> cut_off;
 

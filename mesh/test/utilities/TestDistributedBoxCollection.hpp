@@ -288,16 +288,8 @@ public:
         double cut_off_length = 5.0;
         c_vector<double, 2> domain_size;
         domain_size(0) = 0.0;
-
-        // Make sure we do not allow a collection with width not divisible by cut off.
-        domain_size(1) = 20.5;
-        TS_ASSERT_THROWS_THIS(DistributedBoxCollection<1> box_collection_wrong(cut_off_length, domain_size), "The domainSize must be divisible by the boxWidth in each coordinate");
-
-        // Make sure we do not allow a collection with zero volume.
-        domain_size(1) = 0.0;
-        TS_ASSERT_THROWS_THIS(DistributedBoxCollection<1> box_collection_wrong2(cut_off_length, domain_size), "The domainSize must be divisible by the boxWidth in each coordinate");
-        domain_size(1) = 25.0;
-
+		domain_size(1) = 25.0;
+		
         DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupAllLocalBoxes();
@@ -888,9 +880,9 @@ public:
 
         c_vector<double, 2*2> domain_size;
         domain_size(0) = -0.1;
-        domain_size(1) = 1.10;
+        domain_size(1) = 1.09;
         domain_size(2) = -0.1;
-        domain_size(3) = 1.10;
+        domain_size(3) = 1.09;
 
         DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
 
@@ -1784,8 +1776,8 @@ public:
              TS_ASSERT_EQUALS(num_boxes, p_box_collection->GetNumBoxes());
              for (unsigned i=0; i<3; i++)
              {
-                 TS_ASSERT_EQUALS(0.0, p_box_collection->rGetDomainSize()[2*i]);
-                 TS_ASSERT_EQUALS(4.8, p_box_collection->rGetDomainSize()[2*i+1]);
+                 TS_ASSERT_DELTA(0.0, p_box_collection->rGetDomainSize()[2*i], 1e-4);
+                 TS_ASSERT_DELTA(4.8, p_box_collection->rGetDomainSize()[2*i+1], 1e-4);
              }
 
              delete p_box_collection;

@@ -263,8 +263,8 @@ public:
 
         mesh.ResizeBoxCollection();
 
-        // 10 x 10 x 7
-        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 700u);
+        // 12 x 12 x 9
+        TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 1296u);
 
         for (unsigned i=0; i<nodes.size(); i++)
         {

@@ -448,10 +448,11 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
     c_vector<double, 2*SPACE_DIM> new_domain_size;
 
+    double fudge = 1e-14;
     for (unsigned d=0; d < SPACE_DIM; d++)
     {
-        new_domain_size[2*d] = current_domain_size[2*d] - mMaximumInteractionDistance;
-        new_domain_size[2*d+1] = current_domain_size[2*d+1] + mMaximumInteractionDistance;
+        new_domain_size[2*d] = current_domain_size[2*d] - (mMaximumInteractionDistance - fudge);
+        new_domain_size[2*d+1] = current_domain_size[2*d+1] + (mMaximumInteractionDistance - fudge);
     }
 
     SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size, new_local_rows);
@@ -513,14 +514,8 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
     c_vector<double, 2*SPACE_DIM> domain_size;
     for (unsigned i=0; i < SPACE_DIM; i++)
     {
-        domain_size[2*i] = bounding_box.rGetLowerCorner()[i];
-        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i];
-    }
-
-    // Make the domain size divisible by mMaximumInterationDistance.
-    for (unsigned i=0; i < SPACE_DIM; i++)
-    {
-        domain_size[2*i+1] = domain_size[2*i] + (1 + floor((domain_size[2*i+1] - domain_size[2*i]) / mMaximumInteractionDistance)) * mMaximumInteractionDistance;
+        domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - 1e-14;
+        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + 1e-14;
     }
 
     SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
