@@ -50,7 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "DeltaNotchOffLatticeSimulation.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "DeltaNotchTrackingModifier.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
@@ -114,10 +115,14 @@ public:
         cell_population.SetCellAncestorsToLocationIndices();
 
         // Create and configure cell-based simulation
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Delta Notch Tracking Modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Set up force law and add to simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -205,10 +210,14 @@ public:
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up the simulation
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchTwoCell_heterogee");
         simulator.SetEndTime(10.0);
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Delta Notch Tracking Modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -301,10 +310,14 @@ public:
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up the simulation
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchTwoCell_homgee");
         simulator.SetEndTime(10.0);
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Delta Notch Tracking Modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
@@ -363,10 +376,14 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create and configure cell-based simulation
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchVertex2D");
         simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Delta Notch Tracking Modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Create force law and add to simulation
         MAKE_PTR(NagaiHondaForce<2>, p_force);
@@ -412,10 +429,14 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create and configure cell-based simulation
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Delta Notch Tracking Modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Set up force law and add to simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -462,11 +483,15 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create and configure cell-based simulation
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchOffLatticeSimulationSaveAndLoad");
         double end_time = 0.01;
         simulator.SetEndTime(end_time);
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Delta Notch Tracking Modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
@@ -475,7 +500,7 @@ public:
         // Run and save simulation
         simulator.Solve();
 
-        CellBasedSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
@@ -489,8 +514,8 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
 
         // Load simulation
-        DeltaNotchOffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, DeltaNotchOffLatticeSimulation<2> >::Load("TestDeltaNotchOffLatticeSimulationSaveAndLoad", end_time);
+        OffLatticeSimulation<2>* p_simulator
+            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchOffLatticeSimulationSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 

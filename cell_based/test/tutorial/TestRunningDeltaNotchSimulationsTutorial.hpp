@@ -81,6 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
@@ -100,7 +101,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * specialized to deal with updating of the {{{CellData}}} class to deal with Delta-Notch
  * signalling between cells.
  */
-#include "DeltaNotchOffLatticeSimulation.hpp"
+/*
+ * The next header defines the simulation class modifier corresponding to the Delta Notch cell-cycle model.
+ * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta Notch signalling.
+ */
+#include "DeltaNotchTrackingModifier.hpp"
+
 
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
@@ -177,10 +183,14 @@ public:
 
         /* We are now in a position to create and configure the cell-based simulation object, pass a force law to it,
          * and run the simulation. We can make the simulation run for longer to see more patterning by increasing the end time. */
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexBasedMonolayerWithDeltaNotch");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
+
+        /* Then, we define the modifier class, that automatically updates the values of delta and notch within the cells in {{{CellData}}} and pass it to the simulation.*/
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -255,10 +265,14 @@ public:
             cell_iter->GetCellData()->SetItem("mean delta", RandomNumberGenerator::Instance()->ranf());
         }
 
-        DeltaNotchOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedMonolayerWithDeltaNotch");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(5.0);
+
+        /* Again we define the modifier class, that automatically updates the values of delta and notch within the cells in {{{CellData}}} and pass it to the simulation.*/
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         /* As we are using a node-based cell population, we use an appropriate force law. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
