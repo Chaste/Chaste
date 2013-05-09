@@ -33,45 +33,42 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "VolumeTrackedOffLatticeSimulation.hpp"
+#include "VolumeTrackingModifier.hpp"
 #include "MeshBasedCellPopulation.hpp"
 
 template<unsigned DIM>
-VolumeTrackedOffLatticeSimulation<DIM>::VolumeTrackedOffLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
-                                                      bool deleteCellPopulationInDestructor,
-                                                      bool initialiseCells)
-    : OffLatticeSimulation<DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
+VolumeTrackingModifier<DIM>::VolumeTrackingModifier()
+    : AbstractSimulationModifier<DIM>()
 {
 }
 
 template<unsigned DIM>
-VolumeTrackedOffLatticeSimulation<DIM>::~VolumeTrackedOffLatticeSimulation()
+VolumeTrackingModifier<DIM>::~VolumeTrackingModifier()
 {
 }
 
 template<unsigned DIM>
-void VolumeTrackedOffLatticeSimulation<DIM>::SetupSolve()
+void VolumeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+{
+    UpdateCellData(rCellPopulation);
+}
+
+template<unsigned DIM>
+void VolumeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
      * fully initialised by the time we enter the main time loop.
      */
-    OffLatticeSimulation<DIM>::SetupSolve();
-    UpdateCellData();
+    UpdateCellData(rCellPopulation);
 }
 
-template<unsigned DIM>
-void VolumeTrackedOffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep()
-{
-    OffLatticeSimulation<DIM>::UpdateAtEndOfTimeStep();
-    UpdateCellData();
-}
 
 template<unsigned DIM>
-void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellData()
+void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Make sure the cell population is updated
-    this->mrCellPopulation.Update();
+    rCellPopulation.Update();
 
     /**
      * This hack is needed because in the case of a MeshBasedCellPopulation in which
@@ -82,32 +79,34 @@ void VolumeTrackedOffLatticeSimulation<DIM>::UpdateCellData()
      *
      * \todo work out how to properly fix this (#1986)
      */
-    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
-        static_cast<MeshBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->CreateVoronoiTessellation();
+        static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation))->CreateVoronoiTessellation();
     }
 
     // Iterate over cell population
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-         cell_iter != this->mrCellPopulation.End();
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+         cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
         // Get the volume of this cell
-        double cell_volume = this->mrCellPopulation.GetVolumeOfCell(*cell_iter);
+        double cell_volume = rCellPopulation.GetVolumeOfCell(*cell_iter);
 
         // Store the cell's volume in CellData
         cell_iter->GetCellData()->SetItem("volume", cell_volume);
     }
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class VolumeTrackedOffLatticeSimulation<1>;
-template class VolumeTrackedOffLatticeSimulation<2>;
-template class VolumeTrackedOffLatticeSimulation<3>;
+template class VolumeTrackingModifier<1>;
+template class VolumeTrackingModifier<2>;
+template class VolumeTrackingModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeTrackedOffLatticeSimulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(VolumeTrackingModifier)
+

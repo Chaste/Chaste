@@ -93,12 +93,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ContactInhibitionCellCycleModel.hpp"
 
 /*
- * The next header defines the simulation class corresponding to the contact inhibition cell-cycle model.
- * The essential difference with other simulation classes is that the {{{CellData}}} cell property is updated at each timestep with the
+ * The next header defines the simulation class modifier corresponding to the contact inhibition cell-cycle model.
+ * This modifier leads to the {{{CellData}}} cell property being updated at each timestep with the
  * volume of each cell.
  */
-#include "VolumeTrackedOffLatticeSimulation.hpp"
+#include "VolumeTrackingModifier.hpp"
+
+
 /* The remaining header files define classes that will be also be used and are presented in other tutorials. */
+#include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -164,17 +167,15 @@ public:
         /* In order to visualize labelled cells (i.e. those that are inhibited from division) you need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
-        /* To keep track of the volumes of the cells that are used in the contact inhibition cell-cycle,
-         * we use the {{{CellData}}} class. Here, we just initialise it with one variable
-         * and associate it with the cell population. */
-
-        /* Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
-         */
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionInBox");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
+
+        /* Then, we define the modifier class, that automatically updates the volumes of the cells in {{{CellData}}} and pass it ot the simulation.*/
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
          * cut-off length beyond which cells stop interacting. We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}}. */
@@ -280,13 +281,15 @@ public:
         /* In order to visualize labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
         cell_population.SetOutputCellMutationStates(true);
 
-        /*  Then, we define the contact {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
-         */
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestContactInhibitionTumourInBox");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
+
+        /* Then, we define the modifier class, that automatically updates the volumes of the cells in {{{CellData}}} and pass it ot the simulation.*/
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
          * cut-off length beyond which cells stop interacting. We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}} */
@@ -369,13 +372,15 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellMutationStates(true);
 
-        /*  Then, we define the {{{VolumeTrackedOffLatticeSimulation}}} class, that automatically updates the volumes of the cells
-         * in {{{CellData}}}. We also set up the output directory, the end time and the output multiple.
-         */
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexContactInhibition");
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(10.0);
+
+        /* Then, we define the modifier class, that automatically updates the volumes of the cells in {{{CellData}}} and pass it ot the simulation.*/
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         /* Next, we create a force law, {{{NagaiHondaForce}}}, to be applied to vertices.
          * We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}}. */

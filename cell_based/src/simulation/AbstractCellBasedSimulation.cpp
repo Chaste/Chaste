@@ -268,6 +268,18 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellKillers()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddSimulationModifier(boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier)
+{
+    mSimulationModifiers.push_back(pSimulationModifier);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllSimulationModifiers()
+{
+    mSimulationModifiers.clear();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNodeLocation(const unsigned& rNodeIndex)
 {
     std::vector<double> location;
@@ -370,6 +382,14 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     SetupSolve();
 
+    // Call SetupSolve(), on each modifier
+    for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+         iter != mSimulationModifiers.end();
+         ++iter)
+    {
+        (*iter)->SetupSolve(this->mrCellPopulation);
+    }
+
     /*
      * Age the cells to the correct time. Note that cells are created with
      * negative birth times so that some are initially almost ready to divide.
@@ -427,6 +447,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // Call UpdateAtEndOfTimeStep(), which may be implemented by child classes
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         UpdateAtEndOfTimeStep();
+        // Call UpdateAtEndOfTimeStep(), on each modifier
+        for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+             iter != mSimulationModifiers.end();
+             ++iter)
+        {
+            (*iter)->UpdateAtEndOfTimeStep(this->mrCellPopulation);
+        }
         CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
 
         // Output current results to file
@@ -455,6 +482,14 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
     UpdateAtEndOfSolve();
+
+    // Call UpdateAtEndOfSolve(), on each modifier
+    for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+         iter != mSimulationModifiers.end();
+         ++iter)
+    {
+        (*iter)->UpdateAtEndOfSolve(this->mrCellPopulation);
+    }
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
@@ -571,6 +606,16 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
     }
     *parameter_file << "\t</CellKillers>\n";
 
+    // Loop over Simulation Modifiers
+    *parameter_file << "\n\t<SimulationModifiers>\n";
+    for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+         iter != mSimulationModifiers.end();
+         ++iter)
+    {
+        // Output Simulation Modifier details
+        (*iter)->OutputSimulationModifierInfo(parameter_file);
+    }
+    *parameter_file << "\t</SimulationModifiers>\n";
     // This is used to output information about subclasses
     OutputAdditionalSimulationSetup(parameter_file);
 

@@ -53,7 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 #include "OffLatticeSimulation.hpp"
-#include "VolumeTrackedOffLatticeSimulation.hpp"
+
+#include "VolumeTrackingModifier.hpp"
 
 #include "ContactInhibitionCellCycleModel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -116,14 +117,18 @@ public:
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Create a contact inhibition simulator
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        // Create a simulator
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedSimulationWithVolumeTracked");
         //TS_ASSERT_EQUALS(simulator.GetEndTime(), 10.0);
         TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); //Default for off-lattice
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
         simulator.SetOutputNodeVelocities(true);
+
+        // Add Volume Tracking Modifier
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -198,10 +203,14 @@ public:
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Create a contact inhibition simulator
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        // Create a  simulator
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithVolumeTracked");
         simulator.SetEndTime(simulator.GetDt()/2.0);
+
+        // Add Volume Tracking Modifier
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -270,10 +279,14 @@ public:
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Create a contact inhibition simulator
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        // Create a simulator
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithGhostNodesAndVolumeTracked");
         simulator.SetEndTime(simulator.GetDt()/2.0);
+
+        // Add Volume Tracking Modifier
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
@@ -344,12 +357,16 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
 
-        // Create a contact inhibition simulator
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        // Create a simulator
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexBasedSimulationWithVolumeTracked");
         simulator.AddForce(p_nagai_honda_force);
 
         simulator.SetEndTime(simulator.GetDt()/2.0);
+
+        // Add Volume Tracking Modifier
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
 
         // Run simulation
         simulator.Solve();
@@ -417,16 +434,20 @@ public:
         p_force->SetCutOffLength(1.5);
 
         // Create a contact inhibition simulator
-        VolumeTrackedOffLatticeSimulation<2> simulator(cell_population);
+        OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVolumeTrackedOffLatticeSimulationSaveAndLoad");
         double end_time = 0.01;
         simulator.SetEndTime(end_time);
         simulator.AddForce(p_force);
 
+        // Add Volume Tracking Modifier
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
+
         // Run simulation
         simulator.Solve();
 
-        CellBasedSimulationArchiver<2, VolumeTrackedOffLatticeSimulation<2> >::Save(&simulator);
+        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
         TS_ASSERT_EQUALS((static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumRealCells(), 4u);
@@ -439,8 +460,8 @@ public:
         SimulationTime::Instance()->SetStartTime(0.0);
 
         // Load simulation
-        VolumeTrackedOffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, VolumeTrackedOffLatticeSimulation<2> >::Load("TestVolumeTrackedOffLatticeSimulationSaveAndLoad", end_time);
+        OffLatticeSimulation<2>* p_simulator
+            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestVolumeTrackedOffLatticeSimulationSaveAndLoad", end_time);
 
         p_simulator->SetEndTime(0.2);
 
