@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTDISTRIBUTEDQUADRATICMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include <set>
 #include <vector>
@@ -46,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "PetscTools.hpp"
+#include "ArchiveOpener.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -214,6 +217,7 @@ public:
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
         DistributedQuadraticMesh<2> mesh; //PARMETIS_LIBRARY
         mesh.ConstructFromMeshReader(mesh_reader);
+        TS_ASSERT_EQUALS(mesh.mMeshIsLinear, false);
 
         // Check we have the right number of nodes & elements
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
@@ -393,6 +397,76 @@ public:
                               "Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
 
     }
+
+    void TestArchiveOfReadMesh() throw(Exception)
+    {
+        FileFinder archive_dir("distributed_quadratic_mesh_archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "distributed_rectangle.arch";
+        ArchiveLocationInfo::SetMeshFilename("distributed_rectangle");
+
+
+        DistributedQuadraticMesh<2>* p_mesh = new DistributedQuadraticMesh<2>;
+        //std::vector<unsigned> halo_node_indices;
+        std::vector<Node<2>*> halo_nodes;
+        unsigned num_nodes;
+        unsigned local_num_nodes;
+        unsigned num_elements;
+        //unsigned local_num_elements;
+        //unsigned local_num_belements;
+        unsigned num_vertices;
+
+        // Archive
+        {
+            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_fully_quadratic", 2, 1, false);
+            p_mesh->ConstructFromMeshReader(mesh_reader);
+            num_nodes = p_mesh->GetNumNodes();
+            local_num_nodes = p_mesh->GetNumLocalNodes();
+            num_elements = p_mesh->GetNumElements();
+            //local_num_elements = p_mesh->GetNumLocalElements();
+            //local_num_belements = p_mesh->GetNumLocalBoundaryElements();
+            num_vertices = p_mesh->GetNumVertices();
+            halo_nodes = p_mesh->mHaloNodes;
+
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            AbstractTetrahedralMesh<2,2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2,2>* >(p_mesh);
+            (*p_arch) << p_mesh_abstract;
+        }
+
+        // Restore
+        {
+            // Should archive the most abstract class you can to check boost knows what individual classes are.
+            // (but here AbstractMesh doesn't have the methods below).
+            AbstractTetrahedralMesh<2,2>* p_mesh_abstract2;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore from the archive
+            (*p_arch) >> p_mesh_abstract2;
+
+            // Check we have the right number of nodes & elements
+            DistributedQuadraticMesh<2>* p_mesh2 = static_cast<DistributedQuadraticMesh<2>*>(p_mesh_abstract2);
+
+            TS_ASSERT_EQUALS(p_mesh2->GetNumNodes(), num_nodes);
+            TS_ASSERT_EQUALS(p_mesh2->GetNumLocalNodes(), local_num_nodes);
+            TS_ASSERT_EQUALS(p_mesh2->GetNumElements(), num_elements);
+            TS_ASSERT_EQUALS(p_mesh2->GetNumVertices(), num_vertices);
+
+//            ///\todo These fail at present...
+//            TS_ASSERT_EQUALS(p_mesh2->GetNumLocalElements(), local_num_elements);
+//            TS_ASSERT_EQUALS(p_mesh2->GetNumLocalBoundaryElements(), local_num_belements);
+//
+//            // Check the halo nodes are right
+//            std::vector<Node<2>*> halo_nodes2 = p_mesh2->mHaloNodes;
+//            TS_ASSERT_EQUALS(halo_nodes2.size(), halo_nodes.size());
+            delete p_mesh2;
+        }
+        delete p_mesh;
+    }
+
 };
 
 

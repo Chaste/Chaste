@@ -62,6 +62,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class DistributedTetrahedralMesh : public AbstractTetrahedralMesh< ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestDistributedTetrahedralMesh;
+    friend class TestDistributedQuadraticMesh;
 private:
 
     /** The total number of elements in the mesh. */
