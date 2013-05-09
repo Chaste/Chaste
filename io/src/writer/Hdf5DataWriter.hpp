@@ -249,10 +249,11 @@ public:
     void DefineFixedDimensionUsingMatrix(const std::vector<unsigned>& rNodesToOuput, long vecSize);
 
     /**
-     * Use a particular chunk size, ignoring the algorithm that figures out the optimal value. Useful for reducing
-     * size of checkpoints. USE WITH CAUTION.
+     * Use a particular chunk size, ignoring the algorithm that figures out the optimal value.
      *
-     * @param chunkSize user provided chunk size
+     * Useful for reducing the size of checkpoints. USE WITH CAUTION - as it can degrade performance.
+     *
+     * @param chunkSize  The number of unlimited dimension steps (usually time steps) to include in each chunk.
      */
     void SetFixedChunkSize(unsigned chunkSize);
 
