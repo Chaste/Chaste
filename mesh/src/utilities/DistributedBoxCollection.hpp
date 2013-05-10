@@ -181,6 +181,15 @@ public:
     bool GetBoxOwnership(unsigned globalIndex);
 
     /**
+     * Get whether the box with global index globalIndex is interior on this process.
+     * A box is interior if it doesn't share any boundary (even of zero length) with a halo box.
+     *
+     * @param globalIndex the global index of the box to check.
+     * @return whether the box is interior or not.
+     */
+    bool IsInteriorBox(unsigned globalIndex);
+
+    /**
      * Get whether the box with global index globalIndex is a halo to this process.
      *
      * @param globalIndex the global index of the box.

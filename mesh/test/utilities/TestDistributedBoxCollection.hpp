@@ -352,6 +352,25 @@ public:
         c_vector<double,1> miles_away;
         miles_away(0) = 47323854;
         TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "The point provided is outside all of the boxes");
+
+        // Test whether we can correctly identify interior boxes
+        if (PetscTools::IsSequential())
+        {
+        	// In serial everything is an interior box.
+        	for (unsigned i=0; i<5u; i++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+        	}
+        }
+        else
+        {
+        	TS_ASSERT_EQUALS(box_collection.IsInteriorBox(lo), false);
+        	for (int i=lo+1; i<hi-2; i++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+        	}
+        	TS_ASSERT_EQUALS(box_collection.IsInteriorBox(hi-1), false);
+        }
     }
 
 
@@ -900,7 +919,7 @@ public:
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36u);
 
         // Have checked that all the local boxes are calculated correctly on a 5 by 6 grid - here we
-        // hardcode a few checks on the 7 by 7 grid.
+        // hardcode a few checks on the 6 by 6 grid.
         if (box_collection.GetBoxOwnership(0))
         {
             std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
@@ -939,6 +958,36 @@ public:
             std::set<unsigned> correct_answer_35;
             correct_answer_35.insert(35);
             TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
+        }
+
+        // Test whether we can correctly identify interior boxes
+        if (PetscTools::IsSequential())
+        {
+        	// In serial everything is an interior box.
+        	for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+        	}
+        }
+        else
+        {
+        	int lo = box_collection.mpDistributedBoxStackFactory->GetLow();
+        	int hi = box_collection.mpDistributedBoxStackFactory->GetHigh();
+        	int num_face = box_collection.mNumBoxesInAFace;
+
+        	int counter;
+        	for (counter = lo; counter < lo + num_face; counter++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+        	}
+        	for ( /*Carry on from last loop */;counter < hi-num_face + 1; counter++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), true);
+        	}
+        	for ( /*Carry on from last loop */;counter < hi; counter++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+        	}
         }
     }
 
@@ -1729,6 +1778,36 @@ public:
                 correct_answer_35.insert(26);
             }
             TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
+        }
+
+        // Test whether we can correctly identify interior boxes
+        if (PetscTools::IsSequential())
+        {
+        	// In serial everything is an interior box.
+        	for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+        	}
+        }
+        else
+        {
+        	int lo = box_collection.mpDistributedBoxStackFactory->GetLow();
+        	int hi = box_collection.mpDistributedBoxStackFactory->GetHigh();
+        	int num_face = box_collection.mNumBoxesInAFace;
+
+        	int counter;
+        	for (counter = lo; counter < lo + num_face; counter++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+        	}
+        	for ( /*Carry on from last loop */;counter < hi-num_face + 1; counter++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), true);
+        	}
+        	for ( /*Carry on from last loop */;counter < hi; counter++)
+        	{
+        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+        	}
         }
     }
 

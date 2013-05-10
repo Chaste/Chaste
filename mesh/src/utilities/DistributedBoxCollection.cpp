@@ -215,6 +215,14 @@ bool DistributedBoxCollection<DIM>::GetHaloBoxOwnership(unsigned globalIndex)
 }
 
 template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::IsInteriorBox(unsigned globalIndex)
+{
+	bool is_on_boundary = !(globalIndex < mMaxBoxIndex - mNumBoxesInAFace) || (globalIndex < mMinBoxIndex + mNumBoxesInAFace);
+
+	return (PetscTools::IsSequential() || !(is_on_boundary));
+}
+
+template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::CalculateGlobalIndex(c_vector<unsigned, DIM> coordinateIndices)
 {
     unsigned containing_box_index = 0;
@@ -1022,67 +1030,77 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
         }
     }
 
-    for (unsigned i=0; i<rNodes.size(); i++)
+    for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
+    		map_iter != mBoxesMapping.end();
+    		++map_iter)
     {
-        unsigned node_index = rNodes[i]->GetIndex();
+        // Get the box global index
+        unsigned box_index = map_iter->first;
 
-        // Get the box containing this node
-        unsigned box_index = CalculateContainingBox(rNodes[i]);
+        // Get the box
+        Box<DIM>* p_box = &mBoxes[map_iter->second];
 
-        // Only calculate for owned nodes.
-        if(GetBoxOwnership(box_index))
-        {
-            // Get the local boxes to this node
-            std::set<unsigned> local_boxes_indices = GetLocalBoxes(box_index);
+        // Get the set of nodes in this box
+        std::set< Node<DIM>* >& r_contained_nodes = p_box->rGetNodesContained();
 
-            // Loop over all the local boxes
-            for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
-                 box_iter != local_boxes_indices.end();
-                 box_iter++)
-            {
-                Box<DIM>* p_box;
+		// Get the local boxes to this box
+		std::set<unsigned> local_boxes_indices = GetLocalBoxes(box_index);
 
-                // Establish whether box is locally owned or halo.
-                if (GetBoxOwnership(*box_iter))
-                {
-                    p_box = &mBoxes[mBoxesMapping[*box_iter]];
-                }
-                else // Assume it is a halo.
-                {
-                    p_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
-                }
-                assert(p_box);
+		// Loop over all the local boxes
+		for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
+			 box_iter != local_boxes_indices.end();
+			 box_iter++)
+		{
+			Box<DIM>* p_neighbour_box;
 
-                // Get the set of nodes contained in this box
-                std::set< Node<DIM>* >& r_contained_nodes = p_box->rGetNodesContained();
+			// Establish whether box is locally owned or halo.
+			if (GetBoxOwnership(*box_iter))
+			{
+				p_neighbour_box = &mBoxes[mBoxesMapping[*box_iter]];
+			}
+			else // Assume it is a halo.
+			{
+				p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
+			}
+			assert(p_neighbour_box);
 
-                // Loop over these nodes
-                for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
-                     node_iter != r_contained_nodes.end();
-                     ++node_iter)
-                {
-                    // Get the index of the other node
-                    unsigned other_node_index = (*node_iter)->GetIndex();
+			// Get the set of nodes contained in this box
+			std::set< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
 
-                    // If we're in the same box, then take care not to store the node pair twice
-                    if (*box_iter == box_index)
-                    {
-                        if (other_node_index > node_index)
-                        {
-                            rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
-                            rNodeNeighbours[node_index].insert(other_node_index);
-                            rNodeNeighbours[other_node_index].insert(node_index);
-                        }
-                    }
-                    else
-                    {
-                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
-                        rNodeNeighbours[node_index].insert(other_node_index);
-                        rNodeNeighbours[other_node_index].insert(node_index);
-                    }
-                }
-            }
-        }
+			// Loop over these nodes
+			for (typename std::set<Node<DIM>*>::iterator neighbour_node_iter = r_contained_neighbour_nodes.begin();
+				 neighbour_node_iter != r_contained_neighbour_nodes.end();
+				 ++neighbour_node_iter)
+			{
+				// Get the index of the other node
+				unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
+
+				// Loop over nodes in this box
+				for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
+					 node_iter != r_contained_nodes.end();
+					 ++node_iter)
+				{
+					unsigned node_index = (*node_iter)->GetIndex();
+
+					// If we're in the same box, then take care not to store the node pair twice
+					if (*box_iter == box_index)
+					{
+						if (other_node_index > node_index)
+						{
+							rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+							rNodeNeighbours[node_index].insert(other_node_index);
+							rNodeNeighbours[other_node_index].insert(node_index);
+						}
+					}
+					else
+					{
+						rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+						rNodeNeighbours[node_index].insert(other_node_index);
+						rNodeNeighbours[other_node_index].insert(node_index);
+					}
+				}
+			}
+		}
     }
 }
 
