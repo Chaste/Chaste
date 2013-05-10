@@ -139,6 +139,8 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     mpNodesOnlyMesh->UpdateBoxCollection();
 
+    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
+
     RefreshHaloCells();
 
     mpNodesOnlyMesh->AddHaloNodesToBoxes();
@@ -171,7 +173,7 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         this->Validate();
     }
 
-    mpNodesOnlyMesh->CalculateNodePairs(mNodePairs, mNodeNeighbours);
+    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs, mNodeNeighbours);
 
     /*
      * Update cell radii based on CellData

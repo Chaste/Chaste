@@ -197,6 +197,22 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_
 }
 
 template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+{
+    assert(mpBoxCollection);
+
+    mpBoxCollection->CalculateInteriorNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::CalculateBoundaryNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+{
+    assert(mpBoxCollection);
+
+    mpBoxCollection->CalculateBoundaryNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
+}
+
+template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 {
     map.ResetToIdentity();
