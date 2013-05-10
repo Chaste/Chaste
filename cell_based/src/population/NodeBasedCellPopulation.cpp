@@ -645,7 +645,7 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
     this->mCells.remove(p_cell);
 }
 
-/*
+/**
  * This null deleter is for the next method, SendCellsToNeighbourProcesses so we can make a
  * shared_ptr copy of mCellsToSendx without it actually being deleted when the pointer goes out of scope.
  * We need a shared pointer to send it because ObjectCommunicator only sends/recvs shared pointers to

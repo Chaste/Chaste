@@ -86,6 +86,10 @@ public:
 
         TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8*PetscTools::GetNumProcs() + PetscTools::GetMyRank() + 1), " does not belong to process ");
 
+        // Cover being able to set the maximum interation distance.
+        p_mesh->SetMaximumInteractionDistance(5.0);
+        TS_ASSERT_DELTA(p_mesh->GetMaximumInteractionDistance(), 5.0, 1e-4);
+
         // Avoid memory leak
         delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
@@ -656,11 +660,17 @@ public:
             TS_ASSERT(mesh.mDeletedNodeIndices.size() == 1u);
 
             boost::shared_ptr<Node<2> > p_node(new Node<2>(1));
+            p_node->AddNodeAttribute(1.0);
             mesh.AddMovedNode(p_node);
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_initial_nodes);
             TS_ASSERT_EQUALS(mesh.SolveNodeMapping(1), 0u);
             TS_ASSERT(mesh.mDeletedNodeIndices.size() == 0u);
         }
+
+        mesh.ClearBoxCollection();
+        mesh.UpdateBoxCollection();
+
+        TS_ASSERT(mesh.mpBoxCollection);
 
         // Clean up
         for (unsigned i=0; i<nodes.size(); i++)
