@@ -139,9 +139,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     mpNodesOnlyMesh->UpdateBoxCollection();
 
-    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
-
     RefreshHaloCells();
+
+    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
 
     mpNodesOnlyMesh->AddHaloNodesToBoxes();
 

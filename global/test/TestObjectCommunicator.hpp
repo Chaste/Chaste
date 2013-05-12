@@ -102,6 +102,114 @@ public:
         }
     }
 
+    /* This test *may* deadlock if we don't use non-blocking communication */
+    void TestNonBlockingSendingClass() throw (Exception)
+    {
+    	MPI_Request send_request;
+        MPI_Status status;
+        ObjectCommunicator<ClassOfSimpleVariables> communicator;
+
+        {
+            // Create a simple class to send
+            std::vector<double> doubles(3);
+            doubles[0] = 1.1;
+            doubles[1] = 1.2;
+            doubles[2] = 1.3;
+
+            std::vector<bool> bools(2);
+            bools[0] = true;
+            bools[1] = true;
+
+            boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
+
+            // Send the class
+            for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
+            {
+                // Arguments are object, destination, tag
+                communicator.ISendObject(p_new_class, p, 123, send_request);
+            }
+
+        }
+
+        {
+            boost::shared_ptr<ClassOfSimpleVariables> p_recv_class;
+
+            for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
+            {
+				p_recv_class = communicator.RecvObject(p, 123, status);
+
+				// Check that the values are correct
+				TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
+				TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
+				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
+				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
+
+				TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
+				TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
+				TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
+
+				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
+				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+            }
+
+        }
+    }
+
+    /** We cannot pre-post Irecv because we need to know the (dynamic) size of the object being sent first */
+    void TestNonBlockingRecvClass() throw (Exception)
+    {
+    	MPI_Request send_request;
+
+    	ObjectCommunicator<ClassOfSimpleVariables> communicator;
+
+        if (PetscTools::AmMaster())
+        {
+			// Create a simple class to send
+			std::vector<double> doubles(3);
+			doubles[0] = 1.1;
+			doubles[1] = 1.2;
+			doubles[2] = 1.3;
+
+			std::vector<bool> bools(2);
+			bools[0] = true;
+			bools[1] = true;
+
+			boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
+
+			// Send the class
+			for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
+			{
+				// Arguments are object, destination, tag
+				communicator.ISendObject(p_new_class, p, 123, send_request);
+			}
+        }
+        else
+        {
+			boost::shared_ptr<ClassOfSimpleVariables> p_recv_class;
+
+			TS_ASSERT_THROWS_THIS(p_recv_class = communicator.GetRecvObject(), "No object to receive in ObjectCommunicator::GetRecvObject");
+
+			// Receive the string. This returns before the receive is complete.
+			communicator.IRecvObject(0, 123);
+
+			// Get an object from the communicator. Implicit MPI_Wait.
+			p_recv_class = communicator.GetRecvObject();
+
+			// Check that the values are correct
+			TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
+			TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
+			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
+			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
+
+			TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
+			TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
+			TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
+
+			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
+			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+        }
+    }
+
     void TestSendRecv() throw (Exception)
     {
         if (PetscTools::GetNumProcs() == 2)
@@ -141,7 +249,6 @@ public:
             TS_ASSERT_EQUALS(p_class->GetVectorOfBools()[1],true);
         }
     }
-
 };
 
 #endif //_TESTOBJECTCOMMUNICATOR_HPP_

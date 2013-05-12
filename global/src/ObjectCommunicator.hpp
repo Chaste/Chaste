@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/serialization/shared_ptr.hpp>
 #include "PetscTools.hpp" // For MPI methods
+#include "Exception.hpp"
 
 /**
  * This is a helper method to enable classes that can be serialized to be sent using
@@ -51,6 +52,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<typename CLASS>
 class ObjectCommunicator
 {
+private:
+
+	/** A buffer for use in asyncronous communication */
+	char* mRecvString;
+
+	/** The size of a string we are waiting for in an asyncronous receive */
+	unsigned mStringLength;
+
+	/** An MPI_Request used in MPI_Irecv */
+	MPI_Request mMpiRequest;
+
+	/** A flag, used as a lock to ensure that we don't accidentally start overwriting the above buffer, mRecvString */
+	bool mIsWriting;
 
 public:
 
@@ -69,6 +83,16 @@ public:
     void SendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
 
     /**
+	 * Send an object.
+	 *
+	 * @param pObject A pointer to the object to be sent
+	 * @param destinationProcess the index of the process to send the data to
+	 * @param tag a unique identifier tag for this communication
+	 * @param request a reference to an MPI_Request used in the send
+	 */
+	void ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag, MPI_Request& request);
+
+    /**
      * Receive an object
      *
      * @param sourceProcess the process from which the data will be received
@@ -78,7 +102,22 @@ public:
      * @return A pointer to the object returned.
      */
     boost::shared_ptr<CLASS> RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status);
- 
+
+    /**
+     * Post an asynchronous receive for an object
+     *
+     * @param sourceProcess the process from which the data will be received
+     * @param tag the unique identifier code
+     */
+    void IRecvObject(unsigned sourceProcess, unsigned tag);
+
+    /**
+     * Obtain a proper object once a call to IRecv, with MPI_Request request, has completed
+     *
+     * @return a boost shared pointer to a receive object
+     */
+    boost::shared_ptr<CLASS> GetRecvObject();
+
      /**
      * Send and receive an object
      *
@@ -103,6 +142,7 @@ public:
 
 template<typename CLASS>
 ObjectCommunicator<CLASS>::ObjectCommunicator()
+	: mIsWriting(false)
 {
 }
 
@@ -125,7 +165,27 @@ void ObjectCommunicator<CLASS>::SendObject(boost::shared_ptr<CLASS> const pObjec
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
     char* send_buf = const_cast<char*>(send_msg.data());
     MPI_Send(send_buf, string_length, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD);
+}
 
+template<typename CLASS>
+void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag, MPI_Request& request)
+{
+	 // Create an output archive
+	std::ostringstream ss(std::ios::binary);
+	boost::archive::binary_oarchive output_arch(ss);
+
+	output_arch << pObject;
+
+	const std::string send_msg = ss.str();
+
+	// Get + send string length
+	unsigned string_length = send_msg.size();
+	MPI_Isend(&string_length, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+
+	// Send archive data
+	// The buffer is treated as const, but not specified as such by MPI_Send's signature
+	char* send_buf = const_cast<char*>(send_msg.data());
+	MPI_Isend(send_buf, string_length, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD, &request);
 }
 
 template<typename CLASS>
@@ -148,6 +208,48 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourcePr
 
     // Tidy up
     delete[] recv_string;
+
+    return p_recv_object;
+}
+
+template<typename CLASS>
+void ObjectCommunicator<CLASS>::IRecvObject(unsigned sourceProcess, unsigned tag)
+{
+	assert(!mIsWriting);	// Make sure the buffers are not already being used by a previous call to IRecvObject.
+
+	mIsWriting = true;
+
+	MPI_Request size_request;
+    MPI_Irecv(&mStringLength, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &size_request);
+    MPI_Wait(&size_request, MPI_STATUS_IGNORE);
+
+    mRecvString = new char[mStringLength];
+    MPI_Irecv(mRecvString, mStringLength, MPI_BYTE, sourceProcess , tag, PETSC_COMM_WORLD, &mMpiRequest);
+}
+
+template<typename CLASS>
+boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
+{
+	if (!mIsWriting)
+	{
+		EXCEPTION("No object to receive in ObjectCommunicator::GetRecvObject");
+	}
+
+    MPI_Wait(&mMpiRequest, MPI_STATUS_IGNORE);
+
+    // Extract a proper object from the buffer
+    std::istringstream ss(std::ios::binary);
+    ss.rdbuf()->pubsetbuf(mRecvString, mStringLength);
+
+    boost::shared_ptr<CLASS> p_recv_object(new CLASS);
+    boost::archive::binary_iarchive input_arch(ss);
+
+    input_arch >> p_recv_object;
+
+    // Tidy up
+    delete[] mRecvString;
+
+    mIsWriting = false;
 
     return p_recv_object;
 }
