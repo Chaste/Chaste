@@ -335,8 +335,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             // Find the location of the intersection
             double determinant = a_to_b[0]*axisOfDivision[1] - a_to_b[1]*axisOfDivision[0];
 
+            // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
             c_vector<double, SPACE_DIM> moved_centroid;
-            moved_centroid = position_a + this->GetVectorFromAtoB(position_a, centroid); // allow for periodicity and other metrics
+            moved_centroid = position_a + this->GetVectorFromAtoB(position_a, centroid);
 
             double alpha = (moved_centroid[0]*a_to_b[1] - position_a[0]*a_to_b[1]
                             -moved_centroid[1]*a_to_b[0] + position_a[1]*a_to_b[0])/determinant;
