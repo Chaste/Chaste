@@ -153,9 +153,24 @@ public:
         calculator.WritePseudoEcg();
 
         std::string output_dir = "ChasteResults/output";//default value
-        FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat",
-                "heart/test/data/ValidPseudoEcg1D.dat");
-        TS_ASSERT(comparer.CompareFiles());
+        {
+            FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat",
+                                    "heart/test/data/ValidPseudoEcg1D.dat");
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        {
+            // Time-step striding
+            PseudoEcgCalculator<1,1,1> course_calculator (mesh, probe_electrode,
+                                                   FileFinder("hdf5",RelativeTo::ChasteTestOutput),
+                                                   "gradient_V", "V" /*Voltage name*/, 2 /*Time stride*/);
+            course_calculator.WritePseudoEcg();
+            FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_15_0_0.dat",
+                    "heart/test/data/CoarsePseudoEcg1D.dat");
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+
 
         ChastePoint<1> bad_probe_electrode(0.0021132486540519);
         PseudoEcgCalculator<1,1,1> bad_calculator (mesh,
@@ -322,23 +337,6 @@ public:
         // For completeness
         ecg_calculator1.WritePseudoEcg();
         ecg_calculator2.WritePseudoEcg();
-
-        {
-            std::string output_dir = "BidomainBath1d_PseudoEcg/output";//default value
-            FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_0.3_0_0.dat",
-                    "heart/test/data/FinePseudoEcg1D.dat");
-            TS_ASSERT(comparer.CompareFiles());
-        }
-
-        //Timestep striding
-        PseudoEcgCalculator<1,1,1> ecg_calculator_coarse_time(mesh, point2, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d", "V", 5);
-        ecg_calculator_coarse_time.WritePseudoEcg();
-        {
-            std::string output_dir = "BidomainBath1d_PseudoEcg/output";//default value
-            FileComparison comparer(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir + "/PseudoEcgFromElectrodeAt_0.3_0_0.dat",
-                    "heart/test/data/CoarsePseudoEcg1D.dat");
-            TS_ASSERT(comparer.CompareFiles());
-        }
     }
 
  };
