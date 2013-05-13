@@ -288,8 +288,8 @@ public:
         double cut_off_length = 5.0;
         c_vector<double, 2> domain_size;
         domain_size(0) = 0.0;
-		domain_size(1) = 25.0;
-		
+        domain_size(1) = 25.0;
+        
         DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupAllLocalBoxes();
@@ -356,20 +356,20 @@ public:
         // Test whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
-        	// In serial everything is an interior box.
-        	for (unsigned i=0; i<5u; i++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
-        	}
+            // In serial everything is an interior box.
+            for (unsigned i=0; i<5u; i++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+            }
         }
         else
         {
-        	TS_ASSERT_EQUALS(box_collection.IsInteriorBox(lo), false);
-        	for (int i=lo+1; i<hi-2; i++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
-        	}
-        	TS_ASSERT_EQUALS(box_collection.IsInteriorBox(hi-1), false);
+            TS_ASSERT_EQUALS(box_collection.IsInteriorBox(lo), false);
+            for (int i=lo+1; i<hi-2; i++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+            }
+            TS_ASSERT_EQUALS(box_collection.IsInteriorBox(hi-1), false);
         }
     }
 
@@ -963,31 +963,31 @@ public:
         // Test whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
-        	// In serial everything is an interior box.
-        	for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
-        	}
+            // In serial everything is an interior box.
+            for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+            }
         }
         else
         {
-        	int lo = box_collection.mpDistributedBoxStackFactory->GetLow();
-        	int hi = box_collection.mpDistributedBoxStackFactory->GetHigh();
-        	int num_face = box_collection.mNumBoxesInAFace;
+            int lo = box_collection.mpDistributedBoxStackFactory->GetLow();
+            int hi = box_collection.mpDistributedBoxStackFactory->GetHigh();
+            int num_face = box_collection.mNumBoxesInAFace;
 
-        	int counter;
-        	for (counter = lo; counter < lo + num_face; counter++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
-        	}
-        	for ( /*Carry on from last loop */;counter < hi-num_face + 1; counter++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), true);
-        	}
-        	for ( /*Carry on from last loop */;counter < hi; counter++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
-        	}
+            int counter;
+            for (counter = lo; counter < lo + num_face; counter++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+            }
+            for ( /*Carry on from last loop */;counter < hi-num_face + 1; counter++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), true);
+            }
+            for ( /*Carry on from last loop */;counter < hi; counter++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+            }
         }
     }
 
@@ -1533,46 +1533,46 @@ public:
     }
 
     void TestSplitNeighbourCalculation() throw (Exception)
-	{
-		std::vector<Node<2>* > nodes;
-		for (unsigned j=0; j<3; j++)
-		{
-			for (unsigned i=0; i<3; i++)
-			{
-				nodes.push_back(new Node<2>(i + 3*j, false, 0.75 + 1.5*i, 0.75 + 1.5*j));
-			}
-		}
+    {
+        std::vector<Node<2>* > nodes;
+        for (unsigned j=0; j<3; j++)
+        {
+            for (unsigned i=0; i<3; i++)
+            {
+                nodes.push_back(new Node<2>(i + 3*j, false, 0.75 + 1.5*i, 0.75 + 1.5*j));
+            }
+        }
 
 
-		double cut_off_length = 1.5;
+        double cut_off_length = 1.5;
 
-		c_vector<double, 4> domain_size;
-		domain_size(0) = 0.0;
-		domain_size(1) = 4.5;
-		domain_size(2) = 0.0;
-		domain_size(3) = 4.5;
+        c_vector<double, 4> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 4.5;
+        domain_size(2) = 0.0;
+        domain_size(3) = 4.5;
 
-		DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
-		box_collection.SetupLocalBoxesHalfOnly();
-		box_collection.SetupHaloBoxes();
+        DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
+        box_collection.SetupLocalBoxesHalfOnly();
+        box_collection.SetupHaloBoxes();
 
-		for (unsigned i=0; i<nodes.size(); i++)
-		{
-			unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
-			if (box_collection.GetBoxOwnership(box_index))
-			{
-				// Check the box collection knows which nodes it should own.
-				TS_ASSERT(box_collection.IsOwned(nodes[i]));
-				TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
+            if (box_collection.GetBoxOwnership(box_index))
+            {
+                // Check the box collection knows which nodes it should own.
+                TS_ASSERT(box_collection.IsOwned(nodes[i]));
+                TS_ASSERT_EQUALS(box_collection.GetProcessOwningNode(nodes[i]), PetscTools::GetMyRank());
 
-				box_collection.rGetBox(box_index).AddNode(nodes[i]);
-			}
-			// Add as a halo if appropriate.
-			if (box_collection.GetHaloBoxOwnership(box_index))
-			{
-				box_collection.rGetHaloBox(box_index).AddNode(nodes[i]);
-			}
-		}
+                box_collection.rGetBox(box_index).AddNode(nodes[i]);
+            }
+            // Add as a halo if appropriate.
+            if (box_collection.GetHaloBoxOwnership(box_index))
+            {
+                box_collection.rGetHaloBox(box_index).AddNode(nodes[i]);
+            }
+        }
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
@@ -1582,76 +1582,76 @@ public:
         /* On 2 processes only neighbours of the base layer of boxes should have been calculated */
         if (PetscTools::GetNumProcs() == 2)
         {
-        	if (PetscTools::AmMaster())
-        	{
-				std::set<unsigned> neighbours_of_0 = neighbours_returned[0];
-				std::set<unsigned> neighbours_should_be;
-				neighbours_should_be.insert(1);
-				neighbours_should_be.insert(3);
-				neighbours_should_be.insert(4);
+            if (PetscTools::AmMaster())
+            {
+                std::set<unsigned> neighbours_of_0 = neighbours_returned[0];
+                std::set<unsigned> neighbours_should_be;
+                neighbours_should_be.insert(1);
+                neighbours_should_be.insert(3);
+                neighbours_should_be.insert(4);
 
-				/* The set for node 5 should be empty*/
-				TS_ASSERT_EQUALS(neighbours_returned[5].size(), 0u);
-        	}
+                /* The set for node 5 should be empty*/
+                TS_ASSERT_EQUALS(neighbours_returned[5].size(), 0u);
+            }
 
         }
 
         /* On 3 processes nothing should have been calculated as no boxes are interior*/
         if (PetscTools::GetNumProcs() == 3)
         {
-        	for (std::map<unsigned, std::set<unsigned> >::iterator iter = neighbours_returned.begin();
-        			iter != neighbours_returned.end();
-        			++iter)
-        	{
-        		TS_ASSERT_EQUALS(iter->second.size(), 0u);
-        	}
+            for (std::map<unsigned, std::set<unsigned> >::iterator iter = neighbours_returned.begin();
+                    iter != neighbours_returned.end();
+                    ++iter)
+            {
+                TS_ASSERT_EQUALS(iter->second.size(), 0u);
+            }
         }
 
         box_collection.CalculateBoundaryNodePairs(nodes,pairs_returned, neighbours_returned);
 
         if (PetscTools::GetNumProcs() == 2)
         {
-        	if (PetscTools::AmMaster())
-        	{
-        		std::set<unsigned> neighbours_of_4 = neighbours_returned[4];
-        		std::set<unsigned> neighbours_should_be;
-				neighbours_should_be.insert(0);
-				neighbours_should_be.insert(1);
-				neighbours_should_be.insert(2);
-				neighbours_should_be.insert(3);
-				neighbours_should_be.insert(5);
-				neighbours_should_be.insert(6);
-				neighbours_should_be.insert(7);
-				neighbours_should_be.insert(8);
+            if (PetscTools::AmMaster())
+            {
+                std::set<unsigned> neighbours_of_4 = neighbours_returned[4];
+                std::set<unsigned> neighbours_should_be;
+                neighbours_should_be.insert(0);
+                neighbours_should_be.insert(1);
+                neighbours_should_be.insert(2);
+                neighbours_should_be.insert(3);
+                neighbours_should_be.insert(5);
+                neighbours_should_be.insert(6);
+                neighbours_should_be.insert(7);
+                neighbours_should_be.insert(8);
 
-				TS_ASSERT_EQUALS(neighbours_of_4, neighbours_should_be);
-        	}
+                TS_ASSERT_EQUALS(neighbours_of_4, neighbours_should_be);
+            }
         }
         /* Test the all node neighbours have been calculated on 3 processes */
         if (PetscTools::GetNumProcs() == 3)
         {
-        	if (PetscTools::GetMyRank() == 1)
-        	{
-        		std::set<unsigned> neighbours_of_4 = neighbours_returned[4];
-        		std::set<unsigned> neighbours_should_be;
-        		neighbours_should_be.insert(0);
-        		neighbours_should_be.insert(1);
-        		neighbours_should_be.insert(2);
-        		neighbours_should_be.insert(3);
-        		neighbours_should_be.insert(5);
-        		neighbours_should_be.insert(6);
-        		neighbours_should_be.insert(7);
-        		neighbours_should_be.insert(8);
+            if (PetscTools::GetMyRank() == 1)
+            {
+                std::set<unsigned> neighbours_of_4 = neighbours_returned[4];
+                std::set<unsigned> neighbours_should_be;
+                neighbours_should_be.insert(0);
+                neighbours_should_be.insert(1);
+                neighbours_should_be.insert(2);
+                neighbours_should_be.insert(3);
+                neighbours_should_be.insert(5);
+                neighbours_should_be.insert(6);
+                neighbours_should_be.insert(7);
+                neighbours_should_be.insert(8);
 
-        		TS_ASSERT_EQUALS(neighbours_of_4, neighbours_should_be);
-        	}
+                TS_ASSERT_EQUALS(neighbours_of_4, neighbours_should_be);
+            }
         }
-		// Avoid memory leak
-		for (unsigned i=0; i<nodes.size(); i++)
-		{
-			delete nodes[i];
-		}
-	}
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
 
     void TestPairsReturned2dPeriodic() throw (Exception)
     {
@@ -1904,31 +1904,31 @@ public:
         // Test whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
-        	// In serial everything is an interior box.
-        	for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
-        	}
+            // In serial everything is an interior box.
+            for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
+            }
         }
         else
         {
-        	int lo = box_collection.mpDistributedBoxStackFactory->GetLow();
-        	int hi = box_collection.mpDistributedBoxStackFactory->GetHigh();
-        	int num_face = box_collection.mNumBoxesInAFace;
+            int lo = box_collection.mpDistributedBoxStackFactory->GetLow();
+            int hi = box_collection.mpDistributedBoxStackFactory->GetHigh();
+            int num_face = box_collection.mNumBoxesInAFace;
 
-        	int counter;
-        	for (counter = lo; counter < lo + num_face; counter++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
-        	}
-        	for ( /*Carry on from last loop */;counter < hi-num_face + 1; counter++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), true);
-        	}
-        	for ( /*Carry on from last loop */;counter < hi; counter++)
-        	{
-        		TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
-        	}
+            int counter;
+            for (counter = lo; counter < lo + num_face; counter++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+            }
+            for ( /*Carry on from last loop */;counter < hi-num_face + 1; counter++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), true);
+            }
+            for ( /*Carry on from last loop */;counter < hi; counter++)
+            {
+                TS_ASSERT_EQUALS(box_collection.IsInteriorBox(counter), false);
+            }
         }
     }
 

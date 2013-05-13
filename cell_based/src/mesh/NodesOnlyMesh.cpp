@@ -129,7 +129,7 @@ void NodesOnlyMesh<SPACE_DIM>::Clear()
 template<unsigned SPACE_DIM>
 DistributedBoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection()
 {
-	return mpBoxCollection;
+    return mpBoxCollection;
 }
 
 template <unsigned SPACE_DIM>
@@ -168,7 +168,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetMaximumNodeIndex()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::SetMaximumInteractionDistance(double maxDistance)
 {
-	mMaximumInteractionDistance = maxDistance;
+    mMaximumInteractionDistance = maxDistance;
 }
 
 template<unsigned SPACE_DIM>
@@ -538,11 +538,11 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows)
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, bool isPeriodic)
 {
      ClearBoxCollection();
 
-     mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, false, numLocalRows);
+     mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodic, numLocalRows);
      mpBoxCollection->SetupLocalBoxesHalfOnly();
      mpBoxCollection->SetupHaloBoxes();
 }

@@ -253,7 +253,7 @@ public:
         domain_size[3]=2.5;
         p_mesh->SetUpBoxCollection(cut_off,domain_size);
 
-        DistributedBoxCollection<2>* p_box_collection = p_mesh->mpBoxCollection;
+        DistributedBoxCollection<2>* p_box_collection = p_mesh->GetBoxCollection();
 
         TS_ASSERT(p_box_collection != NULL);
 

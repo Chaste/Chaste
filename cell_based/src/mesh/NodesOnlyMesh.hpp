@@ -77,39 +77,43 @@ private:
         archive & boost::serialization::base_object<MutableMesh<SPACE_DIM, SPACE_DIM> >(*this);
     }
 
-    /** Vector of pointer to halo nodes used by this process. */
+    /** Vector of shared-pointers to halo nodes used by this process. */
     std::vector<boost::shared_ptr<Node<SPACE_DIM> > > mHaloNodes;
 
-    /** Nodes less than mMaximumInteractionDistance are neighbours. */
+    /** Nodes separated by a distance less than mMaximumInteractionDistance are neighbours. */
     double mMaximumInteractionDistance;
 
-    /** A map from node global index to local index used by this process. */
+    /** A map from node global index to local index in mNodes. */
     std::map<unsigned, unsigned> mNodesMapping;
 
-    /** A map from halo node global index to local index used by this process. */
+    /** A map from halo node global index to local index in mHaloNodes. */
     std::map<unsigned, unsigned> mHaloNodesMapping;
 
-    /** A counter of the number of fresh node indices used on this process. */
+    /** A counter of the number of fresh node indices used on this process. Ensures unique indices in parallel. */
     unsigned mIndexCounter;
 
-    /** A minimum separation to maintain between nodes and the boundary of mpBoxCollection. */
+    /** A minimum separation to maintain between nodes and the boundary of mpBoxCollection, which grows with the mesh. */
     double mMinimumNodeDomainBoundarySeparation;
 
-    /** A list of the global index of nodes that have been deleted from this process */
+    /** A list of the global indices of nodes that have been deleted from this process and can be reused. */
     std::vector<unsigned> mDeletedGlobalNodeIndices;
 
-    /** A list of nodes that need to moved to the right hand process */
+    /** A list of global indices of nodes that need to be moved to the right hand process. */
     std::vector<unsigned> mNodesToSendRight;
 
-    /** A list of nodes that need to moved to the right hand process */
+    /** A list of global indices of nodes that need to be moved to the left hand process. */
     std::vector<unsigned> mNodesToSendLeft;
 
     /**A list of flags showing which initial nodes passed to ConstructNodesWithoutMesh
-     * were created on this process */
+     * were created on this process. */
     std::vector<bool> mLocalInitialNodes;
 
-    /** A variable to keep track of added node indices so we know the largest on this process */
+    /** A variable to keep track of added node indices so we know the largest on this process. Used to
+     * create a large enough NodeMap when remeshing. */
     unsigned mMaxAddedNodeIndex;
+
+    /** A pointer to the DistributedBoxCollection. */
+    DistributedBoxCollection<SPACE_DIM>* mpBoxCollection;
 
     /**
      * Calculate the next unique global index available on this
@@ -133,40 +137,33 @@ private:
      */
     unsigned GetNextAvailableIndex();
 
-    /**
-     * Enlarge the underlying BoxCollection by adding an extra row / face of boxes
-     * to each edge / face of the current collection.
-     */
+    /** Increase box collection size by adding an extra row/face to each edge. */
     void EnlargeBoxCollection();
 
     /**
-     * Check whether any of the nodes lie close to the domain boundary
-     *
      * @return Whether any node (deleted or otherwise) is close to the domain boundary.
      */
     bool IsANodeCloseToDomainBoundary();
 
      /**
-      * Set up a box collection by calculating the correct domain size from the node locations
+      * Set up a DistributedBoxCollection by calculating the correct domain size from the node locations.
       *
       * @param rNodes the nodes that will be contained in the box collection.
       */
      void SetUpBoxCollection(const std::vector<Node<SPACE_DIM>* >& rNodes);
 
      /**
-      * Remove all nodes marked as deleted.
+      * Remove all nodes that return mIsDeleted as true.
       *
       * @param map the NodeMap to record which nodes have been removed.
       */
      void RemoveDeletedNodes(NodeMap& map);
 
-     /**
-      * Make sure that node indices match their location, and update mNodesMapping.
-      */
+     /** Make sure that node indices match their location, and update mNodesMapping. */
      void UpdateNodeIndices();
 
      /**
-      * Add pNewNode to the mesh maintaining its current global index. Called by AddNode and AddMovedNode
+      * Add pNewNode to the mesh, maintaining its current global index. Called by AddNode and AddMovedNode.
       *
       * @param pNewNode the new node to add to this mesh.
       */
@@ -174,43 +171,28 @@ private:
 
 protected:
 
-    /**
-     * A pointer to a box collection. Used to calculate neighbourhood information
-     * for nodes in the mesh.
-     */
-    DistributedBoxCollection<SPACE_DIM>* mpBoxCollection;
-
-    /**
-     * Clear the BoxCollection
-     */
+    /**  Clear the BoxCollection  */
     void ClearBoxCollection();
 
     /**
      * Set up the box collection. Overridden in subclasses to implement periodicity.
      *
-     * @param cutOffLength the cut off length for node neighbours
+     * @param cutOffLength the cut off length for node neighbours.
      * @param domainSize the size of the domain containing the nodes.
      * @param numLocalRows the number of rows that should be owned by this process.
+     * @param isPeriodic whether the DistributedBoxCollection should be periodic.
      */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE);
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE, bool isPeriodic = false);
 
-
-     /**
-      * Get a pointer to the box collection
-      * @return mpBoxCollection
-      */
+     /** @return mpBoxCollection */
      DistributedBoxCollection<SPACE_DIM>* GetBoxCollection();
 
 public:
 
-    /**
-     * Default constructor to initialise BoxCollection to NULL.
-     */
+    /**  Default constructor to initialise BoxCollection to NULL.  */
     NodesOnlyMesh();
 
-    /**
-     * Over-written destructor to delete pointer to BoxCollection
-     */
+    /**  Over-written destructor to delete pointer to BoxCollection. */
     virtual ~NodesOnlyMesh();
 
     /**
@@ -221,8 +203,8 @@ public:
      * If this is the only way of constructing a mesh of this type, then we can be certain that
      * elements and boundary elements are always unused.
      *
-     * @param rNodes a vector of pointers to nodes
-     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
+     * @param rNodes a vector of pointers to nodes.
+     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
      */
     void ConstructNodesWithoutMesh(const std::vector<Node<SPACE_DIM>*>& rNodes, double maxInteractionDistance);
 
@@ -230,35 +212,28 @@ public:
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
      * TetrahedralMesh, this calls the ConstructNodesWithoutMesh method with the nodes
      *
-     * If this is the only way of constructing a mesh of this type, then we can be certain that
-     * elements and boundary elements are always unused.
-     *
-     * @param rGeneratingMesh any mesh with nodes, used to generate the NodesOnlyMesh
-     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs
+     * @param rGeneratingMesh any mesh with nodes, used to generate the NodesOnlyMesh.
+     * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
      */
     void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance);
 
-    /**
-     * @return whether each initial nodes is owned by this process.
-     */
+    /** @return whether each initial node given to ConstructNodesWithoutMesh is owned by this process. */
     std::vector<bool>& rGetInitiallyOwnedNodes();
 
-    /**
-     * Overridden Clear() method for NodesOnlyMesh.
-     */
+    /**  Overridden Clear() method for NodesOnlyMesh.  */
     void Clear();
 
     /**
      * Overridden solve node mapping method
      *
-     * @param index the global index of the node
+     * @param index the global index of the node.
      *
-     * @return the local index of the node.
+     * @return the local index of the node in mNodes.
      */
     unsigned SolveNodeMapping(unsigned index) const;
 
     /**
-     * Overridden method to get node or halo node from the mesh
+     * Overridden method to get node or halo node from the mesh.
      *
      * @param index the global index of the node.
      *
@@ -280,14 +255,14 @@ public:
     virtual unsigned GetMaximumNodeIndex();
 
     /**
-     * Set the maximum node interaction distance
+     * Set the maximum node interaction distance.
      *
-     * @param maxDistance the new maximum distance
+     * @param maxDistance the new maximum distance.
      */
     void SetMaximumInteractionDistance(double maxDistance);
 
     /**
-     * @return mMaxInteractionDistance
+     * @return mMaxInteractionDistance.
      */
     double GetMaximumInteractionDistance();
 
@@ -308,7 +283,7 @@ public:
     void CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
-     * Calculate pairs of nodes from interior boxes using the BoxCollection
+     * Calculate pairs of nodes from interior boxes using the BoxCollection.
      *
      * @param rNodePairs reference to the set of node pairs to populate.
      * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
@@ -324,17 +299,15 @@ public:
     void CalculateBoundaryNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
-     * Overridden ReMesh() method. Since only Nodes are stored, this method just cleans up mNodes by
+     * Overridden ReMesh() method. Since only Nodes are stored, this method cleans up mNodes by
      * removing nodes marked as deleted and reallocating mNodes to 'fill the gaps'.
      *
-     * @param rMap a reference to a NodeMap which associated the indices of the old mesh
-     * with the new mesh. It should have the same size as mNodes.
+     * @param rMap a reference to a NodeMap which associates the indices of the old mesh
+     * with the new mesh. It should be large enough to contain all node indices.
      */
     void ReMesh(NodeMap& rMap);
 
-    /**
-     * Clear the old box collection and set up a new one if necessary.
-     */
+    /** Clear the old box collection and set up a new one if necessary. */
     void UpdateBoxCollection();
 
     /**
@@ -354,32 +327,32 @@ public:
     void AddHaloNodesToBoxes();
 
     /**
-     * Work out which nodes lie outside the local domain and add their indices to the vectors NodesToSendLeft and NodesToSendRight.
+     * Work out which nodes lie outside the local domain and add their indices to the vectors #mNodesToSendLeft and #mNodesToSendRight.
      */
     void CalculateNodesOutsideLocalDomain();
 
     /**
-     * @return mNodesToSendLeft
+     * @return #mNodesToSendLeft.
      */
     std::vector<unsigned>& rGetNodesToSendLeft();
 
     /**
-     * @return mNodesToSendRight
+     * @return #mNodesToSendRight.
      */
     std::vector<unsigned>& rGetNodesToSendRight();
 
     /**
-     * @return the indices of halo nodes on the right.
+     * @return the indices of halo nodes, owned by this process, on the right hand boundary.
      */
     std::vector<unsigned>& rGetHaloNodesToSendRight();
 
     /**
-     * @return the indices of halo nodes on the left.
+     * @return the indices of halo nodes, owned by this process, on the left hand boundary.
      */
     std::vector<unsigned>& rGetHaloNodesToSendLeft();
 
     /**
-     * Add a node as a temporary halo node on this process
+     * Add a temporary halo node on this process.
      * @param pNewNode a shared pointer to the new node to add.
      */
     void AddHaloNode(boost::shared_ptr<Node<SPACE_DIM> > pNewNode);
@@ -392,21 +365,21 @@ public:
     /**
      * Overridden AddNode() method.
      *
-     * @param pNewNode  pointer to the new node
-     * @return index of new node
+     * @param pNewNode  pointer to the new node.
+     * @return index of new node.
      */
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
     /**
      * Add a node to this process that has moved from another process.
-     * @param pMovedNode the node to add to this mesh
+     * @param pMovedNode the node to add to this mesh.
      */
     void AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > pMovedNode);
 
     /**
      * Overridden DeleteNode() method.
      *
-     * @param index is the index of the node to be deleted
+     * @param index of the node to be deleted
      */
     void DeleteNode(unsigned index);
 
@@ -418,9 +391,9 @@ public:
     void DeleteMovedNode(unsigned index);
 
     /**
-     * Set the value of mMinimumNodeDomainBoundarySeparation
+     * Set the value of mMinimumNodeDomainBoundarySeparation.
      *
-     * @param separation the new value for the separation
+     * @param separation the new value for the separation.
      */
     void SetMinimumNodeDomainBoundarySeparation(double separation);
 

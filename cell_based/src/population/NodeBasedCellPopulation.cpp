@@ -33,12 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// ObjectCommunicator needs to come first since it includes archive headers, but this won't work on early Boosts
-#include <boost/version.hpp>
-#if BOOST_VERSION >= 103700
-#include "ObjectCommunicator.hpp"
-#endif
-
 #include "NodeBasedCellPopulation.hpp"
 #include "VtkMeshWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
@@ -143,8 +137,6 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
 
-    mpNodesOnlyMesh->AddHaloNodesToBoxes();
-
     if (!map.IsIdentityMap())
     {
         UpdateParticlesAfterReMesh(map);
@@ -172,6 +164,8 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
         this->Validate();
     }
+
+    AddReceivedHaloCells();
 
     mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs, mNodeNeighbours);
 
@@ -666,22 +660,67 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 #if BOOST_VERSION < 103700
     EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
 #else // BOOST_VERSION >= 103700
-    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>* > > > communicator;
     MPI_Status status;
 
     if(!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
-        mpCellsRecvRight = communicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
+        mpCellsRecvRight = mRightCommunicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
     }
     if(!PetscTools::AmMaster())
     {
         boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
-        mpCellsRecvLeft = communicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
+        mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
 #endif
 }
 
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
+{
+#if BOOST_VERSION < 103700
+    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
+#else // BOOST_VERSION >= 103700
+
+    if(!PetscTools::AmTopMost())
+    {
+        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag);
+    }
+    if(!PetscTools::AmMaster())
+    {
+        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag);
+    }
+    // Now post receives to start receiving data before returning.
+    if(!PetscTools::AmTopMost())
+    {
+    	mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, mCellCommunicationTag);
+    }
+    if(!PetscTools::AmMaster())
+    {
+    	mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, mCellCommunicationTag);
+    }
+#endif
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::GetReceivedCells()
+{
+#if BOOST_VERSION < 103700
+    EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
+#else // BOOST_VERSION >= 103700
+
+    if(!PetscTools::AmTopMost())
+    {
+    	mpCellsRecvRight = mRightCommunicator.GetRecvObject();
+    }
+    if(!PetscTools::AmMaster())
+    {
+    	mpCellsRecvLeft = mLeftCommunicator.GetRecvObject();
+    }
+#endif
+}
 template<unsigned DIM>
 std::pair<CellPtr, Node<DIM>* > NodeBasedCellPopulation<DIM>::GetCellNodePair(unsigned nodeIndex)
 {
@@ -784,8 +823,6 @@ void NodeBasedCellPopulation<DIM>::RefreshHaloCells()
     AddCellsToSendLeft(halos_to_send_left);
 
     SendCellsToNeighbourProcesses();
-
-    AddReceivedHaloCells();
 }
 
 template<unsigned DIM>
@@ -834,6 +871,8 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
             AddHaloCell(iter->first, p_node);
         }
     }
+
+    mpNodesOnlyMesh->AddHaloNodesToBoxes();
 }
 
 template<unsigned DIM>

@@ -88,9 +88,8 @@ public:
 	 * @param pObject A pointer to the object to be sent
 	 * @param destinationProcess the index of the process to send the data to
 	 * @param tag a unique identifier tag for this communication
-	 * @param request a reference to an MPI_Request used in the send
 	 */
-	void ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag, MPI_Request& request);
+	void ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
 
     /**
      * Receive an object
@@ -112,7 +111,7 @@ public:
     void IRecvObject(unsigned sourceProcess, unsigned tag);
 
     /**
-     * Obtain a proper object once a call to IRecv, with MPI_Request request, has completed
+     * Obtain a proper object once a call to IRecv has completed
      *
      * @return a boost shared pointer to a receive object
      */
@@ -168,8 +167,10 @@ void ObjectCommunicator<CLASS>::SendObject(boost::shared_ptr<CLASS> const pObjec
 }
 
 template<typename CLASS>
-void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag, MPI_Request& request)
+void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag)
 {
+	MPI_Request request;
+
 	 // Create an output archive
 	std::ostringstream ss(std::ios::binary);
 	boost::archive::binary_oarchive output_arch(ss);

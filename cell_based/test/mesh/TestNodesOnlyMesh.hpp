@@ -667,7 +667,6 @@ public:
             TS_ASSERT(mesh.mDeletedNodeIndices.size() == 0u);
         }
 
-        mesh.ClearBoxCollection();
         mesh.UpdateBoxCollection();
 
         TS_ASSERT(mesh.mpBoxCollection);

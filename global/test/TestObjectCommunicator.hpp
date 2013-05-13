@@ -105,7 +105,6 @@ public:
     /* This test *may* deadlock if we don't use non-blocking communication */
     void TestNonBlockingSendingClass() throw (Exception)
     {
-    	MPI_Request send_request;
         MPI_Status status;
         ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
@@ -126,7 +125,7 @@ public:
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
                 // Arguments are object, destination, tag
-                communicator.ISendObject(p_new_class, p, 123, send_request);
+                communicator.ISendObject(p_new_class, p, 123);
             }
 
         }
@@ -158,8 +157,6 @@ public:
     /** We cannot pre-post Irecv because we need to know the (dynamic) size of the object being sent first */
     void TestNonBlockingRecvClass() throw (Exception)
     {
-    	MPI_Request send_request;
-
     	ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
         if (PetscTools::AmMaster())
@@ -180,7 +177,7 @@ public:
 			for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
 			{
 				// Arguments are object, destination, tag
-				communicator.ISendObject(p_new_class, p, 123, send_request);
+				communicator.ISendObject(p_new_class, p, 123);
 			}
         }
         else

@@ -160,6 +160,42 @@ public:
 #endif
     }
 
+    void TestSendAndRecieveCellsNonBlocking() throw (Exception)
+    {
+        unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
+        mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
+        mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
+
+        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mCellCommunicationTag, 123u);
+
+        TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvRight));
+        TS_ASSERT(!(mpNodeBasedCellPopulation->mpCellsRecvLeft));
+
+#if BOOST_VERSION < 103700
+        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
+                              "Parallel cell-based Chaste requires Boost >= 1.37");
+#else
+        mpNodeBasedCellPopulation->NonBlockingSendCellsToNeighbourProcesses();
+
+        mpNodeBasedCellPopulation->GetReceivedCells();
+
+        if (!PetscTools::AmTopMost())
+        {
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvRight->size(), 1u);
+
+            unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvRight->begin()).second->GetIndex();
+            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() + 1);
+        }
+        if (!PetscTools::AmMaster())
+        {
+            TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mpCellsRecvLeft->size(), 1u);
+
+            unsigned index = (*mpNodeBasedCellPopulation->mpCellsRecvLeft->begin()).second->GetIndex();
+            TS_ASSERT_EQUALS(index, PetscTools::GetMyRank() - 1);
+        }
+#endif
+    }
+
     void TestUpdateCellProcessLocation() throw (Exception)
     {
         if (PetscTools::GetNumProcs() > 1)
@@ -213,18 +249,20 @@ public:
         mpNodeBasedCellPopulation->Update();
 
         // Send and receive halo nodes.
-           mpNodeBasedCellPopulation->RefreshHaloCells();
+		mpNodeBasedCellPopulation->RefreshHaloCells();
 
-           if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
-           {
-               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
-               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
-               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
-           }
-           else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
-           {
-               TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
-           }
+		mpNodeBasedCellPopulation->AddReceivedHaloCells();
+
+		if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
+		{
+		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
+		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
+		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+		}
+		else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
+		{
+		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
+		}
 #endif
     }
 

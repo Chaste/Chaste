@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
-    : mDomainSize(domainSize),
-      mBoxWidth(boxWidth),
+    : mBoxWidth(boxWidth),
       mIsPeriodicInX(isPeriodicInX),
       mAreLocalBoxesSet(false),
       mFudge(5e-14)
@@ -50,8 +49,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         assert(DIM==2 && PetscTools::IsSequential());
     }
 
-    // We insist that the user provide a box width that divides the domainSize in each direction.
-    ///\todo Consider adapting domain size to the width of the boxes.
+    // If the domain size is not 'divisible' (i.e. fmod(width, box_size) > 0.0) we swell the domain to enforce this.
     for (unsigned i=0; i<DIM; i++)
     {
         double r = fmod((domainSize[2*i+1]-domainSize[2*i]), boxWidth);
@@ -63,9 +61,9 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
 
     mDomainSize = domainSize;
 
+    // Calculate the number of boxes in each direction.
     mNumBoxesEachDirection = scalar_vector<unsigned>(DIM, 0u);
 
-    // Calculate the number of boxes in each direction.
     for (unsigned i=0; i<DIM; i++)
     {
         double counter = mDomainSize(2*i);
@@ -82,8 +80,11 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
         mDomainSize[2*DIM - 1] += (PetscTools::GetNumProcs() - mNumBoxesEachDirection(DIM-1))*mBoxWidth;
         mNumBoxesEachDirection(DIM-1) = PetscTools::GetNumProcs();
     }
+
+    // Make a distributed vectory factory to split the rows of boxes between processes.
     mpDistributedBoxStackFactory = new DistributedVectorFactory(mNumBoxesEachDirection(DIM-1), localRows);
 
+    // Calculate how many boxes in a row / face. A useful piece of data in the class.
     mNumBoxesInAFace = 1;
     for (unsigned i=1; i<DIM; i++)
     {
@@ -95,11 +96,16 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     mMinBoxIndex = mpDistributedBoxStackFactory->GetLow() * mNumBoxesInAFace;
     mMaxBoxIndex = mpDistributedBoxStackFactory->GetHigh() * mNumBoxesInAFace - 1;
 
+    /*
+     * The location of the Boxes doesn't matter as it isn't actually used so we don't bother to work it out.
+     * The reason it isn't used is because this class works out which box a node lies in without refernece to actual
+     * box locations, only their global index within the collection.
+     */
     c_vector<double, 2*DIM> arbitrary_location;
     for (unsigned i=0; i<num_boxes; i++)
     {
         Box<DIM> new_box(arbitrary_location);
-        mBoxes.push_back(new_box);    // The location of the Boxes doesn't matter.
+        mBoxes.push_back(new_box);
 
         unsigned global_index = mMinBoxIndex + i;
         mBoxesMapping[global_index] = mBoxes.size() - 1;
@@ -139,7 +145,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     {
         for (unsigned i=0; i < mNumBoxesInAFace; i++)
         {
-            c_vector<double, 2*DIM> arbitrary_location;
+            c_vector<double, 2*DIM> arbitrary_location; // See comment in constructor.
             Box<DIM> new_box(arbitrary_location);
             mHaloBoxes.push_back(new_box);
 
@@ -154,7 +160,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     {
         for (unsigned i=0; i< mNumBoxesInAFace; i++)
         {
-            c_vector<double, 2*DIM> arbitrary_location;
+            c_vector<double, 2*DIM> arbitrary_location; // See comment in constructor.
             Box<DIM> new_box(arbitrary_location);
             mHaloBoxes.push_back(new_box);
 
@@ -217,9 +223,9 @@ bool DistributedBoxCollection<DIM>::GetHaloBoxOwnership(unsigned globalIndex)
 template<unsigned DIM>
 bool DistributedBoxCollection<DIM>::IsInteriorBox(unsigned globalIndex)
 {
-	bool is_on_boundary = !(globalIndex < mMaxBoxIndex - mNumBoxesInAFace) || (globalIndex < mMinBoxIndex + mNumBoxesInAFace);
+    bool is_on_boundary = !(globalIndex < mMaxBoxIndex - mNumBoxesInAFace) || (globalIndex < mMinBoxIndex + mNumBoxesInAFace);
 
-	return (PetscTools::IsSequential() || !(is_on_boundary));
+    return (PetscTools::IsSequential() || !(is_on_boundary));
 }
 
 template<unsigned DIM>
@@ -1031,8 +1037,8 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
     }
 
     for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-    		map_iter != mBoxesMapping.end();
-    		++map_iter)
+            map_iter != mBoxesMapping.end();
+            ++map_iter)
     {
         // Get the box global index
         unsigned box_index = map_iter->first;
@@ -1062,15 +1068,15 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
     }
 
     for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-    		map_iter != mBoxesMapping.end();
-    		++map_iter)
+            map_iter != mBoxesMapping.end();
+            ++map_iter)
     {
         // Get the box global index
         unsigned box_index = map_iter->first;
 
         if (IsInteriorBox(box_index))
         {
-        	AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+            AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
         }
     }
 }
@@ -1079,15 +1085,15 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
-    		map_iter != mBoxesMapping.end();
-    		++map_iter)
+            map_iter != mBoxesMapping.end();
+            ++map_iter)
     {
         // Get the box global index
         unsigned box_index = map_iter->first;
 
         if (!IsInteriorBox(box_index))
         {
-        	AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
+            AddPairsFromBox(box_index, rNodePairs, rNodeNeighbours);
         }
     }
 }
@@ -1095,70 +1101,70 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
-	// Get the box
-	Box<DIM> box = rGetBox(boxIndex);
+    // Get the box
+    Box<DIM> box = rGetBox(boxIndex);
 
-	// Get the set of nodes in this box
-	std::set< Node<DIM>* >& r_contained_nodes = box.rGetNodesContained();
+    // Get the set of nodes in this box
+    std::set< Node<DIM>* >& r_contained_nodes = box.rGetNodesContained();
 
-	// Get the local boxes to this box
-	std::set<unsigned> local_boxes_indices = GetLocalBoxes(boxIndex);
+    // Get the local boxes to this box
+    std::set<unsigned> local_boxes_indices = GetLocalBoxes(boxIndex);
 
-	// Loop over all the local boxes
-	for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
-		 box_iter != local_boxes_indices.end();
-		 box_iter++)
-	{
-		Box<DIM>* p_neighbour_box;
+    // Loop over all the local boxes
+    for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
+         box_iter != local_boxes_indices.end();
+         box_iter++)
+    {
+        Box<DIM>* p_neighbour_box;
 
-		// Establish whether box is locally owned or halo.
-		if (GetBoxOwnership(*box_iter))
-		{
-			p_neighbour_box = &mBoxes[mBoxesMapping[*box_iter]];
-		}
-		else // Assume it is a halo.
-		{
-			p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
-		}
-		assert(p_neighbour_box);
+        // Establish whether box is locally owned or halo.
+        if (GetBoxOwnership(*box_iter))
+        {
+            p_neighbour_box = &mBoxes[mBoxesMapping[*box_iter]];
+        }
+        else // Assume it is a halo.
+        {
+            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
+        }
+        assert(p_neighbour_box);
 
-		// Get the set of nodes contained in this box
-		std::set< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
+        // Get the set of nodes contained in this box
+        std::set< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
 
-		// Loop over these nodes
-		for (typename std::set<Node<DIM>*>::iterator neighbour_node_iter = r_contained_neighbour_nodes.begin();
-			 neighbour_node_iter != r_contained_neighbour_nodes.end();
-			 ++neighbour_node_iter)
-		{
-			// Get the index of the other node
-			unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
+        // Loop over these nodes
+        for (typename std::set<Node<DIM>*>::iterator neighbour_node_iter = r_contained_neighbour_nodes.begin();
+             neighbour_node_iter != r_contained_neighbour_nodes.end();
+             ++neighbour_node_iter)
+        {
+            // Get the index of the other node
+            unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
 
-			// Loop over nodes in this box
-			for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
-				 node_iter != r_contained_nodes.end();
-				 ++node_iter)
-			{
-				unsigned node_index = (*node_iter)->GetIndex();
+            // Loop over nodes in this box
+            for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
+                 node_iter != r_contained_nodes.end();
+                 ++node_iter)
+            {
+                unsigned node_index = (*node_iter)->GetIndex();
 
-				// If we're in the same box, then take care not to store the node pair twice
-				if (*box_iter == boxIndex)
-				{
-					if (other_node_index > node_index)
-					{
-						rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
-						rNodeNeighbours[node_index].insert(other_node_index);
-						rNodeNeighbours[other_node_index].insert(node_index);
-					}
-				}
-				else
-				{
-					rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
-					rNodeNeighbours[node_index].insert(other_node_index);
-					rNodeNeighbours[other_node_index].insert(node_index);
-				}
-			}
-		}
-	}
+                // If we're in the same box, then take care not to store the node pair twice
+                if (*box_iter == boxIndex)
+                {
+                    if (other_node_index > node_index)
+                    {
+                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+                        rNodeNeighbours[node_index].insert(other_node_index);
+                        rNodeNeighbours[other_node_index].insert(node_index);
+                    }
+                }
+                else
+                {
+                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+                    rNodeNeighbours[node_index].insert(other_node_index);
+                    rNodeNeighbours[other_node_index].insert(node_index);
+                }
+            }
+        }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////

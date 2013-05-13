@@ -386,15 +386,15 @@ public:
                 node_iter != p_mesh->GetNodeIteratorEnd();
                 ++node_iter)
         {
-        	if (node_iter->GetIndex()<50)
+            if (node_iter->GetIndex()<50)
             {
-        		TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
+                TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
             }
-        	else
-        	{
-        		// No cell attached
-        		TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), 0.0, 1e-3);
-        	}
+            else
+            {
+                // No cell attached
+                TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), 0.0, 1e-3);
+            }
         }
 
         CellBasedPdeHandler<2> pde_handler(&cell_population);

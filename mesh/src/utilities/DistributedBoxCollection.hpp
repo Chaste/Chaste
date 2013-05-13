@@ -134,8 +134,6 @@ private:
 public:
 
     /**
-     * Constructor
-     *
      * @param boxWidth the width of each box (cut-off length in NodeBasedCellPopulation simulations)
      * @param domainSize the size of the domain, in the form (xmin, xmax, ymin, ymax) (etc)
      * @param isPeriodicInX whether the domain is peiodic in the x direction
@@ -145,7 +143,7 @@ public:
 
 
     /**
-     * Destructor
+     * Destructor - frees memory allocated to distributed vector.
      */
     ~DistributedBoxCollection();
 
@@ -162,8 +160,8 @@ public:
     void SetupHaloBoxes();
 
     /**
-     * Update the halo boxes on this processes, by transferring
-     * the nodes to be sent into the lists mHaloNodesRight / Left
+     * Update the halo boxes on this process, by transferring
+     * the nodes to be sent into the lists mHaloNodesRight / Left.
      */
     void UpdateHaloBoxes();
 
@@ -173,10 +171,8 @@ public:
     unsigned GetNumLocalRows() const;
 
     /**
-     * Get whether the box with global index globalIndex is owned by this process.
-     *
      * @param globalIndex the global index of the box.
-     * @return whether the box is owned.
+     * @return whether the box with global index globalIndex is owned by this process.
      */
     bool GetBoxOwnership(unsigned globalIndex);
 
@@ -190,10 +186,8 @@ public:
     bool IsInteriorBox(unsigned globalIndex);
 
     /**
-     * Get whether the box with global index globalIndex is a halo to this process.
-     *
      * @param globalIndex the global index of the box.
-     * @return whether the box is halo-owned.
+     * @return whether the box with global index globalIndex is a halo to this process.
      */
     bool GetHaloBoxOwnership(unsigned globalIndex);
 
@@ -206,18 +200,14 @@ public:
     unsigned CalculateGlobalIndex(c_vector<unsigned, DIM> coordinateIndices);
 
     /**
-     * Calculate which box this node is contained in.
-     *
      * @param pNode address of the node
      * @return the global index of the box that contains pNode.
      */
     unsigned CalculateContainingBox(Node<DIM>* pNode);
 
     /**
-     * Calculate which box a point is contained in
-     *
      * @param rLocation The point
-     * @return the global index of the box that contains the location rLocation.
+     * @return the global index of the box that contains the rLocation.
      */
     unsigned CalculateContainingBox(c_vector<double, DIM>& rLocation);
 
@@ -230,65 +220,51 @@ public:
     c_vector<unsigned, DIM> CalculateCoordinateIndices(unsigned globalIndex);
 
     /**
-     * Get a box.
      * @param boxIndex the index of the box to return
-     * @return a reference to the box.
+     * @return a reference to the box with global index boxIndex.
      */
     Box<DIM>& rGetBox(unsigned boxIndex);
 
     /**
      * Get a halo box.
      * @param boxIndex the index of the box to return
-     * @return a reference to the halo box.
+     * @return a reference to the halo box with global index boxIndex.
      */
     Box<DIM>& rGetHaloBox(unsigned boxIndex);
 
     /**
-     * Get the number of boxes.
-     *
-     * @return mNumBoxes
+     * @return the total global number of boxes.
      */
     unsigned GetNumBoxes();
 
     /**
-     * Get the number of locally owned boxes.
-     *
-     * @return the number of locally owned boxes. Not including HaloBoxes.
+     * @return the number of locally owned boxes. Not including halos.
      */
     unsigned GetNumLocalBoxes();
 
     /**
-     * Get the global domain size. Used in serialisation.
-     *
-     * @return mDomainSize
+     * @return #mDomainSize
      */
     c_vector<double, 2*DIM> rGetDomainSize() const;
 
     /**
-     * Return whether the local boxes have been set up or not. Used in serialisation.
-     *
-     * @return mAreLocalBoxesSet
+     * @return Whether or not the local boxes have been set up.
      */
     bool GetAreLocalBoxesSet() const;
 
     /**
-     * Return the width of each box. Used in serialisation.
-     *
-     * @return mBoxWdith
+     * @return #mBoxWdith
      */
     double GetBoxWidth() const;
 
     /**
-     * Return the number of rows in the DIM-1th direction
-     * Used in serialization
-     *
      * @return the number of rows in the DIM-1th direction on this process.
      */
     unsigned GetNumRowsOfBoxes() const;
 
     /**
      *  Set up the local boxes (ie itself and its nearest-neighbours) for each of the boxes.
-     *  Just set up half of the local boxes (for example, in 1D, local boxes for box0 = {1}
+     *  This method just sets up half of the local boxes (for example, in 1D, local boxes for box0 = {1}
      *  local boxes for box1 = {2} not {0,2}, and so on. Similar to 2d, 3d.
      */
     void SetupLocalBoxesHalfOnly();
@@ -307,16 +283,14 @@ public:
     std::set<unsigned> GetLocalBoxes(unsigned boxIndex);
 
     /**
-     * Calculate whether the node pNode is owned based on its location.
-     *
-     * @return whether the node is owned.
      * @param pNode the node to test.
+     * @return whether the point at pNode->rGetLocation() is owned on this process.
      */
     bool IsOwned(Node<DIM>* pNode);
 
     /**
      * Get the process that should own this node.
-     * Currently only returns +/-1 of this process so assumes nodes don't move too far.
+     * Currently only returns +/-1 of this process so assumes nodes don't move too far. //\ todo this should be fixed.
      *
      * @param pNode the node to be tested
      * @return the ID of the process that should own the node.
@@ -324,12 +298,12 @@ public:
     unsigned GetProcessOwningNode(Node<DIM>* pNode);
 
     /**
-     * @return mHaloNodesRight the list of nodes that are close to the right boundary
+     * @return #mHaloNodesRight the list of nodes that are close to the right boundary
      */
     std::vector<unsigned>& rGetHaloNodesRight();
 
     /**
-     * @return mHaloNodesRight the list of nodes that are close to the left boundary
+     * @return #mHaloNodesRight the list of nodes that are close to the left boundary
      */
     std::vector<unsigned>& rGetHaloNodesLeft();
 
@@ -345,10 +319,31 @@ public:
      */
     void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
+    /**
+     *  The same as CalculateNodePairs() only we only work on boxes that are interior on this process. I.e. none of their local boxes are halo boxes.
+     *
+     *  @param rNodes all the nodes to be consider
+     *  @param rNodePairs the return value, a set of pairs of nodes
+     *  @param rNodeNeighbours the other return value, the neighbours of each node.
+     */
     void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
+    /**
+     *  The same as CalculateNodePairs() only we only work on boxes that are ''not'' interior on this process. I.e. some of their local boxes are halo boxes.
+     *
+     *  @param rNodes all the nodes to be consider
+     *  @param rNodePairs the return value, a set of pairs of nodes
+     *  @param rNodeNeighbours the other return value, the neighbours of each node.
+     */
     void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
+    /**
+     * A method pulled out of CalculateNodePairs methods that adds all pairs of nodes from neighbouring boxes of the box with index boxIndex.
+     *
+     * @param boxIndex the box to add neighbours to.
+     * @param rNodePairs the return value, a set of pairs of nodes
+     * @param rNodeNeighbours the other return value, the neighbours of each node.
+     */
     void AddPairsFromBox(unsigned boxIndex, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
 };

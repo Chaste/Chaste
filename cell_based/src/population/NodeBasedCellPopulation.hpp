@@ -39,9 +39,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 103700
+#include "ObjectCommunicator.hpp"
+#endif
+
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "BoxCollection.hpp"
+
 
 /**
  * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.
@@ -90,6 +96,12 @@ private:
 
     /** A pointer to the cells received from the left process */
     boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvLeft;
+
+    /** A communicator to send cells to the right hand process */
+    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>* > > > mRightCommunicator;
+
+    /** A communicator to send cells to the left hand process */
+    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>* > > > mLeftCommunicator;
 
     /** The tag used to send and recieve cell information */
     static const unsigned mCellCommunicationTag = 123;
@@ -421,6 +433,20 @@ public:
      * #mpCellsRecvRight/Left.
      */
     void SendCellsToNeighbourProcesses();
+
+    /**
+     * Send the contents of #mCellsToSendRight/Left to
+     * neighbouring processes using asynchronous communication.
+     * #mpCellsRecvLeft/Right will not be updated until the
+     * equivalent GetReceivedCells() is called.
+     */
+    void NonBlockingSendCellsToNeighbourProcesses();
+
+    /**
+     * Obtain proper cell/node pair objects from a previous
+     * call to NonBlockingSendCellsToNeighbourProcesses();
+     */
+    void GetReceivedCells();
 
     /**
      * Helper method to find and pack up nodes and cells together
