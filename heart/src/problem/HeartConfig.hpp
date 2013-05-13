@@ -964,8 +964,13 @@ public:
      */
     void SetPdeTimeStep(double pdeTimeStep);
 
-    /** Set the configuration to use printing time of given value
+    /**
+     * Set the configuration to use printing time of given value.
+     * The printing time step is how long between timesteps that
+     * are written to the HDF5 file.
+     *
      * Calls CheckTimeSteps via SetOdePdeAndPrintingTimeSteps
+     *
      * @param printingTimeStep  the value to use
      */
      void SetPrintingTimeStep(double printingTimeStep);
