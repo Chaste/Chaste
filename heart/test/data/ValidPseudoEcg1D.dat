@@ -1,5 +1,6 @@
--0.0047619
--0.0047619
--0.0047619
--0.0047619
-# Created by Chaste ...
+#Time(ms)	Pseudo-ECG
+0	-0.0047619
+1	-0.0047619
+2	-0.0047619
+3	-0.0047619
+# Created by Chaste version 3.1.18845 (with uncommitted modifications) on Mon, 13 May 2013 15:28:16 +0000.  Chaste was built on Mon, 13 May 2013 14:45:42 +0000 by machine (uname) 'Linux userpc60.cs.ox.ac.uk 2.6.32-46-generic #108-Ubuntu SMP Thu Apr 11 15:56:25 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: SimpleSensitivity=18009; website=15353.

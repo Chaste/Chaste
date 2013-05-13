@@ -63,10 +63,12 @@ PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(Ab
                                                                               const ChastePoint<SPACE_DIM>& rProbeElectrode,
                                                                               const FileFinder& rDirectory,
                                                                               std::string hdf5File,
-                                                                              std::string variableName)
+                                                                              std::string variableName,
+                                                                              unsigned timestepStride)
   : mrMesh(rMesh),
     mProbeElectrode(rProbeElectrode),
-    mVariableName(variableName)
+    mVariableName(variableName),
+    mTimestepStride(timestepStride)
 {
     mpDataReader = new Hdf5DataReader(rDirectory, hdf5File);
     mNumberOfNodes = mpDataReader->GetNumberOfRows();
@@ -124,6 +126,9 @@ double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputePseudoEc
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WritePseudoEcg ()
 {
+    // Cache the time values so that we can plot a decent x-axis
+    std::vector<double> time_points = mpDataReader->GetUnlimitedDimensionValues();
+
     std::stringstream stream;
     stream << "PseudoEcgFromElectrodeAt" << "_" << mProbeElectrode.GetWithDefault(0)
                           << "_" << mProbeElectrode.GetWithDefault(1)
@@ -133,13 +138,14 @@ void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WritePseudoEcg ()
     if (PetscTools::AmMaster())
     {
         p_file = output_file_handler.OpenOutputFile(stream.str());
+        *p_file << "#Time(ms)\tPseudo-ECG\n";
     }
-    for (unsigned i = 0; i < mNumTimeSteps; i++)
+    for (unsigned time_step = 0; time_step < mNumTimeSteps; time_step+=mTimestepStride)
     {
-        double pseudo_ecg_at_one_timestep = ComputePseudoEcgAtOneTimeStep(i);
+        double pseudo_ecg_at_one_timestep = ComputePseudoEcgAtOneTimeStep(time_step);
         if (PetscTools::AmMaster())
         {
-            *p_file << pseudo_ecg_at_one_timestep << "\n";
+            *p_file << time_points[time_step] << "\t" <<pseudo_ecg_at_one_timestep << "\n";
         }
     }
     if (PetscTools::AmMaster())

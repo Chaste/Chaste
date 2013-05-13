@@ -81,7 +81,7 @@ private:
     ChastePoint<SPACE_DIM> mProbeElectrode; /**<The point from where we want to calculate the pseudoECG*/
     double mDiffusionCoefficient;/**<The diffusion coefficient D*/
     std::string mVariableName;/**< the variable for which we want to calculate the pseudo ecg, defaults to "V"*/
-
+    unsigned mTimestepStride; /**< The number of timesteps in a stride (so that we don't have to compute all the ECGs).  This defaults to 1.*/
     /**
      * @return the integrand.
      * The pseudo-ECG is defined as the integral over the mesh of the following integrand:
@@ -127,13 +127,16 @@ public:
      * @param rDirectory  The directory where the simulation results are stored
      * @param hdf5File The file name  where the simulation results are stored
      * @param variableName  The name of the voltage variable (is V by default)
+     * @param timestepStride The number of timesteps in a stride (so that we don't
+     *        have to compute all the ECGs).  This defaults to 1.
      *
      */
     PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                         const ChastePoint<SPACE_DIM>& rProbeElectrode,
                         const FileFinder& rDirectory,
                         std::string hdf5File,
-                        std::string variableName = "V");
+                        std::string variableName = "V",
+                        unsigned timestepStride = 1);
 
     /**
      * Destructor.
