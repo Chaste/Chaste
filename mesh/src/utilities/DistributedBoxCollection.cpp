@@ -41,7 +41,8 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     : mBoxWidth(boxWidth),
       mIsPeriodicInX(isPeriodicInX),
       mAreLocalBoxesSet(false),
-      mFudge(5e-14)
+      mFudge(5e-14),
+      mCalculateNodeNeighbours(true)
 {
     // Periodicity only works in 2d and in serial.
     if (isPeriodicInX)
@@ -1017,7 +1018,13 @@ std::vector<unsigned>& DistributedBoxCollection<DIM>::rGetHaloNodesLeft()
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::SetCalculateNodeNeighbours(bool calculateNodeNeighbours)
+{
+    mCalculateNodeNeighbours = calculateNodeNeighbours;
+}
+
+template<unsigned DIM>
+void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();
     rNodeNeighbours.clear();
@@ -1048,7 +1055,7 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();
     rNodeNeighbours.clear();
@@ -1082,7 +1089,7 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     for (std::map<unsigned, unsigned>::iterator map_iter = mBoxesMapping.begin();
             map_iter != mBoxesMapping.end();
@@ -1099,7 +1106,7 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
 }
 
 template<unsigned DIM>
-void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     // Get the box
     Box<DIM> box = rGetBox(boxIndex);
@@ -1151,17 +1158,24 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::set<
                 {
                     if (other_node_index > node_index)
                     {
-                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
-                        rNodeNeighbours[node_index].insert(other_node_index);
-                        rNodeNeighbours[other_node_index].insert(node_index);
+                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+                        if (mCalculateNodeNeighbours)
+                        {
+                            rNodeNeighbours[node_index].insert(other_node_index);
+                            rNodeNeighbours[other_node_index].insert(node_index);
+                        }
                     }
                 }
                 else
                 {
-                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
-                    rNodeNeighbours[node_index].insert(other_node_index);
-                    rNodeNeighbours[other_node_index].insert(node_index);
+                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+                    if (mCalculateNodeNeighbours)
+                    {
+                        rNodeNeighbours[node_index].insert(other_node_index);
+                        rNodeNeighbours[other_node_index].insert(node_index);
+                    }
                 }
+
             }
         }
     }

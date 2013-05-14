@@ -54,8 +54,8 @@ class ObjectCommunicator
 {
 private:
 
-	/** A buffer for use in asynchronous communication */
-	char* mRecvBuffer;
+    /** A buffer for use in asynchronous communication */
+    char* mRecvBuffer;
 
     /** A buffer for use in asynchronous communication */
     char* mSendBuffer;
@@ -63,17 +63,17 @@ private:
     /** A string member used to ensure buffer doesn't go out of scope in asynchronous communication */
     std::string mSendString;
 
-	/** The size of a string we are waiting for in an asynchronous receive */
-	unsigned mRecvBufferLength;
+    /** The size of a string we are waiting for in an asynchronous receive */
+    unsigned mRecvBufferLength;
 
     /** The size of a string we are sending */
     unsigned mSendBufferLength;
 
-	/** An MPI_Request used in MPI_Irecv */
-	MPI_Request mMpiRequest;
+    /** An MPI_Request used in MPI_Irecv */
+    MPI_Request mMpiRequest;
 
-	/** A flag, used as a lock to ensure that we don't accidentally start overwriting the above buffer, #mRecvBuffer */
-	bool mIsWriting;
+    /** A flag, used as a lock to ensure that we don't accidentally start overwriting the above buffer, #mRecvBuffer */
+    bool mIsWriting;
 
 public:
 
@@ -92,13 +92,13 @@ public:
     void SendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
 
     /**
-	 * Send an object.
-	 *
-	 * @param pObject A pointer to the object to be sent
-	 * @param destinationProcess the index of the process to send the data to
-	 * @param tag a unique identifier tag for this communication
-	 */
-	void ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
+     * Send an object.
+     *
+     * @param pObject A pointer to the object to be sent
+     * @param destinationProcess the index of the process to send the data to
+     * @param tag a unique identifier tag for this communication
+     */
+    void ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag);
 
     /**
      * Receive an object
@@ -134,7 +134,7 @@ public:
      * @param sendTag the tag to send with.
      * @param sourceProcess the process from which the data will be received
      * @param sourceTag the tag to receive with
-     * @param status a refernce to an MPI_Status object.
+     * @param status a reference to an MPI_Status object.
      *
      * @return A pointer to the object returned.
      */
@@ -148,7 +148,7 @@ public:
 // Implementation needs to be here, as CLASS could be anything
 template<typename CLASS>
 ObjectCommunicator<CLASS>::ObjectCommunicator()
-	: mIsWriting(false)
+    : mIsWriting(false)
 {
 }
 
@@ -176,24 +176,24 @@ void ObjectCommunicator<CLASS>::SendObject(boost::shared_ptr<CLASS> const pObjec
 template<typename CLASS>
 void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObject, unsigned destinationProcess, unsigned tag)
 {
-	MPI_Request request;
+    MPI_Request request;
 
-	 // Create an output archive
-	std::ostringstream ss(std::ios::binary);
-	boost::archive::binary_oarchive output_arch(ss);
+     // Create an output archive
+    std::ostringstream ss(std::ios::binary);
+    boost::archive::binary_oarchive output_arch(ss);
 
-	output_arch << pObject;
+    output_arch << pObject;
 
-	mSendString = ss.str();
+    mSendString = ss.str();
 
-	// Get + send string length
-	mSendBufferLength = mSendString.size();
-	MPI_Isend(&mSendBufferLength, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+    // Get + send string length
+    mSendBufferLength = mSendString.size();
+    MPI_Isend(&mSendBufferLength, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD, &request);
 
-	// Send archive data
-	// The buffer is treated as const, but not specified as such by MPI_Send's signature
-	mSendBuffer = const_cast<char*>(mSendString.data());
-	MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+    // Send archive data
+    // The buffer is treated as const, but not specified as such by MPI_Send's signature
+    mSendBuffer = const_cast<char*>(mSendString.data());
+    MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD, &request);
 }
 
 template<typename CLASS>
@@ -223,12 +223,12 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourcePr
 template<typename CLASS>
 void ObjectCommunicator<CLASS>::IRecvObject(unsigned sourceProcess, unsigned tag)
 {
-	assert(!mIsWriting);	// Make sure the buffers are not already being used by a previous call to IRecvObject.
+    assert(!mIsWriting);    // Make sure the buffers are not already being used by a previous call to IRecvObject.
 
-	mIsWriting = true;
+    mIsWriting = true;
 
-	MPI_Request size_request;
-	MPI_Status size_status;
+    MPI_Request size_request;
+    MPI_Status size_status;
 
     MPI_Irecv(&mRecvBufferLength, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &size_request);
 

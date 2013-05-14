@@ -115,6 +115,9 @@ private:
     /** A pointer to the DistributedBoxCollection. */
     DistributedBoxCollection<SPACE_DIM>* mpBoxCollection;
 
+    /** Whether to calculate node neighbours in the box collection. Switch off for efficiency */
+    bool mCalculateNodeNeighbours;
+
     /**
      * Calculate the next unique global index available on this
      * process. Uses a hashing function to ensure that a unique
@@ -275,12 +278,19 @@ public:
     double GetWidth(const unsigned& rDimension) const;
 
     /**
+     * Set whether to calculate node neighbours for the rNodeNeigbours set in CalculateNodePairs. Switch off for efficiency
+     *
+     * @param calculateNodeNeighbours whether to store the neighbours.
+     */
+    void SetCalculateNodeNeighbours(bool calculateNodeNeighbours);
+
+    /**
      * Calculate pairs of nodes using the BoxCollection
      *
      * @param rNodePairs reference to the set of node pairs to populate.
      * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
      * Calculate pairs of nodes from interior boxes using the BoxCollection.
@@ -288,7 +298,7 @@ public:
      * @param rNodePairs reference to the set of node pairs to populate.
      * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateInteriorNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
      * Calculate pairs of nodes from boxes on the process boundary using the BoxCollection
@@ -296,7 +306,7 @@ public:
      * @param rNodePairs reference to the set of node pairs to populate.
      * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
      */
-    void CalculateBoundaryNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
      * Overridden ReMesh() method. Since only Nodes are stored, this method cleans up mNodes by

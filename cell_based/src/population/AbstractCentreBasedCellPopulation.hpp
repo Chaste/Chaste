@@ -230,7 +230,7 @@ public:
      *
      * @return Node pairs for force calculation.
      */
-    virtual std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs()=0;
+    virtual std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs()=0;
 
     /**
      * @return mMeinekeDivisionSeparation

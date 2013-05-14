@@ -1091,7 +1091,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputCellPopulationVolu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
+std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
 {
     //mNodePairs.Clear();
     NEVER_REACHED;

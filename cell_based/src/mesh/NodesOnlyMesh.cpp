@@ -44,7 +44,8 @@ NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh()
           mIndexCounter(0u),
           mMinimumNodeDomainBoundarySeparation(1.0),
           mMaxAddedNodeIndex(0u),
-          mpBoxCollection(NULL)
+          mpBoxCollection(NULL),
+          mCalculateNodeNeighbours(true)
 {
 }
 
@@ -189,7 +190,13 @@ double NodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) const
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void NodesOnlyMesh<SPACE_DIM>::SetCalculateNodeNeighbours(bool calculateNodeNeighbours)
+{
+    mCalculateNodeNeighbours = calculateNodeNeighbours;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     assert(mpBoxCollection);
 
@@ -197,7 +204,7 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::set<std::pair<Node<SPACE_
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     assert(mpBoxCollection);
 
@@ -205,7 +212,7 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::set<std::pair<Nod
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateBoundaryNodePairs(std::set<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void NodesOnlyMesh<SPACE_DIM>::CalculateBoundaryNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     assert(mpBoxCollection);
 
@@ -545,6 +552,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<
      mpBoxCollection = new DistributedBoxCollection<SPACE_DIM>(cutOffLength, domainSize, isPeriodic, numLocalRows);
      mpBoxCollection->SetupLocalBoxesHalfOnly();
      mpBoxCollection->SetupHaloBoxes();
+     mpBoxCollection->SetCalculateNodeNeighbours(mCalculateNodeNeighbours);
 }
 
 template<unsigned SPACE_DIM>

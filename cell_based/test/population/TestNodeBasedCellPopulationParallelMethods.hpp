@@ -249,20 +249,20 @@ public:
         mpNodeBasedCellPopulation->Update();
 
         // Send and receive halo nodes.
-		mpNodeBasedCellPopulation->RefreshHaloCells();
+        mpNodeBasedCellPopulation->RefreshHaloCells();
 
-		mpNodeBasedCellPopulation->AddReceivedHaloCells();
+        mpNodeBasedCellPopulation->AddReceivedHaloCells();
 
-		if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
-		{
-		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
-		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
-		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
-		}
-		else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
-		{
-		   TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
-		}
+        if (!PetscTools::AmMaster() && !PetscTools::AmTopMost())
+        {
+           TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 2u);
+           TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[0]], PetscTools::GetMyRank() - 1);
+           TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCellLocationMap[mpNodeBasedCellPopulation->mHaloCells[1]], PetscTools::GetMyRank() + 1);
+        }
+        else if (!PetscTools::AmMaster() || !PetscTools::AmTopMost())
+        {
+           TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mHaloCells.size(), 1u);
+        }
 #endif
     }
 

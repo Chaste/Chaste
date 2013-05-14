@@ -116,6 +116,9 @@ private:
     /** A distributed vector factory that governs ownership of rows of boxes */
     DistributedVectorFactory* mpDistributedBoxStackFactory;
 
+    /** A flag that can be set to not save rNodeNeighbours in CalculateNodePairs - for efficiency */
+    bool mCalculateNodeNeighbours;
+
     /** Needed for serialization **/
     friend class boost::serialization::access;
 
@@ -308,6 +311,13 @@ public:
     std::vector<unsigned>& rGetHaloNodesLeft();
 
     /**
+     * Set whether to record node neighbour in the map rNodeNeighbours during CalculateNodePairs. Set to false for efficiency if not needed.
+     *
+     * @param celculateNodeNeighbours whether to store the neighbours.
+     */
+    void SetCalculateNodeNeighbours(bool calculateNodeNeighbours);
+
+    /**
      *  Compute all the pairs of (potentially) connected nodes for cell_based simulations, ie nodes which are in a
      *  local box to the box containing the first node. **Note: the user still has to check that the node
      *  pairs are less than the cut-off distance apart.** The pairs are checked so that index1 < index2,
@@ -317,7 +327,7 @@ public:
      *  @param rNodePairs the return value, a set of pairs of nodes
      *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
      *  The same as CalculateNodePairs() only we only work on boxes that are interior on this process. I.e. none of their local boxes are halo boxes.
@@ -326,7 +336,7 @@ public:
      *  @param rNodePairs the return value, a set of pairs of nodes
      *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateInteriorNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
      *  The same as CalculateNodePairs() only we only work on boxes that are ''not'' interior on this process. I.e. some of their local boxes are halo boxes.
@@ -335,7 +345,7 @@ public:
      *  @param rNodePairs the return value, a set of pairs of nodes
      *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateBoundaryNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
     /**
      * A method pulled out of CalculateNodePairs methods that adds all pairs of nodes from neighbouring boxes of the box with index boxIndex.
@@ -344,7 +354,7 @@ public:
      * @param rNodePairs the return value, a set of pairs of nodes
      * @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void AddPairsFromBox(unsigned boxIndex, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
 };
 

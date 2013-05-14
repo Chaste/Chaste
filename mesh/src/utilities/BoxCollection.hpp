@@ -141,7 +141,7 @@ public:
      *  @param rNodePairs the return value, a set of pairs of nodes
      *  @param rNodeNeighbours the other return value, the neighbours of each node.
      */
-    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
+    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 };
 
 

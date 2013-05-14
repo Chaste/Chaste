@@ -74,7 +74,7 @@ private:
     c_vector<double, DIM> mMaxSpatialPositions;
 
     /** Node pairs for force calculations. */
-    std::set< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
+    std::vector< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
 
     /** Indices of neighbours of local nodes. */
     std::map<unsigned, std::set<unsigned> > mNodeNeighbours;
@@ -327,7 +327,7 @@ public:
      *
      * @return Node pairs for force calculation.
      */
-    std::set< std::pair<Node<DIM>*, Node<DIM>* > >& rGetNodePairs();
+    std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& rGetNodePairs();
 
     /**
      * Outputs CellPopulation parameters to file

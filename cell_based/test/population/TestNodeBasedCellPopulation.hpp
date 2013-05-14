@@ -136,6 +136,7 @@ public:
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        p_mesh->SetCalculateNodeNeighbours(false);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -210,7 +211,7 @@ public:
 
         cell_population.Update();
 
-        std::set< std::pair<Node<2>*, Node<2>* > >& r_node_pairs = cell_population.rGetNodePairs();
+        std::vector< std::pair<Node<2>*, Node<2>* > >& r_node_pairs = cell_population.rGetNodePairs();
         r_node_pairs.clear();
 
         // Set a new cut-off

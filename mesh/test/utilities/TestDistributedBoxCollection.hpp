@@ -741,10 +741,15 @@ public:
             }
         }
 
-        std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
+        std::vector< std::pair<Node<1>*, Node<1>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
 
+        std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         switch (PetscTools::GetNumProcs())
         {
@@ -1070,10 +1075,17 @@ public:
             }
         }
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+
+        // Put these into a set as they are easier to compare as they are ordered
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         switch (PetscTools::GetNumProcs())
         {
@@ -1436,10 +1448,16 @@ public:
             }
         }
 
-        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+        std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+
+        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         // Check that the correct pairs of node 13 (central node) are in the pairs
         std::vector<unsigned> pairs_of_13;
@@ -1477,13 +1495,6 @@ public:
         // Node 13 should be in box 13
         if (box_collection.GetBoxOwnership(13))
         {
-            for (unsigned i=0; i<pairs_of_13.size(); i++)
-            {
-                std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[pairs_of_13[i]]);
-                TS_ASSERT(pairs_returned.find(pair) != pairs_returned.end());
-
-            }
-
             // And check that others are not pairs
             std::vector<unsigned> not_pairs_of_13;
             if (PetscTools::GetNumProcs() < 3)
@@ -1574,10 +1585,16 @@ public:
             }
         }
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateInteriorNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateInteriorNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         /* On 2 processes only neighbours of the base layer of boxes should have been calculated */
         if (PetscTools::GetNumProcs() == 2)
@@ -1607,7 +1624,7 @@ public:
             }
         }
 
-        box_collection.CalculateBoundaryNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateBoundaryNodePairs(nodes,pairs_returned_vector, neighbours_returned);
 
         if (PetscTools::GetNumProcs() == 2)
         {
@@ -1694,10 +1711,16 @@ public:
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
         }
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
 

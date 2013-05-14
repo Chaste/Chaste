@@ -438,10 +438,15 @@ public:
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
         }
 
-        std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
+        std::vector< std::pair<Node<1>*, Node<1>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
 
+        std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
         neighbours_should_be[0].insert(1);
         neighbours_should_be[0].insert(2);
@@ -633,10 +638,16 @@ public:
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
         }
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
         neighbours_should_be[0].insert(1);
@@ -748,7 +759,7 @@ public:
         // Make sure there is exactly one node in each box.
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
         {
-            TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 1u)
+            TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 1u);
         }
 
         // Calculate which pairs of node should be pairs
@@ -765,10 +776,16 @@ public:
             }
         }
 
-        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+        std::vector< std::pair<Node<3>*, Node<3>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes,pairs_returned_vector, neighbours_returned);
+
+        std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         // Check that the correct pairs of node 13 (central node) are in the pairs
         std::vector<unsigned> pairs_of_13;
@@ -866,10 +883,16 @@ public:
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
         }
 
-        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        std::vector< std::pair<Node<2>*, Node<2>* > > pairs_returned_vector;
         std::map<unsigned, std::set<unsigned> > neighbours_returned;
 
-        box_collection.CalculateNodePairs(nodes,pairs_returned, neighbours_returned);
+        box_collection.CalculateNodePairs(nodes, pairs_returned_vector, neighbours_returned);
+
+        std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
+        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        {
+            pairs_returned.insert(pairs_returned_vector[i]);
+        }
 
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
 

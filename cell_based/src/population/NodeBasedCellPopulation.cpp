@@ -248,7 +248,7 @@ void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 }
 
 template<unsigned DIM>
-std::set< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rGetNodePairs()
+std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rGetNodePairs()
 {
     return mNodePairs;
 }
@@ -698,11 +698,11 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
     // Now post receives to start receiving data before returning.
     if(!PetscTools::AmTopMost())
     {
-    	mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, mCellCommunicationTag);
+        mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, mCellCommunicationTag);
     }
     if(!PetscTools::AmMaster())
     {
-    	mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, mCellCommunicationTag);
+        mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, mCellCommunicationTag);
     }
 #endif
 }
@@ -716,11 +716,11 @@ void NodeBasedCellPopulation<DIM>::GetReceivedCells()
 
     if(!PetscTools::AmTopMost())
     {
-    	mpCellsRecvRight = mRightCommunicator.GetRecvObject();
+        mpCellsRecvRight = mRightCommunicator.GetRecvObject();
     }
     if(!PetscTools::AmMaster())
     {
-    	mpCellsRecvLeft = mLeftCommunicator.GetRecvObject();
+        mpCellsRecvLeft = mLeftCommunicator.GetRecvObject();
     }
 #endif
 }

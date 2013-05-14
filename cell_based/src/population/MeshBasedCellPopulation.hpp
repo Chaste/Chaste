@@ -154,7 +154,7 @@ protected:
     bool mHasVariableRestLength;
 
     /** Node pairs for force calculations. */
-    std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
+    std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
 
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
@@ -541,7 +541,7 @@ public:
      *
      * @return Node pairs for force calculation.
      */
-    std::set< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs();
+    std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs();
 
     /**
      * Outputs CellPopulation parameters to file

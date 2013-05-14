@@ -135,20 +135,20 @@ public:
 
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
-				p_recv_class = communicator.RecvObject(p, 123, status);
+                p_recv_class = communicator.RecvObject(p, 123, status);
 
-				// Check that the values are correct
-				TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
-				TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
-				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
-				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
+                // Check that the values are correct
+                TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
+                TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
+                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
+                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
 
-				TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
-				TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
-				TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
+                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
+                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
+                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
-				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
-				TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
+                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
             }
 
         }
@@ -157,53 +157,53 @@ public:
     /** We cannot pre-post Irecv because we need to know the (dynamic) size of the object being sent first */
     void TestNonBlockingRecvClass() throw (Exception)
     {
-    	ObjectCommunicator<ClassOfSimpleVariables> communicator;
+        ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
         if (PetscTools::AmMaster())
         {
-			// Create a simple class to send
-			std::vector<double> doubles(3);
-			doubles[0] = 1.1;
-			doubles[1] = 1.2;
-			doubles[2] = 1.3;
+            // Create a simple class to send
+            std::vector<double> doubles(3);
+            doubles[0] = 1.1;
+            doubles[1] = 1.2;
+            doubles[2] = 1.3;
 
-			std::vector<bool> bools(2);
-			bools[0] = true;
-			bools[1] = true;
+            std::vector<bool> bools(2);
+            bools[0] = true;
+            bools[1] = true;
 
-			boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
+            boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
 
-			// Send the class
-			for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
-			{
-				// Arguments are object, destination, tag
-				communicator.ISendObject(p_new_class, p, 123);
-			}
+            // Send the class
+            for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
+            {
+                // Arguments are object, destination, tag
+                communicator.ISendObject(p_new_class, p, 123);
+            }
         }
         else
         {
-			boost::shared_ptr<ClassOfSimpleVariables> p_recv_class;
+            boost::shared_ptr<ClassOfSimpleVariables> p_recv_class;
 
-			TS_ASSERT_THROWS_THIS(p_recv_class = communicator.GetRecvObject(), "No object to receive in ObjectCommunicator::GetRecvObject");
+            TS_ASSERT_THROWS_THIS(p_recv_class = communicator.GetRecvObject(), "No object to receive in ObjectCommunicator::GetRecvObject");
 
-			// Receive the string. This returns before the receive is complete.
-			communicator.IRecvObject(0, 123);
+            // Receive the string. This returns before the receive is complete.
+            communicator.IRecvObject(0, 123);
 
-			// Get an object from the communicator. Implicit MPI_Wait.
-			p_recv_class = communicator.GetRecvObject();
+            // Get an object from the communicator. Implicit MPI_Wait.
+            p_recv_class = communicator.GetRecvObject();
 
-			// Check that the values are correct
-			TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
-			TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
-			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
-			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
+            // Check that the values are correct
+            TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
+            TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
 
-			TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
-			TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
-			TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
-			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
-			TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
+            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
         }
     }
 

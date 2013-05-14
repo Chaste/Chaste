@@ -704,7 +704,7 @@ const c_vector<double, 2*DIM>& BoxCollection<DIM>::rGetDomainSize() const
 }
 
 template<unsigned DIM>
-void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::set<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
+void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     rNodePairs.clear();
     rNodeNeighbours.clear();
@@ -746,14 +746,14 @@ void BoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes, std
                 {
                     if (other_node_index > rNodes[i]->GetIndex())
                     {
-                        rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
+                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
                         rNodeNeighbours[node_index].insert(other_node_index);
                         rNodeNeighbours[other_node_index].insert(node_index);
                     }
                 }
                 else
                 {
-                    rNodePairs.insert(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
+                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(rNodes[i], (*node_iter)));
                     rNodeNeighbours[node_index].insert(other_node_index);
                     rNodeNeighbours[other_node_index].insert(node_index);
                 }
