@@ -183,6 +183,9 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
             this->GetNode(node_index)->SetRadius(cell_radius);
         }
     }
+
+    // Make sure that everyone exits update together so that all asynchronous communications are complete.
+    PetscTools::Barrier("Update");
 }
 
 template<unsigned DIM>
@@ -822,7 +825,7 @@ void NodeBasedCellPopulation<DIM>::RefreshHaloCells()
     std::vector<unsigned> halos_to_send_left = mpNodesOnlyMesh->rGetHaloNodesToSendLeft();
     AddCellsToSendLeft(halos_to_send_left);
 
-    SendCellsToNeighbourProcesses();
+    NonBlockingSendCellsToNeighbourProcesses();
 }
 
 template<unsigned DIM>
@@ -850,6 +853,8 @@ void NodeBasedCellPopulation<DIM>::AddCellsToSendLeft(std::vector<unsigned>& cel
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 {
+    GetReceivedCells();
+
     if (!PetscTools::AmMaster())
     {
         for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();

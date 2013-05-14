@@ -54,16 +54,25 @@ class ObjectCommunicator
 {
 private:
 
-	/** A buffer for use in asyncronous communication */
-	char* mRecvString;
+	/** A buffer for use in asynchronous communication */
+	char* mRecvBuffer;
 
-	/** The size of a string we are waiting for in an asyncronous receive */
-	unsigned mStringLength;
+    /** A buffer for use in asynchronous communication */
+    char* mSendBuffer;
+
+    /** A string member used to ensure buffer doesn't go out of scope in asynchronous communication */
+    std::string mSendString;
+
+	/** The size of a string we are waiting for in an asynchronous receive */
+	unsigned mRecvBufferLength;
+
+    /** The size of a string we are sending */
+    unsigned mSendBufferLength;
 
 	/** An MPI_Request used in MPI_Irecv */
 	MPI_Request mMpiRequest;
 
-	/** A flag, used as a lock to ensure that we don't accidentally start overwriting the above buffer, mRecvString */
+	/** A flag, used as a lock to ensure that we don't accidentally start overwriting the above buffer, #mRecvBuffer */
 	bool mIsWriting;
 
 public:
@@ -132,13 +141,11 @@ public:
     boost::shared_ptr<CLASS> SendRecvObject(boost::shared_ptr<CLASS> const pSendObject, unsigned destinationProcess, unsigned sendTag, unsigned sourceProcess, unsigned sourceTag, MPI_Status& status);
 };
 
-
 #include <sstream>
 #include <string>
 #include <cstring>
 
 // Implementation needs to be here, as CLASS could be anything
-
 template<typename CLASS>
 ObjectCommunicator<CLASS>::ObjectCommunicator()
 	: mIsWriting(false)
@@ -177,16 +184,16 @@ void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObje
 
 	output_arch << pObject;
 
-	const std::string send_msg = ss.str();
+	mSendString = ss.str();
 
 	// Get + send string length
-	unsigned string_length = send_msg.size();
-	MPI_Isend(&string_length, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+	mSendBufferLength = mSendString.size();
+	MPI_Isend(&mSendBufferLength, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD, &request);
 
 	// Send archive data
 	// The buffer is treated as const, but not specified as such by MPI_Send's signature
-	char* send_buf = const_cast<char*>(send_msg.data());
-	MPI_Isend(send_buf, string_length, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+	mSendBuffer = const_cast<char*>(mSendString.data());
+	MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD, &request);
 }
 
 template<typename CLASS>
@@ -221,26 +228,29 @@ void ObjectCommunicator<CLASS>::IRecvObject(unsigned sourceProcess, unsigned tag
 	mIsWriting = true;
 
 	MPI_Request size_request;
-    MPI_Irecv(&mStringLength, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &size_request);
-    MPI_Wait(&size_request, MPI_STATUS_IGNORE);
+	MPI_Status size_status;
 
-    mRecvString = new char[mStringLength];
-    MPI_Irecv(mRecvString, mStringLength, MPI_BYTE, sourceProcess , tag, PETSC_COMM_WORLD, &mMpiRequest);
+    MPI_Irecv(&mRecvBufferLength, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &size_request);
+
+    MPI_Wait(&size_request, &size_status);
+
+    mRecvBuffer = new char[mRecvBufferLength];
+    MPI_Irecv(mRecvBuffer, mRecvBufferLength, MPI_BYTE, sourceProcess, tag, PETSC_COMM_WORLD, &mMpiRequest);
 }
 
 template<typename CLASS>
 boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
 {
-	if (!mIsWriting)
-	{
-		EXCEPTION("No object to receive in ObjectCommunicator::GetRecvObject");
-	}
+    if (!mIsWriting)
+    {
+        EXCEPTION("No object to receive in ObjectCommunicator::GetRecvObject");
+    }
 
     MPI_Wait(&mMpiRequest, MPI_STATUS_IGNORE);
 
     // Extract a proper object from the buffer
     std::istringstream ss(std::ios::binary);
-    ss.rdbuf()->pubsetbuf(mRecvString, mStringLength);
+    ss.rdbuf()->pubsetbuf(mRecvBuffer, mRecvBufferLength);
 
     boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(ss);
@@ -248,7 +258,7 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
     input_arch >> p_recv_object;
 
     // Tidy up
-    delete[] mRecvString;
+    delete[] mRecvBuffer;
 
     mIsWriting = false;
 
