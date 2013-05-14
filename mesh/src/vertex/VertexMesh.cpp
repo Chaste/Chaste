@@ -673,12 +673,13 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             }
 
             double vertex_area = GetVolumeOfElement(index);
+            ///\todo #2367 The is potential for a floating point exception here: assert(vertex_area != 0.0);
             double centroid_coefficient = 1.0/(6.0*vertex_area);
 
             c_vector<double, SPACE_DIM> transformed_centroid = zero_vector<double>(SPACE_DIM);
             transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
             transformed_centroid(1) = centroid_coefficient*temp_centroid_y;
-        
+
             centroid = transformed_centroid + first_node_location;
         }
         break;
