@@ -268,7 +268,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllCellKillers()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddSimulationModifier(boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier)
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier)
 {
     mSimulationModifiers.push_back(pSimulationModifier);
 }
@@ -383,7 +383,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     SetupSolve();
 
     // Call SetupSolve(), on each modifier
-    for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
          ++iter)
     {
@@ -448,7 +448,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         UpdateAtEndOfTimeStep();
         // Call UpdateAtEndOfTimeStep(), on each modifier
-        for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
              iter != mSimulationModifiers.end();
              ++iter)
         {
@@ -484,7 +484,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     UpdateAtEndOfSolve();
 
     // Call UpdateAtEndOfSolve(), on each modifier
-    for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
          ++iter)
     {
@@ -608,7 +608,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
 
     // Loop over Simulation Modifiers
     *parameter_file << "\n\t<SimulationModifiers>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
          ++iter)
     {

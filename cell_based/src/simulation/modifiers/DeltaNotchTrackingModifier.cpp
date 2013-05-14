@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 DeltaNotchTrackingModifier<DIM>::DeltaNotchTrackingModifier()
-    : AbstractSimulationModifier<DIM>()
+    : AbstractCellBasedSimulationModifier<DIM>()
 {
 }
 

@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractSimulationModifier.hpp"
+#include "AbstractCellBasedSimulationModifier.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM>::AbstractSimulationModifier()
+AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedSimulationModifier()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM>::~AbstractSimulationModifier()
+AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::~AbstractCellBasedSimulationModifier()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulationModifierInfo(out_stream& rParamsFile)
+void AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulationModifierInfo(out_stream& rParamsFile)
 {
     std::string force_type = GetIdentifier();
 
@@ -58,10 +58,10 @@ void AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulationModifie
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class AbstractSimulationModifier<1,1>;
-template class AbstractSimulationModifier<1,2>;
-template class AbstractSimulationModifier<2,2>;
-template class AbstractSimulationModifier<1,3>;
-template class AbstractSimulationModifier<2,3>;
-template class AbstractSimulationModifier<3,3>;
+template class AbstractCellBasedSimulationModifier<1,1>;
+template class AbstractCellBasedSimulationModifier<1,2>;
+template class AbstractCellBasedSimulationModifier<2,2>;
+template class AbstractCellBasedSimulationModifier<1,3>;
+template class AbstractCellBasedSimulationModifier<2,3>;
+template class AbstractCellBasedSimulationModifier<3,3>;
 

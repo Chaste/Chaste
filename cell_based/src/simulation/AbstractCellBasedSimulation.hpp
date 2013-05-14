@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellBasedPdeHandler.hpp"
 #include "AbstractCellKiller.hpp"
-#include "AbstractSimulationModifier.hpp"
+#include "AbstractCellBasedSimulationModifier.hpp"
 #include "AbstractForce.hpp"
 #include "RandomNumberGenerator.hpp"
 
@@ -151,7 +151,7 @@ protected:
     std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
 
     /** List of SimulationModifier Rules. */
-    std::vector<boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
+    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
 
     /**
      * The ratio of the number of actual timesteps to the number
@@ -388,7 +388,7 @@ public:
      *
      * @param pSimulationModifier pointer to a SimulationModifier
      */
-    void AddSimulationModifier(boost::shared_ptr<AbstractSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+    void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
      * Method to remove all the SimulationModifiers

@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTSIMULATIONMODIFIER_HPP_
-#define ABSTRACTSIMULATIONMODIFIER_HPP_
+#ifndef ABSTRACTCELLBASEDSIMULATIONMODIFIER_HPP_
+#define ABSTRACTCELLBASEDSIMULATIONMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * An abstract modifier class (to implement setup, update and finalise methods), for use in cell-based simulations.
  */
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class AbstractSimulationModifier : public Identifiable
+class AbstractCellBasedSimulationModifier : public Identifiable
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -66,12 +66,12 @@ public:
     /**
      * Default constructor.
      */
-    AbstractSimulationModifier();
+    AbstractCellBasedSimulationModifier();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractSimulationModifier();
+    virtual ~AbstractCellBasedSimulationModifier();
 
     /**
      * Specifies what to do in the simulation at the end of each timestep.
@@ -108,6 +108,6 @@ public:
     void OutputSimulationModifierInfo(out_stream& rParamsFile);
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractSimulationModifier)
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellBasedSimulationModifier)
 
-#endif /*ABSTRACTSIMULATIONMODIFIER_HPP_*/
+#endif /*ABSTRACTCELLBASEDSIMULATIONMODIFIER_HPP_*/
