@@ -652,6 +652,9 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
  */
 struct null_deleter
 {
+    /**
+     * The delete operation that does nothing.
+     */
     void operator()(void const *) const
     {
     }
@@ -667,12 +670,12 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 
     if(!PetscTools::AmTopMost())
     {
-        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mpCellsRecvRight = mRightCommunicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
     }
     if(!PetscTools::AmMaster())
     {
-        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
     }
 #endif
@@ -687,12 +690,12 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
 
     if(!PetscTools::AmTopMost())
     {
-        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag);
     }
     if(!PetscTools::AmMaster())
     {
-        boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
+        boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag);
     }
     // Now post receives to start receiving data before returning.
@@ -741,7 +744,7 @@ void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendRight(unsigned nodeIndex)
 {
     std::pair<CellPtr, Node<DIM>* > pair = GetCellNodePair(nodeIndex);
 
-    mCellsToSendRight.insert(pair);
+    mCellsToSendRight.push_back(pair);
 }
 
 template<unsigned DIM>
@@ -749,7 +752,7 @@ void NodeBasedCellPopulation<DIM>::AddNodeAndCellToSendLeft(unsigned nodeIndex)
 {
     std::pair<CellPtr, Node<DIM>* > pair = GetCellNodePair(nodeIndex);
 
-    mCellsToSendLeft.insert(pair);
+    mCellsToSendLeft.push_back(pair);
 }
 
 template<unsigned DIM>
@@ -757,7 +760,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
 {
     if (!PetscTools::AmMaster())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
+        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
              iter != mpCellsRecvLeft->end();
              ++iter)
         {
@@ -768,7 +771,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedCells()
     }
     if (!PetscTools::AmTopMost())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
+        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
              iter != mpCellsRecvRight->end();
              ++iter)
         {
@@ -857,7 +860,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
 
     if (!PetscTools::AmMaster())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
+        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvLeft->begin();
                 iter != mpCellsRecvLeft->end();
                 ++iter)
         {
@@ -868,7 +871,7 @@ void NodeBasedCellPopulation<DIM>::AddReceivedHaloCells()
     }
     if (!PetscTools::AmTopMost())
     {
-        for (typename std::set<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
+        for (typename std::vector<std::pair<CellPtr, Node<DIM>* > >::iterator iter = mpCellsRecvRight->begin();
                 iter != mpCellsRecvRight->end();
                 ++iter)
         {

@@ -86,22 +86,22 @@ private:
     bool mUseVariableRadii;
 
     /** The cells to send to the right process */
-    std::set<std::pair<CellPtr, Node<DIM>* > > mCellsToSendRight;
+    std::vector<std::pair<CellPtr, Node<DIM>* > > mCellsToSendRight;
 
     /** The cells to send to the left process */
-    std::set<std::pair<CellPtr, Node<DIM>* > > mCellsToSendLeft;
+    std::vector<std::pair<CellPtr, Node<DIM>* > > mCellsToSendLeft;
 
     /** A shared pointer to the cells received from the right process */
-    boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvRight;
+    boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvRight;
 
     /** A pointer to the cells received from the left process */
-    boost::shared_ptr<std::set<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvLeft;
+    boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > mpCellsRecvLeft;
 
     /** A communicator to send cells to the right hand process */
-    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>* > > > mRightCommunicator;
+    ObjectCommunicator<std::vector<std::pair<CellPtr, Node<DIM>* > > > mRightCommunicator;
 
     /** A communicator to send cells to the left hand process */
-    ObjectCommunicator<std::set<std::pair<CellPtr, Node<DIM>* > > > mLeftCommunicator;
+    ObjectCommunicator<std::vector<std::pair<CellPtr, Node<DIM>* > > > mLeftCommunicator;
 
     /** The tag used to send and recieve cell information */
     static const unsigned mCellCommunicationTag = 123;
