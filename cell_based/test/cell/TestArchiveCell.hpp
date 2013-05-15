@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DefaultCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 /*
  * This test is separate from TestCell.hpp to avoid strange errors with the

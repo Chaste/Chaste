@@ -55,6 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestWntCellCycleOdeSystem : public CxxTest::TestSuite
 {

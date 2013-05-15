@@ -52,6 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CvodeAdaptor.hpp"
 #include "OdeSystemInformation.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 /**
  * Simple ODE system for use in the test suite. Defines the

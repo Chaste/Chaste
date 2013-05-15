@@ -321,6 +321,7 @@ public:
 
     void TestArchivingOfPlaneBoundaryCondition() throw (Exception)
     {
+        EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
         // Set up singleton classes
         OutputFileHandler handler("archive", false); // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PlaneBoundaryCondition.arch";

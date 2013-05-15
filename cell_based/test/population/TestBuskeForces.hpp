@@ -460,6 +460,7 @@ public:
 
     void TestBuskeAdhesiveForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BuskeAdhesiveForce.arch";
 
@@ -501,6 +502,7 @@ public:
 
     void TestBuskeElasticForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BuskeElasticForce.arch";
 
@@ -542,6 +544,7 @@ public:
 
     void TestBuskeCompressionForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BuskeCompressionForce.arch";
 
