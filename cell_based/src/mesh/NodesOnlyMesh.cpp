@@ -196,14 +196,6 @@ void NodesOnlyMesh<SPACE_DIM>::SetCalculateNodeNeighbours(bool calculateNodeNeig
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::CalculateNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
-{
-    assert(mpBoxCollection);
-
-    mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs, rNodeNeighbours);
-}
-
-template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::CalculateInteriorNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours)
 {
     assert(mpBoxCollection);

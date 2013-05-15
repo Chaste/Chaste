@@ -285,14 +285,6 @@ public:
     void SetCalculateNodeNeighbours(bool calculateNodeNeighbours);
 
     /**
-     * Calculate pairs of nodes using the BoxCollection
-     *
-     * @param rNodePairs reference to the set of node pairs to populate.
-     * @param rNodeNeighbours reference to the list of neighbouring nodes for each node.
-     */
-    void CalculateNodePairs(std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
-
-    /**
      * Calculate pairs of nodes from interior boxes using the BoxCollection.
      *
      * @param rNodePairs reference to the set of node pairs to populate.

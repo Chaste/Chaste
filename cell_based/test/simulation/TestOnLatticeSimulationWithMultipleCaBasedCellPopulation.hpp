@@ -267,6 +267,7 @@ public:
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
         simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.SetOutputDivisionLocations(true);
 
         // Run simulation
         simulator.Solve();
