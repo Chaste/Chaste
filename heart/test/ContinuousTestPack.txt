@@ -46,6 +46,7 @@ postprocessing/TestPropagationPropertiesCalculator.hpp
 postprocessing/TestPseudoEcgCalculator.hpp
 postprocessing/TestSpiralWaveAndPhase.hpp
 postprocessing/TestVoltageInterpolaterOntoMechanicsMesh.hpp
+TestAbstractContractionCellFactory.hpp
 TestAbstractPurkinjeCellFactory.hpp
 TestCardiacSimulation.hpp
 TestCardiacSimulationArchiver.hpp
