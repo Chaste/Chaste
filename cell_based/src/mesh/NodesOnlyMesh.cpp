@@ -437,7 +437,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
 {
     unsigned index;
 
-    if(!this->mDeletedGlobalNodeIndices.empty())
+    if (!this->mDeletedGlobalNodeIndices.empty())
     {
         index = this->mDeletedGlobalNodeIndices.back();
         this->mDeletedGlobalNodeIndices.pop_back();
@@ -482,13 +482,14 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
     c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
 
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
-            node_iter != this->GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != this->GetNodeIteratorEnd();
+         ++node_iter)
     {
+        // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
         c_vector<double, SPACE_DIM> location;
         location = node_iter->rGetLocation();
 
-        for (unsigned d=0; d < SPACE_DIM; d++)
+        for (unsigned d=0; d<SPACE_DIM; d++)
         {
             if (location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation))
             {
@@ -498,11 +499,11 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         }
         if (is_local_node_close)
         {
-            break;  // Saves checking every node if we find one close to the boundary.
+            break;  // Saves checking every node if we find one close to the boundary
         }
     }
 
-    // Synchronise between processes.
+    // Synchronise between processes
     int is_any_node_close = 0;
     MPI_Allreduce(&is_local_node_close, &is_any_node_close, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
 

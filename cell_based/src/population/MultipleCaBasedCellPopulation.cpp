@@ -537,6 +537,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         number_of_cells_at_site[location_index]++;
         assert(number_of_cells_at_site[location_index]<=mLatticeCarryingCapacity);
 
+        // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
         c_vector<double, DIM> coords;
         coords = this->mrMesh.GetNode(location_index)->rGetLocation();
 

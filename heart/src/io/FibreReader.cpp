@@ -167,23 +167,23 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
 
     }
 
-    //The binary file and ascii file are row-major.  However, we store column major
-    //matrices
+    // The binary file and ascii file are row-major. However, we store column major matrices.
     rFibreMatrix = trans(rFibreMatrix);
 
-
-    if(checkOrthogonality)
+    if (checkOrthogonality)
     {
-        c_matrix<double,DIM,DIM>  temp;
-        temp = prod(trans(rFibreMatrix),rFibreMatrix);
-        // check temp is equal to the identity
-        for(unsigned i=0; i<DIM; i++)
+        // Note that we define this matrix before setting it as otherwise the profiling build will break (see #2367)
+        c_matrix<double,DIM,DIM> temp;
+        temp = prod(trans(rFibreMatrix), rFibreMatrix);
+
+        // Check temp is equal to the identity
+        for (unsigned i=0; i<DIM; i++)
         {
-            for(unsigned j=0; j<DIM; j++)
+            for (unsigned j=0; j<DIM; j++)
             {
                 double val = (i==j ? 1.0 : 0.0);
 
-                if(fabs(temp(i,j)-val)>1e-4)
+                if (fabs(temp(i,j)-val) > 1e-4)
                 {
                     EXCEPTION("Read fibre-sheet matrix, " << rFibreMatrix << " from file "
                                   << " which is not orthogonal (tolerance 1e-4)");
@@ -191,7 +191,6 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
             }
         }
     }
-
 }
 
 template<unsigned DIM>

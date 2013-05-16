@@ -891,6 +891,8 @@ c_vector<double,SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetSi
          ++cell_iter)
     {
         c_vector<double,SPACE_DIM> cell_location = GetLocationOfCellCentre(*cell_iter);
+
+        // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
         c_vector<double,SPACE_DIM> displacement;
         displacement = centre - cell_location;
 

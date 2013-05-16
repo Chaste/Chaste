@@ -234,8 +234,10 @@ public:
         double scale_factor = 1.5;
         for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
         {
+            // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
             c_vector<double,1> old_point;
             old_point = mesh.GetNode(node_index)->rGetLocation();
+
             ChastePoint<1> new_point;
             new_point.rGetLocation()[0] = scale_factor*old_point[0];
             mesh.SetNode(node_index, new_point, false);

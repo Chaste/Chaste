@@ -1690,7 +1690,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
      */
 
     // Create a new node at the element's centroid: this will be a boundary node if any existing nodes were on the boundary
-    c_vector<double, SPACE_DIM> new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
+
+    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
+    c_vector<double, SPACE_DIM> new_node_location;
+    new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
 
     bool is_node_on_boundary = false;
     for (unsigned i=0; i<3; i++)
@@ -1765,8 +1768,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     // Get the local index of the node in the intersected element after which the new node is to be added
     unsigned node_A_local_index = this->GetLocalIndexForElementEdgeClosestToPoint(pNode->rGetLocation(), elementIndex);
 
-    // Get present node location
-    c_vector<double, SPACE_DIM> node_location = pNode->rGetModifiableLocation();
+    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
+    c_vector<double, SPACE_DIM> node_location;
+    node_location = pNode->rGetModifiableLocation();
 
     // Get element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(elementIndex);
@@ -1967,6 +1971,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             // Move original node
             pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
+            // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
             c_vector<double, SPACE_DIM> new_node_location;
             new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
@@ -2110,6 +2115,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
+                    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
                     c_vector<double, SPACE_DIM> new_node_location;
                     new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
@@ -2156,6 +2162,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
+                    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
                     c_vector<double, SPACE_DIM> new_node_location;
                     new_node_location = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
@@ -2241,6 +2248,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
+                    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
                     c_vector<double, SPACE_DIM> new_node_location;
                     new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
@@ -2286,6 +2294,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
 
+                    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
                     c_vector<double, SPACE_DIM> new_node_location;
                     new_node_location = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 

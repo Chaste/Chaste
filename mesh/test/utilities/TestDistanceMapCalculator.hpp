@@ -81,8 +81,10 @@ public:
         {
             try
             {
+                // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
                 c_vector<double, 1> node;
-                node = parallel_mesh.GetNode(index)->rGetLocation(); //throws if not owned
+                node = parallel_mesh.GetNode(index)->rGetLocation(); // throws if not owned
+
                 TS_ASSERT_DELTA(distances_serial[index], node(0), 1e-12);
                 TS_ASSERT_DELTA(distances_parallel[index], node(0), 1e-12);
             }

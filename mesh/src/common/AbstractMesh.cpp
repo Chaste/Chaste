@@ -212,7 +212,6 @@ double AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetDistanceBetweenNodes(unsigned in
     return norm_2(vector);
 }
 
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetWidth(const unsigned& rDimension) const
 {
@@ -244,6 +243,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
+                // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
                 c_vector<double, SPACE_DIM> position;
                 position = rNodes[index]->rGetLocation();
 
