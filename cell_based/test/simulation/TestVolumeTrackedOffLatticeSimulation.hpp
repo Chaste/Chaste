@@ -126,7 +126,7 @@ public:
 
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Volume Tracking Modifier
+        // Add volume-tracking modifier
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -208,7 +208,7 @@ public:
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithVolumeTracked");
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Add Volume Tracking Modifier
+        // Add volume-tracking modifier
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -284,7 +284,7 @@ public:
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithGhostNodesAndVolumeTracked");
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Add Volume Tracking Modifier
+        // Add volume-tracking modifier
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -364,7 +364,7 @@ public:
 
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Add Volume Tracking Modifier
+        // Add volume-tracking modifier
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -440,7 +440,7 @@ public:
         simulator.SetEndTime(end_time);
         simulator.AddForce(p_force);
 
-        // Add Volume Tracking Modifier
+        // Add volume-tracking modifier
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 

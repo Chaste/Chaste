@@ -120,7 +120,7 @@ public:
         simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta Notch Tracking Modifier
+        // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -215,7 +215,7 @@ public:
         simulator.SetEndTime(10.0);
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta Notch Tracking Modifier
+        // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -315,7 +315,7 @@ public:
         simulator.SetEndTime(10.0);
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta Notch Tracking Modifier
+        // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -381,7 +381,7 @@ public:
         simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta Notch Tracking Modifier
+        // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -434,7 +434,7 @@ public:
         simulator.SetEndTime(0.01);
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta Notch Tracking Modifier
+        // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -489,7 +489,7 @@ public:
         simulator.SetEndTime(end_time);
         simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta Notch Tracking Modifier
+        // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 

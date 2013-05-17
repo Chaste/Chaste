@@ -173,7 +173,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
 
-        /* Then, we define the modifier class, that automatically updates the volumes of the cells in {{{CellData}}} and pass it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the volumes of the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -287,7 +287,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
 
-        /* Then, we define the modifier class, that automatically updates the volumes of the cells in {{{CellData}}} and pass it ot the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the volumes of the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -378,7 +378,7 @@ public:
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(10.0);
 
-        /* Then, we define the modifier class, that automatically updates the volumes of the cells in {{{CellData}}} and pass it ot the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the volumes of the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 

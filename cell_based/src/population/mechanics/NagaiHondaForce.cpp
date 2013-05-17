@@ -82,6 +82,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     // Iterate over vertices in the cell population
     for (unsigned node_index=0; node_index<num_nodes; node_index++)
     {
+        Node<DIM>* p_this_node = p_cell_population->GetNode(node_index);
+
         /*
          * The force on this Node is given by the gradient of the total free
          * energy of the CellPopulation, evaluated at the position of the vertex. This
@@ -91,9 +93,8 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
          * and an adhesion energy.
          *
          * Note that since the movement of this Node only affects the free energy
-         * of the three CellPtrs containing it, we can just consider the
-         * contributions to the free energy gradient from each of these three
-         * CellPtrs.
+         * of the CellPtrs containing it, we can just consider the contributions
+         * to the free energy gradient from each of these CellPtrs.
          */
         c_vector<double, DIM> deformation_contribution = zero_vector<double>(DIM);
         c_vector<double, DIM> membrane_surface_tension_contribution = zero_vector<double>(DIM);
@@ -107,9 +108,10 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
              iter != containing_elem_indices.end();
              ++iter)
         {
-            // Get this element and its index
+            // Get this element, its index and its number of nodes
             VertexElement<DIM, DIM>* p_element = p_cell_population->GetElement(*iter);
             unsigned elem_index = p_element->GetIndex();
+            unsigned num_nodes_elem = p_element->GetNumNodes();
 
             // Find the local index of this node in this element
             unsigned local_index = p_element->GetNodeLocalIndex(node_index);
@@ -118,30 +120,28 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             c_vector<double, DIM> element_area_gradient = p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
             deformation_contribution -= 2*GetNagaiHondaDeformationEnergyParameter()*(element_areas[elem_index] - target_areas[elem_index])*element_area_gradient;
 
-            // Add the force contribution from this cell's membrane surface tension (note the minus sign)
-            c_vector<double, DIM> element_perimeter_gradient = p_cell_population->rGetMesh().GetPerimeterGradientOfElementAtNode(p_element, local_index);
-            double cell_target_perimeter = 2*sqrt(M_PI*target_areas[elem_index]);
-            membrane_surface_tension_contribution -= 2*GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeters[elem_index] - cell_target_perimeter)*element_perimeter_gradient;
-
-            // Get the current, previous and next nodes in this element
-            Node<DIM>* p_current_node = p_element->GetNode(local_index);
-
-            unsigned previous_node_local_index = (p_element->GetNumNodes()+local_index-1)%(p_element->GetNumNodes());
+            // Get the previous and next nodes in this element
+            unsigned previous_node_local_index = (num_nodes_elem+local_index-1)%num_nodes_elem;
             Node<DIM>* p_previous_node = p_element->GetNode(previous_node_local_index);
 
-            unsigned next_node_local_index = (local_index+1)%(p_element->GetNumNodes());
+            unsigned next_node_local_index = (local_index+1)%num_nodes_elem;
             Node<DIM>* p_next_node = p_element->GetNode(next_node_local_index);
 
             // Compute the adhesion parameter for each of these edges
-            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_current_node, *p_cell_population);
-            double next_edge_adhesion_parameter = GetAdhesionParameter(p_current_node, p_next_node, *p_cell_population);
+            double previous_edge_adhesion_parameter = GetAdhesionParameter(p_previous_node, p_this_node, *p_cell_population);
+            double next_edge_adhesion_parameter = GetAdhesionParameter(p_this_node, p_next_node, *p_cell_population);
 
-            // Compute the gradient of each these edges
-            c_vector<double, DIM> previous_edge_gradient = p_cell_population->rGetMesh().GetPreviousEdgeGradientOfElementAtNode(p_element, local_index);
+            // Compute the gradient of each these edges, computed at the present node
+            c_vector<double, DIM> previous_edge_gradient = -p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
             c_vector<double, DIM> next_edge_gradient = p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, local_index);
 
             // Add the force contribution from cell-cell and cell-boundary adhesion (note the minus sign)
             adhesion_contribution -= previous_edge_adhesion_parameter*previous_edge_gradient + next_edge_adhesion_parameter*next_edge_gradient;
+
+            // Add the force contribution from this cell's membrane surface tension (note the minus sign)
+            c_vector<double, DIM> element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
+            double cell_target_perimeter = 2*sqrt(M_PI*target_areas[elem_index]);
+            membrane_surface_tension_contribution -= 2*GetNagaiHondaMembraneSurfaceEnergyParameter()*(element_perimeters[elem_index] - cell_target_perimeter)*element_perimeter_gradient;
         }
 
         c_vector<double, DIM> force_on_node = deformation_contribution + membrane_surface_tension_contribution + adhesion_contribution;

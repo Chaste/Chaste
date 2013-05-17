@@ -102,8 +102,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * signalling between cells.
  */
 /*
- * The next header defines the simulation class modifier corresponding to the Delta Notch cell-cycle model.
- * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta Notch signalling.
+ * The next header defines the simulation class modifier corresponding to the Delta-Notch cell-cycle model.
+ * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta-Notch signalling.
  */
 #include "DeltaNotchTrackingModifier.hpp"
 
@@ -188,7 +188,7 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 
-        /* Then, we define the modifier class, that automatically updates the values of delta and notch within the cells in {{{CellData}}} and pass it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -270,7 +270,7 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(5.0);
 
-        /* Again we define the modifier class, that automatically updates the values of delta and notch within the cells in {{{CellData}}} and pass it to the simulation.*/
+        /* Again we define the modifier class, which automatically updates the values of Delta and Notch within the cells in {{{CellData}}} and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 

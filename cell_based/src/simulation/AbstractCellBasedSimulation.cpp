@@ -382,7 +382,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     SetupSolve();
 
-    // Call SetupSolve(), on each modifier
+    // Call SetupSolve() on each modifier
     for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
          ++iter)
@@ -447,7 +447,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // Call UpdateAtEndOfTimeStep(), which may be implemented by child classes
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         UpdateAtEndOfTimeStep();
-        // Call UpdateAtEndOfTimeStep(), on each modifier
+
+        // Call UpdateAtEndOfTimeStep() on each modifier
         for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
              iter != mSimulationModifiers.end();
              ++iter)
@@ -606,16 +607,17 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
     }
     *parameter_file << "\t</CellKillers>\n";
 
-    // Loop over Simulation Modifiers
+    // Iterate over simulationmodifiers
     *parameter_file << "\n\t<SimulationModifiers>\n";
     for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
          ++iter)
     {
-        // Output Simulation Modifier details
+        // Output simulation modifier details
         (*iter)->OutputSimulationModifierInfo(parameter_file);
     }
     *parameter_file << "\t</SimulationModifiers>\n";
+
     // This is used to output information about subclasses
     OutputAdditionalSimulationSetup(parameter_file);
 

@@ -118,7 +118,7 @@ std::vector<unsigned>& MultipleCaBasedCellPopulation<DIM>::rGetAvailableSpaces()
 template<unsigned DIM>
 bool MultipleCaBasedCellPopulation<DIM>::IsSiteAvailable(unsigned index, CellPtr pCell)
 {
-    // TODO this is where to deal with carrying capacity
+    ///\todo this is where to deal with carrying capacity
     return (mAvailableSpaces[index] != 0);
 }
 
@@ -165,7 +165,6 @@ void MultipleCaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(unsigned inde
     {
         EXCEPTION("No available spaces at location index " << index << ".");
     }
-
 
     mAvailableSpaces[index]--;
     AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);

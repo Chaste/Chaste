@@ -150,7 +150,7 @@ protected:
     /** List of cell killers. */
     std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
 
-    /** List of SimulationModifier Rules. */
+    /** List of SimulationModifier rules. */
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
 
     /**
