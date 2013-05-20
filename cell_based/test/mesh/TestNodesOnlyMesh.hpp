@@ -671,10 +671,6 @@ public:
 
         TS_ASSERT(!mesh.mpBoxCollection);
 
-        mesh.UpdateBoxCollection();
-
-        TS_ASSERT(mesh.mpBoxCollection);
-
         // Clean up
         for (unsigned i=0; i<nodes.size(); i++)
         {

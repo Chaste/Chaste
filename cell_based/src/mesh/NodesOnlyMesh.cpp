@@ -577,10 +577,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddHaloNodesToBoxes()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::UpdateBoxCollection()
 {
-    if (!mpBoxCollection)
-     {
-          SetUpBoxCollection(this->mNodes);
-     }
+    assert(mpBoxCollection);
 
     // Remove node pointers from boxes in BoxCollection.
     mpBoxCollection->EmptyBoxes();
