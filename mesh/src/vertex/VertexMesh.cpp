@@ -1431,7 +1431,9 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetUnitNormalToF
     c_vector<double, SPACE_DIM> v2 = pFace->GetNode(2)->rGetLocation();
 
     c_vector<double, SPACE_DIM> v1_minus_v0 = this->GetVectorFromAtoB(v0, v1);
+    ///\todo #2367 The is potential for a floating point exception here: assert(norm_2(v1_minus_v0) > 0.0);
     c_vector<double, SPACE_DIM> v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
+    ///\todo #2367 The is potential for a floating point exception here: assert(norm_2(v2_minus_v0) > 0.0);
 
     c_vector<double, SPACE_DIM> unit_normal = zero_vector<double>(SPACE_DIM);
     unit_normal(0) = v1_minus_v0(1)*v2_minus_v0(2) - v1_minus_v0(2)*v2_minus_v0(1);

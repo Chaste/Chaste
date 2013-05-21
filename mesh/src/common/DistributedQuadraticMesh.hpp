@@ -74,7 +74,7 @@ class DistributedQuadraticMesh : public DistributedTetrahedralMesh<DIM, DIM>
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractTetrahedralMesh<DIM, DIM> >(*this);
+        archive & boost::serialization::base_object<DistributedTetrahedralMesh<DIM, DIM> >(*this);
     }
 
 public:
@@ -150,7 +150,7 @@ inline void load_construct_data(
     if (DistributedVectorFactory::CheckNumberOfProcessesOnLoad() &&
         num_procs != PetscTools::GetNumProcs())
     {
-        EXCEPTION("This archive was written for a different number of processors");
+        NEVER_REACHED;
     }
 
 }

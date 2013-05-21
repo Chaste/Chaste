@@ -769,6 +769,11 @@ public:
 
     void TestCellPopulationWritersIn3dWithGhostNodes()
     {
+        ///\todo
+        // Warning - this test is broken.  The test that the Voronoi data is unchanged
+        // merely tests that there were Floating Point problems in the code
+        // trunk/cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat
+
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
