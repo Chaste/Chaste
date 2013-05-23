@@ -73,7 +73,7 @@ public:
         return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
     }
 
-    AbstractContractionModel* CreateContractionCellForQuadPoint(unsigned quadIndex)
+    AbstractContractionModel* CreateContractionCellForQuadPoint(unsigned elemIndex)
     {
         switch(mContractionModelName)
         {
@@ -120,6 +120,7 @@ public:
             ConstantActiveTension* p_model =
                 dynamic_cast<ConstantActiveTension*> (factory.CreateContractionCellForQuadPoint(0u));
             TS_ASSERT(p_model);
+            delete p_model;
         }
 
         {
@@ -128,6 +129,7 @@ public:
             NonPhysiologicalContractionModel* p_model =
                 dynamic_cast<NonPhysiologicalContractionModel*> (factory.CreateContractionCellForQuadPoint(0u));
             TS_ASSERT(p_model);
+            delete p_model;
         }
 
         {
@@ -136,6 +138,7 @@ public:
             Nash2004ContractionModel* p_model =
                 dynamic_cast<Nash2004ContractionModel*> (factory.CreateContractionCellForQuadPoint(0u));
             TS_ASSERT(p_model);
+            delete p_model;
         }
 
         {
@@ -144,6 +147,7 @@ public:
             Kerchoffs2003ContractionModel* p_model =
                 dynamic_cast<Kerchoffs2003ContractionModel*> (factory.CreateContractionCellForQuadPoint(0u));
             TS_ASSERT(p_model);
+            delete p_model;
         }
     }
 };

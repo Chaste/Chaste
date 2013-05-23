@@ -112,7 +112,7 @@ public:
             {
                 TS_ASSERT(dynamic_cast<FakeBathCell*>(p_cell) != NULL);
             }
-              delete p_cell;
+            delete p_cell;
         }
 
         TS_ASSERT_EQUALS(cell_factory.GetMixedDimensionMesh(), &mixed_mesh);

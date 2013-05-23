@@ -62,9 +62,12 @@ public:
      * the quad point index is the index that would be obtained by looping over
      * elements and then looping over quad points.
      *
-     * @param quadIndex  Global element index.
+     * It is assumed that all the quad points in a given element will be assigned the same kind
+     * of contraction cell.
+     *
+     * @param elemIndex  Global element index.
      */
-    virtual AbstractContractionModel* CreateContractionCellForQuadPoint(unsigned quadIndex) = 0;
+    virtual AbstractContractionModel* CreateContractionCellForQuadPoint(unsigned elemIndex) = 0;
 
     //
     // \todo 2370 The methods below are likely to be required for the final version of this class.
@@ -75,9 +78,9 @@ public:
      * May be overridden by subclasses to perform any necessary work after all cells
      * have been created.
      *
-     * @param pCellsDistributed  Pointer to a vector of cardiac cell pointers.
-     * @param lo  Lowest index owned by this process.
-     * @param hi  Highest index owned by this process.
+     * @..param pCellsDistributed  Pointer to a vector of cardiac cell pointers.
+     * @..param lo  Lowest index owned by this process.
+     * @..param hi  Highest index owned by this process.
      */
     //virtual void FinaliseCellCreation(std::vector< AbstractCardiacCellInterface* >* pCellsDistributed,
     //                                  unsigned lo, unsigned hi);
@@ -85,7 +88,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param pSolver  the ODE solver to use to simulate this cell.
+     * @..param pSolver  the ODE solver to use to simulate this cell.
      */
    // AbstractContractionCellFactory(boost::shared_ptr<AbstractIvpOdeSolver> pSolver = boost::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
 
