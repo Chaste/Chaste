@@ -184,6 +184,20 @@
    fun:_Z15PetscInitializePiPPPcPKcS4_
 }
 
+{
+   get-user-name-5
+   Memcheck:Leak
+   fun:malloc
+   fun:nss_parse_service_list
+   fun:__nss_database_lookup
+   obj:*
+   fun:getpwuid_r@@GLIBC_2.2.5
+   fun:getpwuid
+   fun:_Z16PetscGetUserNamePcm
+   fun:_Z26PetscErrorPrintfInitializev
+   fun:_Z15PetscInitializePiPPPcPKcS4_
+}
+
 # Ubuntu 8.04.2
 {
    get-user-name-5
