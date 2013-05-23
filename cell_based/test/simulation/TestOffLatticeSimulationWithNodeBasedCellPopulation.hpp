@@ -263,7 +263,7 @@ public:
             TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
 
 
-            // Now set all the Radi to 0.5 Note this could be done inside a cell cycle model.
+            // Now set all the Radi to 2.0 Note this could be done inside a cell cycle model.
             for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
                  cell_iter != simulator.rGetCellPopulation().End();
                  ++cell_iter)
