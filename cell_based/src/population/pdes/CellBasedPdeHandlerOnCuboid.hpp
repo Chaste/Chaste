@@ -61,22 +61,6 @@ class CellBasedPdeHandlerOnCuboid : public CellBasedPdeHandler<DIM>
 
 private:
 
-
-    /** Variable to specify which sides are neumann boundaries */
-    c_vector<bool,4> mAreNeumannBoundaries;
-
-    /* The boundary conditions to apply on the Top */
-    ConstBoundaryCondition<DIM>* mpTopBoundaryCondtion;
-
-	/* The boundary conditions to apply on the Right */
-	ConstBoundaryCondition<DIM>* mpRightBoundaryCondtion;
-
-	/* The boundary conditions to apply on the Bottom */
-	ConstBoundaryCondition<DIM>* mpBottomBoundaryCondtion;
-
-	/* The boundary conditions to apply on the Left */
-	ConstBoundaryCondition<DIM>* mpLeftBoundaryCondtion;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -89,12 +73,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<CellBasedPdeHandler<DIM> >(*this);
-        archive & mAreNeumannBoundaries;
-        archive & mpTopBoundaryCondtion;
-        archive & mpRightBoundaryCondtion;
-        archive & mpBottomBoundaryCondtion;
-        archive & mpLeftBoundaryCondtion;
-
     }
 
 public:

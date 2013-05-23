@@ -41,35 +41,6 @@ CellBasedPdeHandlerOnCuboid<DIM>::CellBasedPdeHandlerOnCuboid(AbstractCellPopula
                                               bool deleteMemberPointersInDestructor)
     : CellBasedPdeHandler<DIM>(pCellPopulation, deleteMemberPointersInDestructor)
 {
-
-    // Use these 2 vectors to define what's happening on the top right bottom and left boundaries
-    // Specify which sides are neumann boundaries
-
-    // Specify the value of the boundary condition on each boundary
-    c_vector<double,4> boundary_condition_values;
-    boundary_condition_values[0] = 1.0; // Top
-    boundary_condition_values[1] = 1.0; // Right
-    boundary_condition_values[2] = 1.0; // Bottom
-    boundary_condition_values[3] = 1.0; // Left
-
-	mAreNeumannBoundaries[0] = false; // Top
-    mAreNeumannBoundaries[1] = true;  // Right
-    mAreNeumannBoundaries[2] = false; // Bottom
-    mAreNeumannBoundaries[3] = true;  // Left
-
-    /*
-     * Now create the BCS Objects.
-     * These will be added to a BoundaryConditionsContainer at each timestep.
-     */
-    ConstBoundaryCondition<DIM> TopBoundaryCondtion = ConstBoundaryCondition<DIM>(boundary_condition_values[0]);
-    ConstBoundaryCondition<DIM> RightBoundaryCondtion = ConstBoundaryCondition<DIM>(boundary_condition_values[1]);
-    ConstBoundaryCondition<DIM> BottomBoundaryCondtion = ConstBoundaryCondition<DIM>(boundary_condition_values[2]);
-    ConstBoundaryCondition<DIM> LeftBoundaryCondtion = ConstBoundaryCondition<DIM>(boundary_condition_values[3]);
-
-    mpTopBoundaryCondtion = &TopBoundaryCondtion;
-    mpRightBoundaryCondtion = &RightBoundaryCondtion;
-    mpBottomBoundaryCondtion = &BottomBoundaryCondtion;
-    mpLeftBoundaryCondtion = &LeftBoundaryCondtion;
 }
 
 template<unsigned DIM>
@@ -80,10 +51,33 @@ CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 template<unsigned DIM>
 BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
 {
-    // Not using the inputs as there's only one BCS passed in and the BCS's are defined in the constructor.
+    // Not using the inputs as theres only one BCS
     assert(DIM==2);
 
     BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
+
+
+    // Use these 2 vectors to define whats happening on the top right bottom and left boundaries
+
+    // Specify which sides are neuman boundaries
+    c_vector<bool,4> are_neumann_boundaries;
+    are_neumann_boundaries[0] = false; // Top
+    are_neumann_boundaries[1] = true;  // Right
+    are_neumann_boundaries[2] = false; // Bottom
+    are_neumann_boundaries[3] = true;  // Left
+
+    // Specify the value of the boundary condition on each boundary
+    c_vector<double,4> boundary_condition_values;
+    boundary_condition_values[0] = 1.0; // Top
+    boundary_condition_values[1] = 1.0; // Right
+    boundary_condition_values[2] = 1.0; // Bottom
+    boundary_condition_values[3] = 1.0; // Left
+
+
+    ConstBoundaryCondition<DIM>* p_bc_top = new ConstBoundaryCondition<DIM>(boundary_condition_values[0]);
+    ConstBoundaryCondition<DIM>* p_bc_right = new ConstBoundaryCondition<DIM>(boundary_condition_values[1]);
+    ConstBoundaryCondition<DIM>* p_bc_bottom = new ConstBoundaryCondition<DIM>(boundary_condition_values[2]);
+    ConstBoundaryCondition<DIM>* p_bc_left = new ConstBoundaryCondition<DIM>(boundary_condition_values[3]);
 
     ChasteCuboid<DIM> cuboid = pMesh->CalculateBoundingBox();
 
@@ -92,6 +86,7 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
     double right = cuboid.rGetUpperCorner()[0];
     double top = cuboid.rGetUpperCorner()[1];
     double fudge_factor = 1e-6;
+
 
     // Apply Neumann Boundaries
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = pMesh->GetBoundaryElementIteratorBegin();
@@ -103,32 +98,32 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
         double x_2 = (*elem_iter)->GetNodeLocation(1)[0];
         double y_2 = (*elem_iter)->GetNodeLocation(1)[1];
 
-        if (mAreNeumannBoundaries[0]) // Top is Neumann Boundary
+        if (are_neumann_boundaries[0]) // Top is Neumann Boundary
         {
             if ( (y_1  > (top-fudge_factor) ) &&  (y_2 > (top-fudge_factor) ))
             {
-                bcc.AddNeumannBoundaryCondition(*elem_iter, mpTopBoundaryCondtion);
+                bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_top);
             }
         }
-        if (mAreNeumannBoundaries[1]) // Right is Neumann Boundary
+        if (are_neumann_boundaries[1]) // Right is Neumann Boundary
         {
             if ( (x_1  > (right-fudge_factor) ) &&  (x_2 > (right-fudge_factor) ))
             {
-                bcc.AddNeumannBoundaryCondition(*elem_iter,  mpRightBoundaryCondtion);
+                bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_right);
             }
         }
-        if (mAreNeumannBoundaries[2]) // Bottom is Neumann Boundary
+        if (are_neumann_boundaries[2]) // Bottom is Neumann Boundary
         {
             if ( (y_1  < (bottom+fudge_factor) ) &&  (y_2 < (bottom+fudge_factor) ))
             {
-                bcc.AddNeumannBoundaryCondition(*elem_iter,  mpBottomBoundaryCondtion);
+                bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_bottom);
             }
         }
-        if (mAreNeumannBoundaries[3]) // Left is Neumann Boundary
+        if (are_neumann_boundaries[3]) // Left is Neumann Boundary
         {
             if ( (x_1  > (left+fudge_factor) ) &&  (x_2 < (left+fudge_factor) ))
             {
-                bcc.AddNeumannBoundaryCondition(*elem_iter,  mpLeftBoundaryCondtion);
+                bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc_left);
             }
         }
     }
@@ -142,35 +137,36 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
         double x = (*node_iter)->GetPoint()[0];
         double y = (*node_iter)->GetPoint()[1];
 
-        if (!mAreNeumannBoundaries[0]) // Top is Dirichlet Boundary
+        if (!are_neumann_boundaries[0]) // Top is Dirichlet Boundary
         {
             if (y > top-fudge_factor)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter,  mpTopBoundaryCondtion);
+                bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_top);
             }
         }
-        if (!mAreNeumannBoundaries[1]) // Right is Dirichlet Boundary
+        if (!are_neumann_boundaries[1]) // Right is Dirichlet Boundary
         {
             if (x > right-fudge_factor)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter,  mpRightBoundaryCondtion);
+                bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_right);
             }
         }
-        if (!mAreNeumannBoundaries[2]) // Bottom is Dirichlet Boundary
+        if (!are_neumann_boundaries[2]) // Bottom is Dirichlet Boundary
         {
             if (y < bottom+fudge_factor)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter,  mpBottomBoundaryCondtion);
+                bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_bottom);
             }
         }
-        if (!mAreNeumannBoundaries[3]) // Left is Dirichlet Boundary
+        if (!are_neumann_boundaries[3]) // Left is Dirichlet Boundary
         {
             if (x < left+fudge_factor)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter,  mpLeftBoundaryCondtion);
+                bcc.AddDirichletBoundaryCondition(*node_iter, p_bc_left);
             }
         }
     }
+
     return bcc;
 }
 
