@@ -57,7 +57,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulati
 }
 
 template<unsigned DIM>
-void DeltaNotchTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void DeltaNotchTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been

@@ -85,8 +85,9 @@ public:
      * Specifies what to do in the simulation before the start of the time loop.
      *
      * @param rCellPopulation reference to the cell population
+     * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Helper method to compute the average delta surrounding each cell in the population and store these in the CellData.

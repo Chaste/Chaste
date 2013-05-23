@@ -83,11 +83,21 @@ public:
     }
 
     /**
-     * Specifies what to do in the simulation before the start of the time loop.
+     * Specifies what to do in the simulation at the end of each output timestep.
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void SetupSolve(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+    {
+    }
+
+    /**
+     * Specifies what to do in the simulation before the start of the time loop.
+     *
+     * @param rCellPopulation reference to the cell population
+     * @param outputDirectory the output directory, relative to where Chaste output is stored
+     */
+    virtual void SetupSolve(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation, std::string outputDirectory)
     {
     }
 

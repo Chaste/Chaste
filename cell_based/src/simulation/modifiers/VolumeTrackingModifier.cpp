@@ -54,7 +54,7 @@ void VolumeTrackingModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<D
 }
 
 template<unsigned DIM>
-void VolumeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void VolumeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been

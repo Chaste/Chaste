@@ -1,6 +1,5 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -387,7 +386,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
          iter != mSimulationModifiers.end();
          ++iter)
     {
-        (*iter)->SetupSolve(this->mrCellPopulation);
+        (*iter)->SetupSolve(this->mrCellPopulation,this->mSimulationOutputDirectory);
     }
 
     /*
@@ -462,6 +461,14 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         if (p_simulation_time->GetTimeStepsElapsed()%mSamplingTimestepMultiple == 0)
         {
             mrCellPopulation.WriteResultsToFiles();
+
+            // Call UpdateAtEndOfOutputTimeStep() on each modifier
+            for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+                 iter != mSimulationModifiers.end();
+                 ++iter)
+            {
+                (*iter)->UpdateAtEndOfOutputTimeStep(this->mrCellPopulation);
+            }
         }
         CellBasedEventHandler::EndEvent(CellBasedEventHandler::OUTPUT);
     }

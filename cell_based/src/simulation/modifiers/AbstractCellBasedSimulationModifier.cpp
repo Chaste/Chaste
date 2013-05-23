@@ -48,10 +48,10 @@ AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::~AbstractCellBasedS
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulationModifierInfo(out_stream& rParamsFile)
 {
-    std::string force_type = GetIdentifier();
+    std::string modifier_type = GetIdentifier();
 
-    *rParamsFile << "\t\t<" << force_type << ">\n";
-    *rParamsFile << "\t\t</" << force_type << ">\n";
+    *rParamsFile << "\t\t<" << modifier_type << ">\n";
+    *rParamsFile << "\t\t</" << modifier_type << ">\n";
 }
 
 /////////////////////////////////////////////////////////////////////////////
