@@ -235,14 +235,14 @@ public:
     virtual void SolvePdeAndWriteResultsToFile(unsigned samplingTimestepMultiple);
 
     /**
-     * Helper method to construct the boundary conditions container for the PDE
+     * Helper method to construct the boundary conditions container for the PDE.
      *
-     * @param pPdeAndBc a pointer to the pde and bcs
-     * @param pMesh the mesh to solve the PDE On
+     * @param pPdeAndBc a pointer to the PDE and BCs
+     * @param pMesh the mesh on which to solve the PDE
+     *
      * @return the full boundary conditions container
-     *
      */
-    virtual BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
+    virtual BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Find the solution of one of the PDEs at a point in space

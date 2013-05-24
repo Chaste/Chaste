@@ -91,14 +91,14 @@ public:
     virtual ~CellBasedPdeHandlerOnCuboid();
 
     /**
-     * Overridden onstructBoundaryConditionsContiner method to implement differnt BCs on each face of Cuboid
+     * Overridden ConstructBoundaryConditionsContainer method to implement
+     * different boundary conditions on each face of the cuboid.
      *
-     * @param pPdeAndBc a pointer to the pde and bcs
-     * @param pMesh the mesh to solve the PDE On
-     * return The full boundary conditions container
-     *
+     * @param pPdeAndBc a pointer to the PDE and BCs
+     * @param pMesh the mesh on which to solve the PDE
+     * @return The full boundary conditions container
      */
-    BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContiner(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
+    BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Output parameters to file.
