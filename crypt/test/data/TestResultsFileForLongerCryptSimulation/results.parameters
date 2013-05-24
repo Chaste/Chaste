@@ -54,6 +54,9 @@
 		</SloughingCellKiller-2>
 	</CellKillers>
 
+	<SimulationModifiers>
+	</SimulationModifiers>
+
 	<Forces>
 		<GeneralisedLinearSpringForce-2-2>
 			<MeinekeSpringStiffness>30</MeinekeSpringStiffness>
