@@ -91,6 +91,8 @@ public:
 
     /**
      * Helper method to compute the volume of each cell in the population and store these in the CellData.
+     *
+     * @return a reference to the cell population
      */
     void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 };
