@@ -1122,70 +1122,124 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 //////////////////////////////////////////////////////////////////////
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
     assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
 
+    // Get the element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
     unsigned num_nodes = p_element->GetNumNodes();
 
     // Initialise boolean
-    bool element_includes_point = true;
+    bool element_includes_point = false;
 
-    unsigned winding_number = 0;
+///\todo (#2387) Investigate why the commented implementation causes Test2DVertexBasedCryptRepresentativeSimulation to fail
+//    // Initialise boolean
+//    bool element_includes_point = true;
+//
+//    unsigned winding_number = 0;
+//
+//    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+//    c_vector<double, SPACE_DIM> test_point = this->GetVectorFromAtoB(first_node_location, rTestPoint);
+//    c_vector<double, SPACE_DIM> this_node_location = zero_vector<double>(SPACE_DIM);
+//
+//    // Loop over edges of the element
+//    for (unsigned local_index=0; local_index<num_nodes; local_index++)
+//    {
+//        c_vector<double, SPACE_DIM> untransformed_vector = p_element->GetNodeLocation((local_index+1)%num_nodes);
+//        c_vector<double, SPACE_DIM> next_node_location = this->GetVectorFromAtoB(first_node_location, untransformed_vector);
+//
+//        // If this edge is crossing upward...
+//        if (this_node_location[1] <= test_point[1])
+//        {
+//            if (next_node_location[1] > test_point[1])
+//            {
+//                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
+//                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+//
+//                // ...and the test point is to the left of the edge...
+//                if (is_left > DBL_EPSILON)
+//                {
+//                    // ...then there is a valid upward edge-ray intersection to the right of the test point
+//                    winding_number++;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            // ...otherwise, if the edge is crossing downward
+//            if (next_node_location[1] <= test_point[1])
+//            {
+//                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
+//                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+//
+//                // ...and the test point is to the right of the edge...
+//                if (is_left < -DBL_EPSILON)
+//                {
+//                    // ...then there is a valid downward edge-ray intersection to the right of the test point
+//                    winding_number--;
+//                }
+//            }
+//        }
+//        this_node_location = next_node_location;
+//    }
+//
+//    if (winding_number == 0)
+//    {
+//        element_includes_point = false;
+//    }
+/////////////////////////////////////////////////////////
 
-    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> test_point = this->GetVectorFromAtoB(first_node_location, rTestPoint);
-    c_vector<double, SPACE_DIM> this_node_location = zero_vector<double>(SPACE_DIM);
+    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses
+    c_vector<double, SPACE_DIM> first_vertex = p_element->GetNodeLocation(0);
+
+    c_vector<double, SPACE_DIM> test_point = GetVectorFromAtoB(first_vertex, rTestPoint);
 
     // Loop over edges of the element
     for (unsigned local_index=0; local_index<num_nodes; local_index++)
     {
-        c_vector<double, SPACE_DIM> untransformed_vector = p_element->GetNodeLocation((local_index+1)%num_nodes);
-        c_vector<double, SPACE_DIM> next_node_location = this->GetVectorFromAtoB(first_node_location, untransformed_vector);
+        // Get the end points of this edge
+        // Remap to the origin to allow alternative distance metrics to be used in subclasses
+        c_vector<double, SPACE_DIM> vertexA = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation(local_index));
+        c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index+1)%num_nodes));
 
-        // If this edge is crossing upward...
-        if (this_node_location[1] <= test_point[1])
+        // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
+        c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
+        c_vector<double, SPACE_DIM> vector_b_to_point = GetVectorFromAtoB(vertexB, test_point);
+        c_vector<double, SPACE_DIM> vector_a_to_b = GetVectorFromAtoB(vertexA, vertexB);
+
+        // Pathological case - test point coincides with vertexA or vertexB
+        if (    (norm_2(vector_a_to_point) < DBL_EPSILON)
+             || (norm_2(vector_b_to_point) < DBL_EPSILON) )
         {
-            if (next_node_location[1] > test_point[1])
-            {
-                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
-                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+            return false;
+        }
 
-                // ...and the test point is to the left of the edge...
-                if (is_left > DBL_EPSILON)
-                {
-                    // ...then there is a valid upward edge-ray intersection to the right of the test point
-                    winding_number++;
-                }
+        // Pathological case - ray coincides with horizontal edge
+        if ( (fabs(vector_a_to_b[1]) < DBL_EPSILON) &&
+             (fabs(vector_a_to_point[1]) < DBL_EPSILON) &&
+             (fabs(vector_b_to_point[1]) < DBL_EPSILON) )
+        {
+            if ( (vector_a_to_point[0]>0) != (vector_b_to_point[0]>0) )
+            {
+                return false;
             }
         }
-        else
-        {
-            // ...otherwise, if the edge is crossing downward
-            if (next_node_location[1] <= test_point[1])
-            {
-                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
-                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
 
-                // ...and the test point is to the right of the edge...
-                if (is_left < -DBL_EPSILON)
-                {
-                    // ...then there is a valid downward edge-ray intersection to the right of the test point
-                    winding_number--;
-                }
+        // Non-pathological case
+        // A and B on different sides of the line y = test_point[1]
+        if ( (vertexA[1] > test_point[1]) != (vertexB[1] > test_point[1]) )
+        {
+            // intersection of y=test_point[1] and vector_a_to_b is on the right of test_point
+            if (test_point[0] < vertexA[0] + vector_a_to_b[0]*vector_a_to_point[1]/vector_a_to_b[1])
+            {
+                element_includes_point = !element_includes_point;
             }
         }
-        this_node_location = next_node_location;
     }
-
-    if (winding_number == 0)
-    {
-        element_includes_point = false;
-    }
-
     return element_includes_point;
 }
 
