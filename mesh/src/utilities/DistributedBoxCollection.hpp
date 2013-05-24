@@ -313,7 +313,7 @@ public:
     /**
      * Set whether to record node neighbour in the map rNodeNeighbours during CalculateNodePairs. Set to false for efficiency if not needed.
      *
-     * @param celculateNodeNeighbours whether to store the neighbours.
+     * @param calculateNodeNeighbours whether to store the neighbours.
      */
     void SetCalculateNodeNeighbours(bool calculateNodeNeighbours);
 
