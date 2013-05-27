@@ -691,21 +691,25 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
     if(!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
-        mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag);
+        int tag = (int) pow (2, 1+ PetscTools::GetMyRank() ) * pow (3, 1 + PetscTools::GetMyRank() + 1);
+        mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, tag);
     }
     if(!PetscTools::AmMaster())
     {
+        int tag = (int) pow (2, 1 + PetscTools::GetMyRank() ) * pow (3, 1 + PetscTools::GetMyRank() - 1);
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
-        mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag);
+        mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, tag);
     }
     // Now post receives to start receiving data before returning.
     if(!PetscTools::AmTopMost())
     {
-        mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, mCellCommunicationTag);
+        int tag = (int) pow (3, 1 + PetscTools::GetMyRank() ) * pow (2, 1+ PetscTools::GetMyRank() + 1);
+        mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, tag);
     }
     if(!PetscTools::AmMaster())
     {
-        mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, mCellCommunicationTag);
+        int tag = (int) pow (3, 1 + PetscTools::GetMyRank() ) * pow (2, 1+ PetscTools::GetMyRank() - 1);
+        mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, tag);
     }
 #endif
 }
@@ -794,7 +798,11 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
     std::vector<unsigned> nodes_to_send_left = mpNodesOnlyMesh->rGetNodesToSendLeft();
     AddCellsToSendLeft(nodes_to_send_left);
 
-    SendCellsToNeighbourProcesses();
+    // Post non-blocking send / receives so communication on both sides can start.
+    NonBlockingSendCellsToNeighbourProcesses();
+
+    // Post blocking receive calls that wait until communication complete.
+    GetReceivedCells();
 
     for (std::vector<unsigned>::iterator iter = nodes_to_send_right.begin();
          iter != nodes_to_send_right.end();

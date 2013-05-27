@@ -105,7 +105,6 @@ public:
     /* This test *may* deadlock if we don't use non-blocking communication */
     void TestNonBlockingSendingClass() throw (Exception)
     {
-        MPI_Status status;
         ObjectCommunicator<ClassOfSimpleVariables> communicator;
 
         {
@@ -135,7 +134,8 @@ public:
 
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
-                p_recv_class = communicator.RecvObject(p, 123, status);
+                communicator.IRecvObject(p, 123);
+                p_recv_class = communicator.GetRecvObject();
 
                 // Check that the values are correct
                 TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);

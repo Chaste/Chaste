@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * PetSc MPI communication. The object is serialized in to a string of characters, and then
  * de-serialized on the receive process.
  */
+const unsigned MAX_BUFFER_SIZE = 1000000;
+
 template<typename CLASS>
 class ObjectCommunicator
 {
@@ -185,10 +187,10 @@ void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObje
     output_arch << pObject;
 
     mSendString = ss.str();
-
-    // Get + send string length
     mSendBufferLength = mSendString.size();
-    MPI_Isend(&mSendBufferLength, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+
+    // Make sure we are not going to overrun the asynchronous buffer size.
+    assert(mSendBufferLength < MAX_BUFFER_SIZE);
 
     // Send archive data
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
@@ -227,15 +229,8 @@ void ObjectCommunicator<CLASS>::IRecvObject(unsigned sourceProcess, unsigned tag
 
     mIsWriting = true;
 
-    MPI_Request size_request;
-    MPI_Status size_status;
-
-    MPI_Irecv(&mRecvBufferLength, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &size_request);
-
-    MPI_Wait(&size_request, &size_status);
-
-    mRecvBuffer = new char[mRecvBufferLength];
-    MPI_Irecv(mRecvBuffer, mRecvBufferLength, MPI_BYTE, sourceProcess, tag, PETSC_COMM_WORLD, &mMpiRequest);
+    mRecvBuffer = new char[MAX_BUFFER_SIZE];
+    MPI_Irecv(mRecvBuffer, MAX_BUFFER_SIZE, MPI_BYTE, sourceProcess, tag, PETSC_COMM_WORLD, &mMpiRequest);
 }
 
 template<typename CLASS>
@@ -246,11 +241,16 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
         EXCEPTION("No object to receive in ObjectCommunicator::GetRecvObject");
     }
 
-    MPI_Wait(&mMpiRequest, MPI_STATUS_IGNORE);
+    MPI_Status return_status;
+
+    MPI_Wait(&mMpiRequest, &return_status);
+
+    int recv_size;
+    MPI_Get_count(&return_status, MPI_BYTE, &recv_size);
 
     // Extract a proper object from the buffer
     std::istringstream ss(std::ios::binary);
-    ss.rdbuf()->pubsetbuf(mRecvBuffer, mRecvBufferLength);
+    ss.rdbuf()->pubsetbuf(mRecvBuffer, recv_size);
 
     boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(ss);
