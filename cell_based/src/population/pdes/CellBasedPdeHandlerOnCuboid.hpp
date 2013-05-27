@@ -60,6 +60,9 @@ class CellBasedPdeHandlerOnCuboid : public CellBasedPdeHandler<DIM>
     friend class TestOnLatticeSimulationWithPdes;
 
 private:
+    
+    /** Container for pointers to boundary conditions that are passed into the boundary condition containers. */
+    std::vector<ConstBoundaryCondition<DIM>* > mConstBoundaryConditions;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
