@@ -38,9 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-#include "AbstractCardiacCellFactory.hpp"
-#include "AbstractContractionModel.hpp"
 
+#include "AbstractContractionModel.hpp"
+#include "QuadraticMesh.hpp"
 
 /**
  * A factory to ease creating contraction cell models for use in a electro-mechanics simulations.
@@ -50,10 +50,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * given element. The user should also implement GetNumberOfCells() if this isn't equal
  * to the number of nodes. FinaliseCellCreation() can be used to (eg) add stimuli to
  * certain cells after they have been created.
+ *
+ * DIM is the dimension of the quadratic mesh (element dimension == space dimension for mechanics at present).
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-class AbstractContractionCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>
+template<unsigned DIM>
+class AbstractContractionCellFactory
 {
+private:
+    QuadraticMesh<DIM>* mpMesh;
+
 public:
     /**
      * @return a newly created contraction model for the given quadrature point.
@@ -62,12 +67,13 @@ public:
      * the quad point index is the index that would be obtained by looping over
      * elements and then looping over quad points.
      *
+     * @param elementIndex  Global element index.
      * It is assumed that all the quad points in a given element will be assigned the same kind
      * of contraction cell.
      *
      * @param elemIndex  Global element index.
      */
-    virtual AbstractContractionModel* CreateContractionCellForQuadPoint(unsigned elemIndex) = 0;
+    virtual AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex) = 0;
 
     //
     // \todo 2370 The methods below are likely to be required for the final version of this class.
@@ -93,9 +99,9 @@ public:
    // AbstractContractionCellFactory(boost::shared_ptr<AbstractIvpOdeSolver> pSolver = boost::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
 
     /**
-     * Destructor: free solver, zero stimulus and fake bath cell.
+     * Destructor
      */
-    //virtual ~AbstractContractionCellFactory();
+    virtual ~AbstractContractionCellFactory(){};
 
 
 };

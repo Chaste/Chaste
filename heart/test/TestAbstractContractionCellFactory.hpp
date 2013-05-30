@@ -68,12 +68,7 @@ public:
     {
     }
 
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
-    {
-        return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
-    }
-
-    AbstractContractionModel* CreateContractionCellForQuadPoint(unsigned elemIndex)
+    AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex)
     {
         switch(mContractionModelName)
         {
@@ -118,7 +113,7 @@ public:
             LabelBasedContractionCellFactory factory(CONSTANT);
 
             ConstantActiveTension* p_model =
-                dynamic_cast<ConstantActiveTension*> (factory.CreateContractionCellForQuadPoint(0u));
+                dynamic_cast<ConstantActiveTension*> (factory.CreateContractionCellForElement(0u));
             TS_ASSERT(p_model);
             delete p_model;
         }
@@ -127,7 +122,7 @@ public:
             LabelBasedContractionCellFactory factory(NONPHYSIOL1);
 
             NonPhysiologicalContractionModel* p_model =
-                dynamic_cast<NonPhysiologicalContractionModel*> (factory.CreateContractionCellForQuadPoint(0u));
+                dynamic_cast<NonPhysiologicalContractionModel*> (factory.CreateContractionCellForElement(0u));
             TS_ASSERT(p_model);
             delete p_model;
         }
@@ -136,7 +131,7 @@ public:
             LabelBasedContractionCellFactory factory(NASH2004);
 
             Nash2004ContractionModel* p_model =
-                dynamic_cast<Nash2004ContractionModel*> (factory.CreateContractionCellForQuadPoint(0u));
+                dynamic_cast<Nash2004ContractionModel*> (factory.CreateContractionCellForElement(0u));
             TS_ASSERT(p_model);
             delete p_model;
         }
@@ -145,7 +140,7 @@ public:
             LabelBasedContractionCellFactory factory(KERCHOFFS2003);
 
             Kerchoffs2003ContractionModel* p_model =
-                dynamic_cast<Kerchoffs2003ContractionModel*> (factory.CreateContractionCellForQuadPoint(0u));
+                dynamic_cast<Kerchoffs2003ContractionModel*> (factory.CreateContractionCellForElement(0u));
             TS_ASSERT(p_model);
             delete p_model;
         }
