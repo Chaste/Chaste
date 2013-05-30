@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1478,18 +1479,22 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetUnitNormalToFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
 {
     assert(SPACE_DIM == 3);
-
     // As we are in 3D, the face must have at least three vertices, so use its first three vertices
+    assert( pFace->GetNumNodes() >= 3u );
     c_vector<double, SPACE_DIM> v0 = pFace->GetNode(0)->rGetLocation();
     c_vector<double, SPACE_DIM> v1 = pFace->GetNode(1)->rGetLocation();
     c_vector<double, SPACE_DIM> v2 = pFace->GetNode(2)->rGetLocation();
 
     c_vector<double, SPACE_DIM> v1_minus_v0 = this->GetVectorFromAtoB(v0, v1);
-    ///\todo #2367 The is potential for a floating point exception here: assert(norm_2(v1_minus_v0) > 0.0);
     c_vector<double, SPACE_DIM> v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
-    ///\todo #2367 The is potential for a floating point exception here: assert(norm_2(v2_minus_v0) > 0.0);
-
     c_vector<double, SPACE_DIM> unit_normal = zero_vector<double>(SPACE_DIM);
+    if ( norm_inf(v1_minus_v0) == 0.0 || norm_inf(v2_minus_v0) == 0.0 )
+    {
+        ///\todo #2391 There is potential for a floating point exception here, so we'll bail out
+        WARNING("Found a face which is degenerate or has repeated points.  We shouldn't let this happen.  Meanwhile, the code will ignore it and carry on.");
+        return unit_normal; //Which is still zero
+    }
+
     unit_normal(0) = v1_minus_v0(1)*v2_minus_v0(2) - v1_minus_v0(2)*v2_minus_v0(1);
     unit_normal(1) = v1_minus_v0(2)*v2_minus_v0(0) - v1_minus_v0(0)*v2_minus_v0(2);
     unit_normal(2) = v1_minus_v0(0)*v2_minus_v0(1) - v1_minus_v0(1)*v2_minus_v0(0);
