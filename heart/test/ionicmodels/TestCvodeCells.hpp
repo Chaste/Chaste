@@ -267,8 +267,9 @@ public:
         lr91_cvode_system.SetMaxSteps(2);
         TS_ASSERT_THROWS_THIS(OdeSolution solution_cvode_fail = lr91_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time),
                               "CVODE failed to solve system: CV_TOO_MUCH_WORK");
-        // Kill the cell
+        // Kill the cell -- will trigger exp overflow if FPE exceptions are on
         boost::shared_ptr<SimpleStimulus> p_boom_stimulus(new SimpleStimulus(-50000, 2.0, 1.0));
+#ifndef TEST_FOR_FPE
         CellLuoRudy1991FromCellMLCvode lr91_boom(p_solver, p_boom_stimulus);
         TS_ASSERT_THROWS_CONTAINS(OdeSolution solution_boom = lr91_boom.Solve(start_time, end_time, max_timestep, sampling_time),
                                   "CVODE failed to solve system: CV_"); // Can be ERR_FAILURE or CONV_FAILURE...
@@ -276,6 +277,7 @@ public:
         lr91_boom.SetMaxSteps(10000);
         TS_ASSERT_THROWS_CONTAINS(lr91_boom.Solve(start_time, end_time, max_timestep),
                                   "CVODE failed to solve system: CV_"); // Can be ERR_FAILURE or CONV_FAILURE...
+#endif // TEST_FOR_FPE
         // Nasty cell
         ExceptionalCell bad_cell(p_solver, p_boom_stimulus);
         TS_ASSERT_THROWS_THIS(OdeSolution solution_bad = bad_cell.Solve(start_time, end_time, max_timestep, sampling_time),

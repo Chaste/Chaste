@@ -140,7 +140,7 @@ const boost::shared_ptr<AbstractIvpOdeSolver> AbstractCardiacCellInterface::GetS
 void AbstractCardiacCellInterface::SetVoltageDerivativeToZero(bool clamp)
 {
     mSetVoltageDerivativeToZero = clamp;
-    if (mFixedVoltage == DOUBLE_UNSET)
+    if (clamp)
     {
         mFixedVoltage = GetVoltage();
     }

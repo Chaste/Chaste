@@ -428,8 +428,8 @@ public:
         std::cout << "\n\tCVODE Optimised: " << cvode_opt_time << std::endl;
         CompareCellModelResults("Lr91FromPyCmlCvode", "Lr91FromPyCmlCvodeOpt", 1e-1, true);
         // Coverage
-        cvode_opt.SetVoltageDerivativeToZero();
         cvode_opt.ResetToInitialConditions();
+        cvode_opt.SetVoltageDerivativeToZero();
         cvode_opt.Solve(0.0, i_ionic_end_time, max_dt);
         TS_ASSERT_DELTA(cvode_opt.GetIIonic(), 0.0, 1e-1); // Cell should be at rest
         cvode_opt.SetVoltageDerivativeToZero(false);
