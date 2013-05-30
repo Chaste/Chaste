@@ -92,7 +92,7 @@ public:
     /**
      * Helper method to compute the mean level of Delta in each cell's neighbours and store these in the CellData.
      *
-     * @return a reference to the cell population
+     * @param rCellPopulation reference to the cell population
      */
     void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 };
