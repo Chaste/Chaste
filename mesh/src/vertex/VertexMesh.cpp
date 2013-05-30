@@ -674,7 +674,8 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
             }
 
             double vertex_area = GetVolumeOfElement(index);
-            ///\todo #2367 The is potential for a floating point exception here: assert(vertex_area != 0.0);
+            assert(vertex_area > 0.0);
+
             double centroid_coefficient = 1.0/(6.0*vertex_area);
 
             c_vector<double, SPACE_DIM> transformed_centroid = zero_vector<double>(SPACE_DIM);
@@ -1487,20 +1488,24 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetUnitNormalToF
 
     c_vector<double, SPACE_DIM> v1_minus_v0 = this->GetVectorFromAtoB(v0, v1);
     c_vector<double, SPACE_DIM> v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
-    c_vector<double, SPACE_DIM> unit_normal = zero_vector<double>(SPACE_DIM);
-    if ( norm_inf(v1_minus_v0) == 0.0 || norm_inf(v2_minus_v0) == 0.0 )
-    {
-        ///\todo #2391 There is potential for a floating point exception here, so we'll bail out
-        WARNING("Found a face which is degenerate or has repeated points.  We shouldn't let this happen.  Meanwhile, the code will ignore it and carry on.");
-        return unit_normal; //Which is still zero
-    }
 
+    c_vector<double, SPACE_DIM> unit_normal = zero_vector<double>(SPACE_DIM);
     unit_normal(0) = v1_minus_v0(1)*v2_minus_v0(2) - v1_minus_v0(2)*v2_minus_v0(1);
     unit_normal(1) = v1_minus_v0(2)*v2_minus_v0(0) - v1_minus_v0(0)*v2_minus_v0(2);
     unit_normal(2) = v1_minus_v0(0)*v2_minus_v0(1) - v1_minus_v0(1)*v2_minus_v0(0);
 
+    double magnitude = norm_2(unit_normal);
+    if ( magnitude == 0.0 )
+    {
+        ///\todo #2391 There is potential for a floating point exception here, so we'll bail out
+        // Either v1_minus_v0 is zero (co-located points), or v2_minus_v0 is zero (co-located points), or
+        // the two vectors are parallel (collinear points).
+        WARNING("Found a face which is degenerate or has repeated points.  We shouldn't let this happen.  Meanwhile, the code will ignore it and carry on.");
+        return unit_normal; //Which is still zero
+    }
+
     // Normalize the normal vector
-    unit_normal /= norm_2(unit_normal);
+    unit_normal /= magnitude;
 
     return unit_normal;
 }
@@ -1513,6 +1518,11 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
 
     // Get the unit normal to the plane of this face
     c_vector<double, SPACE_DIM> unit_normal = GetUnitNormalToFace(pFace);
+    if (norm_inf(unit_normal)==0.0)
+    {
+        ///\todo #2391 We have already warned the user that the face is degenerate and this should not happen
+        return 0.0;
+    }
 
     // Select the largest absolute coordinate to ignore for planar projection
     double abs_x = unit_normal[0]>0 ? unit_normal[0]>0 : -unit_normal[0];

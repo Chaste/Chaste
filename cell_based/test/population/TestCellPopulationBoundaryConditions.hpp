@@ -154,10 +154,12 @@ public:
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-
-        // Set up cell population boundary condition x>1
+        // There are four cells and their x-extents are (0, 1), (0.5, 1.5), (1, 2), (1.5, 2.5)
+        // Imposing x>0.75 will squash two of these cells, but not so much that they degenerate to zero area
+        // Set up cell population boundary condition x>0.75
+        double x_boundary = 0.75;
         c_vector<double,2> point = zero_vector<double>(2);
-        point(0) = 1.0;
+        point(0) = x_boundary;
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
@@ -182,9 +184,9 @@ public:
                 ++node_iter)
         {
             c_vector<double, 2> location = node_iter->rGetLocation();
-            if (old_locations[&(*node_iter)][0] < 1.0)
+            if (old_locations[&(*node_iter)][0] < x_boundary)
             {
-                TS_ASSERT_DELTA(1.0, location[0], 1e-6);
+                TS_ASSERT_DELTA(x_boundary, location[0], 1e-6);
                 TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
             }
             else
@@ -282,6 +284,7 @@ public:
         NodeBasedCellPopulation<3> population_3d(*p_mesh_3d, cells_3d);
 
         c_vector<double,3> centre_3d = zero_vector<double>(3);
+        centre_3d(0) = 0.1; //The centre is at (0.1, 0.0, 0.0).  This is because there is no node at the centre
 
         SphereGeometryBoundaryCondition<3> bc_3d(&population_3d, centre_3d, 0.4, 1e-4);
 
@@ -310,6 +313,27 @@ public:
         }
 
         bc_3d.ImposeBoundaryCondition(old_locations);
+
+        for (std::list<CellPtr>::iterator cell_iter = population_3d.rGetCells().begin();
+             cell_iter != population_3d.rGetCells().end();
+             ++cell_iter)
+        {
+            c_vector<double,3> new_direction = population_3d.GetLocationOfCellCentre(*cell_iter)- centre_3d;
+
+            //Check it's at the right distance from the centre
+            double new_distance = norm_2(new_direction);
+            TS_ASSERT_DELTA(new_distance, 0.4, 1e-10);
+
+            //Check that the direction is correct i.e that the new direction is parallel to the old direction
+            new_direction /= new_distance;
+            unsigned index = population_3d.GetLocationIndexUsingCell(*cell_iter);
+            Node<3>* p_node = p_mesh_3d->GetNode(index);
+            c_vector<double,3> old_direction =  old_locations[p_node] - centre_3d;
+            old_direction /= norm_2(old_direction);
+            TS_ASSERT_DELTA(norm_inf(new_direction-old_direction), 0.0, 1e-10);
+
+
+        }
 
         // Test that the boundary condition was imposed correctly
         TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), true);
