@@ -30,11 +30,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import sys
 import unittest
 
 # Get PyCml modules
-sys.path[0:0] = ['python/pycml']
 import processors
 import protocol
 import pycml

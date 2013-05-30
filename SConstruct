@@ -287,6 +287,7 @@ env.Append(BOPT = 'g_c++') # Needed for some versions of PETSc?
 env.Replace(CXX = build.tools['mpicxx'])
 env.Replace(AR = build.tools['ar'])
 env.Replace(CXXFILESUFFIX = '.cpp')
+env.Append(PYINCPATH='python/pycml') # Ensure Python tests can use PyCml easily
 env['INSTALL_PREFIX'] = install_prefix
 env['INSTALL_FILES'] = install_files
 

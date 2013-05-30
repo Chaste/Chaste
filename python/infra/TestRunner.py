@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # It will be created if necessary.
 # The .log file basename, without extension, will be prepended to the status.
 
+import copy
 import os
 import signal
 import subprocess
@@ -162,7 +163,7 @@ class TestKillerTimer(object):
         print msg
 
 
-def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0):
+def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0, env=os.environ):
     """Actually run the given test."""
     # Find out how we're supposed to run tests under this build type
     if exefile.startswith("python/infra/Check"):
@@ -177,7 +178,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     if not log_fp:
         raise IOError("Unable to open log file")
     start_time = time.time()
-    test_proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+    test_proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, env=env)
     if time_limit and psutil:
         # Set a Timer to kill the test if it runs too long
         kill_timer = TestKillerTimer(time_limit, test_proc.pid, os.path.abspath(exefile), log_fp)
@@ -253,10 +254,13 @@ def get_build_function(build, run_time_flags='', test_time_limit=0):
     """Return a function that can be used as a Builder by SCons."""
     
     def build_function(target, source, env):
-        # Set up the environment from env['ENV']
-        os.environ.update(env['ENV'])
+        # Set up the environment from env['ENV'], env['ENV']['PYTHONPATH'] and env['PYINCPATH']
+        orig_python_path = copy.copy(env['ENV']['PYTHONPATH'])
+        env.PrependENVPath('PYTHONPATH', env.get('PYINCPATH', ''))
+        test_env = copy.copy(env['ENV'])
+        env['ENV']['PYTHONPATH'] = orig_python_path
         # Run the test
-        log = run_test(str(source[0]), str(target[0]), build, run_time_flags, time_limit=test_time_limit)
+        log = run_test(str(source[0]), str(target[0]), build, run_time_flags, time_limit=test_time_limit, env=test_env)
         # Note the extra dependency of the copied log file
         #env.SideEffect(log, target)
         env.Depends(os.path.join(os.path.dirname(log), 'index.html'), log)

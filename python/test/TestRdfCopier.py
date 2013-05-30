@@ -33,10 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
 import unittest
-import sys
 
 # Get PyCml modules
-sys.path[0:0] = ['python/pycml']
 import cellml_metadata
 import translators
 

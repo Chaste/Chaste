@@ -175,6 +175,9 @@ if __name__ == '__main__':
         (file, pathname, desc) = imp.find_module(base, [dirpath])
         try:
             module = imp.load_module(base, file, pathname, desc)
+        except ImportError:
+            print "Python module search path:", sys.path, os.environ['PYTHONPATH']
+            raise
         finally:
             file.close()
         SetTestOutput(module)

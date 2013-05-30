@@ -72,7 +72,7 @@ _lock = threading.Lock()
 chaste_source_exts = ['.cpp', '.xsd', '.cellml']
 
 def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=False,
-                    sourceExts=None):
+                    sourceExts=None, checkSourcesExist=False):
     """Look for source files under rootDir.
     
     Returns 2 lists: the first of source (.cpp, .xsd, .cellml) files, and the second
@@ -83,6 +83,8 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
      * set dirsOnly to True to only find source directories.  In this case
        only a single list is returned
      * set includeRoot to True to include the rootDir in the returned folder list
+     * set checkSourcesExist to True to only return directories that actually contain
+       source files, not all non-ignored folders found
     """
     source_files = []
     source_dirs = []
@@ -94,13 +96,16 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
         for dirname in dirnames[:]:
             if dirname in ignoreDirs:
                 dirnames.remove(dirname)
-            else:
-                source_dirs.append(os.path.join(dirpath, dirname))
-        if not dirsOnly:
+        has_sources = not checkSourcesExist
+        if not dirsOnly or checkSourcesExist:
             for filename in filenames:
                 if os.path.splitext(filename)[1] in source_exts:
-                    filepath = os.path.join(dirpath, filename)
-                    source_files.append(filepath)
+                    has_sources = True
+                    if not dirsOnly:
+                        filepath = os.path.join(dirpath, filename)
+                        source_files.append(filepath)
+        if has_sources and (includeRoot or dirpath != rootDir):
+            source_dirs.append(dirpath)
     if dirsOnly:
         return source_dirs
     elif '.cpp' in source_exts:
@@ -952,8 +957,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     os.chdir('../..') # This is so .o files are built in <project>/build/<something>/
     files, extra_cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
     otherVars['extra_dyn_cpppath'] = extra_cpppath[:]
-    pydirs = FindSourceFiles(env, '.', sourceExts=['.py'],
-                             ignoreDirs=['build', 'test'], dirsOnly=True)
+    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True)
     # Look for source files that tests depend on under <project>/test/.
     testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'])
     extra_cpppath.extend(test_cpppath)
@@ -989,7 +993,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         env.Prepend(CPPPATH=extra_cpppath)
     # Similarly for folders containing Python source
     if pydirs:
-        env.Append(PYINCPATH=pydirs)
+        env.Append(PYINCPATH=map(lambda d: os.path.join(project_path, d), pydirs))
     
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
@@ -1094,8 +1098,7 @@ def DoComponentSConscript(component, otherVars):
     # Look for source files within the <component>/src folder
     os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
     files, _ = FindSourceFiles(env, 'src', ignoreDirs=['broken'])
-    pydirs = FindSourceFiles(env, '.', sourceExts=['.py'],
-                             ignoreDirs=['build', 'test'], dirsOnly=True)
+    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True)
     # Look for source files that tests depend on under test/.
     # We also need to add any subfolders to the CPPPATH, so they are searched
     # for #includes.
@@ -1126,7 +1129,7 @@ def DoComponentSConscript(component, otherVars):
     if test_cpppath:
         env.Prepend(CPPPATH=test_cpppath)
     if pydirs:
-        env.Append(PYINCPATH=pydirs)
+        env.Append(PYINCPATH=map(lambda d: os.path.join(component, d), pydirs))
 
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
