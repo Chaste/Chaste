@@ -69,11 +69,11 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-        IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
+        IncompressibleExplicitSolver2d solver(mesh,problem_defn,"TestExplicitCardiacMech");
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -124,7 +124,7 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
@@ -137,13 +137,13 @@ public:
         /////////////////////////////////////////////////////////////////////
 
         // NONPHYSIOL 1 - contraction model is of the form sin(t)
-        IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL1,mesh,problem_defn,""/*"TestCompareExplAndImplCardiacSolvers_Exp"*/);
+        IncompressibleExplicitSolver2d expl_solver(mesh,problem_defn,""/*"TestCompareExplAndImplCardiacSolvers_Exp"*/);
         p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
         p_pair->DeleteFineBoxCollection();
         expl_solver.SetFineCoarseMeshPair(p_pair);
         expl_solver.Initialise();
 
-        IncompressibleImplicitSolver2d impl_solver(NONPHYSIOL1,mesh,problem_defn,""/*"TestCompareExplAndImplCardiacSolvers_Imp"*/);
+        IncompressibleImplicitSolver2d impl_solver(mesh,problem_defn,""/*"TestCompareExplAndImplCardiacSolvers_Imp"*/);
         impl_solver.SetFineCoarseMeshPair(p_pair);
         impl_solver.Initialise();
 
@@ -181,7 +181,7 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL2,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
@@ -194,13 +194,13 @@ public:
         /////////////////////////////////////////////////////////////////////
 
         // NONPHYSIOL 2 - contraction model is of the form lam*sin(t)
-        IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL2,mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Exp");
+        IncompressibleExplicitSolver2d expl_solver(mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Exp");
         p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
         p_pair->DeleteFineBoxCollection();
         expl_solver.SetFineCoarseMeshPair(p_pair);
         expl_solver.Initialise();
 
-        IncompressibleImplicitSolver2d impl_solver(NONPHYSIOL2,mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Imp");
+        IncompressibleImplicitSolver2d impl_solver(mesh,problem_defn,"TestCompareExplAndImplCardiacSolversStretch_Imp");
         impl_solver.SetFineCoarseMeshPair(p_pair);
         impl_solver.Initialise();
 
@@ -269,7 +269,7 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL3,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         TS_ASSERT_THROWS_THIS(problem_defn.SetApplyAnisotropicCrossFibreTension(true,1.0,1.0),
@@ -286,22 +286,25 @@ public:
         p_coarse_mesh_big->ConstructRegularSlabMesh(1.0, 3.0, 3.0);
         FineCoarseMeshPair<2>* p_pair_wrong = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh_big);
 
-        IncompressibleExplicitSolver2d expl_solver(NONPHYSIOL3,mesh,problem_defn,"");
+        IncompressibleExplicitSolver2d expl_solver(mesh,problem_defn,"");
         p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
         p_pair->DeleteFineBoxCollection();
         expl_solver.SetFineCoarseMeshPair(p_pair);
         expl_solver.Initialise();
 
-        IncompressibleExplicitSolver2d expl_solver_with_nash(NASH2004,mesh,problem_defn,"");
+        problem_defn.SetContractionModel(NASH2004,0.01);
+        IncompressibleExplicitSolver2d expl_solver_with_nash(mesh,problem_defn,"");
         expl_solver_with_nash.SetFineCoarseMeshPair(p_pair);
         expl_solver_with_nash.Initialise();
 
-        IncompressibleExplicitSolver2d expl_solver_with_kerchoffs(KERCHOFFS2003,mesh,problem_defn,"");
+        problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
+        IncompressibleExplicitSolver2d expl_solver_with_kerchoffs(mesh,problem_defn,"");
         expl_solver_with_kerchoffs.SetFineCoarseMeshPair(p_pair);
         expl_solver_with_kerchoffs.Initialise();
 
         // bad contraction model
-        IncompressibleExplicitSolver2d solver(NHS,mesh,problem_defn,"");
+        problem_defn.SetContractionModel(NHS,0.01);
+        IncompressibleExplicitSolver2d solver(mesh,problem_defn,"");
         TS_ASSERT_THROWS_THIS(solver.SetFineCoarseMeshPair(p_pair_wrong),
                 "When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
         solver.SetFineCoarseMeshPair(p_pair);
@@ -325,7 +328,7 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //Cross fibre tension fractions to be tested
@@ -356,7 +359,7 @@ public:
             TS_ASSERT_DELTA(problem_defn.GetSheetNormalTensionFraction(),tension_fractions[i], 1e-6);
 
             // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-            IncompressibleExplicitSolver2d solver(NONPHYSIOL1,mesh,problem_defn,"TestExplicitCardiacMech");
+            IncompressibleExplicitSolver2d solver(mesh,problem_defn,"TestExplicitCardiacMech");
 
             // The following lines are not relevant to this test but need to be there
             // as the solver is expecting an electrics node to be paired up with each mechanics node.
@@ -434,13 +437,13 @@ public:
         ElectroMechanicsProblemDefinition<3> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
         double tension_fraction=1;
         problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fraction);
 
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-        IncompressibleExplicitSolver3d solver(NONPHYSIOL1,mesh,problem_defn,"TestIsotropicCrossFibreExplicit");
+        IncompressibleExplicitSolver3d solver(mesh,problem_defn,"TestIsotropicCrossFibreExplicit");
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.
@@ -524,14 +527,14 @@ public:
         ElectroMechanicsProblemDefinition<3> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
         double sheet_tension_fraction=0;
         double sheet_normal_tension_fraction=1;
         problem_defn.SetApplyAnisotropicCrossFibreTension(true,sheet_tension_fraction, sheet_normal_tension_fraction);
 
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-        IncompressibleExplicitSolver3d solver(NONPHYSIOL1,mesh,problem_defn,"TestAnisotropicCrossFibreExplicit");
+        IncompressibleExplicitSolver3d solver(mesh,problem_defn,"TestAnisotropicCrossFibreExplicit");
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.

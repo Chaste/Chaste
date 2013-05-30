@@ -41,12 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsSolver(
-                                  ContractionModelName contractionModelName,
                                   QuadraticMesh<DIM>& rQuadMesh,
                                   ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                   std::string outputDirectory)
     : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
-                                                            contractionModelName,
                                                             rProblemDefinition,
                                                             outputDirectory)
 {
@@ -55,7 +53,7 @@ ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsS
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels(ContractionModelName contractionModelName)
+void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels()
 {
     for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
         iter != this->mQuadPointToDataAtQuadPointMap.end();
@@ -64,13 +62,14 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
         AbstractContractionModel* p_contraction_model;
         if (iter->second.Active == true)
         {
-            switch(contractionModelName)
+            ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
+            switch(model_name)
             {
                 case NONPHYSIOL1:
                 case NONPHYSIOL2:
                 case NONPHYSIOL3:
                 {
-                    unsigned option = (contractionModelName==NONPHYSIOL1 ? 1 : (contractionModelName==NONPHYSIOL2? 2 : 3));
+                    unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
                     p_contraction_model = new NonPhysiologicalContractionModel(option);
                     break;
                 }

@@ -90,10 +90,8 @@ private:
 
     /**
      * Initialise contraction models for each quadrature point
-     * @param contractionModelName The name of the contraction model (from the enumeration ContractionModel
-     * defined in AbstractContactionModel)
      */
-    void InitialiseContractionModels(ContractionModelName contractionModelName);
+    void InitialiseContractionModels();
 
 public:
     /**
@@ -104,8 +102,7 @@ public:
      * @param rProblemDefinition Object defining body force and boundary conditions
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */
-    ImplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
-                                   QuadraticMesh<DIM>& rQuadMesh,
+    ImplicitCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
                                    ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
 

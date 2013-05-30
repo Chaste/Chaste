@@ -76,7 +76,7 @@ public:
             ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-            problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+            problem_defn.SetContractionModel(NHS,0.01);
             problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
             if (run==1)
             {
@@ -85,7 +85,7 @@ public:
                 problem_defn.SetApplyIsotropicCrossFibreTension(apply_cross_fibre_tension, cross_fibre_tension_fraction);
             }
 
-            IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"");
+            IncompressibleImplicitSolver2d solver(mesh,problem_defn,"");
 
             //The following lines are not relevant to this test but need to be there
             TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -180,10 +180,10 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NHS,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
-        IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/ZeroActiveTension");
+        IncompressibleImplicitSolver2d solver(mesh,problem_defn,"ImplicitCardiacMech/ZeroActiveTension");
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -233,10 +233,10 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NHS,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
-        IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/SpecifiedCaCompression");
+        IncompressibleImplicitSolver2d solver(mesh,problem_defn,"ImplicitCardiacMech/SpecifiedCaCompression");
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
 
         //The following lines are not relevant to this test but need to be there
@@ -356,10 +356,10 @@ public:
             ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-            problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+            problem_defn.SetContractionModel(NHS,0.01);
             problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
-            IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"ImplicitCardiacMech/FibresInYDirection");
+            IncompressibleImplicitSolver2d solver(mesh,problem_defn,"ImplicitCardiacMech/FibresInYDirection");
 
             //The following lines are not relevant to this test but need to be there
             TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -449,7 +449,7 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
@@ -461,12 +461,14 @@ public:
         p_pair->SetUpBoxesOnFineMesh();
 
         //////////////////////////////////////////////////////////////////
-        IncompressibleImplicitSolver2d impl_solver1(KERCHOFFS2003,mesh,problem_defn,"");
+        IncompressibleImplicitSolver2d impl_solver1(mesh,problem_defn,"");
         p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(impl_solver1.GetQuadratureRule()), false);
         p_pair->DeleteFineBoxCollection();
         impl_solver1.SetFineCoarseMeshPair(p_pair);
         impl_solver1.Initialise();
-        IncompressibleImplicitSolver2d impl_solver2(NONPHYSIOL3,mesh,problem_defn,"");
+
+        problem_defn.SetContractionModel(NONPHYSIOL3,0.01);
+        IncompressibleImplicitSolver2d impl_solver2(mesh,problem_defn,"");
         impl_solver2.SetFineCoarseMeshPair(p_pair);
         impl_solver2.Initialise();
 
@@ -490,10 +492,10 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
-        IncompressibleImplicitSolver2d solver(KERCHOFFS2003,mesh,problem_defn,"");
+        IncompressibleImplicitSolver2d solver(mesh,problem_defn,"");
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -593,10 +595,10 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NHS,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
-        IncompressibleImplicitSolver2d solver(NHS, mesh, problem_defn, "ImplicitCardiacMech/FibresInYDirectionDefinePerQuadPoint");
+        IncompressibleImplicitSolver2d solver(mesh, problem_defn, "ImplicitCardiacMech/FibresInYDirectionDefinePerQuadPoint");
 
         //The following lines are not relevant to this test but need to be there
         TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
@@ -664,7 +666,7 @@ public:
         ElectroMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NHS,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NHS,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
 
@@ -696,7 +698,7 @@ public:
             TS_ASSERT_DELTA(problem_defn.GetSheetNormalTensionFraction(),tension_fractions[i], 1e-6);
 
             // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-            IncompressibleImplicitSolver2d solver(NHS,mesh,problem_defn,"TestImplicitCardiacMech");
+            IncompressibleImplicitSolver2d solver(mesh,problem_defn,"TestImplicitCardiacMech");
 
             // The following lines are not relevant to this test but need to be there
             // as the solver is expecting an electrics node to be paired up with each mechanics node.
@@ -780,13 +782,13 @@ public:
         ElectroMechanicsProblemDefinition<3> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
         double tension_fraction=1;
         problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fraction);
 
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-        IncompressibleImplicitSolver3d solver(NONPHYSIOL1,mesh,problem_defn,"TestIsotropicCrossFibreImplicit");
+        IncompressibleImplicitSolver3d solver(mesh,problem_defn,"TestIsotropicCrossFibreImplicit");
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.
@@ -870,14 +872,14 @@ public:
         ElectroMechanicsProblemDefinition<3> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetContractionModel(NONPHYSIOL1,0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
+        problem_defn.SetContractionModel(NONPHYSIOL1,0.01);
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
         double sheet_tension_fraction=0;
         double sheet_normal_tension_fraction=1;
         problem_defn.SetApplyAnisotropicCrossFibreTension(true,sheet_tension_fraction, sheet_normal_tension_fraction);
 
         // NONPHYSIOL1 => NonphysiologicalContractionModel 1
-        IncompressibleImplicitSolver3d solver(NONPHYSIOL1,mesh,problem_defn,"TestAnisotropicCrossFibreImplicit");
+        IncompressibleImplicitSolver3d solver(mesh,problem_defn,"TestAnisotropicCrossFibreImplicit");
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.

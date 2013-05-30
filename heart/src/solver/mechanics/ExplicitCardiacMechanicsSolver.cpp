@@ -41,12 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ConstantActiveTension.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsSolver(ContractionModelName contractionModelName,
-                                                                                      QuadraticMesh<DIM>& rQuadMesh,
+ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
                                                                                       ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
     : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
-                                                            contractionModelName,
                                                             rProblemDefinition,
                                                             outputDirectory)
 {
@@ -56,7 +54,7 @@ ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsS
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels(ContractionModelName contractionModelName)
+void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels()
 {
     for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
         iter != this->mQuadPointToDataAtQuadPointMap.end();
@@ -67,7 +65,8 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
         if (iter->second.Active == true)
         {
             //tissue node
-            switch(contractionModelName)
+            ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
+            switch(model_name)
             {
                 case CONSTANT:
                 {
@@ -78,7 +77,7 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
                 case NONPHYSIOL2:
                 case NONPHYSIOL3:
                 {
-                    unsigned option = (contractionModelName==NONPHYSIOL1 ? 1 : (contractionModelName==NONPHYSIOL2? 2 : 3));
+                    unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
                     p_contraction_model = new NonPhysiologicalContractionModel(option);
                     break;
                 }

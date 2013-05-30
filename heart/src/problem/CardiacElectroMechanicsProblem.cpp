@@ -405,14 +405,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
             case NASH2004:
                 // Create an EXPLICIT, INCOMPRESSIBLE solver
                 mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>,DIM>(
-                        mpProblemDefinition->GetContractionModel(),*mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
+                        *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
             break;
 
             case KERCHOFFS2003:
             case NHS:
                 // Create an IMPLICIT, INCOMPRESSIBLE solver
                 mpCardiacMechSolver = new ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>,DIM>(
-                        mpProblemDefinition->GetContractionModel(),*mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
+                        *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
             break;
             default:
                 EXCEPTION("Invalid contraction model, options are: NASH2004, KERCHOFFS2003 or NHS");
@@ -428,14 +428,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
             case NASH2004:
                 // Create an EXPLICIT, COMPRESSIBLE solver
                 mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>,DIM>(
-                        mpProblemDefinition->GetContractionModel(),*mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
+                        *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
             break;
 
             case KERCHOFFS2003:
             case NHS:
                 // Create an IMPLICIT, COMPRESSIBLE solver
                 mpCardiacMechSolver = new ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>,DIM>(
-                        mpProblemDefinition->GetContractionModel(),*mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
+                        *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
             break;
             default:
                 EXCEPTION("Invalid contraction model, options are: NASH2004, KERCHOFFS2003 or NHS");

@@ -101,9 +101,6 @@ protected:
      */
     std::map<unsigned,DataAtQuadraturePoint>::iterator mMapIterator;
 
-    /**The name of the contraction model to be used in all active quad points*/
-    ContractionModelName mContractionModelName;
-
     /** A mesh pair object that can be set by the user to inform the solver about the electrics mesh. */
     FineCoarseMeshPair<DIM>* mpMeshPair;
 
@@ -194,10 +191,9 @@ protected:
 
     /**
      * Must assign a contraction model at each quad point.
-     * It has to assign fake-bath models to non-active regions
-     * @param contractionModelName the name of the contraction model.
+     * It has to assign fake-bath models to non-active regions.
      */
-    virtual void InitialiseContractionModels(ContractionModelName contractionModelName) = 0;
+    virtual void InitialiseContractionModels() = 0;
 
 
     /**
@@ -228,7 +224,6 @@ public:
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */
     AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
-                                   ContractionModelName contractionModelName,
                                    ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                    std::string outputDirectory);
 
@@ -340,21 +335,17 @@ public:
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
-                                                                                      ContractionModelName contractionModelName,
                                                                                       ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
    : ELASTICITY_SOLVER(rQuadMesh,
                        rProblemDefinition,
                        outputDirectory),
-     mContractionModelName(contractionModelName),
      mpMeshPair(NULL),
      mCurrentTime(DBL_MAX),
      mNextTime(DBL_MAX),
      mOdeTimestep(DBL_MAX),
      mrElectroMechanicsProblemDefinition(rProblemDefinition)
 {
-    // This fails for a couple of cardiac mechanics solver tests, but not for the 'real' simulations.
-    //assert(mContractionModelName==mrElectroMechanicsProblemDefinition.GetContractionModel());
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
@@ -410,7 +401,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     mpVariableFibreSheetDirections = NULL;
 
-    InitialiseContractionModels(mContractionModelName);
+    InitialiseContractionModels();
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
