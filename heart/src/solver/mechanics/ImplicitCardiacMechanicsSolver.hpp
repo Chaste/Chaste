@@ -97,7 +97,6 @@ public:
     /**
      * Constructor
      *
-     * @param contractionModelName The contraction model.
      * @param rQuadMesh A reference to the mesh.
      * @param rProblemDefinition Object defining body force and boundary conditions
      * @param outputDirectory The output directory, relative to TEST_OUTPUT

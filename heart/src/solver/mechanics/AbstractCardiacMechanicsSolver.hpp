@@ -109,8 +109,10 @@ protected:
 
     /** Current time */
     double mCurrentTime;
+
     /** Time to which the solver has been asked to solve to */
     double mNextTime;
+
     /** Time used to integrate the contraction model */
     double mOdeTimestep;
 
@@ -219,7 +221,6 @@ public:
      * Constructor
      *
      * @param rQuadMesh A reference to the mesh.
-     * @param contractionModelName the name of the contraction model to be used
      * @param rProblemDefinition Object defining body force and boundary conditions
      * @param outputDirectory The output directory, relative to TEST_OUTPUT
      */

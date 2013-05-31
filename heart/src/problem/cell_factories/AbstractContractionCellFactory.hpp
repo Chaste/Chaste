@@ -57,6 +57,7 @@ template<unsigned DIM>
 class AbstractContractionCellFactory
 {
 private:
+    /** The mechanics mesh */
     QuadraticMesh<DIM>* mpMesh;
 
 public:
