@@ -50,6 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "StochasticWntCellCycleModel.hpp"
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 /**
  * This class consists of a single crypt simulation archiving test.
  */

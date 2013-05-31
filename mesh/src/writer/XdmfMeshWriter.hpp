@@ -39,6 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractTetrahedralMeshWriter.hpp"
 
 
+/**
+ * A class for writing from a Chaste mesh to the geometry/topology components of 
+ * an XDMF file.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class XdmfMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {

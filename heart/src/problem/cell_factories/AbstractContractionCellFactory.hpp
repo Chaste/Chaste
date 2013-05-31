@@ -68,11 +68,10 @@ public:
      * the quad point index is the index that would be obtained by looping over
      * elements and then looping over quad points.
      *
-     * @param elementIndex  Global element index.
+     * @param elemIndex  Global element index.
      * It is assumed that all the quad points in a given element will be assigned the same kind
      * of contraction cell.
      *
-     * @param elemIndex  Global element index.
      */
     virtual AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex) = 0;
 
