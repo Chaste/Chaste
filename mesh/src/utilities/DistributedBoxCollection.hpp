@@ -256,7 +256,7 @@ public:
     bool GetAreLocalBoxesSet() const;
 
     /**
-     * @return #mBoxWdith
+     * @return #mBoxWidth
      */
     double GetBoxWidth() const;
 

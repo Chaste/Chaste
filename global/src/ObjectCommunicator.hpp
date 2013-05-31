@@ -44,13 +44,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp" // For MPI methods
 #include "Exception.hpp"
 
+const unsigned MAX_BUFFER_SIZE = 1000000;
+
 /**
- * This is a helper method to enable classes that can be serialized to be sent using
+ * This is a helper class to enable classes that can be serialized to be sent using
  * PetSc MPI communication. The object is serialized in to a string of characters, and then
  * de-serialized on the receive process.
  */
-const unsigned MAX_BUFFER_SIZE = 1000000;
-
 template<typename CLASS>
 class ObjectCommunicator
 {
