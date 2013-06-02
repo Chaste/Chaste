@@ -90,8 +90,6 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
     source_dirs = []
     source_exts = sourceExts or chaste_source_exts
     ignoreDirs.append('.svn')
-    if includeRoot:
-        source_dirs.append(rootDir)
     for dirpath, dirnames, filenames in os.walk(rootDir):
         for dirname in dirnames[:]:
             if dirname in ignoreDirs:
@@ -957,7 +955,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     os.chdir('../..') # This is so .o files are built in <project>/build/<something>/
     files, extra_cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
     otherVars['extra_dyn_cpppath'] = extra_cpppath[:]
-    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True)
+    pydirs = FindPyDirs(env)
     # Look for source files that tests depend on under <project>/test/.
     testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'])
     extra_cpppath.extend(test_cpppath)
@@ -992,9 +990,8 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     if extra_cpppath:
         env.Prepend(CPPPATH=extra_cpppath)
     # Similarly for folders containing Python source
-    if pydirs:
-        env.Append(PYINCPATH=map(lambda d: os.path.join(project_path, d), pydirs))
-    
+    AddPyDirs(env, project_path, pydirs)
+
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
 
@@ -1069,7 +1066,22 @@ def CheckForSpecialFiles(env, component, files, otherVars):
                 RegisterObjects(env, key, objs)
                 special_objs.extend(objs)
     return special_objs
-                
+
+def FindPyDirs(env):
+    """Find folders containing Python sources in this component/project."""
+    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True)
+    # Clear out any stale .pyc files (i.e. those without associated .py sources)
+    for pydir in pydirs:
+        for pyc in glob.glob(os.path.join(pydir, '*.pyc')):
+            if not os.path.exists(pyc[:-1]):
+                env.Execute(Delete(pyc))
+    return pydirs
+
+def AddPyDirs(env, basePath, pydirs):
+    """Add folders containing Python sources, if any, to the module search path."""
+    if pydirs:
+        pydir_paths = map(lambda d: os.path.join(basePath, d), pydirs)
+        env.Append(PYINCPATH=pydir_paths)
 
 def DoComponentSConscript(component, otherVars):
     """Main logic for a Chaste component's SConscript file.
@@ -1098,7 +1110,7 @@ def DoComponentSConscript(component, otherVars):
     # Look for source files within the <component>/src folder
     os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
     files, _ = FindSourceFiles(env, 'src', ignoreDirs=['broken'])
-    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True)
+    pydirs = FindPyDirs(env)
     # Look for source files that tests depend on under test/.
     # We also need to add any subfolders to the CPPPATH, so they are searched
     # for #includes.
@@ -1128,8 +1140,7 @@ def DoComponentSConscript(component, otherVars):
         env = CloneEnv(env)
     if test_cpppath:
         env.Prepend(CPPPATH=test_cpppath)
-    if pydirs:
-        env.Append(PYINCPATH=map(lambda d: os.path.join(component, d), pydirs))
+    AddPyDirs(env, component, pydirs)
 
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
