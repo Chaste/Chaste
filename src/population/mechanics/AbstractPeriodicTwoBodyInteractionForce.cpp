@@ -71,10 +71,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(Abstract
 
     switch (DIM)
     {
-        case 1:
-        {
-            break;
-        }
+        // case 1: is not implemented (and will drop through to NEVER_REACHED below.
         case 2:
         {
             for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
