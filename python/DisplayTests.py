@@ -198,7 +198,10 @@ def _recent(req, type='', start=0, **filters):
         if filters:
             for filter_name, filter_value in filters.items():
                 if filter_name in poss_filters:
-                    where.append(filter_name + '=?')
+                    if '*' in filter_value:
+                        where.append(filter_name + ' GLOB ?')
+                    else:
+                        where.append(filter_name + '=?')
                     params.append(filter_value)
         if where:
             where = ' where ' + ' and '.join(where)
