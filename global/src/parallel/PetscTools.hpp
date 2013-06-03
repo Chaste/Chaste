@@ -218,6 +218,13 @@ public:
     static void IsolateProcesses(bool isolate=true);
 
     /**
+     * Get the MPI Communicator representing the whole set of running processes.  This will normally be
+     * PETSC_COMM_WORLD, unless IsolateProcesses has been called, in which case it will be PETSC_COMM_SELF.
+     * @return  the MPI Communicator representing the whole set of running processes
+     */
+    static MPI_Comm GetWorld();
+
+    /**
      * Create a vector of the specified size. SetFromOptions is called.
      *
      * @param size  the size of the vector

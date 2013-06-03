@@ -155,6 +155,18 @@ void PetscTools::IsolateProcesses(bool isolate)
     mIsolateProcesses = isolate;
 }
 
+MPI_Comm PetscTools::GetWorld()
+{
+    if (mIsolateProcesses)
+    {
+        return PETSC_COMM_SELF;
+    }
+    else
+    {
+        return PETSC_COMM_WORLD;
+    }
+}
+
 bool PetscTools::ReplicateBool(bool flag)
 {
     CheckCache();
@@ -437,6 +449,3 @@ bool PetscTools::HasParMetis()
     MatPartitioningDestroy(PETSC_DESTROY_PARAM(part));
     return (parmetis_installed_error == 0);
 }
-
-
-
