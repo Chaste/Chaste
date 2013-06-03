@@ -536,7 +536,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
 
         for (unsigned i=0; i<phase_counts.size(); i++)
         {
-            MPI_Allreduce(&mCellCyclePhaseCount[i], &phase_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+            MPI_Allreduce(&mCellCyclePhaseCount[i], &phase_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
         }
 
         mCellCyclePhaseCount = phase_counts;
@@ -567,14 +567,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
         unsigned local_size = mCellProliferativeTypesCount.size();
         unsigned global_size;
 
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
         mCellProliferativeTypesCount.resize(global_size, 0u);
 
         std::vector<unsigned> types_counts(mCellProliferativeTypesCount.size(), 0u);
 
         for (unsigned i=0; i<types_counts.size(); i++)
         {
-            MPI_Allreduce(&mCellProliferativeTypesCount[i], &types_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+            MPI_Allreduce(&mCellProliferativeTypesCount[i], &types_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
         }
 
         mCellProliferativeTypesCount = types_counts;
@@ -598,14 +598,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
         unsigned local_size = mCellMutationStateCount.size();
         unsigned global_size;
 
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
         mCellMutationStateCount.resize(global_size, 0u);
 
         std::vector<unsigned> mutation_counts(mCellMutationStateCount.size(), 0u);
 
         for (unsigned i=0; i<mutation_counts.size(); i++)
         {
-            MPI_Allreduce(&mCellMutationStateCount[i], &mutation_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+            MPI_Allreduce(&mCellMutationStateCount[i], &mutation_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
         }
 
         mCellMutationStateCount = mutation_counts;

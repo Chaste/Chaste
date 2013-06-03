@@ -397,7 +397,7 @@ private:
         if (PetscTools::IsParallel())
         {
             double total_cpu_time[NUM_EVENTS];
-            MPI_Reduce(&mWallTime[0], total_cpu_time, NUM_EVENTS, MPI_DOUBLE, MPI_SUM, 0, PETSC_COMM_WORLD);
+            MPI_Reduce(&mWallTime[0], total_cpu_time, NUM_EVENTS, MPI_DOUBLE, MPI_SUM, 0, PetscTools::GetWorld());
             if (PetscTools::AmMaster())
             {
                 total = ConvertWallTimeToSeconds(total_cpu_time[top_event]);
@@ -412,7 +412,7 @@ private:
             }
 
             double max_cpu_time[NUM_EVENTS];
-            MPI_Reduce(&mWallTime[0], max_cpu_time, NUM_EVENTS, MPI_DOUBLE, MPI_MAX, 0, PETSC_COMM_WORLD);
+            MPI_Reduce(&mWallTime[0], max_cpu_time, NUM_EVENTS, MPI_DOUBLE, MPI_MAX, 0, PetscTools::GetWorld());
             if (PetscTools::AmMaster())
             {
                 total = ConvertWallTimeToSeconds(max_cpu_time[top_event]);

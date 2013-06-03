@@ -167,12 +167,12 @@ void ObjectCommunicator<CLASS>::SendObject(boost::shared_ptr<CLASS> const pObjec
 
     // Get + send string length
     unsigned string_length = send_msg.size();
-    MPI_Send(&string_length, 1, MPI_UNSIGNED, destinationProcess, tag, PETSC_COMM_WORLD);
+    MPI_Send(&string_length, 1, MPI_UNSIGNED, destinationProcess, tag, PetscTools::GetWorld());
 
     // Send archive data
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Send(send_buf, string_length, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD);
+    MPI_Send(send_buf, string_length, MPI_BYTE, destinationProcess, tag, PetscTools::GetWorld());
 }
 
 template<typename CLASS>
@@ -195,17 +195,17 @@ void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObje
     // Send archive data
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
     mSendBuffer = const_cast<char*>(mSendString.data());
-    MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PETSC_COMM_WORLD, &request);
+    MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PetscTools::GetWorld(), &request);
 }
 
 template<typename CLASS>
 boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourceProcess, unsigned tag, MPI_Status& status)
 {
     unsigned string_length = 0;
-    MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PETSC_COMM_WORLD, &status);
+    MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PetscTools::GetWorld(), &status);
 
     char* recv_string = new char[string_length];
-    MPI_Recv(recv_string, string_length, MPI_BYTE, sourceProcess , tag, PETSC_COMM_WORLD, &status);
+    MPI_Recv(recv_string, string_length, MPI_BYTE, sourceProcess , tag, PetscTools::GetWorld(), &status);
 
     // Extract a proper object from the buffer
     std::istringstream ss(std::ios::binary);
@@ -230,7 +230,7 @@ void ObjectCommunicator<CLASS>::IRecvObject(unsigned sourceProcess, unsigned tag
     mIsWriting = true;
 
     mRecvBuffer = new char[MAX_BUFFER_SIZE];
-    MPI_Irecv(mRecvBuffer, MAX_BUFFER_SIZE, MPI_BYTE, sourceProcess, tag, PETSC_COMM_WORLD, &mMpiRequest);
+    MPI_Irecv(mRecvBuffer, MAX_BUFFER_SIZE, MPI_BYTE, sourceProcess, tag, PetscTools::GetWorld(), &mMpiRequest);
 }
 
 template<typename CLASS>
@@ -280,13 +280,13 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::SendRecvObject(boost::shared
     unsigned send_string_length = send_msg.size();
     unsigned recv_string_length;
 
-    MPI_Sendrecv(&send_string_length, 1, MPI_UNSIGNED, destinationProcess, sendTag, &recv_string_length, 1, MPI_UNSIGNED, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
+    MPI_Sendrecv(&send_string_length, 1, MPI_UNSIGNED, destinationProcess, sendTag, &recv_string_length, 1, MPI_UNSIGNED, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
 
     char recv_string[recv_string_length];
 
     // Send archive data
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PETSC_COMM_WORLD, &status);
+    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
 
     // Extract received object
     std::istringstream iss(std::ios::binary);

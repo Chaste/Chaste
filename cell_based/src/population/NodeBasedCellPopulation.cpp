@@ -308,7 +308,7 @@ c_vector<double, DIM> NodeBasedCellPopulation<DIM>::GetSizeOfCellPopulation()
 
     for (unsigned i=0; i<DIM; i++)
     {
-        MPI_Allreduce(&local_size[i], &global_size[i], 1, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
+        MPI_Allreduce(&local_size[i], &global_size[i], 1, MPI_DOUBLE, MPI_MAX, PetscTools::GetWorld());
     }
 
     return global_size;

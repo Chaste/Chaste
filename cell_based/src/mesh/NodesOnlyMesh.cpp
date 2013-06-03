@@ -184,7 +184,7 @@ double NodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) const
     double local_width = AbstractMesh<SPACE_DIM, SPACE_DIM>::GetWidth(rDimension);
     double global_width;
 
-    MPI_Allreduce(&local_width, &global_width, 1, MPI_DOUBLE, MPI_MAX, PETSC_COMM_WORLD);
+    MPI_Allreduce(&local_width, &global_width, 1, MPI_DOUBLE, MPI_MAX, PetscTools::GetWorld());
 
     return global_width;
 }
@@ -505,7 +505,7 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
 
     // Synchronise between processes
     int is_any_node_close = 0;
-    MPI_Allreduce(&is_local_node_close, &is_any_node_close, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD);
+    MPI_Allreduce(&is_local_node_close, &is_any_node_close, 1, MPI_INT, MPI_SUM, PetscTools::GetWorld());
 
     return (is_any_node_close > 0);
 }
