@@ -37,15 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 std::string FormDebugHead()
 {
-    if (PetscTools::IsSequential())
+    std::stringstream header;
+    header << "DEBUG: ";
+    if (PetscTools::IsParallel())
     {
-        std::string ret("DEBUG: ");
-        return ret;
+        header << "proc " << PetscTools::GetMyRank() << ": ";
     }
-    else
-    {
-        std::stringstream stringstream;
-        stringstream << "DEBUG: proc " << PetscTools::GetMyRank() << ": ";
-        return stringstream.str();
-    }
+    return header.str();
 }

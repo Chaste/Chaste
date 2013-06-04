@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "Debug.hpp"
 
-// Interestingly, this test won't fork if you attempt to run in parallel unless this is included
+#include "PetscTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestDebug : public CxxTest::TestSuite
@@ -102,6 +102,11 @@ public:
         PRINT_VECTOR(vec);
 
         MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 95"
+
+        // Check interaction with process isolation
+        PetscTools::IsolateProcesses();
+        TRACE("Processes are isolated.");
+        PetscTools::IsolateProcesses(false);
     }
 };
 
