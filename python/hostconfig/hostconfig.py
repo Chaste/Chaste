@@ -129,7 +129,7 @@ def RemoveFromPath(pathList, searchString):
             pathList.remove(path)
     return
 
-def AddBoost(basePath, version):
+def AddBoost(basePath, version, forceUseSystem=False):
     """Use Boost installed in a non-standard location.
 
     Expects basePath to point to a folder containing include and lib folders,
@@ -155,7 +155,7 @@ def AddBoost(basePath, version):
     libpath = os.path.join(basePath, 'lib')
     conf.other_libpaths.append(libpath)
     boost_libs = ['boost_serialization', 'boost_filesystem']
-    if float(version[:4]) >= 1.42:
+    if float(version[:4]) >= 1.42 or forceUseSystem:
         boost_libs.append('boost_system')
     testlib = boost_libs[0]
     base = os.path.join(libpath, 'lib' + testlib)
