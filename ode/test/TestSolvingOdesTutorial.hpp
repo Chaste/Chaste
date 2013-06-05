@@ -69,6 +69,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * need the following header.
  */
 #include "OdeSystemInformation.hpp"
+
+/* This test doesn't support being run on multiple processes, so we need this header
+ * to prevent race conditions when writing files.
+ */
+#include "FakePetscSetup.hpp"
+
 /*
  * == Defining the ODE classes ==
  *
