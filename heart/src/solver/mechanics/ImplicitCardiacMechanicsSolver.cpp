@@ -53,52 +53,39 @@ ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsS
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels()
+AbstractContractionModel* ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModel()
 {
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-        iter != this->mQuadPointToDataAtQuadPointMap.end();
-        iter++)
+    AbstractContractionModel* p_contraction_model;
+
+    ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
+    switch(model_name)
     {
-        AbstractContractionModel* p_contraction_model;
-        if (iter->second.Active == true)
+        case NONPHYSIOL1:
+        case NONPHYSIOL2:
+        case NONPHYSIOL3:
         {
-            ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
-            switch(model_name)
-            {
-                case NONPHYSIOL1:
-                case NONPHYSIOL2:
-                case NONPHYSIOL3:
-                {
-                    unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
-                    p_contraction_model = new NonPhysiologicalContractionModel(option);
-                    break;
-                }
-                case NHS:
-                {
-                    p_contraction_model = new NhsModelWithBackwardSolver;
-                    break;
-                }
-                case KERCHOFFS2003: //stretch dependent
-                {
-                    p_contraction_model = new Kerchoffs2003ContractionModel;
-                    break;
-                }
-                default:
-                {
-                    #define COVERAGE_IGNORE
-                    EXCEPTION("Unknown or disallowed contraction model");
-                    #undef COVERAGE_IGNORE
-                }
-            }
-            iter->second.ContractionModel = p_contraction_model;
+            unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
+            p_contraction_model = new NonPhysiologicalContractionModel(option);
+            break;
         }
-        else
+        case NHS:
         {
-               //bath
-               p_contraction_model = new FakeBathContractionModel;
-               iter->second.ContractionModel = p_contraction_model;
+            p_contraction_model = new NhsModelWithBackwardSolver;
+            break;
+        }
+        case KERCHOFFS2003: //stretch dependent
+        {
+            p_contraction_model = new Kerchoffs2003ContractionModel;
+            break;
+        }
+        default:
+        {
+            #define COVERAGE_IGNORE
+            EXCEPTION("Unknown or disallowed contraction model");
+            #undef COVERAGE_IGNORE
         }
     }
+    return p_contraction_model;
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>

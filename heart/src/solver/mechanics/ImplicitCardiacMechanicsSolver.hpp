@@ -89,9 +89,11 @@ private:
                                           double& rDerivActiveTensionWrtDLambdaDt);
 
     /**
-     * Initialise contraction models for each quadrature point
+     * Initialise contraction model for each quadrature point
+     *
+     * @return a contraction model
      */
-    void InitialiseContractionModels();
+    AbstractContractionModel* InitialiseContractionModel();
 
 public:
     /**

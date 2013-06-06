@@ -80,6 +80,15 @@ typedef struct DataAtQuadraturePoint_
 template<class ELASTICITY_SOLVER, unsigned DIM>
 class AbstractCardiacMechanicsSolver : public ELASTICITY_SOLVER, public AbstractCardiacMechanicsSolverInterface<DIM>
 {
+private:
+    /**
+     * Must assign a contraction model at each active quadrature point.
+     * This method ensures that fake contraction models are applied
+     * in the bath, and calls the method InitialiseContractionModels
+     * for active sites.
+     */
+    void InitialiseContractionModelsWrapper();
+
 protected:
     static const unsigned NUM_VERTICES_PER_ELEMENT = ELASTICITY_SOLVER::NUM_VERTICES_PER_ELEMENT; /**< Useful const from base class */
 
@@ -187,15 +196,16 @@ protected:
     /**
      * Sets relevant data at all quad points, including whether it is an active region or not.
      * The contraction model is set to NULL.
-     * At the end, it calls InitialiseContractionModels in the child class to assign a proper model.
+     * At the end, it calls InitialiseContractionModel in the child class to assign a proper model.
      */
     void Initialise();
 
     /**
-     * Must assign a contraction model at each quad point.
-     * It has to assign fake-bath models to non-active regions.
+     * Must assign a contraction model at each active quadrature point.
+     *
+     * The bath is handled by the wrapper method #InitialiseContractionModelsWrapper().
      */
-    virtual void InitialiseContractionModels() = 0;
+    virtual AbstractContractionModel*  InitialiseContractionModel() = 0;
 
 
     /**

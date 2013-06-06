@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Nash2004ContractionModel.hpp"
 #include "Kerchoffs2003ContractionModel.hpp"
 #include "NonPhysiologicalContractionModel.hpp"
-#include "FakeBathContractionModel.hpp"
 #include "ConstantActiveTension.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
@@ -52,60 +51,45 @@ ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsS
 }
 
 
-
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModels()
+AbstractContractionModel* ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModel()
 {
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-        iter != this->mQuadPointToDataAtQuadPointMap.end();
-        iter++)
+    AbstractContractionModel* p_contraction_model;
+
+    //tissue node
+    ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
+    switch(model_name)
     {
-        AbstractContractionModel* p_contraction_model;
-
-        if (iter->second.Active == true)
+        case CONSTANT:
         {
-            //tissue node
-            ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
-            switch(model_name)
-            {
-                case CONSTANT:
-                {
-                    p_contraction_model = new ConstantActiveTension;
-                    break;
-                }
-                case NONPHYSIOL1:
-                case NONPHYSIOL2:
-                case NONPHYSIOL3:
-                {
-                    unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
-                    p_contraction_model = new NonPhysiologicalContractionModel(option);
-                    break;
-                }
-                case NASH2004: //stretch dependent, will this work with explicit??
-                {
-                    p_contraction_model = new Nash2004ContractionModel;
-                    break;
-                }
-                case KERCHOFFS2003: //stretch dependent, will this work with explicit? Answer: can be unstable
-                {
-                    p_contraction_model = new Kerchoffs2003ContractionModel;
-                    break;
-                }
-                default:
-                {
-                    EXCEPTION("Unknown or stretch-rate-dependent contraction model");
-                }
-            }
-
-            iter->second.ContractionModel = p_contraction_model;
+            p_contraction_model = new ConstantActiveTension;
+            break;
         }
-        else
+        case NONPHYSIOL1:
+        case NONPHYSIOL2:
+        case NONPHYSIOL3:
         {
-            //bath
-            p_contraction_model = new FakeBathContractionModel;
-            iter->second.ContractionModel = p_contraction_model;
+            unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
+            p_contraction_model = new NonPhysiologicalContractionModel(option);
+            break;
+        }
+        case NASH2004: //stretch dependent, will this work with explicit??
+        {
+            p_contraction_model = new Nash2004ContractionModel;
+            break;
+        }
+        case KERCHOFFS2003: //stretch dependent, will this work with explicit? Answer: can be unstable
+        {
+            p_contraction_model = new Kerchoffs2003ContractionModel;
+            break;
+        }
+        default:
+        {
+            EXCEPTION("Unknown or stretch-rate-dependent contraction model");
         }
     }
+
+    return p_contraction_model;
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>

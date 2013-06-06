@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCardiacMechanicsSolver.hpp"
-
+#include "FakeBathContractionModel.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
@@ -74,6 +74,10 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
             {
                 unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
 
+                // We construct a set of data to be assigned to each quadrature point
+                // to begin with the contraction model pointer is set to NULL.
+                // These are set later (at the bottom of this method)
+                // by calling #InitialiseContractionModels().
                 DataAtQuadraturePoint data_at_quad_point;
                 data_at_quad_point.ContractionModel = NULL;
                 data_at_quad_point.Stretch = 1.0;
@@ -104,7 +108,29 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     mpVariableFibreSheetDirections = NULL;
 
-    InitialiseContractionModels();
+    InitialiseContractionModelsWrapper();
+}
+
+template<class ELASTICITY_SOLVER,unsigned DIM>
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModelsWrapper()
+{
+    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+            iter != this->mQuadPointToDataAtQuadPointMap.end();
+            iter++)
+    {
+        AbstractContractionModel* p_contraction_model;
+
+        if (iter->second.Active == true)
+        {
+            p_contraction_model = InitialiseContractionModel();
+        }
+        else
+        {
+            //bath
+            p_contraction_model = new FakeBathContractionModel;
+        }
+        iter->second.ContractionModel = p_contraction_model;
+    }
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
