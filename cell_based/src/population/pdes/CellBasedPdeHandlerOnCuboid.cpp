@@ -105,17 +105,18 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
          ++elem_iter)
     {
         double x_1 = (*elem_iter)->GetNodeLocation(0)[0];
-        double y_1 = (*elem_iter)->GetNodeLocation(0)[1];
+//        double y_1 = (*elem_iter)->GetNodeLocation(0)[1];
         double x_2 = (*elem_iter)->GetNodeLocation(1)[0];
-        double y_2 = (*elem_iter)->GetNodeLocation(1)[1];
+//        double y_2 = (*elem_iter)->GetNodeLocation(1)[1];
 
-        if (are_neumann_boundaries[0]) // Top is Neumann boundary
-        {
-            if ( (y_1  > (top-fudge_factor) ) &&  (y_2 > (top-fudge_factor) ))
-            {
-                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[0]);
-            }
-        }
+        assert(!are_neumann_boundaries[0]);
+//        if (are_neumann_boundaries[0]) // Top is Neumann boundary
+//        {
+//            if ( (y_1  > (top-fudge_factor) ) &&  (y_2 > (top-fudge_factor) ))
+//            {
+//                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[0]);
+//            }
+//        }
         if (are_neumann_boundaries[1]) // Right is Neumann boundary
         {
             if ( (x_1  > (right-fudge_factor) ) &&  (x_2 > (right-fudge_factor) ))
@@ -123,13 +124,14 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
                 bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[1]);
             }
         }
-        if (are_neumann_boundaries[2]) // Bottom is Neumann boundary
-        {
-            if ( (y_1  < (bottom+fudge_factor) ) &&  (y_2 < (bottom+fudge_factor) ))
-            {
-                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[2]);
-            }
-        }
+        assert(!are_neumann_boundaries[2]);
+//        if (are_neumann_boundaries[2]) // Bottom is Neumann boundary
+//        {
+//            if ( (y_1  < (bottom+fudge_factor) ) &&  (y_2 < (bottom+fudge_factor) ))
+//            {
+//                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[2]);
+//            }
+//        }
         if (are_neumann_boundaries[3]) // Left is Neumann Boundary
         {
             if ( (x_1  > (left+fudge_factor) ) &&  (x_2 < (left+fudge_factor) ))
@@ -145,7 +147,7 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
          node_iter != pMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
-        double x = (*node_iter)->GetPoint()[0];
+//        double x = (*node_iter)->GetPoint()[0];
         double y = (*node_iter)->GetPoint()[1];
 
         if (!are_neumann_boundaries[0]) // Top is Dirichlet boundary
@@ -155,13 +157,14 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
                 bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[0]);
             }
         }
-        if (!are_neumann_boundaries[1]) // Right is Dirichlet boundary
-        {
-            if (x > right-fudge_factor)
-            {
-                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[1]);
-            }
-        }
+        assert(are_neumann_boundaries[1]);
+//        if (!are_neumann_boundaries[1]) // Right is Dirichlet boundary
+//        {
+//            if (x > right-fudge_factor)
+//            {
+//                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[1]);
+//            }
+//        }
         if (!are_neumann_boundaries[2]) // Bottom is Dirichlet boundary
         {
             if (y < bottom+fudge_factor)
@@ -169,13 +172,14 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
                 bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[2]);
             }
         }
-        if (!are_neumann_boundaries[3]) // Left is Dirichlet boundary
-        {
-            if (x < left+fudge_factor)
-            {
-                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[3]);
-            }
-        }
+        assert(are_neumann_boundaries[3]);
+//        if (!are_neumann_boundaries[3]) // Left is Dirichlet boundary
+//        {
+//            if (x < left+fudge_factor)
+//            {
+//                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[3]);
+//            }
+//        }
     }
 
     return bcc;
