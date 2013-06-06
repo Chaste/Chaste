@@ -102,6 +102,7 @@ public:
         mCommentLineStarts.push_back("#");
         mCommentLineStarts.push_back("!");
         mCommentLineStarts.push_back("Created by Chaste");
+        mCommentLineStarts.push_back("<!-- Created by Chaste");
     }
 
     /**

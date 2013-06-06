@@ -60,7 +60,6 @@ class TestXmlMeshWriters : public CxxTest::TestSuite
 {
 
 public:
-
     void TestBasicVtkMeshWriter() throw(Exception)
     {
 #ifdef CHASTE_VTK
@@ -784,28 +783,55 @@ public:
         writer_from_mesh.WriteFilesUsingMesh(mesh);
 
         //Just check that the files are there
-        TS_ASSERT(FileFinder(OutputFileHandler::GetChasteTestOutputDirectory() +
-                "TestXdmfMeshWriter/simple_cube_from_mesh.xdmf", RelativeTo::Absolute).Exists());
-        TS_ASSERT(FileFinder(OutputFileHandler::GetChasteTestOutputDirectory() +
-                "TestXdmfMeshWriter/simple_cube_from_mesh_geometry_0.xml", RelativeTo::Absolute).Exists());
-        TS_ASSERT(FileFinder(OutputFileHandler::GetChasteTestOutputDirectory() +
-                "TestXdmfMeshWriter/simple_cube_from_mesh_topology_0.xml", RelativeTo::Absolute).Exists());
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_from_mesh.xdmf",
+                       "mesh/test/data/TestXdmfMeshWriter/simple_cube_from_mesh.xdmf").CompareFiles();
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_from_mesh_geometry_0.xml",
+                       "mesh/test/data/TestXdmfMeshWriter/simple_cube_from_mesh_geometry_0.xml").CompareFiles();
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_from_mesh_topology_0.xml",
+                       "mesh/test/data/TestXdmfMeshWriter/simple_cube_from_mesh_topology_0.xml").CompareFiles();
 
     }
 
-    void donotTestXdmfWriterDistributed()
+    void TestXdmfWriter2D()
+    {
+        /*Read as ascii*/
+        TrianglesMeshReader<2,2> reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        XdmfMeshWriter<2,2> writer_from_reader("TestXdmfMeshWriter", "disk", false);
+        writer_from_reader.WriteFilesUsingMeshReader(reader);
+
+        //Check that the files are the same as previously
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/disk.xdmf",
+                       "mesh/test/data/TestXdmfMeshWriter/disk.xdmf").CompareFiles();
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/disk_geometry_0.xml",
+                       "mesh/test/data/TestXdmfMeshWriter/disk_geometry_0.xml").CompareFiles();
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/disk_topology_0.xml",
+                       "mesh/test/data/TestXdmfMeshWriter/disk_topology_0.xml").CompareFiles();
+    }
+
+    void TestXdmfWriterDistributed()
     {
         TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
         DistributedTetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);
-//        writer_from_mesh.WriteFilesUsingMesh(mesh);
-//
-//        //Check that the master XDMF file is there
-//        ///\todo #1157/#2245 This is just an empty file with the correct name...
-//        FileFinder xdmf_file(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist.xdmf", RelativeTo::Absolute);
-//        TS_ASSERT(xdmf_file.Exists());
+        writer_from_mesh.WriteFilesUsingMesh(mesh);
+
+        ///\todo #1157 These files are incorrect because they output local nodes and not halo nodes
+        if (PetscTools::AmMaster())
+        {
+            for (unsigned i=0; i<PetscTools::GetNumProcs(); i++)
+            {
+                std::stringstream chunk_name;
+                chunk_name << OutputFileHandler::GetChasteTestOutputDirectory();
+                chunk_name << "TestXdmfMeshWriter/simple_cube_dist_topology_" << i <<".xml";
+                TS_ASSERT( FileFinder(chunk_name.str(), RelativeTo::Absolute).Exists());
+            }
+
+        }
 
 
      }

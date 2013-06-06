@@ -61,6 +61,14 @@ public:
      * Write the files
      */
     void WriteFiles();
+    /**
+     * Write the files using mesh -- this allows the parallel distributed case to write only local data.
+     * @param rMesh the mesh
+     * @param keepOriginalElementIndexing  Whether to write the mesh with the same element ordering.
+     *                                     Ignored in this derived class
+     */
+    void WriteFilesUsingMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+            bool keepOriginalElementIndexing=true);
 };
 
 #endif /* XDMFMESHWRITER_HPP_ */

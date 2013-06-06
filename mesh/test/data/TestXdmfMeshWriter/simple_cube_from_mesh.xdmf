@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Domain>
+		<Grid Name="Grid" GridType="Collection" CollectionType="Spatial">
+			<Grid Name="Chunk_0" Gridtype="Uniform">
+				<xi:include href="simple_cube_from_mesh_geometry_0.xml"/>
+				<xi:include href="simple_cube_from_mesh_topology_0.xml"/>
+			</Grid>
+		</Grid>
+	</Domain>
+</Xdmf>
+<!-- Created by Chaste version 3.1.19098 (with uncommitted modifications) on Thu, 06 Jun 2013 16:24:55 +0000.  Chaste was built on Thu, 06 Jun 2013 15:50:28 +0000 by machine (uname) 'Linux clpc117.cs.ox.ac.uk 3.9.4-200.fc18.x86_64 #1 SMP Fri May 24 20:10:49 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: louiecn=18140:19058M.
+-->
