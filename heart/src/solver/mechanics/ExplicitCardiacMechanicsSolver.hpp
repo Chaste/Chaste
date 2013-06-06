@@ -90,6 +90,8 @@ private:
 
     /**
      * Initialise contraction model for each quadrature point
+     *
+     * @return a contraction model.
      */
     AbstractContractionModel* InitialiseContractionModel();
 

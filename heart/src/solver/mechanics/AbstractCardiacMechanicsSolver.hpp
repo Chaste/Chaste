@@ -84,7 +84,7 @@ private:
     /**
      * Must assign a contraction model at each active quadrature point.
      * This method ensures that fake contraction models are applied
-     * in the bath, and calls the method InitialiseContractionModels
+     * in the bath, and calls the method InitialiseContractionModel
      * for active sites.
      */
     void InitialiseContractionModelsWrapper();
@@ -194,16 +194,18 @@ protected:
     void SetupChangeOfBasisMatrix(unsigned elementIndex, unsigned currentQuadPointGlobalIndex);
 
     /**
-     * Sets relevant data at all quad points, including whether it is an active region or not.
-     * The contraction model is set to NULL.
-     * At the end, it calls InitialiseContractionModel in the child class to assign a proper model.
+     * Sets relevant data at all quadrature points, including whether it is an active region or not.
+     *
+     * It calls #InitialiseContractionModel()  to assign a proper model.
      */
     void Initialise();
 
     /**
-     * Must assign a contraction model at each active quadrature point.
+     * Child classes must assign a contraction model at each active quadrature point.
      *
-     * The bath is handled by the wrapper method #InitialiseContractionModelsWrapper().
+     * [The bath is handled by the wrapper method #InitialiseContractionModelsWrapper()]
+     *
+     * @return a contraction model
      */
     virtual AbstractContractionModel*  InitialiseContractionModel() = 0;
 

@@ -77,7 +77,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 // We construct a set of data to be assigned to each quadrature point
                 // to begin with the contraction model pointer is set to NULL.
                 // These are set later (at the bottom of this method)
-                // by calling #InitialiseContractionModels().
+                // by calling #InitialiseContractionModelsWrapper().
                 DataAtQuadraturePoint data_at_quad_point;
                 data_at_quad_point.ContractionModel = NULL;
                 data_at_quad_point.Stretch = 1.0;
@@ -126,7 +126,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
         }
         else
         {
-            //bath
+            // Bath
             p_contraction_model = new FakeBathContractionModel;
         }
         iter->second.ContractionModel = p_contraction_model;
