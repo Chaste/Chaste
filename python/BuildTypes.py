@@ -905,8 +905,8 @@ class GccOptNative(GccOpt):
     
     def GetGccVersion(self):
         version_str = os.popen(self.tools['mpicxx'] + ' -dumpversion').readline().strip()
-        version_tup = map(int, version_str.split('.')[0:2])
-        return version_tup
+        version = map(int, version_str.split('.')[0:2])
+        return tuple(version)
     
     def __init__(self, *args, **kwargs):
         super(GccOptNative, self).__init__(*args, **kwargs)
