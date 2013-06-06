@@ -52,6 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "OutputFileHandler.hpp"
 
+#include "FakePetscSetup.hpp"
+
 // Tolerance for tests
 const double tol = 0.01;
 
