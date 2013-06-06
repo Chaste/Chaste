@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCardiacMechanicsSolver.hpp"
+#include "AbstractContractionCellFactory.hpp"
 #include "FakeBathContractionModel.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
@@ -114,6 +115,8 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModelsWrapper()
 {
+    AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
+
     for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
             iter != this->mQuadPointToDataAtQuadPointMap.end();
             iter++)
@@ -122,7 +125,18 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractio
 
         if (iter->second.Active == true)
         {
-            p_contraction_model = InitialiseContractionModel();
+            ///\todo #2370 pass in the element index!
+            p_contraction_model = p_factory->CreateContractionCellForElement(0u);
+
+            if (!IsImplicitSolver() && p_contraction_model->IsStretchDependent())
+            {
+                WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
+            }
+
+            if (!IsImplicitSolver() && p_contraction_model->IsStretchRateDependent())
+            {
+                EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
+            }
         }
         else
         {

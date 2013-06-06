@@ -57,6 +57,9 @@ template<unsigned DIM>
 class AbstractContractionCellFactory
 {
 private:
+    /** This class tests that the mesh is set correctly */
+    friend class TestElectroMechanicsProblemDefinition;
+
     /** The mechanics mesh */
     QuadraticMesh<DIM>* mpMesh;
 
@@ -74,6 +77,16 @@ public:
      *
      */
     virtual AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex) = 0;
+
+    /**
+     * Set the mechanics mesh to be used by this cell factory.
+     *
+     * @param pMesh  A quadratic (mechanics) mesh.
+     */
+    void SetMechanicsMesh(QuadraticMesh<DIM>* pMesh)
+    {
+        mpMesh = pMesh;
+    }
 
     //
     // \todo 2370 The methods below are likely to be required for the final version of this class.

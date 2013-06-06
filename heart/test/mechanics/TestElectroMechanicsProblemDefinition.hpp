@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "ElectroMechanicsProblemDefinition.hpp"
+#include "LabelBasedContractionCellFactory.hpp"
+#include "SolverType.hpp"
 
 class TestElectroMechanicsProblemDefinition : public CxxTest::TestSuite
 {
@@ -53,6 +55,14 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
 
+        LabelBasedContractionCellFactory<2> cell_factory(NASH2004);
+        problem_defn.SetContractionCellFactory(&cell_factory);
+
+        // Test that the mesh has been set in the cell factory correctly by ElectroMechanicsProblemDefinition
+        TS_ASSERT_EQUALS(&mesh, cell_factory.mpMesh);
+
+        // Wipe the cell factory (since we are a friend class we can do this) for further testing below.
+        problem_defn.mpContractionCellFactory = NULL;
 
         TS_ASSERT_THROWS_THIS(problem_defn.Validate(), "Timestep for mechanics solve hasn't been set yet");
 
@@ -61,8 +71,10 @@ public:
 
         TS_ASSERT_THROWS_THIS(problem_defn.Validate(), "Contraction model hasn't been set yet");
 
+        // This should be the default
+        TS_ASSERT_EQUALS(problem_defn.GetSolverType(), IMPLICIT);
+
         problem_defn.SetContractionModel(NASH2004, 0.01);
-        TS_ASSERT_EQUALS(problem_defn.GetContractionModel(), NASH2004);
         TS_ASSERT_EQUALS(problem_defn.GetContractionModelOdeTimestep(), 0.01);
 
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
@@ -108,6 +120,10 @@ public:
 
         problem_defn.SetDeformationAffectsElectrophysiology(false,true);
         TS_ASSERT_THROWS_CONTAINS(problem_defn.Validate(), "Deformation affecting cell models cannot be done when fibres-sheet");
+
+        TS_ASSERT_EQUALS(problem_defn.GetSolverType(), EXPLICIT);
+        problem_defn.SetSolverType(IMPLICIT);
+        TS_ASSERT_EQUALS(problem_defn.GetSolverType(), IMPLICIT);
     }
 };
 

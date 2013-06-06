@@ -34,10 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ImplicitCardiacMechanicsSolver.hpp"
-#include "Kerchoffs2003ContractionModel.hpp"
-#include "NhsModelWithBackwardSolver.hpp"
-#include "NonPhysiologicalContractionModel.hpp"
-#include "FakeBathContractionModel.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsSolver(
@@ -49,43 +45,6 @@ ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsS
                                                             outputDirectory)
 {
 
-}
-
-
-template<class ELASTICITY_SOLVER,unsigned DIM>
-AbstractContractionModel* ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModel()
-{
-    AbstractContractionModel* p_contraction_model;
-
-    ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
-    switch(model_name)
-    {
-        case NONPHYSIOL1:
-        case NONPHYSIOL2:
-        case NONPHYSIOL3:
-        {
-            unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
-            p_contraction_model = new NonPhysiologicalContractionModel(option);
-            break;
-        }
-        case NHS:
-        {
-            p_contraction_model = new NhsModelWithBackwardSolver;
-            break;
-        }
-        case KERCHOFFS2003: //stretch dependent
-        {
-            p_contraction_model = new Kerchoffs2003ContractionModel;
-            break;
-        }
-        default:
-        {
-            #define COVERAGE_IGNORE
-            EXCEPTION("Unknown or disallowed contraction model");
-            #undef COVERAGE_IGNORE
-        }
-    }
-    return p_contraction_model;
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>

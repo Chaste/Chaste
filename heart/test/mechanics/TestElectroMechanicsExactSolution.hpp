@@ -175,6 +175,7 @@ public:
         problem_defn.SetBodyForce(MyBodyForce);
         problem_defn.SetTractionBoundaryConditions(boundary_elems, MyTraction);
         problem_defn.SetContractionModel(CONSTANT,1.0/*ODE timestep, unused*/);
+        problem_defn.SetSolverType(EXPLICIT);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
 

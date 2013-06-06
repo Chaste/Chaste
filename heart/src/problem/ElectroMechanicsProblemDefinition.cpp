@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ElectroMechanicsProblemDefinition.hpp"
+#include "LabelBasedContractionCellFactory.hpp"
 
 template<unsigned DIM>
 ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh)
@@ -47,7 +48,10 @@ ElectroMechanicsProblemDefinition<DIM>::ElectroMechanicsProblemDefinition(Quadra
       mNumIncrementsForInitialDeformation(1),
       mApplyCrossFibreTension(false),
       mSheetTensionFraction(DOUBLE_UNSET),
-      mSheetNormalTensionFraction(DOUBLE_UNSET)
+      mSheetNormalTensionFraction(DOUBLE_UNSET),
+      mpContractionCellFactory(NULL),
+      mWeMadeCellFactory(false),
+      mSolverType(IMPLICIT) // default solver is implicit
 {
 }
 
@@ -58,14 +62,31 @@ ElectroMechanicsProblemDefinition<DIM>::~ElectroMechanicsProblemDefinition()
     {
         delete mpDefaultMaterialLaw;
     }
+
+    if (mWeMadeCellFactory)
+    {
+        delete mpContractionCellFactory;
+    }
 }
 
 template<unsigned DIM>
 void ElectroMechanicsProblemDefinition<DIM>::SetContractionModel(ContractionModelName contractionModel, double timestep)
 {
     assert(timestep > 0.0);
-    mContractionModel = contractionModel;
+
+    if (contractionModel == NASH2004 || contractionModel == CONSTANT)
+    {
+        // These models can use an Explicit solver, default is Implicit.
+        SetSolverType(EXPLICIT);
+    }
     mContractionModelOdeTimeStep = timestep;
+
+    // Make sure we aren't overwriting a problem that has been set up with a cell factory.
+    assert(mpContractionCellFactory==NULL);
+
+    AbstractContractionCellFactory<DIM>* p_factory = new LabelBasedContractionCellFactory<DIM>(contractionModel);
+    mWeMadeCellFactory = true;
+    SetContractionCellFactory(p_factory);
 }
 
 template<unsigned DIM>
@@ -128,6 +149,16 @@ void ElectroMechanicsProblemDefinition<DIM>::SetApplyAnisotropicCrossFibreTensio
     mApplyCrossFibreTension = applyCrossFibreTension;
     mSheetTensionFraction = sheetTensionFraction;
     mSheetNormalTensionFraction = sheetNormalTensionFraction;
+}
+
+template<unsigned DIM>
+void ElectroMechanicsProblemDefinition<DIM>::SetContractionCellFactory(AbstractContractionCellFactory<DIM>* pCellFactory)
+{
+    // Make sure we aren't overwriting a problem that has been set up with a cell factory already.
+    assert(mpContractionCellFactory==NULL);
+
+    mpContractionCellFactory = pCellFactory;
+    mpContractionCellFactory->SetMechanicsMesh(static_cast<QuadraticMesh<DIM>*>(&(this->mrMesh)));
 }
 
 template<unsigned DIM>

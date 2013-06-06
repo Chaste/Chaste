@@ -34,10 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ExplicitCardiacMechanicsSolver.hpp"
-#include "Nash2004ContractionModel.hpp"
-#include "Kerchoffs2003ContractionModel.hpp"
-#include "NonPhysiologicalContractionModel.hpp"
-#include "ConstantActiveTension.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
@@ -48,48 +44,6 @@ ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsS
                                                             outputDirectory)
 {
 
-}
-
-
-template<class ELASTICITY_SOLVER,unsigned DIM>
-AbstractContractionModel* ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModel()
-{
-    AbstractContractionModel* p_contraction_model;
-
-    //tissue node
-    ContractionModelName model_name = this->mrElectroMechanicsProblemDefinition.GetContractionModel();
-    switch(model_name)
-    {
-        case CONSTANT:
-        {
-            p_contraction_model = new ConstantActiveTension;
-            break;
-        }
-        case NONPHYSIOL1:
-        case NONPHYSIOL2:
-        case NONPHYSIOL3:
-        {
-            unsigned option = (model_name==NONPHYSIOL1 ? 1 : (model_name==NONPHYSIOL2? 2 : 3));
-            p_contraction_model = new NonPhysiologicalContractionModel(option);
-            break;
-        }
-        case NASH2004: //stretch dependent, will this work with explicit??
-        {
-            p_contraction_model = new Nash2004ContractionModel;
-            break;
-        }
-        case KERCHOFFS2003: //stretch dependent, will this work with explicit? Answer: can be unstable
-        {
-            p_contraction_model = new Kerchoffs2003ContractionModel;
-            break;
-        }
-        default:
-        {
-            EXCEPTION("Unknown or stretch-rate-dependent contraction model");
-        }
-    }
-
-    return p_contraction_model;
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>

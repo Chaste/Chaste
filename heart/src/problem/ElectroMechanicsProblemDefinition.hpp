@@ -36,11 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELECTROMECHANICSPROBLEMDEFINITION_HPP_
 #define ELECTROMECHANICSPROBLEMDEFINITION_HPP_
 
+#include <boost/shared_ptr.hpp>
+
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "ContractionModelName.hpp"
 #include "NashHunterPoleZeroLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
 #include "FileFinder.hpp"
+#include "AbstractContractionCellFactory.hpp"
+#include "SolverType.hpp"
 
 /**
  *  Subclass of SolidMechanicsProblemDefinition with some cardiac-electro-mechanics-specific
@@ -50,11 +54,15 @@ template<unsigned DIM>
 class ElectroMechanicsProblemDefinition : public SolidMechanicsProblemDefinition<DIM>
 {
 private:
-    /**
-     *  The contraction model used (ContractionModelName is an enumeration containing all contraction
-     *  models implemented.
-     */
-    ContractionModelName mContractionModel;
+//    /**
+//     *  The contraction model used (ContractionModelName is an enumeration containing all contraction
+//     *  models implemented.
+//     */
+//    ContractionModelName mContractionModel;
+
+    friend class TestExplicitCardiacMechanicsSolver;
+    friend class TestImplicitCardiacMechanicsSolver;
+    friend class TestElectroMechanicsProblemDefinition;
 
     /** Timestep to use when solving contraction models */
     double mContractionModelOdeTimeStep;
@@ -117,6 +125,15 @@ private:
      */
     double mSheetNormalTensionFraction;
 
+    /** The contraction cell factory, provides the contraction model to use on each element */
+    AbstractContractionCellFactory<DIM>* mpContractionCellFactory;
+
+    /** Whether we made the cell factory and therefore need to delete it! */
+    bool mWeMadeCellFactory;
+
+    /** Whether to use an explicit or implicit solver */
+    SolverType mSolverType;
+
 public:
     /**
      * Constructor
@@ -140,11 +157,31 @@ public:
     void SetContractionModel(ContractionModelName contractionModel, double timestep);
 
     /**
+     * We provide an interface to set heterogeneous contraction cells via a
+     * cell factory, which allows different models (or parameters) to be set
+     * per element.
+     *
+     * @param pCellFactory  The contraction cell factory to be used.
+     */
+    void SetContractionCellFactory(AbstractContractionCellFactory<DIM>* pCellFactory);
+
+    /**
      * Use the default material law (NashHunter in the incompressible case, exponential in the
      *  compressible case), throughout the tissue.
      * @param compressibilityType Either INCOMPRESSIBLE or COMPRESSIBLE
      */
     void SetUseDefaultCardiacMaterialLaw(CompressibilityType compressibilityType);
+
+    /**
+     * Decide which type of solver to attempt to use. Default value is
+     * IMPLICIT if this method is not called.
+     *
+     * @param solver The solver type to use (EXPLICIT or IMPLICIT).
+     */
+    void SetSolverType(SolverType solver)
+    {
+        mSolverType = solver;
+    }
 
     /**
      * Set if and how the deformation should affect the electro-physiology.
@@ -220,13 +257,18 @@ public:
      */
     void SetApplyAnisotropicCrossFibreTension(bool applyCrossFibreTension, double sheetTensionFraction, double sheetNormalTensionFraction);
 
-    /**
-     *  @return the contraction model
-     */
-    ContractionModelName GetContractionModel()
+//    /**
+//     *  @return the contraction model
+//     */
+//    ContractionModelName GetContractionModel()
+//    {
+//        assert(mContractionModelOdeTimeStep>0.0); // if this fails SetContractionModel() probably hasn't been called - call Validate() to check
+//        return mContractionModel;
+//    }
+
+    AbstractContractionCellFactory<DIM>* GetContractionCellFactory()
     {
-        assert(mContractionModelOdeTimeStep>0.0); // if this fails SetContractionModel() probably hasn't been called - call Validate() to check
-        return mContractionModel;
+        return mpContractionCellFactory;
     }
 
     /**
@@ -263,6 +305,14 @@ public:
     bool GetDeformationAffectsCellModels()
     {
         return mDeformationAffectsCellModels;
+    }
+
+    /**
+     * @return Whether to use an implicit or explicit mechanics solver.
+     */
+    SolverType GetSolverType()
+    {
+        return mSolverType;
     }
 
     /**

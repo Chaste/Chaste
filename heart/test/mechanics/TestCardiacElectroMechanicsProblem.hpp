@@ -631,12 +631,13 @@ public:
         // coverage
 
         HeartConfig::Instance()->SetSimulationDuration(10.0); // has to be reset after a solve, it seems..
-        CardiacElectroMechProbRegularGeom<2> prob_with_bad_model(INCOMPRESSIBLE,0.05,1,5,&cell_factory,NONPHYSIOL1,1,0.01,"");
-        TS_ASSERT_THROWS_CONTAINS(prob_with_bad_model.Solve(),"Invalid contraction model");
 
-
-        CardiacElectroMechProbRegularGeom<2> prob_with_bad_model_comp(COMPRESSIBLE,0.05,1,5,&cell_factory,NONPHYSIOL1,1,0.01,"");
-        TS_ASSERT_THROWS_CONTAINS(prob_with_bad_model_comp.Solve(),"Invalid contraction model");
+        // We can now #2370 put any model anywhere, so these checks don't make sense...
+//        CardiacElectroMechProbRegularGeom<2> prob_with_bad_model(INCOMPRESSIBLE,0.05,1,5,&cell_factory,NONPHYSIOL1,1,0.01,"");
+//        TS_ASSERT_THROWS_CONTAINS(prob_with_bad_model.Solve(),"Invalid contraction model");
+//
+//        CardiacElectroMechProbRegularGeom<2> prob_with_bad_model_comp(COMPRESSIBLE,0.05,1,5,&cell_factory,NONPHYSIOL1,1,0.01,"");
+//        TS_ASSERT_THROWS_CONTAINS(prob_with_bad_model_comp.Solve(),"Invalid contraction model");
 
         CardiacElectroMechProbRegularGeom<2> prob_with_bad_timesteps(INCOMPRESSIBLE,0.05,1,5,&cell_factory,NHS,0.025,0.01,"");
         TS_ASSERT_THROWS_CONTAINS(prob_with_bad_timesteps.Initialise(),"does not divide");

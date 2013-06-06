@@ -201,16 +201,6 @@ protected:
     void Initialise();
 
     /**
-     * Child classes must assign a contraction model at each active quadrature point.
-     *
-     * [The bath is handled by the wrapper method #InitialiseContractionModelsWrapper()]
-     *
-     * @return a contraction model
-     */
-    virtual AbstractContractionModel*  InitialiseContractionModel() = 0;
-
-
-    /**
      *  Pure method called in AbstractCardiacMechanicsSolver::AddActiveStressAndStressDerivative(), which needs to provide
      *  the active tension (and other info if implicit (if the contraction model depends on stretch
      *  or stretch rate)) at a particular quadrature point. Takes in the current fibre stretch.

@@ -33,58 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTABSTRACTCONTRACTIONCELLFACTORY_HPP_
-#define TESTABSTRACTCONTRACTIONCELLFACTORY_HPP_
+#ifndef SOLVERTYPE_HPP_
+#define SOLVERTYPE_HPP_
 
-
-#include <cxxtest/TestSuite.h>
-
-#include "LabelBasedContractionCellFactory.hpp"
-#include "PetscSetupAndFinalize.hpp"
-
-class TestAbstractContractionCellFactory : public CxxTest::TestSuite
+typedef enum SolverType_
 {
-public:
-    void TestContractionCellFactory() throw (Exception)
-    {
-        {
-            LabelBasedContractionCellFactory<2> factory(CONSTANT);
+    EXPLICIT,
+    IMPLICIT
+} SolverType;
 
-            ConstantActiveTension* p_model =
-                dynamic_cast<ConstantActiveTension*> (factory.CreateContractionCellForElement(0u));
-            TS_ASSERT(p_model);
-            delete p_model;
-        }
-
-        {
-            LabelBasedContractionCellFactory<2> factory(NONPHYSIOL1);
-
-            NonPhysiologicalContractionModel* p_model =
-                dynamic_cast<NonPhysiologicalContractionModel*> (factory.CreateContractionCellForElement(0u));
-            TS_ASSERT(p_model);
-            delete p_model;
-        }
-
-        {
-            LabelBasedContractionCellFactory<2> factory(NASH2004);
-
-            Nash2004ContractionModel* p_model =
-                dynamic_cast<Nash2004ContractionModel*> (factory.CreateContractionCellForElement(0u));
-            TS_ASSERT(p_model);
-            delete p_model;
-        }
-
-        {
-            LabelBasedContractionCellFactory<2> factory(KERCHOFFS2003);
-
-            Kerchoffs2003ContractionModel* p_model =
-                dynamic_cast<Kerchoffs2003ContractionModel*> (factory.CreateContractionCellForElement(0u));
-            TS_ASSERT(p_model);
-            delete p_model;
-        }
-    }
-};
-
-
-
-#endif /* TESTABSTRACTCONTRACTIONCELLFACTORY_HPP_ */
+#endif // SOLVERTYPE_HPP_
