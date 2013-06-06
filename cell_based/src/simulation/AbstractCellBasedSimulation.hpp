@@ -391,11 +391,6 @@ public:
     void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
-     * Method to remove all the SimulationModifiers
-     */
-    void RemoveAllSimulationModifiers();
-
-    /**
      * Main solve method.
      *
      * This method sets up the simulation time, creates output files, and initialises the

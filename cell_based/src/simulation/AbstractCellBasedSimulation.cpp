@@ -274,12 +274,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddSimulationModifier(b
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::RemoveAllSimulationModifiers()
-{
-    mSimulationModifiers.clear();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNodeLocation(const unsigned& rNodeIndex)
 {
     std::vector<double> location;
