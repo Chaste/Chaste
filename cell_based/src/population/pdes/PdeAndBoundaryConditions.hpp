@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Dirichlet (imposed value) boundary conditions. The boundary condition
  * may be constant on the boundary or vary spatially and/or temporally.
  * In cell-based simulations with PDEs, one or more of these objects are
- * accessed via the CellBasedHandler class.
+ * accessed via the CellBasedPdeHandler class.
  */
 template<unsigned DIM>
 class PdeAndBoundaryConditions
@@ -163,7 +163,7 @@ public:
     bool HasAveragedSourcePde();
 
     /**
-     * Call PetscTools::Destroy( on mSolution.
+     * Call PetscTools::Destroy on mSolution.
      */
     void DestroySolution();
 

@@ -46,23 +46,23 @@ CellBasedPdeHandlerOnCuboid<DIM>::CellBasedPdeHandlerOnCuboid(AbstractCellPopula
 template<unsigned DIM>
 CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 {
-	// Delete all boundary conditions
-	for (unsigned i=0; i<mConstBoundaryConditions.size(); i++)
-	{
-		delete mConstBoundaryConditions[i];
-	}
+    // Delete all boundary conditions
+    for (unsigned i=0; i<mConstBoundaryConditions.size(); i++)
+    {
+        delete mConstBoundaryConditions[i];
+    }
 }
 
 template<unsigned DIM>
 BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
 {
-    // Not using the inputs as theres only one BCS
+    // Not using the inputs as there's only one BCS
     assert(DIM==2);
 
     BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
 
 
-    // Use these 2 vectors to define whats happening on the top right bottom and left boundaries
+    // Use these 2 vectors to define what's happening on the top right bottom and left boundaries
 
     // Specify which sides are Neumann boundaries
     c_vector<bool,4> are_neumann_boundaries;
@@ -79,11 +79,11 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
     boundary_condition_values[3] = 1.0; // Left
 
 
-	// Delete all previous boundary conditions
-	for (unsigned i=0; i<mConstBoundaryConditions.size(); i++)
-	{
-		delete mConstBoundaryConditions[i];
-	}
+    // Delete all previous boundary conditions
+    for (unsigned i=0; i<mConstBoundaryConditions.size(); i++)
+    {
+        delete mConstBoundaryConditions[i];
+    }
     mConstBoundaryConditions.clear();
 
     mConstBoundaryConditions.push_back(new ConstBoundaryCondition<DIM>(boundary_condition_values[0]));
