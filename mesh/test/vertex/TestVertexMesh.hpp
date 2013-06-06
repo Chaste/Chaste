@@ -399,6 +399,23 @@ public:
 
         TS_ASSERT_DELTA(centroid(0), 0.0, 1e-6);
         TS_ASSERT_DELTA(centroid(1), 0.0, 1e-6);
+
+///\todo see #2393
+//        // Second test
+//        std::vector<Node<2>*> nodes2;
+//        nodes2.push_back(new Node<2>(0, false, 2.7663,  0.1033));
+//        nodes2.push_back(new Node<2>(1, false, 2.2766, -0.1076));
+//        nodes2.push_back(new Node<2>(2, false, 1.9433,  0.5313));
+//        nodes2.push_back(new Node<2>(3, false, 2.7425,  1.9461));
+//        nodes2.push_back(new Node<2>(4, false, 3.3158,  1.5588));
+//
+//        std::vector<VertexElement<2,2>*> elements2;
+//        elements2.push_back(new VertexElement<2,2>(0, nodes2));
+//
+//        VertexMesh<2,2> mesh2(nodes2, elements2);
+//
+//        TS_ASSERT_DELTA(mesh2.GetCentroidOfElement(0)[0], 2.6088, 1e-4);
+//        TS_ASSERT_DELTA(mesh2.GetCentroidOfElement(0)[1], 0.8063, 1e-4);
     }
 
     void TestGetAreaGradientOfElementAtNode()
