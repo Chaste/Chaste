@@ -155,7 +155,7 @@ template<unsigned DIM>
 void ElectroMechanicsProblemDefinition<DIM>::SetContractionCellFactory(AbstractContractionCellFactory<DIM>* pCellFactory)
 {
     // Make sure we aren't overwriting a problem that has been set up with a cell factory already.
-    assert(mpContractionCellFactory==NULL);
+    assert(mpContractionCellFactory == NULL);
 
     mpContractionCellFactory = pCellFactory;
     mpContractionCellFactory->SetMechanicsMesh(static_cast<QuadraticMesh<DIM>*>(&(this->mrMesh)));

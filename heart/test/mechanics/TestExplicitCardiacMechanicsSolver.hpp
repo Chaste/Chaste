@@ -286,39 +286,48 @@ public:
         p_coarse_mesh_big->ConstructRegularSlabMesh(1.0, 3.0, 3.0);
         FineCoarseMeshPair<2>* p_pair_wrong = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh_big);
 
-        IncompressibleExplicitSolver2d expl_solver(mesh,problem_defn,"");
-        p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
-        p_pair->DeleteFineBoxCollection();
-        expl_solver.SetFineCoarseMeshPair(p_pair);
-        expl_solver.Initialise();
+        // Some strange memory thing happens if we don't have the test with the
+        // exceptions below in a separate block. I have no idea why.
+        {
+            IncompressibleExplicitSolver2d expl_solver(mesh,problem_defn,"");
+            p_pair->ComputeFineElementsAndWeightsForCoarseQuadPoints(*(expl_solver.GetQuadratureRule()), false);
+            p_pair->DeleteFineBoxCollection();
+            expl_solver.SetFineCoarseMeshPair(p_pair);
+            expl_solver.Initialise();
 
-        // Prevent an assertion being thrown about setting the cell factory more than once.
-        problem_defn.mpContractionCellFactory=NULL;
+            // Prevent an assertion being thrown about setting the cell factory more than once.
+            delete problem_defn.mpContractionCellFactory;
+            problem_defn.mpContractionCellFactory = NULL;
 
-        problem_defn.SetContractionModel(NASH2004,0.01);
-        IncompressibleExplicitSolver2d expl_solver_with_nash(mesh,problem_defn,"");
-        expl_solver_with_nash.SetFineCoarseMeshPair(p_pair);
-        expl_solver_with_nash.Initialise();
+            problem_defn.SetContractionModel(NASH2004,0.01);
+            IncompressibleExplicitSolver2d expl_solver_with_nash(mesh,problem_defn,"");
+            expl_solver_with_nash.SetFineCoarseMeshPair(p_pair);
+            expl_solver_with_nash.Initialise();
 
-        // Prevent an assertion being thrown about setting the cell factory more than once.
-        problem_defn.mpContractionCellFactory=NULL;
+            // Prevent an assertion being thrown about setting the cell factory more than once.
+            delete problem_defn.mpContractionCellFactory;
+            problem_defn.mpContractionCellFactory = NULL;
 
-        problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
-        IncompressibleExplicitSolver2d expl_solver_with_kerchoffs(mesh,problem_defn,"");
-        expl_solver_with_kerchoffs.SetFineCoarseMeshPair(p_pair);
-        expl_solver_with_kerchoffs.Initialise();
+            problem_defn.SetContractionModel(KERCHOFFS2003,0.01);
+            IncompressibleExplicitSolver2d expl_solver_with_kerchoffs(mesh,problem_defn,"");
+            expl_solver_with_kerchoffs.SetFineCoarseMeshPair(p_pair);
+            expl_solver_with_kerchoffs.Initialise();
 
-        // Prevent an assertion being thrown about setting the cell factory more than once.
-        problem_defn.mpContractionCellFactory=NULL;
+        }
 
-        // bad contraction model
-        problem_defn.SetContractionModel(NHS,0.01);
-        IncompressibleExplicitSolver2d solver(mesh,problem_defn,"");
-        TS_ASSERT_THROWS_THIS(solver.SetFineCoarseMeshPair(p_pair_wrong),
-                "When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
-        solver.SetFineCoarseMeshPair(p_pair);
-        TS_ASSERT_THROWS_THIS(solver.Initialise(),
-                "stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
+        {
+            // bad contraction model
+            ElectroMechanicsProblemDefinition<2> problem_defn2(mesh);
+            problem_defn2.SetMaterialLaw(INCOMPRESSIBLE,&law);
+            problem_defn2.SetContractionModel(NHS,0.01);
+            IncompressibleExplicitSolver2d solver(mesh,problem_defn2,"");
+            TS_ASSERT_THROWS_THIS(solver.SetFineCoarseMeshPair(p_pair_wrong),
+                    "When setting a mesh pair into the solver, the coarse mesh of the mesh pair must be the same as the quadratic mesh");
+            solver.SetFineCoarseMeshPair(p_pair);
+
+            TS_ASSERT_THROWS_THIS(solver.Initialise(),
+                    "stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
+        }
 
         delete p_fine_mesh;
         delete p_coarse_mesh;

@@ -63,6 +63,8 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
     assert(fine_elements.size()==mTotalQuadPoints);
     assert(mpMeshPair!=NULL);
 
+    AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
+
     for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
@@ -80,19 +82,31 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 // These are set later (at the bottom of this method)
                 // by calling #InitialiseContractionModelsWrapper().
                 DataAtQuadraturePoint data_at_quad_point;
-                data_at_quad_point.ContractionModel = NULL;
                 data_at_quad_point.Stretch = 1.0;
                 data_at_quad_point.StretchLastTimeStep = 1.0;
 
-                if (mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId())
+                if ( mpMeshPair->GetFineMesh().GetElement(fine_elements[quad_pt_global_index].ElementNum)
+                        ->GetUnsignedAttribute() == HeartRegionCode::GetValidBathId() )
                 {
-                    data_at_quad_point.Active = false;//bath
+                    // Bath
+                    data_at_quad_point.ContractionModel = new FakeBathContractionModel;
                 }
                 else
                 {
-                    data_at_quad_point.Active = true;//tissue
+                    // Tissue
+                    data_at_quad_point.ContractionModel = p_factory->CreateContractionCellForElement(element.GetIndex());
                 }
                 mQuadPointToDataAtQuadPointMap[quad_pt_global_index] = data_at_quad_point;
+
+                if (!IsImplicitSolver() && data_at_quad_point.ContractionModel->IsStretchRateDependent())
+                {
+                    EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
+                }
+
+                if (!IsImplicitSolver() && data_at_quad_point.ContractionModel->IsStretchDependent())
+                {
+                    WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
+                }
             }
         }
     }
@@ -109,43 +123,36 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     mpVariableFibreSheetDirections = NULL;
 
-    InitialiseContractionModelsWrapper();
+    //InitialiseContractionModelsWrapper();
 }
 
-template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModelsWrapper()
-{
-    AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
-
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-            iter != this->mQuadPointToDataAtQuadPointMap.end();
-            iter++)
-    {
-        AbstractContractionModel* p_contraction_model;
-
-        if (iter->second.Active == true)
-        {
-            ///\todo #2370 pass in the element index!
-            p_contraction_model = p_factory->CreateContractionCellForElement(0u);
-
-            if (!IsImplicitSolver() && p_contraction_model->IsStretchDependent())
-            {
-                WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
-            }
-
-            if (!IsImplicitSolver() && p_contraction_model->IsStretchRateDependent())
-            {
-                EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
-            }
-        }
-        else
-        {
-            // Bath
-            p_contraction_model = new FakeBathContractionModel;
-        }
-        iter->second.ContractionModel = p_contraction_model;
-    }
-}
+//template<class ELASTICITY_SOLVER,unsigned DIM>
+//void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModelsWrapper()
+//{
+//    AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
+//
+//    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+//            iter != this->mQuadPointToDataAtQuadPointMap.end();
+//            iter++)
+//    {
+//        if (iter->second.Active == true)
+//        {
+//            ///\todo #2370 pass in the element index!
+//            AbstractContractionModel* p_contraction_model = p_factory->CreateContractionCellForElement(0u);
+//
+//            if (!IsImplicitSolver() && p_contraction_model->IsStretchDependent())
+//            {
+//                WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
+//            }
+//
+//            if (!IsImplicitSolver() && p_contraction_model->IsStretchRateDependent())
+//            {
+//                EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
+//            }
+//            iter->second.ContractionModel = p_contraction_model;
+//        }
+//    }
+//}
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
@@ -161,11 +168,15 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPai
 template<class ELASTICITY_SOLVER,unsigned DIM>
 AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanicsSolver()
 {
-    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = mQuadPointToDataAtQuadPointMap.begin();
-        iter != mQuadPointToDataAtQuadPointMap.end();
-        iter++)
+    for(mMapIterator = mQuadPointToDataAtQuadPointMap.begin();
+        mMapIterator != mQuadPointToDataAtQuadPointMap.end();
+        ++mMapIterator)
     {
-        delete iter->second.ContractionModel;
+        AbstractContractionModel* p_model = mMapIterator->second.ContractionModel;
+        if (p_model)
+        {
+            delete p_model;
+        }
     }
 
     if(mpVariableFibreSheetDirections)

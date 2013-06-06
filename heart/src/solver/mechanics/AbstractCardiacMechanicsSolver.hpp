@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef struct DataAtQuadraturePoint_
 {
     AbstractContractionModel* ContractionModel; /**< Pointer to contraction model at this quadrature point */
-    bool Active;/**<whether this quad point is active or not*/
+//    bool Active;/**<whether this quad point is active or not*/
     double Stretch; /**< Stretch (in fibre direction) at this quadrature point */
     double StretchLastTimeStep; /**< Stretch (in fibre direction) at the previous timestep, at this quadrature point */
 
@@ -80,14 +80,14 @@ typedef struct DataAtQuadraturePoint_
 template<class ELASTICITY_SOLVER, unsigned DIM>
 class AbstractCardiacMechanicsSolver : public ELASTICITY_SOLVER, public AbstractCardiacMechanicsSolverInterface<DIM>
 {
-private:
-    /**
-     * Must assign a contraction model at each active quadrature point.
-     * This method ensures that fake contraction models are applied
-     * in the bath, and calls the method InitialiseContractionModel
-     * for active sites.
-     */
-    void InitialiseContractionModelsWrapper();
+//private:
+//    /**
+//     * Must assign a contraction model at each active quadrature point.
+//     * This method ensures that fake contraction models are applied
+//     * in the bath, and calls the method InitialiseContractionModel
+//     * for active sites.
+//     */
+//    void InitialiseContractionModelsWrapper();
 
 protected:
     static const unsigned NUM_VERTICES_PER_ELEMENT = ELASTICITY_SOLVER::NUM_VERTICES_PER_ELEMENT; /**< Useful const from base class */

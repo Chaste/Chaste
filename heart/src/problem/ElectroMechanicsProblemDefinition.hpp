@@ -249,13 +249,17 @@ public:
      */
     void SetApplyAnisotropicCrossFibreTension(bool applyCrossFibreTension, double sheetTensionFraction, double sheetNormalTensionFraction);
 
+    /**
+     * @return A pointer to the contraction cell factory that should be applied to the mechanics mesh.
+     */
     AbstractContractionCellFactory<DIM>* GetContractionCellFactory()
     {
+        assert(mpContractionCellFactory);
         return mpContractionCellFactory;
     }
 
     /**
-     *  @return the contraction model timestep
+     *  @return the contraction model time step.
      */
     double GetContractionModelOdeTimestep()
     {
@@ -264,7 +268,7 @@ public:
     }
 
     /**
-     *  @return how often the mechanics is solved
+     *  @return how often the mechanics PDEs are solved.
      */
     double GetMechanicsSolveTimestep()
     {
