@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELECTROMECHANICSPROBLEMDEFINITION_HPP_
 #define ELECTROMECHANICSPROBLEMDEFINITION_HPP_
 
-#include <boost/shared_ptr.hpp>
-
 #include "SolidMechanicsProblemDefinition.hpp"
 #include "ContractionModelName.hpp"
 #include "NashHunterPoleZeroLaw.hpp"
@@ -54,12 +52,6 @@ template<unsigned DIM>
 class ElectroMechanicsProblemDefinition : public SolidMechanicsProblemDefinition<DIM>
 {
 private:
-//    /**
-//     *  The contraction model used (ContractionModelName is an enumeration containing all contraction
-//     *  models implemented.
-//     */
-//    ContractionModelName mContractionModel;
-
     friend class TestExplicitCardiacMechanicsSolver;
     friend class TestImplicitCardiacMechanicsSolver;
     friend class TestElectroMechanicsProblemDefinition;
@@ -256,15 +248,6 @@ public:
      * @param sheetNormalTensionFraction The fraction of the active tension to apply in the sheet-normal direction.
      */
     void SetApplyAnisotropicCrossFibreTension(bool applyCrossFibreTension, double sheetTensionFraction, double sheetNormalTensionFraction);
-
-//    /**
-//     *  @return the contraction model
-//     */
-//    ContractionModelName GetContractionModel()
-//    {
-//        assert(mContractionModelOdeTimeStep>0.0); // if this fails SetContractionModel() probably hasn't been called - call Validate() to check
-//        return mContractionModel;
-//    }
 
     AbstractContractionCellFactory<DIM>* GetContractionCellFactory()
     {
