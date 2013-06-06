@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<Domain>
+		<Grid Name="Chunk_0" Gridtype="Uniform">
+			<xi:include href="simple_cube_geometry_0.xml"/>
+			<xi:include href="simple_cube_topology_0.xml"/>
+		</Grid>
+	</Domain>
+</Xdmf>

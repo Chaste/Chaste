@@ -34,8 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef _TESTVTKMESHWRITER_HPP_
-#define _TESTVTKMESHWRITER_HPP_
+#ifndef _TESTXMLMESHWRITERS_HPP_
+#define _TESTXMLMESHWRITERS_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include "TrianglesMeshReader.hpp"
@@ -43,10 +43,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VtkMeshWriter.hpp"
+#include "XdmfMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
 #include "QuadraticMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "FileComparison.hpp"
 #include <iostream>
 
 #ifdef CHASTE_VTK
@@ -54,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVersion.h>
 #endif
 
-class TestVtkMeshWriter : public CxxTest::TestSuite
+class TestXmlMeshWriters : public CxxTest::TestSuite
 {
 
 public:
@@ -759,6 +761,56 @@ public:
 #endif //CHASTE_VTK
     }
 
+    void TestXdmfWriter()
+    {
+        /*Read as ascii*/
+        TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
+        TetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        XdmfMeshWriter<3,3> writer_from_reader("TestXdmfMeshWriter", "simple_cube", false);
+        writer_from_reader.WriteFilesUsingMeshReader(reader);
+
+        //Check that the files are the same as previously
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube.xdmf",
+                       "mesh/test/data/TestXdmfMeshWriter/simple_cube.xdmf").CompareFiles();
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_geometry_0.xml",
+                       "mesh/test/data/TestXdmfMeshWriter/simple_cube_geometry_0.xml").CompareFiles();
+        FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_topology_0.xml",
+                       "mesh/test/data/TestXdmfMeshWriter/simple_cube_topology_0.xml").CompareFiles();
+
+
+        XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_from_mesh", false);
+        writer_from_mesh.WriteFilesUsingMesh(mesh);
+
+        //Just check that the files are there
+        TS_ASSERT(FileFinder(OutputFileHandler::GetChasteTestOutputDirectory() +
+                "TestXdmfMeshWriter/simple_cube_from_mesh.xdmf", RelativeTo::Absolute).Exists());
+        TS_ASSERT(FileFinder(OutputFileHandler::GetChasteTestOutputDirectory() +
+                "TestXdmfMeshWriter/simple_cube_from_mesh_geometry_0.xml", RelativeTo::Absolute).Exists());
+        TS_ASSERT(FileFinder(OutputFileHandler::GetChasteTestOutputDirectory() +
+                "TestXdmfMeshWriter/simple_cube_from_mesh_topology_0.xml", RelativeTo::Absolute).Exists());
+
+    }
+
+    void donotTestXdmfWriterDistributed()
+    {
+        TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
+        DistributedTetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);
+//        writer_from_mesh.WriteFilesUsingMesh(mesh);
+//
+//        //Check that the master XDMF file is there
+//        ///\todo #1157/#2245 This is just an empty file with the correct name...
+//        FileFinder xdmf_file(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist.xdmf", RelativeTo::Absolute);
+//        TS_ASSERT(xdmf_file.Exists());
+
+
+     }
+
+
 };
 
-#endif //_TESTVTKMESHWRITER_HPP_
+#endif //_TESTXMLMESHWRITERS_HPP_

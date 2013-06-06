@@ -47,12 +47,73 @@ XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::XdmfMeshWriter(const std::string& rDirec
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
+
     if (PetscTools::AmMaster())
     {
         std::string master_file_name = this->mBaseName + ".xdmf";
         out_stream master_file = this->mpOutputFileHandler->OpenOutputFile(master_file_name);
 
+        // Write header information
+        (*master_file) << "<?xml version=\"1.0\" ?>\n";
+        (*master_file) << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
+        (*master_file) << "<Xdmf Version=\"2.0\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n";
+        (*master_file) << "\t<Domain>\n";
+
+
+        // Write main test Grid collection (to be later replaced by temporal collection)
+        // Write references to geometry and topology chunk(s)
+        std::string geometry_file_name = this->mBaseName + "_geometry_0.xml";
+        std::string topology_file_name = this->mBaseName + "_topology_0.xml";
+        (*master_file) << "\t\t<Grid Name=\"Chunk_0\" Gridtype=\"Uniform\">\n";
+        (*master_file) << "\t\t\t<xi:include href=\""<< geometry_file_name <<"\"/>\n";
+        (*master_file) << "\t\t\t<xi:include href=\""<< topology_file_name <<"\"/>\n";
+        (*master_file) << "\t\t</Grid>\n";
+        // This is where we will deal with the distributed parallel case
+
+        // Write footer
+        (*master_file) << "\t</Domain>\n";
+        (*master_file) << "</Xdmf>\n";
+
         master_file->close();
+
+        // Geometry
+        out_stream geometry_file = this->mpOutputFileHandler->OpenOutputFile(geometry_file_name);
+        (*geometry_file) << "<Geometry GeometryType=\"XYZ\">\n"; ///\todo 2D
+        (*geometry_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< this->GetNumNodes() <<" 3\" DataType=\"Float\">";
+        for (unsigned item_num=0; item_num<this->GetNumNodes(); item_num++)
+        {
+            (*geometry_file) << "\n\t\t";
+            std::vector<double> current_item = this->GetNextNode();
+            for (unsigned j=0; j<SPACE_DIM; j++)
+            {
+                (*geometry_file) << current_item[j]<<"\t";
+            }
+        }
+        (*geometry_file) << "\n";
+
+        (*geometry_file) << "\t</DataItem>\n";
+        (*geometry_file) << "</Geometry>\n";
+        geometry_file->close();
+
+        // Topology
+        out_stream topology_file = this->mpOutputFileHandler->OpenOutputFile(topology_file_name);
+        (*topology_file) << "<Topology TopologyType=\"Tetrahedron\" NumberOfElements=\""<< this->GetNumElements() <<"\">\n"; ///\todo 2D
+        (*topology_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< this->GetNumElements() <<" "<< ELEMENT_DIM+1 <<"\">";
+        for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
+        {
+            (*topology_file) << "\n\t\t";
+            std::vector<unsigned> current_item = this->GetNextElement().NodeIndices;
+            for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+            {
+                (*topology_file) << current_item[j]<<"\t";
+            }
+        }
+        (*topology_file) << "\n";
+
+        (*topology_file) << "\t</DataItem>\n";
+        (*topology_file) << "</Topology>\n";
+        topology_file->close();
+
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////

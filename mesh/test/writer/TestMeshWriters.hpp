@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "MeshalyzerMeshWriter.hpp"
-#include "XdmfMeshWriter.hpp"
 #include "OutputFileHandler.hpp"
 #include "MutableMesh.hpp"
 #include "CmguiMeshWriter.hpp"
@@ -1047,20 +1046,6 @@ public:
             TS_ASSERT_EQUALS(sizeof(unsigned), 4u);
             TS_ASSERT_EQUALS(sizeof(double), 8u);
          */
-    }
-
-    void TestXdmfWriter()
-    {
-        /*Read as ascii*/
-        TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
-
-        XdmfMeshWriter<3,3> writer_from_reader("TestMeshWriters", "simple_cube", false);
-        writer_from_reader.WriteFilesUsingMeshReader(reader);
-
-        //Check that the master XDMF file is there
-        ///\todo #1157/#2245 This is just an empty file with the correct name...
-        FileFinder xdmf_file(OutputFileHandler::GetChasteTestOutputDirectory() + "TestMeshWriters/simple_cube.xdmf", RelativeTo::Absolute);
-        TS_ASSERT(xdmf_file.Exists());
     }
 
 };
