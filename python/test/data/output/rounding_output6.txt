@@ -1,5 +1,5 @@
 Warning: These have been filtered by  python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  6  decimal places.
+This means that all floating point numbers have been rounded to 6 decimal places.
 This is a test file for rounding 
 #A bit of HDF5
    DATASET "Data" {

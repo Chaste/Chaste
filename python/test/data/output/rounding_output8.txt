@@ -1,5 +1,5 @@
 Warning: These have been filtered by  python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  8  decimal places.
+This means that all floating point numbers have been rounded to 8 decimal places.
 This is a test file for rounding 
 #A bit of HDF5
    DATASET "Data" {
@@ -25,9 +25,9 @@ This is a test file for rounding
 -1e-08
 -1e-08
 #Rounding when we are exactly halfway
--2e-08
+-3e-08
 -2.5e-06
-2e-08
+3e-08
 2.5e-06
 #Some tricky ones which shouldn't be rounded
 -2,-3

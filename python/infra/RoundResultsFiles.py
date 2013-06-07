@@ -49,10 +49,21 @@ if len(sys.argv) != 2:
     sys.exit(1)
 tolerance = int(sys.argv[1])
 print 'Warning: These have been filtered by ',sys.argv[0],'.'
-print 'This means that all floating point numbers have been rounded to ', tolerance, ' decimal places.'
+print 'This means that all floating point numbers have been rounded to', tolerance, 'decimal places.'
 def Replace(matchobj):
     """Given a match, round the number to the tolerance."""
-    return str(round(float(matchobj.group(0)), tolerance))
+    number = float(matchobj.group(0))
+    rounded = round(number, tolerance)
+    discriminant = (rounded - number)*10**(tolerance+1) # How much we have moved the truncated digit
+    discriminant = round(discriminant, 10)
+    if (number<0 and discriminant == 5.0):
+        # See: http://docs.python.org/2/library/functions.html#round
+        # Negative number has been arbitrarily rounded towards zero - round it away
+        rounded -= 10**(-tolerance)
+    elif (number>0 and discriminant == -5.0):
+        # Positive number has been arbitrarily rounded towards zero - round it away
+        rounded += 10**(-tolerance)
+    return str(rounded)
 
 #Number must either have a decimal point (and no "e") or match scientific notation
 decimal = '(\+|-)?\d+\.\d+'
