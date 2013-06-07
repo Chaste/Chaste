@@ -97,16 +97,6 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                     data_at_quad_point.ContractionModel = p_factory->CreateContractionCellForElement(element.GetIndex());
                 }
                 mQuadPointToDataAtQuadPointMap[quad_pt_global_index] = data_at_quad_point;
-
-                if (!IsImplicitSolver() && data_at_quad_point.ContractionModel->IsStretchRateDependent())
-                {
-                    EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
-                }
-
-                if (!IsImplicitSolver() && data_at_quad_point.ContractionModel->IsStretchDependent())
-                {
-                    WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
-                }
             }
         }
     }
@@ -123,36 +113,23 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     mpVariableFibreSheetDirections = NULL;
 
-    //InitialiseContractionModelsWrapper();
+    // Check that we are using the right kind of solver.
+    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+            iter != this->mQuadPointToDataAtQuadPointMap.end();
+            iter++)
+    {
+        if (!IsImplicitSolver() && (*iter).second.ContractionModel->IsStretchRateDependent())
+        {
+            EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
+        }
+
+        if (!IsImplicitSolver() && (*iter).second.ContractionModel->IsStretchDependent())
+        {
+            WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
+        }
+    }
 }
 
-//template<class ELASTICITY_SOLVER,unsigned DIM>
-//void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::InitialiseContractionModelsWrapper()
-//{
-//    AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
-//
-//    for(std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-//            iter != this->mQuadPointToDataAtQuadPointMap.end();
-//            iter++)
-//    {
-//        if (iter->second.Active == true)
-//        {
-//            ///\todo #2370 pass in the element index!
-//            AbstractContractionModel* p_contraction_model = p_factory->CreateContractionCellForElement(0u);
-//
-//            if (!IsImplicitSolver() && p_contraction_model->IsStretchDependent())
-//            {
-//                WARN_ONCE_ONLY("stretch-dependent contraction model may require an IMPLICIT cardiac mechanics solver.");
-//            }
-//
-//            if (!IsImplicitSolver() && p_contraction_model->IsStretchRateDependent())
-//            {
-//                EXCEPTION("stretch-rate-dependent contraction model requires an IMPLICIT cardiac mechanics solver.");
-//            }
-//            iter->second.ContractionModel = p_contraction_model;
-//        }
-//    }
-//}
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
 void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)

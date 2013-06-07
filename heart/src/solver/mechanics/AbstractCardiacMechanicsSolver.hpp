@@ -80,18 +80,8 @@ typedef struct DataAtQuadraturePoint_
 template<class ELASTICITY_SOLVER, unsigned DIM>
 class AbstractCardiacMechanicsSolver : public ELASTICITY_SOLVER, public AbstractCardiacMechanicsSolverInterface<DIM>
 {
-//private:
-//    /**
-//     * Must assign a contraction model at each active quadrature point.
-//     * This method ensures that fake contraction models are applied
-//     * in the bath, and calls the method InitialiseContractionModel
-//     * for active sites.
-//     */
-//    void InitialiseContractionModelsWrapper();
-
 protected:
     static const unsigned NUM_VERTICES_PER_ELEMENT = ELASTICITY_SOLVER::NUM_VERTICES_PER_ELEMENT; /**< Useful const from base class */
-
 
     /**
      *  A map from the index of a quadrature point to the data (contraction
@@ -125,7 +115,10 @@ protected:
     /** Time used to integrate the contraction model */
     double mOdeTimestep;
 
-    /** The fibre-sheet-normal directions (in a matrix), if constant (defaults to the identity, ie fibres in the X-direction, sheet in the XY plane) */
+    /** 
+     * The fibre-sheet-normal directions (in a matrix), if constant 
+     * (defaults to the identity, ie fibres in the X-direction, sheet in the XY plane) 
+     */
     c_matrix<double,DIM,DIM> mConstantFibreSheetDirections;
 
     /**
