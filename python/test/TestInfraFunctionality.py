@@ -39,14 +39,14 @@ import filecmp
 class TestInfraFunctionality(unittest.TestCase):
     
     def TestRoundResultsFiles(self):
-        original = 'python/test/data/rounding_input.txt'
+        original = 'python/test/data/input/rounding_input.txt'
         output = os.path.join(CHASTE_TEST_OUTPUT, 'rounding_output.txt')
         # 8 decimal places
         rc = os.system('python/infra/RoundResultsFiles.py 8 <' + original + ' > '+ output)
         self.assertEqual(rc, 0)
-        self.assertTrue(filecmp.cmp(output,'python/test/data/rounding_output8.txt'))
+        self.assertTrue(filecmp.cmp(output,'python/test/data/output/rounding_output8.txt'))
         # 6 decimal places
         rc = os.system('python/infra/RoundResultsFiles.py 6 <' + original + ' > '+ output)
         self.assertEqual(rc, 0)
-        self.assertTrue(filecmp.cmp(output,'python/test/data/rounding_output6.txt'))
+        self.assertTrue(filecmp.cmp(output,'python/test/data/output/rounding_output6.txt'))
         

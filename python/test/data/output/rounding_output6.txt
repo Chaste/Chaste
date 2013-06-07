@@ -1,3 +1,5 @@
+Warning: These have been filtered by  python/infra/RoundResultsFiles.py .
+This means that all floating point numbers have been rounded to  6  decimal places.
 This is a test file for rounding 
 #A bit of HDF5
    DATASET "Data" {
@@ -7,21 +9,26 @@ This is a test file for rounding
       (0,0,0): 3, 103, 1003,
       (0,1,0): 4, 104, 1004,
 #Some smallish numbers 
-6.12345e-05
-0.000000123
-6.12345e-05 0.000000123
-6.12345e-05, 0.000000123
-6.12345e-05,0.000000123
-1.4e-8
+6.1e-05
+0.0
+6.1e-05 0.0
+6.1e-05, 0.0
+6.1e-05,0.0
+0.0
 # Some numbers which are all the same magnitude
-8e-9
-8.e-9
-.8e-8
-0.8e-8
--8e-9
--8.e-9
--.8e-8
--0.8e-8
+0.0
+0.0
+0.0
+0.0
+-0.0
+-0.0
+-0.0
+-0.0
+#Rounding when we are exactly halfway
+-0.0
+-3e-06
+0.0
+3e-06
 #Some tricky ones which shouldn't be rounded
 -2,-3
 24-28-
@@ -31,8 +38,8 @@ GROUP "/" {
       DATATYPE  H5T_IEEE_F64LE
       DATASPACE  SIMPLE { ( 1, 441, 1 ) / ( H5S_UNLIMITED, 441, 1 ) }
       DATA {
-      (0,0,0): 0.0775958,
-      (0,1,0): 0.0730503,
-      (0,2,0): 0.0685049,
-      (0,3,0): 0.0639594,
+      (0,0,0): 0.077596,
+      (0,1,0): 0.07305,
+      (0,2,0): 0.068505,
+      (0,3,0): 0.063959,
 
