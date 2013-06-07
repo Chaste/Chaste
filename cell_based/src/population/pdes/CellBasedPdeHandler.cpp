@@ -375,7 +375,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         if (p_pde_and_bc->HasAveragedSourcePde())
         {
             // When using a coarse PDE mesh, we must set up the source terms before solving the PDE.
-            // pass in mCellPdeElementMap to speed up finding cells.
+            // Pass in mCellPdeElementMap to speed up finding cells.
             this->UpdateCellPdeElementMap();
             p_pde_and_bc->SetUpSourceTermsForAveragedSourcePde(p_mesh, &mCellPdeElementMap);
 
@@ -444,6 +444,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             cell_iter->GetCellData()->SetItem(mPdeAndBcCollection[pde_index]->rGetDependentVariableName(), solution_at_node);
         }
     }
+
     // Write results to file if required
     SimulationTime* p_time = SimulationTime::Instance();
     if ((p_time->GetTimeStepsElapsed())%samplingTimestepMultiple == 0)

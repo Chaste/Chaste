@@ -448,17 +448,16 @@ public:
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
-        // Set up a PDEs (with mixed conditions and pass to simulation via handler (zero uptake to check analytic solution)
+        // Set up a PDE with mixed boundary conditions (use zero uptake to check analytic solution)
         AveragedSourcePde<2> pde(cell_population, 0.0);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("nutrient");
 
-
+        // Pass this to the simulation object via a PDE handler
         CellBasedPdeHandlerOnCuboid<2> pde_handler(&cell_population);
         pde_handler.AddPdeAndBc(&pde_and_bc);
         pde_handler.SetImposeBcsOnCoarseBoundary(false);
-
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
         // Solve the system

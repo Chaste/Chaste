@@ -671,18 +671,19 @@ public:
         PetscTools::Destroy(result);
     }
 
-
-
-    // #2033
-    // Periodic BCs are implemented but not being applied to the linear systems in any assembler
-    // This test will pass if the following two things are done:
-    //   (1) The ApplyPeriodicBcsToLinearProblem() line is uncommented in AbstractAssemblerSolverHybrid.cpp
-    //   (2) This test is run with '-ksp_type gmres' - periodic BCs are not being implemented at the
-    //       moment in such a way that the matrix is kept symmetric, hence CG will diverge.
-    // Todo: Alter ApplyPeriodicBcsToLinearProblem() so that it keeps matrix symmetric, then
-    //       replace ApplyDirichletToLinearProblem() calls in all assemblers to a call to a new method
-    //       ApplyDirichletAndPeriodicBcsToLinearProblem(). Then this test just pass.
-    //
+    /**
+     * #2033
+     *
+     * Periodic BCs are implemented but not being applied to the linear systems in any assembler.
+     * This test will pass if the following two things are done:
+     *   (1) The ApplyPeriodicBcsToLinearProblem() line is uncommented in AbstractAssemblerSolverHybrid.cpp
+     *   (2) This test is run with '-ksp_type gmres' - periodic BCs are not being implemented at the
+     *       moment in such a way that the matrix is kept symmetric, hence CG will diverge.
+     *
+     * \todo: Alter ApplyPeriodicBcsToLinearProblem() so that it keeps matrix symmetric, then
+     *        replace ApplyDirichletToLinearProblem() calls in all assemblers to a call to a new method
+     *        ApplyDirichletAndPeriodicBcsToLinearProblem(). Then this test should just pass.
+     */
     void dont_Test2dHeatEquationWithPeriodicBcs()
     {
         TetrahedralMesh<2,2> mesh;

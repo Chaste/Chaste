@@ -59,6 +59,8 @@ public:
         double dt = 0.01;
         OdeLinearSystemSolver solver(system_size, dt);
 
+        TS_ASSERT_DELTA(solver.GetTimeStep(), 0.01, 1e-6);
+
         // Set up the matrix
         Mat& r_matrix = solver.rGetLhsMatrix();
         PetscMatTools::SetElement(r_matrix, 0, 0, 1.0);

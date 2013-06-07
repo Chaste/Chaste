@@ -56,13 +56,12 @@ CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 template<unsigned DIM>
 BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
 {
-    // Not using the inputs as there's only one BCS
+    // Not using the inputs as there's only one BC
     assert(DIM==2);
 
     BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
 
-
-    // Use these 2 vectors to define what's happening on the top right bottom and left boundaries
+    // Use these two vectors to define what's happening on the top right bottom and left boundaries
 
     // Specify which sides are Neumann boundaries
     c_vector<bool,4> are_neumann_boundaries;
@@ -77,7 +76,6 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
     boundary_condition_values[1] = 1.0; // Right
     boundary_condition_values[2] = 1.0; // Bottom
     boundary_condition_values[3] = 1.0; // Left
-
 
     // Delete all previous boundary conditions
     for (unsigned i=0; i<mConstBoundaryConditions.size(); i++)
