@@ -1,6 +1,6 @@
 Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  8  decimal places.
-HDF5 "/home/jmpf/.texttest/tmp/chaste.06Jun103609.2747/chaste/save_monodomain/ChasteResults/SimulationResults.h5" {
+This means that all floating point numbers have been rounded to 8 decimal places.
+HDF5 "/home/jmpf/.texttest/tmp/chaste.07Jun123913.2391/chaste/save_monodomain/ChasteResults/SimulationResults.h5" {
 GROUP "/" {
    DATASET "Data" {
       DATATYPE  H5T_IEEE_F64LE
@@ -44557,7 +44557,7 @@ GROUP "/" {
             }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.1.19085 on Thu, 06 Jun 2013 09:37:56 +0000.  Chaste was built on Thu, 06 Jun 2013 09:04:17 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
+         (0): "Created by Chaste version 3.1.19085 on Fri, 07 Jun 2013 11:43:43 +0000.  Chaste was built on Thu, 06 Jun 2013 09:04:17 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
            "
          }
       }

@@ -1,6 +1,6 @@
 Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  8  decimal places.
-HDF5 "/home/jmpf/.texttest/tmp/chaste.06Jun110729.27596/chaste/UsingFibreDefinitions/ChasteResults/SimulationResults.h5" {
+This means that all floating point numbers have been rounded to 8 decimal places.
+HDF5 "/home/jmpf/.texttest/tmp/chaste.07Jun123913.2391/chaste/UsingFibreDefinitions/ChasteResults/SimulationResults.h5" {
 GROUP "/" {
    DATASET "ConductionVelocityFromNode200" {
       DATATYPE  H5T_IEEE_F64LE
@@ -457,7 +457,7 @@ GROUP "/" {
             }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.1.19085 on Thu, 06 Jun 2013 10:07:32 +0000.  Chaste was built on Thu, 06 Jun 2013 09:04:17 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
+         (0): "Created by Chaste version 3.1.19085 on Fri, 07 Jun 2013 11:39:16 +0000.  Chaste was built on Thu, 06 Jun 2013 09:04:17 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
            "
          }
       }
@@ -23017,7 +23017,7 @@ GROUP "/" {
             }
          DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
          DATA {
-         (0): "Created by Chaste version 3.1.19085 on Thu, 06 Jun 2013 10:07:30 +0000.  Chaste was built on Thu, 06 Jun 2013 09:04:17 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
+         (0): "Created by Chaste version 3.1.19085 on Fri, 07 Jun 2013 11:39:14 +0000.  Chaste was built on Thu, 06 Jun 2013 09:04:17 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
            "
          }
       }

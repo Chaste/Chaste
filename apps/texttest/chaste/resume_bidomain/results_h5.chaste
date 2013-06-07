@@ -1,6 +1,6 @@
 Warning: These have been filtered by  /home/jmpf/eclipse/workspace/Chaste/python/infra/RoundResultsFiles.py .
-This means that all floating point numbers have been rounded to  8  decimal places.
-HDF5 "/home/jmpf/.texttest/tmp/chaste.06Jun103609.2747/chaste/resume_bidomain/SaveBidomain/Bidomain_3d.h5" {
+This means that all floating point numbers have been rounded to 8 decimal places.
+HDF5 "/home/jmpf/.texttest/tmp/chaste.07Jun123913.2391/chaste/resume_bidomain/SaveBidomain/Bidomain_3d.h5" {
 GROUP "/" {
    DATASET "Data" {
       DATATYPE  H5T_IEEE_F64LE
