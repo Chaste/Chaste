@@ -189,7 +189,7 @@ protected:
     /**
      * Sets relevant data at all quadrature points, including whether it is an active region or not.
      *
-     * It calls #InitialiseContractionModel()  to assign a proper model.
+     * Calls a contraction cell factory to assign a model to each (quadrature point in each) element.
      */
     void Initialise();
 
