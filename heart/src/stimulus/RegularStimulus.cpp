@@ -100,6 +100,11 @@ double RegularStimulus::GetStartTime()
     return mStartTime;
 }
 
+void RegularStimulus::SetMagnitude(double magnitude)
+{
+    mMagnitudeOfStimulus = magnitude;
+}
+
 void RegularStimulus::SetPeriod(double period)
 {
     mPeriod = period;

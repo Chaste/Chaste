@@ -176,6 +176,10 @@ public:
         // No longer a stimulus at this time.
         TS_ASSERT_DELTA(regular_stimulus.GetStimulus(5100.5 + delay),
                          0.0,1e-9);
+
+        TS_ASSERT_DELTA(regular_stimulus.GetMagnitude(),magnitude_of_stimulus,1e-9);
+        regular_stimulus.SetMagnitude(magnitude_of_stimulus-1.0);
+        TS_ASSERT_DELTA(regular_stimulus.GetMagnitude(),magnitude_of_stimulus-1.0,1e-9);
     }
 
     void TestRegularStimulusStopping()

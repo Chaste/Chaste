@@ -122,6 +122,17 @@ public:
     double GetStartTime();
 
     /**
+     * Set the magnitude of the stimulus to apply.
+     * Takes units of uA/cm^2 in single cell simulations
+     * or uA/cm^3 in tissue simulations
+     *
+     * See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/ChasteUnits for a full discussion of this.
+     *
+     * @param magnitude  The magnitude of stimulus to apply.
+     */
+    void SetMagnitude(double magnitude);
+
+    /**
      * set the pacing cycle length ('period') of the stimulus.
      *
      * @param period  The stimulus pacing cycle length to use.
