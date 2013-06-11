@@ -110,7 +110,7 @@ public:
 #ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4351, 1e-4);
 #else
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.8622, 1e-4);
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4511, 1e-4);
 #endif
 
         // Divide the cell
@@ -189,7 +189,7 @@ public:
 #ifdef CHASTE_CVODE
         TS_ASSERT_DELTA(354.3185, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
 #else
-        TS_ASSERT_DELTA(358.5624, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
+        TS_ASSERT_DELTA(354.1761, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
 #endif
 
         TS_ASSERT_DELTA(p_cycle_model->GetBetaCateninDivisionThreshold(), 100, 1e-9);
