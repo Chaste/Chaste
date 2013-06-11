@@ -620,6 +620,34 @@ double CalculateMaxEigenpair(c_matrix<double, 3, 3>& rA, c_vector<double, 3>& rE
 
                              //COMMON VECTOR FUNCTIONS
 
+
+/**
+ * This is a fake cross-product aka vector-product.  Fake because it's only implemented for 3-vectors.
+ * This version is to satisfy template compilation.
+ *
+ * @param rA first vector
+ * @param rB second vector
+ * @return Does not return rA x rB
+ */
+template<class T>
+c_vector<T, 1> VectorProduct(const c_vector<T, 1>& rA, const c_vector<T, 1>& rB)
+{
+    NEVER_REACHED;
+}
+/**
+ * This is a fake cross-product aka vector-product.  Fake because it's only implemented for 3-vectors.
+ * This version is to satisfy template compilation.
+ *
+ * @param rA first vector
+ * @param rB second vector
+ * @return Does not return rA x rB
+ */
+template<class T>
+c_vector<T, 2> VectorProduct(const c_vector<T, 2>& rA, const c_vector<T, 2>& rB)
+{
+    NEVER_REACHED;
+}
+
 /**
  * This is a cross-product aka vector-product, only implemented for 3-vectors.
  *
