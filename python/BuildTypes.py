@@ -69,6 +69,7 @@ class BuildType(object):
         self.dealii_debugging = False
         self.is_optimised = False
         self.is_profile = False
+        self.needs_static = False # Profiling with gprof requires static libraries
         self.is_production = False
         # Where test output will go
         import socket
@@ -533,6 +534,7 @@ class Profile(GccDebug):
         self._test_packs = ['Profile']
         self.build_dir = 'profile'
         self.is_profile = True
+        self.needs_static = True
     
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         """Run test then run profiler."""
@@ -571,7 +573,7 @@ class GoogleProfile(GccDebug):
         return filename[:-10]
 
     def GetTestRunnerCommand(self, exefile, exeflags=''):
-        "Run test with a profiler and rename gmon.out"
+        """Run the test with profiling on and analyse the results."""
         base = os.path.basename(exefile)
         profile_file = '/tmp/' + base + '.prof'
         pprof_args = ' '.join(['--gif',
@@ -579,8 +581,7 @@ class GoogleProfile(GccDebug):
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
         commands = ['export HOME="."',
-                    'export CPUPROFILE=' + profile_file,
-                    exefile + ' ' + exeflags,
+                    'LD_PRELOAD=/usr/lib/libprofiler.so CPUPROFILE=' + profile_file + ' ' + exefile + ' ' + exeflags,
                     self.tools['pprof'] + ' ' + pprof_args,
                     self.tools['rm'] + ' ' + profile_file]
         return '; '.join(commands)

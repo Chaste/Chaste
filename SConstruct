@@ -104,7 +104,7 @@ Export('build')
 
 # Whether to use static or shared libraries
 static_libs = int(ARGUMENTS.get('static', 0))
-if build.is_profile:
+if build.needs_static:
     static_libs = 1
 Export('static_libs')
 
