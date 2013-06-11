@@ -287,10 +287,7 @@ VertexMesh<3,3>::VertexMesh(TetrahedralMesh<3,3>& rMesh)
 
             c_vector<double,3> basis_vector1 = mNodes[element0_index]->rGetLocation() - mid_edge;
 
-            c_vector<double,3> basis_vector2;
-            basis_vector2[0] = edge_vector[1]*basis_vector1[2] - edge_vector[2]*basis_vector1[1];
-            basis_vector2[1] = edge_vector[2]*basis_vector1[0] - edge_vector[0]*basis_vector1[2];
-            basis_vector2[2] = edge_vector[0]*basis_vector1[1] - edge_vector[1]*basis_vector1[0];
+            c_vector<double,3> basis_vector2 = VectorProduct(edge_vector, basis_vector1);
 
             /**
              * Create a std::vector of pairs, where each pair comprises the angle
@@ -1489,10 +1486,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetUnitNormalToF
     c_vector<double, SPACE_DIM> v1_minus_v0 = this->GetVectorFromAtoB(v0, v1);
     c_vector<double, SPACE_DIM> v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
 
-    c_vector<double, SPACE_DIM> unit_normal = zero_vector<double>(SPACE_DIM);
-    unit_normal(0) = v1_minus_v0(1)*v2_minus_v0(2) - v1_minus_v0(2)*v2_minus_v0(1);
-    unit_normal(1) = v1_minus_v0(2)*v2_minus_v0(0) - v1_minus_v0(0)*v2_minus_v0(2);
-    unit_normal(2) = v1_minus_v0(0)*v2_minus_v0(1) - v1_minus_v0(1)*v2_minus_v0(0);
+    c_vector<double, SPACE_DIM> unit_normal = VectorProduct(v1_minus_v0, v2_minus_v0);
 
     double magnitude = norm_2(unit_normal);
     if ( magnitude == 0.0 )

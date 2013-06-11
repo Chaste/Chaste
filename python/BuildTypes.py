@@ -968,10 +968,15 @@ class Intel(BuildType):
                                        '-wd304', #304: access control not specified ("public" by default)
                                        '-wd383', #383: value copied to temporary, reference to temporary used
                                        '-wd444', #444: destructor for base class "boost::noncopyable_::noncopyable" ... is not virtual
-                                       '-wd869', #869: parameter "version" was never referenced
+                                       # Most commonly seen in archiving where the "version" variable is often redundant
+                                       '-wd869', #869: parameter "..." was never referenced
+                                       # Triggered by macros such as TS_ASSERT_EQUALS(a,b)
                                        '-wd981', #981: operands are evaluated in unspecified order
+                                       # We do this when we need to define templated functions in the header file
                                        '-wd1418', #1418: external function definition with no prior declaration
+                                       # There are times when we want a local helper function (RecursiveCopy in FileFinder) or when we need to refer to KSPConvergedReasons
                                        '-wd1419', #1419: external declaration in primary source file
+                                       # This one is really useful for telling us where we might want to use CompareDoubles::WithinRelativeTolerance, but in our core code (TimeStepper) the tests should ensure we aren't doing anything silly
                                        '-wd1572', #1572: floating-point equality and inequality comparisons are unreliable
                                        ])
             # 10.0 produces extra warnings: {181: 'argument is incompatible with corresponding format string conversion', 424: 'extra ";" ignored',   

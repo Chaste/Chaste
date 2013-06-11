@@ -63,7 +63,7 @@ using namespace boost::numeric::ublas;
  * @param rM The matrix of which to find the determinant.
  */
 template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 1>& rM)
+inline T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 1>& rM)
 {
     using namespace boost::numeric::ublas;
 
@@ -528,7 +528,7 @@ boost::numeric::ublas::c_matrix<T, 1, 3> Inverse(const boost::numeric::ublas::c_
  * @return The trace
  */
 template<class T>
-T Trace(const c_matrix<T, 1, 1>& rM)
+inline T Trace(const c_matrix<T, 1, 1>& rM)
 {
     return rM(0,0);
 }
@@ -540,7 +540,7 @@ T Trace(const c_matrix<T, 1, 1>& rM)
  * @return The trace
  */
 template<class T>
-T Trace(const c_matrix<T, 2, 2>& rM)
+inline T Trace(const c_matrix<T, 2, 2>& rM)
 {
     return rM(0,0) + rM(1,1);
 }
@@ -552,7 +552,7 @@ T Trace(const c_matrix<T, 2, 2>& rM)
  * @return The trace
  */
 template<class T>
-T Trace(const c_matrix<T, 3, 3>& rM)
+inline T Trace(const c_matrix<T, 3, 3>& rM)
 {
     return rM(0,0) + rM(1,1) + rM(2,2);
 }
@@ -564,7 +564,7 @@ T Trace(const c_matrix<T, 3, 3>& rM)
  * @return The trace
  */
 template<class T>
-T Trace(const c_matrix<T, 4, 4>& rM)
+inline T Trace(const c_matrix<T, 4, 4>& rM)
 {
     return rM(0,0) + rM(1,1) + rM(2,2) + rM(3,3);
 }
@@ -633,16 +633,9 @@ c_vector<T, 3> VectorProduct(const c_vector<T, 3>& rA, const c_vector<T, 3>& rB)
 
     c_vector<T, 3> result;
 
-    double x1 = rA(0);
-    double y1 = rA(1);
-    double z1 = rA(2);
-    double x2 = rB(0);
-    double y2 = rB(1);
-    double z2 = rB(2);
-
-    result(0) = y1*z2 - z1*y2;
-    result(1) = z1*x2 - x1*z2;
-    result(2) = x1*y2 - y1*x2;
+    result(0) = rA(1)*rB(2) - rA(2)*rB(1);
+    result(1) = rA(2)*rB(0) - rA(0)*rB(2);
+    result(2) = rA(0)*rB(1) - rA(1)*rB(0);
 
     return result;
 }
