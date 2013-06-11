@@ -62,10 +62,10 @@ class TestTest(unittest.TestCase):
     """A simple test case for testing the framework."""
     def TestOk(self):
         self.failUnless(True)
-    
+
     def TestFail(self):
         self.failIf(True)
-    
+
     def TestError(self):
         self.assertEqual(1, 1/0)
 
@@ -86,6 +86,19 @@ class ChasteTestResult(unittest.TestResult):
         unittest.TestResult.__init__(self)
         self.stream = stream
         self.descriptions = descriptions
+        self.debug = bool(int(os.environ.get('CHASTE_DEBUG', 0)))
+        if self.debug:
+            import pdb
+            self.pdb = pdb
+    
+    def _Debug(self, err):
+        type, value, traceback = err
+        if (hasattr(sys, 'ps1')
+            or not sys.stderr.isatty() or not sys.stdin.isatty() or not sys.stdout.isatty()
+            or type == SyntaxError):
+            # Debugging is not possible
+            return
+        self.pdb.post_mortem(traceback)
 
     def getDescription(self, test):
         if self.descriptions:
@@ -105,11 +118,15 @@ class ChasteTestResult(unittest.TestResult):
         unittest.TestResult.addError(self, test, err)
         self.stream.write(self.errors[-1][1])
         self.stream.write("Failed\n")
+        if self.debug:
+            self._Debug(err)
 
     def addFailure(self, test, err):
         unittest.TestResult.addFailure(self, test, err)
         self.stream.write(self.failures[-1][1])
         self.stream.write("Failed\n")
+        if self.debug:
+            self._Debug(err)
 
 class ChasteTestRunner:
     """A test runner class that displays results in Chaste's cxxtest format."""
@@ -137,7 +154,7 @@ class ChasteTestRunner:
         else:
             self.stream.write("OK!\n")
         return result
-    
+
 class ChasteTestLoader(unittest.TestLoader):
     """Allow test methods to start with either Test or test."""
     def getTestCaseNames(self, testCaseClass):

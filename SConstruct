@@ -278,8 +278,9 @@ else:
              'USER': os.environ['USER'],
              'INTEL_LICENSE_FILE': os.environ.get('INTEL_LICENSE_FILE', '.'),
              'CHASTE_TEST_OUTPUT':
-             os.environ.get('CHASTE_TEST_OUTPUT',
-                            '/tmp/'+os.environ['USER']+'/testoutput/'),
+                 os.environ.get('CHASTE_TEST_OUTPUT',
+                                '/tmp/'+os.environ['USER']+'/testoutput/'),
+             'CHASTE_DEBUG': str(debug),
              'LD_LIBRARY_PATH': ':'.join(other_libpaths),
              'HOME': os.environ['HOME']
             })
