@@ -997,7 +997,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
             }
             real_element_index++;
         }
-        catch (Exception &e)
+        catch (Exception &)
         {
             if (SPACE_DIM == 2)
             {
@@ -1044,7 +1044,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
                 this->mBoundaryElements.push_back(p_b_element);
                 next_boundary_element_index++;
             }
-            catch (Exception &e)
+            catch (Exception &)
             {
                 // Tetgen is feeding us lies  //Watch this space for coverage
                 assert(SPACE_DIM == 3);

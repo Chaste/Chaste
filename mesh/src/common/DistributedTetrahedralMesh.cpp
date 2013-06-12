@@ -387,7 +387,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
                 {
                     nodes.push_back(this->GetNodeOrHaloNode(node_indices[node_index]));
                 }
-                catch (Exception &e)
+                catch (Exception &)
                 {
                     EXCEPTION("Face does not appear in element file (Face " << face_index << " in "<<this->mMeshFileBaseName<< ")");
                 }
@@ -547,7 +547,7 @@ bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwne
     {
         return(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfElement(elementIndex));
     }
-    catch(Exception& e)      // we don't own the element
+    catch(Exception&)      // we don't own the element
     {
         return false;
     }
@@ -560,7 +560,7 @@ bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwne
     {
         return(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfBoundaryElement(faceIndex));
     }
-    catch(Exception& e)      //  we don't own the face
+    catch(Exception&)      //  we don't own the face
     {
         return false;
     }
@@ -1337,7 +1337,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         // Advance the file pointer to the first element I own.
         for (unsigned element_index = 0; element_index < first_local_element; element_index++)
         {
-            ElementData element_data = rMeshReader.GetNextElementData();
+            rMeshReader.GetNextElementData();
         }
     }
 

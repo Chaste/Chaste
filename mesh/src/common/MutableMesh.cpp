@@ -185,7 +185,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
                 this->GetBoundaryElement(*it)->CalculateWeightedDirection(this->mBoundaryElementWeightedDirections[ (*it) ],
                                                                     this->mBoundaryElementJacobianDeterminants[ (*it) ]);
             }
-            catch (Exception e)
+            catch (Exception&)
             {
                 EXCEPTION("Moving node caused a boundary element to have a non-positive Jacobian determinant");
             }
@@ -202,7 +202,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
                                                               this->mElementJacobianDeterminants[ (*it) ],
                                                               this->mElementInverseJacobians[ (*it) ]);
                 }
-                catch (Exception e)
+                catch (Exception&)
                 {
                         EXCEPTION("Moving node caused an element to have a non-positive Jacobian determinant");
                 }
@@ -246,7 +246,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
                 MoveMergeNode(index, target_index, false);
                 found_target = true;
             }
-            catch (Exception e)
+            catch (Exception&)
             {
                 // Just try the next node
             }
@@ -345,7 +345,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::MoveMergeNode(unsigned index,
             }
 
         }
-        catch (Exception e)
+        catch (Exception&)
         {
             EXCEPTION("Moving node caused an element to have a non-positive Jacobian determinant");
         }

@@ -283,7 +283,6 @@ public:
             mpTestWriter->AdvanceAlongUnlimitedDimension();
         }
 
-        std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
 
         mpTestReader = new ColumnDataReader("TestColumnDataReaderWriter", "testunlimited");
@@ -427,11 +426,11 @@ public:
             }
         }
 
-        TS_ASSERT_THROWS_THIS(std::vector<double> values_dodgy = mpTestReader->GetValues("non-existent_variable",1),
+        TS_ASSERT_THROWS_THIS(mpTestReader->GetValues("non-existent_variable",1),
                 "Unknown variable");
 
         // Check that get unlimited dimension values throws
-        TS_ASSERT_THROWS_THIS(std::vector<double> unlimited_values = mpTestReader->GetUnlimitedDimensionValues(),
+        TS_ASSERT_THROWS_THIS(mpTestReader->GetUnlimitedDimensionValues(),
                 "Data file has no unlimited dimension");
 
         delete mpTestReader;
@@ -483,7 +482,6 @@ public:
         mpTestWriter->PutVariable(node_var_id, 1,0);
         mpTestWriter->PutVariable(node_var_id, -4,3);
 
-        std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
 
         // This won't be true, as we use an old-format 'good' file, for coverage

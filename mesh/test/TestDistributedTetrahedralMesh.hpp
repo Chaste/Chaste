@@ -184,7 +184,7 @@ private:
                      nodes_owned[node_index] = 1;
                      total_nodes_this_process++;
                 }
-                catch (Exception &e)
+                catch (Exception &)
                 {
                     nodes_owned[node_id] = 0;
                 }
@@ -227,7 +227,7 @@ private:
 
                     total_elements_this_process++;
                 }
-                catch(Exception& e)
+                catch(Exception&)
                 {
                     elements_owned[element_id] = 0;
                 }
@@ -269,7 +269,7 @@ private:
 
                     total_b_elements_this_process++;
                 }
-                catch(Exception& e)
+                catch(Exception&)
                 {
                     b_elements_owned[b_element_id] = 0;
                 }
@@ -332,7 +332,7 @@ public:
                 TS_ASSERT_EQUALS(region, i%5+1);
                 TS_ASSERT_EQUALS(i, mesh.GetElement(i)->GetIndex());
             }
-            catch(Exception& e)
+            catch(Exception&)
             {
                 // I don't own this element do I?
             }
@@ -396,7 +396,7 @@ public:
                 }
             }
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             // I don't own this element do I?
         }
@@ -416,7 +416,7 @@ public:
                 TS_ASSERT_EQUALS(element_direction(row), direction(row));
             }
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             // I don't own this boundary element do I?
         }
@@ -877,7 +877,7 @@ public:
                 unsigned region = mesh.GetElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_EQUALS(region, (i+1)%3+1);
             }
-            catch(Exception& e)
+            catch(Exception&)
             {
                 // I don't own this element do I?
             }
@@ -892,7 +892,7 @@ public:
                 unsigned region = mesh.GetBoundaryElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_LESS_THAN(region, 4u);
             }
-            catch(Exception& e)
+            catch(Exception&)
             {
                 // I don't own this element do I?
             }
@@ -1280,7 +1280,7 @@ private:
                 TS_ASSERT_THROWS_NOTHING(constructedMesh.GetNode(i));
                 TS_ASSERT_EQUALS(index, readMesh.SolveNodeMapping(i));
              }
-            catch(Exception& e)
+            catch(Exception&)
             {
                 // Read mesh threw so does not own node
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetNode(i), "does not belong to processor");
@@ -1296,7 +1296,7 @@ private:
                 TS_ASSERT_THROWS_NOTHING(constructedMesh.GetElement(i));
                 TS_ASSERT_EQUALS(index, readMesh.SolveElementMapping(i));
              }
-            catch(Exception& e)
+            catch(Exception&)
             {
                 // Read mesh threw so does not own element
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetElement(i), "does not belong to processor");
@@ -1312,7 +1312,7 @@ private:
                 TS_ASSERT_THROWS_NOTHING(constructedMesh.GetBoundaryElement(i));
                 TS_ASSERT_EQUALS(index, readMesh.SolveBoundaryElementMapping(i));
              }
-            catch(Exception& e)
+            catch(Exception&)
             {
                 // Read mesh threw so does not own element
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetBoundaryElement(i), "does not belong to processor");

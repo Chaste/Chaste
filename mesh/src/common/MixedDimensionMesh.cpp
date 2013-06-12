@@ -84,7 +84,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
                 node_owned = true;
                 break;
             }
-            catch (Exception &e)
+            catch (Exception &)
             {
                 //We deal with non-owned nodes in the next part
             }
@@ -105,7 +105,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
                 {
                     nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]) );
                 }
-                catch (Exception& e)
+                catch (Exception&)
                 {
                     NEVER_REACHED;
                 }
@@ -181,7 +181,7 @@ bool MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfC
             return false;
         }
     }
-    catch (Exception &e)
+    catch (Exception &)
     {
         //We don't own this cable element
         return false;

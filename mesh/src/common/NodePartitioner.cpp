@@ -273,7 +273,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
         // Advance the file pointer to the first element I own
         for (unsigned element_index = 0; element_index < first_local_element; element_index++)
         {
-            ElementData element_data = rMeshReader.GetNextElementData();
+            rMeshReader.GetNextElementData();
         }
     }
 

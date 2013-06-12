@@ -961,7 +961,10 @@ class Intel(BuildType):
             elif (version == 10 or version == 11): # \todo #1360 Working through version 10 issues on userpc60
                 #\todo #1360 Justify or fix the supressions given below
                 self._cc_flags.extend(['-Wall',
+                                       # This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable. 
                                        '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
+                                       # This one appears when, for example, we catch an exception but don't need to know what exception it was
+                                       # We can work on this one...
                                        '-wd177', #177: handler parameter "..." was declared but never referenced
                                        '-wd185', #185: dynamic initialization in unreachable code (DUE TO INSTANTIATED TEMPLATES)
                                        '-wd280', #280: selector expression is constant
@@ -976,7 +979,7 @@ class Intel(BuildType):
                                        '-wd1418', #1418: external function definition with no prior declaration
                                        # There are times when we want a local helper function (RecursiveCopy in FileFinder) or when we need to refer to KSPConvergedReasons
                                        '-wd1419', #1419: external declaration in primary source file
-                                       # This one is really useful for telling us where we might want to use CompareDoubles::WithinRelativeTolerance, but in our core code (TimeStepper) the tests should ensure we aren't doing anything silly
+                                       # ***This one is really useful for telling us where we might want to use CompareDoubles::WithinRelativeTolerance, but in our core code (TimeStepper) the tests should ensure we aren't doing anything silly
                                        '-wd1572', #1572: floating-point equality and inequality comparisons are unreliable
                                        ])
             # 10.0 produces extra warnings: {181: 'argument is incompatible with corresponding format string conversion', 424: 'extra ";" ignored',   

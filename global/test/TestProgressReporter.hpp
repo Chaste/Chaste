@@ -83,7 +83,7 @@ public:
                 }
                 EXCEPTION("Throw");
             }
-            catch(Exception& e)
+            catch(Exception&)
             {
             }
         }

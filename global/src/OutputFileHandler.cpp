@@ -100,7 +100,7 @@ OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
     {
         relative_path = rDirectory.GetRelativePath(output_root);
     }
-    catch (const Exception& e)
+    catch (const Exception&)
     {
         EXCEPTION("The location provided to OutputFileHandler must be inside CHASTE_TEST_OUTPUT; '"
                   << rDirectory.GetAbsolutePath() << "' is not under '"
