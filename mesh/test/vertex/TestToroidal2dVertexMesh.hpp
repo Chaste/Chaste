@@ -316,8 +316,36 @@ public:
 
             TS_ASSERT_DELTA(moments(0), 5*sqrt(3)/16/9, 1e-6); // Ixx
             TS_ASSERT_DELTA(moments(1), 5*sqrt(3)/16/9, 1e-6); // Iyy
-            TS_ASSERT_DELTA(moments(2), 0.0, 1e-6);            // Ixy
+            TS_ASSERT_DELTA(moments(2), 0.0, 1e-6);            // Ixy = 0 by symmetry
         }
+
+        // Test methods with a toroidal mesh comprising a single rectangular element
+        std::vector<Node<2>*> rectangle_nodes;
+        rectangle_nodes.push_back(new Node<2>(0, false, 8.0, 2.0));
+        rectangle_nodes.push_back(new Node<2>(1, false, 8.0, 0.0));
+        rectangle_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
+        rectangle_nodes.push_back(new Node<2>(3, false, 2.0, 2.0));
+        std::vector<VertexElement<2,2>*> rectangle_elements;
+        rectangle_elements.push_back(new VertexElement<2,2>(0, rectangle_nodes));
+
+        Toroidal2dVertexMesh rectangle_mesh(10.0, 3.0, rectangle_nodes, rectangle_elements);
+
+        TS_ASSERT_DELTA(rectangle_mesh.GetVolumeOfElement(0), 4.0, 1e-10);
+        TS_ASSERT_DELTA(rectangle_mesh.GetSurfaceAreaOfElement(0), 10.0, 1e-4);
+
+        ///\todo #2393 - for consistency, the centroid should be at (0, 2.5)
+        c_vector<double, 2> rectangle_centroid = rectangle_mesh.GetCentroidOfElement(0);
+        TS_ASSERT_DELTA(rectangle_centroid(0), 10.0, 1e-4);
+        TS_ASSERT_DELTA(rectangle_centroid(1), 2.5, 1e-4);
+
+        c_vector<double, 3> rectangle_moments = rectangle_mesh.CalculateMomentsOfElement(0);
+        TS_ASSERT_DELTA(rectangle_moments(0), 1.0/3.0, 1e-6);  // Ixx
+        TS_ASSERT_DELTA(rectangle_moments(1), 16.0/3.0, 1e-6); // Iyy
+        TS_ASSERT_DELTA(rectangle_moments(2), 0.0, 1e-6);      // Ixy = 0 by symmetry
+
+        c_vector<double, 2> rectangle_short_axis = rectangle_mesh.GetShortAxisOfElement(0);
+        TS_ASSERT_DELTA(rectangle_short_axis(0), 0.0, 1e-4);
+        TS_ASSERT_DELTA(rectangle_short_axis(1), 1.0, 1e-4);
     }
 
     void TestDivideElementAlongGivenAxis()

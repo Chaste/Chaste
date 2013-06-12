@@ -1097,6 +1097,21 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
 
+        // Test that the centroid, moments and short axis of the element are calculated correctly
+        // (i.e. agreee with Matlab and pen-and-paper calculations)
+        c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
+        TS_ASSERT_DELTA(centroid[0], 2.0000, 1e-4);
+        TS_ASSERT_DELTA(centroid[1], 1.8666, 1e-4);
+
+        c_vector<double,3> moments = mesh.CalculateMomentsOfElement(0);
+        TS_ASSERT_DELTA(moments[0], 0.5388, 1e-4);
+        TS_ASSERT_DELTA(moments[1], 0.7500, 1e-4);
+        TS_ASSERT_DELTA(moments[2], 0.3750, 1e-4);
+
+        c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
+        TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
+        TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
+
         // Divide element using two given nodes
         unsigned new_element_index = mesh.DivideElementAlongShortAxis(mesh.GetElement(0), true);
 

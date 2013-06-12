@@ -433,7 +433,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
     if (shared_nodes.size() == 1)
     {
         // It's possible that these two elements are actually infinite but are on the edge of the domain
-        EXCEPTION("Elements "<< elementIndex1 <<" and  "<< elementIndex2<< " share only one node.");
+        EXCEPTION("Elements "<< elementIndex1 <<" and "<< elementIndex2<< " share only one node.");
     }
     assert(shared_nodes.size() == 2);
 
@@ -644,46 +644,47 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
         break;
         case 2:
         {
-            double temp_centroid_x = 0;
-            double temp_centroid_y = 0;
+            double centroid_x = 0;
+            double centroid_y = 0;
 
+            // Note that we cannot use GetVolumeOfElement() below as it returns the absolute, rather than signed, area
+            double element_signed_area = 0.0;
+
+            // Map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
             c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-            c_vector<double, SPACE_DIM> this_transformed_node_location = zero_vector<double>(SPACE_DIM);
+            c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
 
-            /*
-             * In order to calculate the centroid we map the origin to (x[0],y[0])
-             * then use GetVectorFromAtoB() to get node coordinates.
-             */
+            // Loop over vertices
             for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
                 c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes);
-                c_vector<double, 2> next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
+                c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
 
-                double this_x = this_transformed_node_location[0];
-                double this_y = this_transformed_node_location[1];
-                double next_x = next_transformed_node_location[0];
-                double next_y = next_transformed_node_location[1];
+                double this_x = pos_1[0];
+                double this_y = pos_1[1];
+                double next_x = pos_2[0];
+                double next_y = pos_2[1];
 
-                temp_centroid_x += (this_x + next_x)*(this_x*next_y - this_y*next_x);
-                temp_centroid_y += (this_y + next_y)*(this_x*next_y - this_y*next_x);
+                double signed_area_term = this_x*next_y - this_y*next_x;
 
-                this_transformed_node_location = next_transformed_node_location;
+                centroid_x += (this_x + next_x)*signed_area_term;
+                centroid_y += (this_y + next_y)*signed_area_term;
+                element_signed_area += 0.5*signed_area_term;
+
+                pos_1 = pos_2;
             }
 
-            double vertex_area = GetVolumeOfElement(index);
-            assert(vertex_area > 0.0);
+            assert(element_signed_area != 0.0);
 
-            double centroid_coefficient = 1.0/(6.0*vertex_area);
-
-            c_vector<double, SPACE_DIM> transformed_centroid = zero_vector<double>(SPACE_DIM);
-            transformed_centroid(0) = centroid_coefficient*temp_centroid_x;
-            transformed_centroid(1) = centroid_coefficient*temp_centroid_y;
-
-            centroid = transformed_centroid + first_node_location;
+            // Finally, map back and employ GetVectorFromAtoB() to allow for periodicity
+            centroid = first_node_location;
+            centroid(0) += centroid_x / (6.0*element_signed_area);
+            centroid(1) += centroid_y / (6.0*element_signed_area);
         }
         break;
         case 3:
         {
+            ///\todo compute centroid rather than centre of mass
             for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
                 centroid += p_element->GetNodeLocation(local_index);
@@ -1033,27 +1034,24 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
     double element_volume = 0.0;
     if (SPACE_DIM == 2)
     {
+        // We map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
         c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-        c_vector<double, SPACE_DIM> this_transformed_node_location = zero_vector<double>(SPACE_DIM);
+        c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
 
-        /*
-         * In order to calculate the area we map the origin to (x[0],y[0])
-         * then use GetVectorFromAtoB() to get node coordinates.
-         */
         unsigned num_nodes = p_element->GetNumNodes();
         for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
             c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index+1)%num_nodes);
-            c_vector<double, SPACE_DIM> next_transformed_node_location = GetVectorFromAtoB(first_node_location, next_node_location);
+            c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
 
-            double this_x = this_transformed_node_location[0];
-            double this_y = this_transformed_node_location[1];
-            double next_x = next_transformed_node_location[0];
-            double next_y = next_transformed_node_location[1];
+            double this_x = pos_1[0];
+            double this_y = pos_1[1];
+            double next_x = pos_2[0];
+            double next_y = pos_2[1];
 
             element_volume += 0.5*(this_x*next_y - next_x*this_y);
 
-            this_transformed_node_location = next_transformed_node_location;
+            pos_1 = pos_2;
         }
     }
     else
@@ -1303,7 +1301,9 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
     unsigned num_nodes = p_element->GetNumNodes();
     c_vector<double, 3> moments = zero_vector<double>(3);
 
+    // Since we compute I_xx, I_yy and I_xy about the centroid, we must shift each vertex accordingly
     c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(index);
+
     c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(0);
     c_vector<double, SPACE_DIM> pos_1 = this->GetVectorFromAtoB(centroid, this_node_location);
 
@@ -1313,20 +1313,15 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
         c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation(next_index);
         c_vector<double, SPACE_DIM> pos_2 = this->GetVectorFromAtoB(centroid, next_node_location);
 
-        /*
-         * In order to calculate the moments we map the origin to the centroid
-         * then use GetVectorFromAtoB() to get node coordinates.
-         */
-        double a = pos_1(0)*pos_2(1)-pos_2(0)*pos_1(1);
-
+        double signed_area_term = pos_1(0)*pos_2(1) - pos_2(0)*pos_1(1);
         // Ixx
-        moments(0) += (pos_1(1)*pos_1(1) + pos_1(1)*pos_2(1) + pos_2(1)*pos_2(1) ) * a;
+        moments(0) += (pos_1(1)*pos_1(1) + pos_1(1)*pos_2(1) + pos_2(1)*pos_2(1) ) * signed_area_term;
 
         // Iyy
-        moments(1) += (pos_1(0)*pos_1(0) + pos_1(0)*pos_2(0) + pos_2(0)*pos_2(0)) * a;
+        moments(1) += (pos_1(0)*pos_1(0) + pos_1(0)*pos_2(0) + pos_2(0)*pos_2(0)) * signed_area_term;
 
         // Ixy
-        moments(2) += (pos_1(0)*pos_2(1) + 2*pos_1(0)*pos_1(1) + 2*pos_2(0)*pos_2(1) + pos_2(0)*pos_1(1)) * a;
+        moments(2) += (pos_1(0)*pos_2(1) + 2*pos_1(0)*pos_1(1) + 2*pos_2(0)*pos_2(1) + pos_2(0)*pos_1(1)) * signed_area_term;
 
         pos_1 = pos_2;
     }
@@ -1335,6 +1330,18 @@ c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElemen
     moments(1) /= 12;
     moments(2) /= 24;
 
+    /*
+     * If the nodes owned by the element were supplied in a clockwise rather
+     * than anticlockwise manner, or if this arose as a result of enforcing
+     * periodicity, then our computed quantities will be the wrong sign, so
+     * we need to fix this.
+     */
+    if (moments(0) < 0.0)
+    {
+        moments(0) = -moments(0);
+        moments(1) = -moments(1);
+        moments(2) = -moments(2);
+    }
     return moments;
 }
 
@@ -1349,12 +1356,6 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 
     double discriminant = sqrt((moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2));
 
-    /*
-     * As the matrix of second moments of area is symmetric, both its eigenvalues are real,
-     * so this is the largest eigenvalue.
-     */
-    double largest_eigenvalue = (moments(0) + moments(1) + discriminant)*0.5;
-
     ///\todo remove magic number? (#1884)
     if (fabs(discriminant) < 1e-10)
     {
@@ -1364,8 +1365,10 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
     }
     else
     {
+        // If the product of inertia is zero, then the coordinate axes are the principal axes
         if (moments(2) == 0.0)
         {
+            // By definition the moments of area must be non-negative
             if (moments(0) < moments(1))
             {
                 short_axis(0) = 0.0;
@@ -1379,6 +1382,13 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
         }
         else
         {
+            /*
+             * As the inertia matrix is symmetric, both its eigenvalues are real.
+             * Also, by definition the moments of area must be non-negative, so
+             * the largest eigenvalue is given as follows.
+             */
+            double largest_eigenvalue = 0.5*(moments(0) + moments(1) + discriminant);
+
             short_axis(0) = 1.0;
             short_axis(1) = (moments(0) - largest_eigenvalue)/moments(2);
 

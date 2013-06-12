@@ -441,7 +441,29 @@ public:
     c_vector<double, SPACE_DIM> GetPerimeterGradientOfElementAtNode(VertexElement<ELEMENT_DIM,SPACE_DIM>* pElement, unsigned localIndex);
 
     /**
-     * Compute the second moments of area of a given 2D element.
+     * Compute the second moments and product moment of area for a given 2D element
+     * about its centroid. These are:
+     *
+     * I_xx, the second moment of area about an axis through the centroid of the
+     * element parallel to the x-axis;
+     *
+     * I_yy, the second moment of area about an axis through the centroid of the
+     * element parallel to the y-axis;
+     *
+     * and I_xy, product moment of area through the centroid of the element.
+     *
+     * Formulae for these quantities may be found e.g. in the following reference:
+     *
+     * Zhang et al. Vector analysis theory on landscape pattern (VATLP).
+     * Ecological Modelling 193:492-502.
+     * http://dx.doi.org/10.1016/j.ecolmodel.2005.08.022
+     *
+     * This method is used within GetShortAxisOfElement() to compute the direction
+     * of the shortest principal axis passing through the centroid, or 'short axis',
+     * of the element.
+     *
+     * Note that by definition, the second moments of area must be non-negative,
+     * while the product moment of area may not be.
      *
      * @param index  the global index of a specified vertex element
      *
@@ -498,14 +520,25 @@ public:
     virtual double GetAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
 
     /**
-     * Calculate the vector of the shortest axis of a given 2D element.
-     * This is the eigenvector associated with the largest eigenvalue
-     * of the inertial tensor. If the polygon is regular then the
-     * eigenvalues are the same, so we return a random unit vector.
+     * Compute the direction of the shortest principal axis passing through the centroid,
+     * or 'short axis', of a given element. This is the eigenvector associated with the
+     * eigenvalue of largest magnitude of the inertia tensor, which is computed by calling
+     * the method CalculateMomentsOfElement().
+     *
+     * Note that if the nodes owned by the element are supplied in clockwise rather than
+     * anticlockwise manner, or if this arises when any periodicity is enforced, then the
+     * sign of each moment may be incorrect change. This means that we need to consider the eigenvalue
+     * of largest magnitude rather than largest value when computing the short axis of the
+     * element.
+     *
+     * If the element is a regular polygon then the eigenvalues of the inertia tensor are
+     * equal: in this case we return a random unit vector.
+     *
+     * This method is only implemented in 2D at present.
      *
      * @param index  the global index of a specified vertex element
      *
-     * @return (short_axis_x, short_axis_y).
+     * @return a unit vector giving the direction of the short axis
      */
     c_vector<double, SPACE_DIM> GetShortAxisOfElement(unsigned index);
 
