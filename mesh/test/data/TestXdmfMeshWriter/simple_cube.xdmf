@@ -2,11 +2,13 @@
 <!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
 <Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
 	<Domain>
-		<Grid Name="Chunk_0" Gridtype="Uniform">
-			<xi:include href="simple_cube_geometry_0.xml"/>
-			<xi:include href="simple_cube_topology_0.xml"/>
+		<Grid Name="Grid" GridType="Collection" CollectionType="Spatial">
+			<Grid Name="Chunk_0" Gridtype="Uniform">
+				<xi:include href="simple_cube_geometry_0.xml"/>
+				<xi:include href="simple_cube_topology_0.xml"/>
+			</Grid>
 		</Grid>
 	</Domain>
 </Xdmf>
-<!-- Created by Chaste version 3.1.19098 (with uncommitted modifications) on Thu, 06 Jun 2013 15:50:32 +0000.  Chaste was built on Thu, 06 Jun 2013 15:50:28 +0000 by machine (uname) 'Linux clpc117.cs.ox.ac.uk 3.9.4-200.fc18.x86_64 #1 SMP Fri May 24 20:10:49 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: louiecn=18140:19058M.
+<!-- Created by Chaste version 3.1.19153 (with uncommitted modifications) on Thu, 13 Jun 2013 13:51:22 +0000.  Chaste was built on Thu, 13 Jun 2013 10:27:51 +0000 by machine (uname) 'Linux userpc60.cs.ox.ac.uk 2.6.32-47-generic #109-Ubuntu SMP Tue May 7 02:02:22 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: SimpleSensitivity=18009; website=15353.
 -->

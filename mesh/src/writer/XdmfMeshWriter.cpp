@@ -57,16 +57,6 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
 
     if (PetscTools::AmMaster())
     {
-        std::string master_file_name = this->mBaseName + ".xdmf";
-        out_stream master_file = this->mpOutputFileHandler->OpenOutputFile(master_file_name);
-
-        // Write header information
-        (*master_file) << "<?xml version=\"1.0\" ?>\n";
-        (*master_file) << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
-        (*master_file) << "<Xdmf Version=\"2.0\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n";
-        (*master_file) << "\t<Domain>\n";
-
-
         // Write main test Grid collection (to be later replaced by temporal collection)
         // Write references to geometry and topology chunk(s)
         unsigned num_chunks = 1;
@@ -74,26 +64,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         {
             num_chunks = PetscTools::GetNumProcs();
         }
-        (*master_file) << "\t\t<Grid Name=\"Grid\" GridType=\"Collection\" CollectionType=\"Spatial\">\n";
-        for (unsigned chunk=0; chunk<num_chunks; chunk++)
-        {
-            std::stringstream geometry_file_name;
-            geometry_file_name << this->mBaseName << "_geometry_"<< chunk <<".xml";
-            std::stringstream topology_file_name;
-            topology_file_name << this->mBaseName << "_topology_"<< chunk <<".xml";
-            (*master_file) << "\t\t\t<Grid Name=\"Chunk_"<< chunk <<"\" Gridtype=\"Uniform\">\n";
-            (*master_file) << "\t\t\t\t<xi:include href=\""<< geometry_file_name.str() <<"\"/>\n";
-            (*master_file) << "\t\t\t\t<xi:include href=\""<< topology_file_name.str() <<"\"/>\n";
-            (*master_file) << "\t\t\t</Grid>\n";
-        }
-        (*master_file) << "\t\t</Grid>\n";
-
-        // Write footer
-        (*master_file) << "\t</Domain>\n";
-        (*master_file) << "</Xdmf>\n";
-
-        (*master_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
-        master_file->close();
+        WriteXdmfMasterFile(num_chunks);
     }
     if (!mesh_is_distributed && !PetscTools::AmMaster())
     {
@@ -204,36 +175,13 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
+    // This method is only called when there is no mesh.  We are writing from a reader.
     if (PetscTools::AmMaster())
     {
-        std::string master_file_name = this->mBaseName + ".xdmf";
-        out_stream master_file = this->mpOutputFileHandler->OpenOutputFile(master_file_name);
-
-        // Write header information
-        (*master_file) << "<?xml version=\"1.0\" ?>\n";
-        (*master_file) << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
-        (*master_file) << "<Xdmf Version=\"2.0\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n";
-        (*master_file) << "\t<Domain>\n";
-
-
-        // Write main test Grid collection (to be later replaced by temporal collection)
-        // Write references to geometry and topology chunk(s)
-        std::string geometry_file_name = this->mBaseName + "_geometry_0.xml";
-        std::string topology_file_name = this->mBaseName + "_topology_0.xml";
-        (*master_file) << "\t\t<Grid Name=\"Chunk_0\" Gridtype=\"Uniform\">\n";
-        (*master_file) << "\t\t\t<xi:include href=\""<< geometry_file_name <<"\"/>\n";
-        (*master_file) << "\t\t\t<xi:include href=\""<< topology_file_name <<"\"/>\n";
-        (*master_file) << "\t\t</Grid>\n";
-
-        // Write footer
-        (*master_file) << "\t</Domain>\n";
-        (*master_file) << "</Xdmf>\n";
-        (*master_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
-
-        master_file->close();
+        WriteXdmfMasterFile();
 
         // Geometry
-        out_stream geometry_file = this->mpOutputFileHandler->OpenOutputFile(geometry_file_name);
+        out_stream geometry_file = this->mpOutputFileHandler->OpenOutputFile(this->mBaseName + "_geometry_0.xml");
         std::string geom_type = "XYZ";
         if (SPACE_DIM == 2)
         {
@@ -258,7 +206,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         geometry_file->close();
 
         // Topology
-        out_stream topology_file = this->mpOutputFileHandler->OpenOutputFile(topology_file_name);
+        out_stream topology_file = this->mpOutputFileHandler->OpenOutputFile(this->mBaseName + "_topology_0.xml");
         std::string top_type = "Tetrahedron";
         if (SPACE_DIM == 2)
         {
@@ -283,6 +231,45 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         topology_file->close();
     }
 }
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned numberOfChunks)
+{
+    assert(PetscTools::AmMaster());
+    std::string master_file_name = this->mBaseName + ".xdmf";
+    out_stream master_file = this->mpOutputFileHandler->OpenOutputFile(master_file_name);
+
+    // Write header information
+    (*master_file) << "<?xml version=\"1.0\" ?>\n";
+    (*master_file) << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
+    (*master_file) << "<Xdmf Version=\"2.0\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n";
+    (*master_file) << "\t<Domain>\n";
+
+
+    // Write main test Grid collection (to be later replaced by temporal collection)
+    // Write references to geometry and topology chunk(s)
+    (*master_file) << "\t\t<Grid Name=\"Grid\" GridType=\"Collection\" CollectionType=\"Spatial\">\n";
+    for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+    {
+        std::stringstream geometry_file_name;
+        geometry_file_name << this->mBaseName << "_geometry_"<< chunk <<".xml";
+        std::stringstream topology_file_name;
+        topology_file_name << this->mBaseName << "_topology_"<< chunk <<".xml";
+        (*master_file) << "\t\t\t<Grid Name=\"Chunk_"<< chunk <<"\" Gridtype=\"Uniform\">\n";
+        (*master_file) << "\t\t\t\t<xi:include href=\""<< geometry_file_name.str() <<"\"/>\n";
+        (*master_file) << "\t\t\t\t<xi:include href=\""<< topology_file_name.str() <<"\"/>\n";
+        (*master_file) << "\t\t\t</Grid>\n";
+    }
+    (*master_file) << "\t\t</Grid>\n";
+
+    // Write footer
+    (*master_file) << "\t</Domain>\n";
+    (*master_file) << "</Xdmf>\n";
+    (*master_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
+
+    master_file->close();
+
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

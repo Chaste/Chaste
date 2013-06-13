@@ -46,6 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class XdmfMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
+private:
+    /**
+     * Write the master file.  This just contains references to the geometry/topology files.
+     * @param numberOfChunks  is the number of geometric pieces which is 1 for sequential code and for non-distributed meshes.
+     */
+    void WriteXdmfMasterFile(unsigned numberOfChunks=1u);
 public:
     /**
      * Constructor.
@@ -58,7 +64,7 @@ public:
                    const std::string& rBaseName,
                    const bool clearOutputDir=true);
     /**
-     * Write the files
+     * Write the files using a mesh reader.  Called from WriteFilesUsingMeshReader in the base class.
      */
     void WriteFiles();
     /**
