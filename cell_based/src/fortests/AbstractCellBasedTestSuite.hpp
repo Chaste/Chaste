@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define CXXTEST_ABORT_TEST_ON_FAIL
 
+#include <cxxtest/TestSuite.h>
+
 #include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CellPropertyRegistry.hpp"
