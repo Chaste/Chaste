@@ -538,7 +538,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataNa
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh )
 {
-    //Have we got a parallel mesh?
+    //Have we got a distributed mesh?
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     mpNodesOnlyMesh = dynamic_cast<NodesOnlyMesh<SPACE_DIM>* >(&rMesh);
 

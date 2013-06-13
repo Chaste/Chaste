@@ -831,7 +831,6 @@ public:
         XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);
         writer_from_mesh.WriteFilesUsingMesh(mesh);
 
-        ///\todo #1157 These files are incorrect because they output local nodes and not halo nodes
         if (PetscTools::AmMaster())
         {
             for (unsigned i=0; i<PetscTools::GetNumProcs(); i++)
@@ -841,13 +840,22 @@ public:
                 chunk_name << "TestXdmfMeshWriter/simple_cube_dist_topology_" << i <<".xml";
                 TS_ASSERT( FileFinder(chunk_name.str(), RelativeTo::Absolute).Exists());
             }
-
+            // If we are running with exactly 2 processes, then we can check for the exact output
+            if (PetscTools::GetNumProcs() == 2u)
+            {
+                FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist.xdmf",
+                               "mesh/test/data/TestXdmfMeshWriter/simple_cube_dist.xdmf", false /*not collective*/).CompareFiles();
+                FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist_geometry_0.xml",
+                               "mesh/test/data/TestXdmfMeshWriter/simple_cube_dist_geometry_0.xml", false /*not collective*/).CompareFiles();
+                FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist_topology_0.xml",
+                               "mesh/test/data/TestXdmfMeshWriter/simple_cube_dist_topology_0.xml", false /*not collective*/).CompareFiles();
+                FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist_geometry_1.xml",
+                                               "mesh/test/data/TestXdmfMeshWriter/simple_cube_dist_geometry_1.xml", false /*not collective*/).CompareFiles();
+                FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_dist_topology_1.xml",
+                                               "mesh/test/data/TestXdmfMeshWriter/simple_cube_dist_topology_1.xml", false /*not collective*/).CompareFiles();
+            }
         }
-
-
      }
-
-
 };
 
 #endif //_TESTXMLMESHWRITERS_HPP_

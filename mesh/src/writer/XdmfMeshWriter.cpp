@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <sstream>
+#include <map>
 #include "XdmfMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "Version.hpp"
@@ -51,8 +52,8 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         bool keepOriginalElementIndexing)
 {
     assert(keepOriginalElementIndexing==true);
-    DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_distributed_mesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
-    bool mesh_is_distributed = (p_distributed_mesh != NULL) && PetscTools::IsParallel();
+    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    bool mesh_is_distributed = (this->mpDistributedMesh != NULL) && PetscTools::IsParallel();
 
     if (PetscTools::AmMaster())
     {
@@ -112,22 +113,49 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     }
     (*geometry_file) << "<Geometry GeometryType=\""<< geom_type <<"\">\n";
     unsigned num_nodes = rMesh.GetNumNodes();
-    if (p_distributed_mesh)
+    if (this->mpDistributedMesh)
     {
-        num_nodes = p_distributed_mesh->GetNumLocalNodes();
+        num_nodes = this->mpDistributedMesh->GetNumLocalNodes() + this->mpDistributedMesh->GetNumHaloNodes();
     }
-    ///\todo #1157 This should output local nodes and halo nodes
+
     (*geometry_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< num_nodes <<" "<< SPACE_DIM <<"\" DataType=\"Float\">";
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
-    for (NodeIterType iter = rMesh.GetNodeIteratorBegin();
+
+    //  Map a global node index into a local index (into mNodes and mHaloNodes as if they were concatenated)
+    std::map<unsigned, unsigned> global_to_node_index_map;
+
+    //Node index that we are writing to the chunk (index into mNodes and mHaloNodes as if they were concatenated)
+    unsigned index = 0;
+
+    // Owned nodes come first
+    for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator iter = rMesh.GetNodeIteratorBegin();
          iter != rMesh.GetNodeIteratorEnd();
          ++iter)
     {
+        global_to_node_index_map[iter->GetIndex()] = index;
+        index++;
         (*geometry_file) << "\n\t\t";
         c_vector<double, SPACE_DIM> current_item = (iter)->rGetLocation();
         for (unsigned j=0; j<SPACE_DIM; j++)
         {
-            (*geometry_file) << current_item[j]<<"\t";
+            (*geometry_file) << current_item[j] << "\t";
+        }
+    }
+
+    // Halo nodes
+    if (this->mpDistributedMesh)
+    {
+        for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
+                halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
+                ++halo_iter)
+        {
+            global_to_node_index_map[(*halo_iter)->GetIndex()] = index;
+            index++;
+            (*geometry_file) << "\n\t\t";
+            c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
+            for (unsigned j=0; j<SPACE_DIM; j++)
+            {
+                (*geometry_file) << current_item[j] << "\t";
+            }
         }
     }
     (*geometry_file) << "\n";
@@ -147,9 +175,9 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         top_type = "Triangle";
     }
     unsigned num_elems = rMesh.GetNumElements();
-    if (p_distributed_mesh)
+    if (this->mpDistributedMesh)
     {
-        num_elems = p_distributed_mesh->GetNumLocalElements();
+        num_elems = this->mpDistributedMesh->GetNumLocalElements();
     }
     (*topology_file) << "<Topology TopologyType=\""<< top_type <<"\" NumberOfElements=\""<< num_elems <<"\">\n";
     (*topology_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< num_elems <<" "<< ELEMENT_DIM+1 <<"\">";
@@ -160,8 +188,8 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         (*topology_file) << "\n\t\t";
         for (unsigned j=0; j<ELEMENT_DIM+1; j++)
         {
-            ///\todo #1157 This should only refer to local nodes and halo nodes
-            (*topology_file) << elem_iter->GetNodeGlobalIndex(j) <<"\t";
+            unsigned local_index = global_to_node_index_map[ elem_iter->GetNodeGlobalIndex(j) ];
+            (*topology_file) << local_index <<"\t";
         }
     }
     (*topology_file) << "\n";

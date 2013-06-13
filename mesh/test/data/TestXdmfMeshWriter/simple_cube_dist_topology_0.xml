@@ -1,0 +1,17 @@
+<Topology TopologyType="Tetrahedron" NumberOfElements="11">
+	<DataItem Format="XML" Dimensions="11 4">
+		5	8	7	1	
+		8	7	1	2	
+		8	7	2	3	
+		7	8	4	3	
+		0	2	3	8	
+		0	1	2	8	
+		0	5	1	8	
+		0	4	5	8	
+		6	8	0	3	
+		6	8	3	4	
+		6	8	4	0	
+	</DataItem>
+</Topology>
+<!-- Created by Chaste version 3.1.19153 (with uncommitted modifications) on Thu, 13 Jun 2013 11:32:39 +0000.  Chaste was built on Thu, 13 Jun 2013 10:27:51 +0000 by machine (uname) 'Linux userpc60.cs.ox.ac.uk 2.6.32-47-generic #109-Ubuntu SMP Tue May 7 02:02:22 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: SimpleSensitivity=18009; website=15353.
+-->
