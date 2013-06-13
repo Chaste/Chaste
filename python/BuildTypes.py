@@ -562,12 +562,12 @@ class GoogleProfile(GccDebug):
         self._cc_flags.append('-O3')
         # Array bounds checking is available in -O2 optimization and above
         # Tetgen code produces a couple of issues, but g++ sometimes gives false negatives.
-        self._cc_flags.append('-Wno-array-bounds')
-        self._link_flags.append('-lprofiler')
+        self._cc_flags.extend(['-Wno-array-bounds', '-fno-omit-frame-pointer'])
+        #self._link_flags.append('-lprofiler')
         self._test_packs = ['Profile']
         self.build_dir = 'google_profile'
         self.is_profile = True
- 
+    
     def ParseGraphFilename(self, filename):
         "Remove the string 'Runner.gif' from the end of a filename, thus returning test_suite name"
         return filename[:-10]
@@ -575,15 +575,17 @@ class GoogleProfile(GccDebug):
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         """Run the test with profiling on and analyse the results."""
         base = os.path.basename(exefile)
-        profile_file = '/tmp/' + base + '.prof'
+        profile_file = os.path.join(self.env['ENV']['CHASTE_TEST_OUTPUT'], base + '.prof')
         pprof_args = ' '.join(['--gif',
                                '--nodefraction=0.0001', '--edgefraction=0.0001',
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
+        preload_hack = '' #'LD_PRELOAD=/usr/local/lib/libprofiler.so '
         commands = ['export HOME="."',
-                    'LD_PRELOAD=/usr/lib/libprofiler.so CPUPROFILE=' + profile_file + ' ' + exefile + ' ' + exeflags,
+                    'export CPUPROFILE="%s"' % profile_file,
+                    preload_hack + exefile + ' ' + exeflags,
                     self.tools['pprof'] + ' ' + pprof_args,
-                    self.tools['rm'] + ' ' + profile_file]
+                    self.tools['rm'] + ' -f ' + profile_file]
         return '; '.join(commands)
     
     def SetNumProcesses(self, np):

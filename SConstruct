@@ -319,6 +319,7 @@ env.Replace(CPPPATH = cpppath)
 
 # Some state needed by our build system
 env['build'] = build
+build.env = env
 env['buildsig'] = build.GetSignature()
 env['CHASTE_COMPONENTS'] = components + ['projects']
 env['CHASTE_COMP_DEPS'] = comp_deps
