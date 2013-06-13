@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "RandomCellKiller.hpp"
+#include "PlaneBasedCellKiller.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -387,6 +388,9 @@ public:
         // Add cell killer
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.997877574));
         simulator.AddCellKiller(p_killer);
+
+//        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_cell_killer,(&node_based_cell_population, 5.0*unit_vector<double>(2,0), unit_vector<double>(2,1)));
+//        simulator.AddCellKiller(p_cell_killer);
 
         // Solve
         simulator.Solve();
