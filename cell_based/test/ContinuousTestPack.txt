@@ -16,7 +16,6 @@ mesh/TestCylindrical2dMesh.hpp
 mesh/TestCylindrical2dNodesOnlyMesh.hpp
 mesh/TestCylindricalHoneycombMeshGenerator.hpp
 mesh/TestHoneycombMeshGenerator.hpp
-mesh/TestNodesOnlyMesh.hpp
 mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
 mesh/TestPottsMeshWriter.hpp

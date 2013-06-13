@@ -8,6 +8,7 @@ TestMutableMesh.hpp
 TestMutableMeshRemesh.hpp
 TestNode.hpp
 TestNodeAttributes.hpp
+TestNodesOnlyMesh.hpp
 TestNonCachedTetrahedralMesh.hpp
 TestQuadraticMesh.hpp
 TestTetrahedralMesh.hpp
