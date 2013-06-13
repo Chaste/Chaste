@@ -35,9 +35,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
 #include <map>
+
+// Mandatory for using any feature of Xerces.
+#include <xercesc/util/PlatformUtils.hpp>
+// DOM (if you want SAX, then that's a different include)
+#include <xercesc/dom/DOM.hpp>
+// Required for outputing a Xerces DOMDocument
+// to a standard output stream (Also see: XMLFormatTarget)
+#include <xercesc/framework/StdOutFormatTarget.hpp>
+// Required for outputing a Xerces DOMDocument
+// to the file system (Also see: XMLFormatTarget)
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+
+
 #include "XdmfMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "Version.hpp"
+#include "XmlTools.hpp" // For Xerces and its macros
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::XdmfMeshWriter(const std::string& rDirectory,
@@ -268,6 +282,47 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 
     master_file->close();
 
+    // Define namespace symbols
+    XERCES_CPP_NAMESPACE_USE
+
+    // Initialize Xerces.
+    XMLPlatformUtils::Initialize();
+
+    // Pointer to our DOMImplementation.
+    DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(X("core"));
+
+    // Pointer to a DOMDocument.
+    DOMDocument * pDOMDocument = pDOMImplementation->createDocument(X("http://www.w3.org/2001/XInclude"), X("Xdmf"), 0);
+    DOMElement* pRootElement = pDOMDocument->getDocumentElement();
+    pRootElement->setAttribute(X("version"), X("2.0"));
+
+    // Create a Comment node, and then append this to the root element.
+    DOMComment* pDOMComment = pDOMDocument->createComment(X(ChasteBuildInfo::GetProvenanceString()));
+    pRootElement->appendChild(pDOMComment);
+
+
+    // Create an Element node, then fill in some attributes,
+    // and then append this to the root element.
+    DOMElement* pDataElement =  pDOMDocument->createElement(X("data"));
+    pDataElement->setAttribute(X("something"), X("blahblah"));
+    pRootElement->appendChild(pDataElement);
+
+
+
+
+    DOMWriter* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createDOMWriter();
+    pSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+
+    XMLFormatTarget* pTarget = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+"_fake.xdmf"));
+
+
+    // Write the serialized output to the target.
+    pSerializer->writeNode(pTarget, *pDOMDocument);
+
+    // Cleanup.
+    pDOMDocument->release();
+    XMLPlatformUtils::Terminate();
+    //delete pTarget;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
