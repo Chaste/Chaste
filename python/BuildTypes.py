@@ -585,7 +585,7 @@ class GoogleProfile(GccDebug):
                     'export CPUPROFILE="%s"' % profile_file,
                     preload_hack + exefile + ' ' + exeflags,
                     self.tools['pprof'] + ' ' + pprof_args,
-                    self.tools['rm'] + ' -f ' + profile_file]
+                    self.tools['rm'] + ' ' + profile_file]
         return '; '.join(commands)
     
     def SetNumProcesses(self, np):
