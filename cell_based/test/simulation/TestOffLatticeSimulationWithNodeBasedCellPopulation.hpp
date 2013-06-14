@@ -180,6 +180,9 @@ public:
         p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
         simulator.AddForce(p_linear_force);
 
+//        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_cell_killer,(&node_based_cell_population, 5.0*unit_vector<double>(2,0), unit_vector<double>(2,1)));
+//        simulator.AddCellKiller(p_cell_killer);
+
         simulator.Solve();
 
         // Check that the radii of all the cells are correct
@@ -388,9 +391,6 @@ public:
         // Add cell killer
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.997877574));
         simulator.AddCellKiller(p_killer);
-
-//        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_cell_killer,(&node_based_cell_population, 5.0*unit_vector<double>(2,0), unit_vector<double>(2,1)));
-//        simulator.AddCellKiller(p_cell_killer);
 
         // Solve
         simulator.Solve();
