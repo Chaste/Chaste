@@ -282,6 +282,8 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 
     master_file->close();
 
+/*
+ *
     // Define namespace symbols
     XERCES_CPP_NAMESPACE_USE
 
@@ -323,6 +325,8 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     pDOMDocument->release();
     XMLPlatformUtils::Terminate();
     //delete pTarget;
+ *
+ */
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
