@@ -266,6 +266,15 @@ public:
     unsigned GetNumRowsOfBoxes() const;
 
     /**
+     * A helper function to work out the optimal number of rows to be owned by this process, to balance the
+     * number of nodes.
+     *
+     * @param localDistribution a vector containing the number of nodes in each row/face of boxes in 2d/3d
+     * @return the updated number of rows, which will differ from current number by at most 2.
+     */
+    int LoadBalance(std::vector<int> localDistribution);
+
+    /**
      *  Set up the local boxes (ie itself and its nearest-neighbours) for each of the boxes.
      *  This method just sets up half of the local boxes (for example, in 1D, local boxes for box0 = {1}
      *  local boxes for box1 = {2} not {0,2}, and so on. Similar to 2d, 3d.

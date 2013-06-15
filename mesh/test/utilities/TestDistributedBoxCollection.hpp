@@ -2006,6 +2006,102 @@ public:
              delete p_box_collection;
          }
     }
+
+    void TestLoadBalanceFunction() throw (Exception)
+    {
+        // This test is designed for 3 process environment. Tests that an equal spread of load results
+        // in an equal spread of the domain size between processes.
+        if (PetscTools::GetNumProcs() == 3)
+        {
+            double cut_off_length = 1.0;
+
+            c_vector<double, 2> domain_size;
+            domain_size(0) = 0.0;
+            domain_size(1) = 9.0;
+
+            DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
+
+            std::vector<int> local_loads;
+
+            // First two processes have two rows of boxes, each with a load of 10.
+            if (PetscTools::GetMyRank() < 2)
+            {
+                local_loads.push_back(10);
+                local_loads.push_back(10);
+            }
+            // The top process has five rows of boxes, each with a load of 10.
+            if (PetscTools::GetMyRank() == 2)
+            {
+                local_loads.push_back(10);
+                local_loads.push_back(10);
+                local_loads.push_back(10);
+                local_loads.push_back(10);
+                local_loads.push_back(10);
+            }
+
+            /*
+             *  We expect the following number of rows to be allocated as we iterate the load-balance function, which re-assigns rows one at a time:
+             *
+             *  Iter    p0  p1  p2
+             *  0       2   2   5   // Initial condition
+             *  1       2   3   4
+             *  2       3   3   3   // In 'equilibrium'
+             */
+
+            int local_rows = box_collection.LoadBalance(local_loads);
+            if (PetscTools::AmMaster())
+            {
+                TS_ASSERT_EQUALS(local_rows, 2);
+            }
+            else if (PetscTools::AmTopMost())
+            {
+                TS_ASSERT_EQUALS(local_rows, 4);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(local_rows, 3);
+            }
+
+            // Update the load vector.
+            local_loads.clear();
+            local_loads.resize(local_rows, 10);
+
+            local_rows = box_collection.LoadBalance(local_loads);
+            TS_ASSERT_EQUALS(local_rows, 3);
+        }
+    }
+
+    /**
+     * Because of the nature of load-bal algorithm, if a domain size becomes smaller than 2 rows we
+     * can encounter problems of domain shrinking to zero size at the next load balance. This test
+     * makes sure that this cannot happen.
+     */
+    void TestLoadBalanceMaintainsMinimumLocalRegion() throw (Exception)
+    {
+        if (PetscTools::GetNumProcs() == 3)
+        {
+            double cut_off_length = 1.0;
+
+            c_vector<double, 2> domain_size;
+            domain_size(0) = 0.0;
+            domain_size(1) = 9.0;
+
+            DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
+
+            // Set up loads as:     1   1    |   1     100    |    1   1
+            std::vector<int> local_loads;
+
+            local_loads.resize(2,1);
+
+            if (PetscTools::GetMyRank() == 1)
+            {
+                local_loads[1] = 100;
+            }
+
+            int new_rows = box_collection.LoadBalance(local_loads);
+            TS_ASSERT(new_rows > 1);
+        }
+    }
 };
 
 #endif /*TESTBOXCOLLECTION_HPP_*/
