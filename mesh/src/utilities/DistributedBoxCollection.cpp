@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedBoxCollection.hpp"
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
-#include "Debug.hpp"
+
 template<unsigned DIM>
 DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
     : mBoxWidth(boxWidth),
@@ -391,9 +391,10 @@ unsigned DistributedBoxCollection<DIM>::GetNumRowsOfBoxes() const
 template<unsigned DIM>
 int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistribution)
 {
+    MPI_Status status;
+
     unsigned proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : PetscTools::GetMyRank() + 1;
     unsigned proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : PetscTools::GetMyRank() - 1;
-    MPI_Status status;
 
     // A variable that will return the new number of rows.
     int new_rows = localDistribution.size();
@@ -401,17 +402,18 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
     /**
      * Shift information on distribution of nodes to the right, so processes can manage their left/bottom/back boundary (1d/2d/3d)
      */
-    unsigned left_rows = 0; // The number of rows on the left process.
-    std::vector<int> left_distribution; // The distribution nodes on the left process.
+    unsigned rows_on_left_process = 0;
+    std::vector<int> node_distr_on_left_process;
 
-    unsigned local_rows = localDistribution.size();
-    MPI_Send(&local_rows, 1, MPI_UNSIGNED, proc_right, 123, PETSC_COMM_WORLD);
-    MPI_Recv(&left_rows, 1, MPI_UNSIGNED, proc_left, 123, PETSC_COMM_WORLD, &status);
+    unsigned num_local_rows = localDistribution.size();
 
-    left_distribution.resize(left_rows);
+    MPI_Send(&num_local_rows, 1, MPI_UNSIGNED, proc_right, 123, PETSC_COMM_WORLD);
+    MPI_Recv(&rows_on_left_process, 1, MPI_UNSIGNED, proc_left, 123, PETSC_COMM_WORLD, &status);
 
-    MPI_Send(&localDistribution[0], local_rows, MPI_INT, proc_right, 123, PETSC_COMM_WORLD);
-    MPI_Recv(&left_distribution[0], left_rows, MPI_INT, proc_left, 123, PETSC_COMM_WORLD, &status);
+    node_distr_on_left_process.resize(rows_on_left_process);
+
+    MPI_Send(&localDistribution[0], num_local_rows, MPI_INT, proc_right, 123, PETSC_COMM_WORLD);
+    MPI_Recv(&node_distr_on_left_process[0], rows_on_left_process, MPI_INT, proc_left, 123, PETSC_COMM_WORLD, &status);
 
     /**
      * Calculate change in balance of loads by shifting the left/bottom boundary in either direction
@@ -421,20 +423,20 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
     {
         local_load += localDistribution[i];
     }
-    int left_load = 0;
-    for (unsigned i=0; i<left_distribution.size(); i++)
+    int load_on_left_proc = 0;
+    for (unsigned i=0; i<node_distr_on_left_process.size(); i++)
     {
-        left_load += left_distribution[i];
+        load_on_left_proc += node_distr_on_left_process[i];
     }
 
-    // Square difference in load after a shift minus square difference in load before a shift.
     if (!PetscTools::AmMaster())
     {
-        int delta_left = pow( ( (local_load + left_distribution[left_distribution.size() - 1]) - (left_load - left_distribution[left_distribution.size() - 1]) ), 2)- pow((local_load - left_load), 2);
-        int delta_right= pow(( (local_load - localDistribution[0]) - (left_load + localDistribution[0])), 2)- pow((local_load - left_load), 2);
+        // Calculate (Difference in load with a shift) - (Difference in current loads) for a move left and right of the boundary
+        int delta_left = pow( ( (local_load + node_distr_on_left_process[node_distr_on_left_process.size() - 1]) - (load_on_left_proc - node_distr_on_left_process[node_distr_on_left_process.size() - 1]) ), 2)- pow((local_load - load_on_left_proc), 2);
+        int delta_right= pow(( (local_load - localDistribution[0]) - (load_on_left_proc + localDistribution[0])), 2)- pow((local_load - load_on_left_proc), 2);
 
-        // Work out the local change base on the above deltas. If a delta is negative we should accept that change.
-        int local_change = (int)(!(delta_left > 0) && (left_distribution.size() > 1)) - (int)(!(delta_right > 0) && (localDistribution.size() > 2));
+        // If a delta is negative we should accept that change. Work out the local change base on the above deltas.
+        int local_change = (int)(!(delta_left > 0) && (node_distr_on_left_process.size() > 1)) - (int)(!(delta_right > 0) && (localDistribution.size() > 2));
 
         // Update the number of local rows.
         new_rows += local_change;
@@ -447,6 +449,7 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
     int remote_change = 0;
     MPI_Recv(&remote_change, 1, MPI_INT, proc_right, 123, PETSC_COMM_WORLD, &status);
 
+    // Update based on change or right/top boundary
     new_rows -= remote_change;
 
     return new_rows;
