@@ -365,6 +365,12 @@ public:
      */
     void AddPairsFromBox(unsigned boxIndex, std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs, std::map<unsigned, std::set<unsigned> >& rNodeNeighbours);
 
+    /**
+     * Calculate how many cells lie in each strip / face of boxes, used in load balancing
+     *
+     * @return A vector containing the number of nodes in each of the strips of boxes.
+     */
+    std::vector<int> CalculateNumberOfNodesInEachStrip();
 };
 
 #include "SerializationExportWrapper.hpp"

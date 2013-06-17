@@ -602,6 +602,18 @@ void NodesOnlyMesh<SPACE_DIM>::ResizeBoxCollection()
 }
 
 template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::LoadBalanceMesh()
+{
+    std::vector<int> local_node_distribution = mpBoxCollection->CalculateNumberOfNodesInEachStrip();
+
+    unsigned new_rows = mpBoxCollection->LoadBalance(local_node_distribution);
+
+    c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
+
+    SetUpBoxCollection(mMaximumInteractionDistance, current_domain_size, new_rows);
+}
+
+template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_DIM, SPACE_DIM>& rMeshReader)
 {
     TetrahedralMesh<SPACE_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);

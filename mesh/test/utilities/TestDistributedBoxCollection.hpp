@@ -2102,6 +2102,40 @@ public:
             TS_ASSERT(new_rows > 1);
         }
     }
+
+    void TestGetDistributionOfNodes() throw (Exception)
+    {
+        double cut_off_length = 1.0;
+
+        c_vector<double, 2> domain_size;
+        domain_size(0) = 0.0;
+        domain_size(1) = 9.0;
+
+        DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
+
+        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        {
+            if (box_collection.GetBoxOwnership(i))
+            {
+                // Add the same number of nodes as the box index.
+                for (unsigned k=0; k<i; k++)
+                {
+                    box_collection.rGetBox(i).AddNode(new Node<1>(i, false));
+                }
+            }
+        }
+
+        std::vector<int> local_distribution = box_collection.CalculateNumberOfNodesInEachStrip();
+        int counter = 0;
+        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        {
+            if (box_collection.GetBoxOwnership(i))
+            {
+                TS_ASSERT_EQUALS(local_distribution[counter], (int)i);
+                counter++;
+            }
+        }
+    }
 };
 
 #endif /*TESTBOXCOLLECTION_HPP_*/

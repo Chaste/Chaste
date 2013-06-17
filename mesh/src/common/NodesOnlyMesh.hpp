@@ -400,6 +400,12 @@ public:
     void SetMinimumNodeDomainBoundarySeparation(double separation);
 
     /**
+     * Re-allocate the underlaying BoxCollection rows based on the load-balance algorithm implemented
+     * in the box collection.
+     */
+    void LoadBalanceMesh();
+
+    /**
      * Overridden ConstructFromMeshReader to correctly assign global node indices on load.
      *
      * @param rMeshReader the mesh reader for input.

@@ -393,8 +393,8 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
 {
     MPI_Status status;
 
-    int proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() + 1;
-    int proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() - 1;
+    unsigned proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : PetscTools::GetMyRank() + 1;
+    unsigned proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : PetscTools::GetMyRank() - 1;
 
     // A variable that will return the new number of rows.
     int new_rows = localDistribution.size();
@@ -1250,6 +1250,24 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex, std::vect
             }
         }
     }
+}
+
+template<unsigned DIM>
+std::vector<int> DistributedBoxCollection<DIM>::CalculateNumberOfNodesInEachStrip()
+{
+    std::vector<int> cell_numbers(mpDistributedBoxStackFactory->GetHigh() - mpDistributedBoxStackFactory->GetLow(), 0);
+
+    for (std::map<unsigned, unsigned>::iterator iter = mBoxesMapping.begin();
+            iter != mBoxesMapping.end();
+            ++iter)
+    {
+        c_vector<unsigned, DIM> coords = CalculateCoordinateIndices(iter->first);
+        unsigned location_in_vector = coords[DIM-1]-mpDistributedBoxStackFactory->GetLow();
+
+        cell_numbers[location_in_vector] += mBoxes[iter->second].rGetNodesContained().size();
+    }
+
+    return cell_numbers;
 }
 
 /////////////////////////////////////////////////////////////////////////////
