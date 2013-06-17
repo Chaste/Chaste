@@ -46,12 +46,12 @@ namespace std { using ::isnan; }
 #endif
 
 #ifndef NAN
-#include <cmath>
+#include <limits>
 /**
  * A NAN macro for compilers which don't have this GNU extension.
  * The following might generate a compiler warning, but that's better than an error!
  */
-#define NAN sqrt(-1.0)
+#define NAN std::numeric_limits<double>::quiet_NaN()
 #endif
 
 #endif /*ISNAN_HPP_*/

@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <sstream>
 #include <map>
+#include <limits>
 
 #include "BoundaryElement.hpp"
 #include "Element.hpp"
@@ -414,7 +415,7 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithI
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    double max_min_weight = -INFINITY;
+    double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;
     for (unsigned i=0; i<this->mElements.size(); i++)
     {

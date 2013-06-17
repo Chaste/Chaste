@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractTetrahedralMesh.hpp"
 
+#include <limits>
+
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
@@ -943,7 +945,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
 {
     assert(testElements.size() > 0);
 
-    double max_min_weight = -INFINITY;
+    double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;
     for (std::set<unsigned>::iterator iter = testElements.begin();
         iter != testElements.end();
