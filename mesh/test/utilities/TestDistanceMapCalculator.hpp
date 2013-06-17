@@ -88,7 +88,7 @@ public:
                 TS_ASSERT_DELTA(distances_serial[index], node(0), 1e-12);
                 TS_ASSERT_DELTA(distances_parallel[index], node(0), 1e-12);
             }
-            catch (Exception &e)
+            catch (Exception&)
             {
             }
         }
@@ -127,7 +127,7 @@ public:
             TS_ASSERT_DELTA( parallel_far_corner[1], 0.25, 1e-11);
             TS_ASSERT_DELTA( parallel_far_corner[2], 0.25, 1e-11);
         }
-        catch (Exception &e)
+        catch (Exception&)
         {
         }
 
@@ -280,7 +280,7 @@ public:
                     map_left.push_back(index);
                 }
             }
-            catch (Exception &e)
+            catch (Exception&)
             {
             }
         }
@@ -297,7 +297,7 @@ public:
                 c_vector<double, 3> node = parallel_mesh.GetNode(index)->rGetLocation();
                 TS_ASSERT_DELTA(parallel_distances[index], node[0]+0.25, 1e-15);
             }
-            catch (Exception &e)
+            catch (Exception&)
             {
                 //If we don't know the geometry of this node, then we still know the distance, which ought to be in [0, 0.5 ] for left and  right faces at extremes
                 TS_ASSERT_DELTA(parallel_distances[index], 0.25, 0.2500001);

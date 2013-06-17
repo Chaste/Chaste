@@ -1669,7 +1669,7 @@ double AbstractNonlinearElasticitySolver<DIM>::ComputeResidualAndGetNorm(bool al
             // Try to assemble the residual using this current solution
             AssembleSystem(true, false);
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             // If fail (because e.g. ODEs fail to solve, or strains are too large for material law), return infinity
             return DBL_MAX;

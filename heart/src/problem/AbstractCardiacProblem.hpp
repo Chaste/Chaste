@@ -169,8 +169,6 @@ private:
         if (has_solution)
         {
             /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods for Mono and BidomainProblem
-            std::string filename = ArchiveLocationInfo::GetArchiveDirectory() + "AbstractCardiacProblem_mSolution.vec";
-
             Hdf5DataWriter writer(*mpMesh->GetDistributedVectorFactory(), ArchiveLocationInfo::GetArchiveRelativePath(), "AbstractCardiacProblem_mSolution", false);
             writer.DefineFixedDimension(mpMesh->GetDistributedVectorFactory()->GetProblemSize());
 

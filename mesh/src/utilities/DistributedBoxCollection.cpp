@@ -393,8 +393,8 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
 {
     MPI_Status status;
 
-    unsigned proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : PetscTools::GetMyRank() + 1;
-    unsigned proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : PetscTools::GetMyRank() - 1;
+    int proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() + 1;
+    int proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() - 1;
 
     // A variable that will return the new number of rows.
     int new_rows = localDistribution.size();
@@ -432,9 +432,13 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
     if (!PetscTools::AmMaster())
     {
         // Calculate (Difference in load with a shift) - (Difference in current loads) for a move left and right of the boundary
-        int delta_left = pow( ( (local_load + node_distr_on_left_process[node_distr_on_left_process.size() - 1]) - (load_on_left_proc - node_distr_on_left_process[node_distr_on_left_process.size() - 1]) ), 2)- pow((local_load - load_on_left_proc), 2);
-        int delta_right= pow(( (local_load - localDistribution[0]) - (load_on_left_proc + localDistribution[0])), 2)- pow((local_load - load_on_left_proc), 2);
+        // This code uses integer arithmetic in order to avoid the rounding errors associated with doubles
+        int local_to_left_sq = (local_load - load_on_left_proc) * (local_load - load_on_left_proc);
+        int delta_left =  ( (local_load + node_distr_on_left_process[node_distr_on_left_process.size() - 1]) - (load_on_left_proc - node_distr_on_left_process[node_distr_on_left_process.size() - 1]) );
+        delta_left = delta_left*delta_left - local_to_left_sq;
 
+        int delta_right= ( (local_load - localDistribution[0]) - (load_on_left_proc + localDistribution[0]));
+        delta_right = delta_right*delta_right - local_to_left_sq;
         // If a delta is negative we should accept that change. Work out the local change base on the above deltas.
         int local_change = (int)(!(delta_left > 0) && (node_distr_on_left_process.size() > 1)) - (int)(!(delta_right > 0) && (localDistribution.size() > 2));
 

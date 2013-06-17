@@ -463,7 +463,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
             {
                 p_node = pMesh->GetNodeFromPrePermutationIndex(node_index);
             }
-            catch (Exception& e)
+            catch (Exception&)
             {
                 // It's a distributed mesh and we don't own this node - skip to the next BC
                 maybe_unused_bcs.insert(it->second);
@@ -490,7 +490,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
             {
                 p_boundary_element = pMesh->GetBoundaryElement(boundary_element_index);
             }
-            catch (Exception& e)
+            catch (Exception&)
             {
                 // It's a distributed mesh and we don't own this element - skip to the next BC
                 maybe_unused_bcs.insert(it->second);

@@ -306,7 +306,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
 
         mStatisticsCounters[0]++;
     }
-    catch(Exception& ex_not_in_box)
+    catch(Exception&) //not_in_box
     {
         // Now try all elements, trying the elements contained in the boxes local to this element first
         test_element_indices.clear();
@@ -319,7 +319,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
             weight = mrFineMesh.GetElement(elem_index)->CalculateInterpolationWeights(rPoint);
             mStatisticsCounters[0]++;
         }
-        catch(Exception& ex_not_in_local_boxes)
+        catch(Exception&) //not_in_local_boxes
         {
             if (safeMode)
             {
@@ -331,7 +331,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
                     mStatisticsCounters[0]++;
 
                 }
-                catch (Exception& ex_not_in_mesh)
+                catch (Exception&) // not_in_mesh
                 {
                     // The point is not in ANY element, so store the nearest element and corresponding weights
                     elem_index = mrFineMesh.GetNearestElementIndexFromTestElements(rPoint,test_element_indices);
@@ -471,7 +471,7 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
 
         mStatisticsCounters[0]++;
     }
-    catch(Exception& ex_not_in_box)
+    catch(Exception&) // not_in_box
     {
         // Now try all elements, trying the elements contained in the boxes local to this element first
         test_element_indices.clear();
@@ -482,7 +482,7 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
             elem_index = mrCoarseMesh.GetContainingElementIndex(rPoint, false, test_element_indices, true);
             mStatisticsCounters[0]++;
         }
-        catch(Exception& ex_not_in_local_boxes)
+        catch(Exception&) // not_in_local_boxes
         {
             if (safeMode)
             {
@@ -493,7 +493,7 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
 
                     mStatisticsCounters[0]++;
                 }
-                catch (Exception& ex_not_in_mesh)
+                catch (Exception&) // not_in_mesh
                 {
                     // The point is not in ANY element, so store the nearest element and corresponding weights
                     elem_index = mrCoarseMesh.GetNearestElementIndexFromTestElements(rPoint,test_element_indices);

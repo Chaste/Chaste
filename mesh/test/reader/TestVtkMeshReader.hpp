@@ -171,7 +171,7 @@ public:
             TS_ASSERT_EQUALS(next_element_data.AttributeValue, 0u);
         }
 
-        TS_ASSERT_THROWS_THIS( ElementData data = mesh_reader.GetNextElementData(),
+        TS_ASSERT_THROWS_THIS( mesh_reader.GetNextElementData(),
                                "Trying to read data for an element that doesn't exist" );
 
         // Test on a .vtu file where the elements are triangles, rather than tetrahedra
@@ -405,7 +405,7 @@ public:
             TS_ASSERT_DELTA(node->GetPoint()[1], 0.3593, 1e-4);
             TS_ASSERT_DELTA(node->GetPoint()[2], 0.9925, 1e-4);
         }
-        catch (Exception& e)
+        catch (Exception&)
         {
             // Don't own this node
         }
@@ -417,7 +417,7 @@ public:
             TS_ASSERT_DELTA(node->GetPoint()[1], 0.6678, 1e-4);
             TS_ASSERT_DELTA(node->GetPoint()[2], 0.7250, 1e-4);
         }
-        catch (Exception& e)
+        catch (Exception&)
         {
             // Don't own this node
         }

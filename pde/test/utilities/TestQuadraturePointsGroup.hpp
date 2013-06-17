@@ -142,7 +142,7 @@ public:
                 TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
             }
         }
-        catch (Exception& e)
+        catch (Exception&)
         {
             //If not, then we know nothing about these quad points
             for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
@@ -163,7 +163,7 @@ public:
                 TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
             }
         }
-        catch (Exception& e)
+        catch (Exception&)
         {
             //If not, then we know nothing about these quad points
             for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
