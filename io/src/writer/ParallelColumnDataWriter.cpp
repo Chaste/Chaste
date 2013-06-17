@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ParallelColumnDataWriter::ParallelColumnDataWriter(const std::string& rDirectory,
                                                    const std::string& rBaseName,
                                                    bool cleanDirectory)
-    : ColumnDataWriter::ColumnDataWriter(rDirectory, rBaseName, cleanDirectory),
+    : ColumnDataWriter(rDirectory, rBaseName, cleanDirectory),
       mConcentrated(NULL)
 {
     int num_procs;
