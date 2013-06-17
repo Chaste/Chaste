@@ -265,8 +265,6 @@ private:
         {
             /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods fo Mono and BidomainProblem
             /// \todo #1317 is there a reason we can't use PETSc's load/save vector functionality?
-            std::string filename = ArchiveLocationInfo::GetArchiveDirectory() + "AbstractCardiacProblem_mSolution.vec";
-
             mSolution = mpMesh->GetDistributedVectorFactory()->CreateVec(PROBLEM_DIM);
             DistributedVector mSolution_distri = mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(mSolution);
 

@@ -254,7 +254,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
             upstroke_times = mpCalculator->CalculateUpstrokeTimes(node_index, threshold);
             assert(upstroke_times.size() != 0);
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             upstroke_times.push_back(0);
             assert(upstroke_times.size() == 1);
@@ -280,7 +280,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteMaxUpstrokeVelocityMap(d
             upstroke_velocities = mpCalculator->CalculateAllMaximumUpstrokeVelocities(node_index, threshold);
             assert(upstroke_velocities.size() != 0);
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             upstroke_velocities.push_back(0);
             assert(upstroke_velocities.size() ==1);
@@ -306,7 +306,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteConductionVelocityMap(un
             conduction_velocities = mpCalculator->CalculateAllConductionVelocities(originNode, dest_node, distancesFromOriginNode[dest_node]);
             assert(conduction_velocities.size() != 0);
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             conduction_velocities.push_back(0);
             assert(conduction_velocities.size() == 1);
@@ -337,7 +337,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
             upstroke_velocities = mpCalculator->CalculateAllMaximumUpstrokeVelocities(node_index, threshold);
             assert(upstroke_velocities.size() != 0);
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             upstroke_velocities.push_back(0);
             assert(upstroke_velocities.size() == 1);

@@ -264,7 +264,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
                 pCell->SetParameter("ScaleFactorGkr", mScaleFactorGkr[ht_index]);
                 pCell->SetParameter("ScaleFactorIto", mScaleFactorIto[ht_index]);
             }
-            catch (const Exception& e)
+            catch (const Exception&)
             {
                 // Just ignore missing parameter errors in this case
             }

@@ -555,7 +555,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 UpdatePurkinjeCaches(index.Global, index.Local, nextTime);
             }
         }
-        catch (Exception &e)
+        catch (Exception&)
         {
             ///\todo #2017 This code will be needed in the future, not being covered now.
             /// Add a test which covers this, e.g.  by doing a simulation with a bad stimulus for one of the

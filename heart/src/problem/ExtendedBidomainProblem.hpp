@@ -136,8 +136,6 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
         archive & has_solution;
         if (has_solution)
         {
-            std::string filename = ArchiveLocationInfo::GetArchiveDirectory() + "AbstractCardiacProblem_mSolution.vec";
-
             Hdf5DataWriter writer(*this->mpMesh->GetDistributedVectorFactory(), ArchiveLocationInfo::GetArchiveRelativePath(), "AbstractCardiacProblem_mSolution", false);
             writer.DefineFixedDimension(this->mpMesh->GetDistributedVectorFactory()->GetProblemSize());
             writer.DefineUnlimitedDimension("Time", "msec", 1);
@@ -231,8 +229,6 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
 
         if (has_solution)
         {
-            std::string filename = ArchiveLocationInfo::GetArchiveDirectory() + "AbstractCardiacProblem_mSolution.vec";
-
             this->mSolution = this->mpMesh->GetDistributedVectorFactory()->CreateVec(3);
             DistributedVector mSolution_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(this->mSolution);
 

@@ -346,8 +346,6 @@ public:
         p_Z_file->close();
 
 
-        std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-
         //////////////////////////////////////////////////////////////////
         // Solve with no fibres read.
         //////////////////////////////////////////////////////////////////

@@ -71,7 +71,7 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
         output_flux = -input_flux;
 
     }
-    catch (Exception& e)
+    catch (Exception&)
     {
         // magnitude of second electrode scaled so that left_area*magnitude_left = -right_area*magnitude_right
         input_flux = magnitude;

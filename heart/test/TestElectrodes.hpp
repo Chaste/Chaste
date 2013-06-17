@@ -181,12 +181,12 @@ public:
                 index =  mesh.rGetNodePermutation()[120];
             }
 
-            // Move the node slightlty to the left so it's not considered to be located at the edge by
+            // Move the node slightly to the left so it's not considered to be located at the edge by
             // the Electrodes constructor. Node might be halo as well...
             c_vector<double, 2>& corner_node_location = mesh.GetNode(index)->rGetModifiableLocation();
             corner_node_location[0] -= 0.5;
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             // Don't do anything if you don't own (or halo-own) the node
         }

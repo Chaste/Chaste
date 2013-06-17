@@ -118,7 +118,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
         p_contraction_model->RunDoNotUpdate(this->mCurrentTime,this->mNextTime,this->mOdeTimestep);
         rActiveTension = p_contraction_model->GetNextActiveTension();
     }
-    catch (Exception& e)
+    catch (Exception&)
     {
         #define COVERAGE_IGNORE
         // if this failed during assembling the Jacobian this is a fatal error.

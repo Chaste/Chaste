@@ -138,7 +138,7 @@ public:
         {
             mesh.GetElement(0)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
-        catch(Exception& e)
+        catch(Exception&)
         {
             // I don't own element 0
         }
