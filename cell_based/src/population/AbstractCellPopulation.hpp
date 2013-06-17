@@ -777,7 +777,7 @@ public:
          * @param rOther iterator with which comparison is made
          * @return not-equal
          */
-        inline bool operator!=(const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther);
+        inline bool operator!=(const typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -867,7 +867,7 @@ CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator->()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator!=(const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther)
+bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator::operator!=(const typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator& rOther)
 {
     return mCellIter != rOther.mCellIter;
 }

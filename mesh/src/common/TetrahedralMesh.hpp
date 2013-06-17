@@ -361,7 +361,7 @@ public:
          *
          * @param rOther edge iterator with which comparison is made
          */
-        bool operator!=(const TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther);
+        bool operator!=(const typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther);
 
         /**
          * Prefix increment operator.

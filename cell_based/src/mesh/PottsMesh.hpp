@@ -348,7 +348,7 @@ public:
          * @param rOther iterator with which comparison is made
          * @return not-equal
          */
-        inline bool operator!=(const PottsMesh<DIM>::PottsElementIterator& rOther);
+        inline bool operator!=(const typename PottsMesh<DIM>::PottsElementIterator& rOther);
 
         /**
          * Prefix increment operator.
@@ -426,7 +426,7 @@ PottsElement<DIM>* PottsMesh<DIM>::PottsElementIterator::operator->()
 }
 
 template<unsigned DIM>
-bool PottsMesh<DIM>::PottsElementIterator::operator!=(const PottsMesh<DIM>::PottsElementIterator& rOther)
+bool PottsMesh<DIM>::PottsElementIterator::operator!=(const typename PottsMesh<DIM>::PottsElementIterator& rOther)
 {
     return mElementIter != rOther.mElementIter;
 }

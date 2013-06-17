@@ -464,7 +464,7 @@ public:
          * @param rOther SpringIterator with which comparison is made
          * @return not-equal
          */
-        bool operator!=(const MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& rOther);
+        bool operator!=(const typename MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SpringIterator& rOther);
 
         /**
          * Prefix increment operator.

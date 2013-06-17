@@ -803,7 +803,7 @@ CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator::GetCellB
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator::operator!=(const MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator& rOther)
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator::operator!=(const typename MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator& rOther)
 {
     return (mEdgeIter != rOther.mEdgeIter);
 }

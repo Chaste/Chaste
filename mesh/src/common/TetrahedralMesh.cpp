@@ -631,7 +631,7 @@ Node<SPACE_DIM>* TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeB
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::operator!=(const TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther)
+bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::operator!=(const typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther)
 {
     return (mElemIndex != rOther.mElemIndex ||
             mNodeALocalIndex != rOther.mNodeALocalIndex ||
