@@ -130,7 +130,7 @@ void AbstractOneStepIvpOdeSolver::InternalSolve(AbstractOdeSystem* pOdeSystem,
     assert(!mStoppingEventOccurred);
     while ( !stepper.IsTimeAtEnd() && !mStoppingEventOccurred )
     {
-        curr_is_curr = not curr_is_curr;
+        curr_is_curr = !curr_is_curr;
         // Function that calls the appropriate one-step solver
         CalculateNextYValue(pOdeSystem,
                             stepper.GetNextTimeStep(),
