@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCardiacTissue.hpp"
 
+#include <boost/scoped_array.hpp>
+
 #include "DistributedVector.hpp"
 #include "AxisymmetricConductivityTensors.hpp"
 #include "OrthotropicConductivityTensors.hpp"
@@ -591,7 +593,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 send_size += mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()]->GetNumberOfStateVariables();
             }
 
-            double send_data[send_size];
+            boost::scoped_array<double> send_data(new double[send_size]);
 
             unsigned send_index = 0;
             for (unsigned cell = 0; cell < number_of_cells_to_send; cell++)
@@ -613,15 +615,15 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 receive_size += mHaloCellsDistributed[halo_cell_index]->GetNumberOfStateVariables();
             }
 
-            double receive_data[receive_size];
+            boost::scoped_array<double> receive_data(new double[receive_size]);
 
             // Send and receive
             int ret;
             MPI_Status status;
-            ret = MPI_Sendrecv(send_data, send_size,
+            ret = MPI_Sendrecv(send_data.get(), send_size,
                                MPI_DOUBLE,
                                send_to, 0,
-                               receive_data,  receive_size,
+                               receive_data.get(), receive_size,
                                MPI_DOUBLE,
                                receive_from, 0,
                                PETSC_COMM_WORLD, &status);

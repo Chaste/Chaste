@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MixedDimensionMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 
+#include <boost/scoped_array.hpp>
+
 #ifdef CHASTE_VTK
 #include "vtkQuadraticTetra.h"
 #include "vtkQuadraticTriangle.h"
@@ -368,9 +370,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
             unsigned number_of_nodes_to_send    = mNodesToSendPerProcess[send_to].size();
             unsigned number_of_nodes_to_receive = mNodesToReceivePerProcess[receive_from].size();
 
-            //??if ( number_of_nodes_to_send > 0 )
-            double send_data[number_of_nodes_to_send];
-            double receive_data[number_of_nodes_to_receive];
+            boost::scoped_array<double> send_data(new double[number_of_nodes_to_send]);
+            boost::scoped_array<double> receive_data(new double[number_of_nodes_to_receive]);
             // Pack
             for (unsigned node = 0; node < number_of_nodes_to_send; node++)
             {
@@ -383,10 +384,10 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 // Send
                 int ret;
                 MPI_Status status;
-                ret = MPI_Sendrecv(send_data, number_of_nodes_to_send,
+                ret = MPI_Sendrecv(send_data.get(), number_of_nodes_to_send,
                                    MPI_DOUBLE,
                                    send_to, 0,
-                                   receive_data,  number_of_nodes_to_receive,
+                                   receive_data.get(),  number_of_nodes_to_receive,
                                    MPI_DOUBLE,
                                    receive_from, 0,
                                    PETSC_COMM_WORLD, &status);
@@ -442,8 +443,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
             unsigned number_of_nodes_to_send    = mNodesToSendPerProcess[send_to].size();
             unsigned number_of_nodes_to_receive = mNodesToReceivePerProcess[receive_from].size();
 
-            double send_data[number_of_nodes_to_send * SPACE_DIM];
-            double receive_data[number_of_nodes_to_receive * SPACE_DIM];
+            boost::scoped_array<double> send_data(new double[number_of_nodes_to_send * SPACE_DIM]);
+            boost::scoped_array<double> receive_data(new double[number_of_nodes_to_receive * SPACE_DIM]);
 
             for (unsigned node = 0; node < number_of_nodes_to_send; node++)
             {
@@ -458,10 +459,10 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 
                 int ret;
                 MPI_Status status;
-                ret = MPI_Sendrecv(send_data, number_of_nodes_to_send * SPACE_DIM,
+                ret = MPI_Sendrecv(send_data.get(), number_of_nodes_to_send * SPACE_DIM,
                                    MPI_DOUBLE,
                                    send_to, 0,
-                                   receive_data,  number_of_nodes_to_receive * SPACE_DIM,
+                                   receive_data.get(),  number_of_nodes_to_receive * SPACE_DIM,
                                    MPI_DOUBLE,
                                    receive_from, 0,
                                    PETSC_COMM_WORLD, &status);

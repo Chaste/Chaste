@@ -56,7 +56,6 @@ class BuildType(object):
         self.build_type = buildType
         self._compiler_type = 'unknown'
         self._cc_flags = ['-Wall', '-Werror']
-        self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter'])
         self._link_flags = []
         self.rdynamic_link_flag = '-rdynamic'
         self._include_flag = ['-isystem']
@@ -377,6 +376,7 @@ class Gcc(BuildType):
     def __init__(self, *args, **kwargs):
         super(Gcc, self).__init__(*args, **kwargs)
         self._compiler_type = 'gcc'
+        self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
 
 class GccDebug(Gcc):
     """
@@ -393,7 +393,7 @@ class Ansi(GccDebug):
     """
     def __init__(self, *args, **kwargs):
         super(Ansi, self).__init__(*args, **kwargs)
-        self._cc_flags.extend(['-ansi', '-pedantic'])
+        self._cc_flags.extend(['-ansi', '-pedantic', '-Wno-long-long'])
         self.build_dir = 'ansi'
 
 class Coverage(GccDebug):

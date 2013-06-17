@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsMeshGenerator.hpp"
 
+#include <boost/scoped_array.hpp>
+
 template<unsigned DIM>
 PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
                                             unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
@@ -57,7 +59,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     unsigned num_nodes = numNodesAcross*numNodesUp*numNodesDeep;
 
     unsigned next_node_index = 0;
-    unsigned node_indices[elementWidth*elementHeight*elementDepth];
+    boost::scoped_array<unsigned> node_indices(new unsigned[elementWidth*elementHeight*elementDepth]);
     unsigned element_index;
 
     unsigned index_offset = 0;

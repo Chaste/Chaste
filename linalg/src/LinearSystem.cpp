@@ -34,15 +34,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "LinearSystem.hpp"
-#include "PetscException.hpp"
+
 #include <iostream>
+#include <cassert>
+#include <algorithm>
+#include <boost/scoped_array.hpp>
+
+#include "PetscException.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
-#include <cassert>
 #include "HeartEventHandler.hpp"
 #include "Timer.hpp"
 #include "Warnings.hpp"
-#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -427,11 +430,11 @@ void LinearSystem::SetNullBasis(Vec nullBasis[], unsigned numberOfBases)
     {
         // The strategy is to check the (i-1)-th vector against vectors from i to n with VecMDot. This should be the most efficient way of doing it.
         unsigned num_vectors_ahead = numberOfBases-vec_index;
-        PetscScalar dot_products[num_vectors_ahead];
+        boost::scoped_array<PetscScalar> dot_products(new PetscScalar[num_vectors_ahead]);
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-        VecMDot(num_vectors_ahead, nullBasis[vec_index-1], &nullBasis[vec_index], dot_products);
+        VecMDot(num_vectors_ahead, nullBasis[vec_index-1], &nullBasis[vec_index], dot_products.get());
 #else
-        VecMDot(nullBasis[vec_index-1], num_vectors_ahead, &nullBasis[vec_index], dot_products);
+        VecMDot(nullBasis[vec_index-1], num_vectors_ahead, &nullBasis[vec_index], dot_products.get());
 #endif
         for (unsigned index=0; index<num_vectors_ahead; index++)
         {

@@ -124,7 +124,6 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
     if (mpMesh)
     {
         std::vector<double> coords(SPACE_DIM);
-        double raw_coords[SPACE_DIM];
 
         //Iterate over the locally-owned nodes
         if ( (*(mpIters->pNodeIter)) != mpMesh->GetNodeIteratorEnd())
@@ -150,7 +149,8 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         MPI_Status status;
         status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
         // do receive, convert to std::vector on master
-        MPI_Recv(raw_coords, SPACE_DIM, MPI_DOUBLE, MPI_ANY_SOURCE, mNodeCounterForParallelMesh, PETSC_COMM_WORLD, &status);
+        boost::scoped_array<double> raw_coords(new double[SPACE_DIM]);
+        MPI_Recv(raw_coords.get(), SPACE_DIM, MPI_DOUBLE, MPI_ANY_SOURCE, mNodeCounterForParallelMesh, PETSC_COMM_WORLD, &status);
         assert(status.MPI_ERROR == MPI_SUCCESS);
         for (unsigned j=0; j<coords.size(); j++)
         {
@@ -540,7 +540,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
         {
 //            PetscTools::Barrier("DodgyBarrierBeforeNODE");
             MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
-            double raw_coords[SPACE_DIM];
+            boost::scoped_array<double> raw_coords(new double[SPACE_DIM]);
             // Slaves concentrate the Nodes
             typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
             for (NodeIterType it = mpMesh->GetNodeIteratorBegin(); it != mpMesh->GetNodeIteratorEnd(); ++it)
@@ -549,25 +549,25 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                 {
                     raw_coords[j] = it->GetPoint()[j];
                 }
-                MPI_Ssend(raw_coords, SPACE_DIM, MPI_DOUBLE, 0, it->GetIndex(), PETSC_COMM_WORLD);//Nodes sent with positive tags
+                MPI_Ssend(raw_coords.get(), SPACE_DIM, MPI_DOUBLE, 0, it->GetIndex(), PETSC_COMM_WORLD);//Nodes sent with positive tags
             }
 //            PetscTools::Barrier("DodgyBarrierAfterNODE");
             MeshEventHandler::EndEvent(MeshEventHandler::NODE);
 
             MeshEventHandler::BeginEvent(MeshEventHandler::ELE);
             // Slaves concentrate the Elements for which they are owners
-            unsigned raw_indices[mNodesPerElement]; // Assuming that we don't have parallel quadratic elements
+            boost::scoped_array<unsigned> raw_indices(new unsigned[mNodesPerElement]); // Assuming that we don't have parallel quadratic elements
             typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElementIterType;
             for (ElementIterType it = mpMesh->GetElementIteratorBegin(); it != mpMesh->GetElementIteratorEnd(); ++it)
             {
-                unsigned index =it->GetIndex();
+                unsigned index = it->GetIndex();
                 if ( mpDistributedMesh->CalculateDesignatedOwnershipOfElement( index ) == true )
                 {
                     for (unsigned j=0; j<mNodesPerElement; j++)
                     {
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
-                    PostElement(index, raw_indices, mNodesPerElement, this->mNumNodes + index, it->GetAttribute());
+                    PostElement(index, raw_indices.get(), mNodesPerElement, this->mNumNodes + index, it->GetAttribute());
                 }
             }
 //            PetscTools::Barrier("DodgyBarrierAfterELE");
@@ -576,18 +576,18 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             // Slaves concentrate the Faces for which they are owners (not in 1-d)
             if (ELEMENT_DIM != 1)  /// \todo #2351 Also exclude VTK writer
             {
-                unsigned raw_face_indices[ELEMENT_DIM]; // Assuming that we don't have parallel quadratic meshes
+                boost::scoped_array<unsigned> raw_face_indices(new unsigned[ELEMENT_DIM]); // Assuming that we don't have parallel quadratic meshes
                 typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElementIterType;
                 for (BoundaryElementIterType it = mpMesh->GetBoundaryElementIteratorBegin(); it != mpMesh->GetBoundaryElementIteratorEnd(); ++it)
                 {
-                    unsigned index =(*it)->GetIndex();
+                    unsigned index = (*it)->GetIndex();
                     if ( mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement( index ) == true )
                     {
                         for (unsigned j=0; j<ELEMENT_DIM; j++)
                         {
                             raw_face_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }
-                        PostElement(index, raw_face_indices, ELEMENT_DIM, this->mNumNodes + this->mNumElements + index, (*it)->GetAttribute());
+                        PostElement(index, raw_face_indices.get(), ELEMENT_DIM, this->mNumNodes + this->mNumElements + index, (*it)->GetAttribute());
                     }
                 }
             }

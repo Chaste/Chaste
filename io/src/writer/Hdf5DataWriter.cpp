@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <set>
 #include <cstring> //For strcmp etc. Needed in gcc-4.4
+#include <boost/scoped_array.hpp>
 
 #include "Hdf5DataWriter.hpp"
 
@@ -787,13 +788,13 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         else
         {
             // Make a local copy of the data you own
-            double local_data[mNumberOwned];
+            boost::scoped_array<double> local_data(new double[mNumberOwned]);
             for (unsigned i=0; i<mNumberOwned; i++)
             {
                 local_data[i] = p_petsc_vector[ mIncompleteNodeIndices[mOffset+i]-mLo ];
 
             }
-            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, local_data);
+            H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, file_dataspace, property_list_id, local_data.get());
         }
     }
 
@@ -914,7 +915,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
             else
             {
                 // Make a local copy of the data you own
-                double local_data[mNumberOwned*NUM_STRIPES];
+                boost::scoped_array<double> local_data(new double[mNumberOwned*NUM_STRIPES]);
                 for (unsigned i=0; i<mNumberOwned; i++)
                 {
                     unsigned local_node_number = mIncompleteNodeIndices[mOffset+i] - mLo;
@@ -922,7 +923,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
                     local_data[NUM_STRIPES*i+1] = p_petsc_vector[ local_node_number*NUM_STRIPES + 1];
                 }
 
-                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data);
+                H5Dwrite(mVariablesDatasetId, H5T_NATIVE_DOUBLE, memspace, hyperslab_space, property_list_id, local_data.get());
             }
         }
         else

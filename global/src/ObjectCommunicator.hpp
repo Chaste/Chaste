@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include "PetscTools.hpp" // For MPI methods
 #include "Exception.hpp"
@@ -81,7 +83,7 @@ public:
 
     /**
      * Default constructor.
-     */    
+     */
     ObjectCommunicator();
 
     /**
@@ -282,15 +284,15 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::SendRecvObject(boost::shared
 
     MPI_Sendrecv(&send_string_length, 1, MPI_UNSIGNED, destinationProcess, sendTag, &recv_string_length, 1, MPI_UNSIGNED, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
 
-    char recv_string[recv_string_length];
+    boost::scoped_array<char> recv_string(new char[recv_string_length]);
 
     // Send archive data
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_string, recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
+    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_string.get(), recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
 
     // Extract received object
     std::istringstream iss(std::ios::binary);
-    iss.rdbuf()->pubsetbuf(recv_string, recv_string_length);
+    iss.rdbuf()->pubsetbuf(recv_string.get(), recv_string_length);
 
     boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(iss);

@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTDISTRIBUTEDTETRAHEDRALMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 #include <sstream>
+#include <boost/scoped_array.hpp>
 
 #include "UblasCustomFunctions.hpp"
 #include "DistributedTetrahedralMesh.hpp"
@@ -168,7 +168,7 @@ private:
         unsigned total_nodes_this_process = 0;
         {
             const unsigned num_global_nodes = rMesh.GetNumNodes();
-            unsigned nodes_owned[num_global_nodes];
+            boost::scoped_array<unsigned> nodes_owned(new unsigned[num_global_nodes]);
             for (unsigned index=0; index<num_global_nodes; index++)
             {
                 nodes_owned[index]=0u;
@@ -193,8 +193,8 @@ private:
             TS_ASSERT_EQUALS(rMesh.GetNumLocalNodes(), total_nodes_this_process);
 
             // Combine all the local maps by adding them up in the master process
-            unsigned nodes_reduction[num_global_nodes];
-            MPI_Reduce(&nodes_owned, &nodes_reduction, num_global_nodes, MPI_UNSIGNED, MPI_SUM, PetscTools::MASTER_RANK, PETSC_COMM_WORLD);
+            boost::scoped_array<unsigned> nodes_reduction(new unsigned[num_global_nodes]);
+            MPI_Reduce(nodes_owned.get(), nodes_reduction.get(), num_global_nodes, MPI_UNSIGNED, MPI_SUM, PetscTools::MASTER_RANK, PETSC_COMM_WORLD);
 
             // Make sure every node is owned at least by one processor
             if (PetscTools::AmMaster())
@@ -213,7 +213,7 @@ private:
         unsigned total_elements_this_process = 0;
         {
             const unsigned num_global_elements = rMesh.GetNumElements();
-            unsigned elements_owned[num_global_elements];
+            boost::scoped_array<unsigned> elements_owned(new unsigned[num_global_elements]);
 
             // Create a local map of the elements this processor owns
             for (unsigned element_id=0; element_id<num_global_elements; element_id++)
@@ -236,8 +236,8 @@ private:
             TS_ASSERT_EQUALS(rMesh.GetNumLocalElements(), total_elements_this_process);
 
             // Combine all the local maps by adding them up in the master process
-            unsigned elements_reduction[num_global_elements];
-            MPI_Reduce(&elements_owned, &elements_reduction, num_global_elements, MPI_UNSIGNED, MPI_SUM, PetscTools::MASTER_RANK, PETSC_COMM_WORLD);
+            boost::scoped_array<unsigned> elements_reduction(new unsigned[num_global_elements]);
+            MPI_Reduce(elements_owned.get(), elements_reduction.get(), num_global_elements, MPI_UNSIGNED, MPI_SUM, PetscTools::MASTER_RANK, PETSC_COMM_WORLD);
 
             // Make sure every element is owned at least by one processor
             if (PetscTools::AmMaster())
@@ -255,7 +255,7 @@ private:
         unsigned total_b_elements_this_process = 0;
         {
             const unsigned num_global_b_elements = rMesh.GetNumBoundaryElements();
-            unsigned b_elements_owned[num_global_b_elements];
+            boost::scoped_array<unsigned> b_elements_owned(new unsigned[num_global_b_elements]);
 
             // Create a local map of the boundary elements this processor owns
             for (unsigned b_element_id=0; b_element_id<num_global_b_elements; b_element_id++)
@@ -278,8 +278,8 @@ private:
             TS_ASSERT_EQUALS(rMesh.GetNumLocalBoundaryElements(), total_b_elements_this_process);
 
             // Combine all the local maps by adding them up in the master process
-            unsigned b_elements_reduction[num_global_b_elements];
-            MPI_Reduce(&b_elements_owned, &b_elements_reduction, num_global_b_elements, MPI_UNSIGNED, MPI_SUM, PetscTools::MASTER_RANK, PETSC_COMM_WORLD);
+            boost::scoped_array<unsigned> b_elements_reduction(new unsigned[num_global_b_elements]);
+            MPI_Reduce(b_elements_owned.get(), b_elements_reduction.get(), num_global_b_elements, MPI_UNSIGNED, MPI_SUM, PetscTools::MASTER_RANK, PETSC_COMM_WORLD);
 
             // Make sure every boundary element is owned at least by one processor
             if (PetscTools::AmMaster())
@@ -629,7 +629,7 @@ public:
         /* Note that the PARMETIS_LIBRARY partitioning type is able to randomly permute element
          * access when using binary files (in order to avoid disk contention).  This means that a
          * binary reader can give a different partition compared to the equivalent ascii reader
-         * 
+         *
          * Here we select the METIS_LIBRARY partition in order to avoid such issues.
          */
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements_binary");
@@ -1875,7 +1875,6 @@ public:
 
         // Do some communication
 
-        //mesh.rGetDistributedVectorFactory()->rGetGlobalLows();
         for ( unsigned rank_offset = 1; rank_offset < PetscTools::GetNumProcs(); rank_offset++ )
         {
             unsigned send_to      = (PetscTools::GetMyRank() + rank_offset) % (PetscTools::GetNumProcs());
@@ -1888,10 +1887,10 @@ public:
                       0,
                       PETSC_COMM_WORLD );
 
-            unsigned received[nodes_to_receive_per_process[receive_from].size()];
+            boost::scoped_array<unsigned> received(new unsigned[nodes_to_receive_per_process[receive_from].size()]);
             MPI_Status status;
 
-            MPI_Recv( received,
+            MPI_Recv( received.get(),
                       nodes_to_receive_per_process[receive_from].size(),
                       MPI_UNSIGNED,
                       receive_from,
@@ -1904,13 +1903,6 @@ public:
                 TS_ASSERT_EQUALS( received[i], nodes_to_receive_per_process[receive_from][i] );
             }
         }
-
-//        for (unsigned process = 0; process < PetscTools::GetNumProcs(); process++)
-//        {
-//            PRINT_3_VARIABLES( process,
-//                               nodes_to_receive_per_process[process].size(),
-//                               nodes_to_send_per_process[process].size() );
-//        }
     }
 
     void TestParallelWriting3D()

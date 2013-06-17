@@ -34,6 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MultipleCaBasedCellPopulation.hpp"
+
+#include <boost/scoped_array.hpp>
+
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
 
@@ -518,7 +521,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     // Counter to keep track of how many cells are at a lattice site
     unsigned num_sites = this->mrMesh.GetNumNodes();
-    unsigned number_of_cells_at_site[num_sites];
+    boost::scoped_array<unsigned> number_of_cells_at_site(new unsigned[num_sites]);
     for (unsigned i=0; i<num_sites; i++)
     {
         number_of_cells_at_site[i] = 0;

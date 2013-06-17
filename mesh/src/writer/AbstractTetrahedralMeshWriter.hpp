@@ -52,7 +52,7 @@ struct MeshWriterIterators;
 
 #include <fstream>
 #include <sstream>
-#include <iostream>
+#include <boost/scoped_array.hpp>
 
 #include "AbstractMeshWriter.hpp"
 #include "AbstractMesh.hpp"
@@ -99,17 +99,16 @@ private:
      */
     void PostElement(unsigned globalIndex, unsigned indices[], unsigned numIndices, unsigned tag, double attribute)
     {
-        //PRINT_2_VARIABLES(globalIndex, numIndices);
         MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
         MPI_Ssend(indices, numIndices, MPI_UNSIGNED, 0,
-                 tag, //Elements sent with tags offset
-                 PETSC_COMM_WORLD);
+                  tag, //Elements sent with tags offset
+                  PETSC_COMM_WORLD);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
         // Attribute value has the same tag (assume that it doesn't overtake the previous message)
         MeshEventHandler::BeginEvent(MeshEventHandler::COMM2);
         MPI_Ssend(&attribute, 1, MPI_DOUBLE, 0,
-                tag, //Elements sent with tags offset
-                PETSC_COMM_WORLD);
+                  tag, //Elements sent with tags offset
+                  PETSC_COMM_WORLD);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM2);
     }
     /**
@@ -121,13 +120,12 @@ private:
      */
     void UnpackElement(ElementData& rElementData, unsigned globalIndex, unsigned numIndices, unsigned tag)
     {
-        //PRINT_2_VARIABLES(globalIndex, numIndices);
         assert( numIndices == rElementData.NodeIndices.size());
-        unsigned raw_indices[numIndices];
+        boost::scoped_array<unsigned> raw_indices(new unsigned[numIndices]);
         MPI_Status status;
-        //Get it from elsewhere
+        // Get it from elsewhere
         MeshEventHandler::BeginEvent(MeshEventHandler::COMM1);
-        MPI_Recv(raw_indices, numIndices, MPI_UNSIGNED, MPI_ANY_SOURCE,
+        MPI_Recv(raw_indices.get(), numIndices, MPI_UNSIGNED, MPI_ANY_SOURCE,
                  tag,
                  PETSC_COMM_WORLD, &status);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
@@ -147,7 +145,6 @@ private:
 
         // Attribute value
         rElementData.AttributeValue = attribute;
-
     }
 
     /**

@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <sstream>
 #include <string>
+#include <boost/scoped_array.hpp>
 
 #include "Exception.hpp"
 #include "Element.hpp"
@@ -1308,10 +1309,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     /*
      *  Work out initial element distribution
      */
-    idxtype element_distribution[num_procs+1];
-    idxtype element_counts[num_procs];
+    boost::scoped_array<idxtype> element_distribution(new idxtype[num_procs+1]);
+    boost::scoped_array<idxtype> element_counts(new idxtype[num_procs]);
 
-    element_distribution[0]=0;
+    element_distribution[0] = 0;
 
     for (unsigned proc_index=1; proc_index<num_procs; proc_index++)
     {
@@ -1329,8 +1330,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     unsigned last_plus_one_element = element_distribution[local_proc_index+1];
     unsigned num_local_elements = last_plus_one_element - first_local_element;
 
-    idxtype* eind = new idxtype[num_local_elements*(ELEMENT_DIM+1)];
-    idxtype* eptr = new idxtype[num_local_elements+1];
+    boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
+    boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
 
     if ( ! rMeshReader.IsFileFormatBinary() )
     {
@@ -1341,7 +1342,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         }
     }
 
-    unsigned counter=0;
+    unsigned counter = 0;
     for (unsigned element_index = 0; element_index < num_local_elements; element_index++)
     {
         ElementData element_data;
@@ -1385,12 +1386,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     idxtype* adjncy;
 
     Timer::Reset();
-    ParMETIS_V3_Mesh2Dual(element_distribution, eptr, eind,
+    ParMETIS_V3_Mesh2Dual(element_distribution.get(), eptr.get(), eind.get(),
                           &numflag, &ncommonnodes, &xadj, &adjncy, &communicator);
     //Timer::Print("ParMETIS Mesh2Dual");
 
-    delete[] eind;
-    delete[] eptr;
+    // Be more memory efficient, and get rid of (maybe large) arrays as soon as they're no longer needed, rather than at end of scope
+    eind.reset();
+    eptr.reset();
 
     int weight_flag = 0; // unweighted graph
     int n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
@@ -1398,13 +1400,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     int options[3]; // extra options
     options[0] = 0; // ignore extra options
     int edgecut;
-    real_t* tpwgts=new real_t[n_subdomains];
-    real_t ubvec_value=1.05;
+    boost::scoped_array<real_t> tpwgts(new real_t[n_subdomains]);
+    real_t ubvec_value = 1.05;
     for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
     {
-        tpwgts[proc]=((real_t)1.0)/n_subdomains;
+        tpwgts[proc] = ((real_t)1.0)/n_subdomains;
     }
-    idxtype* local_partition = new idxtype[num_local_elements];
+    boost::scoped_array<idxtype> local_partition(new idxtype[num_local_elements]);
 
 /*
  *  In order to use ParMETIS_V3_PartGeomKway, we need to sort out how to compute the coordinates of the
@@ -1420,18 +1422,18 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //                             options, &edgecut, local_partition, &communicator);
 
     Timer::Reset();
-    ParMETIS_V3_PartKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
-                         &n_constraints, &n_subdomains, tpwgts, &ubvec_value,
-                         options, &edgecut, local_partition, &communicator);
+    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
+                         &n_constraints, &n_subdomains, tpwgts.get(), &ubvec_value,
+                         options, &edgecut, local_partition.get(), &communicator);
     //Timer::Print("ParMETIS PartKway");
-    delete [] tpwgts;
+    tpwgts.reset();
 
-    idxtype* global_element_partition = new idxtype[num_elements];
+    boost::scoped_array<idxtype> global_element_partition(new idxtype[num_elements]);
 
-    MPI_Allgatherv(local_partition, num_local_elements, MPI_INT,
-                   global_element_partition, element_counts, element_distribution, MPI_INT, PETSC_COMM_WORLD);
+    MPI_Allgatherv(local_partition.get(), num_local_elements, MPI_INT,
+                   global_element_partition.get(), element_counts.get(), element_distribution.get(), MPI_INT, PETSC_COMM_WORLD);
 
-    delete[] local_partition;
+    local_partition.reset();
 
     for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
     {
@@ -1534,7 +1536,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         }
     }
 
-    delete[] global_element_partition;
+    global_element_partition.get();
 
     /*
      * Refine element distribution. Add extra elements that parMETIS didn't consider initially but

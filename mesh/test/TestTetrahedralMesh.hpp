@@ -37,9 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTTETRAHEDRALMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 #include <fstream>
+#include <cmath>
+#include <vector>
+#include <boost/scoped_array.hpp>
 #include "TetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "GenericMeshReader.hpp"
@@ -49,8 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "CuboidMeshConstructor.hpp"
 #include "ArchiveOpener.hpp"
-#include <cmath>
-#include <vector>
 
 class TestTetrahedralMesh : public CxxTest::TestSuite
 {
@@ -1652,7 +1652,7 @@ public:
         TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
         TetrahedralMesh<1,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
-        
+
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 3u);
@@ -1871,10 +1871,10 @@ public:
                       0,
                       PETSC_COMM_WORLD );
 
-            unsigned received[nodes_to_receive_per_process[receive_from].size()];
+            boost::scoped_array<unsigned> received(new unsigned[nodes_to_receive_per_process[receive_from].size()]);
             MPI_Status status;
 
-            MPI_Recv( received,
+            MPI_Recv( received.get(),
                       nodes_to_receive_per_process[receive_from].size(),
                       MPI_UNSIGNED,
                       receive_from,

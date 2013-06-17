@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTBOUNDARYCONDITIONCONTAINER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include "CheckpointArchiveTypes.hpp"
 #include <boost/shared_ptr.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include <vector>
 
 #include "BoundaryConditionsContainer.hpp"
 #include "ConstBoundaryCondition.hpp"
@@ -61,7 +61,7 @@ public:
         TS_ASSERT(!bcc1.HasDirichletBoundaryConditions());
 
         {
-            Node<1>* nodes[num_nodes];
+            std::vector<Node<1>*> nodes(num_nodes);
 
             for (int i=0; i<num_nodes; i++)
             {
@@ -88,7 +88,7 @@ public:
         std::vector<BoundaryElement<0,1> > elements;
         for (unsigned element_index=0; element_index< (unsigned) num_elem; element_index++)
         {
-            std::vector<Node<1>* > nodes;
+            std::vector<Node<1>*> nodes;
             Node<1>* node = new Node<1>(element_index,true,0);
             nodes.push_back(node);
 
@@ -114,7 +114,7 @@ public:
         num_nodes = 10;
         BoundaryConditionsContainer<2,2,1> bcc2;
 
-        Node<2>* nodes2[num_nodes];
+        std::vector<Node<2>*> nodes2(num_nodes);
         for (int i=0; i<num_nodes; i++)
         {
             nodes2[i] = new Node<2>(i,true,0,0);
@@ -168,7 +168,7 @@ public:
         num_nodes = 10;
         BoundaryConditionsContainer<3,3,1> bcc3;
 
-        Node<3>* nodes3[num_nodes];
+        std::vector<Node<3>*> nodes3(num_nodes);
         for (int i=0; i<num_nodes; i++)
         {
             nodes3[i] = new Node<3>(i,true,0,0);
