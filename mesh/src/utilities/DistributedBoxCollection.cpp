@@ -393,8 +393,8 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
 {
     MPI_Status status;
 
-    int proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : PetscTools::GetMyRank() + 1;
-    int proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : PetscTools::GetMyRank() - 1;
+    int proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() + 1;
+    int proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() - 1;
 
     // A variable that will return the new number of rows.
     int new_rows = localDistribution.size();
