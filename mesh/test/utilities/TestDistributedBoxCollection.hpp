@@ -2123,7 +2123,7 @@ public:
                 for (unsigned k=0; k<i; k++)
                 {
                     nodes.push_back(new Node<1>(i, false));
-                    box_collection.rGetBox(i).AddNode(nodes[i]);
+                    box_collection.rGetBox(i).AddNode(nodes[k]);
                 }
             }
         }
