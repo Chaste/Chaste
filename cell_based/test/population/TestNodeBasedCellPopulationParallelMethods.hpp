@@ -266,6 +266,18 @@ public:
 #endif
     }
 
+    void TestUpdateWithLoadBalanceDoesntThrow() throw (Exception)
+    {
+#if BOOST_VERSION < 103700
+        TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
+                              "Parallel cell-based Chaste requires Boost >= 1.37");
+#else
+        mpNodeBasedCellPopulation->SetLoadBalanceMesh(true);
+
+        TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->Update());
+#endif
+    }
+
     void TestGetCellUsingLocationIndexWithHaloCell() throw (Exception)
     {
         boost::shared_ptr<Node<3> > p_node(new Node<3>(10, false, 0.0, 0.0, 0.0));

@@ -905,6 +905,48 @@ public:
             delete p_mesh;
         }
     }
+
+    void TestLoadBalanceMesh()  throw (Exception)
+    {
+        // Test designed for np=2
+        if (PetscTools::GetNumProcs() == 2)
+        {
+            std::vector<Node<1>*> nodes;
+            nodes.push_back(new Node<1>(0, true,  0.0));
+            nodes.push_back(new Node<1>(1, false, 1.0));
+            nodes.push_back(new Node<1>(2, false, 2.0));
+            nodes.push_back(new Node<1>(3, false, 3.0));
+            nodes.push_back(new Node<1>(4, false, 4.0));
+            nodes.push_back(new Node<1>(5, false, 5.0));
+            nodes.push_back(new Node<1>(6, false, 5.5));
+            nodes.push_back(new Node<1>(7, false, 11.0));
+
+            NodesOnlyMesh<1>* p_mesh = new NodesOnlyMesh<1>;
+            p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+
+            unsigned old_num_rows = p_mesh->mpBoxCollection->CalculateNumberOfNodesInEachStrip().size();
+
+            p_mesh->AddNodesToBoxes();
+            p_mesh->LoadBalanceMesh();
+
+            unsigned new_num_rows = p_mesh->mpBoxCollection->CalculateNumberOfNodesInEachStrip().size();
+
+            if (PetscTools::AmMaster())
+            {
+                TS_ASSERT_EQUALS(new_num_rows, old_num_rows - 1);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(new_num_rows, old_num_rows + 1);
+            }
+
+            // Tidy up
+            for (unsigned i=0; i<nodes.size(); i++)
+            {
+                delete nodes[i];
+            }
+        }
+    }
 };
 
 #endif /*TESTNODESONLYMESH_HPP_*/

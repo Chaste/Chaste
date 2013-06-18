@@ -115,6 +115,9 @@ private:
     /** Map halo cells back to location indices */
     std::map<CellPtr, unsigned> mHaloCellLocationMap;
 
+    /** Whether to load balance the underlying mesh dynamically */
+    bool mLoadBalanceMesh;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -372,6 +375,12 @@ public:
      * @param useVariableRadii the new value of mUseVariableRadii
      */
     void SetUseVariableRadii(bool useVariableRadii=true);
+
+    /**
+     * Set whether to carry out the dynamic load balance algorithm on this mesh when it is updated
+     * @param loadBalanceMesh whether to do dynamic load balancing.
+     */
+    void SetLoadBalanceMesh(bool loadBalanceMesh);
 
     /**
      * Overridden GetWidth() method.

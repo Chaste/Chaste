@@ -610,6 +610,14 @@ void NodesOnlyMesh<SPACE_DIM>::LoadBalanceMesh()
 
     c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
 
+    // This ensures the domain will stay the same size.
+    double fudge = 1e-14;
+    for (unsigned d=0; d < SPACE_DIM; d++)
+    {
+        current_domain_size[2*d] = current_domain_size[2*d] + fudge;
+        current_domain_size[2*d+1] = current_domain_size[2*d+1] - fudge;
+    }
+
     SetUpBoxCollection(mMaximumInteractionDistance, current_domain_size, new_rows);
 }
 

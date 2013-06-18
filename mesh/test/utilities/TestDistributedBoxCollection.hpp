@@ -2111,6 +2111,8 @@ public:
         domain_size(0) = 0.0;
         domain_size(1) = 9.0;
 
+        std::vector<Node<1>* > nodes;
+
         DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
 
         for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
@@ -2120,7 +2122,8 @@ public:
                 // Add the same number of nodes as the box index.
                 for (unsigned k=0; k<i; k++)
                 {
-                    box_collection.rGetBox(i).AddNode(new Node<1>(i, false));
+                    nodes.push_back(new Node<1>(i, false));
+                    box_collection.rGetBox(i).AddNode(nodes[i]);
                 }
             }
         }
@@ -2134,6 +2137,12 @@ public:
                 TS_ASSERT_EQUALS(local_distribution[counter], (int)i);
                 counter++;
             }
+        }
+
+        // Tidy up
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
         }
     }
 };

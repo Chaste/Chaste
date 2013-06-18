@@ -46,7 +46,8 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
                                       bool validate)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
-      mUseVariableRadii(false)
+      mUseVariableRadii(false),
+      mLoadBalanceMesh(false)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 
@@ -60,7 +61,8 @@ template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
-      mUseVariableRadii(false) // will be set by serialize() method
+      mUseVariableRadii(false), // will be set by serialize() method
+      mLoadBalanceMesh(false)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 }
@@ -132,6 +134,18 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     mpNodesOnlyMesh->ReMesh(map);
 
     mpNodesOnlyMesh->UpdateBoxCollection();
+
+    if (mLoadBalanceMesh)
+    {
+        mpNodesOnlyMesh->LoadBalanceMesh();
+
+        UpdateCellProcessLocation();
+
+        NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
+        mpNodesOnlyMesh->ReMesh(map);
+
+        mpNodesOnlyMesh->UpdateBoxCollection();
+    }
 
     RefreshHaloCells();
 
@@ -292,6 +306,12 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetUseVariableRadii(bool useVariableRadii)
 {
     mUseVariableRadii = useVariableRadii;
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::SetLoadBalanceMesh(bool loadBalanceMesh)
+{
+    mLoadBalanceMesh = loadBalanceMesh;
 }
 
 template<unsigned DIM>

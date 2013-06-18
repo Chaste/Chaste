@@ -198,6 +198,7 @@ void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObje
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
     mSendBuffer = const_cast<char*>(mSendString.data());
     MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PetscTools::GetWorld(), &request);
+    MPI_Request_free(&request);
 }
 
 template<typename CLASS>
