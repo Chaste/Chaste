@@ -272,7 +272,14 @@ public:
         TS_ASSERT_THROWS_THIS(mpNodeBasedCellPopulation->SendCellsToNeighbourProcesses(),
                               "Parallel cell-based Chaste requires Boost >= 1.37");
 #else
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
+
         mpNodeBasedCellPopulation->SetLoadBalanceMesh(true);
+
+        mpNodeBasedCellPopulation->SetLoadBalanceFrequency(50);
+
+        TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->mLoadBalanceFrequency, 50u);
 
         TS_ASSERT_THROWS_NOTHING(mpNodeBasedCellPopulation->Update());
 #endif

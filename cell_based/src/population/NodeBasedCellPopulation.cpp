@@ -47,7 +47,8 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
     : AbstractCentreBasedCellPopulation<DIM>(rMesh, rCells, locationIndices),
       mDeleteMesh(deleteMesh),
       mUseVariableRadii(false),
-      mLoadBalanceMesh(false)
+      mLoadBalanceMesh(false),
+      mLoadBalanceFrequency(100)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 
@@ -62,7 +63,8 @@ NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh)
     : AbstractCentreBasedCellPopulation<DIM>(rMesh),
       mDeleteMesh(true),
       mUseVariableRadii(false), // will be set by serialize() method
-      mLoadBalanceMesh(false)
+      mLoadBalanceMesh(false),
+      mLoadBalanceFrequency(100)
 {
     mpNodesOnlyMesh = static_cast<NodesOnlyMesh<DIM>* >(&(this->mrMesh));
 }
@@ -137,14 +139,17 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     if (mLoadBalanceMesh)
     {
-        mpNodesOnlyMesh->LoadBalanceMesh();
+        if ((SimulationTime::Instance()->GetTimeStepsElapsed() % mLoadBalanceFrequency) == 0)
+        {
+            mpNodesOnlyMesh->LoadBalanceMesh();
 
-        UpdateCellProcessLocation();
+            UpdateCellProcessLocation();
 
-        NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
-        mpNodesOnlyMesh->ReMesh(map);
+            NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
+            mpNodesOnlyMesh->ReMesh(map);
 
-        mpNodesOnlyMesh->UpdateBoxCollection();
+            mpNodesOnlyMesh->UpdateBoxCollection();
+        }
     }
 
     RefreshHaloCells();
@@ -312,6 +317,12 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetLoadBalanceMesh(bool loadBalanceMesh)
 {
     mLoadBalanceMesh = loadBalanceMesh;
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::SetLoadBalanceFrequency(unsigned loadBalanceFrequency)
+{
+    mLoadBalanceFrequency = loadBalanceFrequency;
 }
 
 template<unsigned DIM>

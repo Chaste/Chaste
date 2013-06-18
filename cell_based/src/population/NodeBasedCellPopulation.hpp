@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "BoxCollection.hpp"
 
-
 /**
  * A NodeBasedCellPopulation is a CellPopulation consisting of only nodes in space with associated cells.
  * There are no elements and no mesh.
@@ -117,6 +116,9 @@ private:
 
     /** Whether to load balance the underlying mesh dynamically */
     bool mLoadBalanceMesh;
+
+    /** The frequency at which the mesh is rebalanced */
+    unsigned mLoadBalanceFrequency;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -381,6 +383,12 @@ public:
      * @param loadBalanceMesh whether to do dynamic load balancing.
      */
     void SetLoadBalanceMesh(bool loadBalanceMesh);
+
+    /**
+     * Set the freqeuncy, in number of time steps, with which the underlying mesh should be load balanced.
+     * @param loadBalanceFrequency the frequency for load balancing.
+     */
+    void SetLoadBalanceFrequency(unsigned loadBalanceFrequency);
 
     /**
      * Overridden GetWidth() method.
