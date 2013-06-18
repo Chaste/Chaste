@@ -100,6 +100,10 @@ public:
         /**
          * STEADY STATE PACING EXPERIMENT
          */
+        /*
+         * HOW_TO_TAG Cardiac/Cell Models
+         * Get a cardiac cell model to (roughly) a steady state, given a regular stimulus, using the `SteadyStateRunner` class.
+         */
         SteadyStateRunner steady_runner(p_model);
 
         bool result;
@@ -115,7 +119,7 @@ public:
         result = steady_runner.RunToSteadyState();
 
         TS_ASSERT_EQUALS(result,true);
-        // Your mileage may vary.  32-bit machine, default build gives 520 evaluations.
+        // Your mileage may vary. 32-bit machine, default build gives 520 evaluations.
         TS_ASSERT_LESS_THAN(steady_runner.GetNumEvaluations(),550u);
 
         // For coverage
