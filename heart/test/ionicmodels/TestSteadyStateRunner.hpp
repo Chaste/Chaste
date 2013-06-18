@@ -92,6 +92,11 @@ public:
 
         p_reg_stim->SetPeriod(1000.0/hertz);
 
+        // Note that increasing the strictness of the tolerances here (default is 1e-5, 1e-7)
+        // actually leads to a faster convergence to steady state, as a model solved in
+        // a sloppy way might never actually get close to its true limit cycle!
+        p_model->SetTolerances(1e-6,1e-8);
+
         /**
          * STEADY STATE PACING EXPERIMENT
          */

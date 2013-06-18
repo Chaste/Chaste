@@ -52,7 +52,12 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
 
     mpModel->SetMaxSteps(1e5); // Per pace.
 
-    bool rough_solution = true;
+    /*
+     * This was an idea about solving roughly to start with and then refining later,
+     * but it overrides anything set by the user and is therefore a bit dangerous.
+     * It also didn't seem to make very much difference...
+     */
+    //bool rough_solution = true;
     //mpModel->SetTolerances(1e-4,1e-6);
 
     // Use optimisations from #1912 - since we don't interfere with the model between Solve() calls don't reset.
@@ -74,11 +79,11 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
             temp += fabs(new_state_vars[j] - old_state_vars[j]);
         }
 
-        if (rough_solution && temp < 1e-4)
-        {
-            mpModel->SetTolerances(1e-6,1e-8);
-            rough_solution = false;
-        }
+//        if (rough_solution && temp < 1e-4)
+//        {
+//            mpModel->SetTolerances(1e-6,1e-8);
+//            rough_solution = false;
+//        }
 
         if (temp < 1e-6)
         {

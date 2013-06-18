@@ -114,8 +114,8 @@ void AbstractCvodeCell::ComputeExceptVoltage(double tStart, double tEnd)
     SetVoltage(saved_voltage); // In case of naughty models
 
 #ifndef NDEBUG
-    //Note that tests which rely on this throwing  (e.g. such-and-such a variable is out of range)
-    //ought to be anotated with the NDEBUG macro
+    // Note that tests which rely on this throwing  (e.g. such-and-such a variable is out of range)
+    // ought to be annotated with the NDEBUG macro
     VerifyStateVariables();
 #endif // NDEBUG
 }
