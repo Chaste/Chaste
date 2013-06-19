@@ -304,7 +304,7 @@ public:
             DistributedTetrahedralMesh<DIM, DIM> mesh;
             constructor.Construct(mesh, this->MeshNum, mMeshWidth);
 
-            unsigned num_ele_across = (unsigned) SmallPow(2, this->MeshNum+2); // number of elements in each dimension
+            unsigned num_ele_across = SmallPow(2u, this->MeshNum+2); // number of elements in each dimension
 
             AbstractCardiacCellFactory<DIM>* p_cell_factory=NULL;
 
@@ -356,7 +356,7 @@ public:
                 }
                 case 2:
                 {
-                    unsigned n= (unsigned) SmallPow (2, this->MeshNum+2);
+                    unsigned n= SmallPow (2u, this->MeshNum+2);
                     first_quadrant_node =   (n+1)*(n/2)+  n/4 ;
                     third_quadrant_node =   (n+1)*(n/2)+3*n/4 ;
                     break;
@@ -637,7 +637,7 @@ public:
         {
             return; //Only master displays this
         }
-        unsigned num_ele_across = (unsigned) SmallPow(2, this->MeshNum+2);// number of elements in each dimension
+        unsigned num_ele_across = SmallPow(2u, this->MeshNum+2);// number of elements in each dimension
         double scaling = mMeshWidth/(double) num_ele_across;
 
         std::cout<<"================================================================================"<<std::endl;

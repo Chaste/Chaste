@@ -74,6 +74,42 @@ double SmallPow(double x, unsigned exponent)
         }
     }
 }
+unsigned SmallPow(unsigned x, unsigned exponent)
+{
+    switch (exponent)
+    {
+        case 0:
+        {
+            return 1u;
+        }
+        case 1:
+        {
+            return x;
+        }
+        case 2:
+        {
+            return x*x;
+        }
+        case 3:
+        {
+            return x*x*x;
+        }
+        default:
+        {
+            if (exponent % 2 == 0)
+            {
+                // Even power
+                unsigned partial_answer = SmallPow(x, exponent/2);
+                return partial_answer*partial_answer;
+            }
+            else
+            {
+                // Odd power
+                return SmallPow(x, exponent-1)*x;
+            }
+        }
+    }
+}
 
 bool Divides(double smallerNumber, double largerNumber)
 {

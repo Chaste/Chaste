@@ -712,9 +712,6 @@ public:
     void TestArchivingOfIsolatedLabelledCellKiller() throw (Exception)
     {
         // Set up singleton classes
-        OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "isolated_killer.arch";
-
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "isolated_killer.arch";
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh");

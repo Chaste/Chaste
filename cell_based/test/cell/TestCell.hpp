@@ -547,8 +547,8 @@ public:
 
         // Now at t=6.00
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>();
+        CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>();
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
 
         FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel();
@@ -617,8 +617,8 @@ public:
 
             boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
             boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-            boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+            CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>();
+            CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>();
 
             StochasticDurationGenerationBasedCellCycleModel* p_model = new StochasticDurationGenerationBasedCellCycleModel();
             CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
@@ -885,7 +885,7 @@ public:
             }
             if (p_tn_cell->ReadyToDivide())
             {
-                CellPtr p_tn_cell2 = p_tn_cell->Divide();
+                p_tn_cell->Divide();
                 ++num_divisions;
             }
         }

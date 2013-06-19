@@ -739,7 +739,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
         // Get the cell's volume from the Voronoi tessellation
         cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
     }
-    catch (Exception& e)
+    catch (Exception&)
     {
         // If it doesn't exist this must be a boundary cell, so return infinite volume.
         cell_volume = DBL_MAX;
@@ -966,7 +966,7 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVoronoiEdgeLength(unsi
         double edge_length = mpVoronoiTessellation->GetEdgeLength(element_index1, element_index2);
         return edge_length;
     }
-    catch (Exception& e)
+    catch (Exception&)
     {
         // The edge was between two (potentially infinite) cells on the boundary of the mesh
         EXCEPTION("Spring iterator tried to calculate interaction between degenerate cells on the boundary of the mesh.  Have you set ghost layers correctly?");

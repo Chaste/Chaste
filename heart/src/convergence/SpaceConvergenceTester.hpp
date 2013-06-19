@@ -98,7 +98,7 @@ public:
      */
     double Abscissa()
     {
-        unsigned mesh_size = (unsigned) SmallPow(2, this->MeshNum+2); // number of elements in each dimension
+        unsigned mesh_size = SmallPow(2u, this->MeshNum+2); // number of elements in each dimension
         return this->mMeshWidth/(double) mesh_size;
     }
 
@@ -114,7 +114,7 @@ public:
      */
     double GetSpaceStep()
     {
-        unsigned mesh_size = (unsigned) SmallPow(2, this->MeshNum+2);// number of elements in each dimension
+        unsigned mesh_size = SmallPow(2u, this->MeshNum+2);// number of elements in each dimension
         double scaling = this->mMeshWidth/(double) mesh_size;
         return scaling;
     }

@@ -721,7 +721,7 @@ public:
 
         // Coverage
         TS_ASSERT_EQUALS(p_hepa_one_cell->ReadyToDivide(), true);
-        CellPtr p_hepa_one_cell_divide = p_hepa_one_cell->Divide();
+        p_hepa_one_cell->Divide();
 
         // Check that cell division correctly resets the cell cycle phase
         StochasticOxygenBasedCellCycleModel* p_hepa_one_model2 = static_cast <StochasticOxygenBasedCellCycleModel*> (p_hepa_one_model->CreateCellCycleModel());

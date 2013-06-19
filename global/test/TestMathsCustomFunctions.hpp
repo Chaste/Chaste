@@ -49,6 +49,8 @@ public:
         for (unsigned i=0; i<10; i++)
         {
             TS_ASSERT_DELTA(SmallPow(0.0, i), pow(0.0, double(i)), DBL_EPSILON);
+            //Integer version
+            TS_ASSERT_EQUALS(SmallPow(5u, i), (unsigned)round(pow(5.0, double(i))));
             TS_ASSERT_DELTA(SmallPow(-1.67e3, i), pow(-1.67e3, double(i)), 1e14);//(1e3)^10/DBL_EPSILON
             //Note the following should be within DBL_EPSILON on a 64-bit machine.  However,
             //32-bit floating point accumulated errors push both SmallPow and pow away from integer values.

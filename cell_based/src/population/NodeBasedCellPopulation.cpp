@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "NodeBasedCellPopulation.hpp"
+#include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
@@ -108,7 +109,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
         {
             this->GetCellUsingLocationIndex(node_iter->GetIndex());
         }
-        catch (const Exception& e)
+        catch (Exception&)
         {
             EXCEPTION("Node " << node_iter->GetIndex() << " does not appear to have a cell associated with it");
         }
@@ -145,8 +146,8 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
             UpdateCellProcessLocation();
 
-            NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
-            mpNodesOnlyMesh->ReMesh(map);
+            NodeMap another_map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());///\todo conflicts with Dan?
+            mpNodesOnlyMesh->ReMesh(another_map);
 
             mpNodesOnlyMesh->UpdateBoxCollection();
         }
@@ -722,24 +723,24 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
     if(!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
-        int tag = (int) pow (2, 1+ PetscTools::GetMyRank() ) * pow (3, 1 + PetscTools::GetMyRank() + 1);
+        int tag = SmallPow(2u, 1+ PetscTools::GetMyRank() ) * SmallPow (3u, 1 + PetscTools::GetMyRank() + 1);
         mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, tag);
     }
     if(!PetscTools::AmMaster())
     {
-        int tag = (int) pow (2, 1 + PetscTools::GetMyRank() ) * pow (3, 1 + PetscTools::GetMyRank() - 1);
+        int tag = SmallPow (2u, 1 + PetscTools::GetMyRank() ) * SmallPow (3u, 1 + PetscTools::GetMyRank() - 1);
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, tag);
     }
     // Now post receives to start receiving data before returning.
     if(!PetscTools::AmTopMost())
     {
-        int tag = (int) pow (3, 1 + PetscTools::GetMyRank() ) * pow (2, 1+ PetscTools::GetMyRank() + 1);
+        int tag = SmallPow (3u, 1 + PetscTools::GetMyRank() ) * SmallPow (2u, 1+ PetscTools::GetMyRank() + 1);
         mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, tag);
     }
     if(!PetscTools::AmMaster())
     {
-        int tag = (int) pow (3, 1 + PetscTools::GetMyRank() ) * pow (2, 1+ PetscTools::GetMyRank() - 1);
+        int tag = SmallPow (3u, 1 + PetscTools::GetMyRank() ) * SmallPow (2u, 1+ PetscTools::GetMyRank() - 1);
         mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, tag);
     }
 #endif

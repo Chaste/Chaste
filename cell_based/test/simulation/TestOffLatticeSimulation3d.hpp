@@ -350,7 +350,6 @@ public:
 
             TS_ASSERT_EQUALS(num_cells, 64u);
             TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-9);
-            CellPtr p_cell = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(23u);
             TS_ASSERT_DELTA(p_simulator->rGetCellPopulation().GetNode(23)->rGetLocation()[2],
                             mLocationWithoutGhosts, 1e-6);
             TS_ASSERT(!p_simulator->GetUpdateCellPopulationRule());

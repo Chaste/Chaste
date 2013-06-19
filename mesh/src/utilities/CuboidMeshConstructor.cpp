@@ -46,7 +46,7 @@ void CuboidMeshConstructor<ELEMENT_DIM, SPACE_DIM>::Construct(AbstractTetrahedra
     assert(meshRefinementNum < 30); // Sanity
 
     // Create the mesh
-    unsigned mesh_size = (unsigned) SmallPow(2, meshRefinementNum+2); // number of elements in each dimension
+    unsigned mesh_size = SmallPow(2u, meshRefinementNum+2); // number of elements in each dimension
     double scaling = mMeshWidth/(double) mesh_size;
     rMesh.ConstructRegularSlabMesh(scaling, mMeshWidth, mMeshWidth, mMeshWidth);
     mNumElements = rMesh.GetNumElements();

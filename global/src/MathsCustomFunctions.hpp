@@ -54,6 +54,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 double SmallPow(double x, unsigned exponent);
 
 /**
+ * Replacement "pow" function for unsigned integer values
+ *
+ * @param x number to be raised to a small power
+ * @param exponent small integer exponent
+ * @return x^exponent a.k.a x**exponent.
+ */
+unsigned SmallPow(unsigned x, unsigned exponent);
+
+/**
  * @return true if the smaller number divides the larger (to machine precision)
  * Uses fmod to determine if smallerNumber divides the largerNumber.
  * We expect smallerNumber/largerNumber <= 1 and therefore

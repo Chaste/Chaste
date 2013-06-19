@@ -103,7 +103,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
                 boundary = 1;
             }
 
-            double x = x0 + horizontal_spacing*((double)j + 0.25*(1.0+ SmallPow(-1,i+1)));
+            double x = x0 + horizontal_spacing*((double)j + 0.25*(1.0+ SmallPow(-1.0,i+1)));
             double y = y0 + vertical_spacing*(double)i;
 
             // Avoid floating point errors which upset OffLatticeSimulation

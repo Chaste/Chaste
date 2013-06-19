@@ -55,7 +55,7 @@ private:
     void RunTest(unsigned numStepsInEachDimension)
     {
         MeshEventHandler::Reset();
-        unsigned nodes = (unsigned) SmallPow(numStepsInEachDimension+1, 3);
+        unsigned nodes = SmallPow(numStepsInEachDimension+1, 3);
         if (PetscTools::AmMaster())
         {
             std::cout<<"Number steps per dimension = " << std::setw(12) << numStepsInEachDimension<<std::endl;
@@ -121,7 +121,7 @@ public:
             {
                 std::cout<<"Power                      = " << std::setw(12) << pow<<std::endl;
             }
-            unsigned steps = (unsigned) SmallPow(2, pow);
+            unsigned steps = SmallPow(2u, pow);
             RunTest(steps);
         }
         /* See #2351
