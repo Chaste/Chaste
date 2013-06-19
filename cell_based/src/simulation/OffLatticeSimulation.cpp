@@ -245,8 +245,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::WriteVisualizerSetupFile()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
 {
-    unsigned num_nodes = this->mrCellPopulation.GetNumNodes();
-
     /*
      * Get the previous node positions (these may be needed when applying boundary conditions,
      * e.g. in the case of immotile cells)
@@ -296,10 +294,14 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
             {
                 *mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
 
-                for (unsigned node_index=0; node_index<num_nodes; node_index++)
+                for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+                     node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+                     ++node_iter)
                 {
+                    unsigned node_index = node_iter->GetIndex();
+
                     // We should never encounter deleted nodes due to where this method is called by Solve()
-                    assert(!this->mrCellPopulation.GetNode(node_index)->IsDeleted());
+                    assert(!node_iter->IsDeleted());
 
                     // Check that results should be written for this node
                     bool is_real_node = true;
@@ -321,9 +323,9 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
                     // Write node data to file
                     if (is_real_node)
                     {
-                        const c_vector<double,SPACE_DIM>& position = this->mrCellPopulation.GetNode(node_index)->rGetLocation();
+                        const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
                         double damping_constant = static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
-                        c_vector<double, SPACE_DIM> velocity = this->mDt * this->mrCellPopulation.GetNode(node_index)->rGetAppliedForce() / damping_constant;
+                        c_vector<double, SPACE_DIM> velocity = this->mDt * node_iter->rGetAppliedForce() / damping_constant;
 
                         *mpNodeVelocitiesFile << node_index  << " ";
                         for (unsigned i=0; i<SPACE_DIM; i++)
