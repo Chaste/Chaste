@@ -103,6 +103,7 @@ public:
         simulator.SetOutputDirectory("NodeBased3dOnSphere");
         simulator.SetSamplingTimestepMultiple(120);
         simulator.SetEndTime(10.0); // 50.0
+        simulator.SetOutputNodeVelocities(true);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
