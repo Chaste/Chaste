@@ -169,7 +169,11 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     if exefile.startswith("python/infra/Check"):
         command = exefile + ' 2>&1'
     elif exefile.endswith('.py'):
-        command = './python/infra/TestPythonCode.py ' + exefile + ' 2>&1'
+        if build.is_profile:
+            prof = ' --profile'
+        else:
+            prof = ''
+        command = './python/infra/TestPythonCode.py ' + exefile + prof + ' 2>&1'
     else:
         command = build.GetTestRunnerCommand(exefile, '2>&1 ' + run_time_flags)
 

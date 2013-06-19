@@ -130,9 +130,13 @@ class ChasteTestResult(unittest.TestResult):
 
 class ChasteTestRunner:
     """A test runner class that displays results in Chaste's cxxtest format."""
-    def __init__(self, stream=sys.stdout, descriptions=True):
+    def __init__(self, stream=sys.stdout, descriptions=True, profile=False):
         self.stream = stream
         self.descriptions = descriptions
+        self.profiler = None
+        if profile:
+            import cProfile
+            self.profiler = cProfile.Profile()
 
     def _makeResult(self):
         return ChasteTestResult(self.stream, descriptions=self.descriptions)
@@ -140,9 +144,13 @@ class ChasteTestRunner:
     def run(self, test):
         "Run the given test case or test suite."
         result = self._makeResult()
+        if self.profiler:
+            self.profiler.enable()
         start_time = time.time()
         test(result)
         stop_time = time.time()
+        if self.profiler:
+            self.profiler.disable()
         time_taken = stop_time - start_time
         num_run = result.testsRun
         self.stream.write("\nRan %d test%s in %.3fs\n\n" %
@@ -153,6 +161,18 @@ class ChasteTestRunner:
             self.stream.write("Failed %d of %d tests\n" % (num_bad, num_run))
         else:
             self.stream.write("OK!\n")
+        if self.profiler:
+            # Append a profile report to the output
+            import pstats
+            stats = pstats.Stats(self.profiler, stream=self.stream)
+            self.stream.write('\n\nProfile report:\n\n')
+            stats.sort_stats('time')
+            stats.print_stats()
+            self.stream.write('\n\n')
+            stats.print_callees(.2)
+            self.stream.write('\n\n')
+#            stats.sort_stats('cumulative')
+            stats.print_callers(.2)
         return result
 
 class ChasteTestLoader(unittest.TestLoader):
@@ -179,32 +199,43 @@ def SetTestOutput(module):
     except:
         pass
 
+def main(filepath, profile=False):
+    """Run tests defined in the given Python file.
+
+    :param profile: whether to enable profiling of the test execution using cProfile.
+    """
+    if not os.path.isfile(filepath):
+        raise ValueError(filepath + ' is not a file')
+    base, ext = os.path.splitext(os.path.basename(filepath))
+    if ext != '.py':
+        raise ValueError(filepath + ' is not a Python source file')
+    # Load Python file
+    dirpath = os.path.dirname(filepath)
+    (file, pathname, desc) = imp.find_module(base, [dirpath])
+    try:
+        module = imp.load_module(base, file, pathname, desc)
+    except ImportError:
+        print "Python module search path:", sys.path, os.environ.get('PYTHONPATH')
+        raise
+    finally:
+        file.close()
+    # Extract and run its tests
+    SetTestOutput(module)
+    runner = ChasteTestRunner(profile=profile)
+    if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
+        suite = module.MakeTestSuite()
+        result = runner.run(suite)
+        sys.exit(not result.wasSuccessful())
+    else:
+        unittest.main(module=module, argv=[sys.argv[0]] + sys.argv[2:],
+                      testRunner=runner, testLoader=ChasteTestLoader())
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        filepath = sys.argv[1]
-        if not os.path.isfile(filepath):
-            raise ValueError(filepath + ' is not a file')
-        base, ext = os.path.splitext(os.path.basename(filepath))
-        if ext != '.py':
-            raise ValueError(filepath + ' is not a Python source file')
-        # Load Python file and run its tests
-        dirpath = os.path.dirname(filepath)
-        (file, pathname, desc) = imp.find_module(base, [dirpath])
-        try:
-            module = imp.load_module(base, file, pathname, desc)
-        except ImportError:
-            print "Python module search path:", sys.path, os.environ.get('PYTHONPATH')
-            raise
-        finally:
-            file.close()
-        SetTestOutput(module)
-        if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
-            suite = module.MakeTestSuite()
-            result = ChasteTestRunner().run(suite)
-            sys.exit(not result.wasSuccessful())
-        else:
-            unittest.main(module=module, argv=[sys.argv[0]] + sys.argv[2:],
-                          testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())
+        profile = '--profile' in sys.argv
+        if profile:
+            sys.argv.remove('--profile')
+        main(sys.argv[1], profile=profile)
     else:
         # Default test of this file
         unittest.main(testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())
