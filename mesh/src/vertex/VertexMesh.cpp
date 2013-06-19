@@ -1245,7 +1245,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2); // only works in 2D at present
+    assert(SPACE_DIM == 2);
     assert(ELEMENT_DIM == SPACE_DIM);
 
     // Get the element
@@ -1270,13 +1270,13 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 
         double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
 
-        //If the point lies almost bang on the supporting line of the edge, then snap to the line
-        //This allows us to do floating point tie-breaks when line is exactly at a node
+        // If the point lies almost bang on the supporting line of the edge, then snap to the line
+        // This allows us to do floating point tie-breaks when line is exactly at a node
         if (squared_distance_normal_to_edge < DBL_EPSILON)
         {
             squared_distance_normal_to_edge = 0.0;
         }
-        // Make sure node is within the confines of the edge and is the nearest edge to the node \this breks for convex elements
+        // Make sure node is within the confines of the edge and is the nearest edge to the node \this breaks for convex elements
         if (squared_distance_normal_to_edge < min_squared_normal_distance &&
             distance_parallel_to_edge >=0 &&
             distance_parallel_to_edge <= norm_2(vector_a_to_b))
@@ -1285,8 +1285,8 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
             min_distance_edge_index = local_index;
         }
     }
-    assert(min_distance_edge_index<num_nodes);
 
+    assert(min_distance_edge_index < num_nodes);
     return min_distance_edge_index;
 }
 
@@ -1352,14 +1352,15 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
     assert(SPACE_DIM == 2);
 
     c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
+
+    // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
     c_vector<double, 3> moments = CalculateMomentsOfElement(index);
 
-    double discriminant = sqrt((moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2));
-
-    ///\todo remove magic number? (#1884)
-    if (fabs(discriminant) < 1e-10)
+    // If the principal moments are equal...
+    double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
+    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (#1884)
     {
-        // Return a random unit vector
+        // ...then every axis through the centroid is a principal axis, so return a random unit vector
         short_axis(0) = RandomNumberGenerator::Instance()->ranf();
         short_axis(1) = sqrt(1.0 - short_axis(0)*short_axis(0));
     }
@@ -1368,7 +1369,6 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
         // If the product of inertia is zero, then the coordinate axes are the principal axes
         if (moments(2) == 0.0)
         {
-            // By definition the moments of area must be non-negative
             if (moments(0) < moments(1))
             {
                 short_axis(0) = 0.0;
@@ -1382,21 +1382,17 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
         }
         else
         {
-            /*
-             * As the inertia matrix is symmetric, both its eigenvalues are real.
-             * Also, by definition the moments of area must be non-negative, so
-             * the largest eigenvalue is given as follows.
-             */
-            double largest_eigenvalue = 0.5*(moments(0) + moments(1) + discriminant);
+            // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
+            double lambda = 0.5*(moments(0) + moments(1) + sqrt(discriminant));
 
             short_axis(0) = 1.0;
-            short_axis(1) = (moments(0) - largest_eigenvalue)/moments(2);
+            short_axis(1) = (moments(0) - lambda)/moments(2);
 
-            double length_short_axis = norm_2(short_axis);
-
-            short_axis /= length_short_axis;
+            double magnitude = norm_2(short_axis);
+            short_axis = short_axis / magnitude;
         }
     }
+
     return short_axis;
 }
 

@@ -887,6 +887,20 @@ public:
         TS_ASSERT_DELTA(far_rectangle_centroid[0], 10.5, 1e-4);
         TS_ASSERT_DELTA(far_rectangle_centroid[1], 12.0, 1e-4);
 
+        // Test method with a single rectangular element at a 30 degree angle to the x-axis
+        std::vector<Node<2>*> angled_rectangle_nodes;
+        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3)));
+        std::vector<VertexElement<2,2>*> angled_rectangle_elements;
+        angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
+        VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
+
+        c_vector<double, 2> angled_rectangle_centroid = angled_rectangle_mesh.GetCentroidOfElement(0);
+        TS_ASSERT_DELTA(angled_rectangle_centroid(0), 0.0, 1e-6);
+        TS_ASSERT_DELTA(angled_rectangle_centroid(1), 0.0, 1e-6);
+
         // Test method with a single element that is close to circular
         std::vector<Node<2>*> circle_nodes;
         unsigned num_nodes = 1000;
@@ -1286,6 +1300,20 @@ public:
     void TestCalculateMomentsOfElement() throw(Exception)
     {
         // Test method with a single triangular element
+        std::vector<Node<2>*> isos_triangle_nodes;
+        isos_triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        isos_triangle_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        isos_triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
+        std::vector<VertexElement<2,2>*> isos_triangle_elements;
+        isos_triangle_elements.push_back(new VertexElement<2,2>(0, isos_triangle_nodes));
+        VertexMesh<2,2> isos_triangle_mesh(isos_triangle_nodes, isos_triangle_elements);
+
+        c_vector<double, 3> isos_triangle_moments = isos_triangle_mesh.CalculateMomentsOfElement(0);
+        TS_ASSERT_DELTA(isos_triangle_moments[0], 0.0277, 1e-4);
+        TS_ASSERT_DELTA(isos_triangle_moments[1], 0.0277, 1e-4);
+        TS_ASSERT_DELTA(isos_triangle_moments[2], -0.0138, 1e-4);
+
+        // Test method with a single triangular element
         std::vector<Node<2>*> triangle_nodes;
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         triangle_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
@@ -1359,6 +1387,21 @@ public:
         TS_ASSERT_DELTA(far_rectangle_moments[1], 1.0/3.0, 1e-4);  // Iyy
         TS_ASSERT_DELTA(far_rectangle_moments[2], 0.0, 1e-4);      // Ixy = 0 by symmetry
 
+        // Test method with a single rectangular element at a 30 degree angle to the x-axis
+        std::vector<Node<2>*> angled_rectangle_nodes;
+        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3)));
+        std::vector<VertexElement<2,2>*> angled_rectangle_elements;
+        angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
+        VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
+
+        c_vector<double, 3> angled_rectangle_moments = angled_rectangle_mesh.CalculateMomentsOfElement(0);
+        TS_ASSERT_DELTA(angled_rectangle_moments[0], 14.0/3.0, 1e-4);    // Ixx
+        TS_ASSERT_DELTA(angled_rectangle_moments[1], 26.0/3.0, 1e-4);    // Iyy
+        TS_ASSERT_DELTA(angled_rectangle_moments[2], 2.0*sqrt(3), 1e-4); // Ixy
+
         // Test method with a single irregular element (compare with pen-and-paper solution)
         std::vector<Node<2>*> irregular_nodes;
         irregular_nodes.push_back(new Node<2>(0, false, 2.7663,  0.1033));
@@ -1394,15 +1437,15 @@ public:
         // Test method with a single triangular element
         std::vector<Node<2>*> triangle_nodes;
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        triangle_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
+        triangle_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
         std::vector<VertexElement<2,2>*> triangle_elements;
         triangle_elements.push_back(new VertexElement<2,2>(0, triangle_nodes));
         VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
 
         c_vector<double, 2> triangle_short_axis = triangle_mesh.GetShortAxisOfElement(0);
-        TS_ASSERT_DELTA(triangle_short_axis[0], 0.2897, 1e-4);
-        TS_ASSERT_DELTA(triangle_short_axis[1], 0.9570, 1e-4);
+        TS_ASSERT_DELTA(triangle_short_axis[0], 1/sqrt(2), 1e-4);
+        TS_ASSERT_DELTA(triangle_short_axis[1], 1/sqrt(2), 1e-4);
 
         // Test method with a single rectangular element parallel to the x-axis
         std::vector<Node<2>*> horizontal_rectangle_nodes;
@@ -1460,6 +1503,20 @@ public:
         TS_ASSERT_DELTA(far_rectangle_short_axis[0], 1.0, 1e-4);
         TS_ASSERT_DELTA(far_rectangle_short_axis[1], 0.0, 1e-4);
 
+        // Test method with a single rectangular element at a 30 degree angle to the x-axis
+        std::vector<Node<2>*> angled_rectangle_nodes;
+        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3)));
+        std::vector<VertexElement<2,2>*> angled_rectangle_elements;
+        angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
+        VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
+
+        c_vector<double, 2> angled_rectangle_short_axis = angled_rectangle_mesh.GetShortAxisOfElement(0);
+        TS_ASSERT_DELTA(angled_rectangle_short_axis(0), 0.5, 1e-6);
+        TS_ASSERT_DELTA(angled_rectangle_short_axis(1), -0.5*sqrt(3), 1e-6);
+
         // Test method with a single irregular element (compare with pen-and-paper solution)
         std::vector<Node<2>*> irregular_nodes;
         irregular_nodes.push_back(new Node<2>(0, false, 2.7663,  0.1033));
@@ -1487,7 +1544,7 @@ public:
 
         c_vector<double, 2> trapezium_short_axis = trapezium_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(trapezium_short_axis(0), 0.5, 1e-6);
-        TS_ASSERT_DELTA(trapezium_short_axis(1), -sqrt(3.0)*0.5, 1e-6);
+        TS_ASSERT_DELTA(trapezium_short_axis(1), -0.5*sqrt(3), 1e-6);
 
         // Test method with a single hexagonal element centred at the origin
         std::vector<Node<2>*> hexagon_nodes;

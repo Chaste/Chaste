@@ -454,9 +454,9 @@ public:
      *
      * Formulae for these quantities may be found e.g. in the following reference:
      *
-     * Zhang et al. Vector analysis theory on landscape pattern (VATLP).
-     * Ecological Modelling 193:492-502.
-     * http://dx.doi.org/10.1016/j.ecolmodel.2005.08.022
+     * Mechanics of Materials
+     * James M. Gere (Author), Barry J. Goodno.
+     * Cengage Learning; 8th edition (January 1, 2012)
      *
      * This method is used within GetShortAxisOfElement() to compute the direction
      * of the shortest principal axis passing through the centroid, or 'short axis',
@@ -522,8 +522,12 @@ public:
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,
      * or 'short axis', of a given element. This is the eigenvector associated with the
-     * eigenvalue of largest magnitude of the inertia tensor, which is computed by calling
-     * the method CalculateMomentsOfElement().
+     * eigenvalue of largest magnitude of the inertia matrix
+     *
+     * J = (  I_xx  -I_xy )
+     *     ( -I_xy   I_yy )
+     *
+     * whose entries are computed by calling the method CalculateMomentsOfElement().
      *
      * Note that if the nodes owned by the element are supplied in clockwise rather than
      * anticlockwise manner, or if this arises when any periodicity is enforced, then the
