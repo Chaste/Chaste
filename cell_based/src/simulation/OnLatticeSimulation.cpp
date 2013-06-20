@@ -152,7 +152,8 @@ void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
             unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
             const c_vector<double,DIM>& position = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-            c_vector<double, DIM> velocity = (position - old_cell_locations[*cell_iter])/this->mDt;
+            c_vector<double, DIM> velocity; // Two lines for profile build
+            velocity = (position - old_cell_locations[*cell_iter])/this->mDt;
 
             *mpCellVelocitiesFile << index  << " ";
             for (unsigned i=0; i<DIM; i++)

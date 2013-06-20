@@ -563,7 +563,7 @@ class GoogleProfile(GccDebug):
         # Array bounds checking is available in -O2 optimization and above
         # Tetgen code produces a couple of issues, but g++ sometimes gives false negatives.
         self._cc_flags.extend(['-Wno-array-bounds', '-fno-omit-frame-pointer'])
-        #self._link_flags.append('-lprofiler')
+        self._link_flags.append('-lprofiler')
         self._test_packs = ['Profile']
         self.build_dir = 'google_profile'
         self.is_profile = True
