@@ -580,7 +580,11 @@ class GoogleProfile(GccDebug):
                                '--nodefraction=0.0001', '--edgefraction=0.0001',
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
-        preload_hack = '' #'LD_PRELOAD=/usr/local/lib/libprofiler.so '
+        import socket
+        if socket.getfqdn().startswith('scoop'):
+            preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so '
+        else:
+            preload_hack = ''
         commands = ['export HOME="."',
                     'export CPUPROFILE="%s"' % profile_file,
                     preload_hack + exefile + ' ' + exeflags,

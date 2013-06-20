@@ -156,7 +156,7 @@ public:
     }
 
     /**
-     * Remove a property of the given type.
+     * Remove a single property of the given type.
      */
     template<typename CLASS>
     void RemoveProperty()
