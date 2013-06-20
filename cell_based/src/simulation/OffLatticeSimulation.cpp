@@ -285,7 +285,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
         OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
         PetscTools::BeginRoundRobin();
         {
-            if (!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed()!=0)
+            if (!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed() != 0)
             {
                 mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat", std::ios::app);
             }
@@ -342,15 +342,17 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
             }
             mpNodeVelocitiesFile->close();
         }
+        PetscTools::EndRoundRobin();
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
 {
+    OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+
     if (mOutputNodeVelocities && PetscTools::AmMaster())
     {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
         mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat");
     }
 }
@@ -358,7 +360,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateAtEndOfSolve()
 {
-    if (mOutputNodeVelocities)
+    if (mOutputNodeVelocities && PetscTools::AmTopMost())
     {
         mpNodeVelocitiesFile->close();
     }
