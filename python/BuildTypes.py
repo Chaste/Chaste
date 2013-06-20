@@ -580,7 +580,12 @@ class GoogleProfile(GccDebug):
                                '--nodefraction=0.0001', '--edgefraction=0.0001',
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
-        preload_hack = '' #'LD_PRELOAD=/usr/local/lib/libprofiler.so '
+        import socket 
+        if socket.getfqdn().startswith('scoop'): 
+            preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so ' 
+        else: 
+            preload_hack = '' 
+
         commands = ['export HOME="."',
                     'export CPUPROFILE="%s"' % profile_file,
                     preload_hack + exefile + ' ' + exeflags,
@@ -939,6 +944,7 @@ class Intel(BuildType):
         BuildType.__init__(self, *args, **kwargs)
         self._compiler_type = 'intel'
         self._checked_version = False
+        self._link_flags = [] # Newer Intel (12.0) doesn't support '-static-libcxa'; not sure why we need it anyway 
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
