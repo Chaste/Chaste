@@ -944,7 +944,6 @@ class Intel(BuildType):
         BuildType.__init__(self, *args, **kwargs)
         self._compiler_type = 'intel'
         self._checked_version = False
-        self._link_flags = [] # Newer Intel (12.0) doesn't support '-static-libcxa'; not sure why we need it anyway 
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
