@@ -198,9 +198,9 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
         }
         // Not root finding, so should have reached requested time
         assert(fabs(cvode_stopped_at - stepper.GetNextTime()) < DBL_EPSILON);
-
+#ifndef NDEBUG
         VerifyStateVariables();
-
+#endif
         // Store solution
         solutions.rGetSolutions().push_back(MakeStdVec(mStateVariables));
         solutions.rGetTimes().push_back(cvode_stopped_at);
@@ -261,7 +261,9 @@ void AbstractCvodeSystem::Solve(realtype tStart,
 //    printf("nni = %-6ld ncfn = %-6ld netf = %-6ld nge = %ld\n \n",
 //       nni, ncfn, netf, nge);
 //    std::cout << std::flush;
+#ifndef NDEBUG
     VerifyStateVariables();
+#endif
 }
 
 

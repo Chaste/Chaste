@@ -1759,7 +1759,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
             
             using_cvode = (self.TYPE_VECTOR_REF == CellMLToCvodeTranslator.TYPE_VECTOR_REF)        
             if using_cvode:
-                self.writeln('const double tol = this->mAbsTol; // We only expect CVODE solver to ever be as accurate as its absolute tolerance...')
+                self.writeln('/* We only expect CVODE to keep state variables to within its tolerances,')
+                self.writeln(' * not exactly the bounds prescribed to each variable that are checked here.')
+                self.writeln(' *')
+                self.writeln(' * For 99.99% of paces this->mAbsTol works,')
+                self.writeln(' * For 99.999% of paces 10*this->mAbsTol is fine,')
+                self.writeln(' * but unfortunately 100x seems to be required on rare occasions for upstrokes.')
+                self.writeln(' * This sounds bad, but is probably typically only 1e-5 or 1e-6.')
+                self.writeln(' */')
+                self.writeln('const double tol = 100*this->mAbsTol;')
                             
             self.output_state_assignments(nodeset=nodeset)
             error_template = 'EXCEPTION(DumpState("State variable %s has gone out of range. Check numerical parameters, for example time and space stepsizes, and/or solver tolerances"));'
