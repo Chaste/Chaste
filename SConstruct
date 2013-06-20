@@ -582,7 +582,7 @@ if offline_mode:
             # For chaste_libs=1
             print >> handle, "$MPI_LAUNCH_COMMAND", runner[0]
         else:
-            # For chaste_libs=-
+            # For chaste_libs=0
             print >> handle, "$MPI_LAUNCH_COMMAND", runner
     print >> handle, ""
     handle.close()
