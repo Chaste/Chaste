@@ -580,11 +580,7 @@ class GoogleProfile(GccDebug):
                                '--nodefraction=0.0001', '--edgefraction=0.0001',
                                exefile, profile_file,
                                '>', os.path.join(self.output_dir, base+'.gif')])
-        import socket
-        if socket.getfqdn().startswith('scoop'):
-            preload_hack = 'LD_PRELOAD=/usr/lib/libprofiler.so '
-        else:
-            preload_hack = ''
+        preload_hack = '' #'LD_PRELOAD=/usr/local/lib/libprofiler.so '
         commands = ['export HOME="."',
                     'export CPUPROFILE="%s"' % profile_file,
                     preload_hack + exefile + ' ' + exeflags,
@@ -943,7 +939,6 @@ class Intel(BuildType):
         BuildType.__init__(self, *args, **kwargs)
         self._compiler_type = 'intel'
         self._checked_version = False
-        self._link_flags = [] # Newer Intel (12.0) doesn't support '-static-libcxa'; not sure why we need it anyway
         self.build_dir = 'intel'
         # Intel compiler uses optimisation by default
         self.is_optimised = True
@@ -952,12 +947,11 @@ class Intel(BuildType):
         if not self._checked_version:
             # Turn off some warnings, and report warnings as errors.
             # The flags to use depend on compiler version, alas.
-            self._cc_flags = ['-Werror']
+            # Note that (at least) -Wall and -Werror are set by base/sub class constructors
             version = self.GetCompilerVersion()
             assert version > 0
             if version >= 12:
-                self._cc_flags.extend(['-Wall',
-                                       '-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
+                self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wno-unused-parameter', # Not available on 10.0
                                        '-wr2304', #2304: non-explicit constructor with single argument
                                        # Switch these ones on for compatibility
                                        '-we271', #271: trailing comma is nonstandard
@@ -966,8 +960,7 @@ class Intel(BuildType):
                                        ])
             elif (version == 10 or version == 11): # \todo #1360 Working through version 10 issues on userpc60
                 #\todo #1360 Justify or fix the supressions given below
-                self._cc_flags.extend(['-Wall',
-                                       # This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable. 
+                self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable. 
                                        '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
                                        # This one appears when, for example, we catch an exception but don't need to know what exception it was
                                        # We can work on this one...
@@ -1314,7 +1307,7 @@ class IntelP3(Intel):
         self.build_dir = 'intel_p3'
 
 class IntelP4(Intel):
-    """Intel compilers optimised for Pentium 4.
+    """Intel compilers optimised for Pentium 4 onwards.
     
     Figures out from /proc/cpuinfo which of the following options to use.
     
@@ -1330,18 +1323,21 @@ class IntelP4(Intel):
     def __init__(self, *args, **kwargs):
         Intel.__init__(self, *args, **kwargs)
         cpu_flags = self._get_cpu_flags()
-        if 'ssse3' in cpu_flags:
-            opt = '-xT'
-        elif 'sse3' in cpu_flags:
-            opt = '-xP'
-        else:
-            opt = '-xW'
+        opt = '-xHost'
+        # We used to switch on each optimisation in turn but -xHost 
+        # will effectively do a "native" build for all the available cpu instructions.
+        #if 'ssse3' in cpu_flags:
+        #    opt = '-xT'
+        #elif 'sse3' in cpu_flags:
+        #    opt = '-xP'
+        #else:
+        #    opt = '-xW'
         self._cc_flags.extend([opt, '-O3', '-ip', '-ipo1'])
         self._link_flags.extend(['-ipo1'])
         self.build_dir = 'intel_p4'
 
 class IntelProduction(IntelP4):
-    """Intel Production version optimised for Pentium 4."""
+    """Intel Production version optimised for Pentium 4 onwards."""
     def __init__(self, *args, **kwargs):
         IntelP4.__init__(self, *args, **kwargs)
         self.build_dir = 'intel_production'
