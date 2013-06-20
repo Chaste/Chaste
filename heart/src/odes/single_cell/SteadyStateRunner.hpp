@@ -46,6 +46,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * It does it by simply pacing and looking for a small change in the norm of the
  * state variables between subsequent paces.
+ *
+ * Note - because it looks for a small change in state variables between solves
+ * this method requires quite an accurate CVODE solution to do this efficiently
+ * (otherwise you just have to wait to get lucky on subsequent solves).
+ *
+ * So although running with stricter tolerances takes longer per pace
+ * it can mean you detect a steady state in up to 3x fewer paces, so it is
+ * recommended to use a model with SetTolerances(1e-6, 1e-8); or stricter.
  */
 class SteadyStateRunner: public AbstractSteadyStateRunner
 {
