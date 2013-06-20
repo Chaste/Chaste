@@ -50,11 +50,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <xsd/cxx/tree/error-handler.hxx>
 #include <xsd/cxx/tree/elements.hxx>
 
+#ifndef X //Also used in XSD code for XdmfMeshWriter
 /**
  * Convenience macro for transcoding C++ strings to Xerces' format.
  * @param str  the string to transcode
  */
 #define X(str) xsd::cxx::xml::string(str).c_str()
+#endif //X
 
 /**
  * Convenience macro for transcoding an XML string to a C++ std::string.

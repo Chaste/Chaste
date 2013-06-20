@@ -46,12 +46,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Required for outputing a Xerces DOMDocument
 // to the file system (Also see: XMLFormatTarget)
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
-
+#include <xsd/cxx/xml/string.hxx>
 
 #include "XdmfMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "Version.hpp"
-#include "XmlTools.hpp" // For Xerces and its macros
+
+#ifndef X //Also used in XmlTools in the heart component
+/**
+ * Convenience macro for transcoding C++ strings to Xerces' format.
+ * @param str  the string to transcode
+ */
+#define X(str) xsd::cxx::xml::string(str).c_str()
+#endif //X
+
+#if _XERCES_VERSION >= 30000
+///\todo
+#endif
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::XdmfMeshWriter(const std::string& rDirectory,
@@ -249,41 +260,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned numberOfChunks)
 {
     assert(PetscTools::AmMaster());
-    std::string master_file_name = this->mBaseName + ".xdmf";
-    out_stream master_file = this->mpOutputFileHandler->OpenOutputFile(master_file_name);
-
-    // Write header information
-    (*master_file) << "<?xml version=\"1.0\" ?>\n";
-    (*master_file) << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
-    (*master_file) << "<Xdmf Version=\"2.0\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n";
-    (*master_file) << "\t<Domain>\n";
-
-
-    // Write main test Grid collection (to be later replaced by temporal collection)
-    // Write references to geometry and topology chunk(s)
-    (*master_file) << "\t\t<Grid Name=\"Grid\" GridType=\"Collection\" CollectionType=\"Spatial\">\n";
-    for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
-    {
-        std::stringstream geometry_file_name;
-        geometry_file_name << this->mBaseName << "_geometry_"<< chunk <<".xml";
-        std::stringstream topology_file_name;
-        topology_file_name << this->mBaseName << "_topology_"<< chunk <<".xml";
-        (*master_file) << "\t\t\t<Grid Name=\"Chunk_"<< chunk <<"\" Gridtype=\"Uniform\">\n";
-        (*master_file) << "\t\t\t\t<xi:include href=\""<< geometry_file_name.str() <<"\"/>\n";
-        (*master_file) << "\t\t\t\t<xi:include href=\""<< topology_file_name.str() <<"\"/>\n";
-        (*master_file) << "\t\t\t</Grid>\n";
-    }
-    (*master_file) << "\t\t</Grid>\n";
-
-    // Write footer
-    (*master_file) << "\t</Domain>\n";
-    (*master_file) << "</Xdmf>\n";
-    (*master_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
-
-    master_file->close();
-
-/*
- *
     // Define namespace symbols
     XERCES_CPP_NAMESPACE_USE
 
@@ -291,42 +267,60 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     XMLPlatformUtils::Initialize();
 
     // Pointer to our DOMImplementation.
-    DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(X("core"));
+    DOMImplementation* p_DOM_implementation = DOMImplementationRegistry::getDOMImplementation(X("core"));
 
     // Pointer to a DOMDocument.
-    DOMDocument * pDOMDocument = pDOMImplementation->createDocument(X("http://www.w3.org/2001/XInclude"), X("Xdmf"), 0);
-    DOMElement* pRootElement = pDOMDocument->getDocumentElement();
-    pRootElement->setAttribute(X("version"), X("2.0"));
-
-    // Create a Comment node, and then append this to the root element.
-    DOMComment* pDOMComment = pDOMDocument->createComment(X(ChasteBuildInfo::GetProvenanceString()));
-    pRootElement->appendChild(pDOMComment);
-
+    DOMDocumentType* p_DOM_document_type = p_DOM_implementation->createDocumentType(X("Xdmf"),0,X("Xdmf.dtd"));
+    DOMDocument * p_DOM_document = p_DOM_implementation->createDocument(0, X("Xdmf"), p_DOM_document_type);
+    DOMElement* p_root_element = p_DOM_document->getDocumentElement();
+    p_root_element->setAttribute(X("Version"), X("2.0"));
+    p_root_element->setAttribute(X("xmlns:xi"), X("http://www.w3.org/2001/XInclude"));
 
     // Create an Element node, then fill in some attributes,
     // and then append this to the root element.
-    DOMElement* pDataElement =  pDOMDocument->createElement(X("data"));
-    pDataElement->setAttribute(X("something"), X("blahblah"));
-    pRootElement->appendChild(pDataElement);
+    DOMElement* p_domain_element =  p_DOM_document->createElement(X("Domain"));
+    p_root_element->appendChild(p_domain_element);
 
+    DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
+    p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
+    p_grid_collection_element->setAttribute(X("GridType"), X("Collection"));
+    p_domain_element->appendChild(p_grid_collection_element);
 
+    for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+    {
+        std::stringstream chunk_stream;
+        chunk_stream << chunk;
 
+        DOMElement* p_grid_element =  p_DOM_document->createElement(X("Grid"));
+        p_grid_element->setAttribute(X("GridType"), X("Uniform"));
+        p_grid_element->setAttribute(X("Name"), X("Chunk_" + chunk_stream.str()));
+        p_grid_collection_element->appendChild(p_grid_element);
 
-    DOMWriter* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createDOMWriter();
-    pSerializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+        DOMElement* p_geom_element =  p_DOM_document->createElement(X("xi:include"));
+        p_geom_element->setAttribute(X("href"), X(this->mBaseName+"_geometry_"+chunk_stream.str()+".xml"));
+        p_grid_element->appendChild(p_geom_element);
+        DOMElement* p_topo_element =  p_DOM_document->createElement(X("xi:include"));
+        p_topo_element->setAttribute(X("href"), X(this->mBaseName+"_topology_"+chunk_stream.str()+".xml"));
+        p_grid_element->appendChild(p_topo_element);
+    }
 
-    XMLFormatTarget* pTarget = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+"_fake.xdmf"));
+    // Create a Comment node, and then append this to the root element.
+    DOMComment* p_provenance_comment = p_DOM_document->createComment(X(" "+ChasteBuildInfo::GetProvenanceString()));
+    p_DOM_document->appendChild(p_provenance_comment);
 
+    DOMWriter* p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createDOMWriter();
+    p_serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+
+    XMLFormatTarget* p_target = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".xdmf"));
 
     // Write the serialized output to the target.
-    pSerializer->writeNode(pTarget, *pDOMDocument);
+    p_serializer->writeNode(p_target, *p_DOM_document);
 
     // Cleanup.
-    pDOMDocument->release();
+    p_serializer->release();
+    p_DOM_document->release();
+    delete p_target;
     XMLPlatformUtils::Terminate();
-    //delete pTarget;
- *
- */
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

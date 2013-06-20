@@ -1,14 +1,16 @@
-<?xml version="1.0" ?>
-<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd">
 <Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
-	<Domain>
-		<Grid Name="Grid" GridType="Collection" CollectionType="Spatial">
-			<Grid Name="Chunk_0" Gridtype="Uniform">
-				<xi:include href="disk_from_mesh_geometry_0.xml"/>
-				<xi:include href="disk_from_mesh_topology_0.xml"/>
-			</Grid>
-		</Grid>
-	</Domain>
+
+  <Domain>
+    <Grid CollectionType="Spatial" GridType="Collection">
+      <Grid GridType="Uniform" Name="Chunk_0">
+        <xi:include href="disk_from_mesh_geometry_0.xml"/>
+        <xi:include href="disk_from_mesh_topology_0.xml"/>
+      </Grid>
+    </Grid>
+  </Domain>
+
 </Xdmf>
-<!-- Created by Chaste version 3.1.19075 (with uncommitted modifications) on Fri, 07 Jun 2013 09:25:54 +0000.  Chaste was built on Wed, 05 Jun 2013 11:16:00 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: default, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
+<!-- Created by Chaste version 3.1.19223 (with uncommitted modifications) on Thu, 20 Jun 2013 11:31:07 +0000.  Chaste was built on Thu, 20 Jun 2013 11:30:56 +0000 by machine (uname) 'Linux userpc60.cs.ox.ac.uk 2.6.32-48-generic #110-Ubuntu SMP Fri May 31 18:32:53 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: SimpleSensitivity=18009; website=15353.
 -->
