@@ -1,0 +1,30 @@
+project(testcell_based)
+
+if(ENABLE_CHASTE_TESTING)
+#copy test data
+file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/cell_based/test")
+
+#Create testcell_based library to link cell_based's tests against
+file(GLOB_RECURSE CHASTE_TEST_CELL_BASED_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
+add_library(testcell_based STATIC ${CHASTE_TEST_CELL_BASED_SOURCES})
+
+add_definitions(-D_USE_MATH_DEFINES)#cmath and M_PI
+
+
+include_directories("${CHASTE_CELL_BASED_INCLUDE_DIRS}" 
+"${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/simulation" "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" 
+"${CHASTE_LINALG_INCLUDE_DIRS}" "${CHASTE_IO_INCLUDE_DIRS}" )
+
+#Auto-generate test suites
+set(COMPONENT_LIBRARIES testcell_based cell_based pde ode mesh linalg io global)
+file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
+
+set(TEST_MPIEXEC_ENABLED TRUE)
+
+set(HAS_OWN_LINKER_FLAGS TRUE)
+set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:MSVCRT /NODEFAULTLIB:MSVCRTD")
+#set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD /NODEFAULTLIB:LIBCPMT")#unresolved externals getcwd etc.
+
+chaste_generate_test_suites()
+
+endif(ENABLE_CHASTE_TESTING)
