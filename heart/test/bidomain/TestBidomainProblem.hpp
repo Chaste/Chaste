@@ -542,8 +542,8 @@ public:
 
         bidomain_problem.Initialise();
 
-        TS_ASSERT_THROWS_CONTAINS(bidomain_problem.Solve(), "State variable fast_sodium_current_m_gate__m has gone out of range. "
-                                  "Check model parameters, for example spatial stepsize\n");
+        TS_ASSERT_THROWS_CONTAINS(bidomain_problem.Solve(),
+               "State variable fast_sodium_current_m_gate__m has gone out of range. Check numerical parameters, for example time and space stepsizes");
 
         // Make sure that there's time for the files to be written
         // (most files are only written by the master)

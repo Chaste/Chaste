@@ -135,7 +135,8 @@ public:
         // EvaluateYDerivatives() method of the cell model
 
         TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Solve(),
-                "State variable fast_sodium_current_m_gate__m has gone out of range. Check model parameters, for example spatial stepsize");
+                "State variable fast_sodium_current_m_gate__m has gone out of range. "
+                "Check numerical parameters, for example time and space stepsizes");
 #endif //NDEBUG //Note that this test relies on the debug VerifyStateVariables() method throwing
     }
 

@@ -1740,8 +1740,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         which specify allowable ranges for these variables.  The generated method will check that
         they are within the range.  Both limits are included, i.e. they specify a closed interval.
         """
-        self.output_method_start('VerifyStateVariables', [], 'void')
-        self.open_block()
+        
+        # First work out if there are any constraints on state variables
         low_prop = ('pycml:range-low', NSS['pycml'])
         high_prop = ('pycml:range-high', NSS['pycml'])
         low_range_vars = filter(
@@ -1751,15 +1751,30 @@ class CellMLToChasteTranslator(CellMLTranslator):
             lambda v: v.get_type() == VarTypes.State,
             cellml_metadata.find_variables(self.model, high_prop))
         nodeset = set(low_range_vars + high_range_vars)
-        self.output_state_assignments(nodeset=nodeset)
-        error_template = 'EXCEPTION(DumpState("State variable %s has gone out of range. Check model parameters, for example spatial stepsize"));'
-        for var in low_range_vars:
-            self.writeln('if (', self.code_name(var), ' < ', var.get_rdf_annotation(low_prop), ')')
-            self.writeln(error_template % self.var_display_name(var), indent_offset=1)
-        for var in high_range_vars:
-            self.writeln('if (', self.code_name(var), ' > ', var.get_rdf_annotation(high_prop), ')')
-            self.writeln(error_template % self.var_display_name(var), indent_offset=1)
-        self.close_block(True)
+        
+        # If not, don't bother writing the method, an empty implementation is in the abstract classes.
+        if nodeset:        
+            self.output_method_start('VerifyStateVariables', [], 'void')
+            self.open_block()    
+            
+            using_cvode = (self.TYPE_VECTOR_REF == CellMLToCvodeTranslator.TYPE_VECTOR_REF)        
+            if using_cvode:
+                self.writeln('const double tol = this->mAbsTol; // We only expect CVODE solver to ever be as accurate as its absolute tolerance...')
+                            
+            self.output_state_assignments(nodeset=nodeset)
+            error_template = 'EXCEPTION(DumpState("State variable %s has gone out of range. Check numerical parameters, for example time and space stepsizes, and/or solver tolerances"));'
+            additional_tolerance_adjustment = ''
+            for var in low_range_vars:
+                if using_cvode:
+                    additional_tolerance_adjustment = ' - tol'
+                self.writeln('if (', self.code_name(var), ' < ', var.get_rdf_annotation(low_prop), additional_tolerance_adjustment, ')')
+                self.writeln(error_template % self.var_display_name(var), indent_offset=1)
+            for var in high_range_vars:
+                if using_cvode:
+                    additional_tolerance_adjustment = ' + tol'            
+                self.writeln('if (', self.code_name(var), ' > ', var.get_rdf_annotation(high_prop), additional_tolerance_adjustment, ')')
+                self.writeln(error_template % self.var_display_name(var), indent_offset=1)
+            self.close_block(True)
   
     def output_constructor(self, params, base_class_params):
         """Output a cell constructor.
