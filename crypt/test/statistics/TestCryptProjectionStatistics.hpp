@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "CryptProjectionStatistics.hpp"
 #include "CryptProjectionForce.hpp"
@@ -52,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntConcentration.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
+
+#include "FakePetscSetup.hpp"
 
 class TestCryptProjectionStatistics : public AbstractCellBasedTestSuite
 {
