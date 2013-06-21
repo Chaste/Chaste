@@ -149,11 +149,11 @@ public:
 
         TS_ASSERT_EQUALS(cell_type_count[0], 6u);   // Stem
 
-        TS_ASSERT_LESS_THAN_EQUALS(cell_type_count[1], 22u); // 21 <= Transit <= 22
+        TS_ASSERT_LESS_THAN_EQUALS(cell_type_count[1], 23u); // 21 <= Transit <= 23
         TS_ASSERT_LESS_THAN_EQUALS(21u, cell_type_count[1]);
 
-        TS_ASSERT_LESS_THAN_EQUALS(cell_type_count[2], 35u); // 34 <= Differentiated <= 35
-        TS_ASSERT_LESS_THAN_EQUALS(34u, cell_type_count[2]);
+        TS_ASSERT_LESS_THAN_EQUALS(cell_type_count[2], 35u); // 33 <= Differentiated <= 35
+        TS_ASSERT_LESS_THAN_EQUALS(33u, cell_type_count[2]);
 
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);   // Default
     }
