@@ -287,7 +287,7 @@ public:
         SimulationTime::Instance()->IncrementTimeOneStep();
         TS_ASSERT_EQUALS(p_stem_cell_1d->ReadyToDivide(), true);
 
-        CellPtr p_daughter_1d = p_stem_cell_1d->Divide();
+        p_stem_cell_1d->Divide();
 
         // Coverage of 3D
 
@@ -310,7 +310,7 @@ public:
         SimulationTime::Instance()->IncrementTimeOneStep();
         TS_ASSERT_EQUALS(p_stem_cell_3d->ReadyToDivide(), true);
 
-        CellPtr p_daughter_3d = p_stem_cell_3d->Divide();
+        p_stem_cell_3d->Divide();
 
         // Tidy up
         WntConcentration<1>::Destroy();

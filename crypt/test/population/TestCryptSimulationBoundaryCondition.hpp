@@ -444,8 +444,6 @@ public:
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
-        // Now move the first cell (which should be on x=0) to the left
-        AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
         crypt.GetNode(0)->rGetModifiableLocation()[0] = -0.1;
 
         // Create a boundary condition object
@@ -481,7 +479,6 @@ public:
         }
 
         // Now move the first cell (which should be on y=0) down a bit
-        AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
 
         // Create a boundary condition object

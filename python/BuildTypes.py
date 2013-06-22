@@ -967,9 +967,6 @@ class Intel(BuildType):
                 #\todo #1360 Justify or fix the supressions given below
                 self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable. 
                                        '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
-                                       # This one appears when, for example, we catch an exception but don't need to know what exception it was
-                                       # We can work on this one...
-                                       '-wd177', #177: handler parameter "..." was declared but never referenced
                                        '-wd185', #185: dynamic initialization in unreachable code (DUE TO INSTANTIATED TEMPLATES)
                                        '-wd280', #280: selector expression is constant
                                        '-wd304', #304: access control not specified ("public" by default)
