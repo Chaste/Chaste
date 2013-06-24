@@ -308,13 +308,23 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     DOMComment* p_provenance_comment = p_DOM_document->createComment(X(" "+ChasteBuildInfo::GetProvenanceString()));
     p_DOM_document->appendChild(p_provenance_comment);
 
+#if _XERCES_VERSION >= 30000
+    DOMLSSerializer *p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createLSSerializer();
+    p_serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+#else
     DOMWriter* p_serializer = ((DOMImplementationLS*)p_DOM_implementation)->createDOMWriter();
     p_serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+#endif
 
     XMLFormatTarget* p_target = new LocalFileFormatTarget(X(this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName+".xdmf"));
 
-    // Write the serialized output to the target.
+#if _XERCES_VERSION >= 30000
+    DOMLSOutput *p_output = ((DOMImplementationLS*)p_DOM_implementation)->createLSOutput();
+    p_output->setByteStream(p_target);
+    p_serializer->write(p_DOM_document, p_output);
+#else
     p_serializer->writeNode(p_target, *p_DOM_document);
+#endif
 
     // Cleanup.
     p_serializer->release();
