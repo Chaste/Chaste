@@ -201,7 +201,7 @@ c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::Calcula
     }
     else
     {
-        ///\todo do something for vertex models here
+        ///\todo do something for vertex models here (see #2400)
         return zero_vector<double>(SPACE_DIM);
     }
 }
