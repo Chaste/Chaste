@@ -652,8 +652,7 @@ public:
             expected_node_pairs.insert(node_pair);
         }
 
-        // set up simple cell population with honeycomb mesh
-
+        // Set up simple cell population with honeycomb mesh
         unsigned num_cells_depth = 2;
         unsigned num_cells_width = 2;
         unsigned thickness_of_ghosts = 1;
@@ -1027,6 +1026,53 @@ public:
             TS_ASSERT_EQUALS(cell_population.IsGhostNode(node_index), should_be_ghost_node);
         }
     }
+
+    void TestAddCellDataToPopulation()
+    {
+        // Set up simulation time
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a mesh-based cell population with ghost nodes
+        unsigned num_cells_depth = 11;
+        unsigned num_cells_width = 6;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
+
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        // Set up cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
+
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+
+        cell_population.SetDataOnAllCells("variable", 100.0);
+
+        // Check that the data made it there and that copies of the data are independent
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("variable"), 100.0);
+            cell_iter->GetCellData()->SetItem("variable", 1.0);
+        }
+
+        cell_population.SetDataOnAllCells("added variable", 200.0);
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("added variable"), 200.0);
+            cell_iter->GetCellData()->SetItem("added variable", 1.0);
+        }
+
+        std::vector<std::string> keys = cell_population.Begin()->GetCellData()->GetKeys();
+        TS_ASSERT_EQUALS(keys.size(), 2u);
+        TS_ASSERT_EQUALS(keys[0], "added variable");
+        TS_ASSERT_EQUALS(keys[1], "variable");
+    }
+
 };
 
 #endif /*TESTMESHBASEDCELLPOPULATIONWITHGHOSTNODES_HPP_*/

@@ -1003,7 +1003,6 @@ public:
             cell_iter->GetCellData()->SetItem("variable", 1.0);
         }
 
-
         cell_population.SetDataOnAllCells("added variable", 200.0);
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
                  cell_iter != cell_population.End();
@@ -1018,9 +1017,6 @@ public:
         TS_ASSERT_EQUALS(keys[0], "added variable");
         TS_ASSERT_EQUALS(keys[1], "variable");
     }
-
-
-
 
     // This test checks that the cells and nodes are correctly archived.
     void TestArchivingMeshBasedCellPopulation() throw (Exception)
