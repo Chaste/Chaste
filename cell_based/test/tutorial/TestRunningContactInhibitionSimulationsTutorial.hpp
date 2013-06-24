@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNIGCONTACTINHIBITIONSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to use the contact inhibition cell cycle model (with the contact inhibition simulator) =
+ * = An example showing how to use a contact inhibition cell cycle model and volume tracking simulation modifier =
  *
  * == Introduction ==
  *
@@ -94,11 +94,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * The next header defines the simulation class modifier corresponding to the contact inhibition cell-cycle model.
- * This modifier leads to the {{{CellData}}} cell property being updated at each timestep with the
- * volume of each cell.
+ * This modifier updates the {{{CellData}}} cell property at each timestep with the volume of each cell.
  */
 #include "VolumeTrackingModifier.hpp"
-
 
 /* The remaining header files define classes that will be also be used and are presented in other tutorials. */
 #include "OffLatticeSimulation.hpp"
