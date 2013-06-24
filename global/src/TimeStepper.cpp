@@ -138,7 +138,7 @@ void TimeStepper::AdvanceOneTimeStep()
     {
         EXCEPTION("Time step counter has overflowed.");
     }
-    if (mTime == mNextTime)
+    if (mTime >= mNextTime)
     {
         EXCEPTION("TimeStepper incremented beyond end time.");
     }
@@ -161,7 +161,7 @@ double TimeStepper::GetNextTimeStep()
 {
     double dt = mDt;
 
-    if (mNextTime == mEnd)
+    if (mNextTime >= mEnd)
     {
         dt = mEnd - mTime;
     }
@@ -169,7 +169,8 @@ double TimeStepper::GetNextTimeStep()
     // If the next time or the current time is one of the additional times, the timestep will not be mDt
     if (mAdditionalTimesReached > 0)
     {
-        if ((mNextTime == mAdditionalTimes[mAdditionalTimesReached-1]) || (mTime == mAdditionalTimes[mAdditionalTimesReached-1]))
+        if (fabs(mNextTime - mAdditionalTimes[mAdditionalTimesReached-1]) < mEpsilon ||
+            fabs(mTime - mAdditionalTimes[mAdditionalTimesReached-1]) < mEpsilon)
         {
             dt = mNextTime - mTime;
             assert(dt > 0);

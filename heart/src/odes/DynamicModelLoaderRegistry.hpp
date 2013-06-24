@@ -51,7 +51,7 @@ typedef boost::weak_ptr<DynamicCellModelLoader> DynamicCellModelLoaderWeakPtr;
  * This class provides a static registry to keep track of the cell model loaders used,
  * hence ensuring that we don't have a given .so loaded more than once at any given point.
  */
-class DynamicModelLoaderRegistry : boost::noncopyable
+class DynamicModelLoaderRegistry : private boost::noncopyable
 {
 public:
     /**

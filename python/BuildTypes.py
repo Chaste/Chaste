@@ -963,14 +963,18 @@ class Intel(BuildType):
                                        #Following doesn't seem to play
                                        '-we810', #810: conversion from "double" to "unsigned int" may lose significant bits
                                        ])
-            elif (version == 10 or version == 11): # \todo #1360 Working through version 10 issues on userpc60
-                #\todo #1360 Justify or fix the supressions given below
+            elif (version == 10 or version == 11):
                 self._cc_flags.extend([# This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (SPACE_DIM<3){return;}" will complain that the SPACE_DIM=3 specific code is unreachable. 
                                        '-wd111', #111: statement is unreachable (DUE TO INSTANTIATED TEMPLATES)
+                                       # This is where the statement is unreachable in a particular instatiation of the template.  e.g. "if (ELEMENT_DIM<SPACE_DIM){return;}" will complain that the ELEMENT_DIM == SPACE_DIM dynamic initialization is unreachable.
                                        '-wd185', #185: dynamic initialization in unreachable code (DUE TO INSTANTIATED TEMPLATES)
+                                       # This happens when a switch is based on an unsigned template parameter
                                        '-wd280', #280: selector expression is constant
+                                       # This is seen when used templates to access the is_abstract base class definition 
                                        '-wd304', #304: access control not specified ("public" by default)
+                                       # This is when we pass an explict string to a std::string reference: e.g. FileFinder save_bidomain_dir("some_directory", RelativeTo::ChasteSourceRoot);
                                        '-wd383', #383: value copied to temporary, reference to temporary used
+                                       # Noncopyable doesn't have a virtual destructor.  The derived class should not have access to it either
                                        '-wd444', #444: destructor for base class "boost::noncopyable_::noncopyable" ... is not virtual
                                        # Most commonly seen in archiving where the "version" variable is often redundant
                                        '-wd869', #869: parameter "..." was never referenced
@@ -980,12 +984,9 @@ class Intel(BuildType):
                                        '-wd1418', #1418: external function definition with no prior declaration
                                        # There are times when we want a local helper function (RecursiveCopy in FileFinder) or when we need to refer to KSPConvergedReasons
                                        '-wd1419', #1419: external declaration in primary source file
-                                       # ***This one is really useful for telling us where we might want to use CompareDoubles::WithinRelativeTolerance, but in our core code (TimeStepper) the tests should ensure we aren't doing anything silly
+                                       # This one is potentially useful for telling us where we might want to use CompareDoubles::WithinRelativeTolerance, but in our core code (TimeStepper) the tests should ensure we aren't doing anything silly
                                        '-wd1572', #1572: floating-point equality and inequality comparisons are unreliable
                                        ])
-            # 10.0 produces extra warnings: {181: 'argument is incompatible with corresponding format string conversion', 424: 'extra ";" ignored',   
-            #    82: 'storage class is not first',  271: 'trailing comma is nonstandard', 1599: 'declaration hides variable "random_direction" (declared at line 79)', 
-            #    810: 'conversion from "double" to "PetscInt={int}" may lose significant bits'}
             self._checked_version = True
         return super(Intel, self).CcFlags()
     

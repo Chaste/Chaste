@@ -146,26 +146,26 @@ bool CompareDoubles::IsNearZero(double number, double tolerance)
 
 /**
  * Divide two non-negative floating point numbers, avoiding overflow and underflow.
- * @param number  the number to be divided
+ * @param numerator  the number to be divided
  * @param divisor  the number to divide by
  */
-double SafeDivide(double number, double divisor);
+double SafeDivide(double numerator, double divisor);
 
-double SafeDivide(double number, double divisor)
+double SafeDivide(double numerator, double divisor)
 {
     // Avoid overflow
-    if (divisor < 1.0 && number > divisor*DBL_MAX)
+    if (divisor < 1.0 && numerator > divisor*DBL_MAX)
     {
         return DBL_MAX;
     }
 
     // Avoid underflow
-    if (number == 0.0 || (divisor > 1.0 && number < divisor*DBL_MIN))
+    if (numerator == 0.0 || (divisor > 1.0 && numerator < divisor*DBL_MIN))
     {
         return 0.0;
     }
 
-    return number/divisor;
+    return numerator/divisor;
 
 }
 
