@@ -684,7 +684,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfEle
         break;
         case 3:
         {
-            ///\todo compute centroid rather than centre of mass
+            ///\todo compute centroid rather than centre of mass (see #1422)
             for (unsigned local_index=0; local_index<num_nodes; local_index++)
             {
                 centroid += p_element->GetNodeLocation(local_index);
@@ -1133,7 +1133,7 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<dou
     // Initialise boolean
     bool element_includes_point = false;
 
-///\todo (#2387) Investigate why the commented implementation causes Test2DVertexBasedCryptRepresentativeSimulation to fail
+///\todo (see #2387 and #2401) Investigate why the commented implementation causes Test2DVertexBasedCryptRepresentativeSimulation to fail
 //    // Initialise boolean
 //    bool element_includes_point = true;
 //
@@ -1358,7 +1358,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfEl
 
     // If the principal moments are equal...
     double discriminant = (moments(0) - moments(1))*(moments(0) - moments(1)) + 4.0*moments(2)*moments(2);
-    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (#1884)
+    if (fabs(discriminant) < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
     {
         // ...then every axis through the centroid is a principal axis, so return a random unit vector
         short_axis(0) = RandomNumberGenerator::Instance()->ranf();

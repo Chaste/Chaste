@@ -327,7 +327,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         if (norm_2(a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
             WARNING("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.");
-            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399)
+            ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
             intersection = position_a + 0.5*a_to_b;
         }
         else
@@ -504,7 +504,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(VertexElement<
      */
 
     // Find lowest element
-    ///\todo this could be more efficient
+    ///\todo this could be more efficient (see #2401)
     double height_midpoint_1 = 0.0;
     double height_midpoint_2 = 0.0;
     unsigned counter_1 = 0;
@@ -820,19 +820,19 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT1Swaps(VertexElementMap
          elem_iter != this->GetElementIteratorEnd();
          ++elem_iter)
     {
-        ///\todo Could we search more efficiently by just iterating over edges?
+        ///\todo Could we search more efficiently by just iterating over edges? (see #2401)
 
         unsigned num_nodes = elem_iter->GetNumNodes();
         assert(num_nodes > 0);
 
-        unsigned new_num_nodes = num_nodes;    ///\todo Is this required?
+        unsigned new_num_nodes = num_nodes;    ///\todo Is this required? (see #2401)
 
         // Loop over the nodes contained in this element
         for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
             // Find locations of the current node and anticlockwise node
             Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-            unsigned local_index_plus_one = (local_index+1)%new_num_nodes;    ///\todo Use iterators to tidy this up
+            unsigned local_index_plus_one = (local_index+1)%new_num_nodes;    ///\todo Use iterators to tidy this up (see #2401)
             Node<SPACE_DIM>* p_anticlockwise_node = elem_iter->GetNode(local_index_plus_one);
 
             // Find distance between nodes
@@ -906,7 +906,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
     // If checking for internal intersections as well as on the boundary, then check that no nodes have overlapped any elements...
     if (mCheckForInternalIntersections)
     {
-        ///\todo Change to only loop over neighbouring elements
+        ///\todo Change to only loop over neighbouring elements (see #2401)
         for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
              node_iter != this->GetNodeIteratorEnd();
              ++node_iter)
@@ -1096,7 +1096,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *   --o--o (2)
                      *     (1) \
                      *
-                     * We merge the nodes in this case. ///\todo this should be a T1 Swap see #1263
+                     * We merge the nodes in this case. ///\todo this should be a T1 swap (see #1263 and #2401)
                      */
                     PerformNodeMerge(pNodeA, pNodeB);
 
@@ -1395,7 +1395,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
     mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*vector_AB);
 
     double distance_AB = norm_2(vector_AB);
-    if (distance_AB < 1e-10) ///\todo remove magic number? (#1884)
+    if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
     {
         EXCEPTION("Nodes are too close together, this shouldn't happen");
     }
@@ -1799,12 +1799,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     // Store the location of the T3Swap, the location of the intersection with the edge.
     mLocationsOfT3Swaps.push_back(intersection);
 
-    /*
+    /**
      * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearrangementThreshold move vertexA and vertexB
-     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart. \todo investigate if moving A and B causes other issues with nearby nodes.
+     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart.
+     * \todo investigate if moving A and B causes other issues with nearby nodes (see #2401)
      *
      * Note: this distance so that there is always enough room for new nodes (if necessary)
-     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases. #1399
+     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases
+     *       (see #1399 and #2401)
      */
     if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
@@ -1828,12 +1830,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
         intersection = centre_a_and_b;
     }
 
-    /*
+    /**
      * If the intersection is within mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or vertexB move it
      * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
      *
      * Note: this distance so that there is always enough room for new nodes (if necessary).
-     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases.
+     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases
+     *       (see #2401)
      */
     if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
     {
