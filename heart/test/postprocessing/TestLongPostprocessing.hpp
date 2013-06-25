@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CardiacSimulationArchiver.hpp"
 
 #include "AbstractCardiacCell.hpp"
+#include "AbstractCardiacCellWithModifiers.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "RegularStimulus.hpp"
 #include "LuoRudy1991.hpp"
