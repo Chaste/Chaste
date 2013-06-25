@@ -1180,6 +1180,98 @@ public:
 
 
     /**
+     * This tests the ReMesh method for performing multiple T2Swaps.
+     *
+     * Currently fails as the ElementMap is not updated properly
+     *
+     *
+     *   ________          _________
+     *  |\      /|        |\       /|
+     *  | |\__/| | -----> | \_____/ |
+     *  | |/  \| |        | /     \ |
+     *  |/______\|        |/_______\|
+     *
+     *
+     */
+    void noTestRemeshForMultipleT2Swap() throw(Exception)
+    {
+        // Make 10 nodes to assign to six elements
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 0.3, 0.45));
+        nodes.push_back(new Node<2>(5, false, 0.4, 0.5));
+        nodes.push_back(new Node<2>(6, false, 0.3, 0.55));
+        nodes.push_back(new Node<2>(7, false, 0.6, 0.5));
+        nodes.push_back(new Node<2>(8, false, 0.7, 0.45));
+        nodes.push_back(new Node<2>(9, false, 0.7, 0.55));
+
+
+        // Make a set of elements out of these nodes
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3, nodes_elem_4, nodes_elem_5;
+        unsigned node_indices_elem_0[6] = {0, 1, 8, 7, 5, 4};
+        unsigned node_indices_elem_1[6] = {2, 3, 6, 5, 7, 9};
+        unsigned node_indices_elem_2[4] = {1, 2, 9, 8};
+        unsigned node_indices_elem_3[4] = {0, 4, 6, 3};
+        unsigned node_indices_elem_4[3] = {4, 5, 6};
+        unsigned node_indices_elem_5[3] = {7, 8, 9};
+        for (unsigned i=0; i<6; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            if (i < 4)
+            {
+            	nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+                nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+            }
+            if (i < 3)
+            {
+				nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
+				nodes_elem_5.push_back(nodes[node_indices_elem_5[i]]);
+			}
+        }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_5));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        vertex_mesh.SetT2Threshold(0.01);
+        vertex_mesh.SetCellRearrangementThreshold(0.00001); //So T1Swaps don't happen
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
+
+        VertexElementMap map(vertex_mesh.GetNumElements());
+
+        vertex_mesh.ReMesh(map); // Elements too big so nothing happens
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
+
+
+        // These should all pass but the map is not being updated in RemoveDeletedNodesAndElements
+        TS_ASSERT_EQUALS(map.GetNewIndex(0u),0u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(1u),1u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(2u),2u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(3u),3u);
+        TS_ASSERT(map.IsDeleted(4u));
+        TS_ASSERT(map.IsDeleted(5u));
+
+
+    }
+
+
+
+    /**
      * This tests the ReMesh method for performing T1Swaps, both internally and on the boundary.
      * In this test we read in a vertex mesh that contains several pairs of nodes that
      * are close enough for T1Swaps to be performed. The mesh consists of 6 elements and all
