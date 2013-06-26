@@ -116,98 +116,56 @@ if(MSVC10)
 endif(MSVC10)
 
 set(CHASTE_INCLUDES #These are now mainly set externally in AdditionalIncludes.cmake
-	"${WINDOWS_SDK}" "${CXXTEST_INCLUDES}" "${CHASTE_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}"  
-	"${VS_INCLUDES}" "${MS_MPI_INCLUDES}"   
-	#"${BOOST_INCLUDES}" "${PETSC_INCLUDES}" "${HDF5_INCLUDES}" 
-	#"${PARMETIS_INCLUDES}" "${METIS_INCLUDES}" 
+	"${WINDOWS_SDK}" "${CXXTEST_INCLUDES}" "${CHASTE_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}"
+	"${VS_INCLUDES}" "${MS_MPI_INCLUDES}"
+	#"${BOOST_INCLUDES}" "${PETSC_INCLUDES}" "${HDF5_INCLUDES}"
+	#"${PARMETIS_INCLUDES}" "${METIS_INCLUDES}"
 )
 include_directories("${CHASTE_INCLUDES}")
 
-#set up the component source and include include_directories
+# A macro to recursively find Chaste header locations
+macro(HEADER_DIRS base_dir return_list)
+    file(GLOB_RECURSE new_list base_dir *.hpp)
+    set(dir_list "")
+    foreach(file_path ${new_list})
+        get_filename_component(dir_path ${file_path} PATH)
+        set(dir_list ${dir_list} ${dir_path})
+    endforeach()
+    list(REMOVE_DUPLICATES dir_list)
+    list(APPEND dir_list "${CHASTE_INCLUDES}")
+    set(${return_list} ${dir_list})
+endmacro()
+
+#set up the component source and include directories
 set(CHASTE_GLOBAL_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/global/src")
-set(CHASTE_GLOBAL_INCLUDE_DIRS "${CHASTE_GLOBAL_SOURCE_DIR}" "${CHASTE_GLOBAL_SOURCE_DIR}/checkpointing"
-"${CHASTE_GLOBAL_SOURCE_DIR}/fortests" "${CHASTE_GLOBAL_SOURCE_DIR}/parallel"
- "${CHASTE_GLOBAL_SOURCE_DIR}/timing" "${CHASTE_INCLUDES}")
+HEADER_DIRS(${CHASTE_GLOBAL_SOURCE_DIR} CHASTE_GLOBAL_INCLUDE_DIRS)
 
 set(CHASTE_IO_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/io/src")
-set(CHASTE_IO_INCLUDE_DIRS "${CHASTE_IO_SOURCE_DIR}" "${CHASTE_IO_SOURCE_DIR}/common" "${CHASTE_IO_SOURCE_DIR}/fortests" 
-	"${CHASTE_IO_SOURCE_DIR}/reader" "${CHASTE_IO_SOURCE_DIR}/writer")
+HEADER_DIRS(${CHASTE_IO_SOURCE_DIR} CHASTE_IO_INCLUDE_DIRS)
 
 set(CHASTE_LINALG_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/linalg/src")
-set(CHASTE_LINALG_INCLUDE_DIRS "${CHASTE_LINALG_SOURCE_DIR}")
+HEADER_DIRS(${CHASTE_LINALG_SOURCE_DIR} CHASTE_LINALG_INCLUDE_DIRS)
 
 set(CHASTE_MESH_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mesh/src")
-set(CHASTE_MESH_INCLUDE_DIRS "${CHASTE_MESH_SOURCE_DIR}/3rdparty/tetgen1.4.2" 
-	"${CHASTE_MESH_SOURCE_DIR}/3rdparty/triangle" "${CHASTE_MESH_SOURCE_DIR}/common"
- "${CHASTE_MESH_SOURCE_DIR}/utilities" "${CHASTE_MESH_SOURCE_DIR}/reader" 
- "${CHASTE_MESH_SOURCE_DIR}/writer" "${CHASTE_MESH_SOURCE_DIR}/vertex")
+HEADER_DIRS(${CHASTE_MESH_SOURCE_DIR} CHASTE_MESH_INCLUDE_DIRS)
 
 set(CHASTE_ODE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ode/src")
-set(CHASTE_ODE_INCLUDE_DIRS "${CHASTE_ODE_SOURCE_DIR}/common" 
-	"${CHASTE_ODE_SOURCE_DIR}/fortests" "${CHASTE_ODE_SOURCE_DIR}/solver")
+HEADER_DIRS(${CHASTE_ODE_SOURCE_DIR} CHASTE_ODE_INCLUDE_DIRS)
 
 set(CHASTE_PDE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/pde/src")
-set(CHASTE_PDE_INCLUDE_DIRS "${CHASTE_PDE_SOURCE_DIR}/common" 
-	"${CHASTE_PDE_SOURCE_DIR}/problem" "${CHASTE_PDE_SOURCE_DIR}/postprocessing" 
-    "${CHASTE_PDE_SOURCE_DIR}/solver")
+HEADER_DIRS(${CHASTE_PDE_SOURCE_DIR} CHASTE_PDE_INCLUDE_DIRS)
 
 set(CHASTE_CELL_BASED_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cell_based/src")
-set(CHASTE_CELL_BASED_INCLUDE_DIRS "${CHASTE_CELL_BASED_SOURCE_DIR}/common" 
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/fortests" "${CHASTE_CELL_BASED_SOURCE_DIR}/mesh" 
-    "${CHASTE_CELL_BASED_SOURCE_DIR}/odes" 
-    "${CHASTE_CELL_BASED_SOURCE_DIR}/population"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/boundary_conditions"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/cell"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/cell/cycle"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/cell/properties"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/cell/properties/mutations"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/cell/properties/proliferative_types"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/killers"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/mechanics"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/pdes"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/population/update_rules"
-	"${CHASTE_CELL_BASED_SOURCE_DIR}/simulation")
+HEADER_DIRS(${CHASTE_CELL_BASED_SOURCE_DIR} CHASTE_CELL_BASED_INCLUDE_DIRS)
 
 set(CHASTE_CRYPT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/crypt/src")
-set(CHASTE_CRYPT_INCLUDE_DIRS "${CHASTE_CRYPT_SOURCE_DIR}/boundary_conditions" 
-	"${CHASTE_CRYPT_SOURCE_DIR}/cell" 
-	"${CHASTE_CRYPT_SOURCE_DIR}/cell/cycle" 
-	"${CHASTE_CRYPT_SOURCE_DIR}/killers" 
-    "${CHASTE_CRYPT_SOURCE_DIR}/mechanics"
-	"${CHASTE_CRYPT_SOURCE_DIR}/odes"
-	"${CHASTE_CRYPT_SOURCE_DIR}/simulation"
-	"${CHASTE_CRYPT_SOURCE_DIR}/statistics")
-
+HEADER_DIRS(${CHASTE_CRYPT_SOURCE_DIR} CHASTE_CRYPT_INCLUDE_DIRS)
 
 set(CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/continuum_mechanics/src")
-set(CHASTE_CONTINUUM_MECHANICS_INCLUDE_DIRS "${CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR}/common" 
-	"${CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR}/problem" 
-	"${CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR}/problem/material_laws" 
-	"${CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR}/solver") 
-
+HEADER_DIRS(${CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR} CHASTE_CONTINUUM_MECHANICS_INCLUDE_DIRS)
 
 set(CHASTE_HEART_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/heart/src")
-set(CHASTE_HEART_INCLUDE_DIRS "${CHASTE_HEART_SOURCE_DIR}/convergence" 
-	"${CHASTE_HEART_SOURCE_DIR}/problem" 
-	"${CHASTE_HEART_SOURCE_DIR}/problem/adaptivity" 
-	"${CHASTE_HEART_SOURCE_DIR}/problem/cell_factories" 	
-	"${CHASTE_HEART_SOURCE_DIR}/problem/conductivity_tensors" 
-	"${CHASTE_HEART_SOURCE_DIR}/solver/mechanics"
-	"${CHASTE_HEART_SOURCE_DIR}/solver/electrics"
-	"${CHASTE_HEART_SOURCE_DIR}/solver/electrics/bidomain"
-	"${CHASTE_HEART_SOURCE_DIR}/solver/electrics/extended_bidomain"
-	"${CHASTE_HEART_SOURCE_DIR}/solver/electrics/monodomain"
-	"${CHASTE_HEART_SOURCE_DIR}/fortests"
-	"${CHASTE_HEART_SOURCE_DIR}/io"
-	"${CHASTE_HEART_SOURCE_DIR}/odes"
-	"${CHASTE_HEART_SOURCE_DIR}/odes/contractionmodels"
-	"${CHASTE_HEART_SOURCE_DIR}/odes/ionicmodels"
-	"${CHASTE_HEART_SOURCE_DIR}/odes/ionicmodels/noncardiac"
-	"${CHASTE_HEART_SOURCE_DIR}/odes/singlecell"
-	"${CHASTE_HEART_SOURCE_DIR}/postprocessing"
-	"${CHASTE_HEART_SOURCE_DIR}/stimulus"
-	"${CHASTE_HEART_SOURCE_DIR}/stimulus/tissue_electrodes"
-	"${CHASTE_HEART_SOURCE_DIR}/tissue") 
+HEADER_DIRS(${CHASTE_HEART_SOURCE_DIR} CHASTE_HEART_INCLUDE_DIRS)
 
 #Third-party libraries linked against chaste test executables
 if(MSVC11)
@@ -315,39 +273,39 @@ if(ENABLE_CHASTE_TESTING)
 	    endif(TEST_MPIEXEC_ENABLED)
 	endmacro() 
 
-  macro(CHASTE_GENERATE_TEST_SUITES)
-  	if(NOT HAS_OWN_LINKER_FLAGS)
-  		set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT")
-  	endif(NOT HAS_OWN_LINKER_FLAGS)
+macro(CHASTE_GENERATE_TEST_SUITES)
+	if(NOT HAS_OWN_LINKER_FLAGS)
+		set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT")
+	endif(NOT HAS_OWN_LINKER_FLAGS)
 
-  	#disable linker warnings 4217, 4049: locally-defined symbol imported in function ...
-  	set(LINKER_FLAGS "${LINKER_FLAGS} /IGNORE:4217 /IGNORE:4049")
+	#disable linker warnings 4217, 4049: locally-defined symbol imported in function ...
+	set(LINKER_FLAGS "${LINKER_FLAGS} /IGNORE:4217 /IGNORE:4049")
     #message("Linker flags for project ${PROJECT_NAME} = ${LINKER_FLAGS}")
 
 	foreach(test ${TEST_SUITES})
-	 string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.]hpp" "\\1" testName "${test}")
-	 string(REPLACE "/" ";" testPath "${testName}")
+	  string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.]hpp" "\\1" testName "${test}")
+	  string(REPLACE "/" ";" testPath "${testName}")
 	  list(LENGTH testPath pathLength)
 	  if(${pathLength} EQUAL 1)
-	  	set(testName ${testPath})
-	  	set(testPath "")
-	  	chaste_add_test("${testName}Runner" "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testName}.hpp")
-	 	target_link_libraries("${testName}Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-	 	set_target_properties("${testName}Runner" PROPERTIES LINK_FLAGS 
-	 	"${LINKER_FLAGS}")
+		set(testName ${testPath})
+		set(testPath "")
+		chaste_add_test("${testName}Runner" "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testName}.hpp")
+		target_link_libraries("${testName}Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
+		set_target_properties("${testName}Runner" PROPERTIES LINK_FLAGS 
+		"${LINKER_FLAGS}")
 	  else()
-	  	math(EXPR index "${pathLength} - 1")
-	  	list(GET testPath ${index} testName)
-	  	list(REMOVE_AT testPath ${index})
-	  	string(REPLACE ";" "_" _testPath_ "${testPath}")
-	  	string(REPLACE ";" "/" testPath "${testPath}")
-	  	chaste_add_test("${testName}_${_testPath_}_Runner" "${testName}_${_testPath_}_.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testPath}/${testName}.hpp")
-	 	target_link_libraries("${testName}_${_testPath_}_Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-	 	set_target_properties("${testName}_${_testPath_}_Runner" PROPERTIES LINK_FLAGS 
-	 	"${LINKER_FLAGS}")
+		math(EXPR index "${pathLength} - 1")
+		list(GET testPath ${index} testName)
+		list(REMOVE_AT testPath ${index})
+		string(REPLACE ";" "_" _testPath_ "${testPath}")
+		string(REPLACE ";" "/" testPath "${testPath}")
+		chaste_add_test("${testName}_${_testPath_}_Runner" "${testName}_${_testPath_}_.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testPath}/${testName}.hpp")
+		target_link_libraries("${testName}_${_testPath_}_Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
+		set_target_properties("${testName}_${_testPath_}_Runner" PROPERTIES LINK_FLAGS 
+		"${LINKER_FLAGS}")
 	  endif()	
 	endforeach(test)
-   endmacro()
+endmacro()
 
 
 endif(ENABLE_CHASTE_TESTING)
@@ -372,8 +330,8 @@ int main( )
 
 add_executable(timekeeper "${CMAKE_BINARY_DIR}/timekeeper.cpp")
 execute_process(COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${CHASTE_BUILD_DIR_NAME}/timekeeper"
- WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
- OUTPUT_FILE build_timestamp)
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    OUTPUT_FILE build_timestamp)
 
 
 #build each component as a project

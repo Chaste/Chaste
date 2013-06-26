@@ -1,10 +1,9 @@
 project(testglobal)
 
-#copy test data
+#Copy test data
 file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/global/test")
 
-include_directories(#"${CHASTE_GLOBAL_INCLUDE_DIRS}" 
-"${CMAKE_CURRENT_SOURCE_DIR}" "${CXXTEST_INCLUDES}" "${CHASTE_LINALG_INCLUDE_DIRS}" )
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CHASTE_GLOBAL_INCLUDE_DIRS}")
 
 #Create testglobal library to link global's tests against
 file(GLOB_RECURSE CHASTE_TEST_GLOBAL_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
