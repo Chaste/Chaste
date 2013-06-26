@@ -69,7 +69,7 @@ public:
         ///\todo this should really be 4 as mesh is periodic
         TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], 3.5, 1e-4);
 
-        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 3.0*0.5*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 3.0*0.5*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], 0.0,1e-4);
 
@@ -78,7 +78,7 @@ public:
         double height = p_mesh->GetWidth(1);
 
         TS_ASSERT_DELTA(width, 4, 1e-4);
-        TS_ASSERT_DELTA(height, 3.0*0.5*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(height, 3.0*0.5*sqrt(3.0), 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -144,13 +144,13 @@ public:
         // Move one of the nodes to past the periodic boundary
         c_vector<double, 2> new_point_location;
         new_point_location[0] = -0.01;
-        new_point_location[1] = 0.5*sqrt(3);
+        new_point_location[1] = 0.5*sqrt(3.0);
         ChastePoint<2> new_point(new_point_location);
 
         // This node was on left and is now near the right
         p_mesh->SetNode(4, new_point);
         TS_ASSERT_DELTA(p_mesh->GetNode(4u)->rGetLocation()[0], 3.99, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(4u)->rGetLocation()[1], 3.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(4u)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
 
         // This node has stayed close to where it was
         TS_ASSERT_DELTA(p_mesh->GetNode(5u)->rGetLocation()[0], 1.5, 1e-4);
@@ -162,7 +162,7 @@ public:
         new_point.SetCoordinate(0, 4.1);
         p_mesh->SetNode(7, new_point);
         TS_ASSERT_DELTA(p_mesh->GetNode(7u)->rGetLocation()[0], 0.1, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(7u)->rGetLocation()[1], 3.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(7u)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
 
         // Avoid memory leak
         delete p_mesh;
@@ -187,7 +187,7 @@ public:
         // Choose a node on the left boundary
         ChastePoint<2> point = p_mesh->GetNode(4)->GetPoint();
         TS_ASSERT_DELTA(point[0], 0.5, 1e-4);
-        TS_ASSERT_DELTA(point[1], 0.5*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(point[1], 0.5*sqrt(3.0), 1e-4);
 
         // Create a new node close to this node
         point.SetCoordinate(0, -0.01);
@@ -203,7 +203,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 17u);
 
         TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 3.99, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], 0.5*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], 0.5*sqrt(3.0), 1e-4);
 
         // Now test AddNode() when mDeletedNodeIndices is populated
 

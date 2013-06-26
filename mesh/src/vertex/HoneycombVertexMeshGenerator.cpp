@@ -73,7 +73,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         for (unsigned i=0; i<=numElementsAcross; i++)
         {
             double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
-            double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
+            double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3.0);
             bool is_boundary_node = (j==1 || j==2*numElementsUp || i==0 || i==numElementsAcross) ? true : false;
 
             Node<2>* p_node = new Node<2>(node_index, is_boundary_node, x_coord, y_coord);
@@ -85,7 +85,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
     /*
      * On the last row we have numElementsAcross nodes, all of which are boundary nodes.
      */
-    double y_coord = (1.5*(2*numElementsUp+1) - 0.5*((2*numElementsUp+1)%2))*0.5/sqrt(3);
+    double y_coord = (1.5*(2*numElementsUp+1) - 0.5*((2*numElementsUp+1)%2))*0.5/sqrt(3.0);
     if (((2*numElementsUp+1)%4 == 0)||((2*numElementsUp+1)%4 == 3))
     {
         Node<2>* p_node = new Node<2>(node_index, true, 0.5, y_coord);

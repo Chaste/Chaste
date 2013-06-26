@@ -806,7 +806,7 @@ public:
         // Create mesh
         unsigned crypt_width = 6;
         unsigned crypt_height = 4;
-        double crypt_length = crypt_height*(sqrt(3)/2);
+        double crypt_length = crypt_height*(sqrt(3.0)/2);
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
 

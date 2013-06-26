@@ -69,7 +69,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     unsigned num_nodes_along_width = mNumCellWidth;
     unsigned num_nodes_along_length = mNumCellLength;
     double horizontal_spacing = mDomainWidth / (double)num_nodes_along_width;
-    double vertical_spacing = (sqrt(3)/2)*horizontal_spacing;
+    double vertical_spacing = (sqrt(3.0)/2)*horizontal_spacing;
 
     // This line is needed to define ghost nodes later
     mDomainDepth = (double)(num_nodes_along_length) * vertical_spacing;

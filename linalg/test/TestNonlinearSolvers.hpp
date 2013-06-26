@@ -103,7 +103,7 @@ public:
 
         for (int i=0; i<2; i++)
         {
-            // the solution is x = 1/sqrt(2), y = 1/sqrt(2)
+            // the solution is x = 1/sqrt(2.0), y = 1/sqrt(2.0)
             TS_ASSERT_DELTA(answer_petsc_repl[i] ,1/sqrt(2.0),tol);
             TS_ASSERT_DELTA(answer_newton_repl[i],1/sqrt(2.0),tol);
         }
@@ -146,7 +146,7 @@ public:
 
         for (int i=0; i<3; i++)
         {
-            // the solution is x = 1/sqrt(3), y = 1/sqrt(3),  z = 1/sqrt(3)
+            // the solution is x = 1/sqrt(3.0), y = 1/sqrt(3.0),  z = 1/sqrt(3.0)
             TS_ASSERT_DELTA(answer_petsc_repl[i] ,1/sqrt(3.0),tol);
             TS_ASSERT_DELTA(answer_newton_repl[i],1/sqrt(3.0),tol);
         }

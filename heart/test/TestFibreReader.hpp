@@ -92,10 +92,10 @@ public:
         // Non-symmetrical test case, standard rotation matrix
         // [cos(theta)  sin(theta)]fibre_matrix(0,0),
         // [-sin(theta) cos(theta)]
-        correct_matrix(0,0) =  1.0/sqrt(2);  // fibre0
-        correct_matrix(1,0) = -1.0/sqrt(2);  // fibre1
-        correct_matrix(0,1) =  1.0/sqrt(2);  // sheet0
-        correct_matrix(1,1) =  1.0/sqrt(2);  // sheet1
+        correct_matrix(0,0) =  1.0/sqrt(2.0);  // fibre0
+        correct_matrix(1,0) = -1.0/sqrt(2.0);  // fibre1
+        correct_matrix(0,1) =  1.0/sqrt(2.0);  // sheet0
+        correct_matrix(1,1) =  1.0/sqrt(2.0);  // sheet1
         fibre_reader.GetFibreSheetAndNormalMatrix(3u, fibre_matrix);
         TS_ASSERT_DELTA(UblasMatrixInfinityNorm<2>(fibre_matrix-correct_matrix), 0, 1e-9);
 

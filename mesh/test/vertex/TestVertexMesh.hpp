@@ -889,10 +889,10 @@ public:
 
         // Test method with a single rectangular element at a 30 degree angle to the x-axis
         std::vector<Node<2>*> angled_rectangle_nodes;
-        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3.0) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3.0) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3.0) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3.0) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3.0)));
         std::vector<VertexElement<2,2>*> angled_rectangle_elements;
         angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
         VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
@@ -947,7 +947,7 @@ public:
         TS_ASSERT_DELTA(irregular_centroid[0], 2.6269, 1e-4);
         TS_ASSERT_DELTA(irregular_centroid[1], 0.8930, 1e-4);
 
-        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3)
+        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1038,7 +1038,7 @@ public:
 
         TS_ASSERT_DELTA(irregular_mesh.GetVolumeOfElement(0), 1.4684, 1e-3);
 
-        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3)
+        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1128,7 +1128,7 @@ public:
 
         TS_ASSERT_DELTA(irregular_mesh.GetSurfaceAreaOfElement(0), 5.1263, 1e-3);
 
-        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3)
+        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1138,7 +1138,7 @@ public:
              ++iter)
         {
             unsigned elem_index = iter->GetIndex();
-            TS_ASSERT_DELTA(regular_mesh.GetSurfaceAreaOfElement(elem_index), 2*sqrt(3), 1e-4);
+            TS_ASSERT_DELTA(regular_mesh.GetSurfaceAreaOfElement(elem_index), 2*sqrt(3.0), 1e-4);
         }
 
         // Test method with a 3D mesh
@@ -1277,7 +1277,7 @@ public:
 
     void TestMeshGetWidthAndBoundingBoxMethod()
     {
-        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3)
+        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1389,10 +1389,10 @@ public:
 
         // Test method with a single rectangular element at a 30 degree angle to the x-axis
         std::vector<Node<2>*> angled_rectangle_nodes;
-        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3.0) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3.0) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3.0) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3.0) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3.0)));
         std::vector<VertexElement<2,2>*> angled_rectangle_elements;
         angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
         VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
@@ -1400,7 +1400,7 @@ public:
         c_vector<double, 3> angled_rectangle_moments = angled_rectangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(angled_rectangle_moments[0], 14.0/3.0, 1e-4);    // Ixx
         TS_ASSERT_DELTA(angled_rectangle_moments[1], 26.0/3.0, 1e-4);    // Iyy
-        TS_ASSERT_DELTA(angled_rectangle_moments[2], 2.0*sqrt(3), 1e-4); // Ixy
+        TS_ASSERT_DELTA(angled_rectangle_moments[2], 2.0*sqrt(3.0), 1e-4); // Ixy
 
         // Test method with a single irregular element (compare with pen-and-paper solution)
         std::vector<Node<2>*> irregular_nodes;
@@ -1418,7 +1418,7 @@ public:
         TS_ASSERT_DELTA(irregular_moments[1], 0.1264, 1e-4); // Iyy
         TS_ASSERT_DELTA(irregular_moments[2], 0.1162, 1e-4); // Ixy
 
-        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3)
+        // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
@@ -1426,8 +1426,8 @@ public:
         for (unsigned i=0; i<regular_mesh.GetNumElements(); i++)
         {
             c_vector<double, 3> regular_moments = regular_mesh.CalculateMomentsOfElement(i);
-            TS_ASSERT_DELTA(regular_moments(0), 5*sqrt(3)/16/9, 1e-6); // Ixx
-            TS_ASSERT_DELTA(regular_moments(1), 5*sqrt(3)/16/9, 1e-6); // Iyy
+            TS_ASSERT_DELTA(regular_moments(0), 5*sqrt(3.0)/16/9, 1e-6); // Ixx
+            TS_ASSERT_DELTA(regular_moments(1), 5*sqrt(3.0)/16/9, 1e-6); // Iyy
             TS_ASSERT_DELTA(regular_moments(2), 0.0,            1e-6); // Ixy = 0 by symmetry
         }
     }
@@ -1444,8 +1444,8 @@ public:
         VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
 
         c_vector<double, 2> triangle_short_axis = triangle_mesh.GetShortAxisOfElement(0);
-        TS_ASSERT_DELTA(triangle_short_axis[0], 1/sqrt(2), 1e-4);
-        TS_ASSERT_DELTA(triangle_short_axis[1], 1/sqrt(2), 1e-4);
+        TS_ASSERT_DELTA(triangle_short_axis[0], 1/sqrt(2.0), 1e-4);
+        TS_ASSERT_DELTA(triangle_short_axis[1], 1/sqrt(2.0), 1e-4);
 
         // Test method with a single rectangular element parallel to the x-axis
         std::vector<Node<2>*> horizontal_rectangle_nodes;
@@ -1505,17 +1505,17 @@ public:
 
         // Test method with a single rectangular element at a 30 degree angle to the x-axis
         std::vector<Node<2>*> angled_rectangle_nodes;
-        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3)));
-        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3)));
+        angled_rectangle_nodes.push_back(new Node<2>(0, false,  2.0*0.5*sqrt(3.0) - 1.0*0.5,  2.0*0.5 + 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3.0) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3.0) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3.0)));
+        angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3.0) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3.0)));
         std::vector<VertexElement<2,2>*> angled_rectangle_elements;
         angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
         VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
 
         c_vector<double, 2> angled_rectangle_short_axis = angled_rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(angled_rectangle_short_axis(0), 0.5, 1e-6);
-        TS_ASSERT_DELTA(angled_rectangle_short_axis(1), -0.5*sqrt(3), 1e-6);
+        TS_ASSERT_DELTA(angled_rectangle_short_axis(1), -0.5*sqrt(3.0), 1e-6);
 
         // Test method with a single irregular element (compare with pen-and-paper solution)
         std::vector<Node<2>*> irregular_nodes;
@@ -1532,7 +1532,7 @@ public:
         TS_ASSERT_DELTA(irregular_short_axis[0], 0.9210, 1e-4);
         TS_ASSERT_DELTA(irregular_short_axis[1], -0.3894, 1e-4);
 
-        // Test with a single trapezoidal element of width 1, lengths 3*sqrt(3) and sqrt(3), rotated 30 degrees anticlockwise
+        // Test with a single trapezoidal element of width 1, lengths 3*sqrt(3.0) and sqrt(3.0), rotated 30 degrees anticlockwise
         std::vector<Node<2>*> trapezium_nodes;
         trapezium_nodes.push_back(new Node<2>(0, false,  1.0, 0.0));
         trapezium_nodes.push_back(new Node<2>(1, false,  2.0, sqrt(3.0)));
@@ -1544,7 +1544,7 @@ public:
 
         c_vector<double, 2> trapezium_short_axis = trapezium_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(trapezium_short_axis(0), 0.5, 1e-6);
-        TS_ASSERT_DELTA(trapezium_short_axis(1), -0.5*sqrt(3), 1e-6);
+        TS_ASSERT_DELTA(trapezium_short_axis(1), -0.5*sqrt(3.0), 1e-6);
 
         // Test method with a single hexagonal element centred at the origin
         std::vector<Node<2>*> hexagon_nodes;

@@ -144,10 +144,10 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
 
         /**
          * Compute the parameter d1 such that d0+A*d1=1, where A is the equilibrium area
-         * of a cell (this is equal to sqrt(3)/4, which is a third of the area of a regular
+         * of a cell (this is equal to sqrt(3.0)/4, which is a third of the area of a regular
          * hexagon of edge length 1)
          */
-        double d1 = 2.0*(1.0 - d0)/(sqrt(3)*rest_length*rest_length);
+        double d1 = 2.0*(1.0 - d0)/(sqrt(3.0)*rest_length*rest_length);
 
         double area_cell = GetVolumeOfVoronoiElement(nodeIndex);
 

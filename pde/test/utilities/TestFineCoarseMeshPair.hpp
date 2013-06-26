@@ -363,10 +363,10 @@ public:
          * in the box containing this point.
          */
         c_matrix<double,2,2> rotation_mat;
-        rotation_mat(0,0) = 1.0/sqrt(2);
-        rotation_mat(1,0) = -1.0/sqrt(2);
-        rotation_mat(0,1) = 1.0/sqrt(2);
-        rotation_mat(1,1) = 1.0/sqrt(2);
+        rotation_mat(0,0) = 1.0/sqrt(2.0);
+        rotation_mat(1,0) = -1.0/sqrt(2.0);
+        rotation_mat(0,1) = 1.0/sqrt(2.0);
+        rotation_mat(1,1) = 1.0/sqrt(2.0);
 
         fine_mesh.Rotate(rotation_mat);
         coarse_mesh.Rotate(rotation_mat);

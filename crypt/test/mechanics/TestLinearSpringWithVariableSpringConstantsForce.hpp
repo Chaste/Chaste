@@ -64,7 +64,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
-        double crypt_length = 1.1*12.0*sqrt(3)/2.0;
+        double crypt_length = 1.1*12.0*sqrt(3.0)/2.0;
       //This one is going to throw because the ghost layers haven't been set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
 
@@ -105,7 +105,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
-        double crypt_length = 1.1*12.0*sqrt(3)/2.0;
+        double crypt_length = 1.1*12.0*sqrt(3.0)/2.0;
         //Do it again, but with ghost layers set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 2, 1.1);
         //                                                 ^-- That was a zero before
@@ -147,7 +147,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
-        double crypt_length = 1.1*12.0*sqrt(3)/2.0;
+        double crypt_length = 1.1*12.0*sqrt(3.0)/2.0;
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
@@ -352,8 +352,8 @@ public:
         c_vector<double, 2> new_force = linear_force.CalculateForceBetweenNodes(41, 42, cell_population);
 
         // Force calculation: shift is along x-axis so we should have
-        // new_edge_length = (5/6 + shift[0])*tan(0.5*arctan(5*sqrt(3)/(5 + 12*shift[0]))),
-        // force^2 = mu^2 * (new_edge_length*sqrt(3))^2 * (1 - 5/6 - shift[0])^2
+        // new_edge_length = (5/6 + shift[0])*tan(0.5*arctan(5*sqrt(3.0)/(5 + 12*shift[0]))),
+        // force^2 = mu^2 * (new_edge_length*sqrt(3.0))^2 * (1 - 5/6 - shift[0])^2
         TS_ASSERT_DELTA(new_force[0]*new_force[0] + new_force[1]*new_force[1], 4.34024, 1e-3);
     }
 

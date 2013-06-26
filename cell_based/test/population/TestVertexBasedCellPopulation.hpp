@@ -120,7 +120,7 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), sqrt(3)/2, 1e-6);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), sqrt(3.0)/2, 1e-6);
         }
     }
 

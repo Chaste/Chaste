@@ -891,8 +891,8 @@ public:
                 {
                     fixed_nodes.push_back(i);
                     c_vector<double,2> new_position;
-                    new_position(0) = (lambda/sqrt(2)) * mesh.GetNode(i)->rGetLocation()[1];
-                    new_position(1) = (lambda/sqrt(2)) * mesh.GetNode(i)->rGetLocation()[1];
+                    new_position(0) = (lambda/sqrt(2.0)) * mesh.GetNode(i)->rGetLocation()[1];
+                    new_position(1) = (lambda/sqrt(2.0)) * mesh.GetNode(i)->rGetLocation()[1];
                     locations.push_back(new_position);
                 }
             }
@@ -957,8 +957,8 @@ public:
                 double exact_x_before_rotation = (1.0/lambda)*mesh.GetNode(i)->rGetLocation()[0];
                 double exact_y_before_rotation = lambda*mesh.GetNode(i)->rGetLocation()[1];
 
-                double exact_x = (1.0/sqrt(2))*( exact_x_before_rotation + exact_y_before_rotation);
-                double exact_y = (1.0/sqrt(2))*(-exact_x_before_rotation + exact_y_before_rotation);
+                double exact_x = (1.0/sqrt(2.0))*( exact_x_before_rotation + exact_y_before_rotation);
+                double exact_y = (1.0/sqrt(2.0))*(-exact_x_before_rotation + exact_y_before_rotation);
 
                 TS_ASSERT_DELTA( r_solution[i](0), exact_x, 1e-3 );
                 TS_ASSERT_DELTA( r_solution[i](1), exact_y, 1e-3 );

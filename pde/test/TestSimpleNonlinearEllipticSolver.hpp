@@ -398,8 +398,8 @@ public:
 
         // Boundary conditions
         BoundaryConditionsContainer<1,1,1> bcc;
-        // u(1) = sqrt(3)
-        ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(sqrt(3));
+        // u(1) = sqrt(3.0)
+        ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(sqrt(3.0));
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
         // u(0)*u'(0) = 2
         // Note that we specify -2 as the value, since figuring out which direction

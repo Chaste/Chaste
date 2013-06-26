@@ -180,9 +180,9 @@ double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
         /* Want Q=(Area_Tri / Area_Cir) / (Area_Equilateral_Tri / Area_Equilateral_Cir)
          * Area_Tri = |Jacobian| /2
          * Area_Cir = Pi * r^2
-         * Area_Eq_Tri = (3*sqrt(3)/4)*R^2
+         * Area_Eq_Tri = (3*sqrt(3.0)/4)*R^2
          * Area_Eq_Tri = Pi * R^2
-         * Q= (2*|Jacobian|)/3*sqrt(3)*r^2)
+         * Q= (2*|Jacobian|)/3*sqrt(3.0)*r^2)
          */
         return 2.0*jacobian_determinant/(3.0*sqrt(3.0)*circum[SPACE_DIM]);
     }
@@ -190,9 +190,9 @@ double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
     /* Want Q=(Vol_Tet / Vol_CirS) / (Vol_Plat_Tet / Vol_Plat_CirS)
       *  Vol_Tet  = |Jacobian| /6
       *  Vol_CirS = 4*Pi*r^3/3
-      *  Vol_Plat_Tet  = 8*sqrt(3)*R^3/27
+      *  Vol_Plat_Tet  = 8*sqrt(3.0)*R^3/27
       *  Vol_Plat_CirS = 4*Pi*R^3/3
-     * Q= 3*sqrt(3)*|Jacobian|/ (16*r^3)
+     * Q= 3*sqrt(3.0)*|Jacobian|/ (16*r^3)
       */
 
     return (3.0*sqrt(3.0)*jacobian_determinant)

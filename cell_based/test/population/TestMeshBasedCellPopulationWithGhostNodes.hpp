@@ -349,7 +349,7 @@ public:
         {
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
             double area = cell_population.GetVolumeOfVoronoiElement(node_index);
-            TS_ASSERT_DELTA(area, sqrt(3)*scale_factor*scale_factor/2, 1e-6);
+            TS_ASSERT_DELTA(area, sqrt(3.0)*scale_factor*scale_factor/2, 1e-6);
         }
     }
 
@@ -900,8 +900,8 @@ public:
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
             if (!cell_population.IsGhostNode(node_index))
             {
-                TS_ASSERT_DELTA(cell_population.GetVolumeOfVoronoiElement(node_index), sqrt(3)/2, 1e-4);
-                TS_ASSERT_DELTA(cell_population.GetSurfaceAreaOfVoronoiElement(node_index), 6/sqrt(3), 1e-4);
+                TS_ASSERT_DELTA(cell_population.GetVolumeOfVoronoiElement(node_index), sqrt(3.0)/2, 1e-4);
+                TS_ASSERT_DELTA(cell_population.GetSurfaceAreaOfVoronoiElement(node_index), 6/sqrt(3.0), 1e-4);
             }
         }
     }

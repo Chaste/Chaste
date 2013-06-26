@@ -305,10 +305,10 @@ public:
 
         // anything will do here
         c_matrix<double,3,3> rotation_matrix = identity_matrix<double>(3);
-        rotation_matrix(0,0)=1.0/sqrt(2);
-        rotation_matrix(0,1)=-1.0/sqrt(2);
-        rotation_matrix(1,0)=1.0/sqrt(2);
-        rotation_matrix(1,1)=1.0/sqrt(2);
+        rotation_matrix(0,0)=1.0/sqrt(2.0);
+        rotation_matrix(0,1)=-1.0/sqrt(2.0);
+        rotation_matrix(1,0)=1.0/sqrt(2.0);
+        rotation_matrix(1,1)=1.0/sqrt(2.0);
 
 
         // Define displacement boundary conditions

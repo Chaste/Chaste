@@ -73,7 +73,7 @@ public:
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-        double crypt_length = (double)num_cells_depth *sqrt(3)/2.0;
+        double crypt_length = (double)num_cells_depth *sqrt(3.0)/2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 

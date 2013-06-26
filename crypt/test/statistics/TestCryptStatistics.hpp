@@ -104,7 +104,7 @@ public:
 
         CryptStatistics crypt_statistics(crypt);
 
-        std::vector<CellPtr> test_section = crypt_statistics.GetCryptSection(sqrt(3),0.5,1.5);
+        std::vector<CellPtr> test_section = crypt_statistics.GetCryptSection(sqrt(3.0),0.5,1.5);
 
         // Test the cells are correct
         TS_ASSERT_EQUALS(test_section.size(), 6u);
@@ -117,7 +117,7 @@ public:
         }
 
         // Test that we get a valid section when the x-values are the same
-        std::vector<CellPtr> test_section_vertical = crypt_statistics.GetCryptSection(sqrt(3),0.5,0.5);
+        std::vector<CellPtr> test_section_vertical = crypt_statistics.GetCryptSection(sqrt(3.0),0.5,0.5);
 
         // Test the cells are correct
         TS_ASSERT_EQUALS(test_section_vertical.size(), 5u);
@@ -129,7 +129,7 @@ public:
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section_vertical[i]), expected_indices_vertical[i]);
         }
 
-        std::vector<CellPtr> test_section_periodic = crypt_statistics.GetCryptSectionPeriodic(sqrt(3),0.5,2.5);
+        std::vector<CellPtr> test_section_periodic = crypt_statistics.GetCryptSectionPeriodic(sqrt(3.0),0.5,2.5);
 
         // Test the cells are correct
         TS_ASSERT_EQUALS(test_section_periodic.size(), 6u);
@@ -141,7 +141,7 @@ public:
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section_periodic[i]), expected_indices_periodic[i]);
         }
 
-        std::vector<CellPtr> test_section_periodic_2 = crypt_statistics.GetCryptSectionPeriodic(sqrt(3),2.5,0.5);
+        std::vector<CellPtr> test_section_periodic_2 = crypt_statistics.GetCryptSectionPeriodic(sqrt(3.0),2.5,0.5);
 
         // Test the cells are correct
         TS_ASSERT_EQUALS(test_section_periodic_2.size(), 6u);

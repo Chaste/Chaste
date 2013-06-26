@@ -577,11 +577,11 @@ public:
          * should have the equivalent area of 16 full regular hexagonal
          * cells.
          *
-         * The area of a single hexagonal cell is sqrt(3)/2, so the
-         * correct spheroid radius is given by sqrt((16*sqrt(3)/2)/pi).
+         * The area of a single hexagonal cell is sqrt(3.0)/2, so the
+         * correct spheroid radius is given by sqrt((16*sqrt(3.0)/2)/pi).
          *
          * Since there are 3 apoptotic cells, the correct apoptotic radius
-         * is given by sqrt((3*sqrt(3)/2)/pi).
+         * is given by sqrt((3*sqrt(3.0)/2)/pi).
          */
 
 

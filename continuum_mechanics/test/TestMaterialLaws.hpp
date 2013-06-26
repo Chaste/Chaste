@@ -845,10 +845,10 @@ public:
 
         // Pick a P such that P =/= P^T
         c_matrix<double,3,3> basis = identity_matrix<double>(3);
-        basis(0,0) = 1/sqrt(2);
-        basis(1,0) = 1/sqrt(2);
-        basis(0,1) = -1/sqrt(2);
-        basis(1,1) = 1/sqrt(2);
+        basis(0,0) = 1/sqrt(2.0);
+        basis(1,0) = 1/sqrt(2.0);
+        basis(0,1) = -1/sqrt(2.0);
+        basis(1,1) = 1/sqrt(2.0);
 
         law.SetChangeOfBasisMatrix(basis);
         law.ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);

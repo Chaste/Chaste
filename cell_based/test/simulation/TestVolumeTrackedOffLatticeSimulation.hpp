@@ -189,7 +189,7 @@ public:
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
-            p_cycle_model->SetEquilibriumVolume(0.866); //sqrt(3)/2
+            p_cycle_model->SetEquilibriumVolume(0.866); //sqrt(3.0)/2
             p_cycle_model->SetStemCellG1Duration(0.1);
             p_cycle_model->SetTransitCellG1Duration(0.1);
 
@@ -265,7 +265,7 @@ public:
             p_cycle_model->SetDimension(2);
             p_cycle_model->SetBirthTime(-10.0);
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
-            p_cycle_model->SetEquilibriumVolume(0.866); //sqrt(3)/2
+            p_cycle_model->SetEquilibriumVolume(0.866); //sqrt(3.0)/2
             p_cycle_model->SetStemCellG1Duration(0.1);
             p_cycle_model->SetTransitCellG1Duration(0.1);
 

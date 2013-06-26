@@ -89,7 +89,7 @@ public:
         // Last real node
         index = (ghosts+num_cells_depth)*(num_cells_width)-1;
         TS_ASSERT_DELTA(p_mesh->GetNode(index)->GetPoint()[0], 7.5, 1e-12);
-        TS_ASSERT_DELTA(p_mesh->GetNode(index)->GetPoint()[1], 21.0*sqrt(3)/2.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(index)->GetPoint()[1], 21.0*sqrt(3.0)/2.0, 1e-4);
 
         // Last node
         int last_node = p_mesh->GetNumNodes()-1;
@@ -165,7 +165,7 @@ public:
         // Last real node
         index = (ghosts+num_cells_depth)*(num_cells_width)-1;
         TS_ASSERT_DELTA(p_mesh->GetNode(index)->GetPoint()[0], x_factor*7.5, 1e-12);
-        TS_ASSERT_DELTA(p_mesh->GetNode(index)->GetPoint()[1], x_factor*21.0*sqrt(3)/2.0, 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(index)->GetPoint()[1], x_factor*21.0*sqrt(3.0)/2.0, 1e-4);
 
         // Last node
         int last_node = p_mesh->GetNumNodes()-1;

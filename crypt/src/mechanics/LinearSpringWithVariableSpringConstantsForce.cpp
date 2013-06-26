@@ -107,7 +107,7 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
         assert(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation));
         assert(!mUseBCatSprings);   // don't want to do both (both account for edge length)
 
-        multiplication_factor = (static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))->GetVoronoiEdgeLength(nodeAGlobalIndex, nodeBGlobalIndex)*sqrt(3);
+        multiplication_factor = (static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))->GetVoronoiEdgeLength(nodeAGlobalIndex, nodeBGlobalIndex)*sqrt(3.0);
     }
 
     if (mUseMutantSprings)

@@ -142,13 +142,8 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
     }
     else
     {
-        /*
-         * We cannot directly assert this dynamic cast. This is because the assert macro
-         * doesn't understand the <2,2> and thinks that it is being passed two arguments.
-         */
-        bool is_vertex_mesh = (dynamic_cast<VertexMesh<2,2>*>(pMesh));
-        UNUSED_OPT(is_vertex_mesh);
-        assert(is_vertex_mesh);
+        // Note the double brackets, to stop the macro thinking is has two arguments.
+        assert((dynamic_cast<VertexMesh<2,2>*>(pMesh)));
         mesh_size = static_cast<VertexMesh<2,2>*>(pMesh)->GetNumElements();
         rCells.reserve(mesh_size);
     }
@@ -174,18 +169,13 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
         }
         else if (dynamic_cast<PottsMesh<2>*>(pMesh))
         {
-            y = dynamic_cast<PottsMesh<2>*>(pMesh)->GetCentroidOfElement(i)[1];
+            y = static_cast<PottsMesh<2>*>(pMesh)->GetCentroidOfElement(i)[1];
         }
         else
         {
-            /*
-             * We cannot directly assert this dynamic cast. This is because the assert macro
-             * doesn't understand the <2,2> and thinks that it is being passed two arguments.
-             */
-            bool is_vertex_mesh = (dynamic_cast<VertexMesh<2,2>*>(pMesh));
-            UNUSED_OPT(is_vertex_mesh);
-            assert(is_vertex_mesh);
-            y = dynamic_cast<VertexMesh<2,2>*>(pMesh)->GetCentroidOfElement(i)[1];
+            // Note the double brackets, to stop the macro thinking is has two arguments.
+            assert((dynamic_cast<VertexMesh<2,2>*>(pMesh)));
+            y = static_cast<VertexMesh<2,2>*>(pMesh)->GetCentroidOfElement(i)[1];
         }
 
         // Create a cell-cycle model and set the spatial dimension

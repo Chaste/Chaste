@@ -419,7 +419,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetRestLength(1,2), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(2,3), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,3), 1.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population.GetRestLength(0,2), sqrt(2), 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(0,2), sqrt(2.0), 1e-6);
 
         cell_population.DivideLongSprings(1.0);
 
@@ -437,10 +437,10 @@ public:
         TS_ASSERT_DELTA(cell_population.GetRestLength(2,3), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,3), 1.0, 1e-6);
         TS_ASSERT_THROWS_THIS(cell_population.GetRestLength(0,2),"Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
-        TS_ASSERT_DELTA(cell_population.GetRestLength(0,4), 0.5*sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population.GetRestLength(1,4), 0.5*sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population.GetRestLength(2,4), 0.5*sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population.GetRestLength(3,4), 0.5*sqrt(2), 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(0,4), 0.5*sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(1,4), 0.5*sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(2,4), 0.5*sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(3,4), 0.5*sqrt(2.0), 1e-6);
 
         cell_population.DivideLongSprings(0.8);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 9u); // Mesh has 8 elements and 9 nodes
@@ -624,11 +624,11 @@ public:
         TS_ASSERT_DELTA(cell_population2d.GetVolumeOfVoronoiElement(4), 0.5, 1e-6);
 
         // Test element perimeters
-        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(0), sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(1), sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(2), sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(3), sqrt(2), 1e-6);
-        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(4), 2*sqrt(2), 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(0), sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(1), sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(2), sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(3), sqrt(2.0), 1e-6);
+        TS_ASSERT_DELTA(cell_population2d.GetSurfaceAreaOfVoronoiElement(4), 2*sqrt(2.0), 1e-6);
 
         // ...now test the 3D case
 

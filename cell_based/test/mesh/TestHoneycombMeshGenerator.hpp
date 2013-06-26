@@ -90,7 +90,7 @@ public:
         unsigned ghosts = 2;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts);
-        double length = (double)num_cells_depth*(sqrt(3)/2)*width/(double)num_cells_width;
+        double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
 
         // Check the mesh
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -102,7 +102,7 @@ public:
 
         // Zeroth node
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[0], -spooky, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -spooky*sqrt(3)/2, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -spooky*sqrt(3.0)/2, 1e-6);
 
         unsigned this_many_ghosts_at_start = ((2*ghosts+num_cells_width)*ghosts+ghosts);
 
@@ -117,7 +117,7 @@ public:
 
         // Last node
         int last_node = p_mesh->GetNumNodes()-1;
-        double last_node_y = length+(spooky-1)*(sqrt(3)/2);
+        double last_node_y = length+(spooky-1)*(sqrt(3.0)/2);
         TS_ASSERT_DELTA(p_mesh->GetNode(last_node)->GetPoint()[0], width+(spooky-0.5), 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(last_node)->GetPoint()[1], last_node_y, 1e-5);
 
@@ -167,7 +167,7 @@ public:
         unsigned ghosts = 4;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts, width/num_cells_width);
-        double length = (double)num_cells_depth*(sqrt(3)/2)*width/(double)num_cells_width;
+        double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
 
         // Check the mesh
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -180,7 +180,7 @@ public:
 
         // Zeroth node
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[0], -spooky*factor, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -spooky*factor*sqrt(3)/2, 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -spooky*factor*sqrt(3.0)/2, 1e-6);
 
         unsigned this_many_ghosts_at_start = ((2*ghosts+num_cells_width)*ghosts+ghosts);
 
@@ -195,7 +195,7 @@ public:
 
         // Last node
         int last_node = p_mesh->GetNumNodes()-1;
-        double last_node_y = length+(spooky-1)*factor*(sqrt(3)/2);
+        double last_node_y = length+(spooky-1)*factor*(sqrt(3.0)/2);
         TS_ASSERT_DELTA(p_mesh->GetNode(last_node)->GetPoint()[0], width+(spooky-0.5)*factor, 1e-6);
         TS_ASSERT_DELTA(p_mesh->GetNode(last_node)->GetPoint()[1], last_node_y, 1e-6);
 

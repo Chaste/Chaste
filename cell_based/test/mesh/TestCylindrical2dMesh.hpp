@@ -488,7 +488,7 @@ public:
 
         // Test GetWidth
         TS_ASSERT_DELTA(p_mesh->GetWidth(0u), 3.0, 1e-9);
-        TS_ASSERT_DELTA(p_mesh->GetWidth(1u), sqrt(3), 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetWidth(1u), sqrt(3.0), 1e-6);
     }
 
     void TestHaloNodeInsertionAndRemoval() throw (Exception)

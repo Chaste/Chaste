@@ -338,7 +338,7 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
 
-        double crypt_length = cells_up*(sqrt(3)/2);
+        double crypt_length = cells_up*(sqrt(3.0)/2);
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -387,7 +387,7 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
 
-        double crypt_length = cells_up*(sqrt(3)/2);
+        double crypt_length = cells_up*(sqrt(3.0)/2);
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -470,7 +470,7 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
 
-        double crypt_length = cells_up*(sqrt(3)/2);
+        double crypt_length = cells_up*(sqrt(3.0)/2);
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 

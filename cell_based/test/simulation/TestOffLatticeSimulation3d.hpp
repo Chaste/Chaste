@@ -260,7 +260,7 @@ public:
 
             cells2.push_back(p_cell);
 
-            if (norm_2(node_location - spheroid_centre) <= 0.5*sqrt(3)*1.01*((double) min_spatial_dimension)/3.0)
+            if (norm_2(node_location - spheroid_centre) <= 0.5*sqrt(3.0)*1.01*((double) min_spatial_dimension)/3.0)
             {
                 location_indices.push_back(i);
                 cells.push_back(p_cell);

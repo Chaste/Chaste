@@ -79,7 +79,7 @@ public:
         ///\todo this should really be 4 as mesh is periodic
         TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], 3.5, 1e-4);
 
-        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 13.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], 13.0*0.5/sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], 0.0, 1e-4);
         TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], 0.0, 1e-4);
 
@@ -88,7 +88,7 @@ public:
         double height = p_mesh->GetWidth(1);
 
         TS_ASSERT_DELTA(width, 4, 1e-4);
-        TS_ASSERT_DELTA(height, 13.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(height, 13.0*0.5/sqrt(3.0), 1e-4);
     }
 
     void TestGetVectorFromAtoB() throw (Exception)
@@ -129,13 +129,13 @@ public:
         // Move one of the nodes to near the periodic boundary
         c_vector<double, 2> new_point_location;
         new_point_location[0] = -0.01;
-        new_point_location[1] = 3.0*0.5/sqrt(3);
+        new_point_location[1] = 3.0*0.5/sqrt(3.0);
         ChastePoint<2> new_point(new_point_location);
 
         // This node was on left and is now near the right
         p_mesh->SetNode(12, new_point);
         TS_ASSERT_DELTA(p_mesh->GetNode(12)->rGetLocation()[0], 3.99, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(12)->rGetLocation()[1], 3.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(12)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
 
         // This node has stayed close to where it was
         new_point.SetCoordinate(0, 0.2);
@@ -146,7 +146,7 @@ public:
         new_point.SetCoordinate(0, 4.1);
         p_mesh->SetNode(8, new_point);
         TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[0], 0.1, 1e-4);
-        TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(p_mesh->GetNode(8)->rGetLocation()[1], 3.0*0.5/sqrt(3.0), 1e-4);
     }
 
     void TestAddNodeAndReMesh() throw (Exception)
@@ -161,7 +161,7 @@ public:
         // Choose a node on the left boundary
         ChastePoint<2> point = p_mesh->GetNode(18)->GetPoint();
         TS_ASSERT_DELTA(point[0], 0.5, 1e-4);
-        TS_ASSERT_DELTA(point[1], 4.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(point[1], 4.0*0.5/sqrt(3.0), 1e-4);
 
         // Create a new node close to this node
         point.SetCoordinate(0, -0.01);
@@ -222,22 +222,22 @@ public:
         // Test centroid calculations for non-periodic element
         c_vector<double, 2> centroid = p_mesh->GetCentroidOfElement(5);
         TS_ASSERT_DELTA(centroid(0), 2.0, 1e-4);
-        TS_ASSERT_DELTA(centroid(1), 5.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(centroid(1), 5.0*0.5/sqrt(3.0), 1e-4);
 
         // Test centroid calculations for periodic element
         centroid = p_mesh->GetCentroidOfElement(7);
         TS_ASSERT_DELTA(centroid(0), 0.0, 1e-4);
-        TS_ASSERT_DELTA(centroid(1), 5.0*0.5/sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(centroid(1), 5.0*0.5/sqrt(3.0), 1e-4);
 
         // Test CalculateMomentOfElement() for all elements
-        // all elements are regular hexagons with edge 1/sqrt(3)
+        // all elements are regular hexagons with edge 1/sqrt(3.0)
         c_vector<double, 3> moments;
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
             moments = p_mesh->CalculateMomentsOfElement(i);
 
-            TS_ASSERT_DELTA(moments(0), 5*sqrt(3)/16/9, 1e-6); // Ixx
-            TS_ASSERT_DELTA(moments(1), 5*sqrt(3)/16/9, 1e-6); // Iyy
+            TS_ASSERT_DELTA(moments(0), 5*sqrt(3.0)/16/9, 1e-6); // Ixx
+            TS_ASSERT_DELTA(moments(1), 5*sqrt(3.0)/16/9, 1e-6); // Iyy
             TS_ASSERT_DELTA(moments(2), 0.0, 1e-6);            // Ixy = 0 by symmetry
         }
 

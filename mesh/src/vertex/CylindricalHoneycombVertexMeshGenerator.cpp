@@ -78,7 +78,7 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
             for (unsigned i=0; i<=numElementsAcross-1; i++)
             {
                 double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
-                double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3);
+                double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3.0);
                 bool is_boundary_node = (j==0 || j==1 || j==2*numElementsUp || j==2*numElementsUp+1) ? true : false;
 
                 Node<2>* p_node = new Node<2>(node_index, is_boundary_node , x_coord, y_coord);
