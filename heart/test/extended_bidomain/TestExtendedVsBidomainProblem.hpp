@@ -233,7 +233,7 @@ public:
         RunExtendedBidomainStimulateFirstCell();
 
         //pick up the results...
-        Hdf5DataReader reader_extended("Extended1dStimulateFirstCell", "extended1d");
+        Hdf5DataReader reader_extended("TestExtendedVs_Extended1dStimulateFirstCell", "extended1d");
         Hdf5DataReader reader_bidomain("TestExtendedVs_Bidomain1d", "normal1d");
         TS_ASSERT_EQUALS(reader_extended.GetNumberOfRows(), reader_bidomain.GetNumberOfRows());
 
