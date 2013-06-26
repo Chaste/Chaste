@@ -33,44 +33,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _PETSCSETUPANDFINALIZE_HPP_
-#define _PETSCSETUPANDFINALIZE_HPP_
+#ifndef PETSCSETUPUTILS_HPP_
+#define PETSCSETUPUTILS_HPP_
 
 /**
- * This file is designed to be included by any test suites that use PETSc.
- * It controls the PETSc initialisation and finalisation.
+ * Common code for setting up and tearing down tests.
+ * Used by PetscSetupAndFinalize.hpp and FakePetscSetup.hpp
  */
-
-#include "PetscSetupUtils.hpp"
-
-#include <cxxtest/GlobalFixture.h>
-#include <petsc.h>
-
-#include "PetscException.hpp"
-
-class PetscSetup : public CxxTest::GlobalFixture
+class PetscSetupUtils
 {
 public:
-
-    /** Standard setup method for PETSc.
-     * @return true (by CxxTest convention)
+    /**
+     * The global setup for Chaste tests.
      */
-    bool setUpWorld()
-    {
-        PetscSetupUtils::CommonSetup();
-        return true;
-    }
-    /** Clean up PETSc after running all tests.
-     * * @return true (by CxxTest convention)
-     */
-    bool tearDownWorld()
-    {
-        ///Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
-        PETSCEXCEPT(PetscFinalize());
-        return true;
-    }
+    static void CommonSetup();
+private:
 };
 
-static PetscSetup thisSetup;
-
-#endif //_PETSCSETUPANDFINALIZE_HPP_
+#endif // PETSCSETUPUTILS_HPP_

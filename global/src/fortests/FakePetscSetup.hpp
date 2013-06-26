@@ -43,90 +43,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * sure that only one process is left to run the actual tests.
  */
 
-#ifdef TEST_FOR_FPE
-#include <fenv.h>
-#include <signal.h>
-#endif
-
 #include <cxxtest/GlobalFixture.h>
-#include <petsc.h>
+
 #include <cstdlib>
-#include <cassert>
-#include <cstring>
-#include <unistd.h> //For chdir()
-#include <iostream>
+#include <petsc.h>
 
-#include "Exception.hpp"
+#include "PetscSetupUtils.hpp"
+
 #include "PetscException.hpp"
-#include "CommandLineArguments.hpp"
-#include "ChasteBuildRoot.hpp"
-#include "GetCurrentWorkingDirectory.hpp"
-
-#ifdef TEST_FOR_FPE
-void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
-{
-       if ( info->si_code == FPE_FLTDIV)
-       {
-           std::cerr<<"SIGFPE: floating point exception was divide by zero.\n";
-       }
-       else if ( info->si_code == FPE_FLTINV)
-       {
-           std::cerr<<"SIGFPE: floating point exception was an invalid operation (like 0.0/0.0).\n";
-       }
-       else
-       {
-           std::cerr<<"SIGFPE: unexpected error code.\n";
-       }
-}
-#endif
 
 class PetscSetup : public CxxTest::GlobalFixture
 {
 public:
 
-    /** Run the standard setup method for PETSc, but then take it down again.
+    /**
+     * Run the standard setup method for PETSc, but then take it down again.
      * Only the process with PETSc rank zero continues beyond setUpWorld(); the others
-     * exit gracefully
+     * exit gracefully.
      *
      * @return true (by CxxTest convention)
      */
     bool setUpWorld()
     {
-        // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
-        CommandLineArguments* p_args = CommandLineArguments::Instance();
-        PETSCEXCEPT(PetscInitialize(p_args->p_argc, p_args->p_argv,
-                                    PETSC_NULL, PETSC_NULL) );
+        PetscSetupUtils::CommonSetup();
 
-        // Check that the working directory is correct, or many tests will fail
-        std::string cwd = GetCurrentWorkingDirectory() + "/";
-        if (strcmp(cwd.c_str(), ChasteBuildRootDir()) != 0)
-        {
-#define COVERAGE_IGNORE
-            // Change directory
-            std::cout << std::endl << "Changing directory from '" << cwd << "' to '" << ChasteBuildRootDir() << "'." << std::endl;
-            EXPECT0(chdir, ChasteBuildRootDir());
-            std::cout << "CWD now: " << GetCurrentWorkingDirectory() << std::endl;
-#undef COVERAGE_IGNORE
-        }
-
-#ifdef TEST_FOR_FPE
-        // Give all PETSc enabled tests the ability to trap for divide-by-zero
-        feenableexcept(FE_DIVBYZERO | FE_INVALID );
-        // Catch all SIGFPE signals and convert them to exceptions (before PETSc gets to them)
-        struct sigaction sa;
-        sa.sa_sigaction = FpeSignalToAbort;
-        sa.sa_flags = SA_RESETHAND|SA_SIGINFO;
-        sa.sa_restorer = 0;
-        sigaction(SIGFPE, &sa, NULL);
-#endif
-        //Get rank
+        // Get rank
         PetscInt my_rank;
         MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
 
-        //Close PETSc down again
+        // Close PETSc down again
         PETSCEXCEPT(PetscFinalize());
 
-        //Make sure that only one process proceeds into the test itself
+        // Make sure that only one process proceeds into the test itself
         if (my_rank != 0)
         {
             exit(0);
