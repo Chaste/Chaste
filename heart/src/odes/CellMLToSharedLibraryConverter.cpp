@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMLToSharedLibraryConverter.hpp"
 
 #include <sstream>
-#include <unistd.h> // For getpid()
 #include <sys/stat.h> // For mkdir()
 #include <ctime>
 #include <cstring> // For strerror()
@@ -44,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/foreach.hpp>
 
+#include "ChasteSyscalls.hpp"
 #include "Exception.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "PetscTools.hpp"

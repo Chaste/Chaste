@@ -38,13 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/foreach.hpp>
 #include "RandomNumberGenerator.hpp"
 #include "MathsCustomFunctions.hpp"
-
-/*Windows_Port_Begins*/
-#ifdef _MSC_VER
-#include <process.h>
-#define getpid _getpid
-#endif
-/*Windows_Port_Ends*/
+#include "ChasteSyscalls.hpp"
 
 CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
 {

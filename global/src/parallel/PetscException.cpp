@@ -121,7 +121,7 @@ std::string GetKspErrorMessage(PetscInt kspError)
     {
         err_string = "Unknown KSP error code";
     }
-    #endif
+#endif
 
     return err_string;
 }

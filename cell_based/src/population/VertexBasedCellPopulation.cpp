@@ -34,7 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #if defined(__GCC__)
-/*potential workaround for enabling floating point exception 
+/*potential workaround for enabling floating point exception
 capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
 #define _GNU_SOURCE
 #endif
@@ -43,14 +43,8 @@ capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
 #include <boost/foreach.hpp>
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
+#include "ChasteSyscalls.hpp"
 #include <boost/math/special_functions/fpclassify.hpp> //for isnan
-
-/*Windows_Port_Begins*/ 
-#ifdef _MSC_VER 
-#include <process.h>
-#define getpid _getpid  
-#endif 
-/*Windows_Port_Ends*/ 
 
 // Cell writer definitions
 #include "AbstractCellPopulationWriter.hpp"
@@ -681,7 +675,7 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
          ++edge_iter)
     {
         std::pair<unsigned, unsigned> this_edge;
-        
+
         ///\todo we do not yet consider boundaryness in vertex meshes (see #1558)
         (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << 0 << std::endl;
     }
