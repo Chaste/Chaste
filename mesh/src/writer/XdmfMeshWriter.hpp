@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * A class for writing from a Chaste mesh to the geometry/topology components of 
+ * A class for writing from a Chaste mesh to the geometry/topology components of
  * an XDMF file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -74,7 +74,7 @@ public:
      *                                     Ignored in this derived class
      */
     void WriteFilesUsingMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-            bool keepOriginalElementIndexing=true);
+                             bool keepOriginalElementIndexing=true);
 };
 
 #endif /* XDMFMESHWRITER_HPP_ */

@@ -352,7 +352,7 @@ public:
         unsigned num_simulations = 2;
 
         // Guess of maximum number of cells a crypt section may contain
-        unsigned max_length_of_crypt_section = 5 * (unsigned)sqrt(pow(cells_across/2.0+1,2) + pow(cells_up,2));
+        unsigned max_length_of_crypt_section = 5 * (unsigned)sqrt(pow(cells_across/2.0+1,2.0) + pow((double)cells_up,2.0));
 
         std::vector<unsigned> labelled_cells_counter(max_length_of_crypt_section);
 

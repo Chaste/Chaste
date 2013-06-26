@@ -58,7 +58,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestXmlMeshWriters : public CxxTest::TestSuite
 {
-
 public:
     void TestBasicVtkMeshWriter() throw(Exception)
     {
@@ -766,6 +765,9 @@ public:
         TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
 
         XdmfMeshWriter<3,3> writer_from_reader("TestXdmfMeshWriter", "simple_cube", false);
+#ifdef _MSC_VER
+        TS_ASSERT_THROWS_THIS(writer_from_reader.WriteFilesUsingMeshReader(reader), "XDMF is not supported under Windows at present.");
+#else
         writer_from_reader.WriteFilesUsingMeshReader(reader);
 
         //Check that the files are the same as previously
@@ -775,11 +777,14 @@ public:
                        "mesh/test/data/TestXdmfMeshWriter/simple_cube_geometry_0.xml").CompareFiles();
         FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_topology_0.xml",
                        "mesh/test/data/TestXdmfMeshWriter/simple_cube_topology_0.xml").CompareFiles();
-
+#endif // _MSC_VER
 
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
         XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_from_mesh", false);
+#ifdef _MSC_VER
+        TS_ASSERT_THROWS_THIS(writer_from_mesh.WriteFilesUsingMesh(mesh), "XDMF is not supported under Windows at present.");
+#else
         writer_from_mesh.WriteFilesUsingMesh(mesh);
 
         //Just check that the files are there
@@ -789,11 +794,12 @@ public:
                        "mesh/test/data/TestXdmfMeshWriter/simple_cube_from_mesh_geometry_0.xml").CompareFiles();
         FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/simple_cube_from_mesh_topology_0.xml",
                        "mesh/test/data/TestXdmfMeshWriter/simple_cube_from_mesh_topology_0.xml").CompareFiles();
-
+#endif // _MSC_VER
     }
 
     void TestXdmfWriter2D()
     {
+#ifndef _MSC_VER
         /*Read as ascii*/
         TrianglesMeshReader<2,2> reader("mesh/test/data/disk_522_elements");
 
@@ -820,10 +826,12 @@ public:
                        "mesh/test/data/TestXdmfMeshWriter/disk_from_mesh_geometry_0.xml").CompareFiles();
         FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/disk_from_mesh_topology_0.xml",
                        "mesh/test/data/TestXdmfMeshWriter/disk_from_mesh_topology_0.xml").CompareFiles();
+#endif // _MSC_VER
     }
 
     void TestXdmfWriterDistributed()
     {
+#ifndef _MSC_VER
         TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
         DistributedTetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(reader);
@@ -855,6 +863,7 @@ public:
                                                "mesh/test/data/TestXdmfMeshWriter/simple_cube_dist_topology_1.xml", false /*not collective*/).CompareFiles();
             }
         }
+#endif // _MSC_VER
      }
 };
 

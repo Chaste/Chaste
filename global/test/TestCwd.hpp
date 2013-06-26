@@ -39,11 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include <cstdlib>
+#include <climits>
 
 #include "FakePetscSetup.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "BoostFilesystem.hpp"
+#include "IsNan.hpp"
 /**
  * Test for a strange 'feature' of Debian sarge systems, where the
  * current working directory changes on PETSc initialisation.  There
@@ -73,7 +75,7 @@ public:
 #else
 // If we aren't testing for it, then there will be no exception
         TS_ASSERT_THROWS_NOTHING(ans = one / zero);
-        double negative_infinity=std::numeric_limits<double>::infinity();
+        double negative_infinity = std::numeric_limits<double>::infinity();
         TS_ASSERT_EQUALS(ans, negative_infinity);
 #endif
     }

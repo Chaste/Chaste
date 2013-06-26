@@ -1366,7 +1366,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     rMeshReader.Reset();
 
-    int numflag = 0; // METIS speak for C-style numbering
+    idxtype numflag = 0; // METIS speak for C-style numbering
     /* Connectivity degree.
      * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share
      * at least this many nodes.
@@ -1374,7 +1374,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      * Manual recommends "for meshes containing only triangular, tetrahedral,
      * hexahedral, or rectangular elements, this parameter can be set to two, three, four, or two, respectively.
      */
-    int ncommonnodes = 3; //Linear tetrahedra
+    idxtype ncommonnodes = 3; //Linear tetrahedra
     if (ELEMENT_DIM == 2)
     {
         ncommonnodes = 2;
@@ -1394,14 +1394,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     eind.reset();
     eptr.reset();
 
-    int weight_flag = 0; // unweighted graph
-    int n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
-    int n_subdomains = PetscTools::GetNumProcs();
-    int options[3]; // extra options
+    idxtype weight_flag = 0; // unweighted graph
+    idxtype n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
+    idxtype n_subdomains = PetscTools::GetNumProcs();
+    idxtype options[3]; // extra options
     options[0] = 0; // ignore extra options
-    int edgecut;
+    idxtype edgecut;
     boost::scoped_array<real_t> tpwgts(new real_t[n_subdomains]);
-    real_t ubvec_value = 1.05;
+    real_t ubvec_value = (real_t)1.05;
     for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
     {
         tpwgts[proc] = ((real_t)1.0)/n_subdomains;
@@ -1418,7 +1418,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //    float node_coordinates[num_local_elements*SPACE_DIM];
 //
 //    ParMETIS_V3_PartGeomKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
-//                             &n_dimensions, node_coordinates, &n_constrains, &n_subdomains, NULL, NULL,
+//                             &n_dimensions, node_coordinates, &n_constraints, &n_subdomains, NULL, NULL,
 //                             options, &edgecut, local_partition, &communicator);
 
     Timer::Reset();
@@ -1431,7 +1431,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     boost::scoped_array<idxtype> global_element_partition(new idxtype[num_elements]);
 
     MPI_Allgatherv(local_partition.get(), num_local_elements, MPI_INT,
-                   global_element_partition.get(), element_counts.get(), element_distribution.get(), MPI_INT, PETSC_COMM_WORLD);
+                   global_element_partition.get(), (int*)element_counts.get(), (int*)element_distribution.get(), MPI_INT, PETSC_COMM_WORLD);
 
     local_partition.reset();
 

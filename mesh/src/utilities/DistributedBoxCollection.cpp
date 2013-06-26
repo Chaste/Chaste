@@ -437,7 +437,7 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
         int delta_left =  ( (local_load + node_distr_on_left_process[node_distr_on_left_process.size() - 1]) - (load_on_left_proc - node_distr_on_left_process[node_distr_on_left_process.size() - 1]) );
         delta_left = delta_left*delta_left - local_to_left_sq;
 
-        int delta_right= ( (local_load - localDistribution[0]) - (load_on_left_proc + localDistribution[0]));
+        int delta_right = ( (local_load - localDistribution[0]) - (load_on_left_proc + localDistribution[0]));
         delta_right = delta_right*delta_right - local_to_left_sq;
 
         // If a delta is negative we should accept that change. If both are negative choose the largest change.
@@ -456,7 +456,7 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
 
         if (move_left && move_right)
         {
-            local_change = (fabs(delta_right) > fabs(delta_left)) ? -1 : 1;
+            local_change = (fabs((double)delta_right) > fabs((double)delta_left)) ? -1 : 1;
         }
 
         // Update the number of local rows.

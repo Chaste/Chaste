@@ -36,6 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <map>
 
+#include "XdmfMeshWriter.hpp"
+#include "DistributedTetrahedralMesh.hpp"
+#include "Version.hpp"
+
+// Xerces is currently not supported in the Windows port
+#ifndef _MSC_VER
+
 // Mandatory for using any feature of Xerces.
 #include <xercesc/util/PlatformUtils.hpp>
 // DOM (if you want SAX, then that's a different include)
@@ -47,10 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // to the file system (Also see: XMLFormatTarget)
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xsd/cxx/xml/string.hxx>
-
-#include "XdmfMeshWriter.hpp"
-#include "DistributedTetrahedralMesh.hpp"
-#include "Version.hpp"
 
 #ifndef X //Also used in XmlTools in the heart component
 /**
@@ -64,19 +67,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///\todo
 #endif
 
+#endif // _MSC_VER
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::XdmfMeshWriter(const std::string& rDirectory,
-        const std::string& rBaseName,
-        const bool clearOutputDir)
-: AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir)
+                                                       const std::string& rBaseName,
+                                                       const bool clearOutputDir)
+    : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-        bool keepOriginalElementIndexing)
+                                                                 bool keepOriginalElementIndexing)
 {
-    assert(keepOriginalElementIndexing==true);
+#ifdef _MSC_VER
+    EXCEPTION("XDMF is not supported under Windows at present.");
+#else
+    assert(keepOriginalElementIndexing);
     this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
     bool mesh_is_distributed = (this->mpDistributedMesh != NULL) && PetscTools::IsParallel();
 
@@ -195,11 +203,15 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     (*topology_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
     topology_file->close();
     PetscTools::Barrier("XdmfMeshWriter wait for chunks to be written");
+#endif
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
+#ifdef _MSC_VER
+    EXCEPTION("XDMF is not supported under Windows at present.");
+#else
     // This method is only called when there is no mesh.  We are writing from a reader.
     if (PetscTools::AmMaster())
     {
@@ -255,10 +267,13 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         (*topology_file) << "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->\n";
         topology_file->close();
     }
+#endif
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned numberOfChunks)
 {
+#ifndef _MSC_VER
     assert(PetscTools::AmMaster());
     // Define namespace symbols
     XERCES_CPP_NAMESPACE_USE
@@ -327,6 +342,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     p_DOM_document->release();
     delete p_target;
     XMLPlatformUtils::Terminate();
+#endif // _MSC_VER
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -125,7 +125,7 @@ include_directories("${CHASTE_INCLUDES}")
 
 # A macro to recursively find Chaste header locations
 macro(HEADER_DIRS base_dir return_list)
-    file(GLOB_RECURSE new_list base_dir *.hpp)
+    file(GLOB_RECURSE new_list base_dir *.hpp *.h)
     set(dir_list "")
     foreach(file_path ${new_list})
         get_filename_component(dir_path ${file_path} PATH)

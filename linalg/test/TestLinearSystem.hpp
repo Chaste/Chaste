@@ -81,7 +81,7 @@ public:
                 ls.SetMatrixElement(row, col, (double) row*3+col+1);
             }
         }
-        
+
         ls.SetRhsVectorElement(0, 1400000.0);
         ls.SetRhsVectorElement(1, 3200000.0);
         ls.SetRhsVectorElement(2, 5000000.0);
@@ -844,9 +844,9 @@ public:
             KSPGetPC(ls_small.mKspSolver, &prec_small);
             PCGetType(prec_small, &pc_small);
             TS_ASSERT( strcmp(pc_small,"none")==0 );
-        }        
+        }
         // Set relative tolerance before first solve
-        LinearSystem ls = LinearSystem(7); 
+        LinearSystem ls = LinearSystem(7);
         ls.SetRelativeTolerance(1e-3);
         ls.SetKspType("cg");
         ls.SetPcType("jacobi"); //Will not be over-ridden because the system is larger...
@@ -1554,7 +1554,7 @@ public:
         ls.SetMatrixElement(1, 0, 0.0);
         ls.SetMatrixElement(1, 1, 1.0);
 
-        ls.SetRhsVectorElement(0, log(0)); // -inf
+        ls.SetRhsVectorElement(0, log(0.0)); // -inf
         ls.SetRhsVectorElement(1, 0.0);
 
         ls.AssembleFinalLinearSystem();
