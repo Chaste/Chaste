@@ -45,12 +45,12 @@ set(quote "\"")
 string(REPLACE ${quote} "\\${quote}" licence "${licence}")
 
 #There seems to be an assumption that SOURCE==BUILD directories. Changing this to make tests pass, may come to bite!
-set(CHASTE_BUILD_ROOT_DIR "${CHASTE_SOURCE_ROOT}")
+#set(CHASTE_BUILD_ROOT_DIR "${CHASTE_SOURCE_ROOT}")
 
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in" template)
 string(REPLACE "%(licence)s" "${licence}" template "${template}")
-string(REPLACE "%(chaste_root)s" "${CHASTE_BUILD_ROOT_DIR}/" template "${template}")
+string(REPLACE "%(chaste_root)s" "${CHASTE_SOURCE_ROOT}/" template "${template}")
 string(REPLACE "%(revision)s" "${chaste_revision}" template "${template}")
 string(REPLACE "%(wc_modified)s" "${CHASTE_WC_MODIFIED}" template "${template}")
 string(REPLACE "%(build_time)s" "${time_stamp}" template "${template}")
@@ -72,7 +72,7 @@ file(WRITE "src/GetChasteBuildRoot.cpp"
 
 const char* ChasteBuildRootDir() 
 { 
-    return \"${CHASTE_BUILD_ROOT_DIR}/\"; 
+    return \"${CHASTE_SOURCE_ROOT}/\"; 
 }
 
 std::string ChasteComponentBuildDir(const std::string& rComponent)
