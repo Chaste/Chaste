@@ -36,8 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTCARDIACSIMULATIONARCHIVER_HPP_
 #define TESTCARDIACSIMULATIONARCHIVER_HPP_
 
-#include <sys/stat.h> // For chmod()
-
 #include <cxxtest/TestSuite.h>
 
 #include "CheckpointArchiveTypes.hpp" // Needs to be before other Chaste code
@@ -47,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVector.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "ArchiveOpener.hpp"
+#include "ChasteSyscalls.hpp"
 
 #include "AbstractCardiacCellInterface.hpp"
 #include "PlaneStimulusCellFactory.hpp"
@@ -630,13 +629,13 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadAsSequential/?* ./heart/test/da
         std::string info_path = handler.GetOutputDirectoryFullPath() + "archive.info";
         if (PetscTools::AmMaster())
         {
-            chmod(info_path.c_str(), 0444);
+            chmod(info_path.c_str(), CHASTE_READONLY);
         }
         TS_ASSERT_THROWS_CONTAINS(CardiacSimulationArchiver<BidomainProblem<3> >::Save(bidomain_problem, directory, false),
                                   "Unable to open archive information file");
         if (PetscTools::AmMaster())
         {
-            chmod(info_path.c_str(), 0666);
+            chmod(info_path.c_str(), CHASTE_READ_WRITE);
         }
     }
 

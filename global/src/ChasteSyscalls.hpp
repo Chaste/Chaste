@@ -38,8 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * This file provides access to some 'system calls' such as getpid() and chdir() in a cross-platform
- * manner.  It provides the normal Linux names, even on Windows.
+ * This file provides access to some 'system calls' in a cross-platform manner.
+ * It provides the normal Linux names, even on Windows.
+ * Functions provided: chdir, getpid, chmod, setenv.
  */
 
 #ifdef _MSC_VER
@@ -50,11 +51,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <process.h>
 #define getpid _getpid
 
+#include <io.h>
+#define CHASTE_READONLY _S_IREAD
+#define CHASTE_READ_EXECUTE _S_IREAD | _S_IEXEC
+#define CHASTE_READ_WRITE _S_IREAD | _S_IWRITE
+#define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
+#define chmod _chmod
+
+/**
+ * Windows version of setenv call.  Note that under Linux we always pass 1 (overwrite) for the third arg.
+ * @param name  environment variable to set
+ * @param value  value to give the variable
+ * @param mode  not used on Windows
+ */
+#define setenv(name, value, mode) _putenv_s(name, value)
+
 #else
 
 #include <unistd.h> // For chdir() and getpid()
+#include <sys/stat.h> // For chmod()
+#define CHASTE_READONLY 0444
+#define CHASTE_READ_EXECUTE 0555
+#define CHASTE_READ_WRITE 0640
+#define CHASTE_READ_WRITE_EXECUTE 0755
 
-#endif
-
+#endif // _MSC_VER
 
 #endif // CHASTESYSCALLS_HPP_

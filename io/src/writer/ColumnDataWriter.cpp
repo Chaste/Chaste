@@ -48,8 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <fstream>
 
-//#include <sys/stat.h> // For chmod()
-
 ColumnDataWriter::ColumnDataWriter(const std::string& rDirectory,
                                    const std::string& rBaseName,
                                    bool cleanDirectory,

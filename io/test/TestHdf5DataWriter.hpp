@@ -44,10 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "DistributedVectorFactory.hpp"
+#include "ChasteSyscalls.hpp"
 
 #include "CompareHdf5ResultsFiles.hpp"
-
-#include <sys/stat.h> // For chmod()
 
 class TestHdf5DataWriter : public CxxTest::TestSuite
 {
@@ -1114,12 +1113,12 @@ public:
         PetscTools::Barrier("TestFailCreateFile"); //Wait for all processes to leave file before checking that it's there
         FileFinder empty = handler.FindFile("empty.h5");
         TS_ASSERT(empty.Exists());
-        chmod(empty.GetAbsolutePath().c_str(), 0440);
+        chmod(empty.GetAbsolutePath().c_str(), CHASTE_READONLY);
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "empty", false);
         writer.DefineVariable("Node","dimensionless");
         writer.DefineFixedDimension(number_nodes);
-        H5E_BEGIN_TRY //Supress HDF5 error in this test
+        H5E_BEGIN_TRY //Suppress HDF5 error in this test
         {
             TS_ASSERT_THROWS_CONTAINS(writer.EndDefineMode(), "Hdf5DataWriter could not create");
         }
@@ -1127,7 +1126,7 @@ public:
         writer.Close();
 
         // Re-instate permission to overwrite file
-        chmod(empty.GetAbsolutePath().c_str(), 0640);
+        chmod(empty.GetAbsolutePath().c_str(), CHASTE_READ_WRITE);
     }
 
     /**
@@ -1135,7 +1134,7 @@ public:
      *
      * This test must come after TestHdf5DataWriterFullFormat and TestHdf5DataWriterFullFormatStripedIncomplete,
      * as we extend their files.
-     * 
+     *
      * NB And this test must come before TestWriteToExistingFile which test that
      * there is a Postprocessing block!
      */

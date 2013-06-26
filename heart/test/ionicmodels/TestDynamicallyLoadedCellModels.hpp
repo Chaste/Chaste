@@ -36,16 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTDYNAMICALLYLOADEDCELLMODELS_HPP_
 #define TESTDYNAMICALLYLOADEDCELLMODELS_HPP_
 
-#include <sys/stat.h> // For chmod()
-
 #include <cxxtest/TestSuite.h>
 #include <boost/assign.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "ChasteSerialization.hpp"
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
 
 #include "RunAndCheckIonicModels.hpp"
@@ -62,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 #include "FileFinder.hpp"
 #include "HeartFileFinder.hpp"
+#include "ChasteSyscalls.hpp"
 
 #include "AbstractDynamicallyLoadableEntity.hpp"
 #include "AbstractCardiacCellInterface.hpp"

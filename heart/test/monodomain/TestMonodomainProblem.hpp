@@ -60,8 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshReader.hpp"
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
-
-#include <sys/stat.h> // For chmod()
+#include "ChasteSyscalls.hpp"
 
 /*
  *  This cell factory introduces a stimulus in the very centre of mesh/test/data/2D_0_to_1mm_400_elements.
@@ -1015,9 +1014,9 @@ public:
         OutputFileHandler handler(directory, false);
         if (PetscTools::AmMaster())
         {
-            chmod(handler.GetOutputDirectoryFullPath().c_str(), 0555);
+            chmod(handler.GetOutputDirectoryFullPath().c_str(), CHASTE_READ_EXECUTE);
         }
-        H5E_BEGIN_TRY //Supress HDF5 error in this test
+        H5E_BEGIN_TRY //Suppress HDF5 error in this test
         {
             TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
                                   "Hdf5DataWriter could not create " + handler.GetOutputDirectoryFullPath() + "results.h5 , H5Fcreate error code = -1");
@@ -1025,7 +1024,7 @@ public:
         H5E_END_TRY;
         if (PetscTools::AmMaster())
         {
-            chmod(handler.GetOutputDirectoryFullPath().c_str(), 0755);
+            chmod(handler.GetOutputDirectoryFullPath().c_str(), CHASTE_READ_WRITE_EXECUTE);
         }
     }
 

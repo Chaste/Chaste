@@ -41,23 +41,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <sstream>
 #include <petsc.h>
-#include <sys/stat.h> // For chmod()
-
-#ifdef _MSC_VER
-#include <io.h>
-#define CHASTE_READONLY _S_IREAD
-#define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
-#define chmod _chmod
-#define setenv(a,b,c) _putenv_s(a,b)
-#else
-#define CHASTE_READONLY 0444
-#define CHASTE_READ_WRITE_EXECUTE 0755
-#endif
 
 #include "OutputFileHandler.hpp"
 #include "BoostFilesystem.hpp"
 #include "FileFinder.hpp"
 #include "PetscTools.hpp"
+#include "ChasteSyscalls.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOutputFileHandler : public CxxTest::TestSuite
@@ -77,7 +66,7 @@ public:
         const std::string handler_path(handler.GetOutputDirectoryFullPath());
         TS_ASSERT(handler_path.length() > 0);
         TS_ASSERT_EQUALS(handler_path, handler.GetChasteTestOutputDirectory());
-        
+
         // Test that CHASTE_TEST_OUTPUT always has a trailing slash
         TS_ASSERT_EQUALS( *(handler_path.end()-1), '/');
 
@@ -141,7 +130,7 @@ public:
             // Check this folder is not present
             FileFinder test_folder("testoutput/whatever", RelativeTo::ChasteSourceRoot);
             TS_ASSERT(!test_folder.Exists());
-            
+
             PetscTools::Barrier("TestOutputFileHandler-2");
 
             // Make a folder and erase it - NB only master can erase files and check it is successful!
@@ -153,7 +142,7 @@ public:
                 test_folder.Remove();
             }
         }
-        
+
         {
             setenv("CHASTE_TEST_OUTPUT", "config__cyborg__T800__cooper", 1/*Overwrite*/);
             // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
@@ -161,7 +150,7 @@ public:
             const std::string nonexistent_test_path(OutputFileHandler::GetChasteTestOutputDirectory());
             TS_ASSERT_EQUALS( *(nonexistent_test_path.end()-1), '/');
         }
-        
+
         {
             // Check this folder is not present
             std::string test_folder("somewhere_without_trailing_forward_slash");

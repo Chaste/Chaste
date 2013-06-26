@@ -37,16 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTARCHIVINGHELPERCLASSES_HPP_
 
 #include <climits>
-#include <sys/stat.h> // For chmod()
-#ifdef _MSC_VER
- #include <io.h>
- #define CHASTE_READONLY _S_IREAD
- #define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
- #define chmod _chmod
-#else
- #define CHASTE_READONLY 0444
- #define CHASTE_READ_WRITE_EXECUTE 0755
-#endif
 
 #include <cxxtest/TestSuite.h>
 
@@ -63,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
+#include "ChasteSyscalls.hpp"
 
 // Save typing, and allow the use of these in cxxtest macros
 typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
