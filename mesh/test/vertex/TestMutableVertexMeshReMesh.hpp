@@ -51,7 +51,9 @@ class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 public:
 
     /*
-     * This tests both PerformNodeMerge and IdentifySwapType
+     * This tests the MutableVertexMesh methods PerformNodeMerge() and IdentifySwapType()
+     * for a single triangular element as shown below, where the nodes marked with an x
+     * are merged.
      *
      *       /|
      *      / |
@@ -60,8 +62,6 @@ public:
      *   /    |
      *  /     |
      *  --xx--
-     *
-     *  The nodes marked with an x are merged
      *
      */
     void TestPerformNodeMerge() throw(Exception)
@@ -140,10 +140,10 @@ public:
      *  |       |       |
      *   ------- -------
      *
-     *  The nodes marked with an x are merged
+     * The nodes marked with an x are merged.
      *
      * \todo this could be merged with the earlier test to shorten the test file.
-     * \todo I think this should be a T1Swap see #1263
+     * \todo I think this should be a T1 swap (see #1263)
      */
     void TestPerformNodeMergeWhenLowIndexNodeMustBeAddedToElement() throw(Exception)
     {
@@ -1131,12 +1131,12 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetT2Threshold(0.01);
-        vertex_mesh.SetCellRearrangementThreshold(0.00001); //So T1Swaps dont happen
+        vertex_mesh.SetCellRearrangementThreshold(0.00001); //So T1Swaps don't happen
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
-        vertex_mesh.ReMesh(); // Elements too big so nothing happens
+        vertex_mesh.ReMesh();
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -1178,12 +1178,11 @@ public:
         }
     }
 
-
     /**
-     * This tests the ReMesh method for performing multiple T2Swaps.
+     * This tests that the ReMesh() method works correctly in the case where multiple T2 swaps are required.
+     * After remeshing, the two triangular elements should be removed from the mesh.
      *
-     * Currently fails as the ElementMap is not updated properly
-     *
+     * \todo (#2403) - the test fails at present, since the VertexElementMap is not updated correctly
      *
      *   ________          _________
      *  |\      /|        |\       /|
@@ -1191,11 +1190,10 @@ public:
      *  | |/  \| |        | /     \ |
      *  |/______\|        |/_______\|
      *
-     *
      */
-    void noTestRemeshForMultipleT2Swap() throw(Exception)
+    void TestRemeshForMultipleT2Swap() throw(Exception)
     {
-        // Make 10 nodes to assign to six elements
+        // Create ten nodes to assign to six elements
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
@@ -1208,8 +1206,7 @@ public:
         nodes.push_back(new Node<2>(8, false, 0.7, 0.45));
         nodes.push_back(new Node<2>(9, false, 0.7, 0.55));
 
-
-        // Make a set of elements out of these nodes
+        // Create six elements associated with these nodes
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3, nodes_elem_4, nodes_elem_5;
         unsigned node_indices_elem_0[6] = {0, 1, 8, 7, 5, 4};
         unsigned node_indices_elem_1[6] = {2, 3, 6, 5, 7, 9};
@@ -1238,44 +1235,67 @@ public:
         vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_4));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_5));
+        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2,2>(5, nodes_elem_5));
 
-        // Make a vertex mesh
+        // Create a vertex mesh from the nodes and elements
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
+        // Set the remeshing threshold parameter values so that T2 swaps do occur, but T1 swaps do not
         vertex_mesh.SetT2Threshold(0.01);
-        vertex_mesh.SetCellRearrangementThreshold(0.00001); //So T1Swaps don't happen
+        vertex_mesh.SetCellRearrangementThreshold(0.00001);
 
+        // Test that the numbers of nodes and elements are correct before and after remeshing
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 6u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
 
         VertexElementMap map(vertex_mesh.GetNumElements());
-
-        vertex_mesh.ReMesh(map); // Elements too big so nothing happens
+        vertex_mesh.ReMesh(map);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
+        ///\todo (#2403) - these should all pass but the map is not being updated in RemoveDeletedNodesAndElements()
+        TS_ASSERT_EQUALS(map.GetNewIndex(0), 0u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(1), 1u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(2), 2u);
+        TS_ASSERT_EQUALS(map.GetNewIndex(3), 3u);
+        TS_ASSERT_EQUALS(map.IsDeleted(4), true);
+        TS_ASSERT_EQUALS(map.IsDeleted(5), true);
 
-        // These should all pass but the map is not being updated in RemoveDeletedNodesAndElements
-        TS_ASSERT_EQUALS(map.GetNewIndex(0u),0u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(1u),1u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(2u),2u);
-        TS_ASSERT_EQUALS(map.GetNewIndex(3u),3u);
-        TS_ASSERT(map.IsDeleted(4u));
-        TS_ASSERT(map.IsDeleted(5u));
+        // Test that each merged node is correctly located at the centroid of the element it has replaced
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 1.0/3.0, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[0], 2.0/3.0, 1e-3);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(5)->rGetLocation()[1], 0.5, 1e-3);
 
+        // Test that after remeshing, each element contains the correct number of nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
 
+        // Test that after remeshing, each element contains the correct nodes
+        unsigned node_indices_element_0[4] = {0, 1, 5, 4};
+        unsigned node_indices_element_1[4] = {2, 3, 4, 5};
+        unsigned node_indices_element_2[3] = {1, 2, 5};
+        unsigned node_indices_element_3[3] = {0, 4, 3};
+        for (unsigned i=0; i<3; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
+        }
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(3), node_indices_element_0[3]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(3), node_indices_element_1[3]);
     }
 
-
-
     /**
-     * This tests the ReMesh method for performing T1Swaps, both internally and on the boundary.
+     * This tests the ReMesh() method for performing T1 swaps, both internally and on the boundary.
      * In this test we read in a vertex mesh that contains several pairs of nodes that
-     * are close enough for T1Swaps to be performed. The mesh consists of 6 elements and all
-     * T1Swaps are performed on all horizontal edges.
+     * are close enough for T1 swaps to be performed. The mesh consists of 6 elements and all
+     * T1 swaps are performed on all horizontal edges.
      *
      *      /\    /\
      *     /  \__/  \
@@ -1290,7 +1310,7 @@ public:
      */
     void TestReMeshForT1Swaps() throw(Exception)
     {
-        // This also tests IdentifySwapType
+        // This also tests the MutableVertexMesh method IdentifySwapType()
 
         // Load mesh
         VertexMeshReader<2,2> mesh_reader("cell_based/test/data/TestMutableVertexMesh/vertex_remesh_T1");

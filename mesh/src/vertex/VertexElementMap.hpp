@@ -111,7 +111,6 @@ public:
      * @return the size of the VertexElementMap.
      */
     unsigned Size();
-
 };
 
 #endif /*VERTEXELEMENTMAP_HPP_*/

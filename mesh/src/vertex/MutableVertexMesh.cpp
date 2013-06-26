@@ -693,33 +693,48 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(VertexElementMap& rElementMap)
 {
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM==2 || SPACE_DIM==3);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
     // Make sure the map is big enough
     rElementMap.Resize(this->GetNumAllElements());
 
-    // Remove deleted elements
+    // Remove any elements that have been marked for deletion and store all other elements in a temporary structure
     std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> live_elements;
-    for (unsigned i=0; i< this->mElements.size(); i++)
+    unsigned map_index = 0;
+    for (unsigned i=0; i<this->mElements.size(); i++)
     {
+        /*
+         * Here we assume that element indices run from 0 to mElements.size()-1. We allow
+         * for the possibility that this is not the first time we have removed an element
+         * through this method at the present time step. This means that we must be careful
+         * in specifying which entry of rElementMap to set as deleted, hence the use of
+         * map_index.
+         */
+        while (rElementMap.IsDeleted(map_index))
+        {
+            map_index++;
+        }
+
         if (this->mElements[i]->IsDeleted())
         {
             delete this->mElements[i];
-            rElementMap.SetDeleted(i);
+            rElementMap.SetDeleted(map_index);
         }
         else
         {
             live_elements.push_back(this->mElements[i]);
-            rElementMap.SetNewIndex(i, (unsigned)(live_elements.size()-1));
+            rElementMap.SetNewIndex(map_index, (unsigned)(live_elements.size()-1));
         }
+
+        map_index++;
     }
 
+    // Sanity check
     assert(mDeletedElementIndices.size() == this->mElements.size() - live_elements.size());
+
+    // Repopulate the elements vector and reset the list of deleted element indices
     mDeletedElementIndices.clear();
     this->mElements = live_elements;
 
+    // Finally, reset the element indices to run from zero
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
         this->mElements[i]->ResetIndex(i);
@@ -732,6 +747,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
 {
+    // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     std::vector<Node<SPACE_DIM>*> live_nodes;
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
@@ -745,10 +761,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
         }
     }
 
+    // Sanity check
     assert(mDeletedNodeIndices.size() == this->mNodes.size() - live_nodes.size());
+
+    // Repopulate the nodes vector and reset the list of deleted node indices
     this->mNodes = live_nodes;
     mDeletedNodeIndices.clear();
 
+    // Finally, reset the node indices to run from zero
     for (unsigned i=0; i<this->mNodes.size(); i++)
     {
         this->mNodes[i]->SetIndex(i);
@@ -764,23 +784,30 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
 
     if (SPACE_DIM == 2)
     {
-        /*
-         * We do not need to call Clear() and remove all current data, since
-         * cell birth, rearrangement and death result only in local remeshing
-         * of a vertex-based mesh.
-         */
+        // Make sure the map is big enough
+        rElementMap.Resize(this->GetNumAllElements());
 
-        // Remove deleted nodes and elements
+        /*
+         * To begin the remeshing process, we do not need to call Clear() and remove all current data,
+         * since cell birth, rearrangement and death result only in local remeshing of a vertex-based
+         * mesh. Instead, we just remove any deleted elements and nodes.
+         */
         RemoveDeletedNodesAndElements(rElementMap);
 
-        // Check for element rearrangements
+        // We must check for, and implement, any T2 swaps prior to checking for T1 swaps
         bool recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            // Separate loops as need to check for T2Swaps first
+            // Note that whenever we call CheckForT2Swaps(), the element indices must run from zero up to mElements.size()-1
             recheck_mesh = CheckForT2Swaps(rElementMap);
 
-            if (recheck_mesh == false)
+            // If a T2 swap occurred...
+            if (recheck_mesh == true)
+            {
+                // ...then remove any deleted elements and nodes
+                RemoveDeletedNodesAndElements(rElementMap);
+            }
+            else
             {
                 recheck_mesh = CheckForT1Swaps(rElementMap);
             }
@@ -801,7 +828,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         #define COVERAGE_IGNORE
         EXCEPTION("Remeshing has not been implemented in 3D (see #827 and #860)\n");
         #undef COVERAGE_IGNORE
-        /// \todo put code for remeshing in 3D here - see #866 and the paper doi:10.1016/j.jtbi.2003.10.001
+        ///\todo put code for remeshing in 3D here - see #866 and the paper doi:10.1016/j.jtbi.2003.10.001
     }
 }
 
@@ -889,10 +916,8 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
             // ...and smaller than the threshold area...
             if (this->GetVolumeOfElement(elem_iter->GetIndex()) < GetT2Threshold())
             {
-                // ...then perform a T2 swap and remove the deleted nodes (if we don't do this then the search for T1 swaps causes errors)
+                // ...then perform a T2 swap and break out of the loop
                 PerformT2Swap(*elem_iter);
-                RemoveDeletedNodesAndElements(rElementMap);
-
                 return true;
             }
         }

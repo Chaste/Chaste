@@ -150,7 +150,7 @@ protected:
     bool CheckForIntersections();
 
     /**
-     * Helper method for ReMesh to Identify the type of swap when nodes are too close, T2Swap or NodeMerge.
+     * Helper method for ReMesh to identify the type of swap when nodes are too close, T2 swap or NodeMerge.
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
      *
@@ -172,7 +172,9 @@ protected:
     void PerformNodeMerge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
     /**
-     * Helper method for ReMesh to perform the T1 Swap
+     * Helper method for ReMesh to perform a T1 swap.
+     *
+     * \todo Describe what a T1 swap is
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
      *
@@ -193,7 +195,9 @@ protected:
     void PerformIntersectionSwap(Node<SPACE_DIM>* pNode, unsigned elementIndex);
 
     /**
-     * Helper method for ReMesh to perform the T2 Swap
+     * Helper method for ReMesh to perform a T2 swap.
+     *
+     * \todo Describe what a T2 swap is
      *
      * \todo This method currently assumes SPACE_DIM = 2 (see #866)
      *
@@ -204,7 +208,7 @@ protected:
     /**
      * Called by ReMesh(). Moves a node, which has been found to overlap an element,
      * back onto the edge of that element and associates it with the element and adds
-     * new nodes to maitain three elemets a node.
+     * new nodes to maintain three elements a node.
      *
      * @param pNode pointer to the node
      * @param elementIndex global index of the element in the mesh
@@ -364,7 +368,6 @@ public:
      */
     void ClearLocationsOfT3Swaps();
 
-
     /**
      * Add a node to the mesh.
      *
@@ -472,7 +475,7 @@ public:
     void ReMesh(VertexElementMap& rElementMap);
 
     /**
-     * Alternative version of remesh which takes no parameters does not require a VertexElementMap.
+     * Alternative version of ReMesh which takes no parameters and does not require a VertexElementMap.
      * Note: inherited classes should overload ReMesh(VertexElementMap&).
      */
     void ReMesh();
