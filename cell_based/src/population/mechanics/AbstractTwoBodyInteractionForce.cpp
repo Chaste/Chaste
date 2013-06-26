@@ -33,14 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#if defined(__GCC__)
-/*potential workaround for enabling floating point exception 
-capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
-#define _GNU_SOURCE
-#endif
-
 #include "AbstractTwoBodyInteractionForce.hpp"
-#include <boost/math/special_functions/fpclassify.hpp> //for isnan
+#include "IsNan.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AbstractTwoBodyInteractionForce()
@@ -120,7 +114,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContributio
             c_vector<double, SPACE_DIM> force = CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
             for (unsigned j=0; j<SPACE_DIM; j++)
             {
-                assert(!boost::math::isnan(force[j]));
+                assert(!std::isnan(force[j]));
             }
 
             // Add the force contribution to each node

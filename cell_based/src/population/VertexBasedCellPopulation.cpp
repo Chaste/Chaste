@@ -33,18 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#if defined(__GCC__)
-/*potential workaround for enabling floating point exception
-capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
-#define _GNU_SOURCE
-#endif
-
 #include "VertexBasedCellPopulation.hpp"
 #include <boost/foreach.hpp>
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 #include "ChasteSyscalls.hpp"
-#include <boost/math/special_functions/fpclassify.hpp> //for isnan
+#include "IsNan.hpp"
 
 // Cell writer definitions
 #include "AbstractCellPopulationWriter.hpp"
@@ -267,7 +261,7 @@ void VertexBasedCellPopulation<DIM>::UpdateNodeLocations(double dt)
 
         for (unsigned i=0; i<DIM; i++)
         {
-            assert(!boost::math::isnan(new_node_location(i)));
+            assert(!std::isnan(new_node_location(i)));
         }
 
         // Create ChastePoint for new node location

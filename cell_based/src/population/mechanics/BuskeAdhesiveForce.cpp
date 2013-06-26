@@ -33,14 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#if defined(__GCC__)
-/*potential workaround for enabling floating point exception 
-capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
-#define _GNU_SOURCE
-#endif
-
 #include "BuskeAdhesiveForce.hpp"
-#include <boost/math/special_functions/fpclassify.hpp> //for isnan
+#include "IsNan.hpp"
 
 template<unsigned DIM>
 BuskeAdhesiveForce<DIM>::BuskeAdhesiveForce()
@@ -96,7 +90,7 @@ c_vector<double, DIM> BuskeAdhesiveForce<DIM>::CalculateForceBetweenNodes(unsign
 
     // Assert that the nodes are a finite, non-zero distance apart
     assert(distance_between_nodes > 0);
-    assert(!boost::math::isnan(distance_between_nodes));
+    assert(!std::isnan(distance_between_nodes));
 
     // Normalize the unit vector
     unit_vector /= distance_between_nodes;

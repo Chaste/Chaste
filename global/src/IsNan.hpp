@@ -41,15 +41,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Compiler workarounds, for compilers which don't include std::isnan (from C99).
  */
 
+// isnan()
 #if defined(__PGI) || defined(__xlC__)
-namespace std { using ::isnan; }
+namespace std
+{
+    using ::isnan;
+}
 #endif
 
+#ifdef _MSC_VER
+#include <cfloat>
+namespace std
+{
+    /**
+     * @param x  the number to test
+     * @return  whether x is not-a-number
+     */
+    inline int isnan(double x)
+    {
+        return _isnan(x);
+    }
+}
+#endif
+
+// NAN macro
 #ifndef NAN
 #include <limits>
 /**
  * A NAN macro for compilers which don't have this GNU extension.
- * The following might generate a compiler warning, but that's better than an error!
  */
 #define NAN std::numeric_limits<double>::quiet_NaN()
 #endif
