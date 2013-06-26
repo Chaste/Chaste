@@ -36,13 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
-/*Windows_Port_Begins*/
-#ifdef _MSC_VER
-#define srandom srand
-#define random rand 
-#endif
-/*Windows_Port_Ends*/
-
 RandomNumberGenerator* RandomNumberGenerator::mpInstance = NULL;
 
 RandomNumberGenerator::RandomNumberGenerator()
@@ -130,7 +123,7 @@ double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
     boost::gamma_distribution<> gd(shape);
     boost::variate_generator<boost::mt19937& , boost::gamma_distribution<> > var_gamma(mMersenneTwisterGenerator, gd);
 
-    return scale*var_gamma();;
+    return scale*var_gamma();
 }
 
 void RandomNumberGenerator::Reseed(unsigned seed)
