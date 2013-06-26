@@ -198,7 +198,7 @@ public:
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended1dStimulateFirstCell");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Extended1dStimulateFirstCell");
         HeartConfig::Instance()->SetOutputFilenamePrefix("extended1d");
 
         //stimulated cell factory passed in as first cell
@@ -216,7 +216,7 @@ public:
         SetupParameters();
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
 
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain1d");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Bidomain1d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("normal1d");
         StimulatedCellFactoryBidomain bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
@@ -234,7 +234,7 @@ public:
 
         //pick up the results...
         Hdf5DataReader reader_extended("Extended1dStimulateFirstCell", "extended1d");
-        Hdf5DataReader reader_bidomain("Bidomain1d", "normal1d");
+        Hdf5DataReader reader_bidomain("TestExtendedVs_Bidomain1d", "normal1d");
         TS_ASSERT_EQUALS(reader_extended.GetNumberOfRows(), reader_bidomain.GetNumberOfRows());
 
         bool ap_generated =false;
@@ -277,7 +277,7 @@ public:
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended1dStimulateSecondCell");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Extended1dStimulateSecondCell");
         HeartConfig::Instance()->SetOutputFilenamePrefix("extended1d");
 
         //stimulated cell factory passed in as second cell
@@ -301,8 +301,8 @@ public:
         RunExtendedBidomainStimulateSecondCell();
 
         //pick up the results...(note the bidomain simulatioon is the same as the test above for the first cell)
-        Hdf5DataReader reader_extended("Extended1dStimulateSecondCell", "extended1d");
-        Hdf5DataReader reader_bidomain("Bidomain1d", "normal1d");
+        Hdf5DataReader reader_extended("TestExtendedVs_Extended1dStimulateSecondCell", "extended1d");
+        Hdf5DataReader reader_bidomain("TestExtendedVs_Bidomain1d", "normal1d");
         TS_ASSERT_EQUALS(reader_extended.GetNumberOfRows(), reader_bidomain.GetNumberOfRows());
 
         bool ap_generated = false;
@@ -347,7 +347,7 @@ public:
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended1dStimulateSecondCellNullBasis");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Extended1dStimulateSecondCellNullBasis");
         HeartConfig::Instance()->SetOutputFilenamePrefix("extended1d");
 
         //stimulated cell factory passed in as second cell
@@ -365,7 +365,7 @@ public:
     {
         SetupParameters();
 
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain1dNullBasis");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Bidomain1dNullBasis");
         HeartConfig::Instance()->SetOutputFilenamePrefix("normal1d");
         StimulatedCellFactoryBidomain bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
@@ -382,8 +382,8 @@ public:
         RunBidomainNullBasis();
 
         //pick up the results...(note the bidomain simulatioon is the same as the test above for the first cell)
-        Hdf5DataReader reader_extended("Extended1dStimulateSecondCellNullBasis", "extended1d");
-        Hdf5DataReader reader_bidomain("Bidomain1dNullBasis", "normal1d");
+        Hdf5DataReader reader_extended("TestExtendedVs_Extended1dStimulateSecondCellNullBasis", "extended1d");
+        Hdf5DataReader reader_bidomain("TestExtendedVs_Bidomain1dNullBasis", "normal1d");
         TS_ASSERT_EQUALS(reader_extended.GetNumberOfRows(), reader_bidomain.GetNumberOfRows());
 
         bool ap_generated = false;
@@ -428,7 +428,7 @@ public:
         StimulatedCellFactory stimulated_cell_factory;
         UnStimulatedCellFactory unstimulated_cell_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended1dPinnedNode");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Extended1dPinnedNode");
         HeartConfig::Instance()->SetOutputFilenamePrefix("extended1d");
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-7);
         //stimulated cell factory passed in as second cell
@@ -453,7 +453,7 @@ public:
     {
         SetupParameters();
 
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain1dPinnedNode");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Bidomain1dPinnedNode");
         HeartConfig::Instance()->SetOutputFilenamePrefix("normal1d");
         HeartConfig::Instance()->SetUseRelativeTolerance(1e-7);
         StimulatedCellFactoryBidomain bidomain_cell_factory;
@@ -477,8 +477,8 @@ public:
         RunExtendedSimulationPinnedNode();
 
         //pick up the results...
-        Hdf5DataReader reader_extended("Extended1dPinnedNode", "extended1d");
-        Hdf5DataReader reader_bidomain("Bidomain1dPinnedNode", "normal1d");
+        Hdf5DataReader reader_extended("TestExtendedVs_Extended1dPinnedNode", "extended1d");
+        Hdf5DataReader reader_bidomain("TestExtendedVs_Bidomain1dPinnedNode", "normal1d");
         TS_ASSERT_EQUALS(reader_extended.GetNumberOfRows(), reader_bidomain.GetNumberOfRows());
 
         bool ap_generated = false;
@@ -548,7 +548,7 @@ public:
         //...where cells are coupled
         Ggap_values.push_back(2.0);
 
-        HeartConfig::Instance()->SetOutputDirectory("HeterogeneousGgaps");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_HeterogeneousGgaps");
         HeartConfig::Instance()->SetOutputFilenamePrefix("extended1d");
         //stimulated cell factory passed in as second cell
         ExtendedBidomainProblem<1> extended_problem( &unstimulated_cell_factory,  &stimulated_cell_factory);
@@ -569,7 +569,7 @@ public:
          * Here, therefore, we check that the first cell peaks at about -68 and (and it is not at rest)
          * the second (stimulated) at about -57.8 (much lower than it would be if an AP was triggered).
          */
-        Hdf5DataReader reader_extended("HeterogeneousGgaps", "extended1d");
+        Hdf5DataReader reader_extended("TestExtendedVs_HeterogeneousGgaps", "extended1d");
         unsigned probe_node = 0u; //we probe the stimulated one
 
         const std::vector<unsigned>& r_permutation = mesh.rGetNodePermutation();
@@ -623,7 +623,7 @@ public:
         UnStimulatedCellFactory second_cell_factory;
         ExtracellularStimulusFactory extra_factory;
 
-        HeartConfig::Instance()->SetOutputDirectory("Extended1dOtherMethods");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_Extended1dOtherMethods");
         HeartConfig::Instance()->SetOutputFilenamePrefix("extended1d");
 
         //stimulated cell factory passed in as first cell
@@ -642,7 +642,7 @@ public:
         HeartConfig::Instance()->Reset();
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
-        HeartConfig::Instance()->SetOutputDirectory("ExtendedExceptions");
+        HeartConfig::Instance()->SetOutputDirectory("TestExtendedVs_ExtendedExceptions");
         HeartConfig::Instance()->SetOutputFilenamePrefix("exceptions");
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
