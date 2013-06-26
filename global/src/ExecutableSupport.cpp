@@ -36,15 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExecutableSupport.hpp"
 
 #include "Version.hpp"
-//GetCurrentTime clashes with a similarly-named API in <windows.h>
-#define ChasteGetCurrentTime ChasteBuildInfo::GetCurrentTime
 
 #include <iostream>
 #include <sstream>
 #ifdef _MSC_VER
 #include <windows.h> // For system info on Windows
+//GetCurrentTime clashes with a similarly-named API in <windows.h>
+#define GetCurrentTime() ChasteBuildInfo::GetCurrentTime()
+#define ChasteGetCurrentTime() GetCurrentTime()
 #else
 #include <sys/utsname.h> // For uname
+#define ChasteGetCurrentTime() ChasteBuildInfo::GetCurrentTime()
 #endif
 #include <hdf5.h>
 #include <parmetis.h>

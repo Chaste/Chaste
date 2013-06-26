@@ -52,11 +52,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define getpid _getpid
 
 #include <io.h>
+#define chmod _chmod
+#include <sys/stat.h>
 #define CHASTE_READONLY _S_IREAD
 #define CHASTE_READ_EXECUTE _S_IREAD | _S_IEXEC
 #define CHASTE_READ_WRITE _S_IREAD | _S_IWRITE
 #define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
-#define chmod _chmod
 
 /**
  * Windows version of setenv call.  Note that under Linux we always pass 1 (overwrite) for the third arg.

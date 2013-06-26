@@ -37,8 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRANDOMNUMBERGENERATOR_HPP_
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -49,6 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
+
+#ifdef _MSC_VER
+#define srandom srand
+#define random rand
+#endif
 
 class TestRandomNumberGenerator : public CxxTest::TestSuite
 {
