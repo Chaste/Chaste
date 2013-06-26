@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VertexElement.hpp"
 #include "Element.hpp"
+#include <cmath> //for M_PI
 
 class TestVertexElement : public CxxTest::TestSuite
 {

@@ -82,11 +82,11 @@ public:
         // The tests
         double analytical_solution[3];
 
-        analytical_solution[0] = -sin(2);
-        analytical_solution[1] = sin(2)+cos(2);
-        analytical_solution[2] = 2*sin(2);
+        analytical_solution[0] = -sin(2.0);
+        analytical_solution[1] = sin(2.0)+cos(2.0);
+        analytical_solution[2] = 2*sin(2.0);
 
-        double global_error_euler = 0.5*2*(exp(2)-1)*h_value;
+        double global_error_euler = 0.5*2*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(numerical_solution[0], analytical_solution[0], global_error_euler);
         TS_ASSERT_DELTA(numerical_solution[1], analytical_solution[1], global_error_euler);
         TS_ASSERT_DELTA(numerical_solution[2], analytical_solution[2], global_error_euler);

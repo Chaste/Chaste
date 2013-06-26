@@ -154,7 +154,7 @@ public:
                     const ChastePoint<1> transformed_quad_point =
                         ChastePoint<1>((1-quad_point[0])*x1 + quad_point[0]*x2);
 
-                    double integrand_value = pow(transformed_quad_point[0],poly_degree);
+                    double integrand_value = pow(transformed_quad_point[0],(double)poly_degree);
 
                     integral+= integrand_value*jacobian_determinant
                                *quad_rule.GetWeight(quad_index);
@@ -164,7 +164,7 @@ public:
                 //
                 // \int_0^3 x^p dx = [(1/(p+1))*x^(p+1)]_1^3
                 //
-                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3,poly_degree+1)-1), 1e-12); // Largest integral is about 100
+                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3.0,(double)poly_degree+1)-1), 1e-12); // Largest integral is about 100
                 
                 delete nodes2[0];
                 delete nodes2[1];
@@ -204,8 +204,8 @@ public:
                     {
                         const ChastePoint<2>& quad_point = quad_rule.rGetQuadPoint(quad_index);
 
-                        integral += pow(quad_point[0], poly_degree_x)
-                                   * pow(quad_point[1], poly_degree_y)
+                        integral += pow(quad_point[0], (double)poly_degree_x)
+                                    *pow(quad_point[1], (double)poly_degree_y)
                                     *quad_rule.GetWeight(quad_index);
                     }
 
@@ -293,9 +293,9 @@ public:
                         {
                             const ChastePoint<3>& quad_point = quad_rule.rGetQuadPoint(quad_index);
 
-                            integral += pow(quad_point[0], poly_degree_x)
-                                        * pow(quad_point[1], poly_degree_y)
-                                        * pow(quad_point[2], poly_degree_z)
+                            integral += pow(quad_point[0], (double)poly_degree_x)
+                                        * pow(quad_point[1], (double)poly_degree_y)
+                                        * pow(quad_point[2], (double)poly_degree_z)
                                         * quad_rule.GetWeight(quad_index);
                         }
 

@@ -61,7 +61,7 @@ private:
 public:
     double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX, Element<SPACE_DIM,SPACE_DIM>*)
     {
-        return pow(DistanceFromOrigin(rX),3);
+        return pow(DistanceFromOrigin(rX),3.0);
     }
 
     double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM,SPACE_DIM>*)
@@ -71,7 +71,7 @@ public:
 
     c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& x)
     {
-        return pow(DistanceFromOrigin(x),2)*identity_matrix<double>(SPACE_DIM);
+        return pow(DistanceFromOrigin(x),2.0)*identity_matrix<double>(SPACE_DIM);
     }
 };
 

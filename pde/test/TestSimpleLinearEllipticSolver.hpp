@@ -532,7 +532,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = a sin(x) + cos(x), where a = (2-cos1)/sin1
-        double a = (2-cos(2))/sin(2);
+        double a = (2-cos(2.0))/sin(2.0);
         for (unsigned i=0; i<result_repl.GetSize(); i++)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];

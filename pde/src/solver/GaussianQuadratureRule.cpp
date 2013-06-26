@@ -236,7 +236,7 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned quadratureOrder)
              *                 This one is hard to derive a closed form solution to.
              */
             {
-                double root_seventeen = sqrt(17);
+                double root_seventeen = sqrt(17.0);
                 double root_term = sqrt(1022.0-134.0*root_seventeen);
                 double b = (55.0 - 3.0*root_seventeen + root_term)/196; //b = 0.328055
                 double d = (55.0 - 3.0*root_seventeen - root_term)/196; //d = 0.106952

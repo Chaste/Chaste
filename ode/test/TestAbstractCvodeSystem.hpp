@@ -359,7 +359,7 @@ public:
         double testvalue = solutions.rGetSolutions()[last][0];
 
         // The tests
-        double exact_solution = exp(2);
+        double exact_solution = exp(2.0);
 
         /// \todo: #890 Work out what the global error should be bounded by
         double global_error = 1e-3;

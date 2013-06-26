@@ -337,7 +337,7 @@ public:
         // Define pressure boundary conditions X=1 surface
         std::vector<BoundaryElement<2,3>*> boundary_elems;
 
-        double pressure_bc = 2*c1*((pow(lambda,-2)-pow(lambda,4)))/(lambda*lambda);
+        double pressure_bc = 2*c1*((pow(lambda,-2.0)-pow(lambda,4.0)))/(lambda*lambda);
 
         for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();

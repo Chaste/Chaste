@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTGENERICEVENTHANDLER_HPP_
 
 #include "GenericEventHandler.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class AnEventHandler : public GenericEventHandler<3, AnEventHandler>
 {

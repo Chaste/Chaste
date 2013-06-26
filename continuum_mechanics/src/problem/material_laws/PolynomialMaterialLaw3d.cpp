@@ -79,7 +79,7 @@ double PolynomialMaterialLaw3d::Get_d2W_dI1(double I1, double I2)
     {
         for (int q=0; q<=(int)mN-p; q++)
         {
-            ret += mAlpha[p][q] * p * (p-1) * pow(I1-3,(p-1)*(p-2)) * pow(I2-3,q);
+            ret += mAlpha[p][q] * p * (p-1) * pow(I1-3,(p-1)*(p-2)) * pow((double)I2-3,(double)q);
         }
     }
     return ret;
@@ -96,7 +96,7 @@ double PolynomialMaterialLaw3d::Get_d2W_dI2(double I1, double I2)
     {
         for (int q=2; q<=(int)mN-p; q++)
         {
-            ret += mAlpha[p][q] * q * (q-1) * pow(I1-3,p) * pow(I2-3,(q-1)*(q-2));
+            ret += mAlpha[p][q] * q * (q-1) * pow((double)I1-3,(double)p) * pow(I2-3,(q-1)*(q-2));
         }
     }
     return ret;

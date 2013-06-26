@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define STIFFNESSMATRIXASSEMBLER_HPP_
 
 #include "AbstractFeVolumeIntegralAssembler.hpp"
-#include "HeartConfig.hpp"
 
 /**
  * Simple implementation of AbstractFeVolumeIntegralAssembler which provides the stiffness matrix

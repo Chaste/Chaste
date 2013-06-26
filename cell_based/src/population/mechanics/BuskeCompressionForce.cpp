@@ -115,16 +115,16 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
                 // ...then compute the adhesion force and add it to the vector of forces...
                 double xij = 0.5*(radius_of_cell_i*radius_of_cell_i - radius_of_cell_j*radius_of_cell_j + dij*dij)/dij;
                 double dxijdd = 1.0 - xij/dij;
-                double dVAdd = M_PI*dxijdd*(5.0*pow(radius_of_cell_i,2) + 3.0*pow(xij,2) - 8.0*radius_of_cell_i*xij)/3.0;
+                double dVAdd = M_PI*dxijdd*(5.0*pow(radius_of_cell_i,2.0) + 3.0*pow(xij,2.0) - 8.0*radius_of_cell_i*xij)/3.0;
 
                 dVAdd_vector += dVAdd*unit_vector;
 
                 // ...and add the contribution to the compression force acting on cell i
-                delta_V_c += M_PI*pow(radius_of_cell_i - xij,2)*(2*radius_of_cell_i - xij)/3.0;
+                delta_V_c += M_PI*pow(radius_of_cell_i - xij,2.0)*(2*radius_of_cell_i - xij)/3.0;
             }
         }
 
-        double V_A = 4.0/3.0*M_PI*pow(radius_of_cell_i,3) - delta_V_c;
+        double V_A = 4.0/3.0*M_PI*pow(radius_of_cell_i,3.0) - delta_V_c;
 
         /**
          * Target volume of the cell

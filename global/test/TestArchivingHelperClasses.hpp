@@ -228,11 +228,13 @@ public:
         TS_ASSERT_THROWS_CONTAINS(InputArchiveOpener archive_opener_in(archive_dir_finder, archive_base_name),
                                   "Cannot load main archive file: ");
 
-        // Remove write permissions on the archive dir
+        // Remove write permissions on the archive dir 
+        //Note: changing *directory* permissions and other attributes does not work on Windows
+        //See http://support.microsoft.com/kb/326549
+#ifndef _MSC_VER
         if (PetscTools::AmMaster())
         {
-            std::string path(ChastePosixPathFixer::to_posix(fs::path(handler.GetOutputDirectoryFullPath().c_str())));
-            chmod(path.c_str(), CHASTE_READONLY);
+            chmod(handler.GetOutputDirectoryFullPath().c_str(), CHASTE_READONLY);
         }
         PetscTools::Barrier("TestArchiveOpenerExceptions-3");
 
@@ -260,6 +262,7 @@ public:
             // Restore permissions on the folder before allowing processes to continue.
             chmod(handler.GetOutputDirectoryFullPath().c_str(), CHASTE_READ_WRITE_EXECUTE);
         }
+#endif // _MSC_VER
         PetscTools::Barrier("TestArchiveOpenerExceptions-5");
     }
 

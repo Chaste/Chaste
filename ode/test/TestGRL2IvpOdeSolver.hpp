@@ -220,9 +220,9 @@ public:
         // The tests
         double exact_solution[3];
 
-        exact_solution[0] = -sin(2);
-        exact_solution[1] = sin(2)+cos(2);
-        exact_solution[2] = 2*sin(2);
+        exact_solution[0] = -sin(2.0);
+        exact_solution[1] = sin(2.0)+cos(2.0);
+        exact_solution[2] = 2*sin(2.0);
 
         double order = 2;
 
@@ -270,7 +270,7 @@ public:
         double exact_solution = sin(2.0);
         double error1 = testvalue1 - exact_solution;
         double error2 = testvalue2 - exact_solution;
-        TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
+        TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)order), 1.5e-1);
     }
 
     //Test the order of the method by comparing two solutions using dt/2 for the second.
@@ -302,7 +302,7 @@ public:
         double exact_solution = -sin(2.0);
         double error1 = testvalue1 - exact_solution;
         double error2 = testvalue2 - exact_solution;
-        TS_ASSERT_DELTA(error1/error2, pow(2,order), 1.5e-1);
+        TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)order), 1.5e-1);
     }
 
     void TestArchivingSolvers() throw(Exception)

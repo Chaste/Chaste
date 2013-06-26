@@ -26289,7 +26289,7 @@ bool tetgenmesh::smoothpoint(point smthpt, point e1, point e2, list *starlist,
     // The point is moved.
     if (key) {
       // Check if the quality is improved by the smoothed point.
-      maxcosd = 0.0; // = cos(90).
+      maxcosd = 0.0; // = cos(90.0).
       for (j = 0; j < starlist->len(); j++) {
         starttet = * (triface *)(* starlist)[j];
         adjustedgering(starttet, !invtori ? CCW : CW);

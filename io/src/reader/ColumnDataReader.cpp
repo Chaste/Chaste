@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <cassert>
 #include <climits>
+#include <cctype> //for isdigit
 #include "OutputFileHandler.hpp"
 #include "Exception.hpp"
 
@@ -85,6 +86,7 @@ ColumnDataReader::ColumnDataReader(const std::string& rDirectory,
 ColumnDataReader::ColumnDataReader(const FileFinder& rDirectory,
                                    const std::string& rBaseName)
 {
+    mIsWindowsExponentFormat = false;
     if (!rDirectory.IsDir() || !rDirectory.Exists())
     {
         EXCEPTION("Directory does not exist: " + rDirectory.GetAbsolutePath());
@@ -200,7 +202,7 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
      * Now read the first line of proper data to determine the field width used when this
      * file was created. Do this by reading the first entry and measuring the distance from
      * the decimal point to the 'e'.  This gives the precision; the field width is then
-     * precision + 7.
+     * precision + 7 (With MSVC on Windows, it's precision + 8).
      * e.g. if the first entry is
      *   6.3124e+01         => field width = 11 // chaste release 1 and 1.1
      *  -3.5124e+01         => field width = 11 // chaste release 1 and 1.1
@@ -230,17 +232,26 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
     {
         EXCEPTION("Badly formatted scientific data field");
     }
+
     mFieldWidth = e_pos - dot_pos - 1 + 7;
 
-    // Attempt to account for old format files (which only allowed 2 characters for the exponent)
-    dot_pos = first_line.find(".");
-    size_t second_dot_pos = first_line.find(".", dot_pos+1);
-    if ((second_dot_pos != std::string::npos) &&
-        (second_dot_pos - dot_pos == mFieldWidth + SPACING - 1))
+    if (first_entry.length()>(e_pos+4) && isdigit(first_entry[e_pos+4])) // MSVC only uses 3-digit exponents
     {
-        mFieldWidth--;
+        mIsWindowsExponentFormat = true;
+        mFieldWidth++; // i.e. e_pos - dot_pos - 1 + 8
     }
-
+    else
+    {
+      mIsWindowsExponentFormat = false;
+      // Attempt to account for old format files (which only allowed 2 characters for the exponent)
+      dot_pos = first_line.find(".");
+      size_t second_dot_pos = first_line.find(".", dot_pos+1);
+      if ((second_dot_pos != std::string::npos) &&
+          (second_dot_pos - dot_pos == mFieldWidth + SPACING - 1))
+      {
+          mFieldWidth--;
+      }
+    }
     infofile.close();
     datafile.close();
 }
@@ -391,8 +402,18 @@ void ColumnDataReader::ReadColumnFromFile(const std::string& rFilename, int col)
 
 void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col)
 {
-    int startpos = col * (mFieldWidth + SPACING) + SPACING - 1;
-    std::string value = rLine.substr(startpos, mFieldWidth + 1);
+    std::string value;
+    if (mIsWindowsExponentFormat)
+    {
+        int startpos = 1;
+        if (col != 0) startpos = col * (mFieldWidth + SPACING);
+        value = rLine.substr(startpos, mFieldWidth + 2);
+    }
+    else
+    {
+        int startpos = col * (mFieldWidth + SPACING) + SPACING - 1;
+        value = rLine.substr(startpos, mFieldWidth + 1);
+    }
     std::stringstream variable_stream(value);
     double d_value;
     variable_stream >> d_value;

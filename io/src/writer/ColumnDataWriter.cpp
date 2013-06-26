@@ -64,7 +64,13 @@ ColumnDataWriter::ColumnDataWriter(const std::string& rDirectory,
       mpCurrentAncillaryFile(NULL),
       mpUnlimitedDimensionVariable(NULL),
       mpFixedDimensionVariable(NULL),
+#ifdef _MSC_VER
+      mFieldWidth(precision+8), // Allow for numbers like -1.111e-321 (where precision=3),MSVC requires +1 for exponent format
+      mIsWindowsExponentFormat(true),
+#else
       mFieldWidth(precision+7), // Allow for numbers like -1.111e-321 (where precision=3)
+      mIsWindowsExponentFormat(false),
+#endif
       mPrecision(precision),
       mHasPutVariable(false),
       mNeedAdvanceAlongUnlimitedDimension(false),
@@ -406,6 +412,9 @@ void ColumnDataWriter::AdvanceAlongUnlimitedDimension()
 
 void ColumnDataWriter::PutVariable(int variableID, double variableValue, long dimensionPosition)
 {
+    int OFFSET = 1;
+    if (mIsWindowsExponentFormat) OFFSET = 2;//MSVC adjustment
+
     if (mNeedAdvanceAlongUnlimitedDimension)
     {
         DoAdvanceAlongUnlimitedDimension();
@@ -457,12 +466,12 @@ void ColumnDataWriter::PutVariable(int variableID, double variableValue, long di
                 int position;
                 if (variableID == FIXED_DIMENSION_VAR_ID)
                 {
-                    position = mRowStartPosition + (mRowWidth+1) * dimensionPosition + SPACING - 1;
+                    position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition + SPACING - 1;
                 }
                 else
                 {
                     // ordinary variables
-                    position = mRowStartPosition + (mRowWidth+1) * dimensionPosition +
+                    position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition +
                                ((variableID + (mpFixedDimensionVariable != NULL)) * (mFieldWidth + SPACING)) + SPACING - 1;
                 }
 
@@ -496,11 +505,11 @@ void ColumnDataWriter::PutVariable(int variableID, double variableValue, long di
         int position;
         if (variableID == FIXED_DIMENSION_VAR_ID)
         {
-            position = mRowStartPosition + (mRowWidth+1) * dimensionPosition + SPACING - 1;
+            position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition + SPACING - 1;
         }
         else
         {
-            position = mRowStartPosition + (mRowWidth+1) * dimensionPosition +
+            position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition +
                        ((variableID + (mpFixedDimensionVariable != NULL)) * (mFieldWidth + SPACING)) + SPACING - 1;
         }
         mpCurrentOutputFile->seekp(position);

@@ -381,18 +381,18 @@ public:
         double testvalue_rk4 = solutions_rk4.rGetSolutions()[last3][0];
 
         // The tests
-        double exact_solution = exp(2);
+        double exact_solution = exp(2.0);
 
         double global_error_euler;
-        global_error_euler = 0.5*exp(2)*(exp(2)-1)*h_value;
+        global_error_euler = 0.5*exp(2.0)*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_euler, exact_solution, global_error_euler);
 
         double global_error_rk2;
-        global_error_rk2 = (1.0/6.0)*h_value*exp(2)*(exp(2)-1)*h_value;
+        global_error_rk2 = (1.0/6.0)*h_value*exp(2.0)*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk2, exact_solution, global_error_rk2);
 
         double global_error_rk4;
-        global_error_rk4 = (1.0/24.0)*pow(h_value,3)*exp(2)*(exp(2)-1)*h_value;
+        global_error_rk4 = (1.0/24.0)*pow((double)h_value,(double)3)*exp(2.0)*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk4, exact_solution, global_error_rk4);
 
         //The info files should now contain the ODE solver identifiers
@@ -465,21 +465,21 @@ public:
         // The tests
         double exact_solution[2];
 
-        exact_solution[0] = sin(2);
-        exact_solution[1] = cos(2);
+        exact_solution[0] = sin(2.0);
+        exact_solution[1] = cos(2.0);
 
         double global_error_euler;
-        global_error_euler = 0.5*1*(exp(2)-1)*h_value;
+        global_error_euler = 0.5*1*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_euler[0], exact_solution[0], global_error_euler);
         TS_ASSERT_DELTA(testvalue_euler[1], exact_solution[1], global_error_euler);
 
         double global_error_rk2;
-        global_error_rk2 = (1.0/6.0)*h_value*1*(exp(2)-1)*h_value;
+        global_error_rk2 = (1.0/6.0)*h_value*1*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk2[0], exact_solution[0],global_error_rk2);
         TS_ASSERT_DELTA(testvalue_rk2[1], exact_solution[1], global_error_rk2);
 
         double global_error_rk4;
-        global_error_rk4 = (1.0/24.0)*pow(h_value,3)*1*(exp(2)-1)*h_value;
+        global_error_rk4 = (1.0/24.0)*pow((double)h_value,(double)3)*1*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk4[0], exact_solution[0], global_error_rk4);
         TS_ASSERT_DELTA(testvalue_rk4[1], exact_solution[1], global_error_rk4);
     }
@@ -532,24 +532,24 @@ public:
         // The tests
         double exact_solution[3];
 
-        exact_solution[0] = -sin(2);
-        exact_solution[1] = sin(2)+cos(2);
-        exact_solution[2] = 2*sin(2);
+        exact_solution[0] = -sin(2.0);
+        exact_solution[1] = sin(2.0)+cos(2.0);
+        exact_solution[2] = 2*sin(2.0);
 
         double global_error_euler;
-        global_error_euler = 0.5*2*(exp(2)-1)*h_value;
+        global_error_euler = 0.5*2*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_euler[0], exact_solution[0], global_error_euler);
         TS_ASSERT_DELTA(testvalue_euler[1], exact_solution[1], global_error_euler);
         TS_ASSERT_DELTA(testvalue_euler[2], exact_solution[2], global_error_euler);
 
         double global_error_rk2;
-        global_error_rk2 = (1.0/6.0)*h_value*2*(exp(2)-1)*h_value;
+        global_error_rk2 = (1.0/6.0)*h_value*2*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk2[0], exact_solution[0], global_error_rk2);
         TS_ASSERT_DELTA(testvalue_rk2[1], exact_solution[1], global_error_rk2);
         TS_ASSERT_DELTA(testvalue_rk2[2], exact_solution[2], global_error_rk2);
 
         double global_error_rk4;
-        global_error_rk4 = (1.0/24.0)*pow(h_value,3)*2*(exp(2)-1)*h_value;
+        global_error_rk4 = (1.0/24.0)*pow((double)h_value,(double)3)*2*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk4[0], exact_solution[0], global_error_rk4);
         TS_ASSERT_DELTA(testvalue_rk4[1], exact_solution[1], global_error_rk4);
         TS_ASSERT_DELTA(testvalue_rk4[2], exact_solution[2], global_error_rk4);
@@ -593,15 +593,15 @@ public:
         double exact_solution = 1/(1+exp(-alpha*2));
 
         double global_error_euler;
-        global_error_euler = 0.5*1/(1+exp(-alpha*2))*(exp(2)-1)*h_value;
+        global_error_euler = 0.5*1/(1+exp(-alpha*2))*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_euler, exact_solution, global_error_euler);
 
         double global_error_rk2;
-        global_error_rk2 = (1.0/6.0)*h_value*1/(1+exp(-alpha*2))*(exp(2)-1)*h_value;
+        global_error_rk2 = (1.0/6.0)*h_value*1/(1+exp(-alpha*2))*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk2, exact_solution, global_error_rk2);
 
         double global_error_rk4;
-        global_error_rk4 = (1.0/24.0)*pow(h_value,3)*1/(1+exp(-alpha*2))*(exp(2)-1)*h_value;
+        global_error_rk4 = (1.0/24.0)*pow((double)h_value,(double)3)*1/(1+exp(-alpha*2))*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_rk4, exact_solution, global_error_rk4);
     }
 

@@ -64,7 +64,11 @@ public:
         int time_var_id=-1, var1_id=-1, var2_id=-1;
 
         // Make a parallel data writer
+#ifndef _MSC_VER
         mpParallelWriter = new ParallelColumnDataWriter("TestParallelColumnDataWriter", "ParallelColumnWriter");
+#else
+        mpParallelWriter = new ParallelColumnDataWriter("TestParallelColumnDataWriter", "ParallelColumnWriter_Windows");
+#endif
         TS_ASSERT_THROWS_NOTHING(time_var_id = mpParallelWriter->DefineUnlimitedDimension("Time", "msecs"));
         TS_ASSERT_THROWS_NOTHING(mpParallelWriter->DefineFixedDimension("Node", "dimensionless", num_nodes));
 
@@ -78,7 +82,11 @@ public:
         std::string output_dir = mpParallelWriter->GetOutputDirectory();
 
         // Test that the output directory and the .info file was created
+#ifndef _MSC_VER
         FileFinder info_file(output_dir+"ParallelColumnWriter.info", RelativeTo::Absolute);
+#else
+        FileFinder info_file(output_dir+"ParallelColumnWriter_Windows.info", RelativeTo::Absolute);
+#endif
         TS_ASSERT(info_file.Exists());
 
         // Set up some data in PETSc vectors
@@ -169,11 +177,17 @@ public:
         PetscTools::Barrier("TestParallelColumnWriter2");
 
         std::vector<std::string> files_to_compare;
+#ifndef _MSC_VER
         files_to_compare.push_back("ColumnWriter.info");
         files_to_compare.push_back("ColumnWriter_000000.dat");
         files_to_compare.push_back("ColumnWriter_000001.dat");
         files_to_compare.push_back("ColumnWriter_unlimited.dat");
-
+#else
+        files_to_compare.push_back("ColumnWriter_Windows.info");
+        files_to_compare.push_back("ColumnWriter_Windows_000000.dat");
+        files_to_compare.push_back("ColumnWriter_Windows_000001.dat");
+        files_to_compare.push_back("ColumnWriter_Windows_unlimited.dat");
+#endif
         for (unsigned i=0; i<files_to_compare.size(); i++)
         {
             FileComparison comparer(output_dir+ "Parallel" + files_to_compare[i],
@@ -208,8 +222,11 @@ public:
         }
 
         // Write to file with parallel data writer
-
+#ifndef _MSC_VER
         ParallelColumnDataWriter* p_parallel_writer = new ParallelColumnDataWriter("TestParallelColumnDataWriterStripe","Stripe");
+#else
+        ParallelColumnDataWriter* p_parallel_writer = new ParallelColumnDataWriter("TestParallelColumnDataWriterStripe","Stripe_Windows");
+#endif
         unsigned time_var_id = p_parallel_writer->DefineUnlimitedDimension("Time","msecs");
         unsigned var1_id = p_parallel_writer->DefineVariable("Var1","LightYears");
         p_parallel_writer->DefineFixedDimension("Node","dimensionless", problem_size);
@@ -220,15 +237,21 @@ public:
         p_parallel_writer->PutVariable(time_var_id, 0.1);
         p_parallel_writer->PutVectorStripe(var1_id, ones);
         p_parallel_writer->AdvanceAlongUnlimitedDimension();
-
+        
         // Check file
         PetscTools::Barrier("TestPutSlice2");
 
         std::vector<std::string> files_to_compare;
+#ifndef _MSC_VER
         files_to_compare.push_back("Stripe.info");
         files_to_compare.push_back("Stripe_000000.dat");
         files_to_compare.push_back("Stripe_unlimited.dat");
-
+#else
+        p_parallel_writer->Close();//ensure files flushed before comparison
+        files_to_compare.push_back("Stripe_Windows.info");
+        files_to_compare.push_back("Stripe_Windows_000000.dat");
+        files_to_compare.push_back("Stripe_Windows_unlimited.dat");
+#endif
         for (unsigned i=0; i<files_to_compare.size(); i++)
         {
             FileComparison comparer(output_dir+files_to_compare[i], "io/test/data/" + files_to_compare[i]);
@@ -249,8 +272,11 @@ public:
          */
 
         // Make a parallel data writer
+#ifndef _MSC_VER
         mpReader = new ColumnDataReader("TestParallelColumnDataWriter", "ParallelColumnWriter");
-
+#else
+        mpReader = new ColumnDataReader("TestParallelColumnDataWriter", "ParallelColumnWriter_Windows");
+#endif
         // Check that there's the correct number of files
         std::vector<double> time_stamps;
         time_stamps = mpReader->GetUnlimitedDimensionValues();

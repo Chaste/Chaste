@@ -198,7 +198,7 @@ public:
         double testvalue = solutions.rGetSolutions()[last][0];
 
         // The tests
-        double exact_solution = exp(2);
+        double exact_solution = exp(2.0);
 
         /// \todo: #890 Work out what the global error should be bounded by
         double global_error = 1e-3;
@@ -222,7 +222,7 @@ public:
         OdeSolution solutions;
         std::vector<double> state_variables = ode_system.GetInitialConditions();
 
-        double exact_solution = exp(2);
+        double exact_solution = exp(2.0);
         double global_error = 1e-3;
 
         {   // Solve in two steps with reset
@@ -298,8 +298,8 @@ public:
         testvalue[1] = solutions.rGetSolutions()[last][1];
 
         double exact_solution[2];
-        exact_solution[0] = sin(2);
-        exact_solution[1] = cos(2);
+        exact_solution[0] = sin(2.0);
+        exact_solution[1] = cos(2.0);
         double global_error = 1e-3;
 
         TS_ASSERT_DELTA(testvalue[0], exact_solution[0], global_error);

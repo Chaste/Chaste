@@ -98,11 +98,11 @@ private:
 
         if (!PetscTools::AmTopMost())
         {
-            TS_ASSERT_EQUALS(box_collection.rGetHaloNodesRight().size(), pow(3, DIM-1));
+            TS_ASSERT_EQUALS(box_collection.rGetHaloNodesRight().size(), pow(3.0, (double)DIM-1));
         }
         if (!PetscTools::AmMaster())
         {
-            TS_ASSERT_EQUALS(box_collection.rGetHaloNodesLeft().size(), pow(3, DIM-1));
+            TS_ASSERT_EQUALS(box_collection.rGetHaloNodesLeft().size(), pow(3.0, (double)DIM-1));
         }
 
         // Tidy up.
@@ -176,7 +176,7 @@ private:
 
         // Work out how many halos there should be. # boundary processes * 3^(DIM-1)
         unsigned num_boundary_processes = 2-(unsigned)(PetscTools::AmMaster()) - (unsigned)(PetscTools::AmTopMost());
-        unsigned correct_num_halos = num_boundary_processes*(unsigned)pow(3.0,DIM-1);
+        unsigned correct_num_halos = num_boundary_processes*(unsigned)pow(3.0,(double)DIM-1);
 
         // Work out what the halo boxes should be.
         std::vector<unsigned> halos_should_be_right;
@@ -186,7 +186,7 @@ private:
         {
             // Only halos to the right. Code below calculates a layer of boxes.
             std::vector<unsigned> dimension_counters(DIM-1, 0);
-            for (unsigned i=0; i<(unsigned)pow(3,DIM-1); /*Increment later*/)
+            for (unsigned i=0; i<(unsigned)pow(3.0,(double)DIM-1); /*Increment later*/)
             {
                 c_vector<unsigned, DIM> box_coords;
                 for (int d=0; d< (int)DIM-1; d++)
@@ -199,7 +199,7 @@ private:
                 i++;
                 for (int var = 0; var < (int)DIM-1; var++)
                 {
-                  if (i%(unsigned)pow(3, var) == 0)
+                  if (i%(unsigned)pow(3.0, (double)var) == 0)
                   {
                       dimension_counters[var] = ((dimension_counters[var]+1)%3);
                   }
@@ -212,7 +212,7 @@ private:
         {
             // Only halos to the right. Code below calculates a layer of boxes.
             std::vector<unsigned> dimension_counters(DIM-1, 0);
-            for (unsigned i=0; i<(unsigned)pow(3,DIM-1); /*Increment later*/)
+            for (unsigned i=0; i<(unsigned)pow(3.0,(double)DIM-1); /*Increment later*/)
             {
                 c_vector<unsigned, DIM> box_coords;
                 for (int d=0; d< (int)DIM-1; d++)
@@ -225,7 +225,7 @@ private:
                 i++;
                 for (int var = 0; var < (int)DIM-1; var++)
                 {
-                  if (i%(unsigned)pow(3, var) == 0)
+                  if (i%(unsigned)pow(3.0, (double)var) == 0)
                   {
                       dimension_counters[var] = ((dimension_counters[var]+1)%3);
                   }

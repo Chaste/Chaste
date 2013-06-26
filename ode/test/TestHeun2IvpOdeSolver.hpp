@@ -195,10 +195,10 @@ public:
         double testvalue_heun = solutions_heun.rGetSolutions()[last2][0];
 
         // The tests
-        double exact_solution = exp(2);
+        double exact_solution = exp(2.0);
 
         double global_error_heun;
-        global_error_heun = (1.0 / 6.0) * h_value * exp(2) * (exp(2) - 1)
+        global_error_heun = (1.0 / 6.0) * h_value * exp(2.0) * (exp(2.0) - 1)
             * h_value;
         TS_ASSERT_DELTA(testvalue_heun, exact_solution, global_error_heun);
     }
@@ -225,11 +225,11 @@ public:
         // The tests
         double exact_solution[2];
 
-        exact_solution[0] = sin(2);
-        exact_solution[1] = cos(2);
+        exact_solution[0] = sin(2.0);
+        exact_solution[1] = cos(2.0);
 
         double global_error_heun;
-        global_error_heun = (1.0 / 6.0) * h_value * 1* (exp (2)-1)*h_value;
+        global_error_heun = (1.0 / 6.0) * h_value * 1 * (exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_heun[0], exact_solution[0],global_error_heun);
         TS_ASSERT_DELTA(testvalue_heun[1], exact_solution[1], global_error_heun);
     }
@@ -256,12 +256,12 @@ public:
         // The tests
         double exact_solution[3];
 
-        exact_solution[0] = -sin(2);
-        exact_solution[1] = sin(2)+cos(2);
-        exact_solution[2] = 2*sin(2);
+        exact_solution[0] = -sin(2.0);
+        exact_solution[1] = sin(2.0)+cos(2.0);
+        exact_solution[2] = 2*sin(2.0);
 
         double global_error_heun;
-        global_error_heun = (1.0/6.0)*h_value*2*(exp(2)-1)*h_value;
+        global_error_heun = (1.0/6.0)*h_value*2*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_heun[0], exact_solution[0], global_error_heun);
         TS_ASSERT_DELTA(testvalue_heun[1], exact_solution[1], global_error_heun);
         TS_ASSERT_DELTA(testvalue_heun[2], exact_solution[2], global_error_heun);
@@ -287,7 +287,7 @@ public:
         double exact_solution = 1/(1+exp(-alpha*2));
 
         double global_error_heun;
-        global_error_heun = (1.0/6.0)*h_value*1/(1+exp(-alpha*2))*(exp(2)-1)*h_value;
+        global_error_heun = (1.0/6.0)*h_value*1/(1+exp(-alpha*2))*(exp(2.0)-1)*h_value;
         TS_ASSERT_DELTA(testvalue_heun, exact_solution, global_error_heun);
     }
 
@@ -353,7 +353,7 @@ public:
         double exact_solution = sin(2.0);
         double error1 = testvalue_heun1 - exact_solution;
         double error2 = testvalue_heun2 - exact_solution;
-        TS_ASSERT_DELTA(error1/error2, pow(2,heun_order), 1e-1);
+        TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)heun_order), 1e-1);
     }
 
     // Test the order of the method by comparing two solutions using dt/2 for the second.
@@ -386,7 +386,7 @@ public:
         double exact_solution = -sin(2.0);
         double error1 = testvalue_heun1 - exact_solution;
         double error2 = testvalue_heun2 - exact_solution;
-        TS_ASSERT_DELTA(error1/error2, pow(2,heun_order), 1e-1);
+        TS_ASSERT_DELTA(error1/error2, pow(2.0,(double)heun_order), 1e-1);
     }
 
     void TestArchivingSolvers() throw(Exception)

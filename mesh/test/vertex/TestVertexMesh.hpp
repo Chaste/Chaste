@@ -1145,7 +1145,7 @@ public:
         VertexMesh<3,3>* p_mesh = ConstructPrismMesh();
 
         // The surface area of the prism should be the sum of the face areas
-        TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(0), 11 + sqrt(13), 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(0), 11 + sqrt(13.0), 1e-6);
 
         // Avoid memory leaks
         delete p_mesh;
@@ -1178,14 +1178,14 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetAreaOfFace(p_face_1), 3.0, 1e-6);
 
         // Face 2 has four vertices, is at an angle theta to the y axis where tan(theta) = 2/3,
-        // and has area 1*sqrt(2^2 + 3^2) = sqrt(13)
+        // and has area 1*sqrt(2^2 + 3^2) = sqrt(13.0)
         VertexElement<2,3>* p_face_2 = p_mesh->GetFace(2);
         TS_ASSERT_EQUALS(p_face_2->GetNumNodes(), 4u);
         c_vector<double, 3> unit_normal_2 = p_mesh->GetUnitNormalToFace(p_face_2);
         TS_ASSERT_DELTA(unit_normal_2[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(unit_normal_2[1], -sin(atan2(3,2)), 1e-6);
-        TS_ASSERT_DELTA(unit_normal_2[2], -cos(atan2(3,2)), 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetAreaOfFace(p_face_2), sqrt(13), 1e-6);
+        TS_ASSERT_DELTA(unit_normal_2[1], -sin(atan2(3.0,2.0)), 1e-6);
+        TS_ASSERT_DELTA(unit_normal_2[2], -cos(atan2(3.0,2.0)), 1e-6);
+        TS_ASSERT_DELTA(p_mesh->GetAreaOfFace(p_face_2), sqrt(13.0), 1e-6);
 
         // Face 1 has three vertices, is perpendicular to the x axis, and has area 0.5*2*3 = 3
         VertexElement<2,3>* p_face_3 = p_mesh->GetFace(3);

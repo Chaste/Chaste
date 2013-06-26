@@ -63,7 +63,7 @@ public:
 
     c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTermPrime(const ChastePoint<SPACE_DIM>& , double u)
     {
-        return identity_matrix<double>(SPACE_DIM)*(-1.0/pow(u,2));
+        return identity_matrix<double>(SPACE_DIM)*(-1.0/pow(u,2.0));
     }
 
     double ComputeNonlinearSourceTermPrime(const ChastePoint<SPACE_DIM>& , double )

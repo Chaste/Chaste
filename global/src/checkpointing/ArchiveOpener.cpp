@@ -167,7 +167,11 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
     else
     {
         // Non-master processes need to go through the serialization methods, but not write any data
+#ifdef _MSC_VER
+        mpCommonStream = new std::ofstream("NUL");
+#else
         mpCommonStream = new std::ofstream("/dev/null");
+#endif
         #define COVERAGE_IGNORE
         if (!mpCommonStream->is_open())
         {

@@ -300,9 +300,9 @@ public:
         double h = 0.01;
         std::vector<double> inits = combined_ode_system.GetInitialConditions();
         solutions = solver.Solve(&combined_ode_system, inits, 0.0, 2.0, h, h);
-        double global_error = 0.5*(exp(2)-1)*h;
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], sin(2), global_error);
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], cos(2), global_error);
+        double global_error = 0.5*(exp(2.0)-1)*h;
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], sin(2.0), global_error);
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], cos(2.0), global_error);
 
         // Check that if we create the same combination, we get the same information object
         boost::shared_ptr<const AbstractOdeSystemInformation> info1 = combined_ode_system.GetSystemInformation();
@@ -344,9 +344,9 @@ public:
         double h = 0.01;
         std::vector<double> inits = combined_ode_system.GetInitialConditions();
         solutions = solver.Solve(&combined_ode_system, inits, 0.0, 2.0, h, h);
-        double global_error = 0.5*(exp(2)-1)*h;
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], sin(2), global_error);
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], cos(2), global_error);
+        double global_error = 0.5*(exp(2.0)-1)*h;
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], sin(2.0), global_error);
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], cos(2.0), global_error);
     }
 
     void TestWithThreeVariables()
@@ -414,10 +414,10 @@ public:
         double h = 0.01;
         std::vector<double> inits = combined_ode_system.GetInitialConditions();
         solutions = solver.Solve(&combined_ode_system, inits, 0.0, 2.0, h, h);
-        double global_error = 0.5*(exp(2)-1)*h;
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], -sin(2), global_error);
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], sin(2)+cos(2), global_error);
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[2], 2.0*sin(2), global_error);
+        double global_error = 0.5*(exp(2.0)-1)*h;
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], -sin(2.0), global_error);
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], sin(2.0)+cos(2.0), global_error);
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[2], 2.0*sin(2.0), global_error);
     }
 
     void TestWithThreeVariablesTwoSystems()
@@ -466,10 +466,10 @@ public:
         double h = 0.01;
         std::vector<double> inits = combined_ode_system.GetInitialConditions();
         solutions = solver.Solve(&combined_ode_system, inits, 0.0, 2.0, h, h);
-        double global_error = 0.5*(exp(2)-1)*h;
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], -sin(2), global_error);
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], sin(2)+cos(2), global_error);
-        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[2], 2.0*sin(2), global_error);
+        double global_error = 0.5*(exp(2.0)-1)*h;
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[0], -sin(2.0), global_error);
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[1], sin(2.0)+cos(2.0), global_error);
+        TS_ASSERT_DELTA(solutions.rGetSolutions().back()[2], 2.0*sin(2.0), global_error);
     }
 };
 

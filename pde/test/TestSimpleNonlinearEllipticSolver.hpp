@@ -81,7 +81,7 @@ double bc_y1_func(const ChastePoint<2>& p)
  */
 double bc_x1_func2(const ChastePoint<2>& p)
 {
-    return sin(2)*(sin(1)*sin(1)+1+p[1]*p[1]);
+    return sin(2.0)*(sin(1.0)*sin(1.0)+1+p[1]*p[1]);
 }
 /**
  * For use in TestSimpleNonlinearEllipticSolver::TestNasty2dEquationOnUnitSquare.
@@ -697,7 +697,7 @@ public:
             }
             else if (fabs(x-1.0) < 1e-12)
             {
-                // On x=1, Dgradu_dot_n = sin(2)(sin^2(1)+1+y^2)
+                // On x=1, Dgradu_dot_n = sin(2.0)(sin^2(1)+1+y^2)
                 p_functional_bc = new FunctionalBoundaryCondition<2>(&bc_x1_func2);
             }
             if (p_functional_bc)

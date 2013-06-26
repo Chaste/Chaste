@@ -230,6 +230,7 @@ public:
         test_folder = "can_delete_me";
         OutputFileHandler handler(test_folder);
         out_stream p_file_stream = handler.OpenOutputFile("test_file");
+        p_file_stream->close(); //Windows does not like deleting open files
 
         // Test file is present
         FileFinder test_file = handler.FindFile("test_file");

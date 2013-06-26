@@ -45,7 +45,7 @@ public:
 
     double ComputeLinearSourceTerm(const ChastePoint<SPACE_DIM>& x)
     {
-        return (-(exp(-2*x[0])-4*x[0]*exp(-2*x[0])+2*pow(x[0],2)*exp(-2*x[0])));
+        return (-(exp(-2*x[0])-4*x[0]*exp(-2*x[0])+2*pow(x[0],2.0)*exp(-2*x[0])));
     }
 
     double ComputeNonlinearSourceTerm(const ChastePoint<SPACE_DIM>& , double )

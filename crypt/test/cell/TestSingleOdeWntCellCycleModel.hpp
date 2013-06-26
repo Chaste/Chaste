@@ -60,11 +60,11 @@ class TestSingleOdeWntCellCycleModel : public AbstractCellBasedTestSuite
 {
 private:
     // Just update these if random number generation changes (error messages will show new values)
-    static const double mFirstRandomNumber = 0.721992;  // 3.11227;
-    static const double mSecondRandomNumber = 1.59526;  // 1.65468;
-    static const double mThirdRandomNumber = 1.58154;   // 2.60806;
-    static const double mFourthRandomNumber = 0.117421; // 2.64101;
-    static const double mFifthRandomNumber = 0.422089;  // 1.28792;
+    static const double mFirstRandomNumber;
+    static const double mSecondRandomNumber;
+    static const double mThirdRandomNumber;
+    static const double mFourthRandomNumber;
+    static const double mFifthRandomNumber;
 
 public:
 
@@ -386,5 +386,12 @@ public:
         FileComparison( single_ode_wnt_results_dir + "single_ode_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/single_ode_wnt_results.parameters").CompareFiles();
     }
 };
+
+//Member initialisation
+    const double TestSingleOdeWntCellCycleModel::mFirstRandomNumber = 0.721992;  // 3.11227;
+    const double TestSingleOdeWntCellCycleModel::mSecondRandomNumber = 1.59526;  // 1.65468;
+    const double TestSingleOdeWntCellCycleModel::mThirdRandomNumber = 1.58154;   // 2.60806;
+    const double TestSingleOdeWntCellCycleModel::mFourthRandomNumber = 0.117421; // 2.64101;
+    const double TestSingleOdeWntCellCycleModel::mFifthRandomNumber = 0.422089;  // 1.28792;
 
 #endif /* TESTSINGLEODEWNTCELLCYCLEMODEL_HPP_ */
