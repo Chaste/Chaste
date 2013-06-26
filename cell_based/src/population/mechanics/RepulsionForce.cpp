@@ -33,7 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#if defined(__GCC__)
+/*potential workaround for enabling floating point exception 
+capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
+#define _GNU_SOURCE
+#endif
+
+
 #include "RepulsionForce.hpp"
+#include <boost/math/special_functions/fpclassify.hpp> //for isnan
 
 template<unsigned DIM>
 RepulsionForce<DIM>::RepulsionForce()
@@ -84,7 +92,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
             c_vector<double, DIM> negative_force = -1.0 * force;
             for (unsigned j=0; j<DIM; j++)
             {
-                assert(!std::isnan(force[j]));
+                assert(!boost::math::isnan(force[j]));
             }
             // Add the force contribution to each node
             p_node_a->AddAppliedForceContribution(force);

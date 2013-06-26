@@ -157,9 +157,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
         {
             eptr[i]= i * (ELEMENT_DIM+1);
         }
-        METIS_PartMeshNodal(&ne, &nn,  eptr, elmnts,
-                NULL /*vwgt*/, NULL /*vsize*/, &nparts, NULL /*tpwgts*/,
-                NULL /*options*/, &edgecut /*aka objval*/, epart, npart);
+        METIS_PartMeshNodal((idxtype*)&ne, (idxtype*)&nn,  eptr, elmnts,
+                NULL /*vwgt*/, NULL /*vsize*/, (idxtype*)&nparts, NULL /*tpwgts*/,
+                NULL /*options*/,(idxtype*) &edgecut /*aka objval*/, epart, npart);
 #else
         //Old interface
         int numflag = 0; //0 means C-style numbering is assumed

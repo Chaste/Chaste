@@ -44,6 +44,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SerializableSingleton.hpp"
 #include <boost/serialization/split_member.hpp>
 
+/*Windows_Port_Begins*/
+#ifdef _MSC_VER
+#define srandom srand
+#define random rand 
+#endif
+/*Windows_Port_Ends*/
+
+
 /**
  * A special singleton class allowing one to generate different types of
  * random number in a globally consistent way.

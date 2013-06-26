@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
-
+#include "BoostFilesystem.hpp"
 /**
  * Test for a strange 'feature' of Debian sarge systems, where the
  * current working directory changes on PETSc initialisation.  There
@@ -55,7 +55,9 @@ public:
     void TestShowCwd()
     {
         std::string chaste_build_root(ChasteBuildRootDir());
-        TS_ASSERT_EQUALS(GetCurrentWorkingDirectory() + "/", chaste_build_root);
+        fs::path chaste_build_root_path(chaste_build_root);
+        fs::path cwd(GetCurrentWorkingDirectory()+"/");
+        TS_ASSERT(fs::equivalent(cwd,chaste_build_root));
     }
 
     void TestDivideOneByZero() throw(Exception)

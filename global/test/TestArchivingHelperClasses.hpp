@@ -38,6 +38,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <climits>
 #include <sys/stat.h> // For chmod()
+#ifdef _MSC_VER
+ #include <io.h>
+ #define CHASTE_READONLY _S_IREAD
+ #define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
+ #define chmod _chmod
+#else
+ #define CHASTE_READONLY 0444
+ #define CHASTE_READ_WRITE_EXECUTE 0755
+#endif
+
 #include <cxxtest/TestSuite.h>
 
 #include <boost/archive/text_oarchive.hpp>
@@ -52,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GetCurrentWorkingDirectory.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
+#include "PosixPathFixer.hpp"
 
 // Save typing, and allow the use of these in cxxtest macros
 typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
@@ -229,7 +240,8 @@ public:
         // Remove write permissions on the archive dir
         if (PetscTools::AmMaster())
         {
-            chmod(handler.GetOutputDirectoryFullPath().c_str(), 0444);
+            std::string path(ChastePosixPathFixer::to_posix(fs::path(handler.GetOutputDirectoryFullPath().c_str())));
+            chmod(path.c_str(), CHASTE_READONLY);
         }
         PetscTools::Barrier("TestArchiveOpenerExceptions-3");
 
@@ -255,7 +267,7 @@ public:
         if (PetscTools::AmMaster())
         {
             // Restore permissions on the folder before allowing processes to continue.
-            chmod(handler.GetOutputDirectoryFullPath().c_str(), 0755);
+            chmod(handler.GetOutputDirectoryFullPath().c_str(), CHASTE_READ_WRITE_EXECUTE);
         }
         PetscTools::Barrier("TestArchiveOpenerExceptions-5");
     }

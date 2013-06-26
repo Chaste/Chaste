@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GetCurrentWorkingDirectory.hpp"
 #include "OutputFileHandler.hpp"
 #include "Warnings.hpp"
+#include "PosixPathFixer.hpp"
 
 bool FileFinder::msFaking = false;
 
@@ -355,26 +356,29 @@ void FileFinder::PrivateRemove(bool dangerous) const
 {
     // Test for bad paths
     const std::string test_output(OutputFileHandler::GetChasteTestOutputDirectory());
-    bool in_testoutput = (GetAbsolutePath().substr(0, test_output.length()) == test_output);
+    const std::string test_output_path(ChastePosixPathFixer::to_posix(fs::path(test_output)));
+    const std::string absolute_path(ChastePosixPathFixer::to_posix(fs::path(GetAbsolutePath())));
+    bool in_testoutput = (absolute_path.substr(0, test_output_path.length()) == test_output_path);
 
     if (!in_testoutput)
     {
         if (dangerous)
         {
             const std::string source_folder(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath());
-            bool in_source = (GetAbsolutePath().substr(0, source_folder.length()) == source_folder);
+            const std::string source_folder_path = ChastePosixPathFixer::to_posix(fs::path(source_folder));
+            bool in_source = (absolute_path.substr(0, source_folder_path.length()) == source_folder_path);
             if (!in_source)
             {
                 EXCEPTION("Cannot remove location '" << mAbsPath
                           << "' as it is not located within the Chaste test output folder ("
-                          << test_output << ") or the Chaste source folder (" << source_folder <<").");
+                          << test_output_path << ") or the Chaste source folder (" << source_folder_path <<").");
             }
         }
         else
         {
             EXCEPTION("Cannot remove location '" << mAbsPath
                       << "' as it is not located within the Chaste test output folder ("
-                      << test_output << ").");
+                      << test_output_path << ").");
         }
     }
 

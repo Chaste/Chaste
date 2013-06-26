@@ -37,6 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petsc.h>
 
 #include "Exception.hpp"
+#include "BoostFilesystem.hpp"
+#include "FileFinder.hpp"
+#include "PosixPathFixer.hpp"
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
 typedef PetscBool PetscTruth;
@@ -58,10 +61,18 @@ Exception::Exception(const std::string& rMessage,
 void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
+    std::string cwd(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath()); 
+    std::string file_path(ChastePosixPathFixer::to_posix(fs::path(rFilename))); 
+    size_t pos = file_path.find(cwd); 
+    std::string rFilename_new = rFilename; 
+    if(pos != std::string::npos) 
+    { 
+        rFilename_new = "./"+rFilename.substr(pos + cwd.length(),rFilename.length()); 
+    } 
     mShortMessage = rMessage;
     std::stringstream line_number_stream;
     line_number_stream << lineNumber;
-    mMessage = std::string("\nChaste error: ") + rFilename + ":"  + line_number_stream.str()  + ": " + mShortMessage;
+    mMessage = std::string("\nChaste error: ") + rFilename_new + ":"  + line_number_stream.str()  + ": " + mShortMessage;
 }
 
 std::string Exception::GetMessage() const

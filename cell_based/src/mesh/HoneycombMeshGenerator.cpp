@@ -42,6 +42,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "MathsCustomFunctions.hpp"
 
+/*Windows_Port_Begins*/
+#ifdef _MSC_VER
+#include <process.h>
+#define getpid _getpid
+#endif
+/*Windows_Port_Ends*/
+
+
 HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsigned numNodesAlongLength, unsigned ghosts, double scaleFactor)
   : mpMesh(NULL),
     mMeshFilename("mesh"),

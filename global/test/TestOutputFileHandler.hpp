@@ -43,6 +43,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <petsc.h>
 #include <sys/stat.h> // For chmod()
 
+#ifdef _MSC_VER
+#include <io.h>
+#define CHASTE_READONLY _S_IREAD
+#define CHASTE_READ_WRITE_EXECUTE _S_IREAD | _S_IWRITE | _S_IEXEC
+#define chmod _chmod
+#define setenv(a,b,c) _putenv_s(a,b)
+#else
+#define CHASTE_READONLY 0444
+#define CHASTE_READ_WRITE_EXECUTE 0755
+#endif
+
 #include "OutputFileHandler.hpp"
 #include "BoostFilesystem.hpp"
 #include "FileFinder.hpp"
@@ -55,7 +66,6 @@ public:
 
     void TestHandler() throw(Exception)
     {
-
         // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
         // a class object is instantiated
         // Fails when the directory does not exist
@@ -172,8 +182,11 @@ public:
             }
         }
 
-        // Reset the location of CHASTE_TEST_OUTPUT
-        setenv("CHASTE_TEST_OUTPUT", chaste_test_output, 1/*Overwrite*/);
+        // Reset the location of CHASTE_TEST_OUTPUT (NOTE: it may not have been set and hence NULL)
+        if (chaste_test_output != NULL)
+        {
+            setenv("CHASTE_TEST_OUTPUT", chaste_test_output, 1/*Overwrite*/);
+        }
 
         // We don't want other people using CHASTE_TEST_OUTPUT whilst we are messing with it!
         PetscTools::Barrier("TestOutputFileHandler-4");
@@ -182,11 +195,15 @@ public:
         OutputFileHandler handler6("no_write_access");
         if (PetscTools::AmMaster())
         {
-            std::string dir_path = handler6.GetOutputDirectoryFullPath();
-            chmod(dir_path.c_str(), 0444);
+            std::string dir_path =  handler6.GetOutputDirectoryFullPath();
+#ifndef _MSC_VER
+            // This test can never pass on modern Windows OS! See: http://support.microsoft.com/kb/326549
+            // You can't change DIRECTORY attributes
+            chmod(dir_path.c_str(), CHASTE_READONLY);
             TS_ASSERT_THROWS_CONTAINS(p_file_stream = handler6.OpenOutputFile("test_file"),
                                       "Could not open file");
-            chmod(dir_path.c_str(), 0755);
+#endif
+            chmod(dir_path.c_str(), CHASTE_READ_WRITE_EXECUTE);
             fs::remove(dir_path + ".chaste_deletable_folder");
             fs::remove(dir_path);
         }

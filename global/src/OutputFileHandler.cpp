@@ -120,7 +120,11 @@ void OutputFileHandler::CommonConstructor(const std::string &rDirectory,
                   " due to it potentially being above, and cleaning, CHASTE_TEST_OUTPUT.");
         // Note: in Boost 1.48 and above we could use 'canonical' to check this better
     }
-    if (FileFinder::IsAbsolutePath(rDirectory))
+    //The notion of absolute path on Windows is rather different.
+    //For example, / and /foo are not absolute paths. 
+    //However, fs::path.has_root_path() captures the intended semantics here as follows
+    
+    if(fs::path(rDirectory).has_root_path())
     {
         EXCEPTION("The constructor argument to OutputFileHandler must be a relative path; '"
                   << rDirectory << "' is absolute.");

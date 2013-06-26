@@ -36,6 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
 
+/*Windows_Port_Begins*/
+#ifdef _MSC_VER
+#define srandom srand
+#define random rand 
+#endif
+/*Windows_Port_Ends*/
+
 RandomNumberGenerator* RandomNumberGenerator::mpInstance = NULL;
 
 RandomNumberGenerator::RandomNumberGenerator()

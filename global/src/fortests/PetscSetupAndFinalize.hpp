@@ -51,7 +51,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
+#ifdef _MSC_VER
+#include <direct.h>
+#define chdir _chdir
+#else
 #include <unistd.h> //For chdir()
+#endif
 #include <iostream>
 
 #include "Exception.hpp"

@@ -33,7 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#if defined(__GCC__)
+/*potential workaround for enabling floating point exception 
+capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
+#define _GNU_SOURCE
+#endif
+
 #include "BuskeElasticForce.hpp"
+#include <boost/math/special_functions/fpclassify.hpp> //for isnan
 
 template<unsigned DIM>
 BuskeElasticForce<DIM>::BuskeElasticForce()
@@ -89,7 +96,7 @@ c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigne
 
     // Assert that the nodes are a finite, non-zero distance apart
     assert(distance_between_nodes > 0);
-    assert(!std::isnan(distance_between_nodes));
+    assert(!boost::math::isnan(distance_between_nodes));
 
     // Normalize the unit vector
     unit_vector /= distance_between_nodes;

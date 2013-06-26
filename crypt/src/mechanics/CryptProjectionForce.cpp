@@ -33,9 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#if defined(__GCC__)
+/*potential workaround for enabling floating point exception 
+capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
+#define _GNU_SOURCE
+#endif
+
 #include "CryptProjectionForce.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
+#include <boost/math/special_functions/fpclassify.hpp> //for isnan 
 
 CryptProjectionForce::CryptProjectionForce()
     : GeneralisedLinearSpringForce<2>(),
@@ -131,7 +138,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);
     assert(distance_between_nodes > 0);
-    assert(!std::isnan(distance_between_nodes));
+    assert(!boost::math::isnan(distance_between_nodes));
 
     unit_difference /= distance_between_nodes;
 
@@ -156,8 +163,8 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     double ageA = p_cell_A->GetAge();
     double ageB = p_cell_B->GetAge();
 
-    assert(!std::isnan(ageA));
-    assert(!std::isnan(ageB));
+    assert(!boost::math::isnan(ageA));
+    assert(!boost::math::isnan(ageB));
 
     /*
      * If the cells are both newly divided, then the rest length of the spring

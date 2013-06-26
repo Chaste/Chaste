@@ -35,9 +35,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ExecutableSupport.hpp"
 
+#include "Version.hpp"
+//GetCurrentTime clashes with a similarly-named API in <windows.h>
+#define ChasteGetCurrentTime ChasteBuildInfo::GetCurrentTime
+
 #include <iostream>
 #include <sstream>
+#ifdef _MSC_VER
+#include <windows.h> // For system info on Windows
+#else
 #include <sys/utsname.h> // For uname
+#endif
 #include <hdf5.h>
 #include <parmetis.h>
 
@@ -48,7 +56,6 @@ typedef std::pair<std::string, std::string> StringPair;
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 #include "PetscException.hpp"
-#include "Version.hpp"
 #include "ChasteSerialization.hpp"
 
 #ifdef CHASTE_VTK
@@ -145,6 +152,101 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
     *out_file << "Process " << PetscTools::GetMyRank() << " of "
         << PetscTools::GetNumProcs() << "." << std::endl << std::flush;
 
+#ifdef _MSC_VER
+    //use native windows equivalent of system info. from uname and /proc/cpuinfo
+
+    //operating system and machine name
+    *out_file << "uname sysname  = " << "Microsoft Windows" << std::endl;
+    #define INFO_BUFFER_SIZE 32767
+    TCHAR info_buffer[INFO_BUFFER_SIZE];
+    DWORD buffer_char_count = INFO_BUFFER_SIZE;
+    if(!GetComputerName(info_buffer, &buffer_char_count))
+        *out_file << "uname nodename = " << "Windows machine name is unknown" << std::endl;
+    else
+        *out_file << "uname nodename = " << info_buffer << std::endl;
+    //more detailed operating system version information
+    OSVERSIONINFOEX os_info;
+    ZeroMemory(&os_info, sizeof(OSVERSIONINFO));
+    os_info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    //copy os version info into the structure
+    GetVersionEx((OSVERSIONINFO*) &os_info);
+    //Pivot around Windows Vista (dwMajorVersion >= 6)
+    //See http://msdn.microsoft.com/en-us/library/ms724834%28v=vs.85%29.aspx for details
+    if(os_info.dwMajorVersion < 6)
+    { //earlier than Windows Vista
+        *out_file << "uname release  = " << "Microsoft Windows Server 2003 R2 (or earlier)" << std::endl;
+    }
+    else {
+        //reverse chronological order (simply add newer OS version to the top)
+        if(os_info.dwMajorVersion > 6)
+        {
+            *out_file << "uname release  = " << "Microsoft Windows (Later than Microsoft Windows 8)" << std::endl;
+        }
+        else  //os_info.dwMajorVersion == 6
+        {
+            if(os_info.dwMinorVersion == 2)
+            {
+                if(os_info.wProductType == VER_NT_WORKSTATION)
+                    *out_file << "uname release  = " << "Microsoft Windows 8" << std::endl;
+                else
+                    *out_file << "uname release  = " << "Microsoft Windows Server 2012" << std::endl;
+            }
+            else if(os_info.dwMinorVersion == 1)
+            {
+                if(os_info.wProductType == VER_NT_WORKSTATION)
+                    *out_file << "uname release  = " << "Microsoft Windows 7" << std::endl;
+                else
+                    *out_file << "uname release  = " << "Microsoft Windows Server 2008 R2" << std::endl;
+            }
+            else if(os_info.dwMinorVersion == 0)
+            {
+                if(os_info.wProductType == VER_NT_WORKSTATION)
+                    *out_file << "uname release  = " << "Microsoft Windows Server 2008" << std::endl;
+                else
+                    *out_file << "uname release  = " << "Microsoft Windows Vista" << std::endl;
+            }
+        }
+    }
+    *out_file << "uname version  = " << os_info.dwMajorVersion << "." << os_info.dwMinorVersion << std::endl;
+
+    //hardware information
+    // See http://msdn.microsoft.com/en-us/library/ms724958%28v=vs.85%29.aspx for details of the SYSTEM_INFO structure
+    SYSTEM_INFO sys_info;
+    GetSystemInfo(&sys_info);
+    switch (sys_info.wProcessorArchitecture)
+    {
+    case PROCESSOR_ARCHITECTURE_AMD64:
+        *out_file << "uname machine  = " << "x64 (AMD or Intel)" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM:
+        *out_file << "uname machine  = " << "ARM" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_IA64:
+        *out_file << "uname machine  = " << "Intel Itanium-based" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        *out_file << "uname machine  = " << "x86" << std::endl;
+        break;
+    case PROCESSOR_ARCHITECTURE_UNKNOWN:
+        *out_file << "uname machine  = " << "Unknown Architecture" << std::endl;
+        break;
+    default:
+        *out_file << "uname machine  = " << "Other Architecture. Code = " << sys_info.wProcessorArchitecture << std::endl;
+        break;
+    }
+
+    *out_file << "\nInformation on number and type of processors:" << std::endl;
+    *out_file << sys_info.dwNumberOfProcessors;
+    *out_file << "\nInformation on processor caches, in the same order as above:" << std::endl;
+    *out_file << "Unknown" << std::endl; ///\todo #2016 Get CPU info on Windows?
+
+    //get physical memory
+    MEMORYSTATUSEX mem_status;
+    mem_status.dwLength = sizeof (mem_status);
+    GlobalMemoryStatusEx (&mem_status);
+    *out_file << "\nInformation on system memory:" << std::endl;
+    *out_file << mem_status.ullTotalPhys/1024 << " kB" << std::endl;
+#else
     struct utsname uts_info;
     uname(&uts_info);
 
@@ -179,6 +281,7 @@ void ExecutableSupport::WriteMachineInfoFile(std::string fileBaseName)
         *out_file << buffer;
     }
     fclose(system_info);
+#endif //end of _MSC_VER not defined
 
     out_file->close();
 }
@@ -219,7 +322,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<IsWorkingCopyModified>"<< ChasteBuildInfo::IsWorkingCopyModified() << "</IsWorkingCopyModified>\n";
     output << "\t\t<BuildInformation>"<< ChasteBuildInfo::GetBuildInformation() << "</BuildInformation>\n";
     output << "\t\t<BuildTime>"<< ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
-    output << "\t\t<CurrentTime>"<< ChasteBuildInfo::GetCurrentTime() << "</CurrentTime>\n";
+    output << "\t\t<CurrentTime>"<< ChasteGetCurrentTime() << "</CurrentTime>\n";
     output << "\t\t<BuilderUnameInfo>"<< ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
     output << "\t\t<Projects>\n";
     BOOST_FOREACH(const StringPair& r_project_version, ChasteBuildInfo::rGetProjectVersions())

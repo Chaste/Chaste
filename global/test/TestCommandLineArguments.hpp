@@ -75,9 +75,13 @@ public:
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
+#ifdef _MSC_VER
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe",final_part_of_string);
+#else
         std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
         TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner",final_part_of_string);
-
+#endif
         // Now test OptionExists() and GetValueCorrespondingToOption()
         //
         // The following tests would require the following arguments to be passed
@@ -240,8 +244,13 @@ public:
         char** argv = *(CommandLineArguments::Instance()->p_argv);
         assert(argv != NULL);
         std::string arg_as_string(argv[0]);
+#ifdef _MSC_VER
+        std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-34,arg_as_string.length());
+        TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner.exe",final_part_of_string);
+#else
         std::string final_part_of_string = arg_as_string.substr(arg_as_string.length()-30,arg_as_string.length());
         TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner",final_part_of_string);
+#endif
     }
 };
 

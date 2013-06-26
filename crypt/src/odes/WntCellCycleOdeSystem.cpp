@@ -32,9 +32,17 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#if defined(__GCC__)
+/*potential workaround for enabling floating point exception 
+capabilities in some GCC versions. Re: FE_ALL_EXCEPT undefined.*/
+#define _GNU_SOURCE
+#endif
+
 #include "WntCellCycleOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
-
+#include "IsNan.hpp"
+#include <boost/math/special_functions/fpclassify.hpp> //for isnan 
 
 WntCellCycleOdeSystem::WntCellCycleOdeSystem(double wntLevel,
                                              boost::shared_ptr<AbstractCellMutationState> pMutationState,
@@ -291,8 +299,8 @@ bool WntCellCycleOdeSystem::CalculateStoppingEvent(double time, const std::vecto
     double factor = mPhiE2F1*60.0;  // Convert non-dimensional d/dt s to d/dt in hours.
     dY1 = dY1*factor;
 
-    assert(!std::isnan(rY[1]));
-    assert(!std::isnan(dY1));
+    assert(!boost::math::isnan(rY[1]));
+    assert(!boost::math::isnan(dY1));
     return (rY[1] > 1.0 && dY1 > 0.0);
 }
 

@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "Warnings.hpp"
 #include "IsNan.hpp"
-
+#include <boost/math/special_functions/fpclassify.hpp> //for isnan
 /**
  * This tests that the initialisation of PETSc does something.
  */
@@ -146,7 +146,7 @@ public:
 #else
 // If we aren't testing for it, then there will be no exception
         TS_ASSERT_THROWS_NOTHING(ans = zero / zero);
-        TS_ASSERT(std::isnan(ans));
+        TS_ASSERT(boost::math::isnan(ans));
 #endif
     }
 };

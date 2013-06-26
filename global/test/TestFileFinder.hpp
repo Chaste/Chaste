@@ -73,7 +73,7 @@ public:
             TS_ASSERT(!file_finder2.IsDir());
 
             // Check the path is as expected
-            TS_ASSERT_EQUALS(file_finder2.GetAbsolutePath(), abs_path);
+            TS_ASSERT( fs::equivalent( fs::path(file_finder2.GetAbsolutePath()) , fs::path(abs_path) ) );
 
             // file_name is relative
             file_finder2.SetPath(file_name, RelativeTo::AbsoluteOrCwd);
@@ -82,7 +82,7 @@ public:
             TS_ASSERT(!file_finder2.IsDir());
 
             // Check the path is as expected
-            TS_ASSERT_EQUALS(file_finder2.GetAbsolutePath(), abs_path);
+            TS_ASSERT( fs::equivalent( fs::path(file_finder2.GetAbsolutePath()), fs::path(abs_path) ) );
 
             // Check we can extract the leaf name
             TS_ASSERT_EQUALS(file_finder.GetLeafName(), "FileFinder.hpp");
@@ -97,10 +97,10 @@ public:
             TS_ASSERT_EQUALS(parent.GetExtension(), "");
 
             // Check we can construct from a Boost path or a string
-            TS_ASSERT_EQUALS(FileFinder(fs::path(file_name)).GetAbsolutePath(), abs_path);
-            TS_ASSERT_EQUALS(FileFinder(file_name).GetAbsolutePath(), abs_path);
-            TS_ASSERT_EQUALS(FileFinder(abs_path).GetAbsolutePath(), abs_path);
-            TS_ASSERT_EQUALS(FileFinder("global/src/FileFinder.hpp").GetAbsolutePath(), abs_path);
+            TS_ASSERT(fs::equivalent(fs::path(FileFinder(fs::path(file_name)).GetAbsolutePath()),fs::path(abs_path)));
+            TS_ASSERT(fs::equivalent(fs::path(FileFinder(file_name).GetAbsolutePath()),fs::path(abs_path)));
+            TS_ASSERT(fs::equivalent(fs::path(FileFinder(abs_path).GetAbsolutePath()),fs::path(abs_path)));
+            TS_ASSERT(fs::equivalent(fs::path(FileFinder("global/src/FileFinder.hpp").GetAbsolutePath()),fs::path(abs_path)));
         }
 
         {
@@ -163,7 +163,10 @@ public:
     void TestIsAbsolutePath()
     {
         TS_ASSERT(!FileFinder::IsAbsolutePath("global/src/FileFinder.hpp"));
+#ifndef _MSC_VER
+        //This would always fail on Windows: it's not a single-root OS 
         TS_ASSERT(FileFinder::IsAbsolutePath("/root"));
+#endif
     }
 
     void TestDirFinder()
@@ -175,13 +178,13 @@ public:
         TS_ASSERT(!dir.IsEmpty());
         TS_ASSERT(dir.IsPathSet());
         std::string abs_path = std::string(ChasteBuildRootDir()) + "global/";
-        TS_ASSERT_EQUALS(dir.GetAbsolutePath(), abs_path);
+        TS_ASSERT(fs::equivalent(fs::path(dir.GetAbsolutePath()),fs::path(abs_path)));
 
         FileFinder dir2("global", RelativeTo::CWD); // CWD should be the same as ChasteSourceRoot for tests
         TS_ASSERT(dir2.Exists());
         TS_ASSERT(dir2.IsDir());
         TS_ASSERT(!dir2.IsFile());
-        TS_ASSERT_EQUALS(dir2.GetAbsolutePath(), dir.GetAbsolutePath());
+        TS_ASSERT(fs::equivalent(fs::path(dir2.GetAbsolutePath()),fs::path(dir.GetAbsolutePath())));
 
         dir2.SetPath(dir.GetAbsolutePath(), RelativeTo::Absolute);
         TS_ASSERT(dir2.Exists());
@@ -368,12 +371,12 @@ public:
         TS_ASSERT(!expected_dest.Exists());
         FileFinder dest = source.CopyTo(dest_dir);
         TS_ASSERT(dest.IsFile());
-        TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
+        TS_ASSERT(fs::equivalent(fs::path(dest.GetAbsolutePath()),fs::path(expected_dest.GetAbsolutePath())));
 
         // Copy to existing file
         dest = source.CopyTo(dest_dir);
         TS_ASSERT(dest.IsFile());
-        TS_ASSERT_EQUALS(dest.GetAbsolutePath(), expected_dest.GetAbsolutePath());
+        TS_ASSERT(fs::equivalent(fs::path(dest.GetAbsolutePath()),fs::path(expected_dest.GetAbsolutePath())));
 
         // Copy to new name
         expected_dest.SetPath("new_name", dest_dir);
