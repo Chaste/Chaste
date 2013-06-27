@@ -90,7 +90,7 @@ public:
     ~PottsElement();
 
     /**
-     * Add node to element. Note that we dont care about ordering in a potts
+     * Add node to element. Note that we don't care about ordering in a potts
      * element so just add it to the end of the mNodes vector.
      *
      * @param pNode is a pointer to the new node

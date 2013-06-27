@@ -964,7 +964,7 @@ public:
 
     void TestNodeBasedCellPopulationOutputWriters2d()
     {
-        EXIT_IF_PARALLEL;    // Population writers dont work in parallel yet.
+        EXIT_IF_PARALLEL;    // Population writers don't work in parallel yet'
 
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -1095,7 +1095,7 @@ public:
 
     void TestNodeBasedCellPopulationOutputWriters3d()
     {
-        EXIT_IF_PARALLEL;    // Population writers dont work in parallel yet.
+        EXIT_IF_PARALLEL;    // Population writers don't work in parallel yet
 
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);

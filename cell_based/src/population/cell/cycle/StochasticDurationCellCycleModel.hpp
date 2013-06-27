@@ -40,7 +40,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A stochastic cell-cycle model where Cells keep dividing with a stochastic cell cycle duration drawn from a uniform distribution.
+ * A stochastic cell-cycle model where cells divide with a stochastic G1 phase duration.
+ *
+ * For proliferative cells, the G1 phase duration is drawn from a uniform distribution
+ * on [T, T+2], where the parameter T depends on cell proliferative type as follows: if
+ * the cell has StemCellProliferativeType, then T is given by GetStemCellG1Duration();
+ * and if the cell has TransitCellProliferativeType, then T is given by
+ * GetTransitCellG1Duration().
+ *
+ * If the cell has DifferentiatedCellProliferativeType, then the G1 phase duration is
+ * set to be infinite, so that the cell will never divide.
  */
 class StochasticDurationCellCycleModel : public AbstractSimpleCellCycleModel
 {

@@ -71,7 +71,7 @@ private:
      */
     MutableVertexMesh<DIM, DIM>* mpMutableVertexMesh;
 
-    /** Whether to output the locations of T1Swaps and T3Swaps to files. Defaults to true. */
+    /** Whether to output the locations of T1 swaps and T3 swaps to files. Defaults to true. */
     bool mOutputCellRearrangementLocations;
 
     /**

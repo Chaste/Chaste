@@ -363,7 +363,12 @@ public:
         HoneycombVertexMeshGenerator generator(4,4);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
-        p_mesh->SetT2Threshold(1.0); // so T2Swaps once it becomes a triangle
+
+        /*
+         * Set a high threshold for the maximum cell area for a T2 swap,
+         * so that this occurs as soon a any element becomes triangular.
+         */
+        p_mesh->SetT2Threshold(1.0);
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -415,7 +420,7 @@ public:
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Cell removed due to T2Swap this is not counted in the dead cells counter");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Cell removed due to a T2 swap; this is not counted in the dead cells counter");
         Warnings::QuietDestroy();
     }
 

@@ -304,10 +304,11 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
             if (element_map.IsDeleted(old_elem_index))
             {
                 /**
-                 * \todo this is a kludge to remove the cell once a T2Swap occurs this is not included in the dead cells counter.
-                 * This should be included in the RemoveDeadCells method so the death is counted
+                 * \todo this is a kludge to remove the cell once a T2 swap occurs; this is not included
+                 * in the dead cells counter at present. This should be included in the RemoveDeadCells()
+                 * method so that the death is correctly counted.
                  */
-                WARNING("Cell removed due to T2Swap this is not counted in the dead cells counter");
+                WARNING("Cell removed due to a T2 swap; this is not counted in the dead cells counter");
                 cell_iter = this->mCells.erase(cell_iter);
                 --cell_iter;
             }
