@@ -42,8 +42,9 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
                                                            double t2Threshold)
 {
     // numElementsAcross must be even for cylindrical meshes
+    ///\todo This should be an exception (#2401)
     assert(numElementsAcross > 1);
-    assert(numElementsAcross%2 == 0);///\todo This should be an exception
+    assert(numElementsAcross%2 == 0);
 
     assert(numElementsUp > 0);
     assert(cellRearrangementThreshold > 0.0);

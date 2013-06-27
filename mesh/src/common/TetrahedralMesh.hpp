@@ -348,11 +348,11 @@ public:
     {
     public:
         /**
-         * @return a pointer to the node in the mesh at end A of the spring.
+         * @return a pointer to the node in the mesh at end A of the edge.
          */
         Node<SPACE_DIM>* GetNodeA();
         /**
-         * @return a pointer to the node in the mesh at end B of the spring.
+         * @return a pointer to the node in the mesh at end B of the edge.
          */
         Node<SPACE_DIM>* GetNodeB();
 
@@ -377,12 +377,10 @@ public:
          */
         EdgeIterator(TetrahedralMesh& rMesh, unsigned elemIndex);
 
-
-
-
     private:
-        /** Keep track of what edges have been visited
-         *  Each edge is stored as a pair of ordered indices
+        /**
+         * Keep track of what edges have been visited.
+         * Each edge is stored as a pair of ordered indices.
          */
         std::set< std::pair<unsigned, unsigned> > mEdgesVisited;
 
@@ -391,7 +389,6 @@ public:
         unsigned mElemIndex;       /**< Element index. */
         unsigned mNodeALocalIndex; /**< Index of one node on the edge. */
         unsigned mNodeBLocalIndex; /**< Index of the other node on the edge. */
-
     };
 
     /**

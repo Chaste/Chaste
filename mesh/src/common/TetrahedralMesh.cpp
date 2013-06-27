@@ -731,7 +731,7 @@ TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::EdgeIterator(TetrahedralM
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgesBegin()
 {
-    unsigned first_element_index=0;
+    unsigned first_element_index = 0;
     while (first_element_index!=this->GetNumAllElements() && this->GetElement(first_element_index)->IsDeleted())
     {
         first_element_index++;

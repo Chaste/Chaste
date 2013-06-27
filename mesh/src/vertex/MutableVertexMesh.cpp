@@ -49,6 +49,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
       mT2Threshold(t2Threshold),
       mCheckForInternalIntersections(false)
 {
+    // Threshold parameters must be strictly positive
     assert(cellRearrangementThreshold > 0.0);
     assert(t2Threshold > 0.0);
 
@@ -67,7 +68,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
         this->mElements.push_back(p_temp_vertex_element);
     }
 
-    // In 3D, populate mFaces
+    // If in 3D, then also populate mFaces
     if (SPACE_DIM == 3)
     {
         // Use a std::set to keep track of which faces have been added to mFaces
@@ -81,7 +82,7 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
             {
                 VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = this->mElements[elem_index]->GetFace(face_index);
 
-                // If this face is not already contained in mFaces, add it, and update faces_counted
+                // If this face is not already contained in mFaces, then add it and update faces_counted
                 if (faces_counted.find(p_face->GetIndex()) == faces_counted.end())
                 {
                     this->mFaces.push_back(p_face);
@@ -326,7 +327,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 
         if (norm_2(a_to_b) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
         {
-            WARNING("Edge is too small for normal division, putting node in the middle of a and b, there may be T1Swaps straight away.");
+            WARNING("Edge is too small for normal division; putting node in the middle of a and b. There may be T1 swaps straight away.");
             ///\todo or should we move a and b apart, it may interfere with neighbouring edges? (see #1399 and #2401)
             intersection = position_a + 0.5*a_to_b;
         }
@@ -817,18 +818,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            // Check mesh for intersections, and perform T3Swaps where required
+            // Check mesh for intersections, and perform T3 swaps where required
             recheck_mesh = CheckForIntersections();
         }
 
-        RemoveDeletedNodes(); // to remove any nodes if they are deleted
+        RemoveDeletedNodes();
     }
     else // 3D
     {
         #define COVERAGE_IGNORE
         EXCEPTION("Remeshing has not been implemented in 3D (see #827 and #860)\n");
         #undef COVERAGE_IGNORE
-        ///\todo put code for remeshing in 3D here - see #866 and the paper doi:10.1016/j.jtbi.2003.10.001
+        ///\todo Implement ReMesh() in 3D (see #1422)
     }
 }
 
@@ -1002,9 +1003,6 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
     // Find the sets of elements containing nodes A and B
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();
     std::set<unsigned> nodeB_elem_indices = pNodeB->rGetContainingElementIndices();
@@ -1028,7 +1026,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
          *  /
          *
          */
-        EXCEPTION("A node is contained in more than three elements"); // the code can't handle this case
+        EXCEPTION("A node is contained in more than three elements"); // The code can't handle this case
     }
     else // each node is contained in at most three elements
     {
@@ -1037,22 +1035,17 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
             case 1:
             {
                 /*
-                 * In this case, each node is contained in a single element, so the nodes
-                 * lie on the boundary of the mesh:
+                 * Each node is contained in a single element, so the nodes must lie on the boundary
+                 * of the mesh, as shown below. In this case, we merge the nodes and tidy up node
+                 * indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
                  *
                  *    A   B
                  * ---o---o---
-                 *
-                 * We merge the nodes.
                  */
-
-                // Nodes A and B must be on the boundary
                 assert(pNodeA->IsBoundaryNode());
                 assert(pNodeB->IsBoundaryNode());
 
                 PerformNodeMerge(pNodeA, pNodeB);
-
-                // Remove the deleted node and re-index
                 RemoveDeletedNodes();
                 break;
             }
@@ -1063,69 +1056,59 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     if (pNodeA->IsBoundaryNode() && pNodeB->IsBoundaryNode())
                     {
                         /*
-                         * In this case, the node configuration looks like:
+                         * The node configuration is as shown below, with voids on either side. In this case
+                         * we perform a T1 swap, which separates the elements.
                          *
                          *   \   /
                          *    \ / Node A
                          * (1) |   (2)      (element number in brackets)
                          *    / \ Node B
                          *   /   \
-                         *
-                         * With voids on top and bottom
-                         *
-                         * We perform a Type 1 swap and separate the elements in this case.
                          */
                          PerformT1Swap(pNodeA, pNodeB,all_indices);
                     }
                     else if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
                     {
                         /*
-                         * In this case, the node configuration looks like:
+                         * The node configuration is as shown below, with a void on one side. We should not
+                         * be able to reach this case at present, since we allow only for three-way junctions
+                         * or boundaries, so we throw an exception.
                          *
                          *   \   /
                          *    \ / Node A
                          * (1) |   (2)      (element number in brackets)
                          *     x Node B
                          *     |
-                         *
-                         * With a void on top.
-                         *
-                         * We should not be able to get here when running normal vertex code
-                         * as there should only be nodes on 3 way junctions or boundaries.
-                         *
                          */
-                        EXCEPTION("There is a non boundary node contained only in 2 elements something has gone wrong.");
+                        EXCEPTION("There is a non-boundary node contained only in two elements; something has gone wrong.");
                     }
                     else
                     {
                         /*
-                         * In this case, each node is contained in two elements, so the nodes
-                         * lie on an internal edge:
+                         * Each node is contained in two elements, so the nodes lie on an internal edge, as shown below.
+                         * We should not be able to reach this case at present, since we allow only for three-way junctions
+                         * or boundaries, so we throw an exception.
                          *
                          *    A   B
                          * ---o---o---
-                         *
-                         * We should not be able to get here when running normal vertex code
-                         * as there should only be nodes on 3 way junctions or boundaries.
                          */
-                        EXCEPTION("There are non-boundary nodes contained in only in 2 elements something has gone wrong.");
+                        EXCEPTION("There are non-boundary nodes contained only in two elements; something has gone wrong.");
                     }
                 }
                 else
                 {
                     /*
-                     * In this case, the node configuration looks like:
+                     * The node configuration looks like that shown below. In this case, we merge the nodes
+                     * and tidy up node indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
                      *
                      * Outside
                      *         /
                      *   --o--o (2)
                      *     (1) \
                      *
-                     * We merge the nodes in this case. ///\todo this should be a T1 swap (see #1263 and #2401)
+                     * ///\todo this should be a T1 swap (see #1263 and #2401)
                      */
                     PerformNodeMerge(pNodeA, pNodeB);
-
-                    // Remove the deleted node and re-index
                     RemoveDeletedNodes();
                 }
                 break;
@@ -1135,8 +1118,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                 if (nodeA_elem_indices.size()==1 || nodeB_elem_indices.size()==1)
                 {
                     /*
-                     * In this case, one node is contained in one element and
-                     * the other node is contained in three elements:
+                     * One node is contained in one element and the other node is contained in three elements.
+                     * We should not be able to reach this case at present, since we allow each boundary node
+                     * to be contained in at most two elements, so we throw an exception.
                      *
                      *    A   B
                      *
@@ -1145,12 +1129,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      * ---o---o-----   (element number in brackets)
                      *  (1)    \ (2)
                      *          \
-                     *
-                     * We should not be able to get here when running normal vertex code
-                     * as a boundary node is contained in at most 2 elements.
                      */
-
-                    // Nodes A and B must be on the boundary
                     assert(pNodeA->IsBoundaryNode());
                     assert(pNodeB->IsBoundaryNode());
 
@@ -1161,22 +1140,18 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     // element in nodeA_elem_indices which is not in nodeB_elem_indices contains a shared node with the element in nodeA_elem_indices which is not in nodeB_elem_indices.
 
                     std::set<unsigned> element_A_not_B, temp_set;
-                    std::set_difference(all_indices.begin(), all_indices.end(),
-                                        nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
-                                        std::inserter(temp_set, temp_set.begin()));
+                    std::set_difference(all_indices.begin(), all_indices.end(), nodeB_elem_indices.begin(), nodeB_elem_indices.end(), std::inserter(temp_set, temp_set.begin()));
                     element_A_not_B.swap(temp_set);
 
-                    // Should only be one such element
-                    assert(element_A_not_B.size()==1);
+                    // There must be only one such element
+                    assert(element_A_not_B.size() == 1);
 
                     std::set<unsigned> element_B_not_A;
-                    std::set_difference(all_indices.begin(), all_indices.end(),
-                                        nodeA_elem_indices.begin(), nodeA_elem_indices.end(),
-                                        std::inserter(temp_set, temp_set.begin()));
+                    std::set_difference(all_indices.begin(), all_indices.end(), nodeA_elem_indices.begin(), nodeA_elem_indices.end(), std::inserter(temp_set, temp_set.begin()));
                     element_B_not_A.swap(temp_set);
 
-                    // Should only be one such element
-                    assert(element_B_not_A.size()==1);
+                    // There must be only one such element
+                    assert(element_B_not_A.size() == 1);
 
                     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_A_not_B = this->mElements[*element_A_not_B.begin()];
                     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_B_not_A = this->mElements[*element_B_not_A.begin()];
@@ -1191,7 +1166,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
                      {
                         /*
-                         * In this case, the node configuration looks like:
+                         * The node configuration looks like that shown below, and both nodes must be on the boundary.
+                         * In this case we remove the void through a call to PerformVoidRemoval().
                          *
                          *    A  C  B                A      B
                          *      /\                 \        /
@@ -1200,15 +1176,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          *   /  (2) \                 \v /
                          *  /        \                 \/
                          *                             C
-                         *
-                         * We perform a T3 way merge, removing the void.
                          */
-
-                        // Check nodes A and B are on the boundary
                         assert(pNodeA->IsBoundaryNode());
                         assert(pNodeB->IsBoundaryNode());
 
-                        // Get the other node in the triangular void
+                        // Get the third node in the triangular void
                         unsigned nodeC_index;
                         if (next_node_1 == previous_node_2 && next_node_2 != previous_node_1)
                         {
@@ -1229,7 +1201,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     else
                     {
                         /*
-                         * In this case, the node configuration looks like:
+                         * The node configuration looks like that below, and both nodes must lie on the boundary.
+                         * In this case we perform a T1 swap.
                          *
                          *     A  B                  A  B
                          *   \ empty/              \      /
@@ -1237,11 +1210,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          * (3) o--o (1)  or      (2) o--o (3)    (element number in brackets)
                          *    / (2)\                /    \
                          *   /      \              /empty \
-                         *
-                         * We perform a T1 Swap in this case.
                          */
-
-                        // Nodes A and B must be on the boundary
                         assert(pNodeA->IsBoundaryNode());
                         assert(pNodeB->IsBoundaryNode());
 
@@ -1250,10 +1219,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                 }
                 else
                 {
-                    /*
-                     * In this case, one of the nodes is contained in two elements
-                     * and the other node is contained in three elements.
-                     */
+                    // In this case, one node must be contained in two elements and the other in three elements.
                     assert (   (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==3)
                             || (nodeA_elem_indices.size()==3 && nodeB_elem_indices.size()==2) );
 
@@ -1263,7 +1229,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                     if (pNodeA->IsBoundaryNode() || pNodeB->IsBoundaryNode())
                     {
                         /*
-                         * In this case, the node configuration looks like:
+                         * The node configuration looks like that shown below. We perform a T1 swap in this case.
                          *
                          *     A  B                      A  B
                          *   \      /                  \      /
@@ -1271,15 +1237,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          * (3) o--o (empty)  or  (empty) o--o (3)    (element number in brackets)
                          *    / (2)\                    /(2) \
                          *   /      \                  /      \
-                         *
-                         * We perform a Type 1 swap in this case.
                          */
                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
                     else
                     {
                         /*
-                         * In this case, the node configuration looks like:
+                         * The node configuration looks like that shown below. We should not be able to reach this case
+                         * at present, since we allow only for three-way junctions or boundaries, so we throw an exception.
                          *
                          *     A  B             A  B
                          *   \                       /
@@ -1287,11 +1252,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          * (3) o--o---   or  ---o--o (3)    (element number in brackets)
                          *    /  (2)           (2)  \
                          *   /                       \
-                         *
-                          * We should not be able to get here when running normal vertex code
-                         * as there should only be nodes on 3 way junctions or boundaries.
                          */
-                        EXCEPTION("There are non-boundary nodes contained only in 2 elements something has gone wrong.");
+                        EXCEPTION("There are non-boundary nodes contained only in two elements; something has gone wrong.");
                     }
                 }
                 break;
@@ -1299,15 +1261,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
             case 4:
             {
                 /*
-                 * In this case, the node configuration looks like:
+                 * The node configuration looks like that shown below. We perform a T1 swap in this case.
                  *
                  *   \(1)/
                  *    \ / Node A
                  * (2) |   (4)      (element number in brackets)
                  *    / \ Node B
                  *   /(3)\
-                 *
-                 * We perform a Type 1 swap in this case.
                  */
                 PerformT1Swap(pNodeA, pNodeB, all_indices);
                 break;
@@ -1375,13 +1335,27 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
                                                               Node<SPACE_DIM>* pNodeB,
                                                               std::set<unsigned>& rElementsContainingNodes)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    // First compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
+    double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
+
+    c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
+    c_vector<double, SPACE_DIM> nodeB_location = pNodeB->rGetLocation();
+    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
+    mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*vector_AB);
+
+    double distance_AB = norm_2(vector_AB);
+    if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
+    {
+        EXCEPTION("Nodes are too close together, this shouldn't happen");
+    }
 
     /*
-     * Restructure elements - remember to update nodes and elements.
+     * Compute the locations of two new nodes C, D, placed on either side of the
+     * edge E_old formed by nodes A and B, such that the edge E_new formed by the
+     * new nodes is the perpendicular bisector of E_old, with |E_new| 'just larger'
+     * (mCellRearrangementRatio) than mThresholdDistance.
      *
-     * We need to implement the following changes:
+     * We implement the following changes to the mesh:
      *
      * The element whose index was in nodeA_elem_indices but not nodeB_elem_indices,
      * and the element whose index was in nodeB_elem_indices but not nodeA_elem_indices,
@@ -1401,29 +1375,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
      * (2) |   (4)     elements in brackets
      *    / \ Node B
      *   /(3)\
-     *
      */
-
-    /*
-     * Compute the locations of two new nodes C, D, placed on either side of the
-     * edge E_old formed by nodes current_node and anticlockwise_node, such
-     * that the edge E_new formed by the new nodes is the perpendicular bisector
-     * of E_old, with |E_new| 'just larger' (mCellRearrangementRatio) than mThresholdDistance.
-     */
-
-    // Compute and store the location of the T1 swap, which is at the midpoint of nodes A and B
-    double distance_between_nodes_CD = mCellRearrangementRatio*mCellRearrangementThreshold;
-
-    c_vector<double, SPACE_DIM> nodeA_location = pNodeA->rGetLocation();
-    c_vector<double, SPACE_DIM> nodeB_location = pNodeB->rGetLocation();
-    c_vector<double, SPACE_DIM> vector_AB = this->GetVectorFromAtoB(nodeA_location, nodeB_location);
-    mLocationsOfT1Swaps.push_back(nodeA_location + 0.5*vector_AB);
-
-    double distance_AB = norm_2(vector_AB);
-    if (distance_AB < 1e-10) ///\todo remove magic number? (see #1884 and #2401)
-    {
-        EXCEPTION("Nodes are too close together, this shouldn't happen");
-    }
 
     // Move nodes A and B to C and D respectively
     c_vector<double, SPACE_DIM> vector_CD;
@@ -1475,7 +1427,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(Node<SPACE_DIM>* p
              * identify the element, if nodeB_index > nodeA_index then element 4
              * and if nodeA_index > nodeB_index then element 2
              */
-
             unsigned nodeB_local_index_plus_one = (nodeB_local_index + 1)%(this->mElements[*it]->GetNumNodes());
 
             if (nodeA_local_index == nodeB_local_index_plus_one)
@@ -1674,19 +1625,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
     {
         assert((intersected_edge+1)%num_nodes==node_B_local_index_in_3);
 
-        /*
-         * Add node B to element 1 before node A
-         * Add node A to element 3 before node B
-         *
-         * Remove node A from element 2
-         * Remove node B from element 4
-         */
+        // Add node B to element 1 before node A and add node A to element 3 before node B
         unsigned node_before_A_in_1 = (node_A_local_index_in_1 - 1)%this->GetElement(element_1_index)->GetNumNodes();
         unsigned node_before_B_in_3 = (node_B_local_index_in_3 - 1)%this->GetElement(element_3_index)->GetNumNodes();
-
         this->mElements[element_1_index]->AddNode(this->mNodes[node_B_index], node_before_A_in_1);
         this->mElements[element_3_index]->AddNode(this->mNodes[node_A_index], node_before_B_in_3);
 
+        // Remove node A from element 2 and remove node B from element 4
         this->mElements[element_2_index]->DeleteNode(node_A_local_index_in_2);
         this->mElements[element_4_index]->DeleteNode(node_B_local_index_in_4);
     }
@@ -1695,31 +1640,14 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(Node<SPA
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEMENT_DIM,SPACE_DIM>& rElement)
 {
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
+    // The given element must be triangular for us to be able to perform a T2 swap on it
     assert(rElement.GetNumNodes() == 3);
 
-    /*
-     * The following code removes a small triangular element from the mesh:
-     *
-     *   \                           \
-     *    \                           \
-     *    |\                           \
-     *    | \                           \
-     *    |  \_ _ _ _ _    ---->         \_ _ _ _ _
-     *    |  /                           /
-     *    | /                           /
-     *    |/                           /
-     *    /                           /
-     *   /                           /
-     */
-
-    // Create a new node at the element's centroid: this will be a boundary node if any existing nodes were on the boundary
-
-    // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
+    // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
     c_vector<double, SPACE_DIM> new_node_location;
     new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
 
+    // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
     bool is_node_on_boundary = false;
     for (unsigned i=0; i<3; i++)
     {
@@ -1767,7 +1695,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
         }
     }
 
-    // Also have to mark pElement, pElement->GetNode(0), pElement->GetNode(1), and pElement->GetNode(2) as deleted.
+    // We also have to mark pElement, pElement->GetNode(0), pElement->GetNode(1), and pElement->GetNode(2) as deleted
     mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(0));
     mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(1));
     mDeletedNodeIndices.push_back(rElement.GetNodeGlobalIndex(2));
@@ -1808,7 +1736,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     // Check these nodes are also boundary nodes if this fails then the elements have become concave and you need a smaller timestep
     if (!this->mNodes[vertexA_index]->IsBoundaryNode() || !this->mNodes[vertexB_index]->IsBoundaryNode())
     {
-        EXCEPTION("A boundary node has intersected a non boundary edge, this is because the boundary element has become concave you need to rerun the simulation with a smaller time step to prevent this.");
+        EXCEPTION("A boundary node has intersected a non-boundary edge; this is because the boundary element has become concave. You need to rerun the simulation with a smaller time step to prevent this.");
     }
 
     // Get the nodes at either end of the edge to be divided and calculate intersection
@@ -1821,7 +1749,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
     c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
-    // Store the location of the T3Swap, the location of the intersection with the edge.
+    // Store the location of the T3 swap, the location of the intersection with the edge
     mLocationsOfT3Swaps.push_back(intersection);
 
     /**
@@ -2103,7 +2031,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             {
                 // Get elements containing vertexA_index (the common vertex)
 
-                assert(this->mNodes[vertexA_index]->GetNumContainingElements()>1);
+                assert(this->mNodes[vertexA_index]->GetNumContainingElements() > 1);
 
                 std::set<unsigned> elements_containing_vertex_A = this->mNodes[vertexA_index]->rGetContainingElementIndices();
                 std::set<unsigned>::const_iterator iter = elements_containing_vertex_A.begin();
@@ -2341,7 +2269,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     else
                     {
                         assert(next_node_2 == previous_node_1);
-
                         p_element_1->AddNode(this->mNodes[new_node_global_index], local_index_1);
                     }
 
@@ -2429,10 +2356,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
     unsigned nodeC_index = pNodeC->GetIndex();
 
     c_vector<double, SPACE_DIM> nodes_midpoint = pNodeA->rGetLocation() + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation())/3.0
-                                                                        + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeC->rGetLocation())/3.0;
+                                                                          + this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeC->rGetLocation())/3.0;
 
     Node<SPACE_DIM>* p_low_node_A_B = (nodeA_index < nodeB_index) ? pNodeA : pNodeB; // Node with the lowest index out of A and B
-    Node<SPACE_DIM>* p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : pNodeC; // Node with the lowest index out of A, B and C.
+    Node<SPACE_DIM>* p_low_node = (p_low_node_A_B->GetIndex() < nodeC_index) ? p_low_node_A_B : pNodeC; // Node with the lowest index out of A, B and C
 
     PerformNodeMerge(pNodeA, pNodeB);
     PerformNodeMerge(p_low_node_A_B, pNodeC);

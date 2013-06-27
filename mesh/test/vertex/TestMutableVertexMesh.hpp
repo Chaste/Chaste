@@ -1268,9 +1268,10 @@ public:
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
 
-        // Make a vertex mesh
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
-        vertex_mesh.SetCellRearrangementThreshold(0.09);// Threshold distance set to ease calculations.
+
+        // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.09);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
@@ -1608,7 +1609,6 @@ public:
         TS_ASSERT_DELTA(mesh.GetSurfaceAreaOfElement(2), 4.0, 1e-6);
 
         // Test other nodes are updated
-
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(0), 0u);
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(1), 3u);
@@ -1697,6 +1697,81 @@ public:
         }
     }
 
+    void TestElementIncludesPointAndGetLocalIndexForElementEdgeClosestToPoint()
+    {
+        /*
+         * Create a simple mesh comprising four nodes contained in a square element.
+         * We will test for inclusion in the element for several points.
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+
+        // Test a point far outside the element
+        c_vector<double, 2> test_point1;
+        test_point1[0] = -1.0;
+        test_point1[1] = -1.0;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point1, 0), false);
+
+        // Test a point far inside the element
+        c_vector<double, 2> test_point2;
+        test_point2[0] = 0.5;
+        test_point2[1] = 0.5;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point2, 0), true);
+        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point2, 0), 0u);
+
+        // Test a point on the left edge
+        c_vector<double, 2> test_point3;
+        test_point3[0] = 0.0;
+        test_point3[1] = 0.5;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point3, 0), true);
+        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point3, 0), 3u);
+
+        // Test a point on the right edge
+        c_vector<double, 2> test_point4;
+        test_point4[0] = 1.0;
+        test_point4[1] = 0.5;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point4, 0), false);
+
+        // A point on the bottom edge
+        c_vector<double, 2> test_point5;
+        test_point5[0] = 0.5;
+        test_point5[1] = 0.0;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point5, 0), false); ///\todo #2387
+//        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point5, 0), true);
+
+        // Test a point on the top edge
+        c_vector<double, 2> test_point6;
+        test_point6[0] = 0.5;
+        test_point6[1] = 1.0;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point6, 0), false);
+
+        // Test a point just inside the element
+        c_vector<double, 2> test_point7;
+        test_point7[0] = 0.999;
+        test_point7[1] = 0.998;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point7, 0), true);
+        TS_ASSERT_EQUALS(mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point7, 0), 1u);
+
+        // Test a point just outside the element
+        c_vector<double, 2> test_point8;
+        test_point8[0] = 1.001;
+        test_point8[1] = 0.5;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point8, 0), false);
+
+        // Test a point coinciding with a vertex
+        c_vector<double, 2> test_point9;
+        test_point9[0] = 1.0;
+        test_point9[1] = 1.0;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point9, 0), false);
+    }
 };
 
 #endif /*TESTMUTABLEVERTEXMESH_HPP_*/

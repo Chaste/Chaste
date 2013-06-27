@@ -57,7 +57,18 @@ class VertexMeshWriter;
 #include "TetrahedralMesh.hpp"
 
 /**
- * A vertex-based mesh class, for use in vertex-based simulations.
+ * A vertex-based mesh class, in which elements may contain different numbers of nodes.
+ * This is facilitated by the VertexElement class.
+ *
+ * This class has two applications in the cell_based code.
+ *
+ * First, VertexMesh is used as a member of the MeshBasedCellPopulation class to represent
+ * a Voronoi tessellation, the dual to a Delaunay mesh, which allows the shapes of cells
+ * to be visualised in simulations of a class of off-lattice cell centre-based models.
+ *
+ * Second, VertexMesh serves as a parent class for MutableVertexMesh, which is used as a
+ * member of the VertexBasedCellPopulation class to represent the junctional network of
+ * cells that forms the basis of simulations of off-lattice vertex-based models.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
@@ -126,10 +137,6 @@ protected:
      */
     void GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
-    //////////////////////////////////////////////////////////////////////
-    //                        2D-specific methods                       //
-    //////////////////////////////////////////////////////////////////////
-
     /**
      * Test whether a given point lies inside a given element.
      *
@@ -186,7 +193,7 @@ protected:
     }
 
     /**
-     * Loads a mesh by using VertexMeshReader and the location in ArchiveLocationInfo.
+     * Load a mesh by using VertexMeshReader and the location in ArchiveLocationInfo.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -203,11 +210,7 @@ protected:
 
 public:
 
-    //////////////////////////////////////////////////////////////////////
-    //                            Iterators                             //
-    //////////////////////////////////////////////////////////////////////
-
-    /** Forward declaration */
+    /** Forward declaration of element iterator. */
     class VertexElementIterator;
 
     /**
@@ -221,10 +224,6 @@ public:
      * @return an iterator to one past the last element in the mesh.
      */
     inline VertexElementIterator GetElementIteratorEnd();
-
-    //////////////////////////////////////////////////////////////////////
-    //                             Methods                              //
-    //////////////////////////////////////////////////////////////////////
 
     /**
      * Default constructor.
@@ -250,7 +249,7 @@ public:
      * Alternative 2D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,
      * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
      *
-     * \todo Merge with 3D Voronoi constructor? (#1075)
+     * \todo Merge with 3D Voronoi constructor? (see #1075)
      *
      * @param rMesh a tetrahedral mesh
      * @param isPeriodic a boolean that indicates whether the mesh is periodic or not
@@ -261,7 +260,7 @@ public:
      * Alternative 3D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,
      * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
      *
-     * \todo Merge with 2D Voronoi constructor? (#1075)
+     * \todo Merge with 2D Voronoi constructor? (see #1075)
      *
      * @param rMesh a tetrahedral mesh
      */
@@ -314,11 +313,17 @@ public:
     /**
      * Compute the centroid of an element.
      *
+     * A formula for the centroid of a plane polygon may be found e.g. in the following reference:
+     *
+     * Mechanics of Materials
+     * James M. Gere (Author), Barry J. Goodno.
+     * Cengage Learning; 8th edition (January 1, 2012)
+     *
      * This needs to be overridden in daughter classes for non-Euclidean metrics.
      *
      * @param index  the global index of a specified vertex element
      *
-     * @return (centroid_x,centroid_y).
+     * @return (centroid_x, centroid_y).
      */
     virtual c_vector<double, SPACE_DIM> GetCentroidOfElement(unsigned index);
 
@@ -385,10 +390,6 @@ public:
      * @return the surfacearea of the element
      */
     virtual double GetSurfaceAreaOfElement(unsigned index);
-
-    //////////////////////////////////////////////////////////////////////
-    //                        2D-specific methods                       //
-    //////////////////////////////////////////////////////////////////////
 
     /**
      * Compute the area gradient of a 2D element at one of its nodes.
@@ -491,10 +492,6 @@ public:
      */
     double GetElongationShapeFactorOfElement(unsigned elementIndex);
 
-    //////////////////////////////////////////////////////////////////////
-    //                        3D-specific methods                       //
-    //////////////////////////////////////////////////////////////////////
-
     /**
      * Compute the unit normal vector to a given face in 3D. This is achieved from a triangle
      * of vertices of the face. Note: this may return the outward or inward normal, depending
@@ -575,10 +572,6 @@ public:
      * @return its neighbouring element indices
      */
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
-
-    //////////////////////////////////////////////////////////////////////
-    //                         Nested classes                           //
-    //////////////////////////////////////////////////////////////////////
 
     /**
      * A smart iterator over the elements in the mesh.
@@ -740,6 +733,5 @@ bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::IsAllowedElement
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());
 }
-
 
 #endif /*VERTEXMESH_HPP_*/
