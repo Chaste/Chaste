@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToVtkConverter.hpp"
 #include "Hdf5ToTxtConverter.hpp"
 #include "Hdf5ToMeshalyzerConverter.hpp"
+#include "Hdf5ToXdmfConverter.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
@@ -425,6 +426,41 @@ public:
         // Compare the time information file
         FileComparison(test_output_directory + output_dir + "/output/many_variables_times.info",
                        "heart/test/data/many_variables/many_variables_times.info").CompareFiles();
+    }
+
+    /**
+    * This tests the HDF5 to XDMF converter
+    */
+    void TestHdf5ToXdmfConverter() throw(Exception)
+    {
+        std::string working_directory = "TestHdf5ToXdmfConverter";
+
+        CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
+                                  working_directory);
+
+        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Convert
+        Hdf5ToXdmfConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+                                           "cube_2mm_12_elements",
+                                           &mesh);
+
+        /*std::vector<std::string> files_to_compare;
+            files_to_compare.push_back("cube_2mm_12_elements_V_0.txt");
+            files_to_compare.push_back("cube_2mm_12_elements_V_1.txt");
+            files_to_compare.push_back("cube_2mm_12_elements_Phi_e_0.txt");
+            files_to_compare.push_back("cube_2mm_12_elements_Phi_e_1.txt");
+
+            for (unsigned i=0; i<files_to_compare.size(); i++)
+            {
+                std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
+                FileFinder generated_file(working_directory +"/txt_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);
+                FileFinder reference_file("pde/test/data/" + files_to_compare[i], RelativeTo::ChasteSourceRoot);
+                FileComparison comparer(generated_file, reference_file);
+                TS_ASSERT(comparer.CompareFiles());
+            }*/
     }
 };
 

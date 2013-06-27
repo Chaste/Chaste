@@ -43,15 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Xerces is currently not supported in the Windows port
 #ifndef _MSC_VER
 
-// Mandatory for using any feature of Xerces.
 #include <xercesc/util/PlatformUtils.hpp>
-// DOM (if you want SAX, then that's a different include)
 #include <xercesc/dom/DOM.hpp>
-// Required for outputing a Xerces DOMDocument
-// to a standard output stream (Also see: XMLFormatTarget)
-#include <xercesc/framework/StdOutFormatTarget.hpp>
-// Required for outputing a Xerces DOMDocument
-// to the file system (Also see: XMLFormatTarget)
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xsd/cxx/xml/string.hxx>
 
@@ -63,9 +56,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define X(str) xsd::cxx::xml::string(str).c_str()
 #endif //X
 
-#if _XERCES_VERSION >= 30000
-///\todo
-#endif
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* p_grid_element,
+                                                            XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* p_DOM_document)
+{
+    /*
+     * Do nothing (but get overloaded elsewhere!)
+     */
+}
 
 #endif // _MSC_VER
 
@@ -73,7 +71,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::XdmfMeshWriter(const std::string& rDirectory,
                                                        const std::string& rBaseName,
                                                        const bool clearOutputDir)
-    : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir)
+    : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
+      mNumberOfTimePoints(1u)
 {
 }
 
@@ -281,44 +280,113 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     // Initialize Xerces.
     XMLPlatformUtils::Initialize();
 
-    // Pointer to our DOMImplementation.
     DOMImplementation* p_DOM_implementation = DOMImplementationRegistry::getDOMImplementation(X("core"));
 
-    // Pointer to a DOMDocument.
     DOMDocumentType* p_DOM_document_type = p_DOM_implementation->createDocumentType(X("Xdmf"),0,X("Xdmf.dtd"));
-    DOMDocument * p_DOM_document = p_DOM_implementation->createDocument(0, X("Xdmf"), p_DOM_document_type);
+    DOMDocument* p_DOM_document = p_DOM_implementation->createDocument(0, X("Xdmf"), p_DOM_document_type);
     DOMElement* p_root_element = p_DOM_document->getDocumentElement();
     p_root_element->setAttribute(X("Version"), X("2.0"));
     p_root_element->setAttribute(X("xmlns:xi"), X("http://www.w3.org/2001/XInclude"));
 
-    // Create an Element node, then fill in some attributes,
-    // and then append this to the root element.
     DOMElement* p_domain_element =  p_DOM_document->createElement(X("Domain"));
     p_root_element->appendChild(p_domain_element);
 
-    DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
-    p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
-    p_grid_collection_element->setAttribute(X("GridType"), X("Collection"));
-    p_domain_element->appendChild(p_grid_collection_element);
+    // Temporal collection
+    DOMElement* p_grid_temp_collection_element =  p_DOM_document->createElement(X("Grid"));
+    p_grid_temp_collection_element->setAttribute(X("CollectionType"), X("Temporal"));
+    p_grid_temp_collection_element->setAttribute(X("GridType"), X("Collection"));
+    p_domain_element->appendChild(p_grid_temp_collection_element);
 
-    for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+    // Time values
+    DOMElement* p_time_element =  p_DOM_document->createElement(X("Time"));
+    p_time_element->setAttribute(X("TimeType"), X("HyperSlab"));
+    p_grid_temp_collection_element->appendChild(p_time_element);
+
+    DOMElement* p_time_dataitem_element =  p_DOM_document->createElement(X("DataItem"));
+    p_time_dataitem_element->setAttribute(X("Format"),X("XML"));
+    p_time_dataitem_element->setAttribute(X("NumberType"),X("Float"));
+    p_time_dataitem_element->setAttribute(X("Dimensions"),X("3"));
+    p_time_element->appendChild(p_time_dataitem_element);
+
+    std::stringstream num_time_stream;
+    num_time_stream << mNumberOfTimePoints;
+    DOMText* p_time_text = p_DOM_document->createTextNode(X("0.0 1.0 "+num_time_stream.str()));
+    p_time_element->appendChild(p_time_text);
+    p_time_dataitem_element->appendChild(p_time_text);
+
+    for(unsigned t=0; t<mNumberOfTimePoints; ++t)
     {
-        std::stringstream chunk_stream;
-        chunk_stream << chunk;
 
-        DOMElement* p_grid_element =  p_DOM_document->createElement(X("Grid"));
-        p_grid_element->setAttribute(X("GridType"), X("Uniform"));
-        p_grid_element->setAttribute(X("Name"), X("Chunk_" + chunk_stream.str()));
-        p_grid_collection_element->appendChild(p_grid_element);
+        DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
+        p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
+        p_grid_collection_element->setAttribute(X("GridType"), X("Collection"));
+        //p_grid_collection_element->setAttribute(X("Name"), X("spatial_collection"));
+        p_grid_temp_collection_element->appendChild(p_grid_collection_element);
 
-        DOMElement* p_geom_element =  p_DOM_document->createElement(X("xi:include"));
-        p_geom_element->setAttribute(X("href"), X(this->mBaseName+"_geometry_"+chunk_stream.str()+".xml"));
-        p_grid_element->appendChild(p_geom_element);
-        DOMElement* p_topo_element =  p_DOM_document->createElement(X("xi:include"));
-        p_topo_element->setAttribute(X("href"), X(this->mBaseName+"_topology_"+chunk_stream.str()+".xml"));
-        p_grid_element->appendChild(p_topo_element);
+        if (t>0)
+        {
+            ///\todo #1157 This is uncovered
+ #define COVERAGE_IGNORE
+            NEVER_REACHED;
+            for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+            {
+                std::stringstream chunk_stream;
+                chunk_stream << chunk;
+
+                DOMElement* p_grid_element =  p_DOM_document->createElement(X("Grid"));
+                p_grid_element->setAttribute(X("GridType"), X("Subset"));
+                p_grid_element->setAttribute(X("Section"), X("All"));
+                p_grid_collection_element->appendChild(p_grid_element);
+
+                /*
+                 * p_grid_element may now need an Attribute (node data). Call Annotate,
+                 * which here does nothing, but in pde can be overloaded to print variables
+                 */
+                AddDataOnNodes(p_grid_element, p_DOM_document);
+
+                DOMElement* p_grid_ref_element =  p_DOM_document->createElement(X("Grid"));
+                p_grid_ref_element->setAttribute(X("GridType"), X("Uniform"));
+                p_grid_ref_element->setAttribute(X("Reference"), X("XML"));
+                //p_grid_ref_element->setAttribute(X("Name"), X("Chunk_" + chunk_stream.str()));
+
+                DOMText* p_ref_text = p_DOM_document->createTextNode(X("/Xdmf/Domain/Grid/Grid/Grid[@Name=\"Chunk_"+chunk_stream.str()+"\"]"));
+                p_grid_ref_element->appendChild(p_ref_text);
+                p_grid_element->appendChild(p_grid_ref_element);
+
+            }
+#undef COVERAGE_IGNORE
+        }
+        else // If t==0
+        {
+            for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+            {
+                std::stringstream chunk_stream;
+                chunk_stream << chunk;
+
+                DOMElement* p_grid_element =  p_DOM_document->createElement(X("Grid"));
+                p_grid_element->setAttribute(X("GridType"), X("Uniform"));
+                p_grid_element->setAttribute(X("Name"), X("Chunk_" + chunk_stream.str()));
+                p_grid_collection_element->appendChild(p_grid_element);
+
+                //DOMElement* p_geom_element =  p_DOM_document->createElement(X("Geometry"));
+                //p_geom_element->setAttribute(X("Reference"),X("/Xdmf/Domain/Geometry[1]"));
+                DOMElement* p_geom_element =  p_DOM_document->createElement(X("xi:include"));
+                p_geom_element->setAttribute(X("href"), X(this->mBaseName+"_geometry_"+chunk_stream.str()+".xml"));
+                p_grid_element->appendChild(p_geom_element);
+                //DOMElement* p_topo_element =  p_DOM_document->createElement(X("Topology"));
+                //p_topo_element->setAttribute(X("Reference"),X("/Xdmf/Domain/Topology[1]"));
+                DOMElement* p_topo_element =  p_DOM_document->createElement(X("xi:include"));
+                p_topo_element->setAttribute(X("href"), X(this->mBaseName+"_topology_"+chunk_stream.str()+".xml"));
+                p_grid_element->appendChild(p_topo_element);
+
+                /*
+                 * p_grid_element may now need an Attribute (node data). Call Annotate,
+                 * which here does nothing, but in pde can be overloaded to print variables
+                 */
+                AddDataOnNodes(p_grid_element, p_DOM_document);
+            }
+        }
     }
-
     // Create a Comment node, and then append this to the root element.
     DOMComment* p_provenance_comment = p_DOM_document->createComment(X(" "+ChasteBuildInfo::GetProvenanceString()));
     p_DOM_document->appendChild(p_provenance_comment);
@@ -337,7 +405,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     p_serializer->writeNode(p_target, *p_DOM_document);
 #endif
 
-    // Cleanup.
+    // Cleanup
     p_serializer->release();
     p_DOM_document->release();
     delete p_target;
@@ -355,6 +423,3 @@ template class XdmfMeshWriter<1,3>;
 template class XdmfMeshWriter<2,2>; // Actually used
 template class XdmfMeshWriter<2,3>;
 template class XdmfMeshWriter<3,3>; // Actually used
-
-
-

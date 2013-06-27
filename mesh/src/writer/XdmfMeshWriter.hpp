@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define XDMFMESHWRITER_HPP_
 
 #include "AbstractTetrahedralMeshWriter.hpp"
-
+#include <xercesc/dom/DOM.hpp>
 
 /**
  * A class for writing from a Chaste mesh to the geometry/topology components of
@@ -47,11 +47,24 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class XdmfMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+    unsigned mNumberOfTimePoints; /**< Defaults to 1, when we are writing geometry only.  Used in HDF5 converter.*/
     /**
      * Write the master file.  This just contains references to the geometry/topology files.
      * @param numberOfChunks  is the number of geometric pieces which is 1 for sequential code and for non-distributed meshes.
      */
     void WriteXdmfMasterFile(unsigned numberOfChunks=1u);
+
+#ifndef _MSC_VER
+    /**
+     * Generate <Attribute>...</Attribute> tags and append to the element.  Here this is a dummy class, but can be
+     * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
+     * @param p_grid_element  Pointer to DOMElement to append <Attribute>...</Attribute> tags to.
+     * @param p_DOM_document  Pointer to DOMDocument to generate new elements
+     */
+    void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* p_grid_element,
+                        XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* p_DOM_document);
+#endif // _MSC_VER
+
 public:
     /**
      * Constructor.
