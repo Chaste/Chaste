@@ -71,9 +71,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <unistd.h> // For chdir() and getpid()
 #include <sys/stat.h> // For chmod()
+/** Mode for chmod() to set readonly permissions for everyone. */
 #define CHASTE_READONLY 0444
+/** Mode for chmod() to set read & execute permissions for everyone. */
 #define CHASTE_READ_EXECUTE 0555
+/** Mode for chmod() to set read-write permissions for owner, and readonly for group. */
 #define CHASTE_READ_WRITE 0640
+/** Mode for chmod() to set full permissions for owner, and read-execute for everyone else. */
 #define CHASTE_READ_WRITE_EXECUTE 0755
 
 #endif // _MSC_VER

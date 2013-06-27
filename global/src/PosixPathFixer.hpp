@@ -38,12 +38,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BoostFilesystem.hpp"
 
+/**
+ * A helper class to convert native paths into POSIX syntax.
+ * Mainly for Windows.
+ */
 class ChastePosixPathFixer
 {
 
 public:
-    /**Returns a POSIX string representation of rPath. Mainly for Windows*/
-    static std::string to_posix(const fs::path path);
+    /**
+     * @param path  the native path to convert
+     * @return  a POSIX string representation of path
+     */
+    static std::string ToPosix(const fs::path path);
 
 };
 

@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PosixPathFixer.hpp"
 
-std::string ChastePosixPathFixer::to_posix(const fs::path path)
+std::string ChastePosixPathFixer::ToPosix(const fs::path path)
 {
 #ifdef _MSC_VER
     return path.generic_string();

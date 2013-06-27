@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <cassert>
 #include <iostream>
 #include <petsc.h>
 
@@ -40,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoostFilesystem.hpp"
 #include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
+#include "GetCurrentWorkingDirectory.hpp"
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
 typedef PetscBool PetscTruth;
@@ -61,18 +63,24 @@ Exception::Exception(const std::string& rMessage,
 void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
-    std::string cwd(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath()); 
-    std::string file_path(ChastePosixPathFixer::to_posix(fs::path(rFilename))); 
-    size_t pos = file_path.find(cwd); 
-    std::string rFilename_new = rFilename; 
-    if(pos != std::string::npos) 
-    { 
-        rFilename_new = "./"+rFilename.substr(pos + cwd.length(),rFilename.length()); 
-    } 
+    // Windows returns full path of __FILE__ , whereas the Scons build somehow
+    // generates relative paths. The following fixes this mismatch in rFileName
+#ifdef _MSC_VER
+    std::string relative_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
+    try
+    {
+        std::string cwd = GetCurrentWorkingDirectory();
+        assert(rFilename.substr(0, cwd.length()) == cwd);
+        relative_filename = "." + rFilename.substr(0, cwd.length());
+    }
+    catch (...) {}
+#else
+    const std::string& relative_filename = rFilename;
+#endif // _MSV_VER
     mShortMessage = rMessage;
     std::stringstream line_number_stream;
     line_number_stream << lineNumber;
-    mMessage = std::string("\nChaste error: ") + rFilename_new + ":"  + line_number_stream.str()  + ": " + mShortMessage;
+    mMessage = std::string("\nChaste error: ") + relative_filename + ":"  + line_number_stream.str()  + ": " + mShortMessage;
 }
 
 std::string Exception::GetMessage() const

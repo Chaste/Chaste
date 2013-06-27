@@ -356,8 +356,8 @@ void FileFinder::PrivateRemove(bool dangerous) const
 {
     // Test for bad paths
     const std::string test_output(OutputFileHandler::GetChasteTestOutputDirectory());
-    const std::string test_output_path(ChastePosixPathFixer::to_posix(fs::path(test_output)));
-    const std::string absolute_path(ChastePosixPathFixer::to_posix(fs::path(GetAbsolutePath())));
+    const std::string test_output_path(ChastePosixPathFixer::ToPosix(fs::path(test_output)));
+    const std::string absolute_path(ChastePosixPathFixer::ToPosix(fs::path(GetAbsolutePath())));
     bool in_testoutput = (absolute_path.substr(0, test_output_path.length()) == test_output_path);
 
     if (!in_testoutput)
@@ -365,7 +365,7 @@ void FileFinder::PrivateRemove(bool dangerous) const
         if (dangerous)
         {
             const std::string source_folder(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath());
-            const std::string source_folder_path = ChastePosixPathFixer::to_posix(fs::path(source_folder));
+            const std::string source_folder_path = ChastePosixPathFixer::ToPosix(fs::path(source_folder));
             bool in_source = (absolute_path.substr(0, source_folder_path.length()) == source_folder_path);
             if (!in_source)
             {
