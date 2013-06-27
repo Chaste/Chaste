@@ -14,7 +14,6 @@ include_directories("${CHASTE_ODE_INCLUDE_DIRS}"
 set(COMPONENT_LIBRARIES ode linalg io global)
 file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
 
-#set(TEST_MPIEXEC_ENABLED TRUE)
 chaste_generate_test_suites()
 
 endif(ENABLE_CHASTE_TESTING)

@@ -13,8 +13,6 @@ add_definitions(-D_USE_MATH_DEFINES)#cmath and M_PI
 set(COMPONENT_LIBRARIES mesh linalg global)
 file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
 
-set(TEST_MPIEXEC_ENABLED TRUE)
-
 set(HAS_OWN_LINKER_FLAGS TRUE)
 #GKLib uses/does C-style structured exception handling, using longjmp, 
 #which caused untold headaches -- with MSVC linker errors.

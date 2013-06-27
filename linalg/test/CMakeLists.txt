@@ -11,8 +11,6 @@ include_directories("${CHASTE_LINALG_INCLUDE_DIRS}"
 set(COMPONENT_LIBRARIES linalg global )
 file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
 
-set(TEST_MPIEXEC_ENABLED TRUE)
-
 foreach(test ${TEST_SUITES})
  string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.]hpp" "\\1" testName "${test}")
  chaste_add_test("${testName}Runner" "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testName}.hpp")

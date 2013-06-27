@@ -11,6 +11,8 @@ project(Chaste)
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
 
+option(TEST_MPIEXEC_ENABLED OFF "Whether to run tests in parallel using mpiexec, or sequentially as normal executables.")
+
 if(RUN_TESTS)
 set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;ProfileAssembly;Profile")
 foreach(type ${TestPackTypes})
