@@ -56,9 +56,9 @@ private:
 
 #ifndef _MSC_VER
     /**
-     * Generate <Attribute>...</Attribute> tags and append to the element.  Here this is a dummy class, but can be
+     * Generate Attribute tags and append to the element.  Here this is a dummy class, but can be
      * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
-     * @param p_grid_element  Pointer to DOMElement to append <Attribute>...</Attribute> tags to.
+     * @param p_grid_element  Pointer to DOMElement to append Attribute tags to.
      * @param p_DOM_document  Pointer to DOMDocument to generate new elements
      */
     void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* p_grid_element,
