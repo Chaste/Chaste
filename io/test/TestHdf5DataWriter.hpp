@@ -38,6 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <sys/stat.h> // For chmod()
+#include <cstring> // For strcpy
+
 #include "Hdf5DataWriter.hpp"
 #include "Hdf5DataReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
