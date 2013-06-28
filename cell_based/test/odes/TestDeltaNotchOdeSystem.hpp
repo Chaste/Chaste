@@ -52,6 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestDeltaNotchOdeSystem : public CxxTest::TestSuite
 {
