@@ -56,7 +56,11 @@ import imp
 import os
 import sys
 import time
-import unittest
+
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 class TestTest(unittest.TestCase):
     """A simple test case for testing the framework."""
