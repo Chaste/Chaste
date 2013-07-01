@@ -405,36 +405,44 @@ def FindTestsToRun(env, build, BUILD_TARGETS, otherVars,
                 except OSError:
                     pass
     else:
-        # Are we building this component/project?
+        # Are we building (some of) this component/project?
         test_this_comp = False
+        test_subset_folders = []
         root_dir = Dir('#').abspath
-        this_comp_targets = ['.', root_dir]
+        this_comp_targets = set(['.', root_dir])
         if not project and component in env['CHASTE_COMP_DEPS']['core']:
-            this_comp_targets.append('core')
+            this_comp_targets.add('core')
         if project:
-            this_comp_targets.extend(
-                [os.path.join('projects', project),
-                 os.path.join(root_dir, 'projects', project)])
+            comp_path = os.path.join('projects', project)
         else:
-            this_comp_targets.extend([component,
-                                      os.path.join(root_dir, component)])
-        #print map(str, BUILD_TARGETS)
-        #print component, project, this_comp_targets
+            comp_path = component
+        this_comp_targets.add(comp_path)
+        this_comp_targets.add(os.path.join(root_dir, comp_path))
+        test_root_path = os.path.join(comp_path, 'test') + os.sep
+#        print map(str, BUILD_TARGETS)
+#        print component, project, this_comp_targets
         for targ in BUILD_TARGETS:
-            if str(targ).endswith(os.sep):
-                # Allow users to specify (e.g.) "global/" as a target
-                # (handy for use with tab completion).
-                targ = str(targ)[:-len(os.sep)]
-            if str(targ) in this_comp_targets:
+            targ = str(targ)
+            if targ.endswith(os.sep):
+                # Allow users to specify (e.g.) "global/" as a target (handy for use with tab completion)
+                targ = targ[:-len(os.sep)]
+            if targ in this_comp_targets:
                 test_this_comp = True
                 break
-        if test_this_comp:
+            if targ.startswith(test_root_path):
+                # A particular test folder has been given
+                test_subset_folders.append(targ[len(test_root_path):])
+        if test_this_comp or test_subset_folders:
             if otherVars['all_tests']:
                 pack_names = set()
             else:
                 pack_names = set(build.TestPacks())
-            testfiles.update(BuildTools.GetTestsInTestPacks('../../test', pack_names))
-    #print component, project, testfiles
+            if test_this_comp:
+                testfiles.update(BuildTools.GetTestsInTestPacks('../../test', pack_names))
+            else:
+                for folder in test_subset_folders:
+                    testfiles.update(BuildTools.GetTestsInTestPacks('../../test', pack_names, subfolder=folder))
+#    print component, project, testfiles
     return testfiles
 
 

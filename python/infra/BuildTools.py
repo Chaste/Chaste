@@ -69,10 +69,11 @@ except AttributeError:
 
 
 
-def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False):
+def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False, subfolder=''):
     """Generate a set of all test files listed in test pack files under the given folder.
     
     If packNames is non-empty, only test packs with matching names will be considered.
+    If subfolder is given, only test packs under that folder will be considered.
     """
     pack_suffix = 'TestPack.txt'
     suffix_len = len(pack_suffix)
@@ -94,8 +95,10 @@ def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False):
                             # Ignore empty lines and duplicates
                             rel_testfile = rel_testfile.strip()
                             if rel_testfile:
-                                testfiles.add(relpath(os.path.join(dirpath, rel_testfile.strip()),
-                                                      testRootDir))
+                                rel_test_path = relpath(os.path.join(dirpath, rel_testfile.strip()),
+                                                        testRootDir)
+                                if rel_test_path.startswith(subfolder):
+                                    testfiles.add(rel_test_path)
                         pack_file.close()
                     except IOError:
                         pass
