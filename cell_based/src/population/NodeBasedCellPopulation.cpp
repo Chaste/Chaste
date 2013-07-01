@@ -493,6 +493,11 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
     VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+
+    // Make sure the nodes are ordered contiguously in memory.
+    NodeMap map(1 + this->mpNodesOnlyMesh->GetMaximumNodeIndex());
+    this->mpNodesOnlyMesh->ReMesh(map);
+
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
     unsigned num_nodes = GetNumNodes();
