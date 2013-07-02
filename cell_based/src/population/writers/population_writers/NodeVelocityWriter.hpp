@@ -33,36 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLMUTATIONSTATESWRITER_HPP_
-#define CELLMUTATIONSTATESWRITER_HPP_
+#ifndef NODEVELOCITYWRITER_HPP_
+#define NODEVELOCITYWRITER_HPP_
 
+#include "OutputFileHandler.hpp"
+#include "AbstractCellPopulation.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 
-/** A class written using the visitor pattern for writing cell mutations states from a cell population to file. */
+#include <string>
+
+/**
+ * A class written using the visitor pattern for writing the velocities of the nodes
+ * associated with a cell population to file.
+ *
+ * \todo some code duplication in methods; potential for refactoring (#2404)
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellMutationStatesWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class NodeVelocityWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
 public:
 
     /**
-     * Default constructor
+     * Default constructor.
+     *
      * @param directory the path to the directory in to which this class should write.
      */
-    CellMutationStatesWriter(std::string directory);
-
-    /**
-     * Write the header to file
-     * @param pCellPopulation a pointer to the population to be written.
-     *
-     */
-    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
-
-    /**
-     * A general method for writing to any population
-     *
-     * @param pCellPopulation the population to write.
-     */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    NodeVelocityWriter(std::string directory);
 
     /**
      * Visit the population and write the data.
@@ -100,4 +96,4 @@ public:
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
-#endif /*CELLMUTATIONSTATESWRITER_HPP_*/
+#endif /*NODEVELOCITYWRITER_HPP_*/

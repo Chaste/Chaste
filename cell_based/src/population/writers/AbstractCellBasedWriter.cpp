@@ -56,7 +56,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile()
 {
     OutputFileHandler output_file_handler(mDirectory, false);
-
     mpOutStream = output_file_handler.OpenOutputFile(mFileName);
 }
 
@@ -64,7 +63,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend()
 {
     OutputFileHandler output_file_handler(mDirectory, false);
-
     mpOutStream = output_file_handler.OpenOutputFile(mFileName, std::ios::app);
 }
 

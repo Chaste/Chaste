@@ -64,7 +64,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the vertex based cell population population to visit.
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -85,7 +85,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
+     * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
@@ -94,7 +94,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
+     * @param pCellPopulation a pointer to the MultipleCaBasedCellPopulation to visit.
      */
     virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -103,7 +103,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
+     * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -112,7 +112,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the potts based cell population population to visit.
+     * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -139,7 +139,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the vertex based cell population population to visit.
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -160,7 +160,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the mesh based cell population population to visit.
+     * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
@@ -169,7 +169,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the mutliple-ca based cell population population to visit.
+     * @param pCellPopulation a pointer to the MultipleCaBasedCellPopulation to visit.
      */
     virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -178,7 +178,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the node based cell population population to visit.
+     * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
@@ -187,7 +187,7 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the potts based cell population population to visit.
+     * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
     {
