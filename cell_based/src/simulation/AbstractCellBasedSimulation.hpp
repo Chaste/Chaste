@@ -239,9 +239,16 @@ protected:
     virtual void UpdateCellPopulation();
 
     /**
-     * Updates the locations and topology of cells, must be defined in subclasses.
+     * Update the cell locations and topology (connectivity) of the cell population. This method
+     * is called within the main time loop of Solve() and is pure virtual in the parent class,
+     * so must be overridden.
      *
-     * For example this calculates forces and updates node positions in off lattice simulations.
+     * In the case of an OffLatticeSimulation, the method computes the force acting on each node
+     * (corresponding to a cell in centre-based models and to a vertex in vertex-based models)
+     * and integrates equations of motion to find the new position of each node.
+     *
+     * In the case of an OnLatticeSimulation, the method performs Monte Carlo updating of the cell
+     * population, through a call to UpdateCellLocations() on the cell population object.
      */
     virtual void UpdateCellLocationsAndTopology()=0;
 
@@ -391,14 +398,52 @@ public:
     void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
-     * Main solve method.
+     * Main Solve() method, used to evolve the cell population. Note that prior to calling Solve()
+     * we must have called SetEndTime(). We may also have optionally called SetDt(); if not, then
+     * a default time step is used.
      *
-     * This method sets up the simulation time, creates output files, and initialises the
-     * cell population. It then iterates through a time loop. At each time step, first any cell death
-     * or birth is implemented, then the cell population topology is updated, then the forces are
-     * recalculated and the cell population evolved according to whatever force laws are present in
-     * the simulation, and finally the results for that time step are output to file. At the
-     * end of the time loop, the method closes any output files.
+     * The Solve() method proceeds as follows.
+     *
+     * Setting up:
+     *
+     * First, we set up SimulationTime, which (i) provides a globally consistent time, accessible
+     * to all other classes in the cell_based code and (ii) handles any rounding issues when the
+     * time step does not exactly divide the end time.
+     *
+     * Next, we create output files. We then call SetupSolve(), which is empty in the parent class
+     * but may be overridden, e.g. to open additional output files. We then call SetupSolve() on
+     * any member objects inheriting from AbstractCellBasedSimulationModifier. This class hierarchy
+     * allows the user to introduce new ways of updating the cell population within the simulation.
+     *
+     * Next, we set up each cell by calling ReadyToDivide() on it, which updates the cell's age and
+     * cell cycle model. Finally, we call WriteVisualizerSetupFile() and OutputSimulationSetup(),
+     * as well as WriteResultsToFiles() on the cell population, to record the initial configration.
+     * This completes the set up process.
+     *
+     * The main time loop:
+     *
+     * At each time step, we begin by calling UpdateCellPopulation(), which implements any cell
+     * deaths and cell divisions through DoCellRemoval() and DoCellBirth() respectively. We then
+     * update the correspondence between cells and the mesh by calling Update() on the cell
+     * population.
+     *
+     * Next, we call UpdateCellLocationsAndTopology(), which is pure virtual in the parent class so
+     * must be overridden. As the cell population has been updated, we then increment
+     * SimulationTime by one time step. We then call UpdateAtEndOfTimeStep(), which is empty in the
+     * parent class but may be overridden, e.g. to write additional output. We also call
+     * UpdateAtEndOfTimeStep() on any member objects inheriting from AbstractCellBasedSimulationModifier
+     * in an analogous manner to the calls to SetupSolve() prior to entering the main time loop.
+     *
+     * The last step within the main time loop is to output the present results to file.
+     *
+     * Finishing up:
+     *
+     * After exiting the main time loop, we call UpdateCellPopulation() in order to carry out a final
+     * update of the cell population. We then call UpdateAtEndOfSolve(), which is empty in the parent
+     * class but may be overridden, e.g. to close additional output files. We also call
+     * UpdateAtEndOfSolve()} on any member objects inheriting from AbstractCellBasedSimulationModifier
+     * in an analogous manner to the aforementioned calls to SetupSolve() UpdateAtEndOfTimeStep().
+     * Finally, we close output files. This completes the Solve() method.
      */
     void Solve();
 
