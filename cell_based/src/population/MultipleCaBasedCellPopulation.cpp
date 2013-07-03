@@ -245,7 +245,7 @@ CellPtr MultipleCaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_ve
 
     assert(total_propensity>0); // if this trips the cell cant divided so need to include this in the IsSiteAvailable method
 
-    for(unsigned i = 0; i< num_neighbours; i++)
+    for (unsigned i=0; i<num_neighbours; i++)
     {
         neighbouring_node_propensities[i] /= total_propensity;
     }

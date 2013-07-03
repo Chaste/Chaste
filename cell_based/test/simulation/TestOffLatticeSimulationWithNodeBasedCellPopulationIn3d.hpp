@@ -78,32 +78,30 @@ public:
 
     void Test3dNodeBasedRestrictedToSphere() throw (Exception)
     {
-        // Create mesh
+        // Create a simple 3D NodeBasedCellPopulation
         std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false,  0.5, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, -0.5, 0.0, 0.0));
 
-        nodes.push_back(new Node<3>(0u,  false,  0.5, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1u,  false,  -0.5, 0.0, 0.0));
-
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
-        // Create a node-based cell population
         NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
+
+        // Set output options
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
+        node_based_cell_population.SetOutputNodeVelocities(true);
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("NodeBased3dOnSphere");
         simulator.SetSamplingTimestepMultiple(120);
         simulator.SetEndTime(10.0); // 50.0
-        simulator.SetOutputNodeVelocities(true);
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
@@ -147,23 +145,19 @@ public:
     {
         EXIT_IF_PARALLEL;    // Output doesn't work in parallel so we cannot solve a simulation #2365
 
-        // Create mesh
+        // Create a simple 3D NodeBasedCellPopulation
         std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, false,  1.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, false, -1.0, 0.0, 0.0));
 
-        nodes.push_back(new Node<3>(0u,  false,  1.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1u,  false,  -1.0, 0.0, 0.0));
-
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
-        // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
-        // Create a node-based cell population
         NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
 

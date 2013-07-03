@@ -172,8 +172,8 @@ void CellBasedPdeHandler<DIM>::UpdateCellPdeElementMap()
 template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 {
-    //if appropriate make a coarse mesh which overlays (exactly) the lattice sites of a PottsMesh (used for all OnLattice simulations)
-    if((dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
+    // If appropriate, make a coarse mesh which exactly overlays the lattice sites of a PottsMesh (used for all OnLattice simulations)
+    if ((dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
     {
         assert(DIM ==2);
         ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();

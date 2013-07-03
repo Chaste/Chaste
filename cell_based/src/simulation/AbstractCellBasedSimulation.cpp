@@ -410,6 +410,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     }
 
     mrCellPopulation.WriteResultsToFiles();
+
     OutputSimulationSetup();
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
 

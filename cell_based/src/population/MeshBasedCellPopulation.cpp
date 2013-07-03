@@ -67,12 +67,20 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
       mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
-    // This must always be true
+
     assert(this->mCells.size() <= this->mrMesh.GetNumNodes());
 
     if (validate)
     {
         Validate();
+    }
+
+    // Initialise the applied force at each node to zero
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        node_iter->ClearAppliedForce();
     }
 }
 
@@ -255,34 +263,64 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrDeaths)
 {
-    NodeMap map(static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).GetNumAllNodes());
-    static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).ReMesh(map);
-
-    if (!map.IsIdentityMap())
+    ///\todo check if there is a more efficient way of keeping track of node velocity information (#2404)
+    std::map<unsigned, c_vector<double, SPACE_DIM> > old_node_applied_force_map;
+    old_node_applied_force_map.clear();
+    if (this->mOutputNodeVelocities)
     {
-        UpdateGhostNodesAfterReMesh(map);
+        /*
+         * If outputting node velocities, we must keep a record of the applied force at each
+         * node, since this will be cleared during the remeshing process. We then restore
+         * these attributes to the nodes after calling ReMesh().
+         */
+        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+             node_iter != this->mrMesh.GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+            old_node_applied_force_map[node_index] = node_iter->rGetAppliedForce();
+        }
+    }
+
+    NodeMap node_map(static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).GetNumAllNodes());
+    static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).ReMesh(node_map);
+
+    if (!node_map.IsIdentityMap())
+    {
+        UpdateGhostNodesAfterReMesh(node_map);
 
         // Update the mappings between cells and location indices
-        std::map<Cell*, unsigned> old_map = this->mCellLocationMap;
+        std::map<Cell*, unsigned> old_cell_location_map = this->mCellLocationMap;
 
         // Remove any dead pointers from the maps (needed to avoid archiving errors)
         this->mLocationCellMap.clear();
         this->mCellLocationMap.clear();
 
-        for (std::list<CellPtr>::iterator it = this->mCells.begin();
-             it != this->mCells.end();
-             ++it)
+        for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
         {
-            unsigned old_node_index = old_map[(*it).get()];
+            unsigned old_node_index = old_cell_location_map[(*it).get()];
 
             // This shouldn't ever happen, as the cell vector only contains living cells
-            assert(!map.IsDeleted(old_node_index));
+            assert(!node_map.IsDeleted(old_node_index));
 
-            unsigned new_node_index = map.GetNewIndex(old_node_index);
+            unsigned new_node_index = node_map.GetNewIndex(old_node_index);
             this->SetCellUsingLocationIndex(new_node_index,*it);
+
+            if (this->mOutputNodeVelocities)
+            {
+                this->GetNode(new_node_index)->AddAppliedForceContribution(old_node_applied_force_map[old_node_index]);
+            }
         }
 
         this->Validate();
+    }
+    else if (this->mOutputNodeVelocities)
+    {
+        for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
+        {
+            unsigned node_index = this->mCellLocationMap[(*it).get()];
+            this->GetNode(node_index)->AddAppliedForceContribution(old_node_applied_force_map[node_index]);
+        }
     }
 
     // Purge any marked springs that are no longer springs

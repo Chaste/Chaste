@@ -430,7 +430,6 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(3u)->GetCellId(), 455u);
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(4u)->GetCellId(), 456u);
 
-
         // Check rest lengths
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(1,2), 1.0, 1e-6);
@@ -463,10 +462,30 @@ public:
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Specify that one cell should be removed
         cells[27]->StartApoptosis();
 
         // Create a cell population without ghost nodes
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Specify node velocities to be output, and set non-zero applied forces on some nodes
+        cell_population.SetOutputNodeVelocities(true);
+
+        c_vector<double, 2> applied_force_on_node_0;
+        applied_force_on_node_0[0] = 4.5;
+        applied_force_on_node_0[1] = 4.8;
+        cell_population.GetNode(0)->AddAppliedForceContribution(applied_force_on_node_0);
+
+        c_vector<double, 2> applied_force_on_node_18;
+        applied_force_on_node_18[0] = 3.0;
+        applied_force_on_node_18[1] = 1.9;
+        cell_population.GetNode(18)->AddAppliedForceContribution(applied_force_on_node_18);
+
+        c_vector<double, 2> applied_force_on_node_42;
+        applied_force_on_node_42[0] = 0.1;
+        applied_force_on_node_42[1] = 2.8;
+        cell_population.GetNode(42)->AddAppliedForceContribution(applied_force_on_node_42);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 81u);
@@ -492,9 +511,23 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 80u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 80u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 80u);
-        TS_ASSERT_DIFFERS(cell_population.rGetCells().size(), cells.size()); // CellPopulation now copies cells
+        TS_ASSERT_DIFFERS(cell_population.rGetCells().size(), cells.size());
 
         cell_population.Update();
+
+        // Test that, node velocities are to be output, the Update() preserved the applied force on each node
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 4.5, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 4.8, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(18)->rGetAppliedForce()[0], 3.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(18)->rGetAppliedForce()[1], 1.9, 1e-6);
+
+        // Note that a cell has been removed, so node indices above 26 have all decreased by one
+        TS_ASSERT_DELTA(cell_population.GetNode(41)->rGetAppliedForce()[0], 0.1, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(41)->rGetAppliedForce()[1], 2.8, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(42)->rGetAppliedForce()[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetNode(42)->rGetAppliedForce()[1], 0.0, 1e-6);
 
         // For coverage
         NodeMap map(mesh.GetNumAllNodes());

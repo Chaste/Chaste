@@ -11,3 +11,4 @@
 		<OutputCellCyclePhases>1</OutputCellCyclePhases>
 		<OutputCellAges>1</OutputCellAges>
 		<OutputCellVolumes>1</OutputCellVolumes>
+		<OutputNodeVelocities>0</OutputNodeVelocities>

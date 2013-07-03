@@ -86,7 +86,6 @@ private:
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM> >(*this);
         archive & mForceCollection;
         archive & mBoundaryConditions;
-        archive & mOutputNodeVelocities;
     }
 
 protected:
@@ -96,12 +95,6 @@ protected:
 
     /** List of boundary conditions. */
     std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM> > > mBoundaryConditions;
-
-    /** Whether to write the node velocities to a file. */
-    bool mOutputNodeVelocities;
-
-    /** Results file node velocities. */
-    out_stream mpNodeVelocitiesFile;
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
@@ -189,18 +182,6 @@ public:
      * Method to remove all the cell population boundary conditions
      */
     void RemoveAllCellPopulationBoundaryConditions();
-
-    /**
-     * @return mOutputNodeVelocities
-     */
-    bool GetOutputNodeVelocities();
-
-    /**
-     * Set mOutputNodeVelocities.
-     *
-     * @param outputNodeVelocities the new value of mOutputNodeVelocities
-     */
-    void SetOutputNodeVelocities(bool outputNodeVelocities);
 
     /**
      * Overridden OutputAdditionalSimulationSetup method to output the force and cell

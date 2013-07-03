@@ -66,7 +66,6 @@ void DeltaNotchTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>
     UpdateCellData(rCellPopulation);
 }
 
-
 template<unsigned DIM>
 void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
@@ -132,7 +131,6 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         }
     }
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

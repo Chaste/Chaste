@@ -47,32 +47,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 
 #include "AbstractCellBasedTestSuite.hpp"
-
 #include "SmartPointers.hpp"
-#include "OutputFileHandler.hpp"
-#include "SimulationTime.hpp"
-
 #include "OffLatticeSimulation.hpp"
-
 #include "VolumeTrackingModifier.hpp"
-
 #include "ContactInhibitionCellCycleModel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
-
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
-
-#include "MutableMesh.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "NodesOnlyMesh.hpp"
-#include "MutableVertexMesh.hpp"
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 
@@ -84,16 +72,14 @@ public:
 
     void TestNodeBasedSimulationWithContactInhibition()
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
+        // Create a simple 2D NodeBasedCellPopulation
         HoneycombMeshGenerator generator(5, 5, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
-
-        // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
-        // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
@@ -112,25 +98,23 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create a node-based cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
+        cell_population.SetOutputNodeVelocities(true);
 
-        // Create a simulator
+        // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestNodeBasedSimulationWithVolumeTracked");
-        //TS_ASSERT_EQUALS(simulator.GetEndTime(), 10.0);
-        TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); //Default for off-lattice
+
+        TS_ASSERT_EQUALS(simulator.GetDt(), 1.0/120.0); // Default value for off-lattice simulations
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        simulator.SetOutputNodeVelocities(true);
-
-        // Add volume-tracking modifier
+        // Create a volume-tracking modifier and pass it to the simulation
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        // Create a force law
+        // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -173,13 +157,12 @@ public:
 
     void TestMeshBasedSimulationWithContactInhibition()
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
-        // Create a simple mesh
+        // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(3, 3);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
@@ -198,21 +181,20 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Create a  simulator
+        // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithVolumeTracked");
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Add volume-tracking modifier
+        // Create a volume-tracking modifier and pass it to the simulation
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        // Create a force law
+        // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -249,13 +231,11 @@ public:
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel.
 
-        // Create a simple mesh
+        // Create a simple 2D MeshBasedCellPopulationWithGhostNodes
         HoneycombMeshGenerator generator(3, 3, 3);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-        // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
@@ -274,62 +254,60 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create a cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells,location_indices);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Create a simulator
+        // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestMeshBasedSimulationWithGhostNodesAndVolumeTracked");
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Add volume-tracking modifier
+        // Create a volume-tracking modifier and pass it to the simulation
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        // Create a force law
+        // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
         // Run simulation
-         simulator.Solve();
+        simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData at the first timestep
-         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-              cell_iter != cell_population.End();
-              ++cell_iter)
-         {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
-         }
+        // Test that the volumes of the cells are correct in CellData at the first timestep
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+        }
 
-         simulator.SetEndTime(2.0);
+        simulator.SetEndTime(2.0);
 
-         // Run simulation
-         simulator.Solve();
+        // Run simulation
+        simulator.Solve();
 
-         // Test that the volumes of the cells are correct in CellData at the end time
-         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-              cell_iter != cell_population.End();
-              ++cell_iter)
-         {
-             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
-         }
+        // Test that the volumes of the cells are correct in CellData at the end time
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+        }
 
-         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-         TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 12u);
+        // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 12u);
     }
 
     void TestVertexBasedSimulationWithContactInhibition()
     {
-        EXIT_IF_PARALLEL;    // Output in cell-based simulations doesn't work in parallel. ///\todo #2356
+        EXIT_IF_PARALLEL;    // Output in cell-based simulations doesn't work in parallel ///\todo #2356
 
-        // Create a simple 2D MutableVertexMesh
+        // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Create cell state
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         std::vector<CellPtr> cells;
@@ -349,24 +327,22 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetOutputCellMutationStates(true);
         cell_population.SetOutputCellVolumes(true);
 
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-
-        // Create a simulator
+        // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVertexBasedSimulationWithVolumeTracked");
-        simulator.AddForce(p_nagai_honda_force);
-
         simulator.SetEndTime(simulator.GetDt()/2.0);
 
-        // Add volume-tracking modifier
+        // Create a volume-tracking modifier and pass it to the simulation
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+        simulator.AddForce(p_nagai_honda_force);
 
         // Run simulation
         simulator.Solve();
@@ -400,15 +376,13 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a simple mesh
+        // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Create cell state
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         std::vector<CellPtr> cells;
-
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
@@ -426,23 +400,22 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create a cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create a force law
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        p_force->SetCutOffLength(1.5);
 
         // Create a contact inhibition simulator
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestVolumeTrackedOffLatticeSimulationSaveAndLoad");
         double end_time = 0.01;
         simulator.SetEndTime(end_time);
-        simulator.AddForce(p_force);
 
-        // Add volume-tracking modifier
+        // Create a volume-tracking modifier and pass it to the simulation
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
+
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Run simulation
         simulator.Solve();

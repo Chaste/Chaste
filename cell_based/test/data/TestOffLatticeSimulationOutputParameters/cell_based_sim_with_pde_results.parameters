@@ -1,4 +1,3 @@
-		<OutputNodeVelocities>0</OutputNodeVelocities>
 		<CellBasedPdeHandler-2>
 		<WriteAverageRadialPdeSolution>0</WriteAverageRadialPdeSolution>
 		<WriteDailyAverageRadialPdeSolution>0</WriteDailyAverageRadialPdeSolution>

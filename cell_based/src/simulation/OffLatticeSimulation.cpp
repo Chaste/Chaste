@@ -50,8 +50,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                 bool deleteCellPopulationInDestructor,
                                                 bool initialiseCells)
-    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
-      mOutputNodeVelocities(false)
+    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
 {
     if (!dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
     {
@@ -278,92 +277,23 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePositions()
             EXCEPTION("The cell population boundary conditions are incompatible.");
         }
     }
-
-    // Write node velocities to file if required
-    if (mOutputNodeVelocities)
-    {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
-        PetscTools::BeginRoundRobin();
-        {
-            if (!PetscTools::AmMaster() || SimulationTime::Instance()->GetTimeStepsElapsed() != 0)
-            {
-                mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat", std::ios::app);
-            }
-
-            if (SimulationTime::Instance()->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0)
-            {
-                *mpNodeVelocitiesFile << SimulationTime::Instance()->GetTime() << "\t";
-
-                for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
-                     node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
-                     ++node_iter)
-                {
-                    unsigned node_index = node_iter->GetIndex();
-
-                    // We should never encounter deleted nodes due to where this method is called by Solve()
-                    assert(!node_iter->IsDeleted());
-
-                    // Check that results should be written for this node
-                    bool is_real_node = true;
-
-                    if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&this->mrCellPopulation))
-                    {
-                        if (static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->IsGhostNode(node_index))
-                        {
-                            // If this node is a ghost node then don't record its velocity
-                            is_real_node = false;
-                        }
-                        else
-                        {
-                            // We should never encounter nodes associated with dead cells due to where this method is called by Solve()
-                            assert(!this->mrCellPopulation.GetCellUsingLocationIndex(node_index)->IsDead());
-                        }
-                    }
-
-                    // Write node data to file
-                    if (is_real_node)
-                    {
-                        const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
-                        double damping_constant = static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation))->GetDampingConstant(node_index);
-                        c_vector<double, SPACE_DIM> velocity = this->mDt * node_iter->rGetAppliedForce() / damping_constant;
-
-                        *mpNodeVelocitiesFile << node_index  << " ";
-                        for (unsigned i=0; i<SPACE_DIM; i++)
-                        {
-                            *mpNodeVelocitiesFile << position[i] << " ";
-                        }
-                        for (unsigned i=0; i<SPACE_DIM; i++)
-                        {
-                            *mpNodeVelocitiesFile << velocity[i] << " ";
-                        }
-                    }
-                }
-                *mpNodeVelocitiesFile << "\n";
-            }
-            mpNodeVelocitiesFile->close();
-        }
-        PetscTools::EndRoundRobin();
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
 {
-    OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
-
-    if (mOutputNodeVelocities && PetscTools::AmMaster())
+    // Clear all forces
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
-        mpNodeVelocitiesFile = output_file_handler2.OpenOutputFile("nodevelocities.dat");
+        node_iter->ClearAppliedForce();
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateAtEndOfSolve()
 {
-    if (mOutputNodeVelocities && PetscTools::AmTopMost())
-    {
-        mpNodeVelocitiesFile->close();
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -393,22 +323,8 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputAdditionalSimulationSetu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetOutputNodeVelocities()
-{
-    return mOutputNodeVelocities;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputNodeVelocities(bool outputNodeVelocities)
-{
-    mOutputNodeVelocities = outputNodeVelocities;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<OutputNodeVelocities>" << mOutputNodeVelocities << "</OutputNodeVelocities>\n";
-
     // Call method on direct parent class
     AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(rParamsFile);
 }

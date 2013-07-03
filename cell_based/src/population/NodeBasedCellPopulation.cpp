@@ -101,9 +101,9 @@ void NodeBasedCellPopulation<DIM>::Clear()
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Validate()
 {
-    for(typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-            node_iter != this->mrMesh.GetNodeIteratorEnd();
-            ++node_iter)
+    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+         node_iter != this->mrMesh.GetNodeIteratorEnd();
+         ++node_iter)
     {
         try
         {
@@ -705,12 +705,12 @@ void NodeBasedCellPopulation<DIM>::SendCellsToNeighbourProcesses()
 #else // BOOST_VERSION >= 103700
     MPI_Status status;
 
-    if(!PetscTools::AmTopMost())
+    if (!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         mpCellsRecvRight = mRightCommunicator.SendRecvObject(p_cells_right, PetscTools::GetMyRank() + 1, mCellCommunicationTag, PetscTools::GetMyRank() + 1, mCellCommunicationTag, status);
     }
-    if(!PetscTools::AmMaster())
+    if (!PetscTools::AmMaster())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mpCellsRecvLeft = mLeftCommunicator.SendRecvObject(p_cells_left, PetscTools::GetMyRank() - 1, mCellCommunicationTag, PetscTools::GetMyRank() - 1, mCellCommunicationTag, status);
@@ -725,25 +725,25 @@ void NodeBasedCellPopulation<DIM>::NonBlockingSendCellsToNeighbourProcesses()
     EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
 #else // BOOST_VERSION >= 103700
 
-    if(!PetscTools::AmTopMost())
+    if (!PetscTools::AmTopMost())
     {
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_right(&mCellsToSendRight, null_deleter());
         int tag = SmallPow(2u, 1+ PetscTools::GetMyRank() ) * SmallPow (3u, 1 + PetscTools::GetMyRank() + 1);
         mRightCommunicator.ISendObject(p_cells_right, PetscTools::GetMyRank() + 1, tag);
     }
-    if(!PetscTools::AmMaster())
+    if (!PetscTools::AmMaster())
     {
         int tag = SmallPow (2u, 1 + PetscTools::GetMyRank() ) * SmallPow (3u, 1 + PetscTools::GetMyRank() - 1);
         boost::shared_ptr<std::vector<std::pair<CellPtr, Node<DIM>* > > > p_cells_left(&mCellsToSendLeft, null_deleter());
         mLeftCommunicator.ISendObject(p_cells_left, PetscTools::GetMyRank() - 1, tag);
     }
     // Now post receives to start receiving data before returning.
-    if(!PetscTools::AmTopMost())
+    if (!PetscTools::AmTopMost())
     {
         int tag = SmallPow (3u, 1 + PetscTools::GetMyRank() ) * SmallPow (2u, 1+ PetscTools::GetMyRank() + 1);
         mRightCommunicator.IRecvObject(PetscTools::GetMyRank() + 1, tag);
     }
-    if(!PetscTools::AmMaster())
+    if (!PetscTools::AmMaster())
     {
         int tag = SmallPow (3u, 1 + PetscTools::GetMyRank() ) * SmallPow (2u, 1+ PetscTools::GetMyRank() - 1);
         mLeftCommunicator.IRecvObject(PetscTools::GetMyRank() - 1, tag);
@@ -758,11 +758,11 @@ void NodeBasedCellPopulation<DIM>::GetReceivedCells()
     EXCEPTION("Parallel cell-based Chaste requires Boost >= 1.37");
 #else // BOOST_VERSION >= 103700
 
-    if(!PetscTools::AmTopMost())
+    if (!PetscTools::AmTopMost())
     {
         mpCellsRecvRight = mRightCommunicator.GetRecvObject();
     }
-    if(!PetscTools::AmMaster())
+    if (!PetscTools::AmMaster())
     {
         mpCellsRecvLeft = mLeftCommunicator.GetRecvObject();
     }

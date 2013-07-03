@@ -452,12 +452,12 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.viznodes").CompareFiles();
-        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
-        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.vizancestors").CompareFiles();
-        FileComparison( results_dir + "cellmutationstates.dat", "cell_based/test/data/TestPottsBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
-        FileComparison( results_dir + "cellages.dat", "cell_based/test/data/TestPottsBasedCellPopulationWriters/cellages.dat").CompareFiles();
-        FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestPottsBasedCellPopulationWriters/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestPottsBasedCellPopulationWriters/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestPottsBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestPottsBasedCellPopulationWriters/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestPottsBasedCellPopulationWriters/cellareas.dat").CompareFiles();
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");

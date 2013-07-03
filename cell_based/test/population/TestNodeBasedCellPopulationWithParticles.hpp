@@ -652,10 +652,8 @@ public:
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellAges(true);
         cell_population.SetOutputCellCyclePhases(true);
-
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.SetOutputCellAncestors(true);
-
 
         std::string output_directory = "TestCellPopulationWritersIn3dWithParticles";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -668,9 +666,9 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.viznodes").CompareFiles();
-        FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizcelltypes").CompareFiles();
-        FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestCellPopulationWritersIn3dWithParticles/results.vizancestors").CompareFiles();
 
         // Test the GetCellMutationStateCount function: there should only be healthy cells
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();

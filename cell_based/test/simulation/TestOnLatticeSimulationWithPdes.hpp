@@ -274,7 +274,7 @@ public:
         cells_generator.GenerateBasic(cells, 100);
 
         std::vector<unsigned> location_indices;
-        for(unsigned i=0; i<100; i++)
+        for (unsigned i=0; i<100; i++)
         {
             location_indices.push_back(i);
         }
@@ -287,7 +287,6 @@ public:
         simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnNaturalMesh");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
-
 
         // Set up 2 PDEs (one with dirichlet and one with Neumann BCS) and pass to simulation via handler (zero uptake to check analytic solution)
         // Note even with uptake the PDE has U=0 as solution with zero neumann conditions.
@@ -328,21 +327,21 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient_neumann"), 0.0, 1e-2);
         }
 
-        //Test coarse mesh has the same nodes as the PottsMesh
+        // Test coarse mesh has the same nodes as the PottsMesh
         TetrahedralMesh<2,2>* p_coarse_mesh = simulator.GetCellBasedPdeHandler()->GetCoarsePdeMesh();
 
         TS_ASSERT_EQUALS(p_coarse_mesh->GetNumNodes(),p_mesh->GetNumNodes());
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0),p_mesh->GetWidth(0),1e-8);
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1),p_mesh->GetWidth(1),1e-8);
 
-        for(unsigned i=0; i< p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_coarse_mesh->GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0],p_mesh->GetNode(i)->rGetLocation()[0],1e-8);
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1],p_mesh->GetNode(i)->rGetLocation()[1],1e-8);
         }
     }
 
-    // In this test there are only 50 cells but 100 lattice sites.
+    // In this test there are only 50 cells but 100 lattice sites
     void TestMultipleCaBasedWithCellwiseSourcePde() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -357,7 +356,7 @@ public:
         cells_generator.GenerateBasic(cells, 50);
 
         std::vector<unsigned> location_indices;
-        for(unsigned i=0; i<50; i++)
+        for (unsigned i=0; i<50; i++)
         {
             location_indices.push_back(i);
         }
@@ -434,7 +433,7 @@ public:
         cells_generator.GenerateBasic(cells, 100);
 
         std::vector<unsigned> location_indices;
-        for(unsigned i=0; i<100; i++)
+        for (unsigned i=0; i<100; i++)
         {
             location_indices.push_back(i);
         }
@@ -498,7 +497,7 @@ public:
         cells_generator.GenerateBasic(cells, 100);
 
         std::vector<unsigned> location_indices;
-        for(unsigned i=0; i<100; i++)
+        for (unsigned i=0; i<100; i++)
         {
             location_indices.push_back(i);
         }
@@ -511,7 +510,6 @@ public:
         simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesWithCellsOutsideMesh");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
-
 
         // Set up PDE and pass to simulation via handler (zero uptake to check analytic solution)
         AveragedSourcePde<2> pde(cell_population, 0.0);
@@ -788,7 +786,7 @@ public:
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0),p_mesh->GetWidth(0),1e-8);
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(1),p_mesh->GetWidth(1),1e-8);
 
-        for(unsigned i=0; i< p_coarse_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i< p_coarse_mesh->GetNumNodes(); i++)
         {
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[0],p_mesh->GetNode(i)->rGetLocation()[0],1e-8);
             TS_ASSERT_DELTA(p_coarse_mesh->GetNode(i)->rGetLocation()[1],p_mesh->GetNode(i)->rGetLocation()[1],1e-8);

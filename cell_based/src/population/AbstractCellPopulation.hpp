@@ -113,6 +113,7 @@ private:
         archive & mOutputCellCyclePhases;
         archive & mOutputCellAges;
         archive & mOutputCellVolumes;
+        archive & mOutputNodeVelocities;
     }
 
 protected:
@@ -176,6 +177,9 @@ protected:
 
     /** Whether to write the cell volumes (in 3D) or areas (in 2D) to a file. */
     bool mOutputCellVolumes;
+
+    /** Whether to write the node velocities to a file. */
+    bool mOutputNodeVelocities;
 
     /** A list of cell writers */
     std::vector<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* > mCellWriters;
@@ -649,6 +653,11 @@ public:
     bool GetOutputCellVolumes();
 
     /**
+     * @return mOutputNodeVelocities
+     */
+    bool GetOutputNodeVelocities();
+
+    /**
      * Add a cell population writer to the population
      *
      * @param pWriter a boost_shared_ptr to the writer to add.
@@ -724,6 +733,13 @@ public:
      * @param outputCellVolumes the new value of mOutputCellVolumes
      */
     void SetOutputCellVolumes(bool outputCellVolumes);
+
+    /**
+     * Set mOutputNodeVelocities.
+     *
+     * @param outputNodeVelocities the new value of mOutputNodeVelocities
+     */
+    void SetOutputNodeVelocities(bool outputNodeVelocities);
 
     /**
      * @return The width (maximum distance to centroid) of the cell population

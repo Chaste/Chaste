@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include <ctime>
-#include "NodesOnlyMesh.hpp"
+
 #include "DeltaNotchCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -81,13 +81,13 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a small population
+        // Create a small 2D NodeBasedCellPopulation
         HoneycombMeshGenerator generator(2, 2, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
-        // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+        // ASsociate each cell with a cell-cycle model that incorporates a Delta-Notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -110,21 +110,20 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.SetOutputNodeVelocities(true);
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
-        simulator.SetOutputNodeVelocities(true);
 
-        // Add Delta-Notch tracking modifier
+        // Create a Delta-Notch tracking modifier and add it to the simulation
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        // Set up force law and add to simulation
+        // Set up a force law and add to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -208,12 +207,12 @@ public:
 
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputNodeVelocities(true);
 
         // Set up the simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchTwoCell_heterogee");
         simulator.SetEndTime(10.0);
-        simulator.SetOutputNodeVelocities(true);
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -308,12 +307,12 @@ public:
 
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputNodeVelocities(true);
 
         // Set up the simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchTwoCell_homgee");
         simulator.SetEndTime(10.0);
-        simulator.SetOutputNodeVelocities(true);
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -374,12 +373,12 @@ public:
 
         // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputNodeVelocities(true);
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchVertex2D");
         simulator.SetEndTime(0.01);
-        simulator.SetOutputNodeVelocities(true);
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -427,12 +426,12 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputNodeVelocities(true);
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
-        simulator.SetOutputNodeVelocities(true);
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -444,7 +443,13 @@ public:
         simulator.AddForce(p_force);
 
         // Run simulation
-        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+//        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
+        simulator.Solve();
+
+        // Test that the node velocities file exists
+        OutputFileHandler output_file_handler("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep", false);
+        FileFinder generated = output_file_handler.FindFile("results_from_time_0/nodevelocities.dat");
+        TS_ASSERT(generated.Exists());
 
         // Check levels in cell 0
         double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
@@ -459,11 +464,11 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a regular vertex mesh
+        // Create a regular 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(2, 2);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
+        // Associate each cell with a cell-cycle model that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -479,15 +484,14 @@ public:
             cells.push_back(p_cell);
         }
 
-        // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetOutputNodeVelocities(true);
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchOffLatticeSimulationSaveAndLoad");
         double end_time = 0.01;
         simulator.SetEndTime(end_time);
-        simulator.SetOutputNodeVelocities(true);
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
