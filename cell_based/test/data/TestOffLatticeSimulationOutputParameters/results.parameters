@@ -27,7 +27,7 @@
 		<OutputCellCyclePhases>0</OutputCellCyclePhases>
 		<OutputCellAges>0</OutputCellAges>
 		<OutputCellVolumes>0</OutputCellVolumes>
-        <OutputNodeVelocities>0</OutputNodeVelocities>
+		<OutputNodeVelocities>0</OutputNodeVelocities>
 	</MeshBasedCellPopulation-2-2>
 
 	<CellCycleModels>
