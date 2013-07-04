@@ -61,17 +61,16 @@ public:
     {
         AbstractContractionModel* p_model;
 
-        double x = this->mpMesh->GetElement(elemIndex)->GetNode(0)->rGetLocation()[0];//The first node and its x location
-        double y = this->mpMesh->GetElement(elemIndex)->GetNode(0)->rGetLocation()[1];//The first node and its y location
+        c_vector<double, 2> centroid = this->mpMesh->GetElement(elemIndex)->CalculateCentroid();
 
-        if (x>=0.07)
+        if (centroid[0] >= 0.07)
         {
             p_model = new FakeBathContractionModel;
         }
         else
         {
             p_model = new Kerchoffs2003ContractionModel;
-            if ( y >= 0.05)
+            if ( centroid[1] >= 0.05)
             {
                 static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("tr", 25.0);
                 static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("td", 25.0); // ms
@@ -136,7 +135,7 @@ public:
         QuadraticMesh<2>* p_mesh_m = new QuadraticMesh<2>(0.02, 0.1, 0.1);//width/no of ele, width, height
 
         //General simulation setup
-        HeartConfig::Instance()->SetSimulationDuration(50.0);
+        HeartConfig::Instance()->SetSimulationDuration(5.0);
         //Set up the electrophysiology
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000); //stimulates along X=0
 
@@ -162,7 +161,8 @@ public:
         problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
-
+        //We are adding the mechano-electric coupling to ensure stretches are calculated for testing.
+        problem_defn.SetDeformationAffectsElectrophysiology(false,true);
         //Solve the problem
         //2 is space dim, 1 is monodomain (2 would be bidomain)
         CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
@@ -174,6 +174,32 @@ public:
                                                     "TestContractionCellFactoryOnSquare");
 
         problem.Solve();
+
+        // We get the stretches directly as this test is a friend of CardiacElectroMechanicsProblem.
+        std::vector<double> stretches = problem.mStretchesForEachMechanicsElement;
+
+        for (unsigned i=0; i<stretches.size(); i++)
+        {
+            c_vector<double, 2> centroid = p_mesh_m->GetElement(i)->CalculateCentroid();
+
+            //std::cout << "Element " << i << ": pos = [" << centroid[0] << "," << centroid[1] << "], stretch = " << stretches[i] << "\n";
+
+            if (centroid[0] > 0.09) // We set a Fake contraction model near x = 0.1.
+            {
+                // Slight increases in stretch in this region
+                TS_ASSERT_LESS_THAN(0.999, stretches[i]); // 0.99 if run for 50ms.
+            }
+            else if (centroid[0] > 0.02 && centroid[0] < 0.07)
+            {
+                // contraction in this region.
+                TS_ASSERT_LESS_THAN(stretches[i], 0.998); // 0.9 if run for 50ms.
+            }
+            // In other regions (near x=0 and x=0.8) you can get nothing or contraction
+            // depending on whether you are near the sides (y=0, y=0.1).
+
+            // If this ever fails, then run the test for 50 milliseconds.
+            // The top tolerance was 0.99, the bottom one was 0.9
+        }
     }
 };
 

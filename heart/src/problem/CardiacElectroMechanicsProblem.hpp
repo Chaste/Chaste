@@ -95,7 +95,7 @@ class CardiacElectroMechanicsProblem
     : public AbstractConductivityModifier<DIM,DIM> // this only inherits from this class so it can be passed to the tissue to
                                                    // allow deformation-based altering of the conductivity
 {
-
+friend class TestAbstractContractionCellFactory;
 friend class TestCardiacElectroMechanicsProblem;
 friend class TestCardiacElectroMechanicsFurtherFunctionality;
 friend class TestElectroMechanicsExactSolution;

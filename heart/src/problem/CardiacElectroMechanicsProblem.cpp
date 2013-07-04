@@ -464,7 +464,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     if(mpProblemDefinition->GetDeformationAffectsCellModels() || mpProblemDefinition->GetDeformationAffectsConductivity())
     {
         // initialise the stretches saved for each mechanics element
-        mStretchesForEachMechanicsElement.resize(mpMechanicsMesh->GetNumElements(),1.0);
+        mStretchesForEachMechanicsElement.resize(mpMechanicsMesh->GetNumElements(), 1.0);
 
         // initialise the store of the F in each mechanics element (one constant value of F) in each
         mDeformationGradientsForEachMechanicsElement.resize(mpMechanicsMesh->GetNumElements(),identity_matrix<double>(DIM));
