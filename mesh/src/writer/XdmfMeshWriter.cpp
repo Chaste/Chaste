@@ -40,39 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "Version.hpp"
 
-// Xerces is currently not supported in the Windows port
-#ifndef _MSC_VER
-
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/framework/LocalFileFormatTarget.hpp>
-#include <xsd/cxx/xml/string.hxx>
-
-#ifndef X //Also used in XmlTools in the heart component
-/**
- * Convenience macro for transcoding C++ strings to Xerces' format.
- * @param str  the string to transcode
- */
-#define X(str) xsd::cxx::xml::string(str).c_str()
-#endif //X
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* p_grid_element,
-                                                            XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* p_DOM_document)
-{
-    /*
-     * Do nothing (but get overloaded elsewhere!)
-     */
-}
-
-#endif // _MSC_VER
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::XdmfMeshWriter(const std::string& rDirectory,
                                                        const std::string& rBaseName,
                                                        const bool clearOutputDir)
     : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
-      mNumberOfTimePoints(1u)
+      mNumberOfTimePoints(1u),
+      mTimeStep(1.0)
 {
 }
 
@@ -308,55 +282,20 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     p_time_dataitem_element->setAttribute(X("Dimensions"),X("3"));
     p_time_element->appendChild(p_time_dataitem_element);
 
-    std::stringstream num_time_stream;
-    num_time_stream << mNumberOfTimePoints;
-    DOMText* p_time_text = p_DOM_document->createTextNode(X("0.0 1.0 "+num_time_stream.str()));
-    p_time_element->appendChild(p_time_text);
+    std::stringstream time_stream;
+    time_stream << "0.0 " << mTimeStep << " " << mNumberOfTimePoints;
+    DOMText* p_time_text = p_DOM_document->createTextNode(X(time_stream.str()));
     p_time_dataitem_element->appendChild(p_time_text);
 
     for(unsigned t=0; t<mNumberOfTimePoints; ++t)
     {
-
         DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
         p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
         p_grid_collection_element->setAttribute(X("GridType"), X("Collection"));
         //p_grid_collection_element->setAttribute(X("Name"), X("spatial_collection"));
         p_grid_temp_collection_element->appendChild(p_grid_collection_element);
 
-        if (t>0)
-        {
-            ///\todo #1157 This is uncovered
- #define COVERAGE_IGNORE
-            NEVER_REACHED;
-            for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
-            {
-                std::stringstream chunk_stream;
-                chunk_stream << chunk;
-
-                DOMElement* p_grid_element =  p_DOM_document->createElement(X("Grid"));
-                p_grid_element->setAttribute(X("GridType"), X("Subset"));
-                p_grid_element->setAttribute(X("Section"), X("All"));
-                p_grid_collection_element->appendChild(p_grid_element);
-
-                /*
-                 * p_grid_element may now need an Attribute (node data). Call Annotate,
-                 * which here does nothing, but in pde can be overloaded to print variables
-                 */
-                AddDataOnNodes(p_grid_element, p_DOM_document);
-
-                DOMElement* p_grid_ref_element =  p_DOM_document->createElement(X("Grid"));
-                p_grid_ref_element->setAttribute(X("GridType"), X("Uniform"));
-                p_grid_ref_element->setAttribute(X("Reference"), X("XML"));
-                //p_grid_ref_element->setAttribute(X("Name"), X("Chunk_" + chunk_stream.str()));
-
-                DOMText* p_ref_text = p_DOM_document->createTextNode(X("/Xdmf/Domain/Grid/Grid/Grid[@Name=\"Chunk_"+chunk_stream.str()+"\"]"));
-                p_grid_ref_element->appendChild(p_ref_text);
-                p_grid_element->appendChild(p_grid_ref_element);
-
-            }
-#undef COVERAGE_IGNORE
-        }
-        else // If t==0
+        if (t==0)
         {
             for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
             {
@@ -383,7 +322,34 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
                  * p_grid_element may now need an Attribute (node data). Call Annotate,
                  * which here does nothing, but in pde can be overloaded to print variables
                  */
-                AddDataOnNodes(p_grid_element, p_DOM_document);
+                AddDataOnNodes(p_grid_element, p_DOM_document, t);
+            }
+        }
+        else // t>0
+        {
+            for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+            {
+                std::stringstream chunk_stream;
+                chunk_stream << chunk;
+
+                DOMElement* p_grid_element =  p_DOM_document->createElement(X("Grid"));
+                p_grid_element->setAttribute(X("GridType"), X("Subset"));
+                p_grid_element->setAttribute(X("Section"), X("All"));
+                p_grid_collection_element->appendChild(p_grid_element);
+
+                /*
+                 * p_grid_element may now need an Attribute (node data). Call Annotate,
+                 * which here does nothing, but in pde can be overloaded to print variables
+                 */
+                AddDataOnNodes(p_grid_element, p_DOM_document, t);
+                DOMElement* p_grid_ref_element =  p_DOM_document->createElement(X("Grid"));
+                p_grid_ref_element->setAttribute(X("GridType"), X("Uniform"));
+                p_grid_ref_element->setAttribute(X("Reference"), X("XML"));
+                //p_grid_ref_element->setAttribute(X("Name"), X("Chunk_" + chunk_stream.str()));
+
+                DOMText* p_ref_text = p_DOM_document->createTextNode(X("/Xdmf/Domain/Grid/Grid/Grid[@Name=\"Chunk_"+chunk_stream.str()+"\"]"));
+                p_grid_ref_element->appendChild(p_ref_text);
+                p_grid_element->appendChild(p_grid_ref_element);
             }
         }
     }

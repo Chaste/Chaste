@@ -5,7 +5,7 @@
   <Domain>
     <Grid CollectionType="Temporal" GridType="Collection">
       <Time TimeType="HyperSlab">
-        <DataItem Dimensions="3" Format="XML" NumberType="Float">0.0 1.0 1</DataItem>
+        <DataItem Dimensions="3" Format="XML" NumberType="Float">0.0 1 1</DataItem>
       </Time>
       <Grid CollectionType="Spatial" GridType="Collection">
         <Grid GridType="Uniform" Name="Chunk_0">
@@ -17,5 +17,5 @@
   </Domain>
 
 </Xdmf>
-<!-- Created by Chaste version 3.1.19298 (with uncommitted modifications) on Thu, 27 Jun 2013 16:27:02 +0000.  Chaste was built on Thu, 27 Jun 2013 16:12:18 +0000 by machine (uname) 'Linux userpc60.cs.ox.ac.uk 2.6.32-48-generic #110-Ubuntu SMP Fri May 31 18:32:53 UTC 2013 x86_64' using settings: default, shared libraries.  Checked-out project versions: SimpleSensitivity=18009; website=15353.
+<!-- Created by Chaste version 3.1.19364 (with uncommitted modifications) on Thu, 04 Jul 2013 15:19:54 +0000.  Chaste was built on Thu, 04 Jul 2013 15:19:44 +0000 by machine (uname) 'Linux clpc117.cs.ox.ac.uk 3.9.6-200.fc18.x86_64 #1 SMP Thu Jun 13 18:56:55 UTC 2013 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: louiecn=19118:19274M.
 -->

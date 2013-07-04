@@ -524,5 +524,5 @@
 		224	311	113	
 	</DataItem>
 </Topology>
-<!-- Created by Chaste version 3.1.19075 (with uncommitted modifications) on Fri, 07 Jun 2013 09:25:54 +0000.  Chaste was built on Wed, 05 Jun 2013 11:16:00 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: default, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
+<!-- Created by Chaste version 3.1.19364 (with uncommitted modifications) on Thu, 04 Jul 2013 15:19:54 +0000.  Chaste was built on Thu, 04 Jul 2013 15:19:44 +0000 by machine (uname) 'Linux clpc117.cs.ox.ac.uk 3.9.6-200.fc18.x86_64 #1 SMP Thu Jun 13 18:56:55 UTC 2013 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: louiecn=19118:19274M.
 -->

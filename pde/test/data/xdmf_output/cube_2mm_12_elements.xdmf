@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd">
+<Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <Domain>
+    <Grid CollectionType="Temporal" GridType="Collection">
+      <Time TimeType="HyperSlab">
+        <DataItem Dimensions="3" Format="XML" NumberType="Float">0.0 0.03 2</DataItem>
+      </Time>
+      <Grid CollectionType="Spatial" GridType="Collection">
+        <Grid GridType="Uniform" Name="Chunk_0">
+          <xi:include href="cube_2mm_12_elements_geometry_0.xml"/>
+          <xi:include href="cube_2mm_12_elements_topology_0.xml"/>
+          <Attribute Center="Node" Name="V">
+            <DataItem Dimensions="1 12 1" ItemType="HyperSlab">
+              <DataItem Dimensions="3 3" Format="XML">0 0 0 1 1 1 1 12 1</DataItem>
+              <DataItem Dimensions="2 12 2" Format="HDF" NumberType="Float" Precision="8">../cube_2mm_12_elements.h5:/Data</DataItem>
+            </DataItem>
+          </Attribute>
+          <Attribute Center="Node" Name="Phi_e">
+            <DataItem Dimensions="1 12 1" ItemType="HyperSlab">
+              <DataItem Dimensions="3 3" Format="XML">0 0 1 1 1 1 1 12 1</DataItem>
+              <DataItem Dimensions="2 12 2" Format="HDF" NumberType="Float" Precision="8">../cube_2mm_12_elements.h5:/Data</DataItem>
+            </DataItem>
+          </Attribute>
+        </Grid>
+      </Grid>
+      <Grid CollectionType="Spatial" GridType="Collection">
+        <Grid GridType="Subset" Section="All">
+          <Attribute Center="Node" Name="V">
+            <DataItem Dimensions="1 12 1" ItemType="HyperSlab">
+              <DataItem Dimensions="3 3" Format="XML">1 0 0 1 1 1 1 12 1</DataItem>
+              <DataItem Dimensions="2 12 2" Format="HDF" NumberType="Float" Precision="8">../cube_2mm_12_elements.h5:/Data</DataItem>
+            </DataItem>
+          </Attribute>
+          <Attribute Center="Node" Name="Phi_e">
+            <DataItem Dimensions="1 12 1" ItemType="HyperSlab">
+              <DataItem Dimensions="3 3" Format="XML">1 0 1 1 1 1 1 12 1</DataItem>
+              <DataItem Dimensions="2 12 2" Format="HDF" NumberType="Float" Precision="8">../cube_2mm_12_elements.h5:/Data</DataItem>
+            </DataItem>
+          </Attribute>
+          <Grid GridType="Uniform" Reference="XML">/Xdmf/Domain/Grid/Grid/Grid[@Name="Chunk_0"]</Grid>
+        </Grid>
+      </Grid>
+    </Grid>
+  </Domain>
+
+</Xdmf>
+<!-- Created by Chaste version 3.1.19364 (with uncommitted modifications) on Thu, 04 Jul 2013 15:12:56 +0000.  Chaste was built on Thu, 04 Jul 2013 15:12:44 +0000 by machine (uname) 'Linux clpc117.cs.ox.ac.uk 3.9.6-200.fc18.x86_64 #1 SMP Thu Jun 13 18:56:55 UTC 2013 x86_64' using settings: _1, no Chaste libraries.  Checked-out project versions: louiecn=19118:19274M.
+-->

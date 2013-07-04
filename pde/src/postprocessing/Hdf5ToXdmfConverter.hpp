@@ -49,18 +49,30 @@ class Hdf5ToXdmfConverter :
     public XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 public:
-        /**
-          * Constructor, which does the conversion and writes the .vtu file.
-          *
-          * @note This method is collective, and hence must be called by all processes.
-          *
-          * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
-          * @param rFileBaseName The base name of the data file.
-          * @param pMesh Pointer to the mesh.
-          */
-        Hdf5ToXdmfConverter(const FileFinder& rInputDirectory,
-                            const std::string& rFileBaseName,
-                            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    /**
+     * Constructor, which does the conversion and writes the .vtu file.
+     *
+     * @note This method is collective, and hence must be called by all processes.
+     *
+     * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param rFileBaseName The base name of the data file.
+     * @param pMesh Pointer to the mesh.
+     */
+    Hdf5ToXdmfConverter(const FileFinder& rInputDirectory,
+            const std::string& rFileBaseName,
+            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+#ifndef _MSC_VER
+    /**
+     * Generate Attribute tags and append to the element.  Here this is a dummy class, but can be
+     * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
+     * @param pGridElement  Pointer to DOMElement to append Attribute tags to.
+     * @param pDomDocument  Pointer to DOMDocument to generate new elements.
+     * @param timeStep  Index of time point to write.
+     */
+    void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
+                        XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
+                        unsigned timeStep);
+#endif // _MSC_VER
 };
 
 #endif // HDF5TOXDMFCONVERTER_HPP_

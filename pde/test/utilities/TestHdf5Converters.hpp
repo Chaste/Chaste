@@ -447,20 +447,19 @@ public:
                                            "cube_2mm_12_elements",
                                            &mesh);
 
-        /*std::vector<std::string> files_to_compare;
-            files_to_compare.push_back("cube_2mm_12_elements_V_0.txt");
-            files_to_compare.push_back("cube_2mm_12_elements_V_1.txt");
-            files_to_compare.push_back("cube_2mm_12_elements_Phi_e_0.txt");
-            files_to_compare.push_back("cube_2mm_12_elements_Phi_e_1.txt");
+        std::vector<std::string> files_to_compare;
+        files_to_compare.push_back("cube_2mm_12_elements.xdmf");
+        files_to_compare.push_back("cube_2mm_12_elements_geometry_0.xml");
+        files_to_compare.push_back("cube_2mm_12_elements_topology_0.xml");
 
-            for (unsigned i=0; i<files_to_compare.size(); i++)
-            {
-                std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
-                FileFinder generated_file(working_directory +"/txt_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);
-                FileFinder reference_file("pde/test/data/" + files_to_compare[i], RelativeTo::ChasteSourceRoot);
-                FileComparison comparer(generated_file, reference_file);
-                TS_ASSERT(comparer.CompareFiles());
-            }*/
+        for (unsigned i=0; i<files_to_compare.size(); i++)
+        {
+            std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
+            FileFinder generated_file(working_directory +"/xdmf_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);
+            FileFinder reference_file("pde/test/data/xdmf_output/" + files_to_compare[i], RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file, reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 };
 

@@ -1,0 +1,18 @@
+<Geometry GeometryType="XYZ">
+	<DataItem Format="XML" Dimensions="12 3" DataType="Float">
+		0	0	0	
+		0.2	0	0	
+		0.2	0.2	0	
+		0	0.2	0	
+		0	0	0.2	
+		0.2	0	0.2	
+		0.2	0.2	0.2	
+		0	0.2	0.2	
+		0.0999125	0	0	
+		0.2	0.099907	0	
+		0.0999285	0.2	0.2	
+		0	0.0999914	0.2	
+	</DataItem>
+</Geometry>
+<!-- Created by Chaste version 3.1.19364 (with uncommitted modifications) on Thu, 04 Jul 2013 10:21:23 +0000.  Chaste was built on Thu, 04 Jul 2013 10:21:11 +0000 by machine (uname) 'Linux clpc117.cs.ox.ac.uk 3.9.6-200.fc18.x86_64 #1 SMP Thu Jun 13 18:56:55 UTC 2013 x86_64' using settings: default, no Chaste libraries.  Checked-out project versions: louiecn=19118:19274M.
+-->

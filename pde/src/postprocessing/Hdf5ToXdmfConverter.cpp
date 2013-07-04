@@ -44,8 +44,98 @@ Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(const FileFinde
 {
     ///\todo #1157 The output directory is hard-coded
 
-    ///\todo Set number of time points here
+    // Set number of time steps
+    std::vector<double> time_values = this->mpReader->GetUnlimitedDimensionValues();
+    unsigned num_timesteps = time_values.size();
+    this->mNumberOfTimePoints = num_timesteps;
+    // Set time step size
+    if (num_timesteps > 1)
+    {
+        this->mTimeStep = time_values[1] - time_values[0];
+    }
+    // Write
     this->WriteFilesUsingMesh(*pMesh);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
+                                                                 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
+                                                                 unsigned timeStep)
+{
+    // Use xerces namespace for convenience
+    XERCES_CPP_NAMESPACE_USE
+
+    unsigned num_timesteps = this->mpReader->GetUnlimitedDimensionValues().size();
+
+    // Loop over variables
+    for (unsigned var_index=0; var_index<this->mNumVariables; var_index++)
+    {
+        std::string variable_name = this->mpReader->GetVariableNames()[var_index];
+
+        /*
+         * e.g. <Attribute Center="Node" Name="V">
+         */
+        DOMElement* p_attr_element =  pDomDocument->createElement(X("Attribute"));
+        p_attr_element->setAttribute(X("Name"), X(variable_name));
+        p_attr_element->setAttribute(X("Center"), X("Node"));
+        pGridElement->appendChild(p_attr_element);
+
+        /*
+         * e.g. <DataItem Dimensions="1 12 1" ItemType="HyperSlab">
+         */
+        DOMElement* p_hype_element =  pDomDocument->createElement(X("DataItem"));
+        p_hype_element->setAttribute(X("ItemType"), X("HyperSlab"));
+        std::stringstream dim_stream;
+
+        // First index is time value, second is number of nodes, third is variable index
+        ///\todo #1157 Make this work in parallel
+        /* DistributedVectorFactory* p_factory = AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::mpMesh->GetDistributedVectorFactory();
+        dim_stream << "1 " << p_factory->GetHigh()-p_factory->GetLow() << " 1"; */
+        unsigned num_nodes = AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::mpMesh->GetNumNodes();
+        dim_stream << "1 " << num_nodes << " 1";
+        p_hype_element->setAttribute(X("Dimensions"), X(dim_stream.str()));
+        p_attr_element->appendChild(p_hype_element);
+
+        /*
+         * e.g. <DataItem Dimensions="3 3" Format="XML">
+         */
+        DOMElement* p_xml_element =  pDomDocument->createElement(X("DataItem"));
+        p_xml_element->setAttribute(X("Format"), X("XML"));
+        p_xml_element->setAttribute(X("Dimensions"), X("3 3"));
+        p_hype_element->appendChild(p_xml_element);
+
+        /*
+         * e.g. 0 0 0 1 1 1 1 12 1
+         */
+        std::stringstream XMLStream;
+        XMLStream << timeStep << " 0 " << var_index << " ";
+        XMLStream << "1 1 1 ";
+        /* XMLStream << "1 " << p_factory->GetHigh()-p_factory->GetLow() << " 1"; */
+        XMLStream << "1 " << num_nodes << " 1";
+        DOMText* p_xml_text = pDomDocument->createTextNode(X(XMLStream.str()));
+        p_xml_element->appendChild(p_xml_text);
+
+        /*
+         * e.g. <DataItem Dimensions="2 12 2" Format="HDF" NumberType="Float" Precision="8">
+         */
+        DOMElement* p_hdf_element =  pDomDocument->createElement(X("DataItem"));
+        p_hdf_element->setAttribute(X("Format"), X("HDF"));
+        p_hdf_element->setAttribute(X("NumberType"), X("Float"));
+        p_hdf_element->setAttribute(X("Precision"), X("8"));
+        std::stringstream hdf_dims_stream;
+        /* hdf_dims_stream << num_timesteps << " " << p_factory->GetHigh()-p_factory->GetLow() << " " << this->mNumVariables; */
+        hdf_dims_stream << num_timesteps << " " << num_nodes << " " << this->mNumVariables;
+        p_hdf_element->setAttribute(X("Dimensions"), X(hdf_dims_stream.str()));
+        p_hype_element->appendChild(p_hdf_element);
+
+        /*
+         * e.g. ../cube_2mm_12_elements.h5:/Data
+         */
+        std::stringstream HDFStream;
+        HDFStream << "../" << AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::mFileBaseName << ".h5:/Data";
+        DOMText* p_hdf_text = pDomDocument->createTextNode(X(HDFStream.str()));
+        p_hdf_element->appendChild(p_hdf_text);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////

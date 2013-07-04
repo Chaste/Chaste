@@ -37,11 +37,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define XDMFMESHWRITER_HPP_
 
 #include "AbstractTetrahedralMeshWriter.hpp"
-
+// Xerces is currently not supported in the Windows port
 #ifndef _MSC_VER
-#include <xercesc/dom/DOM.hpp>
-#endif
 
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <xsd/cxx/xml/string.hxx>
+
+#ifndef X //Also used in XmlTools in the heart component
+/**
+ * Convenience macro for transcoding C++ strings to Xerces' format.
+ * @param str  the string to transcode
+ */
+#define X(str) xsd::cxx::xml::string(str).c_str()
+#endif //X
+
+#endif // _MSC_VER
 /**
  * A class for writing from a Chaste mesh to the geometry/topology components of
  * an XDMF file.
@@ -49,8 +61,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class XdmfMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
+protected:
+    unsigned mNumberOfTimePoints; /**< Defaults to 1, when we are writing geometry only.  Used in HDF5 converter which has "protected" access as a derived class.*/
+    double mTimeStep; /**< Defaults to 1.0.*/
+
 private:
-    unsigned mNumberOfTimePoints; /**< Defaults to 1, when we are writing geometry only.  Used in HDF5 converter.*/
     /**
      * Write the master file.  This just contains references to the geometry/topology files.
      * @param numberOfChunks  is the number of geometric pieces which is 1 for sequential code and for non-distributed meshes.
@@ -61,11 +76,16 @@ private:
     /**
      * Generate Attribute tags and append to the element.  Here this is a dummy class, but can be
      * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
-     * @param p_grid_element  Pointer to DOMElement to append Attribute tags to.
-     * @param p_DOM_document  Pointer to DOMDocument to generate new elements
+     * @param pGridElement  Pointer to DOMElement to append Attribute tags to.
+     * @param pDomDocument  Pointer to DOMDocument to generate new elements.
+     * @param timeStep  Index of time point to write.
      */
-    void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* p_grid_element,
-                        XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* p_DOM_document);
+    virtual void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
+                                XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
+                                unsigned timeStep)
+	{
+		//Empty body - implemented in derived classes
+	}
 #endif // _MSC_VER
 
 public:
