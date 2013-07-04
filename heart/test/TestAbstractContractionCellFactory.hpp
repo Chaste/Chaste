@@ -41,6 +41,46 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LabelBasedContractionCellFactory.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "PlaneStimulusCellFactory.hpp"
+#include "CardiacElectroMechanicsProblem.hpp"
+#include "LuoRudy1991.hpp"
+#include "NonlinearElasticityTools.hpp"
+#include "FakeBathContractionModel.hpp"
+#include "ElectroMechanicsProblemDefinition.hpp"
+#include "AbstractContractionCellFactory.hpp"
+
+template <unsigned DIM>
+class ExampleContractionCellFactory : public AbstractContractionCellFactory<DIM>
+{
+public:
+    ExampleContractionCellFactory()
+     : AbstractContractionCellFactory<DIM>()
+    {};
+
+    AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex)
+    {
+        AbstractContractionModel* p_model;
+
+        double x = this->mpMesh->GetElement(elemIndex)->GetNode(0)->rGetLocation()[0];//The first node and its x location
+        double y = this->mpMesh->GetElement(elemIndex)->GetNode(0)->rGetLocation()[1];//The first node and its y location
+
+        if (x>=0.07)
+        {
+            p_model = new FakeBathContractionModel;
+        }
+        else
+        {
+            p_model = new Kerchoffs2003ContractionModel;
+            if ( y >= 0.05)
+            {
+                static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("tr", 25.0);
+                static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("td", 25.0); // ms
+                static_cast<AbstractOdeBasedContractionModel*>(p_model)->SetParameter("b", 75.0); // ms/um
+            }
+        }
+        return p_model;
+    }
+};
 
 class TestAbstractContractionCellFactory : public CxxTest::TestSuite
 {
@@ -82,6 +122,58 @@ public:
             TS_ASSERT(p_model);
             delete p_model;
         }
+    }
+
+    void TestContractionCellFactoryOnSquare() throw (Exception)
+    {
+
+        //2D square meshes for electrics and mechanics
+        // create electrics mesh
+        TetrahedralMesh<2,2>* p_mesh_e = new TetrahedralMesh<2,2>();
+        p_mesh_e->ConstructRegularSlabMesh(0.01, 0.1, 0.1);//width/no of ele, width, height
+
+        // create mechanics mesh
+        QuadraticMesh<2>* p_mesh_m = new QuadraticMesh<2>(0.02, 0.1, 0.1);//width/no of ele, width, height
+
+        //General simulation setup
+        HeartConfig::Instance()->SetSimulationDuration(50.0);
+        //Set up the electrophysiology
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000); //stimulates along X=0
+
+        //Set up the mechanics
+        ElectroMechanicsProblemDefinition<2> problem_defn(*p_mesh_m);
+        //fixed nodes along X=0
+        std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<2>::GetNodesByComponentValue(*p_mesh_m, 0, 0.0); // all the X=0.0 nodes
+
+        /*
+         * HOW_TO_TAG Cardiac/Electro-mechanics
+         * Set heterogeneous contraction models by using a contraction cell factory.
+         *
+         * Here we give a factory to put a contraction model at each element
+         * (this is called by AbstractCardiacMechanicsProblem::Initialise()).
+         */
+        ExampleContractionCellFactory<2> mechanics_factory;
+        problem_defn.SetContractionCellFactory(&mechanics_factory);
+        problem_defn.SetContractionModelOdeTimestep(0.01); // NB you need to use the finest timestep of any model the factory will create.
+
+        // The following line is an example of the 'old' way of setting a homogeneous contraction model.
+        // This method now just creates a LabelBasedCellFactory as per above...
+        //problem_defn.SetContractionModel(KERCHOFFS2003,0.01/*contraction model ODE timestep*/);
+        problem_defn.SetUseDefaultCardiacMaterialLaw(INCOMPRESSIBLE);
+        problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+        problem_defn.SetMechanicsSolveTimestep(1.0);
+
+        //Solve the problem
+        //2 is space dim, 1 is monodomain (2 would be bidomain)
+        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+                                                    MONODOMAIN,
+                                                    p_mesh_e,
+                                                    p_mesh_m,
+                                                    &cell_factory,
+                                                    &problem_defn,
+                                                    "TestContractionCellFactoryOnSquare");
+
+        problem.Solve();
     }
 };
 

@@ -78,9 +78,8 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
 
                 // We construct a set of data to be assigned to each quadrature point
-                // to begin with the contraction model pointer is set to NULL.
-                // These are set later (at the bottom of this method)
-                // by calling #InitialiseContractionModelsWrapper().
+                // this includes a contraction cell model set as bath or by the contraction
+                // cell factory.
                 DataAtQuadraturePoint data_at_quad_point;
                 data_at_quad_point.Stretch = 1.0;
                 data_at_quad_point.StretchLastTimeStep = 1.0;

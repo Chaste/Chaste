@@ -153,6 +153,8 @@ public:
      * cell factory, which allows different models (or parameters) to be set
      * per element.
      *
+     * Note you also need to call #SetContractionModelOdeTimestep() before solving.
+     *
      * @param pCellFactory  The contraction cell factory to be used.
      */
     void SetContractionCellFactory(AbstractContractionCellFactory<DIM>* pCellFactory);
@@ -256,6 +258,18 @@ public:
     {
         assert(mpContractionCellFactory);
         return mpContractionCellFactory;
+    }
+
+    /**
+     * Set the timestep to be used when solving contraction models.
+     * Note that you will need to use the finest timestep that any of
+     * the models requires, it is not set on a per-model basis.
+     *
+     * @param timestep  Timestep to use.
+     */
+    void SetContractionModelOdeTimestep(double timestep)
+    {
+        mContractionModelOdeTimeStep = timestep;
     }
 
     /**

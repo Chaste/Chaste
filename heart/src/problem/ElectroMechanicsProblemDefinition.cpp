@@ -73,13 +73,13 @@ template<unsigned DIM>
 void ElectroMechanicsProblemDefinition<DIM>::SetContractionModel(ContractionModelName contractionModel, double timestep)
 {
     assert(timestep > 0.0);
+    SetContractionModelOdeTimestep(timestep);
 
     if (contractionModel == NASH2004 || contractionModel == CONSTANT)
     {
         // These models can use an Explicit solver, default is Implicit.
         SetSolverType(EXPLICIT);
     }
-    mContractionModelOdeTimeStep = timestep;
 
     // Make sure we aren't overwriting a problem that has been set up with a cell factory.
     assert(mpContractionCellFactory==NULL);

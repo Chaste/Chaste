@@ -60,6 +60,7 @@ private:
     /** This class tests that the mesh is set correctly */
     friend class TestElectroMechanicsProblemDefinition;
 
+protected:
     /** The mechanics mesh */
     QuadraticMesh<DIM>* mpMesh;
 
