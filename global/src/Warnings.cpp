@@ -101,13 +101,13 @@ void Warnings::AddWarning(const std::string& rMessage, const std::string& rFilen
     // generates relative paths. The following fixes this mismatch in rFileName
 #ifdef _MSC_VER
     std::string relative_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
-    try
-    {
-        std::string cwd = GetCurrentWorkingDirectory();
-        assert(rFilename.substr(0, cwd.length()) == cwd);
-        relative_filename = "." + rFilename.substr(0, cwd.length());
-    }
-    catch (...) {}
+//    try
+//    {
+//        std::string cwd = GetCurrentWorkingDirectory();
+//        assert(rFilename.substr(0, cwd.length()) == cwd);
+//        relative_filename = "." + rFilename.substr(0, cwd.length());
+//    }
+//    catch (...) {}
 #else
     const std::string& relative_filename = rFilename;
 #endif // _MSV_VER

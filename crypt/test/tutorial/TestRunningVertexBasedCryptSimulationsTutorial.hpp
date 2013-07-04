@@ -78,6 +78,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SloughingCellKiller.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 /*
  * The next three header files define two different types of cell-cycle model,
  * one with fixed cell-cycle times and one

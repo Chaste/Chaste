@@ -210,11 +210,13 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     p_elem_file->close();
     p_edge_file->close();
 
-
-    // Having written the mesh to file, now construct it using TrianglesMeshReader
-    TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
-    mpMesh = new MutableMesh<2,2>;
-    mpMesh->ConstructFromMeshReader(mesh_reader);
+    // Having written the mesh to file, now construct it using TrianglesMeshReader.
+    // Nested scope so the reader closes files before we try deleting them below the scope.
+    {
+        TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
+        mpMesh = new MutableMesh<2,2>;
+        mpMesh->ConstructFromMeshReader(mesh_reader);
+    }
 
     // Delete the temporary folder
     output_file_handler.FindFile("").Remove();

@@ -199,17 +199,19 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     p_elem_file->close();
     p_edge_file->close();
 
-    // Having written the mesh to file, now construct it using TrianglesMeshReader
-    TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
-    mpMesh = new Cylindrical2dMesh(mDomainWidth);
-    mpMesh->ConstructFromMeshReader(mesh_reader);
+    // Having written the mesh to file, now construct it using TrianglesMeshReader.
+    // Nested scope so the reader closes files before we delete them below.
+    {
+        TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
+        mpMesh = new Cylindrical2dMesh(mDomainWidth);
+        mpMesh->ConstructFromMeshReader(mesh_reader);
+    }
 
     // Make the mesh cylindrical (we use Triangle library mode inside this ReMesh call)
     mpMesh->ReMesh();
 
     // Delete the temporary files
-    FileFinder output_dir_finder(output_file_handler.GetOutputDirectoryFullPath());
-    output_dir_finder.Remove();
+    output_file_handler.FindFile("").Remove();
 
     // The original files have been deleted, it is better if the mesh object forgets about them
     mpMesh->SetMeshHasChangedSinceLoading();

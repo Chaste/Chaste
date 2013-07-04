@@ -47,6 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GenericMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 
+// This is needed on Windows to ensure that meshes are looked up in the source folder.
+#include "FakePetscSetup.hpp"
+
 // these typedefs are just because can't have lines such as
 //  TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new TrianglesMeshReader<2,2>(name));
 // because the macro thinks the comma separates two arguments

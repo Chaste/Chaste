@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 
 /**
  * This class consists of a single test, in which a 2D vertex model

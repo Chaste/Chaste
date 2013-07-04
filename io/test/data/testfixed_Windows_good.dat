@@ -1,0 +1,5 @@
+Node(dimensionless) I_Na(milliamperes) I_K(milliamperes) I_Ca(milliamperes) Short_column(dimensionless)
+  1.000e+000   1.200e+001   5.937e+002   3.333e-001   0.000e+000 
+  2.000e+000   1.200e+001   1.187e+003   1.333e+000   1.000e+000 
+  3.000e+000   1.200e+001   1.781e+003   3.000e+000              
+  4.000e+000   1.200e+001   2.375e+003   5.333e+000              

@@ -92,6 +92,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The next header file defines a cell killer, which specifies how cells are removed from the simulation.*/
 #include "PlaneBasedCellKiller.hpp"
 
+/* Finally, we include a header that enforces running this test only on one process. */
+#include "FakePetscSetup.hpp"
+
 /* Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods.
  */

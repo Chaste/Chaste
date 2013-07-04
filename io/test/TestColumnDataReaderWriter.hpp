@@ -236,8 +236,11 @@ public:
 
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
-
+#ifndef _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testenddefine.dat", "io/test/data/testenddefine_good.dat"));
+#else
+        TS_ASSERT(FilesMatch(output_dir + "testenddefine.dat", "io/test/data/testenddefine_Windows_good.dat"));
+#endif
 
         TS_ASSERT(FilesMatch(output_dir + "testenddefine.info", "io/test/data/testenddefine_good.info"));
     }
@@ -349,8 +352,11 @@ public:
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
 
+#ifdef	_MSC_VER
+        TS_ASSERT(FilesMatch(output_dir + "testunlimitednegative.dat", "io/test/data/testunlimitednegative_good_Windows.dat"));
+#else
         TS_ASSERT(FilesMatch(output_dir + "testunlimitednegative.dat", "io/test/data/testunlimitednegative_good.dat"));
-
+#endif
         // Compare with known good data using ColumnDataReader
         ColumnDataReader good_reader("io/test/data", "testunlimitednegative_good", false);
         ColumnDataReader our_reader("TestColumnDataReaderWriter", "testunlimitednegative");
@@ -397,9 +403,11 @@ public:
 
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
-
+#ifndef _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testfixed.dat", "io/test/data/testfixed_good.dat"));
-
+#else
+        TS_ASSERT(FilesMatch(output_dir + "testfixed.dat", "io/test/data/testfixed_Windows_good.dat"));
+#endif
         TS_ASSERT(FilesMatch(output_dir + "testfixed.info", "io/test/data/testfixed_good.info"));
 
         TS_ASSERT_THROWS_NOTHING(mpTestReader = new ColumnDataReader("TestColumnDataReaderWriter", "testfixed"));
@@ -541,12 +549,20 @@ public:
 
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
-
+#ifndef _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_unlimited.dat",
                              "io/test/data/testfixedandunlimited_unlimited.dat"));
 
         TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_000001.dat",
                              "io/test/data/testfixedandunlimited_000001.dat"));
+#else
+        TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_unlimited.dat",
+                             "io/test/data/testfixedandunlimited_Windows_unlimited.dat"));
+
+        TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_000001.dat",
+                             "io/test/data/testfixedandunlimited_Windows_000001.dat"));
+
+#endif
 
         TS_ASSERT_THROWS_NOTHING(mpTestReader = new ColumnDataReader("TestColumnDataReaderWriter", "testfixedandunlimited"));
 

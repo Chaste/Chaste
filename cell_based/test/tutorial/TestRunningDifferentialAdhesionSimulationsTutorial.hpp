@@ -79,6 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 
 /*
  * The next header file defines a force law for describing the mechanical interactions

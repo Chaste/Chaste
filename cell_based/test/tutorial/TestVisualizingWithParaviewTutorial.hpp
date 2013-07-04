@@ -87,6 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 
 /* Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods.

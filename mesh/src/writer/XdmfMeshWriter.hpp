@@ -37,7 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define XDMFMESHWRITER_HPP_
 
 #include "AbstractTetrahedralMeshWriter.hpp"
+
+#ifndef _MSC_VER
 #include <xercesc/dom/DOM.hpp>
+#endif
 
 /**
  * A class for writing from a Chaste mesh to the geometry/topology components of

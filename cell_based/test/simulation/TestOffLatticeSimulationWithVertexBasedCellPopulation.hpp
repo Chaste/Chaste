@@ -61,6 +61,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
 
+#include "FakePetscSetup.hpp"
+
 class TestOffLatticeSimulationWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
