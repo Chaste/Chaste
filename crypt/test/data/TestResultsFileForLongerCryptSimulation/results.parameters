@@ -3,7 +3,6 @@
 	<CryptSimulation2d>
 		<CryptCircumference>16</CryptCircumference>
 		<UseJiggledBottomCells>1</UseJiggledBottomCells>
-		<OutputNodeVelocities>0</OutputNodeVelocities>
 		<Dt>0.00833333</Dt>
 		<EndTime>20</EndTime>
 		<SamplingTimestepMultiple>10</SamplingTimestepMultiple>
@@ -30,6 +29,7 @@
 		<OutputCellCyclePhases>0</OutputCellCyclePhases>
 		<OutputCellAges>0</OutputCellAges>
 		<OutputCellVolumes>0</OutputCellVolumes>
+		<OutputNodeVelocities>0</OutputNodeVelocities>
 	</MeshBasedCellPopulation-2-2>
 
 	<CellCycleModels>
