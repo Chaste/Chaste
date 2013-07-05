@@ -56,7 +56,7 @@ VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::VanLeeuwen2009WntSwatCellCycle
 
 void VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::InitialiseOdeSystem(double wntConcentration, boost::shared_ptr<AbstractCellMutationState> pMutationState)
 {
-    mpOdeSystem = new VanLeeuwen2009WntSwatCellCycleOdeSystem(1, wntConcentration,  pMutationState);
+    mpOdeSystem = new VanLeeuwen2009WntSwatCellCycleOdeSystem(1, wntConcentration, pMutationState);
 }
 
 AbstractCellCycleModel* VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::CreateCellCycleModel()
@@ -103,9 +103,7 @@ AbstractCellCycleModel* VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::Create
 
 void VanLeeuwen2009WntSwatCellCycleModelHypothesisOne::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    // No new parameters to output
-
-    // Call method on direct parent class
+    // No new parameters to output, so just call method on direct parent class
     AbstractVanLeeuwen2009WntSwatCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 

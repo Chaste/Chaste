@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WntConcentration.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
+#include "CellBetaCateninWriter.hpp"
 #include "SmartPointers.hpp"
 
 CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
@@ -45,7 +46,6 @@ CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
     : OffLatticeSimulation<2>(rCellPopulation,
                              deleteCellPopulationInDestructor,
                              initialiseCells),
-      mWriteBetaCatenin(false),
       mUsingMeshBasedCellPopulation(false)
 {
     /* Throw an exception message if not using a  MeshBasedCellPopulation or a VertexBasedCellPopulation.
@@ -61,17 +61,6 @@ CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,
     if (dynamic_cast<MeshBasedCellPopulation<2>*>(&mrCellPopulation))
     {
         mUsingMeshBasedCellPopulation = true;
-    }
-
-    /*
-     * To check if beta-catenin results will be written to file, we test if the first
-     * cell has a cell-cycle model that is a subclass of AbstractVanLeeuwen2009WntSwatCellCycleModel.
-     * In doing so, we assume that all cells in the simulation have the same cell cycle
-     * model.
-     */
-    if (dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(mrCellPopulation.Begin()->GetCellCycleModel()))
-    {
-        mWriteBetaCatenin = true;
     }
 
     if (!mDeleteCellPopulationInDestructor)
@@ -166,90 +155,25 @@ c_vector<double, 2> CryptSimulation2d::CalculateCellDivisionVector(CellPtr pPare
     }
 }
 
-void CryptSimulation2d::SetupWriteBetaCatenin()
-{
-    OutputFileHandler output_file_handler(this->mSimulationOutputDirectory + "/", false);
-    mVizBetaCateninResultsFile = output_file_handler.OpenOutputFile("results.vizbetacatenin");
-    *mpVizSetupFile << "BetaCatenin\n";
-}
-
-void CryptSimulation2d::WriteBetaCatenin(double time)
-{
-    *mVizBetaCateninResultsFile <<  time << "\t";
-
-    for (AbstractCellPopulation<2>::Iterator cell_iter = mrCellPopulation.Begin();
-         cell_iter != mrCellPopulation.End();
-         ++cell_iter)
-    {
-        unsigned global_index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-        double x = mrCellPopulation.GetLocationOfCellCentre(*cell_iter)[0];
-        double y = mrCellPopulation.GetLocationOfCellCentre(*cell_iter)[1];
-
-        // We should only be calling this code block if mWriteBetaCatenin has been set to true in the constructor
-        assert(mWriteBetaCatenin);
-
-        AbstractVanLeeuwen2009WntSwatCellCycleModel* p_model = dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(cell_iter->GetCellCycleModel());
-        double b_cat_membrane = p_model->GetMembraneBoundBetaCateninLevel();
-        double b_cat_cytoplasm = p_model->GetCytoplasmicBetaCateninLevel();
-        double b_cat_nuclear = p_model->GetNuclearBetaCateninLevel();
-
-        *mVizBetaCateninResultsFile << global_index << " " << x << " " << y << " " << b_cat_membrane << " " << b_cat_cytoplasm << " " << b_cat_nuclear << " ";
-    }
-
-    *mVizBetaCateninResultsFile << "\n";
-}
-
 void CryptSimulation2d::SetupSolve()
 {
     // First call method on base class
     OffLatticeSimulation<2>::SetupSolve();
 
     /*
-     * If there are any cells in the simulation, and mWriteBetaCatenin has been set
-     * to true in the constructor, then set up the beta-catenin results file and
-     * write the initial conditions to file.
+     * To check if beta-catenin results will be written to file, we test if the first
+     * cell has a cell-cycle model that is a subclass of AbstractVanLeeuwen2009WntSwatCellCycleModel.
+     * In doing so, we assume that all cells in the simulation have the same cell-cycle
+     * model.
      */
-    bool any_cells_present = (mrCellPopulation.Begin() != mrCellPopulation.End());
-    if (any_cells_present && mWriteBetaCatenin)
+    if (dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(this->mrCellPopulation.Begin()->GetCellCycleModel()))
     {
-        SetupWriteBetaCatenin();
-        double current_time = SimulationTime::Instance()->GetTime();
-        WriteBetaCatenin(current_time);
+        this->mrCellPopulation.AddCellWriter(new CellBetaCateninWriter<2, 2>(this->mSimulationOutputDirectory));
     }
-}
 
-void CryptSimulation2d::UpdateAtEndOfTimeStep()
-{
-    SimulationTime* p_time = SimulationTime::Instance();
-
-    if ((p_time->GetTimeStepsElapsed())%mSamplingTimestepMultiple == 0)
+    if (dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(mrCellPopulation.Begin()->GetCellCycleModel()))
     {
-        /*
-         * If there are any cells in the simulation, and mWriteBetaCatenin has been set
-         * to true in the constructor, then set up the beta-catenin results file and
-         * write the initial conditions to file.
-         */
-        bool any_cells_present = (mrCellPopulation.Begin() != mrCellPopulation.End());
-        if (any_cells_present && mWriteBetaCatenin)
-        {
-            WriteBetaCatenin(p_time->GetTime());
-        }
-    }
-}
-
-void CryptSimulation2d::UpdateAtEndOfSolve()
-{
-    // First call method on base class
-    OffLatticeSimulation<2>::UpdateAtEndOfSolve();
-
-    /*
-     * If there are any cells in the simulation, and mWriteBetaCatenin has been set
-     * to true in the constructor, then close the beta-catenin results file.
-     */
-    bool any_cells_present = (mrCellPopulation.Begin() != mrCellPopulation.End());
-    if (any_cells_present && mWriteBetaCatenin)
-    {
-        mVizBetaCateninResultsFile->close();
+        *mpVizSetupFile << "BetaCatenin\n";
     }
 }
 

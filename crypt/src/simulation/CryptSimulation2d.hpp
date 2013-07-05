@@ -73,20 +73,7 @@ protected:
 
         SerializableSingleton<WntConcentration<2> >* p_wnt_wrapper = WntConcentration<2>::Instance()->GetSerializationWrapper();
         archive & p_wnt_wrapper;
-
-        archive & mWriteBetaCatenin;
     }
-
-    /**
-     * Whether the simulation includes the cell-cycle models
-     * VanLeeuwen2009WntSwatCellCycleModelHypothesisOne or
-     * VanLeeuwen2009WntSwatCellCycleModelHypothesisOne, and
-     * hence whether beta catenin results are written to file.
-     */
-    bool mWriteBetaCatenin;
-
-    /** The file that the values of beta catenin is written out to. */
-    out_stream mVizBetaCateninResultsFile;
 
     /**
      * Helper member that stores whether we are using a MeshBasedCellPopulationWithGhostNodes
@@ -115,38 +102,11 @@ protected:
     c_vector<double, 2> CalculateCellDivisionVector(CellPtr pParentCell);
 
     /**
-     * Use an output file handler to create a beta catenin results file.
-     */
-    void SetupWriteBetaCatenin();
-
-    /**
-     * Write beta catenin results to file.
-     *
-     * @param time the current time
-     */
-    virtual void WriteBetaCatenin(double time);
-
-    /**
      * Overridden SetupSolve() method.
      *
      * Write initial beta catenin results to file if required.
      */
     void SetupSolve();
-
-    /**
-     * Overridden UpdateAtEndOfTimeStep() method.
-     *
-     * Write current beta catenin results to file if required.
-     */
-    void UpdateAtEndOfTimeStep();
-
-    /**
-     * Overridden UpdateAtEndOfSolve() method.
-     *
-     * Closes beta catenin results file if required, then calls
-     * the base class method.
-     */
-    void UpdateAtEndOfSolve();
 
 public:
 

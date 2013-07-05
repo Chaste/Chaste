@@ -10,6 +10,7 @@ mechanics/TestVertexCryptBoundaryForce.hpp
 odes/TestMirams2010WntOdeSystem.hpp
 odes/TestVanLeeuwen2009WntSwatCellCycleOdeSystem.hpp
 odes/TestWntCellCycleOdeSystem.hpp
+population/TestCellBetaCateninWriter.hpp
 population/TestCryptSimulationBoundaryCondition.hpp
 population/TestSloughingCellKillers.hpp
 population/TestVertexBasedCellPopulationForCrypt.hpp
