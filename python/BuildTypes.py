@@ -41,6 +41,7 @@ suite.
 """
 
 import os
+import sys
 
 class BuildType(object):
     """
@@ -375,8 +376,14 @@ class Gcc(BuildType):
     """gcc compiler with default options."""
     def __init__(self, *args, **kwargs):
         super(Gcc, self).__init__(*args, **kwargs)
-        self._compiler_type = 'gcc'
-        self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
+        if (sys.platform == 'darwin'):
+            # On Mac OSX we assume that the underlying compiler is actually the clang frontend to LLVM
+            self._compiler_type = 'clang'
+            # clang mistakes an instantiation of a class (with no method calls) as an 'unused variable'
+            self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla', '-Wno-unused-variable'])
+        else:
+            self._compiler_type = 'gcc'
+            self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
 
 class GccDebug(Gcc):
     """
