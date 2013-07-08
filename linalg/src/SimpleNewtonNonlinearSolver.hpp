@@ -47,7 +47,6 @@ class SimpleNewtonNonlinearSolver : public AbstractNonlinearSolver
 {
 private:
 
-    double mLinearSolverRelativeTolerance;   /**< The linear solver relative tolerance. */
     double mTolerance;                       /**< The tolerance (set to 1e-5 in constructor). */
     bool mWriteStats;                        /**< Whether the solver writes details as it solves (set to false in constructor). */
 
@@ -58,9 +57,8 @@ public:
     /**
      * Constructor.
      *
-     * @param linearSolverRelativeTolerance defaults to 1e-6
      */
-    SimpleNewtonNonlinearSolver(double linearSolverRelativeTolerance = 1e-6);
+    SimpleNewtonNonlinearSolver();
 
     /**
      * Destructor.

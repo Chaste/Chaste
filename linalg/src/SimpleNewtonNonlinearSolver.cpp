@@ -38,9 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "Exception.hpp"
 
-SimpleNewtonNonlinearSolver::SimpleNewtonNonlinearSolver(double linearSolverRelativeTolerance)
-        : mLinearSolverRelativeTolerance(linearSolverRelativeTolerance),
-        mTolerance(1e-5),
+SimpleNewtonNonlinearSolver::SimpleNewtonNonlinearSolver()
+        : mTolerance(1e-5),
         mWriteStats(false)
 {
     mTestDampingValues.push_back(-0.1);
