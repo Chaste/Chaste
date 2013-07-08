@@ -111,7 +111,7 @@ private:
     bool mAreLocalBoxesSet;
 
     /** A fudge (box swelling) factor to deal with 32-bit floating point issues. */
-    const double mFudge;
+    static const double msFudge;
 
     /** A distributed vector factory that governs ownership of rows of boxes */
     DistributedVectorFactory* mpDistributedBoxStackFactory;

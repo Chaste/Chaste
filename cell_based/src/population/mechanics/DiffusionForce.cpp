@@ -36,14 +36,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DiffusionForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
+//Static constant is instantiated here.
+template<unsigned DIM>
+const double DiffusionForce<DIM>::msBoltzmannConstant = 1.3806488e-23;
+
 template<unsigned DIM>
 DiffusionForce<DIM>::DiffusionForce()
     : AbstractForce<DIM>(),
       mDiffusionConstant(0.01),
       mAbsoluteTemperature(296.0), // default to room temperature
       mViscosity(3.204e-6), // default to viscosity of water at room temperature in (using microns and hours)
-      mMechanicsCutOffLength(10.0),
-      mBoltzmannConstant(1.3806488e-23)
+      mMechanicsCutOffLength(10.0)
 {
 }
 
@@ -107,7 +110,7 @@ double DiffusionForce<DIM>::GetViscosity()
 template<unsigned DIM>
 double DiffusionForce<DIM>::GetDiffusionScalingConstant()
 {
-    return mBoltzmannConstant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
+    return msBoltzmannConstant*mAbsoluteTemperature/(6.0*mViscosity*M_PI);
 }
 
 template<unsigned DIM>

@@ -39,13 +39,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // BoxCollection methods
 /////////////////////////////////////////////////////////////////////////////
 
+// Static member for "fudge factor" is instantiated here
+template<unsigned DIM>
+const double BoxCollection<DIM>::msFudge = 5e-14;
 
 template<unsigned DIM>
 BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX)
     : mDomainSize(domainSize),
       mBoxWidth(boxWidth),
-      mIsPeriodicInX(isPeriodicInX),
-      mFudge(5e-14)
+      mIsPeriodicInX(isPeriodicInX)
 {
     // Periodicity only works in 2d
     if (isPeriodicInX)
@@ -66,7 +68,7 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
 
     for (unsigned i=0; i<DIM; i++)
     {
-        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + mFudge) + 1;
+        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2*i+1) - domainSize(2*i))/boxWidth + msFudge) + 1;
         num_boxes *= mNumBoxesEachDirection(i);
         coefficients.push_back(coefficients[i]*mNumBoxesEachDirection(i));
     }
@@ -157,7 +159,7 @@ unsigned BoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLoca
     c_vector<unsigned, DIM> containing_box_indices;
     for (unsigned i=0; i<DIM; i++)
     {
-        containing_box_indices[i] = (unsigned) floor((rLocation[i] - mDomainSize(2*i) + mFudge)/mBoxWidth);
+        containing_box_indices[i] = (unsigned) floor((rLocation[i] - mDomainSize(2*i) + msFudge)/mBoxWidth);
     }
 
     // Use these to compute the index of the containing box

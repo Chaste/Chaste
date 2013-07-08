@@ -585,7 +585,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::UnflagAllElements()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::FlagElementsNotContainingNodes(std::set<unsigned> nodesList)
+void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::FlagElementsNotContainingNodes(const std::set<unsigned>& rNodes)
 {
     for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
@@ -597,8 +597,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::FlagElementsNotContainingNodes(std
         {
             unsigned node_index = iter->GetNodeGlobalIndex(i);
 
-            std::set<unsigned>::iterator set_iter = nodesList.find(node_index);
-            if (set_iter != nodesList.end())
+            std::set<unsigned>::iterator set_iter = rNodes.find(node_index);
+            if (set_iter != rNodes.end())
             {
                 found_node = true;
             }

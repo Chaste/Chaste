@@ -36,12 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
+
+// Static member for "fudge factor" is instantiated here
+template<unsigned DIM>
+const double DistributedBoxCollection<DIM>::msFudge = 5e-14;
+
 template<unsigned DIM>
 DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX, int localRows)
     : mBoxWidth(boxWidth),
       mIsPeriodicInX(isPeriodicInX),
       mAreLocalBoxesSet(false),
-      mFudge(5e-14),
       mCalculateNodeNeighbours(true)
 {
     // Periodicity only works in 2d and in serial.
@@ -68,7 +72,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     for (unsigned i=0; i<DIM; i++)
     {
         double counter = mDomainSize(2*i);
-        while (counter + mFudge < mDomainSize(2*i+1))
+        while (counter + msFudge < mDomainSize(2*i+1))
         {
             mNumBoxesEachDirection(i)++;
             counter += mBoxWidth;
@@ -272,7 +276,7 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
     for (unsigned i=0; i<DIM; i++)
     {
         double box_counter = mDomainSize(2*i);
-        while (!((box_counter + mBoxWidth) > rLocation[i] + mFudge))
+        while (!((box_counter + mBoxWidth) > rLocation[i] + msFudge))
         {
             containing_box_indices[i]++;
             box_counter += mBoxWidth;

@@ -76,7 +76,7 @@ private :
     /**
      * The boltzmann constant
      */
-    double mBoltzmannConstant;
+    static const double msBoltzmannConstant;
 
     /**
      * Archiving.
@@ -90,7 +90,6 @@ private :
         archive & mAbsoluteTemperature;
         archive & mViscosity;
         archive & mMechanicsCutOffLength;
-        archive & mBoltzmannConstant;
     }
 
 public :
