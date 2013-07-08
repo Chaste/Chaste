@@ -134,13 +134,20 @@ class ChasteTestResult(unittest.TestResult):
 
 class ChasteTestRunner:
     """A test runner class that displays results in Chaste's cxxtest format."""
-    def __init__(self, stream=sys.stdout, descriptions=True, profile=False):
+    def __init__(self, stream=sys.stdout, descriptions=True, profile=False, lineProfile=False):
         self.stream = stream
         self.descriptions = descriptions
         self.profiler = None
         if profile:
             import cProfile
             self.profiler = cProfile.Profile()
+            self.profiler_type = 'func'
+        if lineProfile:
+            import line_profiler
+            self.profiler = line_profiler.LineProfiler()
+            self.profiler_type = 'line'
+            import __builtin__
+            __builtin__.__dict__['line_profile'] = self.profiler
 
     def _makeResult(self):
         return ChasteTestResult(self.stream, descriptions=self.descriptions)
@@ -167,16 +174,18 @@ class ChasteTestRunner:
             self.stream.write("OK!\n")
         if self.profiler:
             # Append a profile report to the output
-            import pstats
-            stats = pstats.Stats(self.profiler, stream=self.stream)
-            self.stream.write('\n\nProfile report:\n\n')
-            stats.sort_stats('time')
-            stats.print_stats()
-            self.stream.write('\n\n')
-            stats.print_callees(.2)
-            self.stream.write('\n\n')
-#            stats.sort_stats('cumulative')
-            stats.print_callers(.2)
+            if self.profiler_type == 'line':
+                self.profiler.print_stats(self.stream)
+            else:
+                import pstats
+                stats = pstats.Stats(self.profiler, stream=self.stream)
+                self.stream.write('\n\nProfile report:\n\n')
+                stats.sort_stats('time')
+                stats.print_stats()
+                self.stream.write('\n\n')
+                stats.print_callees(.2)
+                self.stream.write('\n\n')
+                stats.print_callers(.2)
         return result
 
 class ChasteTestLoader(unittest.TestLoader):
@@ -203,10 +212,11 @@ def SetTestOutput(module):
     except:
         pass
 
-def main(filepath, profile=False):
+def main(filepath, profile=False, lineProfile=False):
     """Run tests defined in the given Python file.
 
     :param profile: whether to enable profiling of the test execution using cProfile.
+    :param lineProfile: whether to enable profiling of the test execution using line_profiler.
     """
     if not os.path.isfile(filepath):
         raise ValueError(filepath + ' is not a file')
@@ -225,7 +235,7 @@ def main(filepath, profile=False):
         file.close()
     # Extract and run its tests
     SetTestOutput(module)
-    runner = ChasteTestRunner(profile=profile)
+    runner = ChasteTestRunner(profile=profile, lineProfile=lineProfile)
     if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
         suite = module.MakeTestSuite()
         result = runner.run(suite)
@@ -239,7 +249,10 @@ if __name__ == '__main__':
         profile = '--profile' in sys.argv
         if profile:
             sys.argv.remove('--profile')
-        main(sys.argv[1], profile=profile)
+        line_profile = '--line-profile' in sys.argv
+        if line_profile:
+            sys.argv.remove('--line-profile')
+        main(sys.argv[1], profile=profile, lineProfile=line_profile)
     else:
         # Default test of this file
         unittest.main(testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())

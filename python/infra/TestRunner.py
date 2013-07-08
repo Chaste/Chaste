@@ -169,7 +169,9 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     if exefile.startswith("python/infra/Check"):
         command = exefile + ' 2>&1'
     elif exefile.endswith('.py'):
-        if build.is_profile:
+        if build.build_dir == 'line_profile':
+            prof = ' --line-profile'
+        elif build.is_profile:
             prof = ' --profile'
         else:
             prof = ''
