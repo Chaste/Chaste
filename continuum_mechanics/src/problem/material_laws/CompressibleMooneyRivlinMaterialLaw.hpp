@@ -73,8 +73,8 @@ private:
     /** Parameter c3 */
     double mC3;
 
-    /** -1.0/DIM */
-    static const double mMinusOneOverDimension = -1.0/DIM;
+    /** Initialised to -1.0/DIM*/
+    static const double msMinusOneOverDimension;
 
 public:
 
@@ -87,7 +87,7 @@ public:
      */
     double Get_dW_dI1(double I1, double I2, double I3)
     {
-        return mC1 * pow(I3, mMinusOneOverDimension);
+        return mC1 * pow(I3, msMinusOneOverDimension);
     }
 
     /**
@@ -111,7 +111,7 @@ public:
      */
     double Get_dW_dI3(double I1, double I2, double I3)
     {
-        return     mC1*I1*mMinusOneOverDimension*pow(I3,mMinusOneOverDimension - 1)
+        return     mC1*I1*msMinusOneOverDimension*pow(I3,msMinusOneOverDimension - 1)
                 +  mC3*(1 - pow(I3,-0.5));
     }
 
@@ -150,7 +150,7 @@ public:
      */
     double Get_d2W_dI3(double I1, double I2, double I3)
     {
-        return    mC1*I1*mMinusOneOverDimension*(mMinusOneOverDimension - 1)*pow(I3,mMinusOneOverDimension - 2)
+        return    mC1*I1*msMinusOneOverDimension*(msMinusOneOverDimension - 1)*pow(I3,msMinusOneOverDimension - 2)
                 + 0.5*mC3*pow(I3,-1.5);
     }
 
@@ -178,7 +178,7 @@ public:
      */
     double Get_d2W_dI1I3(double I1, double I2, double I3)
     {
-        return mC1*mMinusOneOverDimension*pow(I3,mMinusOneOverDimension-1);
+        return mC1*msMinusOneOverDimension*pow(I3,msMinusOneOverDimension-1);
     }
 
 
@@ -234,5 +234,8 @@ public:
     }
 };
 
+/** Initialised to -1.0/DIM  */
+template<unsigned DIM>
+const double CompressibleMooneyRivlinMaterialLaw<DIM>::msMinusOneOverDimension = -1.0/DIM;
 
 #endif /*COMPRESSIBLEMOONEYRIVLINMATERIALLAW_HPP_*/
