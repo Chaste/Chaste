@@ -70,25 +70,18 @@ public:
         // Get rank
         PetscInt my_rank;
         MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
+        
+        // Close PETSc down again.
+        // This needs to occur before we execute any test code, since some parts
+        // (e.g. OutputFileHandler) will use a barrier if PETSc is initialised.
+        PETSCEXCEPT(PetscFinalize());
 
         // Make sure that only one process proceeds into the test itself
         if (my_rank != 0)
         {
-            PETSCEXCEPT(PetscFinalize());
             exit(0);
         }
 
-        return true;
-    }
-    
-    /**
-     * Clean up PETSc after running all tests.
-     * @return true (by CxxTest convention)
-     */
-    bool tearDownWorld()
-    {
-        ///Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
-        PETSCEXCEPT(PetscFinalize());
         return true;
     }
 };
