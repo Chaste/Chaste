@@ -200,6 +200,9 @@ public:
             // If this ever fails, then run the test for 50 milliseconds.
             // The top tolerance was 0.99, the bottom one was 0.9
         }
+
+        delete p_mesh_e;
+        delete p_mesh_m;
     }
 };
 
