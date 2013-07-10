@@ -538,7 +538,7 @@ public:
         p_stem_cell->InitialiseCellCycleModel();
 
         double SG2M_duration = p_cell_model->GetSG2MDuration();
-        TS_ASSERT_THROWS_NOTHING(WntCellCycleModel cell_model_3());
+        TS_ASSERT_THROWS_NOTHING(WntCellCycleModel cell_model_3);
 
         // Create another cell-cycle model and associated cell
         WntCellCycleModel* p_cell_model_1 = new WntCellCycleModel();
@@ -604,7 +604,7 @@ public:
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
-        TS_ASSERT_THROWS_NOTHING(WntCellCycleModel cell_model_3());
+        TS_ASSERT_THROWS_NOTHING(WntCellCycleModel cell_model_3);
 
         // Create another cell-cycle model and associated cell
         WntCellCycleModel* p_cell_model_1 = new WntCellCycleModel();

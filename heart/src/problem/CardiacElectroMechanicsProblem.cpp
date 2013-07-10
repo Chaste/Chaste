@@ -271,7 +271,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
             QuadraticMesh<DIM>* pMechanicsMesh,
             AbstractCardiacCellFactory<DIM>* pCellFactory,
             ElectroMechanicsProblemDefinition<DIM>* pProblemDefinition,
-            std::string outputDirectory = "")
+            std::string outputDirectory)
       : mCompressibilityType(compressibilityType),
         mpCardiacMechSolver(NULL),
         mpMechanicsSolver(NULL),

@@ -380,7 +380,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     solutions.SetNumberOfTimeSteps(stepper.GetTotalTimeStepsTaken());
 
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
+    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
     RecordStoppingPoint(endTime, yout);
     DeleteVector(yout);
 
@@ -427,7 +427,7 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 //    std::cout << " Solved to " << endTime << " in " << steps << " steps.\n";
 
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
+    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
     RecordStoppingPoint(tend, yout);
     DeleteVector(yout);
 }

@@ -46,6 +46,8 @@ const double Kerchoffs2003ContractionModel::Ea = 20;  // 1/um
 const double Kerchoffs2003ContractionModel::v0 = 0.0075; // um/ms
 const double Kerchoffs2003ContractionModel::ls0 = 1.9; // um
 const double Kerchoffs2003ContractionModel::ld = -0.4; // um
+const double Kerchoffs2003ContractionModel::mActivationVoltage = 0.0;
+const double Kerchoffs2003ContractionModel::mDeactivationVoltage = -70.0;
 
 Kerchoffs2003ContractionModel::Kerchoffs2003ContractionModel()
     : AbstractOdeBasedContractionModel(1)

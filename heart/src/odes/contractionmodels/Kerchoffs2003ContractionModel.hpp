@@ -62,9 +62,9 @@ private:
     static const double ld;  /**< See reference. -0.4 um */
 
     /**Voltage threshold above which the cell is activated (mV) - note hysteresis*/
-    static const double mActivationVoltage = 0;
+    static const double mActivationVoltage; //= 0;
     /**Voltage threshold below which the cell is deactivated (mV)*/
-    static const double mDeactivationVoltage = -70;
+    static const double mDeactivationVoltage;// = -70;
 
     /** Length of the sarcomere in um. Variable "ls" in reference. Fibre-stretch is ls/ls0. */
     double mSarcomereLength;

@@ -211,7 +211,7 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
     solutions.SetNumberOfTimeSteps(stepper.GetTotalTimeStepsTaken());
 
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
+    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
 
     RecordStoppingPoint(tEnd);
 
@@ -237,7 +237,7 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     assert(fabs(cvode_stopped_at - tEnd) < DBL_EPSILON);
 
     ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
-    assert(ierr == CV_SUCCESS); ierr=ierr; // avoid unused var warning
+    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
 
     RecordStoppingPoint(cvode_stopped_at);
 
