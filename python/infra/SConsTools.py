@@ -1004,24 +1004,24 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     dyn_libs = DoDynamicallyLoadableModules(otherVars)
 
     # Build and install the library for this project
+    project_lib = test_lib = libpath = None
     set_env_chaste_libs = True
     if use_chaste_libs:
         if otherVars['static_libs']:
-            project_lib = env.StaticLibrary(projectName, files)
+            if files:
+                project_lib = env.StaticLibrary(projectName, files)
+                project_lib = env.Install('#lib', project_lib)[0]
             libpath = '#lib'
-            project_lib = env.Install(libpath, project_lib)[0]
         else:
             if files:
                 project_lib = env.SharedLibrary(projectName, files, libIdPrefix='projects/')[0]
                 set_env_chaste_libs = False # Done by FasterSharedLibrary
-            else:
-                project_lib = None
             libpath = '#linklib'
         # Build the test library for this project
-        test_lib = env.StaticLibrary('test'+projectName, testsource)[0]
+        if testsource:
+            test_lib = env.StaticLibrary('test'+projectName, testsource)[0]
     else:
         # Build the object files for this project
-        project_lib = test_lib = libpath = None
         for source_file in files + testsource:
             objs = env.StaticObject(source_file)
             key = os.path.join(project_path, source_file)
@@ -1033,10 +1033,14 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % project_path]
     if project_lib:
         chaste_libs[0:0] = [projectName]
-    all_libs = ['test'+projectName] + chaste_libs + otherVars['other_libs']
+    if test_lib:
+        chaste_libs[0:0] = ['test' + projectName]
+    all_libs = chaste_libs + otherVars['other_libs']
 
     # Make test output depend on shared libraries, so if implementation changes then tests are re-run.
-    lib_deps = [test_lib] # Source code used by our tests
+    lib_deps = []
+    if test_lib:
+        lib_deps.append(test_lib) # Source code used by our tests
     #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chasteLibsUsed)) # all Chaste libs used
     if project_lib:
         lib_deps.append(project_lib)
@@ -1047,9 +1051,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     if otherVars['build_exes']:
         apps_path = os.path.join(Dir('#').abspath, 'projects', projectName, 'apps')
         if os.path.isdir(apps_path):
-            BuildExes(otherVars['build'], env, apps_path,
-                      components=chaste_libs,
-                      otherVars=otherVars)
+            BuildExes(otherVars['build'], env, apps_path, components=chaste_libs, otherVars=otherVars)
     
     return test_log_files
 
@@ -1157,31 +1159,31 @@ def DoComponentSConscript(component, otherVars):
     
     # Build and install the library for this component
     set_env_chaste_libs = True
+    lib = test_lib = libpath = None
     if use_chaste_libs:
         if otherVars['static_libs']:
-            lib = env.StaticLibrary(component, files + special_objects)
-            # Add explicit dependencies on the Chaste libraries we use too,
-            # so this library and its tests will be re-linked if they change
-            env.Depends(lib, map(lambda lib: '#lib/lib%s.a' % lib,
-                                 env['CHASTE_COMP_DEPS'][component]))
-            lib = env.Install('#lib', lib)[0]
+            if files:
+                lib = env.StaticLibrary(component, files + special_objects)
+                # Add explicit dependencies on the Chaste libraries we use too,
+                # so this library and its tests will be re-linked if they change
+                env.Depends(lib, map(lambda lib: '#lib/lib%s.a' % lib,
+                                     env['CHASTE_COMP_DEPS'][component]))
+                lib = env.Install('#lib', lib)[0]
             libpath = '#lib'
         else:
             if files:
                 lib = env.SharedLibrary(component, files + special_objects)
                 set_env_chaste_libs = False # Done by FasterSharedLibrary
-            else:
-                lib = None
             libpath = '#linklib'
         # Build the test library for this component
-        test_lib = env.StaticLibrary('test'+component, testsource)
+        if testsource:
+            test_lib = env.StaticLibrary('test'+component, testsource)
         # Install libraries?
         if lib and env['INSTALL_FILES']:
             t = env.Install(os.path.join(otherVars['install_prefix'], 'lib'), lib)
             env.Alias('install', t)
     else:
         # Don't build libraries - tests will link against object files directly
-        lib = test_lib = libpath = None
         for source_file in files + testsource:
             objs = env.StaticObject(source_file)
             key = os.path.join(component, str(source_file))
@@ -1194,10 +1196,14 @@ def DoComponentSConscript(component, otherVars):
     chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % component]
     if lib:
         chaste_libs = [component] + chaste_libs
-    all_libs = ['test'+component] + chaste_libs + otherVars['other_libs']
+    if test_lib:
+        chaste_libs = ['test' + component] + chaste_libs
+    all_libs = chaste_libs + otherVars['other_libs']
     
     # Make test output depend on shared libraries, so if implementation changes then tests are re-run.
-    lib_deps = [test_lib] # Source code used by our tests
+    lib_deps = []
+    if test_lib:
+        lib_deps.append(test_lib) # Source code used by our tests
     #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs)) # all Chaste libs used
     if lib:
         lib_deps.append(lib)
