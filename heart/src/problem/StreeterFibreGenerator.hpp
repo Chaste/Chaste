@@ -117,7 +117,7 @@ public:
      * File format: The first line indicates the number of elements. Each of the following lines contain SPACE_DIM vectors of SPACE_DIM elements for the
      * direction of the myofibre, the transverse to it in the plane of the myocyte laminae and the normal to this laminae.
      *
-     * @param outputDirectory Output directory
+     * @param outputDirectory Output directory relative to CHASTE_TEST_OUTPUT
      * @param fibreOrientationFile Output file
      * @param logInfo Tells the method to output extra debug info. To be eliminated once it's fully tested
      *
