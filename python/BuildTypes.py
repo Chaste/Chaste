@@ -86,6 +86,16 @@ class BuildType(object):
                       'gprof': 'gprof', 'pprof': 'pprof',
                       'rm': 'rm', 'cat': 'cat'}
 
+    def __getstate__(self):
+        """Implementation of pickle protocol.
+
+        This is provided because SCons uses the pickle of objects to determine when to rebuild things built
+        with a Python function action.  We need to ignore the build environment or we'll always rebuild.
+        """
+        d = self.__dict__.copy()
+        d.pop('env', None)
+        return d
+
     def DumpDebugInfo(self):
         """Print out some useful build system debugging information."""
         print "Build class", self.__class__.__name__, "from build type", self.build_type
