@@ -84,6 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 
 /*
  * EMPTYLINE

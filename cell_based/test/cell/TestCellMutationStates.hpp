@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "AbstractCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -55,6 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
 #include "SmartPointers.hpp"
+
+#include "FakePetscSetup.hpp"
 
 class TestCellMutationStates : public AbstractCellBasedTestSuite
 {

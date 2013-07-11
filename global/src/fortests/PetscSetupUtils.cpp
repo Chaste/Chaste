@@ -69,12 +69,17 @@ void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
 }
 #endif
 
-
-void PetscSetupUtils::CommonSetup()
+void PetscSetupUtils::InitialisePetsc()
 {
     // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
     CommandLineArguments* p_args = CommandLineArguments::Instance();
     PETSCEXCEPT(PetscInitialize(p_args->p_argc, p_args->p_argv, PETSC_NULL, PETSC_NULL));
+}
+
+
+void PetscSetupUtils::CommonSetup()
+{
+    InitialisePetsc();
 
     // Check that the working directory is correct, or many tests will fail
     std::string cwd = GetCurrentWorkingDirectory() + "/";

@@ -57,9 +57,11 @@ class PetscSetup : public CxxTest::GlobalFixture
 public:
 
     /**
-     * Run the standard setup method for PETSc, but then take it down again.
+     * Run the standard setup method for PETSc, but then fake being a single process.
      * Only the process with PETSc rank zero continues beyond setUpWorld(); the others
      * exit gracefully.
+     *
+     * Note that we need to keep MPI initialized so we can use MPI_Wtime etc.
      *
      * @return true (by CxxTest convention)
      */
@@ -69,19 +71,31 @@ public:
 
         // Get rank
         PetscInt my_rank;
-        MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
+        MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
         
-        // Close PETSc down again.
-        // This needs to occur before we execute any test code, since some parts
-        // (e.g. OutputFileHandler) will use a barrier if PETSc is initialised.
-        PETSCEXCEPT(PetscFinalize());
-
         // Make sure that only one process proceeds into the test itself
         if (my_rank != 0)
         {
+            PETSCEXCEPT(PetscFinalize());
             exit(0);
         }
-
+        
+        // Fool PETSc into thinking it was only run on one process.
+        // This ensures any barriers etc. don't cause deadlock.
+        PETSC_COMM_WORLD = MPI_COMM_SELF;
+        
+        return true;
+    }
+    
+    /**
+     * Clean up PETSc on the master process after running tests.
+     * @return true (by CxxTest convention)
+     */
+    bool tearDownWorld()
+    {
+        // Remind PETSc there were originally more processes so MPI is finalized properly.
+        PETSC_COMM_WORLD = MPI_COMM_WORLD;
+        PETSCEXCEPT(PetscFinalize());
         return true;
     }
 };

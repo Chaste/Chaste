@@ -57,6 +57,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DynamicCellModelLoader.hpp"
 #include "Warnings.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 /*
 Megan E. Marsh, Raymond J. Spiteri
 Numerical Simulation Laboratory
