@@ -60,7 +60,7 @@ class Timer
 private:
 
     /** The start time. */
-    static time_t msStartTime;
+    static double msStartTime;
 
 public:
 

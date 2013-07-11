@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "PetscTools.hpp"
 
-time_t Timer::msStartTime = 0.0;
+double Timer::msStartTime = MPI_Wtime(); //In case user forgets to Reset() before printing.
 
 void Timer::Reset()
 {
