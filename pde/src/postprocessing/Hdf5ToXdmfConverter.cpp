@@ -57,6 +57,8 @@ Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(const FileFinde
     this->WriteFilesUsingMesh(*pMesh);
 }
 
+#ifndef _MSC_VER
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
                                                                  XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
@@ -137,6 +139,8 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAME
         p_hdf_element->appendChild(p_hdf_text);
     }
 }
+
+#endif
 
 /////////////////////////////////////////////////////////////////////
 // Explicit instantiation
