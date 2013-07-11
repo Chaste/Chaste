@@ -107,7 +107,7 @@ Vec ExtendedBidomainProblem<DIM>::CreateInitialCondition()
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::ProcessExtracellularStimulus()
 {
-    if ((mpExtracellularStimulusFactory == NULL))//user has not passed in any extracelular stimulus in any form
+    if ( mpExtracellularStimulusFactory == NULL )//user has not passed in any extracelular stimulus in any form
     {
         mpExtracellularStimulusFactory = new AbstractStimulusFactory<DIM>();
         //create one (with default implementation to zero stimulus everywhere)

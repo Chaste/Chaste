@@ -56,10 +56,10 @@ class StimulatedCellFactory: public AbstractCardiacCellFactory<1>
 {
 private:
         boost::shared_ptr<SimpleStimulus> mpStimulus;
-        static const double magnitude = -105000.0;//volume stimulus in microA/cm3
+        //static const double magnitude = -105000.0;//volume stimulus in microA/cm3
 public:
     StimulatedCellFactory() : AbstractCardiacCellFactory<1>(),
-            mpStimulus ( new SimpleStimulus(magnitude, 1.0))/*amplitude, duration (ms)*/
+            mpStimulus ( new SimpleStimulus(-105000.0, 1.0))/*amplitude, duration (ms)*/
     {
     }
 
@@ -84,11 +84,11 @@ class StimulatedCellFactoryBidomain: public AbstractCardiacCellFactory<1>
 {
 private:
         boost::shared_ptr<SimpleStimulus> mpStimulus;
-        static const double magnitude = -105000.0;
+        //static const double magnitude = -105000.0;
         // this is a volume stimulus in microA/cm3
 public:
         StimulatedCellFactoryBidomain() : AbstractCardiacCellFactory<1>(),
-            mpStimulus ( new SimpleStimulus(magnitude, 1.0))/*amplitude, duration (ms)*/
+            mpStimulus ( new SimpleStimulus(-105000.0, 1.0))/*amplitude, duration (ms)*/
     {
     }
 

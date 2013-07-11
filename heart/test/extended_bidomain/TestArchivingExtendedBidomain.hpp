@@ -59,10 +59,10 @@ class StimulatedCellFactory: public AbstractCardiacCellFactory<2>
 {
 private:
         boost::shared_ptr<SimpleStimulus> mpStimulus;
-        static const double magnitude = -445000.0;
+        //static const double magnitude = -445000.0;
 public:
         StimulatedCellFactory() : AbstractCardiacCellFactory<2>(),
-            mpStimulus ( new SimpleStimulus(magnitude, 1.0))/*amplitude, duration (ms)*/
+            mpStimulus ( new SimpleStimulus(-445000.0, 1.0))/*amplitude, duration (ms)*/
     {
     }
 
@@ -86,10 +86,10 @@ class UnStimulatedCellFactory: public AbstractCardiacCellFactory<2>
 {
 private:
         boost::shared_ptr<SimpleStimulus> mpStimulus;
-        static const double magnitude = 0.0;
+        //static const double magnitude = 0.0;
 public:
         UnStimulatedCellFactory() : AbstractCardiacCellFactory<2>(),
-            mpStimulus ( new SimpleStimulus(magnitude, 1.0))
+				    mpStimulus ( new SimpleStimulus(0.0, 1.0)) ///\todo Shouldn't this be a ZeroStimulus?
     {
     }
 

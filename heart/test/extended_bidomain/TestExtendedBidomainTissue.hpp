@@ -66,10 +66,10 @@ class StimulatedCellFactory: public AbstractCardiacCellFactory<3>
 {
 private:
         boost::shared_ptr<SimpleStimulus> mpStimulus;
-        static const double magnitude = -105.0*1400;
+        //static const double magnitude = -105.0*1400;
 public:
     StimulatedCellFactory() : AbstractCardiacCellFactory<3>(),
-            mpStimulus ( new SimpleStimulus(magnitude, 1.0))/*amplitude, duration (ms)*/
+            mpStimulus ( new SimpleStimulus(-105.0*1400, 1.0))/*amplitude, duration (ms)*/
     {
     }
 
