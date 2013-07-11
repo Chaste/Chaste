@@ -37,17 +37,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Timer.hpp"
 #include "LogFile.hpp"
+#include "PetscTools.hpp"
 
-time_t Timer::StartTime;
+time_t Timer::msStartTime = 0.0;
 
 void Timer::Reset()
 {
-    StartTime = std::clock();
+    msStartTime = MPI_Wtime(); //Arbitrary start time in seconds
 }
 
 void Timer::Print(std::string message)
 {
-    double time = (std::clock() - StartTime)/(CLOCKS_PER_SEC+0.0); //0.0 is to ensure double division
+    double time = MPI_Wtime() - msStartTime;
+    if (PetscTools::IsParallel())
+    {
+    	std::cout << "proc " << PetscTools::GetMyRank() << ": ";
+    }
     std::cout << message << " time: " << time << "s\n" << std::flush;
     LOG(2,"    " << message << " time: "<< time <<"s");
 }

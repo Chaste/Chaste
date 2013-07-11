@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TIMER_HPP_
 #define TIMER_HPP_
 
-#include <ctime>
 #include <string>
 
 /**
@@ -61,7 +60,7 @@ class Timer
 private:
 
     /** The start time. */
-    static time_t StartTime;
+    static time_t msStartTime;
 
 public:
 
@@ -71,7 +70,7 @@ public:
     static void Reset();
 
     /**
-     * Print the elapsed time (to std::cout and the Log file (under logging-level 2)
+     * Print the elapsed wall-clock time (to std::cout and the Log file (under logging-level 2))
      * preceded by the message provided.
      *
      * @param message
@@ -79,7 +78,7 @@ public:
     static void Print(std::string message);
 
     /**
-     * Print the elapsed time (to std::cout and the Log file (under logging-level 2)
+     * Print the elapsed wall-clock time (to std::cout and the Log file (under logging-level 2))
      * preceded by the message provided, and also reset the timer.
      *
      * @param message
