@@ -44,7 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "MonodomainProblem.hpp"
 #include "AbstractCardiacCellFactory.hpp"
+#include "AbstractCvodeCell.hpp"
 #include "LuoRudy1991.hpp"
+#include "LuoRudy1991Cvode.hpp"
 #include "FaberRudy2000.hpp"
 #include "Hdf5DataReader.hpp"
 #include "ReplicatableVector.hpp"
@@ -103,7 +105,44 @@ public:
     }
 };
 
+#ifdef CHASTE_CVODE
+/*
+ * Cell factory for TestOutputDoesNotDependOnPrintTimestep. Returns CVODE cells
+ */
+class Cvode1dCellFactory : public AbstractCardiacCellFactory<1>
+{
+private:
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
 
+public:
+    Cvode1dCellFactory() : AbstractCardiacCellFactory<1>(),
+        mpStimulus(new SimpleStimulus(-70000.0, 1.0, 0.0))
+        {
+        }
+
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    {
+        AbstractCvodeCell* p_cell;
+        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+
+        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+
+        if (x<0.3)
+        {
+            p_cell = new CellLuoRudy1991FromCellMLCvode(p_empty_solver, mpStimulus);
+        }
+        else
+        {
+            p_cell = new CellLuoRudy1991FromCellMLCvode(p_empty_solver, mpZeroStimulus);
+        }
+
+        p_cell->SetMinimalReset(true);
+        p_cell->SetTolerances(1e-5,1e-7);
+
+        return p_cell;
+    }
+};
+#endif // CHASTE_CVODE
 
 class TestMonodomainProblem : public CxxTest::TestSuite
 {
@@ -1279,6 +1318,50 @@ public:
 #endif //CHASTE_VTK
 
     }
+
+#ifdef CHASTE_CVODE
+    void DoNotTestOutputDoesNotDependOnPrintTimestep() throw(Exception)
+    {
+        const double mesh_spacing = 0.01;
+        const double x_size = 1.0;
+        TetrahedralMesh<1,1> mesh;
+        mesh.ConstructRegularSlabMesh(mesh_spacing, x_size);
+        const unsigned max_node_index = mesh.GetMaximumNodeIndex();
+        Cvode1dCellFactory cell_factory;
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetMesh(&mesh);
+        HeartConfig::Instance()->SetSimulationDuration(10.0); //ms
+        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(2.0));
+
+        // Test two values of print timestep
+        c_vector<double,2> print_steps = Create_c_vector(0.1, 0.01);
+        for (unsigned i=0; i<2; ++i)
+        {
+            std::stringstream str_stream;
+            str_stream << print_steps[i];
+            HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_"+str_stream.str());
+            HeartConfig::Instance()->SetOutputDirectory("TestCvodePrintTimestepDependence"+str_stream.str());
+            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, print_steps[i]);
+
+            monodomain_problem.SetWriteInfo();
+            monodomain_problem.Initialise();
+            monodomain_problem.Solve();
+        }
+
+        // Read results in and compare
+        std::vector<double> V_to_compare;
+        for (unsigned i=0; i<2; ++i)
+        {
+            std::stringstream str_stream;
+            str_stream << print_steps[i];
+            Hdf5DataReader simulation_data("TestCvodePrintTimestepDependence"+str_stream.str(),
+                                           "MonodomainLR91_1d_"+str_stream.str());
+            std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index-1);
+            V_to_compare.push_back(V_over_time.back());
+        }
+        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-4);
+    }
+#endif // CHASTE_CVODE
 
 };
 
