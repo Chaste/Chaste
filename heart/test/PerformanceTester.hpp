@@ -58,7 +58,7 @@ template<class CELL, class CARDIAC_PROBLEM, unsigned DIM>
 class PerformanceTester
 {
 protected:
-    static const double mMeshWidth=0.2;//cm
+    static const double mMeshWidth;//=0.2;//cm
 public:
     PerformanceTester()
     : OdeTimeStep(0.0025),
@@ -164,4 +164,9 @@ private:
     unsigned mNumElements;
 
 };
+
+///Set static const on instantiation
+template<class CELL, class CARDIAC_PROBLEM, unsigned DIM>
+const double PerformanceTester<CELL, CARDIAC_PROBLEM, DIM>::mMeshWidth=0.2;//cm
+
 #endif /*PERFORMANCETESTER_HPP_*/
