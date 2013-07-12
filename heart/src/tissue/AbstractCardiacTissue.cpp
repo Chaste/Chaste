@@ -528,7 +528,16 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 std::cout << "Global node " << index.Global << " had problems with ODE solve between "
                         "t = " << time << " and " << nextTime << "ms.\n";
 
-                std::cout << "Voltage at this node before solve was " << voltage_before_update << "mV\n";
+                std::cout << "Voltage at this node before solve was " << voltage_before_update << "mV and this SHOULD ";
+                if (!updateVoltage)
+                {
+                    std::cout << "NOT be the same as the one in the state variables, which is ignored and "
+                            "stays at the initial condition for all time (dictated by PDE instead).\n";
+                }
+                else
+                {
+                    std::cout << "be close to the one in the state variables\n.";
+                }
 
                 std::cout << "Stimulus current (NB converted to micro-Amps per cm^3) applied here is equal to:\n\t"
                     << mCellsDistributed[index.Local]->GetIntracellularStimulus(time) << " at t = " << time     << "ms,\n\t"
