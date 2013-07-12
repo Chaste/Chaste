@@ -161,7 +161,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
 
     if(HeartConfig::Instance()->IsMeshProvided() && HeartConfig::Instance()->GetLoadMesh())
     {
-        mFibreFilePathNoExtension = "./" + HeartConfig::Instance()->GetMeshName();
+        mFibreFilePathNoExtension = HeartConfig::Instance()->GetMeshName();
     }
     else
     {
