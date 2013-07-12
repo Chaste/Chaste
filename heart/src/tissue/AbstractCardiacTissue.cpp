@@ -498,23 +498,51 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
     DistributedVector::Stripe voltage(dist_solution, 0);
     try
     {
+        double voltage_before_update;
         for (DistributedVector::Iterator index = dist_solution.Begin();
              index != dist_solution.End();
              ++index)
         {
-            mCellsDistributed[index.Local]->SetVoltage( voltage[index] );
+            voltage_before_update = voltage[index];
+            mCellsDistributed[index.Local]->SetVoltage( voltage_before_update );
 
-            if (!updateVoltage)
+            // Added a try-catch here to provide more output to screen when an error occurs.
+            /// \todo This may want to go to std::cerr ??
+            try
             {
-                // solve
-                // Note: Voltage is not being updated. The voltage is updated in the PDE solve.
-                mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
+                if (!updateVoltage)
+                {
+                    // solve
+                    // Note: Voltage is not being updated. The voltage is updated in the PDE solve.
+                    mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
+                }
+                else
+                {
+                    // solve, including updating the voltage (for the operator-splitting implementation of the monodomain solver)
+                    mCellsDistributed[index.Local]->SolveAndUpdateState(time, nextTime);
+                    voltage[index] = mCellsDistributed[index.Local]->GetVoltage();
+                }
             }
-            else
+            catch (Exception &e)
             {
-                // solve, including updating the voltage (for the operator-splitting implementation of the monodomain solver)
-                mCellsDistributed[index.Local]->SolveAndUpdateState(time, nextTime);
-                voltage[index] = mCellsDistributed[index.Local]->GetVoltage();
+                std::cout << "Global node " << index.Global << " had problems with ODE solve between "
+                        "t = " << time << " and " << nextTime << "ms.\n";
+
+                std::cout << "Voltage at this node before solve was " << voltage_before_update << "mV\n";
+
+                std::cout << "Stimulus current (NB converted to micro-Amps per cm^3) applied here is equal to:\n\t"
+                    << mCellsDistributed[index.Local]->GetIntracellularStimulus(time) << " at t = " << time     << "ms,\n\t"
+                    << mCellsDistributed[index.Local]->GetIntracellularStimulus(nextTime) << " at t = " << nextTime << "ms.\n";
+
+                std::cout << "All state variables are now:\n";
+                std::vector<double> state_vars = mCellsDistributed[index.Local]->GetStdVecStateVariables();
+                std::vector<std::string> state_var_names = mCellsDistributed[index.Local]->rGetStateVariableNames();
+                for (unsigned i=0; i<state_vars.size(); i++)
+                {
+                    std::cout << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << "\n";
+                }
+                std::cout << std::flush;
+                throw e;
             }
 
             // update the Iionic and stimulus caches
