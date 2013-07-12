@@ -921,8 +921,7 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
         for line in log:
             if (line.startswith('scons: building terminated because of errors.')
                 or line.strip().endswith('(errors occurred during build).')
-                or _sconstruct_traceback_re.match(line)
-                or line.startswith('Traceback (most recent call last):')):
+                or _sconstruct_traceback_re.match(line)):
                 overall_status = 'Build failed (check build log for ": ***").  ' + overall_status
                 colour = 'red'
                 break
