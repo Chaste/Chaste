@@ -105,6 +105,25 @@ public:
     }
 };
 
+class DelayedTotalStimCellFactory : public AbstractCardiacCellFactory<1>
+{
+private:
+    // define a new stimulus
+    boost::shared_ptr<SimpleStimulus> mpIntraStimulus;
+
+public:
+    DelayedTotalStimCellFactory(double mag)
+        : AbstractCardiacCellFactory<1>(),
+          mpIntraStimulus(new SimpleStimulus(  mag, 0.1, 0.1))
+    {
+    }
+
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    {
+        return new CellLuoRudy1991FromCellML(mpSolver, mpIntraStimulus);
+    }
+};
+
 #ifdef CHASTE_CVODE
 /*
  * Cell factory for TestOutputDoesNotDependOnPrintTimestep. Returns CVODE cells
@@ -1017,7 +1036,8 @@ public:
         MonodomainProblem<1> monodomain_problem( &cell_factory );
 
         // Throws because we've not called initialise
-        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),"Cardiac tissue is null, Initialise() probably hasn\'t been called");
+        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
+                              "Cardiac tissue is null, Initialise() probably hasn\'t been called");
 
         // Throws because mesh filename is unset
         TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Initialise(),
@@ -1025,7 +1045,8 @@ public:
                 "No XML element Simulation/Mesh found in parameters when calling");
 
         // Throws because initialise hasn't been called
-        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),"Cardiac tissue is null, Initialise() probably hasn\'t been called");
+        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
+                              "Cardiac tissue is null, Initialise() probably hasn\'t been called");
 
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
         HeartConfig::Instance()->SetOutputDirectory("");
@@ -1034,11 +1055,13 @@ public:
         monodomain_problem.Initialise();
 
         //Throws because the HDF5 slab isn't on the disk
-        TS_ASSERT_THROWS_THIS(monodomain_problem.GetDataReader(),"Data reader invalid as data writer cannot be initialised");
+        TS_ASSERT_THROWS_THIS(monodomain_problem.GetDataReader(),
+                              "Data reader invalid as data writer cannot be initialised");
 
         // throw because end time is negative
         HeartConfig::Instance()->SetSimulationDuration(-1.0); //ms
-        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),"End time should be in the future");
+        TS_ASSERT_THROWS_THIS(monodomain_problem.Solve(),
+                              "End time should be in the future");
         HeartConfig::Instance()->SetSimulationDuration( 1.0); //ms
 
         // throws because output dir and filename are both ""
@@ -1319,9 +1342,10 @@ public:
 
     }
 
-#ifdef CHASTE_CVODE
-    void DoNotTestOutputDoesNotDependOnPrintTimestep() throw(Exception)
+
+    void DontTestOutputDoesNotDependOnPrintTimestep() throw(Exception)
     {
+#ifdef CHASTE_CVODE
         const double mesh_spacing = 0.01;
         const double x_size = 1.0;
         TetrahedralMesh<1,1> mesh;
@@ -1334,14 +1358,19 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(2.0));
 
         // Test two values of print timestep
-        c_vector<double,2> print_steps = Create_c_vector(0.1, 0.01);
-        for (unsigned i=0; i<2; ++i)
+        const unsigned num_print_steps_to_test = 2u;
+        c_vector<double,num_print_steps_to_test> print_steps = Create_c_vector(0.1, 0.01);
+
+        // Always use the same ODE and PDE timestep of 0.01.
+        const double ode_and_pde_steps = 0.01; //ms
+
+        for (unsigned i=0; i<num_print_steps_to_test; ++i)
         {
             std::stringstream str_stream;
             str_stream << print_steps[i];
-            HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_"+str_stream.str());
-            HeartConfig::Instance()->SetOutputDirectory("TestCvodePrintTimestepDependence"+str_stream.str());
-            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, print_steps[i]);
+            HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_" + str_stream.str());
+            HeartConfig::Instance()->SetOutputDirectory("TestCvodePrintTimestepDependence" + str_stream.str());
+            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_and_pde_steps, ode_and_pde_steps, print_steps[i]);
 
             monodomain_problem.SetWriteInfo();
             monodomain_problem.Initialise();
@@ -1350,18 +1379,21 @@ public:
 
         // Read results in and compare
         std::vector<double> V_to_compare;
-        for (unsigned i=0; i<2; ++i)
+        for (unsigned i=0; i<num_print_steps_to_test; ++i)
         {
             std::stringstream str_stream;
             str_stream << print_steps[i];
-            Hdf5DataReader simulation_data("TestCvodePrintTimestepDependence"+str_stream.str(),
-                                           "MonodomainLR91_1d_"+str_stream.str());
+            Hdf5DataReader simulation_data("TestCvodePrintTimestepDependence" + str_stream.str(),
+                                           "MonodomainLR91_1d_" + str_stream.str());
             std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index-1);
-            V_to_compare.push_back(V_over_time.back());
+            V_to_compare.push_back(V_over_time.back()); // Voltage at final time.
         }
         TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-4);
-    }
+#else
+        std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE
+    }
+
 
 };
 

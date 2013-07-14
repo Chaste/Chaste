@@ -530,7 +530,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
 
                 std::cout << "Voltage at this node before solve was " << voltage_before_update << "mV\n"
                         "(this SHOULD NOT necessarily be the same as the one in the state variables,\n"
-                        "which can be ignored and stay at the initial condition - the voltage is dictated by PDE instead of state variable.\n";
+                        "which can be ignored and stay at the initial condition - the voltage is dictated by PDE instead of state variable.)\n";
 
                 std::cout << "Stimulus current (NB converted to micro-Amps per cm^3) applied here is equal to:\n\t"
                     << mCellsDistributed[index.Local]->GetIntracellularStimulus(time) << " at t = " << time     << "ms,\n\t"
