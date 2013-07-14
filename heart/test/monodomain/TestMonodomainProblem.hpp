@@ -105,25 +105,6 @@ public:
     }
 };
 
-class DelayedTotalStimCellFactory : public AbstractCardiacCellFactory<1>
-{
-private:
-    // define a new stimulus
-    boost::shared_ptr<SimpleStimulus> mpIntraStimulus;
-
-public:
-    DelayedTotalStimCellFactory(double mag)
-        : AbstractCardiacCellFactory<1>(),
-          mpIntraStimulus(new SimpleStimulus(  mag, 0.1, 0.1))
-    {
-    }
-
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
-    {
-        return new CellLuoRudy1991FromCellML(mpSolver, mpIntraStimulus);
-    }
-};
-
 #ifdef CHASTE_CVODE
 /*
  * Cell factory for TestOutputDoesNotDependOnPrintTimestep. Returns CVODE cells
