@@ -502,5 +502,7 @@ def CcFlags():
 
 def LdFlags():
     """Return a string containing extra flags for the linker."""
-    return getattr(conf, 'ldflags', '')
-
+    flags = getattr(conf, 'ldflags', '')
+    if sys.platform == 'darwin':
+        flags += ' -Wl,-undefined,dynamic_lookup'
+    return flags
