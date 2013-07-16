@@ -628,6 +628,37 @@ public:
         }
         CompareVectors(our_reader.GetUnlimitedDimensionValues(), good_reader.GetUnlimitedDimensionValues(), 1e-6);
     }
+
+    /** This test is to highlight portability issues with the column data reader.
+     *  GNU/Linux and MacOSX write the same file when running a basic Luo-Rudy cell test, but MacOSX has
+     *  issues in reading it back.
+     *
+     */
+    void TestReadingFileWithThreeDigitExponents() throw (Exception)
+    {
+        ColumnDataReader reader("io/test/data", "lr91_chaste", false);
+
+        //Column (index 0) has time
+        std::vector<double> t = reader.GetValues("Time");
+        //Column (index 2) is unaffected
+        std::vector<double> m_gate = reader.GetValues("fast_sodium_current_m_gate__m");
+        //Column (index 3) has 3-digit exponents
+        std::vector<double> h_gate = reader.GetValues("fast_sodium_current_h_gate__h");
+        //Column (index 4) might be misread becuase of 3-digit exponents
+        std::vector<double> j_gate = reader.GetValues("fast_sodium_current_j_gate__j");
+
+        // The time row before the problem
+        TS_ASSERT_DELTA(t[84], 84, 1e-15);
+        TS_ASSERT_DELTA(m_gate[84], 9.97769687e-01, 1e-09);
+        TS_ASSERT_DELTA(h_gate[84], 4.71914786e-98, 1e-106);
+        TS_ASSERT_DELTA(j_gate[84], 6.56720224e-05, 1e-13);
+
+        // This time row has a value below 10^-100
+        TS_ASSERT_DELTA(t[85], 85, 1e-15);
+        TS_ASSERT_DELTA(m_gate[85], 9.97792458e-01, 1e-09);
+        TS_ASSERT_DELTA(h_gate[85], 5.87710052e-101, 1e-109);  //This value may be misread because it's one character wider
+        TS_ASSERT_DELTA(j_gate[85], 4.88974038e-05, 1e-13);
+    }
 };
 
 #endif //_TESTCOLUMNDATAREADERWRITER_HPP_
