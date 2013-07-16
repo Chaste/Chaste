@@ -634,7 +634,7 @@ public:
      *  issues in reading it back.
      *
      */
-    void TestReadingFileWithThreeDigitExponents() throw (Exception)
+    void TestReadingFileWithVerySmallHighPrecisionNumbers() throw (Exception)
     {
         ColumnDataReader reader("io/test/data", "lr91_chaste", false);
 
@@ -642,7 +642,7 @@ public:
         std::vector<double> t = reader.GetValues("Time");
         //Column (index 2) is unaffected
         std::vector<double> m_gate = reader.GetValues("fast_sodium_current_m_gate__m");
-        //Column (index 3) has 3-digit exponents
+        //Column (index 3) has 3-digit exponents - some less than 1e-300
         std::vector<double> h_gate = reader.GetValues("fast_sodium_current_h_gate__h");
         //Column (index 4) might be misread becuase of 3-digit exponents
         std::vector<double> j_gate = reader.GetValues("fast_sodium_current_j_gate__j");
@@ -656,8 +656,27 @@ public:
         // This time row has a value below 10^-100
         TS_ASSERT_DELTA(t[85], 85, 1e-15);
         TS_ASSERT_DELTA(m_gate[85], 9.97792458e-01, 1e-09);
-        TS_ASSERT_DELTA(h_gate[85], 5.87710052e-101, 1e-109);  //This value may be misread because it's one character wider
+        TS_ASSERT_DELTA(h_gate[85], 5.87710052e-101, 1e-109);
         TS_ASSERT_DELTA(j_gate[85], 4.88974038e-05, 1e-13);
+
+        // This time row has a value above DBL_MIN = 2.2250738585072014e-308
+        TS_ASSERT_DELTA(t[157], 157, 1e-15);
+        TS_ASSERT_DELTA(m_gate[157], 9.96673677e-01, 1e-09);
+        TS_ASSERT_DELTA(h_gate[157], 3.56079375e-307, 1e-316);
+        TS_ASSERT_DELTA(j_gate[157], 3.03889760e-14, 1e-23);
+
+        // This time row has a value below DBL_MIN = 2.2250738585072014e-308
+        // This means that it's not actually expressible in standard double precision arithmetic!
+        // (This number mimicks what might happen in a Mac simulation)
+        TS_ASSERT_DELTA(t[158], 158, 1e-15);
+        TS_ASSERT_DELTA(m_gate[158], 9.96635012e-01, 1e-09);
+        TS_ASSERT_DELTA(h_gate[158], 5.24110021e-310, 1e-319);
+        TS_ASSERT_DELTA(j_gate[158], 2.26824440e-14, 1e-23);
+
+        // This number mimicks the lowest positive number produced in a Mac simulation
+        // Number in file is 3.95252517e-323.  Note that gcc doesn't like positive numbers less than
+        // "min positive subnormal number" = 4.9406564584124654e-324.
+        TS_ASSERT_DELTA(h_gate[159], 3.95252517e-323, 5e-324);
     }
 };
 
