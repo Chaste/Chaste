@@ -666,7 +666,7 @@ public:
         TS_ASSERT_DELTA(j_gate[157], 3.03889760e-14, 1e-23);
 
         // This time row has a value below DBL_MIN = 2.2250738585072014e-308
-        // This means that it's not actually expressible in standard double precision arithmetic!
+        // This means that it's not actually expressible in normalised double precision arithmetic
         // (This number mimicks what might happen in a Mac simulation)
         TS_ASSERT_DELTA(t[158], 158, 1e-15);
         TS_ASSERT_DELTA(m_gate[158], 9.96635012e-01, 1e-09);
@@ -677,6 +677,12 @@ public:
         // Number in file is 3.95252517e-323.  Note that gcc doesn't like positive numbers less than
         // "min positive subnormal number" = 4.9406564584124654e-324.
         TS_ASSERT_DELTA(h_gate[159], 3.95252517e-323, 5e-324);
+
+        // Number in file is 1.00000000e-330.  Note that this is not expressible in double precision arithmetic
+        TS_ASSERT_DELTA(h_gate[160], 0.0, 5e-324);
+
+        // Number in file is 1.00000000e-999.  Note that this is not expressible in double precision arithmetic
+        TS_ASSERT_DELTA(h_gate[161], 0.0, 5e-324);
     }
 };
 
