@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
-
+#include "Debug.hpp"
 class TestColumnDataReaderWriter : public CxxTest::TestSuite
 {
 private:
@@ -683,6 +683,63 @@ public:
 
         // Number in file is 1.00000000e-999.  Note that this is not expressible in double precision arithmetic
         TS_ASSERT_DELTA(h_gate[161], 0.0, 5e-324);
+    }
+
+    /**
+     *  This test establishes that writing 3-digit exponents doesn't work properly (in Linux and Windows)
+     *
+     *  This test is also to highlight portability issues with the column data reader.
+     *  MacOSX (clang) is able to write numbers which are smaller than DBL_MIN = 2.2250738585072014e-308
+     *  but is unable to read them back without signalling iostream::fail.
+     *
+     *  Meanwhile, Gnu/Linux is able to read back all small numbers and round to zero if the number is inexpressible
+     *
+     */
+    void donotTestWritingAndReadingVerySmallNumbers() throw (Exception)
+    {
+        mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "smallnumbers", false);
+
+        int time_var_id = 0;
+        int data_id = 0;
+
+        time_var_id = mpTestWriter->DefineUnlimitedDimension("Time", "msecs");
+        data_id = mpTestWriter->DefineVariable("Data", "dimensionless");
+        mpTestWriter->EndDefineMode();
+
+        mpTestWriter->PutVariable(time_var_id, 0);
+        mpTestWriter->PutVariable(data_id, 2.0*DBL_MIN);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+        mpTestWriter->PutVariable(time_var_id, 1);
+        mpTestWriter->PutVariable(data_id, DBL_MIN);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+        mpTestWriter->PutVariable(time_var_id, 2);
+        mpTestWriter->PutVariable(data_id, -DBL_MIN);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+        mpTestWriter->PutVariable(time_var_id, 3);
+        mpTestWriter->PutVariable(data_id, DBL_MIN/2.0);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+        mpTestWriter->PutVariable(time_var_id, 4);
+        mpTestWriter->PutVariable(data_id, -DBL_MIN/2.0);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+        mpTestWriter->PutVariable(time_var_id, 5);
+        mpTestWriter->PutVariable(data_id, DBL_MIN/100.0);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+        mpTestWriter->PutVariable(time_var_id, 6);
+        mpTestWriter->PutVariable(data_id, -DBL_MIN/100.0);
+        delete mpTestWriter;
+        ColumnDataReader reader("TestColumnDataReaderWriter", "smallnumbers");
+        std::vector<double> read_values = reader.GetValues("Data");
+        // DBL_MIN = 2.2250738585072014e-308
+        double tol = 1e-310;
+        TS_ASSERT_DELTA(read_values[0], 2.0*DBL_MIN, tol);
+        TS_ASSERT_DELTA(read_values[1], DBL_MIN, tol);
+        TS_ASSERT_DELTA(read_values[2], -DBL_MIN, tol);
+        TS_ASSERT_DELTA(read_values[3], DBL_MIN/2.0, tol);
+        TS_ASSERT_DELTA(read_values[4], -DBL_MIN/2.0, tol);
+        TS_ASSERT_DELTA(read_values[5], DBL_MIN/10.0, tol);
+        TS_ASSERT_DELTA(read_values[6], -DBL_MIN/10.0, tol);
+
+
     }
 };
 
