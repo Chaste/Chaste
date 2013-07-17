@@ -107,12 +107,18 @@ public:
 
     /**
      * Whether or not we should ignore lines starting with a comment symbol
-     * (the default symbols are '#' and '!').
-     * @param ignore  whether to ignore these lines
+     * (the default symbols are '#' and '!', set by SetupCommentLines).
+     * @param ignore  whether to ignore these lines.  If set to false, existing
+     *      defined comment symbols are also cleared, so that an entirely new
+     *      set may be defined with SetIgnoreLinesBeginningWith.
      */
     void SetIgnoreCommentLines(bool ignore=true)
     {
         mIgnoreCommentLines = ignore;
+        if (!ignore)
+        {
+            mCommentLineStarts.clear();
+        }
     }
 
     /**
@@ -139,10 +145,7 @@ public:
     }
 
     /**
-     * @return true if the files are identical to within tolerance.
-     * Compare the files under both relative and absolute tolerances.
-     * The comparison only fails if neither tolerance holds.  The
-     * default settings effectively require numbers to match exactly.
+     * @return true if the files are identical, barring ignored content.
      *
      * @param ignoreFirstFewLines  how many lines to ignore from the comparison
      * @param doTsAssert  whether to throw a TS_ASSERT internally (switched off for testing only)
