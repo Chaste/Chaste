@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cctype> //for isdigit
 #include "OutputFileHandler.hpp"
 #include "Exception.hpp"
-
+#include "Debug.hpp"
 /**
  * Variables read in from the data file are initialised to the
  * following constant so one can check if they were read correctly.
@@ -419,9 +419,15 @@ void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col
     variable_stream >> d_value;
     if (variable_stream.fail())
     {
-        d_value = DBL_MAX;
+        if (variable_stream.eof()) //Missing data from column
+        {
+            d_value = DBL_MAX;
+        }
+        else
+        {
+            NEVER_REACHED; // I assert that this IS reached with underflow reading on Clang
+        }
     }
-
     mValues.push_back(d_value);
 }
 

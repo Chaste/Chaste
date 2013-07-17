@@ -659,33 +659,35 @@ public:
         TS_ASSERT_DELTA(h_gate[85], 5.87710052e-101, 1e-109);
         TS_ASSERT_DELTA(j_gate[85], 4.88974038e-05, 1e-13);
 
-//        // This time row has a value above DBL_MIN = 2.2250738585072014e-308
-//        TS_ASSERT_DELTA(t[157], 157, 1e-15);
-//        TS_ASSERT_DELTA(m_gate[157], 9.96673677e-01, 1e-09);
-//        TS_ASSERT_DELTA(h_gate[157], 3.56079375e-307, 1e-316);
-//        TS_ASSERT_DELTA(j_gate[157], 3.03889760e-14, 1e-23);
-//
-//        // This time row has a value below DBL_MIN = 2.2250738585072014e-308
-//        // This means that it's not actually expressible in normalised double precision arithmetic
-//        // (This number mimicks what might happen in a Mac simulation)
-//        TS_ASSERT_DELTA(t[158], 158, 1e-15);
-//        TS_ASSERT_DELTA(m_gate[158], 9.96635012e-01, 1e-09);
-//        TS_ASSERT_DELTA(h_gate[158], 5.24110021e-310, 1e-319);
-//        TS_ASSERT_DELTA(j_gate[158], 2.26824440e-14, 1e-23);
-//
-//        // This number mimicks the lowest positive number produced in a Mac simulation
-//        // Number in file is 3.95252517e-323.  Note that gcc doesn't like positive numbers less than
-//        // "min positive subnormal number" = 4.9406564584124654e-324.
-//        TS_ASSERT_DELTA(h_gate[159], 3.95252517e-323, 5e-324);
-//
-//        // Number in file is 1.00000000e-330.  Note that this is not expressible in double precision arithmetic
-//        TS_ASSERT_DELTA(h_gate[160], 0.0, 5e-324);
-//
-//        // Number in file is 1.00000000e-999.  Note that this is not expressible in double precision arithmetic
-//        TS_ASSERT_DELTA(h_gate[161], 0.0, 5e-324);
+        // This time row has a value above DBL_MIN = 2.2250738585072014e-308
+        TS_ASSERT_DELTA(t[157], 157, 1e-15);
+        TS_ASSERT_DELTA(m_gate[157], 9.96673677e-01, 1e-09);
+        TS_ASSERT_DELTA(h_gate[157], 3.56079375e-307, DBL_MIN);
+        TS_ASSERT_DELTA(j_gate[157], 3.03889760e-14, 1e-23);
+
+        // This time row has a value below DBL_MIN = 2.2250738585072014e-308
+        // This means that it's not actually expressible in normalised double precision arithmetic
+        // (This number mimicks what might happen in a Mac simulation)
+        TS_ASSERT_DELTA(t[158], 158, 1e-15);
+        TS_ASSERT_DELTA(m_gate[158], 9.96635012e-01, 1e-09);
+        TS_ASSERT_DELTA(h_gate[158], 0.0, DBL_MIN);
+        TS_ASSERT_DELTA(j_gate[158], 2.26824440e-14, 1e-23);
+
+        // This number mimicks the lowest positive number produced in a Mac simulation
+        // Number in file is 3.95252517e-323.  Note that gcc doesn't like positive numbers less than
+        // "min positive subnormal number" = 4.9406564584124654e-324.
+        TS_ASSERT_DELTA(h_gate[159], 0.0, DBL_MIN);
+
+        // Number in file is 1.00000000e-330.  Note that this is not expressible in double precision arithmetic
+        TS_ASSERT_DELTA(h_gate[160], 0.0, DBL_MIN);
+
+        // Number in file is 1.00000000e-999.  Note that this is not expressible in double precision arithmetic
+        TS_ASSERT_DELTA(h_gate[161], 0.0, DBL_MIN);
     }
 
     /**
+     *
+     *  \todo #2411
      *  This test establishes that writing 3-digit exponents doesn't work properly (in Linux and Windows)
      *
      *  This test is also to highlight portability issues with the column data reader.
@@ -695,50 +697,53 @@ public:
      *  Meanwhile, Gnu/Linux is able to read back all small numbers and round to zero if the number is inexpressible
      *
      */
-    void TestWritingAndReadingVerySmallNumbers() throw (Exception)
+    void TestWritingAndReadingWithThreeDigitExponents() throw (Exception)
     {
-//        mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "smallnumbers", false);
-//
-//        int time_var_id = 0;
-//        int data_id = 0;
-//
-//        time_var_id = mpTestWriter->DefineUnlimitedDimension("Time", "msecs");
-//        data_id = mpTestWriter->DefineVariable("Data", "dimensionless");
-//        mpTestWriter->EndDefineMode();
-//
-//        mpTestWriter->PutVariable(time_var_id, 0);
-//        mpTestWriter->PutVariable(data_id, 2.0*DBL_MIN);
-//        mpTestWriter->AdvanceAlongUnlimitedDimension();
-//        mpTestWriter->PutVariable(time_var_id, 1);
-//        mpTestWriter->PutVariable(data_id, DBL_MIN);
-//        mpTestWriter->AdvanceAlongUnlimitedDimension();
-//        mpTestWriter->PutVariable(time_var_id, 2);
-//        mpTestWriter->PutVariable(data_id, -DBL_MIN);
-//        mpTestWriter->AdvanceAlongUnlimitedDimension();
-//        mpTestWriter->PutVariable(time_var_id, 3);
-//        mpTestWriter->PutVariable(data_id, DBL_MIN/2.0);
-//        mpTestWriter->AdvanceAlongUnlimitedDimension();
-//        mpTestWriter->PutVariable(time_var_id, 4);
-//        mpTestWriter->PutVariable(data_id, -DBL_MIN/2.0);
-//        mpTestWriter->AdvanceAlongUnlimitedDimension();
-//        mpTestWriter->PutVariable(time_var_id, 5);
-//        mpTestWriter->PutVariable(data_id, DBL_MIN/100.0);
-//        mpTestWriter->AdvanceAlongUnlimitedDimension();
-//        mpTestWriter->PutVariable(time_var_id, 6);
-//        mpTestWriter->PutVariable(data_id, -DBL_MIN/100.0);
-//        delete mpTestWriter;
-//        ColumnDataReader reader("TestColumnDataReaderWriter", "smallnumbers");
-//        std::vector<double> read_values = reader.GetValues("Data");
-//        // DBL_MIN = 2.2250738585072014e-308
-//        double tol = 1e-310;
-//        TS_ASSERT_DELTA(read_values[0], 2.0*DBL_MIN, tol);
-//        TS_ASSERT_DELTA(read_values[1], DBL_MIN, tol);
-//        TS_ASSERT_DELTA(read_values[2], -DBL_MIN, tol);
-//        TS_ASSERT_DELTA(read_values[3], DBL_MIN/2.0, tol);
-//        TS_ASSERT_DELTA(read_values[4], -DBL_MIN/2.0, tol);
-//        TS_ASSERT_DELTA(read_values[5], DBL_MIN/10.0, tol);
-//        TS_ASSERT_DELTA(read_values[6], -DBL_MIN/10.0, tol);
-//
+        mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "widenumbers", false);
+
+        int time_var_id = mpTestWriter->DefineUnlimitedDimension("Time", "aeons");
+        int small_pos_id = mpTestWriter->DefineVariable("Small", "dimensionless");
+        int large_pos_id = mpTestWriter->DefineVariable("Large", "dimensionless");
+        int small_neg_id = mpTestWriter->DefineVariable("SmallNeg", "dimensionless");
+        int large_neg_id = mpTestWriter->DefineVariable("LargeNeg", "dimensionless");
+        int another_time_id = mpTestWriter->DefineVariable("TimeCheck", "aeons");
+        mpTestWriter->EndDefineMode();
+
+        double small = 100*DBL_MIN;
+        // DBL_MIN = 2.2250738585072014e-308
+        double large = 1e99;
+
+        mpTestWriter->PutVariable(time_var_id, 0.0);
+        mpTestWriter->PutVariable(another_time_id, 1.0);
+        mpTestWriter->PutVariable(small_pos_id, 1.0);
+        mpTestWriter->PutVariable(small_neg_id, 1.0);
+        mpTestWriter->PutVariable(large_pos_id, 1.0);
+        mpTestWriter->PutVariable(large_neg_id, 1.0);
+        mpTestWriter->AdvanceAlongUnlimitedDimension();
+
+        for (unsigned i= 1; i<6; i++, small/=10.0, large*=10.0)
+        {
+            mpTestWriter->PutVariable(time_var_id, i);
+            mpTestWriter->PutVariable(another_time_id, i);
+            mpTestWriter->PutVariable(small_pos_id, small);
+            mpTestWriter->PutVariable(small_neg_id, -small);
+            mpTestWriter->PutVariable(large_pos_id, large);
+            mpTestWriter->PutVariable(large_neg_id, -large);
+            mpTestWriter->AdvanceAlongUnlimitedDimension();
+        }
+        delete mpTestWriter;
+
+        ColumnDataReader reader("TestColumnDataReaderWriter", "widenumbers");
+        //std::vector<double> small_values = reader.GetValues("Small");
+        //std::vector<double> large_values = reader.GetValues("Large");
+        //PRINT_VECTOR(reader.GetValues("Small"));
+        //PRINT_VECTOR(reader.GetValues("TimeCheck"));
+        std::vector<double> time_values  = reader.GetValues("Time");
+        std::vector<double> time_values2 = reader.GetValues("TimeCheck");
+        for (unsigned i= 0; i<6; i++)
+        {
+            TS_ASSERT_DELTA(time_values[i], time_values2[i], 110.0); //Watch out!!
+        }
 
     }
 };
