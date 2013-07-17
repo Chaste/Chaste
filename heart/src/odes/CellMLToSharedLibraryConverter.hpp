@@ -50,6 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class CellMLToSharedLibraryConverter
 {
 public:
+    /** Test gets access to the msSoSuffix variable */
+    friend class TestDynamicallyLoadedCellModels;
     /**
      * Create a converter.
      *
@@ -108,6 +110,9 @@ private:
 
     /** Which component to build the loadable module in. */
     std::string mComponentName;
+    
+    /** The .so suffix is nearly always "so" (as you might expect).  On Mac OSX this is redefined to "dylib" */
+    static const std::string msSoSuffix; 
 };
 
 #endif /*CELLMLTOSHAREDLIBRARYCONVERTER_HPP_*/

@@ -193,7 +193,8 @@ public:
     void TestDynamicallyLoadedLr91() throw(Exception)
     {
         // Load the cell model dynamically
-        std::string model_name = "libDynamicallyLoadableLr91.so";
+        std::string model_name = "libDynamicallyLoadableLr91.";
+        model_name  += CellMLToSharedLibraryConverter::msSoSuffix;
         // All tests use the registry, as not doing so can lead to segfaults...
         DynamicCellModelLoaderPtr p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(
             ChasteComponentBuildDir("heart") + "dynamic/" + model_name);
@@ -213,7 +214,8 @@ public:
                                   "Unable to load .so file '" + file_name + "':");
 
         // Try loading a .so that doesn't define a cell model
-        file_name = "libNotACellModel.so";
+        file_name = "libNotACellModel.";
+        file_name += CellMLToSharedLibraryConverter::msSoSuffix;
         TS_ASSERT_THROWS_CONTAINS(DynamicCellModelLoader::Create(ChasteComponentBuildDir("heart") + "dynamic/" + file_name),
                                   "Failed to load cell creation function from .so file");
     }
@@ -230,7 +232,7 @@ public:
         // Convert a real CellML file
         FileFinder cellml_file = handler.CopyFileTo(cellml_file_src);
         TS_ASSERT(cellml_file.Exists());
-        FileFinder so_file(dirname + "/libluo_rudy_1991_dyn.so", RelativeTo::ChasteTestOutput);
+        FileFinder so_file(dirname + "/libluo_rudy_1991_dyn."+CellMLToSharedLibraryConverter::msSoSuffix, RelativeTo::ChasteTestOutput);
         TS_ASSERT(!so_file.Exists());
         DynamicCellModelLoaderPtr p_loader = converter.Convert(cellml_file);
         SaveSoForArchivingTest(so_file);
@@ -259,7 +261,7 @@ public:
         TS_ASSERT_THROWS_THIS(converter.Convert(no_ext), "File does not have an extension: " + no_ext.GetAbsolutePath());
         FileFinder unsupp_ext("global/src/FileFinder.hpp", RelativeTo::ChasteSourceRoot);
         TS_ASSERT_THROWS_THIS(converter.Convert(unsupp_ext), "Unsupported extension '.hpp' of file '"
-                              + unsupp_ext.GetAbsolutePath() + "'; must be .so or .cellml");
+                              + unsupp_ext.GetAbsolutePath() + "'; must be .so, .dylib or .cellml");
 
 
         TRY_IF_MASTER( so_file.Remove() );
@@ -371,6 +373,7 @@ public:
             AbstractCardiacCellInterface* const p_const_cell = p_cell;
             std::ofstream ofs(archive_filename1.c_str());
             boost::archive::text_oarchive output_arch(ofs);
+            ///\todo #2349 this archiving segfaults on Mac OSX
             output_arch << p_const_cell;
         }
 

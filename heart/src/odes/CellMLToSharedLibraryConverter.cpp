@@ -55,6 +55,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         code;                   \
     } catch (...) {}
 
+
+
+/** Set the .so suffix */
+#ifdef __APPLE__
+//Mac OSX
+const std::string CellMLToSharedLibraryConverter::msSoSuffix = "dylib";
+#else
+//Normal behaviour
+const std::string CellMLToSharedLibraryConverter::msSoSuffix = "so";
+#endif
+
 CellMLToSharedLibraryConverter::CellMLToSharedLibraryConverter(bool preserveGeneratedSources,
                                                                std::string component)
     : mPreserveGeneratedSources(preserveGeneratedSources),
@@ -86,7 +97,7 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
         assert(slash_position != std::string::npos);
         std::string folder = absolute_path.substr(0, slash_position+1); // Include trailing slash
         std::string leaf = absolute_path.substr(slash_position+1, dot_position-slash_position); // Include dot
-        std::string so_path = folder + "lib" + leaf + "so";
+        std::string so_path = folder + "lib" + leaf + msSoSuffix;
         // Does the .so file already exist (and was it modified after the .cellml?)
         FileFinder so_file(so_path, RelativeTo::Absolute);
         if (!so_file.Exists() || rFilePath.IsNewerThan(so_file))
@@ -100,14 +111,14 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
         // Load the .so
         p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(so_file);
     }
-    else if (extension == "so")
+    else if (extension == msSoSuffix)
     {
         // Just load the .so
         p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(rFilePath);
     }
     else
     {
-        EXCEPTION("Unsupported extension '." + extension + "' of file '" + absolute_path + "'; must be .so or .cellml");
+        EXCEPTION("Unsupported extension '." + extension + "' of file '" + absolute_path + "'; must be .so, .dylib or .cellml");
     }
 
     return p_loader;
@@ -169,7 +180,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             // Run scons to generate C++ code and compile it to a .so
             EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
 
-            FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + ".so", RelativeTo::Absolute);
+            FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);            
             EXCEPT_IF_NOT(so_file.Exists());
             // CD back
             EXPECT0(chdir, old_cwd);
