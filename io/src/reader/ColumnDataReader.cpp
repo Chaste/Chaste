@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cctype> //for isdigit
 #include "OutputFileHandler.hpp"
 #include "Exception.hpp"
-#include "Debug.hpp"
+
 /**
  * Variables read in from the data file are initialised to the
  * following constant so one can check if they were read correctly.
@@ -425,7 +425,10 @@ void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col
         }
         else
         {
-            NEVER_REACHED; // I assert that this IS reached with underflow reading on Clang
+#define COVERAGE_IGNORE
+           //  Clang Objective C++ (on Mac OSX) treats reading very small numbers (<2e-308) as an error but other compilers just round to zero
+           d_value = 0.0; 
+#undef COVERAGE_IGNORE
         }
     }
     mValues.push_back(d_value);
