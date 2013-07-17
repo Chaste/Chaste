@@ -64,12 +64,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We begin by including the necessary header files. */
 #include <cxxtest/TestSuite.h>
+/* This header needs to be included here to ensure archiving of {{{CelwiseData}}} works on all Boost versions. */
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-
-/* These two headers need to be included here to ensure archiving of {{{CelwiseData}}} works on all Boost versions. */
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 
 /* The next header includes the Boost {{{shared_ptr}}} smart pointer, and defines some useful
  * macros to save typing when using it. */
@@ -114,6 +111,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "MutableVertexMesh.hpp"
 #include "PlaneBoundaryCondition.hpp"
+#include "FakePetscSetup.hpp"
 
 /* We first define the global test class that inherits from {{{AbstractCellBasedTestSuite}}}. */
 class TestRunningContactInhibitionSimulationsTutorial : public AbstractCellBasedTestSuite

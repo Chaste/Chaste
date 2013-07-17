@@ -71,9 +71,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 /* The next header defines a base class for cell mutation states. Our new
  * cell mutation state will inherit from this abstract class. */
 #include "AbstractCellMutationState.hpp"
@@ -87,6 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 
 /*
  * EMPTYLINE

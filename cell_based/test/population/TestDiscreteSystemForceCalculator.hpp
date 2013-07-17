@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "HoneycombMeshGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -51,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "NumericFileComparison.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestDiscreteSystemForceCalculator : public AbstractCellBasedTestSuite
 {

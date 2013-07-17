@@ -72,9 +72,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 /* The next header defines a base class for cell properties. Our new
  * cell property will inherit from this abstract class. */
 #include "AbstractCellProperty.hpp"
