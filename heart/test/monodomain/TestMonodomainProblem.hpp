@@ -1331,10 +1331,8 @@ public:
         const double x_size = 1.0;
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(mesh_spacing, x_size);
-        const unsigned max_node_index = mesh.GetMaximumNodeIndex();
+        const unsigned max_node_index = mesh.GetNumNodes() - 1;
         Cvode1dCellFactory cell_factory;
-        MonodomainProblem<1> monodomain_problem( &cell_factory );
-        monodomain_problem.SetMesh(&mesh);
         HeartConfig::Instance()->SetSimulationDuration(10.0); //ms
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(2.0));
 
@@ -1353,6 +1351,8 @@ public:
             HeartConfig::Instance()->SetOutputDirectory("TestCvodePrintTimestepDependence" + str_stream.str());
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_and_pde_steps, ode_and_pde_steps, print_steps[i]);
 
+            MonodomainProblem<1> monodomain_problem( &cell_factory );
+            monodomain_problem.SetMesh(&mesh);
             monodomain_problem.SetWriteInfo();
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
@@ -1366,7 +1366,7 @@ public:
             str_stream << print_steps[i];
             Hdf5DataReader simulation_data("TestCvodePrintTimestepDependence" + str_stream.str(),
                                            "MonodomainLR91_1d_" + str_stream.str());
-            std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index-1);
+            std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index);
             V_to_compare.push_back(V_over_time.back()); // Voltage at final time.
         }
         TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-4);
