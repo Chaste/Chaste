@@ -27,4 +27,5 @@ tutorials/TestMonodomain3dExampleWithCvodeTutorial.hpp
 tutorials/TestCardiacCheckpointingAndRestartingTutorial.hpp
 tutorials/TestCardiacElectroMechanicsTutorial.hpp
 tutorials/TestAnotherCardiacElectroMechanicsTutorial.hpp
+tutorials/TestSingleCellSimulationTutorial.hpp
 TestStreeterFibreGeneratorNightly.hpp
