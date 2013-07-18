@@ -73,7 +73,7 @@ public:
         LogFile* p_log_file = LogFile::Instance();
         p_log_file->Set(1, "TestLogFile", "log_warnings.txt");
         const std::string warning("This one goes into a log file");
-        WARNING(warning); // Note that the line number for this (74) will appear in the log file and be tested
+        WARNING(warning); // Note that the line number for this (76) will appear in the log file and be tested
         LogFile::Close();
         
         FileFinder log_file_path("TestLogFile/log_warnings.txt", RelativeTo::ChasteTestOutput);
@@ -82,7 +82,7 @@ public:
         getline(log_file, line);
         log_file.close();
         TS_ASSERT_EQUALS(line.find("Chaste warning: in file "), 0u);
-        std::string file_and_line("global/test/TestWarnings.hpp at line 74: ");
+        std::string file_and_line("global/test/TestWarnings.hpp at line 76: ");
         std::string::size_type msg_len = warning.length() + file_and_line.length();
         TS_ASSERT_EQUALS(line.substr(line.length() - msg_len), file_and_line + warning);
 
@@ -100,7 +100,14 @@ public:
         std::string best_hope = "Murray";
         for (unsigned year=2005; year<2020; year++)
         {
-            WARN_ONCE_ONLY("Don't get your hopes up, " << best_hope <<" is not winning Wimbledon.");
+            if (year != 2013)
+            {
+                WARN_ONCE_ONLY("Don't get your hopes up, " << best_hope <<" is not winning Wimbledon.");
+            }
+            else
+            {
+                std::cout << best_hope << " won in " << year << "!" << std::endl;
+            }
         }
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
         Warnings::QuietDestroy();
