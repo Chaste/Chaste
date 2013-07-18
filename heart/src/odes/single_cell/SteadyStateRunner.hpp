@@ -75,7 +75,7 @@ public:
      * Constructor of a helper class for getting action potential models to steady state
      *
      * @param pModel  The cell model to run to steady state.
-     * @param twoPaces  Whether to
+     * @param twoPaces  Whether to run two paces at once, for detection of steady state alternans.
      */
     SteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel, bool twoPaces=false)
      : AbstractSteadyStateRunner(pModel),
