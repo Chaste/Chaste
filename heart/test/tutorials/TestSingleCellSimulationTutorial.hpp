@@ -54,8 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * run the model to steady state using the {{{SteadyStateRunner}}}.
  *  * solve the model for the number of paces of interest.
  *  * Write to voltage data to a file.
- *  * Use {{{CellProperties}}} to output information such as APD and upstroke velocity
- * and use fibre directions.
+ *  * Use {{{CellProperties}}} to output information such as APD and upstroke velocity.
  *
  *
  *
