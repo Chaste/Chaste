@@ -1127,14 +1127,14 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
             if (i < 4)
             {
-            	nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+                nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
                 nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
             }
             if (i < 3)
             {
-				nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
-				nodes_elem_5.push_back(nodes[node_indices_elem_5[i]]);
-			}
+                nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
+                nodes_elem_5.push_back(nodes[node_indices_elem_5[i]]);
+            }
         }
 
         std::vector<VertexElement<2,2>*> vertex_elements;

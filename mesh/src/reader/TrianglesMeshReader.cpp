@@ -353,9 +353,15 @@ std::vector<double> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigne
     }
 
     // Put the file stream pointer to the right location
-    if ( mNodesRead != index )
+    if ( index > mNodesRead )
     {
-    	mNodesFile.seekg(mNodeFileDataStart + mNodeItemWidth*index, std::ios_base::beg);
+        // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
+        // to seek from the current position rather than from the start of the file
+        mNodesFile.seekg( mNodeItemWidth*(index-mNodesRead), std::ios_base::cur);
+    }
+    else if ( mNodesRead != index )
+    {
+        mNodesFile.seekg(mNodeFileDataStart + mNodeItemWidth*index, std::ios_base::beg);
     }
 
     mNodesRead = index; // Allow GetNextNode() to note the position of the item after this one
@@ -376,9 +382,15 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementData(unsigned
     }
 
     // Put the file stream pointer to the right location
-    if ( mElementsRead != index )
+    if ( index > mElementsRead )
     {
-    	mElementsFile.seekg(mElementFileDataStart + mElementItemWidth*index, std::ios_base::beg);
+        // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
+        // to seek from the current position rather than from the start of the file
+        mElementsFile.seekg( mElementItemWidth*(index-mElementsRead), std::ios_base::cur);
+    }
+    else if ( mElementsRead != index )
+    {
+        mElementsFile.seekg(mElementFileDataStart + mElementItemWidth*index, std::ios_base::beg);
     }
 
     mElementsRead = index; // Allow GetNextElementData() to note the position of the item after this one
@@ -399,9 +411,15 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned in
     }
 
     // Put the file stream pointer to the right location
-    if ( mFacesRead != index )
+    if ( index > mFacesRead )
     {
-    	mFacesFile.seekg(mFaceFileDataStart + mFaceItemWidth*index, std::ios_base::beg);
+        // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
+        // to seek from the current position rather than from the start of the file
+        mFacesFile.seekg( mFaceItemWidth*(index-mFacesRead), std::ios_base::cur);
+    }
+    else if ( mFacesRead != index )
+    {
+        mFacesFile.seekg(mFaceFileDataStart + mFaceItemWidth*index, std::ios_base::beg);
     }
     mFacesRead = index; // Allow next call to mark the position in the file stream
 
@@ -433,9 +451,15 @@ std::vector<unsigned> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetContaining
     }
 
     // Put the file stream pointer to the right location
-    if  ( mNclItemsRead != index )
+    if ( index > mNclItemsRead )
     {
-    	mNclFile.seekg(mNclFileDataStart + mNclItemWidth*index, std::ios_base::beg);
+        // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
+        // to seek from the current position rather than from the start of the file
+        mNclFile.seekg( mNclItemWidth*(index-mNclItemsRead), std::ios_base::cur);
+    }
+    else if  ( mNclItemsRead != index )
+    {
+        mNclFile.seekg(mNclFileDataStart + mNclItemWidth*index, std::ios_base::beg);
     }
 
     // Read the next item

@@ -83,9 +83,9 @@ private:
     virtual void AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
                                 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
                                 unsigned timeStep)
-	{
-		//Empty body - implemented in derived classes
-	}
+    {
+        //Empty body - implemented in derived classes
+    }
 #endif // _MSC_VER
 
 public:

@@ -1335,8 +1335,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     if ( rMeshReader.IsFileFormatBinary() && first_local_element > 0)
     {
-         // Advance the file pointer to the first element before the ones I own.
-    	 rMeshReader.GetElementData(first_local_element  - 1);
+        // Advance the file pointer to the first element before the ones I own.
+        rMeshReader.GetElementData(first_local_element  - 1);
     }
     else
     {
@@ -1483,7 +1483,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
         ElementData element_data;
 
-		element_data = rMeshReader.GetNextElementData();
+        element_data = rMeshReader.GetNextElementData();
 
         for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
              node_it != element_data.NodeIndices.end();
