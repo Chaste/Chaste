@@ -1333,9 +1333,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
     boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
 
-    if ( ! rMeshReader.IsFileFormatBinary() )
+    if ( rMeshReader.IsFileFormatBinary() && first_local_element > 0)
     {
-        // Advance the file pointer to the first element I own.
+         // Advance the file pointer to the first element before the ones I own.
+    	 rMeshReader.GetElementData(first_local_element  - 1);
+    }
+    else
+    {
+        // Advance the file pointer to the first element before the ones I own.
         for (unsigned element_index = 0; element_index < first_local_element; element_index++)
         {
             rMeshReader.GetNextElementData();
@@ -1347,14 +1352,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     {
         ElementData element_data;
 
-        if ( rMeshReader.IsFileFormatBinary() )
-        {
-            element_data = rMeshReader.GetElementData(first_local_element + element_index);
-        }
-        else
-        {
-            element_data = rMeshReader.GetNextElementData();
-        }
+        element_data = rMeshReader.GetNextElementData();
 
         eptr[element_index] = counter;
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
@@ -1463,39 +1461,29 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      *      rNodesOwned and rHaloNodesOwned are local.
      */
 
-    std::vector<unsigned> element_access_order;
-
-    if ( rMeshReader.IsFileFormatBinary() )
-    {
-        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-        p_gen->Reseed(0);
-        p_gen->Shuffle(mTotalNumElements, element_access_order);
-    }
-    else
-    {
-        element_access_order.reserve(mTotalNumElements);
-        for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
-        {
-            element_access_order.push_back(element_number);
-        }
-    }
+    /*
+     * Note that at this point each process has to read the entire element file in order to compute
+     * the node partition form the initial element distribution.
+     *  * Previously we randomly permuted the BIN file element access order on each process so that the processes
+     *    weren't reading the same file sectors at the same time
+     *  * We noted that with large files (above about 0.5 GigaByte) on HECToR the random access file reader
+     *    was spending all its time in fseekg.  This is presumably because each fseekg from the start of the file
+     *    involves multiple levels of indirect file block pointers.
+     *  * Hence the use of random element reading is only useful for the niche of moderately large meshes with
+     *    process counts in the thousands.
+     *  Hence BIN file element permuting is deprecated - we just read the file in order.
+     *  See
+     *  https://chaste.cs.ox.ac.uk/trac/browser/trunk/mesh/src/common/DistributedTetrahedralMesh.cpp?rev=19291#L1459
+     */
 
 
-    for (unsigned element_count = 0; element_count < mTotalNumElements; element_count++)
+    for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
     {
-        unsigned element_number = element_access_order[element_count];
         unsigned element_owner = global_element_partition[element_number];
 
         ElementData element_data;
 
-        if ( rMeshReader.IsFileFormatBinary() )
-        {
-            element_data = rMeshReader.GetElementData(element_number);
-        }
-        else
-        {
-            element_data = rMeshReader.GetNextElementData();
-        }
+		element_data = rMeshReader.GetNextElementData();
 
         for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
              node_it != element_data.NodeIndices.end();

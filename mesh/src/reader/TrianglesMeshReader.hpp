@@ -80,12 +80,13 @@ private:
     unsigned mNumFaces;             /**< Number of faces in the mesh. */
     unsigned mNumCableElements;     /**< Number of cable elements in the mesh. */
 
-    unsigned mNodesRead;            /**< Number of nodes read in. */
-    unsigned mElementsRead;         /**< Number of elements read in. */
+    unsigned mNodesRead;            /**< Number of nodes read in (or the index of the last one read in + 1).  */
+    unsigned mElementsRead;         /**< Number of elements read in (or the index of the last one read in + 1). */
     unsigned mCableElementsRead;    /**< Number of cable elements read in. */
-    unsigned mFacesRead;            /**< Number of faces read in. */
+    unsigned mFacesRead;            /**< Number of faces read in (or the index of the last one read in + 1).*/
     unsigned mBoundaryFacesRead;    /**< Number of boundary faces read in. */
-    std::vector<unsigned> mOneDimBoundary; /**<Indices of nodes which are at the boundary of a 1D mesh*/
+    unsigned mNclItemsRead;         /**< Number of NCL element items read in */
+     std::vector<unsigned> mOneDimBoundary; /**<Indices of nodes which are at the boundary of a 1D mesh*/
 
     unsigned mNumNodeAttributes;    /**< Is the number of attributes stored at each node. */
     std::vector<double> mNodeAttributes; /**<Will contain the nodal attributes at each node. Cleared and re-filled at each node*/

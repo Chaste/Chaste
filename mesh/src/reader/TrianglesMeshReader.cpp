@@ -68,6 +68,7 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
       mCableElementsRead(0),
       mFacesRead(0),
       mBoundaryFacesRead(0),
+      mNclItemsRead(0),
       mNumNodeAttributes(0),
       mNumElementAttributes(0),
       mNumFaceAttributes(0),
@@ -181,6 +182,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::Reset()
     mFacesRead = 0;
     mBoundaryFacesRead = 0;
     mCableElementsRead = 0;
+    mNclItemsRead = 0;
     mEofException = false;
 
     OpenFiles();
@@ -351,8 +353,12 @@ std::vector<double> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigne
     }
 
     // Put the file stream pointer to the right location
-    mNodesFile.seekg(mNodeFileDataStart + mNodeItemWidth*index, std::ios_base::beg);
+    if ( mNodesRead != index )
+    {
+    	mNodesFile.seekg(mNodeFileDataStart + mNodeItemWidth*index, std::ios_base::beg);
+    }
 
+    mNodesRead = index; // Allow GetNextNode() to note the position of the item after this one
     // Read the next item.
     return GetNextNode();
 }
@@ -370,8 +376,12 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementData(unsigned
     }
 
     // Put the file stream pointer to the right location
-    mElementsFile.seekg(mElementFileDataStart + mElementItemWidth*index, std::ios_base::beg);
+    if ( mElementsRead != index )
+    {
+    	mElementsFile.seekg(mElementFileDataStart + mElementItemWidth*index, std::ios_base::beg);
+    }
 
+    mElementsRead = index; // Allow GetNextElementData() to note the position of the item after this one
     // Read the next item.
     return GetNextElementData();
 }
@@ -389,7 +399,11 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned in
     }
 
     // Put the file stream pointer to the right location
-    mFacesFile.seekg(mFaceFileDataStart + mFaceItemWidth*index, std::ios_base::beg);
+    if ( mFacesRead != index )
+    {
+    	mFacesFile.seekg(mFaceFileDataStart + mFaceItemWidth*index, std::ios_base::beg);
+    }
+    mFacesRead = index; // Allow next call to mark the position in the file stream
 
     // Read the next item
     return GetNextFaceData();
@@ -419,7 +433,10 @@ std::vector<unsigned> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetContaining
     }
 
     // Put the file stream pointer to the right location
-    mNclFile.seekg(mNclFileDataStart + mNclItemWidth*index, std::ios_base::beg);
+    if  ( mNclItemsRead != index )
+    {
+    	mNclFile.seekg(mNclFileDataStart + mNclItemWidth*index, std::ios_base::beg);
+    }
 
     // Read the next item
     std::vector<unsigned> containing_element_indices;
@@ -427,6 +444,7 @@ std::vector<unsigned> TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetContaining
 
     std::vector<unsigned> dummy; // unused here
     GetNextItemFromStream(mNclFile, index, containing_element_indices, 0, dummy);
+    mNclItemsRead = index + 1; //Ready for the next call
 
     EnsureIndexingFromZero(containing_element_indices);
 
