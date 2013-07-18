@@ -45,13 +45,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = An example showing how to run a single cell simulation =
  *
+ * == Introduction ==
+ *
  * In this tutorial we run a single cell simulation,
  * showing (i) load a cardiac cell (CVODE - best solver to use for single cell simulations),
  * (ii) how to define the stimulus (using the default from CellML)
  * (iii) run the model to steady state using the SteadyStateRunner
  * (iv) solve the model for the number of paces of interest
  * (v) Write to voltage data to a file
- * (vi) Use CellProperties to output information such as APD and upstroke velocity
+ * (vi) Use {{{CellProperties}}} to output information such as APD and upstroke velocity
  * and use fibre directions, and (iii) mentioning how to write other output file formats.
  *
  *
@@ -59,14 +61,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The first thing to do is to include the headers.
  */
 #include <cxxtest/TestSuite.h>
-#include "OutputFileHandler.hpp"
-#include "FileFinder.hpp"
 #include "CellProperties.hpp"
 #include "SteadyStateRunner.hpp"
 #include "AbstractCvodeCell.hpp"
 #include "RegularStimulus.hpp"
 #include "EulerIvpOdeSolver.hpp"
-#include "OdeSystemInformation.hpp"
 #include "Shannon2004Cvode.hpp"
 /* This test is always run sequentially (never in parallel)*/
 #include "FakePetscSetup.hpp"
@@ -90,7 +89,7 @@ public:
          *
          * If you want to define your own stimulus without using the default one,
          * you can define it here instead of giving it an empty stimulus:
-         * boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500);
+         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500);}}}
          * the parameters are magnitude, duration, start time and period of stimulus
          */
         boost::shared_ptr<RegularStimulus> p_stimulus;
@@ -100,17 +99,17 @@ public:
         /* Once the model is set up we can get the the default stimulus from CellML */
         p_model->UseCellMLDefaultStimulus();
 
-        /* And retrieve a pointer to this. We need to cast it to a RegularStimulus */
+        /* And retrieve a pointer to this. We need to cast it to a {{{RegularStimulus}}} */
         boost::shared_ptr<RegularStimulus> p_reg_stim =
                              boost::static_pointer_cast<RegularStimulus>(p_model->GetStimulusFunction());
 
-        /* Now you can modify certain parameters of the stimulus function such as the period
-         * p_reg_stim->SetPeriod(500.0);
+        /* Now you can modify certain parameters of the stimulus function, such as the period
+         * {{{p_reg_stim->SetPeriod(500.0);}}}
          */
 
         /*
          * You can change the absolute and relative tolerances of the solver, the default being (1e-5,1e-7)
-         * p_model->SetTolerances(1e-6,1e-8);
+         * {{{p_model->SetTolerances(1e-6,1e-8);}}}
          */
 
 
@@ -119,7 +118,7 @@ public:
          *
          * Now we run the model to steady state.
          * You can detect for steady state alternans by giving it true as a second parameter
-         * SteadyStateRunner steady_runner(p_model, true);
+         * {{{SteadyStateRunner steady_runner(p_model, true);}}}
          * You may change the number of maximum paces the runner takes. The default is 1e5.
          */
         SteadyStateRunner steady_runner(p_model);
@@ -137,7 +136,7 @@ public:
          * == Solving model for paces of interest ==
          *
          * Now we solve for the number of paces we are interested in
-         * max_timestep and sampling time step are the same for cvode
+         * max_timestep and sampling time step are the same for CVODE
          * The start time and end time are only relevant for the stimulus
          *
          */
@@ -148,14 +147,14 @@ public:
         OdeSolution solution = p_model->Solve(start_time, end_time, max_timestep, sampling_time);
 
         /*
-         * Write the data out to a file. Check function declaration for extra parameters.
+         * Write the data out to a file.
          */
         solution.WriteToFile("TestCvodeCells","Shannon2004Cvode","ms");
 
         /*
          * == Calculating APD and Upstroke Velocity ==
          *
-         * Calculate APD and upstroke velocity using CellProperties
+         * Calculate APD and upstroke velocity using {{{CellProperties}}}
          */
         unsigned voltage_index = p_model->GetSystemInformation()->GetStateVariableIndex("membrane_voltage");
         std::vector<double> voltages = solution.GetVariableAtIndex(voltage_index);
