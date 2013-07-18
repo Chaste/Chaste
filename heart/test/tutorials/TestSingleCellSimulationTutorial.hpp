@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In this tutorial we run a single cell simulation,
  * showing (i) load a cardiac cell (CVODE - best solver to use for single cell simulations),
  * (ii) how to define the stimulus (using the default from CellML)
- * (iii) run the model to steady state using the SteadyStateRunner
+ * (iii) run the model to steady state using the {{{SteadyStateRunner}}}
  * (iv) solve the model for the number of paces of interest
  * (v) Write to voltage data to a file
  * (vi) Use {{{CellProperties}}} to output information such as APD and upstroke velocity
