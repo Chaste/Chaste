@@ -382,8 +382,8 @@ public:
                               "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
 
         // Compare the time information file
-        NumericFileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
-                              "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
+        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
+                       "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables

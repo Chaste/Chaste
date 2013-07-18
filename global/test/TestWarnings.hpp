@@ -81,7 +81,7 @@ public:
         std::string line;
         getline(log_file, line);
         log_file.close();
-        TS_ASSERT_EQUALS(line.find("Chaste warning: in file "), 0);
+        TS_ASSERT_EQUALS(line.find("Chaste warning: in file "), 0u);
         std::string file_and_line("global/test/TestWarnings.hpp at line 74: ");
         std::string::size_type msg_len = warning.length() + file_and_line.length();
         TS_ASSERT_EQUALS(line.substr(line.length() - msg_len), file_and_line + warning);
