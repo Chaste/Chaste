@@ -50,6 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
+#include "CellId.hpp"
+#include "CellAncestor.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "DefaultCellProliferativeType.hpp"

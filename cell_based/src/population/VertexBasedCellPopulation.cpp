@@ -661,7 +661,7 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
 
     // Write edge file
     out_stream p_edge_file = output_file_handler.OpenOutputFile(mesh_file_name+".edge");
-    (*p_node_file) << std::scientific;
+    (*p_edge_file) << std::scientific;
     (*p_edge_file) << tetrahedral_edges.size() << "\t1" << std::endl;
 
     unsigned edge_index = 0;
@@ -677,9 +677,12 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     p_edge_file->close();
 
     // Having written the mesh to file, now construct it using TrianglesMeshReader
-    TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
     TetrahedralMesh<DIM, DIM>* p_mesh = new TetrahedralMesh<DIM, DIM>;
-    p_mesh->ConstructFromMeshReader(mesh_reader);
+    // Nested scope so reader is destroyed before we remove the temporary files.
+    {
+        TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
+        p_mesh->ConstructFromMeshReader(mesh_reader);
+    }
 
     // Delete the temporary files
     output_file_handler.FindFile("").Remove();

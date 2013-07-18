@@ -426,20 +426,23 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetUnsignedAttribute(), 152u);
 
         // Write the mesh to file
-        VertexMeshWriter<2,2> mesh_writer("TestReadingAndWritingElementAttributes", "vertex_mesh_with_element_attributes");
-        mesh_writer.WriteFilesUsingMesh(mesh);
+        // Nested scope so the reader is destroyed before we try writing to the folder again
+        {
+            VertexMeshWriter<2,2> mesh_writer("TestReadingAndWritingElementAttributes", "vertex_mesh_with_element_attributes");
+            mesh_writer.WriteFilesUsingMesh(mesh);
 
-        // Now read in the mesh that was written
-        OutputFileHandler handler("TestReadingAndWritingElementAttributes", false);
-        VertexMeshReader<2,2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh_with_element_attributes");
-        TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
+            // Now read in the mesh that was written
+            OutputFileHandler handler("TestReadingAndWritingElementAttributes", false);
+            VertexMeshReader<2,2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh_with_element_attributes");
+            TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
+            TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
 
-        // Construct the mesh again
-        VertexMesh<2,2> mesh2;
-        mesh2.ConstructFromMeshReader(mesh_reader);
-        TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
-        TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
+            // Construct the mesh again
+            VertexMesh<2,2> mesh2;
+            mesh2.ConstructFromMeshReader(mesh_reader);
+            TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
+            TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
+        }
 
         // For coverage, repeat this test for a vertex mesh whose elements have faces
         VertexMeshReader<3,3> mesh_reader3d("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces_and_attributes");
@@ -463,7 +466,7 @@ public:
 
         // Construct the mesh again
         VertexMesh<3,3> mesh3d2;
-        mesh3d2.ConstructFromMeshReader(mesh_reader3d);
+        mesh3d2.ConstructFromMeshReader(mesh_reader3d2);
         TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetUnsignedAttribute(), 49u);
     }
 };

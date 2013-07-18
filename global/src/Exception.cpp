@@ -63,24 +63,11 @@ Exception::Exception(const std::string& rMessage,
 void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
-    // Windows returns full path of __FILE__ , whereas the Scons build somehow
-    // generates relative paths. The following fixes this mismatch in rFileName
-#ifdef _MSC_VER
-    std::string relative_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
-//    try
-//    {
-//        std::string cwd = GetCurrentWorkingDirectory();
-//        assert(rFilename.substr(0, cwd.length()) == cwd);
-//        relative_filename = "." + rFilename.substr(0, cwd.length());
-//    }
-//    catch (...) {}
-#else
-    const std::string& relative_filename = rFilename;
-#endif // _MSV_VER
+    std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
     mShortMessage = rMessage;
     std::stringstream line_number_stream;
     line_number_stream << lineNumber;
-    mMessage = std::string("\nChaste error: ") + relative_filename + ":"  + line_number_stream.str()  + ": " + mShortMessage;
+    mMessage = std::string("\nChaste error: ") + posix_filename + ":"  + line_number_stream.str()  + ": " + mShortMessage;
 }
 
 std::string Exception::GetMessage() const

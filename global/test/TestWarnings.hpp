@@ -37,9 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTWARNINGS_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <fstream>
+#include <string>
 #include "Warnings.hpp"
 #include "LogFile.hpp"
-#include "FileComparison.hpp"
+#include "FileFinder.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -70,12 +72,20 @@ public:
     {
         LogFile* p_log_file = LogFile::Instance();
         p_log_file->Set(1, "TestLogFile", "log_warnings.txt");
-
-        WARNING("This one goes into a log file"); //The line number for this WARNING is important since it gets written to the log file
-
+        const std::string warning("This one goes into a log file");
+        WARNING(warning); // Note that the line number for this (74) will appear in the log file and be tested
         LogFile::Close();
-        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestLogFile/";
-        FileComparison(results_dir + "log_warnings.txt", "global/test/data/log_warnings.txt").CompareFiles();
+        
+        FileFinder log_file_path("TestLogFile/log_warnings.txt", RelativeTo::ChasteTestOutput);
+        std::ifstream log_file(log_file_path.GetAbsolutePath().c_str());
+        std::string line;
+        getline(log_file, line);
+        log_file.close();
+        TS_ASSERT_EQUALS(line.find("Chaste warning: in file "), 0);
+        std::string file_and_line("global/test/TestWarnings.hpp at line 74: ");
+        std::string::size_type msg_len = warning.length() + file_and_line.length();
+        TS_ASSERT_EQUALS(line.substr(line.length() - msg_len), file_and_line + warning);
+
         Warnings::QuietDestroy();
     }
 

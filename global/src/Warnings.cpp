@@ -97,23 +97,10 @@ Warnings* Warnings::Instance()
 
 void Warnings::AddWarning(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber, bool onlyOnce)
 {
-    // Windows returns full path of __FILE__ , whereas the Scons build somehow
-    // generates relative paths. The following fixes this mismatch in rFileName
-#ifdef _MSC_VER
-    std::string relative_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
-//    try
-//    {
-//        std::string cwd = GetCurrentWorkingDirectory();
-//        assert(rFilename.substr(0, cwd.length()) == cwd);
-//        relative_filename = "." + rFilename.substr(0, cwd.length());
-//    }
-//    catch (...) {}
-#else
-    const std::string& relative_filename = rFilename;
-#endif // _MSV_VER
+    std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
     std::stringstream line_number_stream;
     line_number_stream << lineNumber;
-    std::string context("Chaste warning: in file " + relative_filename + " at line "  + line_number_stream.str()  + ": ");
+    std::string context("Chaste warning: in file " + posix_filename + " at line "  + line_number_stream.str()  + ": ");
     std::pair<std::string, std::string> item(context, rMessage);
 
     if (onlyOnce)

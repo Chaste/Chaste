@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
 #include "FileComparison.hpp"
+#include "NumericFileComparison.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
@@ -290,7 +291,7 @@ public:
             std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
             FileFinder generated_file(working_directory +"/txt_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);
             FileFinder reference_file("pde/test/data/" + files_to_compare[i], RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file, reference_file);
+            NumericFileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
     }
@@ -369,20 +370,20 @@ public:
 
         // Compare the first voltage file
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_1.dat",
-                       "heart/test/data/three_variables/extended_bidomain_Vm_1.dat").CompareFiles();
+        NumericFileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_1.dat",
+                              "heart/test/data/three_variables/extended_bidomain_Vm_1.dat").CompareFiles();
 
         // Compare the second voltage file
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_2.dat",
-                       "heart/test/data/three_variables/extended_bidomain_Vm_2.dat").CompareFiles();
+        NumericFileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Vm_2.dat",
+                              "heart/test/data/three_variables/extended_bidomain_Vm_2.dat").CompareFiles();
 
         // Compare the Phi_e file
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Phi_e.dat",
-                       "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
+        NumericFileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_Phi_e.dat",
+                              "heart/test/data/three_variables/extended_bidomain_Phi_e.dat").CompareFiles();
 
         // Compare the time information file
-        FileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
-                       "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
+        NumericFileComparison(test_output_directory + "TestMeshalyzerConversion3Variables/output/3_vars_times.info",
+                              "heart/test/data/three_variables/extended_bidomain_times.info").CompareFiles();
     }
 
     // This test covers the case when the hdf5 file contains more than 3 variables
@@ -433,6 +434,7 @@ public:
     */
     void TestHdf5ToXdmfConverter() throw(Exception)
     {
+#ifndef _MSC_VER
         std::string working_directory = "TestHdf5ToXdmfConverter";
 
         CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
@@ -460,6 +462,7 @@ public:
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
+#endif // _MSC_VER
     }
 };
 
