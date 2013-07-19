@@ -245,11 +245,13 @@ public:
         RunLr91Test(*p_loader, 0u);
 
         // Cover exceptions
-        std::string file_name = "test";
-        FileFinder no_ext(dirname + "/" + file_name, RelativeTo::ChasteTestOutput);
-        TS_ASSERT_THROWS_THIS(converter.Convert(no_ext), "Dynamically loadable cell model '"
-                              + no_ext.GetAbsolutePath() + "' does not exist.");
+        std::string file_name = "test.no.file";
+        FileFinder no_exist(dirname + "/" + file_name, RelativeTo::ChasteTestOutput);
+        TS_ASSERT_THROWS_THIS(converter.Convert(no_exist), "Dynamically loadable cell model '"
+                              + no_exist.GetAbsolutePath() + "' does not exist.");
 
+        file_name = "test";
+        FileFinder no_ext(dirname + "/" + file_name, RelativeTo::ChasteTestOutput);
         PetscTools::Barrier("TestCellmlConverter_pre_touch");
         if (PetscTools::AmMaster())
         {
