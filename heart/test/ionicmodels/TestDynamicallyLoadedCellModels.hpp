@@ -148,7 +148,7 @@ public:
      * This test demonstrates the easiest way to load a single cell model from CellML,
      * using the CellMLLoader class.
      */
-    void joeTestCellmlLoaderClass() throw(Exception)
+    void TestCellmlLoaderClass() throw(Exception)
     {
         FileFinder cellml_file("heart/src/odes/cellml/LuoRudy1991.cellml", RelativeTo::ChasteSourceRoot);
         // Stimulus to use for simulation, so it matches other tests in this suite
@@ -190,7 +190,7 @@ public:
      * This is based on TestOdeSolverForLR91WithDelayedSimpleStimulus from
      * TestIonicModels.hpp.
      */
-    void joeTestDynamicallyLoadedLr91() throw(Exception)
+    void TestDynamicallyLoadedLr91() throw(Exception)
     {
         // Load the cell model dynamically
         std::string model_name = "libDynamicallyLoadableLr91.";
@@ -206,7 +206,7 @@ public:
         RunLr91Test(*p_loader2);
     }
 
-    void joeTestExceptions() throw(Exception)
+    void TestExceptions() throw(Exception)
     {
         // Try loading a .so that doesn't exist
         std::string file_name = "non-existent-file-we-hope";
@@ -300,7 +300,7 @@ public:
         }
     }
 
-    void joeTestCellmlConverterWithOptions() throw(Exception)
+    void TestCellmlConverterWithOptions() throw(Exception)
     {
         // Copy CellML file into output dir
         std::string dirname = "TestCellmlConverterWithOptions";
