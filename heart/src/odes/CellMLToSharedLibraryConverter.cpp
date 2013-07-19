@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSyscalls.hpp"
 #include "Exception.hpp"
+#include "Warnings.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "PetscTools.hpp"
 #include "DynamicModelLoaderRegistry.hpp"
@@ -78,11 +79,6 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
 {
     DynamicCellModelLoaderPtr p_loader;
     std::string absolute_path = rFilePath.GetAbsolutePath();
-    // Check the file exists
-    if (!rFilePath.Exists())
-    {
-        EXCEPTION("Dynamically loadable cell model '" + absolute_path + "' does not exist.");
-    }
     // Find out whether rFilePath is a .cellml or .so
     size_t dot_position = absolute_path.find_last_of(".");
     if (dot_position == std::string::npos)
@@ -90,6 +86,23 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
         EXCEPTION("File does not have an extension: " + absolute_path);
     }
     std::string extension = absolute_path.substr(dot_position+1);
+    // We make a modifiable version of the const FileFinder just incase we feel like 
+    // amending the suffix
+    FileFinder file_path_copy(rFilePath);
+#ifdef __APPLE__
+    if (extension == "so")
+    {
+        WARN_ONCE_ONLY("CellMLToSharedLibraryConverter asked to load a \".so\" file.  On this architecture it should be \".dylib\"");
+        extension = "dylib";
+        absolute_path.replace(dot_position+1, 5, extension);
+        file_path_copy.SetPath(absolute_path,  RelativeTo::Absolute);
+    }
+#endif
+    // Check the file exists
+    if (!file_path_copy.Exists())
+    {
+        EXCEPTION("Dynamically loadable cell model '" + absolute_path + "' does not exist.");
+    }
     if (extension == "cellml")
     {
         // Split the path into folder and leaf
@@ -114,7 +127,8 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
     else if (extension == msSoSuffix)
     {
         // Just load the .so
-        p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(rFilePath);
+        // Note that this may have been modified to .dylib
+        p_loader = DynamicModelLoaderRegistry::Instance()->GetLoader(file_path_copy);
     }
     else
     {

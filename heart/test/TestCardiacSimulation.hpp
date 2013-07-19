@@ -549,7 +549,11 @@ public:
                               "Missing file parsing configuration file: no file");
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation(""), "No XML file name given");
 
+#ifdef __APPLE__
+        FileFinder model("file_does_not_exist.dylib", RelativeTo::ChasteSourceRoot);
+#else
         FileFinder model("file_does_not_exist.so", RelativeTo::ChasteSourceRoot);
+#endif
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/missing_dynamic_model.xml"),
                               "Dynamically loadable cell model '" + model.GetAbsolutePath() + "' does not exist.");
         TS_ASSERT_THROWS_THIS(CardiacSimulation simulation("heart/test/data/xml/bidomain_with_bath2d_noelectrodes.xml"),
