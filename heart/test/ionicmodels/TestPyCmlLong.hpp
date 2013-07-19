@@ -247,9 +247,7 @@ private:
             boost::shared_ptr<AbstractStimulusFunction> original_stim = p_cell->GetStimulusFunction();
 
             // Tell the cell to use the default stimulus and retrieve it
-            p_cell->UseCellMLDefaultStimulus();
-            boost::shared_ptr<RegularStimulus> p_reg_stim =
-                     boost::static_pointer_cast<RegularStimulus>(p_cell->GetStimulusFunction());
+            boost::shared_ptr<RegularStimulus> p_reg_stim = p_cell->UseCellMLDefaultStimulus();
 
             if (rModelName!="aslanidi_model_2009") // Even before recent changes aslanidi model has stimulus of -400 !
             {

@@ -110,10 +110,11 @@ void AbstractCardiacCellInterface::SetUsedInTissueSimulation(bool tissue)
     mIsUsedInTissue = tissue;
 }
 
-void AbstractCardiacCellInterface::UseCellMLDefaultStimulus()
+boost::shared_ptr<RegularStimulus> AbstractCardiacCellInterface::UseCellMLDefaultStimulus()
 {
     assert(!mHasDefaultStimulusFromCellML);
     EXCEPTION("This class has no default stimulus from CellML metadata.");
+    return boost::shared_ptr<RegularStimulus>();
 }
 
 bool AbstractCardiacCellInterface::HasCellMLDefaultStimulus()

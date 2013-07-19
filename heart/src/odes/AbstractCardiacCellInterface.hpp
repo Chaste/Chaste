@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 
 #include "AbstractIvpOdeSolver.hpp"
-#include "AbstractStimulusFunction.hpp"
+#include "RegularStimulus.hpp"
 #include "OdeSolution.hpp"
 #include "AbstractLookupTableCollection.hpp"
 
@@ -333,7 +333,7 @@ public:
      * models, PyCml will override this to provide a RegularStimulus as defined in
      * the CellML.
      */
-    virtual void UseCellMLDefaultStimulus();
+    virtual boost::shared_ptr<RegularStimulus> UseCellMLDefaultStimulus();
 
     /**
      * @return Whether the cell was generated from a CellML file with stimulus metadata.

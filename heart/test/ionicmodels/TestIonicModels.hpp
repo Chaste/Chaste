@@ -141,15 +141,14 @@ public:
         TS_ASSERT_THROWS_THIS(n98_ode_system.SetSlowValues(slows), error_should_be);
 
         TS_ASSERT(n98_ode_system.HasCellMLDefaultStimulus());
-        n98_ode_system.UseCellMLDefaultStimulus();
-        RegularStimulus* p_stim = static_cast<RegularStimulus*>(n98_ode_system.GetStimulusFunction().get());
+        boost::shared_ptr<RegularStimulus> p_stim = n98_ode_system.UseCellMLDefaultStimulus();
         TS_ASSERT_DELTA(p_stim->GetMagnitude(), -31.5789, 1e-4);
         TS_ASSERT_DELTA(p_stim->GetPeriod(), 1000, 1e-7);
         TS_ASSERT_DELTA(p_stim->GetStartTime(), 100, 1e-7);
         TS_ASSERT_DELTA(p_stim->GetDuration(), 3, 1e-7);
 
         // Coverage of some helper methods
-        double new_value =  -128.73;
+        double new_value = -128.73;
         n98_ode_system.SetStateVariable("membrane_voltage", new_value);
         TS_ASSERT_DELTA(n98_ode_system.GetStateVariable("membrane_voltage"),new_value,1e-9);
     }

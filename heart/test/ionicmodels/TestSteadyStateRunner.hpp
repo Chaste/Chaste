@@ -71,11 +71,7 @@ public:
         boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
         // Get it to use the default stimulus from CellML
-        p_model->UseCellMLDefaultStimulus();
-
-        // And retrieve a pointer to this.
-        boost::shared_ptr<RegularStimulus> p_reg_stim =
-                             boost::static_pointer_cast<RegularStimulus>(p_model->GetStimulusFunction());
+        boost::shared_ptr<RegularStimulus> p_reg_stim = p_model->UseCellMLDefaultStimulus();
 
         { // Test that the steady state analysis throws a nice error if we try to run it with a non-RegularStimulus
 

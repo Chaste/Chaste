@@ -1633,11 +1633,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.has_default_stimulus = True
         nodeset = self.calculate_extended_dependencies(filter(None, vars.values()))
 
-        self.output_method_start('UseCellMLDefaultStimulus', [], self.TYPE_VOID, 'public')
+        self.output_method_start('UseCellMLDefaultStimulus', [], 'boost::shared_ptr<RegularStimulus>', 'public')
         self.open_block()
         self.output_comment('Use the default stimulus specified by CellML metadata')
         self.output_equations(nodeset)
-        self.writeln('mpIntracellularStimulus.reset(new RegularStimulus(')
+        self.writeln('boost::shared_ptr<RegularStimulus> p_cellml_stim(new RegularStimulus(')
         self.writeln('        -fabs(', self.code_name(vars['amplitude']), '),')
         self.writeln('        ', self.code_name(vars['duration']), ',')
         self.writeln('        ', self.code_name(vars['period']), ',')
@@ -1647,7 +1647,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('        0.0')
         if vars['end']:
             self.writeln('      , ', self.code_name(vars['end']))
-        self.writeln('        ));')
+        self.writeln('        ))', self.STMT_END)
+        self.writeln('mpIntracellularStimulus = p_cellml_stim', self.STMT_END)
+        self.writeln('return p_cellml_stim', self.STMT_END)
         self.close_block(blank_line=True)
     
     def output_intracellular_calcium(self):

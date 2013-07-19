@@ -43,6 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSINGLECELLSIMULATIONTUTORIAL_HPP_
 #define TESTSINGLECELLSIMULATIONTUTORIAL_HPP_
 /*
+ * [[PageOutline]]
+ *
  * = An example showing how to run a single cell simulation =
  *
  * == Introduction ==
@@ -89,29 +91,73 @@ public:
          *
          * If you want to define your own stimulus without using the default one,
          * you can define it here instead of giving it an empty stimulus:
+         * EMPTYLINE
          * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500);}}}
-         * the parameters are magnitude, duration, start time and period of stimulus
+         * EMPTYLINE
+         * the parameters are magnitude, duration, start time, and period of stimulus.
          */
         boost::shared_ptr<RegularStimulus> p_stimulus;
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
         boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
-        /* Once the model is set up we can get the the default stimulus from CellML */
-        p_model->UseCellMLDefaultStimulus();
-
-        /* And retrieve a pointer to this. We need to cast it to a {{{RegularStimulus}}} */
-        boost::shared_ptr<RegularStimulus> p_reg_stim =
-                             boost::static_pointer_cast<RegularStimulus>(p_model->GetStimulusFunction());
-
-        /* Now you can modify certain parameters of the stimulus function, such as the period
-         * {{{p_reg_stim->SetPeriod(500.0);}}}
+        /*
+         * Once the model is set up we can tell it to use the the default stimulus from CellML,
+         * (if one has been labelled, you get an exception if not), and return it.
+         *
+         * NB. You could automatically check whether one is available with:
+         * EMPTYLINE
+         * {{{p_model->HasCellMLDefaultStimulus()}}}
+         *
          */
+        boost::shared_ptr<RegularStimulus> p_regular_stim = p_model->UseCellMLDefaultStimulus();
 
         /*
-         * You can change the absolute and relative tolerances of the solver, the default being (1e-5,1e-7)
+         * Now you can modify certain parameters of the stimulus function, such as the period
+         */
+        p_regular_stim->SetPeriod(1000.0);
+
+
+        /*
+         * == Numerical Considerations ==
+         *
+         * Cardiac cell models can be pretty tricky to deal with, as they are very stiff and sometimes full
+         * of singularities.
+         *
+         * EMPTYLINE
+         *
+         * To try to deal with this you can change the absolute and relative tolerances of the CVODE solver,
+         * the default being (1e-5,1e-7).
+         *
+         * EMPTYLINE
+         *
          * {{{p_model->SetTolerances(1e-6,1e-8);}}}
+         *
+         * By default we use an analytic Jacobian for CVODE cells (where available - see ChasteGuides/CodeGenerationFromCellML
+         * for instructions on how to provide one using Maple). In some cases (the Hund-Rudy model particularly being one) the
+         * analytic Jacobian contains effectively divide-by-zero entries, even at resting potential. If you observe
+         * CVODE errors when trying to run simulations, it can be worth switching off the analytic Jacobian and resorting
+         * to a numerical approximation (as happens by default if no analytic Jacobian is available). This can be done with the
+         * following command:
+         *
+         * EMPTYLINE
+         *
+         * {{{p_model->ForceUseOfNumericalJacobian();}}}
          */
 
+
+
+        /*
+         * == Changing Parameters in the Cell Model ==
+         *
+         * You can also change any parameters that are labelled in the cell model.
+         *
+         * Instructions for annotating parameters can be found at ChasteGuides/CodeGenerationFromCellML
+         *
+         * Here we show how to change the parameter dictating the maximal conductance of the IKr current.
+         * Note this call actually leaves it unchanged from the default,
+         * you can experiment with changing it and examine the impact on APD.
+         */
+        p_model->SetParameter("membrane_slow_delayed_rectifier_potassium_current_conductance", 0.07);
 
         /*
          * == Running model to steady state ==
@@ -119,6 +165,9 @@ public:
          * Now we run the model to steady state.
          * You can detect for steady state alternans by giving it true as a second parameter
          * {{{SteadyStateRunner steady_runner(p_model, true);}}}
+         *
+         * EMPTYLINE
+         *
          * You may change the number of maximum paces the runner takes. The default is 1e5.
          */
         SteadyStateRunner steady_runner(p_model);
@@ -129,6 +178,7 @@ public:
         /*
          * Check that the model has NOT reached steady state.
          * The model needs more than a 100 paces to reach steady state.
+         *
          */
         TS_ASSERT_EQUALS(result,false);
 
@@ -136,17 +186,35 @@ public:
          * == Solving model for paces of interest ==
          *
          * Now we solve for the number of paces we are interested in
-         * max_timestep and sampling time step are the same for CVODE
-         * The start time and end time are only relevant for the stimulus
+         * max_timestep and sampling time step should generally be the same for CVODE cells.
+         * EMPTYLINE
+         * The absolute values of start time and end time are typically only relevant for the stimulus, in general
+         * nothing else on the right-hand side of the equations uses time directly.
          *
+         * EMPTYLINE
+         * i.e. if you have a `RegularStimulus` of period 1000ms then you would get exactly the same results
+         * calling Solve(0,1000,...) twice, as you would calling Solve(0,1000,...) and Solve(1000,2000,...).
+         *
+         * EMPTYLINE
+         *
+         * Single cell results can be very sensitive to the sampling time step, because of the steepness of the upstroke.
+         *
+         * EMPTYLINE
+         *
+         * For example, try changing the line below to 1 ms. The upstroke velocity that is detected will change
+         * from 339 mV/ms to around 95 mV/ms. APD calculations will only ever be accurate to sampling timestep
+         * for the same reason.
          */
-        double max_timestep = 1.0;
-        double sampling_time = max_timestep;
+        double max_timestep = 0.1;
+        double sampling_timestep = max_timestep;
         double start_time = 0.0;
         double end_time = 1000.0;
-        OdeSolution solution = p_model->Solve(start_time, end_time, max_timestep, sampling_time);
+        OdeSolution solution = p_model->Solve(start_time, end_time, max_timestep, sampling_timestep);
 
         /*
+         * `p_model` retains the state variables at the end of `Solve`, if you call `Solve` again the state
+         * variables will evolve from their new state, not the original initial conditions.
+         *
          * Write the data out to a file.
          */
         solution.WriteToFile("TestCvodeCells","Shannon2004Cvode","ms");
@@ -165,8 +233,8 @@ public:
         /*
          * Here we just check that the values are equal to the ones we expect with 1e-2 precision.
          */
-        TS_ASSERT_DELTA(apd,212.42,1e-2);
-        TS_ASSERT_DELTA(upstroke_velocity,94.85,1e-2);
+        TS_ASSERT_DELTA(apd, 212.41, 1e-2);
+        TS_ASSERT_DELTA(upstroke_velocity, 339.8, 1e-1);
 
 #else
         /* CVODE is not enable or installed*/

@@ -288,7 +288,8 @@ public:
 
         // This should work now that metadata has been added to the LuoRudy1991 cellML.
         TS_ASSERT_EQUALS(lr91_cvode_system.HasCellMLDefaultStimulus(), true);
-        lr91_cvode_system.UseCellMLDefaultStimulus();
+        boost::shared_ptr<RegularStimulus> p_cellml_stim = lr91_cvode_system.UseCellMLDefaultStimulus();
+        TS_ASSERT_DELTA(p_cellml_stim->GetPeriod(), 1000.0, 1e-9);
 
         {
             lr91_cvode_system.SetMaxSteps(10000);
