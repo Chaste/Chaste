@@ -410,14 +410,18 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned in
         EXCEPTION("Face does not exist - not enough faces.");
     }
 
-    // Put the file stream pointer to the right location
+    /*
+     *
     if ( index > mFacesRead )
     {
-        // This is a monotonic (but non-contiguous) read.  Let's assume that it's more efficient
-        // to seek from the current position rather than from the start of the file
-        mFacesFile.seekg( mFaceItemWidth*(index-mFacesRead), std::ios_base::cur);
+        // This would be a monotonic (but non-contiguous) read. But we don't actually read faces with this access pattern.
+        ///\todo Revisit #1930?
+        mFacesFile.seekg( mFaceItemWidth*(index-mFacesRead), std::ios_base::cur); 
     }
-    else if ( mFacesRead != index )
+    else 
+    */
+    // Put the file stream pointer to the right location
+    if ( mFacesRead != index )
     {
         mFacesFile.seekg(mFaceFileDataStart + mFaceItemWidth*index, std::ios_base::beg);
     }
