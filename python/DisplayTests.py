@@ -130,7 +130,12 @@ def testsuite(req, type, revision, machine, buildType, testsuite, status, runtim
     buildTypesModule = _importBuildTypesModule(revision)
     build = _getBuildObject(buildTypesModule, buildType)
     for suite_name in _test_suite_name_aliases(testsuite):
-        testsuite_file = build.ResultsFileName(test_set_dir, suite_name, status, runtime)
+        if build.is_windows:
+            import glob
+            ctest_results = glob.glob(os.path.join(testSetDir, '*TestOutputs_*.txt*'))
+            testsuite_file = ''.join(ctest_results) #TODO: Hack! (#2016)
+        else:
+            testsuite_file = build.ResultsFileName(test_set_dir, suite_name, status, runtime)
         if os.path.isfile(testsuite_file):
             req.write('\n<pre>\n', 0)
             fp = open(testsuite_file)
@@ -916,9 +921,14 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
     """Check whether the build failed, and return a new status if it did."""
     found_semget = False
     found_done_building = False
+    checked_windows = False
     try:
         log = file(os.path.join(test_set_dir, 'build.log'), 'r')
         for line in log:
+            if not checked_windows:
+                checked_windows = True
+                if 'Windows' in line:
+                    return _checkWinBuildFailure(log, overall_status, colour)
             if (line.startswith('scons: building terminated because of errors.')
                 or line.strip().endswith('(errors occurred during build).')
                 or _sconstruct_traceback_re.match(line)):
@@ -943,6 +953,29 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
         pass
     return overall_status, colour
 
+def _checkWinBuildFailure(log, overallStatus, colour):
+    """Variant of _checkBuildFailure for Windows builds."""
+    build_summary_re = re.compile(r'=+ Build: (\d+) succeeded, (\d+) failed, (\d+) up-to-date, (\d+) skipped =+')
+    test_summary_re = re.compile(r'\d+% tests passed, (\d+) tests failed out of (\d+)')
+    found_summaries = 0
+    for line in log:
+        m = build_summary_re.match(line)
+        if m:
+            found_summaries += 1
+            if int(m.group(2)) > 0:
+                overallStatus = 'Build failed.  ' + overallStatus
+                colour = 'red'
+            continue
+        m = test_summary_re.match(line)
+        if m:
+            found_summaries += 1
+            break
+    if found_summaries < 2:
+        overallStatus = "Build didn't complete.  " + overallStatus
+        colour = 'red'
+    return overallStatus, colour
+
+
 def _getTestStatus(test_set_dir, build, summary=False):
     """
     Return the status for all tests in the given directory, and compute
@@ -955,6 +988,8 @@ def _getTestStatus(test_set_dir, build, summary=False):
     
     If summary is given as True, don't generate or return the dictionaries.
     """
+    if build.is_windows:
+        return _getWinTestStatus(test_set_dir, build, summary)
     ignores = ['.html', '.log']
     result_files = os.listdir(test_set_dir)
     testsuite_status, runtime, graphs = {}, {}, {}
@@ -982,6 +1017,70 @@ def _getTestStatus(test_set_dir, build, summary=False):
     else:
         return testsuite_status, overall_status, colour, runtime, graphs
 
+def _getWinTestStatus(testSetDir, build, summary=False):
+    """Equivalent of _getTestStatus for Windows CMake-based builds.
+    
+    In CMake setups, we expect only three files in the results folder: info.log, build.log, and a ctest output text file.
+    The latter contains all the test results, including the test output for those tests which didn't pass.
+    It will be named like: ${TestPack}TestOutputs_${DateTime}.txt{,.tmp}
+    Lines look like:
+        Start   1: TestArchivingRunner
+  1/248 Test   #1: TestArchivingRunner ..................................................................   Passed    0.55 sec
+        Start   9: TestExceptionRunner
+  9/248 Test   #9: TestExceptionRunner ..................................................................***Failed    0.42 sec
+[test output]
+        Start  10: TestExecutableSupportRunner
+ 10/248 Test  #10: TestExecutableSupportRunner ..........................................................   Passed    1.19 sec
+        Start  59: TestMixedDimensionMeshRunner
+ 59/248 Test  #59: TestMixedDimensionMeshRunner .........................................................***Exception: Other  1.48 sec
+
+69% tests passed, 77 tests failed out of 248
+
+Total Test time (real) = 7724.14 sec
+
+The following tests FAILED:
+          9 - TestExceptionRunner (Failed)
+    """
+    import glob
+    ctest_results = glob.glob(os.path.join(testSetDir, '*TestOutputs_*.txt*'))
+    # Regular expressions matching the key lines in the output 
+    start_re = re.compile(r'\s+Start\s+\d+: ')
+    test_re = re.compile(r'\s*(\d+)/(\d+) Test\s+#\d+: (\S+) \.*\s*(Passed|\*\*\*\D+)\s*([0-9.]+) sec')
+    summary_re = re.compile(r'\d+% tests passed, (\d+) tests failed out of (\d+)')
+    # Parse the output(s)
+    testsuite_status, runtime, graphs = {}, {}, {}
+    tests_completed = True
+    for results in ctest_results:
+        if results.endswith('.tmp'):
+            tests_completed = False
+        for line in file(results):
+            m = test_re.match(line)
+            if m:
+                testsuite = m.group(3)
+                if m.group(4) == 'Passed':
+                    testsuite_status[testsuite] = 'OK'
+                elif m.group(4).startswith('Exception'):
+                    testsuite_status[testsuite] = 'Unknown'
+                else:
+                    testsuite_status[testsuite] = '1_1'
+                #TODO instead: testsuite_status = build.EncodeStatus(test_output)  (#2016)
+                runtime[testsuite] = float(m.group(5))
+            # Sanity check
+            m = summary_re.match(line)
+            if m:
+                assert m.group(2) == len(testsuite_status)
+    overall_status, colour = _overallStatus(testsuite_status, build)
+    if not tests_completed:
+        overall_status = "Tests didn't complete.  " + overall_status
+        colour = 'red'
+    # Check for build failure
+    overall_status, colour = _checkBuildFailure(testSetDir, overall_status, colour)
+    if summary:
+        return overall_status, colour
+    else:
+        return testsuite_status, overall_status, colour, runtime, graphs
+
+
 def _overallStatus(statuses, build):
     """
     Given a dict mapping test suite name to its status,
@@ -993,14 +1092,7 @@ def _overallStatus(statuses, build):
     failed, warnings = 0, 0
     components = set()
     for testsuite, status in statuses.iteritems():
-        try:
-            colour = build.StatusColour(status)
-        except AttributeError:
-            # Backwards compatibility
-            if build.IsGoodStatus(status):
-                colour = 'green'
-            else:
-                colour = 'red'
+        colour = _statusColour(status, build)
         if colour == 'red':
             failed += 1
             try:
@@ -1030,6 +1122,7 @@ def _overallStatus(statuses, build):
             result = "All %d tests run passed" % total
             colour = "green"
     return result, colour
+
 
 def _statusColour(status, build):
     """
@@ -1061,11 +1154,16 @@ def _parseBuildTimings(logfilename):
     Returns a dictionary mapping activity to time (in seconds).
     """
     times = [0] * len(_states)
+    checked_windows = False
     try:
         logfile = open(logfilename, 'r')
         state = 0
     
         for line in logfile:
+            if not checked_windows:
+                checked_windows = True
+                if 'Windows' in line:
+                    return _parseWinBuildTimings(logfile)
             m = _time_re.match(line)
             if m:
                 times[state] += float(m.group(1))
@@ -1083,6 +1181,23 @@ def _parseBuildTimings(logfilename):
         result = dict.fromkeys(_states, -1.0)
     result['Total'] = sum(times)
     return result
+
+def _parseWinBuildTimings(logfile):
+    """Variant of _parseBuildTimings for Windows builds."""
+    res = {'Compile': re.compile(r'\d+>Time Elapsed (\d+):(\d+):([0-9.]+)'),
+           'Test running': re.compile(r'.*?\.+.*?([0-9.]+) sec')}
+    times = dict([(k, 0.0) for k in res])
+    for line in logfile:
+        for key, regexp in res.iteritems():
+            m = regexp.match(line)
+            if m:
+                multiplier = 1
+                for time_part in reversed(m.groups()):
+                    times[key] += float(time_part) * multiplier
+                    multiplier *= 60
+                break
+    times['Total'] = sum(times.values())
+    return times
 
 
 def _getCcFlags(build):

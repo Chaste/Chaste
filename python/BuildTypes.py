@@ -71,6 +71,7 @@ class BuildType(object):
         self.is_profile = False
         self.needs_static = False # Profiling with gprof requires static libraries
         self.is_production = False
+        self.is_windows = False
         # Where test output will go
         import socket
         machine_fqdn = socket.getfqdn()
@@ -403,6 +404,14 @@ class GccDebug(Gcc):
         super(GccDebug, self).__init__(*args, **kwargs)
         self._cc_flags.append('-g')
         self.build_dir = 'debug'
+
+class Windows(BuildType):
+    """Building on Windows with CMake and MSVC."""
+    def __init__(self, *args, **kwargs):
+        super(Windows, self).__init__(*args, **kwargs)
+        self.is_windows = True
+        self._compiler_type = 'msvc'
+        self.build_dir = 'windows'
 
 class Ansi(GccDebug):
     """
