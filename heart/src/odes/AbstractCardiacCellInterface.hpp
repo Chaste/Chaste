@@ -332,6 +332,7 @@ public:
      * By default this method will always throw an exception.  For suitably annotated
      * models, PyCml will override this to provide a RegularStimulus as defined in
      * the CellML.
+     * @return a regular stimulus as defined in the CellML
      */
     virtual boost::shared_ptr<RegularStimulus> UseCellMLDefaultStimulus();
 
