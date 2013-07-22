@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscVecTools.hpp" // Includes Ublas so must come first
 #include "PCBlockDiagonal.hpp"
 #include "Exception.hpp"
+#include "Warnings.hpp"
 
 PCBlockDiagonal::PCBlockDiagonal(KSP& rKspObject)
 {
@@ -198,7 +199,18 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
 
     //    PCSetType(mPCContext.PC_amg_A11, PCBJACOBI);
 
-    PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
+    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it 
+    // in case it aborts 
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
+    if (pc_set_error != 0)
+    {
+        WARNING("PETSc hypre preconditioning library is not installed");
+    }
+    // Stop supressing error     
+    PetscPopErrorHandler();
+                                           
+                                           
     //PCHYPRESetType(mPCContext.PC_amg_A11, "euclid");
     PetscOptionsSetValue("-pc_hypre_type", "euclid");
     PetscOptionsSetValue("-pc_hypre_euclid_levels", "0");
@@ -218,7 +230,11 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
 
     /* Full AMG in the block */
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
+    // Stop supressing error 
+    PetscPopErrorHandler();
+
     //PCHYPRESetType(mPCContext.PC_amg_A22, "boomeramg");
     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");

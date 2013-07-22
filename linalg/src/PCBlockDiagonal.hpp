@@ -77,12 +77,8 @@ PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y);
  * The inverses are approximate with one cycle of AMG.
  *
  * Note: This class requires PETSc to be build including HYPRE library.
- * If it's not available, it will throw the following error:
- *
- *     [0]PETSC ERROR: --------------------- Error Message ------------------------------------
- *     [0]PETSC ERROR: Unknown type. Check for miss-spelling or missing external package needed for type!
- *     [0]PETSC ERROR: Unable to find requested PC type hypre!
- *
+ * If it's not available, it will show the following warning:
+   Chaste warning: in file linalg/src/PCLDUFactorisation.cpp at line ???: PETSc HYPRE preconditioning library is not installed
  * and will approximate the inverse of the subblocks with PETSc's default
  * preconditioner (bjacobi at the time of writing this).
  */

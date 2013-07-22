@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscVecTools.hpp" // Includes Ublas so must come first
 #include "PCLDUFactorisation.hpp"
 #include "Exception.hpp"
+#include "Warnings.hpp"
 
 PCLDUFactorisation::PCLDUFactorisation(KSP& rKspObject)
 {
@@ -250,7 +251,17 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
 ////////
 //    PCSetType(mPCContext.PC_amg_A11, PCBJACOBI);
 
-    PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
+    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it 
+    // in case it aborts 
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
+    PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
+    if (pc_set_error != 0)
+    {
+        WARNING("PETSc hypre preconditioning library is not installed");
+    }
+    // Stop supressing error
+    PetscPopErrorHandler();     
+
     //PCHYPRESetType(mPCContext.PC_amg_A11, "euclid");
     PetscOptionsSetValue("-pc_hypre_type", "euclid");
     PetscOptionsSetValue("-pc_hypre_euclid_levels", "0");
@@ -291,7 +302,13 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     // Choose between the two following blocks in order to approximate inv(A11) with one AMG cycle
     // or with an CG solve with high tolerance
 ////////
+    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it 
+    // in case it aborts 
+    PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
+    // Stop supressing error 
+    PetscPopErrorHandler();
+
     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");
     PetscOptionsSetValue("-pc_hypre_boomeramg_max_iter", "1");
     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
