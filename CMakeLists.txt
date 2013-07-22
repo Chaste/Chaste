@@ -39,7 +39,8 @@ if(found EQUAL -1)
 	message(FATAL_ERROR "Test family ${TEST_FAMILY} does not exist. Must be one of ${TestPackTypes}. Aborting.")
 else()
 	file(STRINGS "test_runner/${TEST_FAMILY}TestsToRun.txt" tests)
-	string(REPLACE ";" "^|;" tests "${tests}")
+	string(REPLACE ";" "|" tests "${tests}")
+	message("\n\nTests to run: ${tests}\n\n")
 	#get date and time, to append to test result filename
 	execute_process(COMMAND cmd /c echo %DATE% %TIME%
 			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

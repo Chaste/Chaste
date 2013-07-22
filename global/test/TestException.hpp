@@ -65,8 +65,10 @@ public:
          * Note: The following test will fail if the number of lines above is changed drastically
          * (that's why method GetShortMessage() was introduced).
          */
+#ifndef _MSC_VER
         TS_ASSERT_THROWS_EQUALS(EXCEPTION("Hello. I'm an exception"), const Exception &err,
                                 err.GetMessage().find("Hello. I\'m an exception",0), 51u); // This appears at position 51 in full message (a bit more robust?!)
+#endif // _MSC_VER
     }
 
 

@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTOUTPUTFILEHANDLER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <cstdlib>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -57,9 +58,8 @@ public:
     {
         // Test that CHASTE_TEST_OUTPUT always has a trailing slash even before
         // a class object is instantiated
-        // Fails when the directory does not exist
-        const std::string no_handler_test_path(OutputFileHandler::GetChasteTestOutputDirectory());
-        TS_ASSERT_EQUALS( *(no_handler_test_path.end()-1), '/');
+        const std::string chaste_test_output(OutputFileHandler::GetChasteTestOutputDirectory());
+        TS_ASSERT_EQUALS( *(chaste_test_output.end()-1), '/');
 
         // Make a handler that points straight to the CHASTE_TEST_OUTPUT directory.
         OutputFileHandler handler("");
@@ -123,8 +123,6 @@ public:
         PetscTools::Barrier("TestOutputFileHandler-1");
 
         // Test that the environment variable actually influences the location of files
-        char *chaste_test_output = getenv("CHASTE_TEST_OUTPUT");
-
         {
             setenv("CHASTE_TEST_OUTPUT", "", 1/*Overwrite*/);
             // Check this folder is not present
@@ -171,11 +169,8 @@ public:
             }
         }
 
-        // Reset the location of CHASTE_TEST_OUTPUT (NOTE: it may not have been set and hence NULL)
-        if (chaste_test_output != NULL)
-        {
-            setenv("CHASTE_TEST_OUTPUT", chaste_test_output, 1/*Overwrite*/);
-        }
+        // Reset the location of CHASTE_TEST_OUTPUT
+        setenv("CHASTE_TEST_OUTPUT", chaste_test_output.c_str(), 1/*Overwrite*/);
 
         // We don't want other people using CHASTE_TEST_OUTPUT whilst we are messing with it!
         PetscTools::Barrier("TestOutputFileHandler-4");

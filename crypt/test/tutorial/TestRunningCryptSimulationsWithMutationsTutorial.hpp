@@ -47,15 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = Examples showing how to run crypt simulations with various mutations =
  *
- * EMPTYLINE
- *
  * == Introduction ==
  *
- * EMPTYLINE
- *
  * This tutorial assumes you have already read UserTutorials/RunningMeshBasedCryptSimulations.
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt with mutations using both mesh and vertex-based simulations.
@@ -104,10 +98,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "WntConcentration.hpp"
 /*
- * The final header file defines a cell killer class, which implements sloughing of cells
+ * The next header file defines a cell killer class, which implements sloughing of cells
  * into the lumen once they reach the top of the crypt.
  */
 #include "SloughingCellKiller.hpp"
+/* The final header ensures that this test is only ever run sequentially, not in parallel. */
+#include "FakePetscSetup.hpp"
 
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}

@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "NumericFileComparison.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -121,7 +122,7 @@ public:
         OutputFileHandler handler("Crypt1dWithNoBirthAndNoDeath", false);
 
         std::string node_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        FileComparison( node_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.viznodes").CompareFiles();
+        NumericFileComparison( node_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.viznodes").CompareFiles(0.0002 /*abstol*/);
 
         std::string cell_type_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
         FileComparison( cell_type_results_file, "crypt/test/data/Crypt1dWithNoBirthAndNoDeath/results.vizcelltypes").CompareFiles();

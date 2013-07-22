@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 
+#include "FakePetscSetup.hpp"
+
 class TestGenerateSteadyStateCrypt : public CxxTest::TestSuite
 {
 public:

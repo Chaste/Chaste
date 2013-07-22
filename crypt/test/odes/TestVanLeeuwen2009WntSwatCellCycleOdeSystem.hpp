@@ -62,6 +62,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
 
+#include "FakePetscSetup.hpp"
+
 class TestVanLeeuwen2009WntSwatCellCycleOdeSystem : public CxxTest::TestSuite
 {
 public:
