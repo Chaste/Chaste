@@ -130,7 +130,7 @@ def testsuite(req, type, revision, machine, buildType, testsuite, status, runtim
     buildTypesModule = _importBuildTypesModule(revision)
     build = _getBuildObject(buildTypesModule, buildType)
     for suite_name in _test_suite_name_aliases(testsuite):
-        if build.is_windows:
+        if _isWindows(build):
             import glob
             ctest_results = glob.glob(os.path.join(testSetDir, '*TestOutputs_*.txt*'))
             testsuite_file = ''.join(ctest_results) #TODO: Hack! (#2016)
@@ -975,6 +975,12 @@ def _checkWinBuildFailure(log, overallStatus, colour):
         colour = 'red'
     return overallStatus, colour
 
+def _isWindows(build):
+    """Return build.is_windows in a backwards-compatible way."""
+    try:
+        return build.is_windows
+    except AttributeError:
+        return False
 
 def _getTestStatus(test_set_dir, build, summary=False):
     """
@@ -988,7 +994,7 @@ def _getTestStatus(test_set_dir, build, summary=False):
     
     If summary is given as True, don't generate or return the dictionaries.
     """
-    if build.is_windows:
+    if _isWindows(build):
         return _getWinTestStatus(test_set_dir, build, summary)
     ignores = ['.html', '.log']
     result_files = os.listdir(test_set_dir)
