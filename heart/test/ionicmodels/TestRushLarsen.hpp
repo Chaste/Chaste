@@ -54,6 +54,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DynamicCellModelLoader.hpp"
 #include "Warnings.hpp"
 
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 /**
  * This test is based on code contributed by Megan Lewis, University of Saskatchewan.
  */
