@@ -162,7 +162,8 @@ def FasterSharedLibrary(env, library, sources, **args):
     catIF = envContentSig.Command(
         '%s.if' % library[0],
         catLib,
-        'nm --extern-only $SOURCES | cut -c 12- | sort > $TARGET')
+        # -g has the synonym --extern-only on GNU systems (but not on MAC OSX)
+        'nm -g $SOURCES | cut -c 12- | sort > $TARGET')
 
     # Install command to copy lib to #linklib, where the link actually occurs.
     # Explicitly make this depend only on the catIF file, which has a target content signature.
