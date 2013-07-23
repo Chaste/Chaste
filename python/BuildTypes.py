@@ -392,6 +392,7 @@ class Gcc(BuildType):
             self._compiler_type = 'clang'
             # clang mistakes an instantiation of a class (with no method calls) as an 'unused variable'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla', '-Wno-unused-variable'])
+            self.rdynamic_link_flag = ''
         else:
             self._compiler_type = 'gcc'
             self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wvla'])
