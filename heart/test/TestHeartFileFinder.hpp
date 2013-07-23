@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteBuildRoot.hpp"
 #include "OutputFileHandler.hpp"
 #include "HeartConfig.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestHeartFileFinder : public CxxTest::TestSuite
 {
