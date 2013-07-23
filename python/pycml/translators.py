@@ -127,10 +127,6 @@ class CellMLTranslator(object):
         """
         pass
 
-    # Methods we could add:
-    # start_func(name, args, rettype)
-    # end_func()
-
     ###########################
     # Various language tokens #
     ###########################
@@ -1325,6 +1321,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
             setattr(self, key, kwargs.get(key, default))
             if key in kwargs:
                 del kwargs[key]
+        # Some other default settings
+        self.use_backward_euler = False
+        self.include_serialization = False
         # Last method's access specification
         self._last_method_access = 'private'
         return super(CellMLToChasteTranslator, self).translate(*args, **kwargs)
@@ -2183,7 +2182,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
     def vector_initialise(self, vector, size):
         """Return code for creating an already-declared vector with the given size."""
         return ''.join(map(str, [vector, '.resize(', size, ')', self.STMT_END]))
-
+    
     def output_nonlinear_state_assignments(self, nodeset=None):
         """Output assignments for nonlinear state variables."""
         for i, var in enumerate(self.nonlinear_system_vars):
@@ -4431,6 +4430,198 @@ class CellMLToMatlabTranslator(CellMLTranslator):
         return
 
 
+
+class CellMLToPythonTranslator(CellMLToChasteTranslator):
+    """Output code suitable for the Python implementation of Functional Curation."""
+    
+    STMT_END = ''
+    COMMENT_START = '# '
+    DOXYGEN_COMMENT_START = '## '
+    TYPE_DOUBLE = ''
+    TYPE_CONST_DOUBLE = ''
+    TYPE_VOID = ''
+    TYPE_CONST_UNSIGNED = ''
+    TYPE_VECTOR = ''
+    TYPE_VECTOR_REF = ''
+    TRUE = 'True'
+    FALSE = 'False'
+    M_PI = 'math.pi'
+    M_E = 'math.e'
+    NOT_A_NUMBER = 'float("nan")'
+    USES_SUBSIDIARY_FILE = False
+    
+    nary_ops = CellMLToChasteTranslator.nary_ops.copy()
+    nary_ops.update({'and': 'and', 'or': 'or'})
+    function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log', 'exp': 'math.exp',
+                    'floor': 'math.floor', 'ceiling': 'math.ceil',
+                    'factorial': 'factorial', # Needs external definition
+                    'not': 'not',
+                    'sin': 'math.sin', 'cos': 'math.cos', 'tan': 'math.tan',
+                    'sec': '1/math.cos', 'csc': '1/math.sin', 'cot': '1/math.tan',
+                    'sinh': 'math.sinh', 'cosh': 'math.cosh', 'tanh': 'math.tanh',
+                    'sech': '1/math.cosh', 'csch': '1/math.sinh', 'coth': '1/math.tanh',
+                    'arcsin': 'math.asin', 'arccos': 'math.acos', 'arctan': 'math.atan',
+                    'arcsinh': 'math.asinh', 'arccosh': 'math.acosh', 'arctanh': 'math.atanh'}
+    special_roots = {2: 'sqrt'}
+    
+    def output_file_name(self, model_filename):
+        """Generate a name for our output file, based on the input file."""
+        return os.path.splitext(model_filename)[0] + '.py'
+    
+    def open_block(self, **kwargs):
+        """Just increase indent; we assume the previous line included a colon."""
+        self.set_indent(offset=1)
+
+    def close_block(self, blank_line=True, **kwargs):
+        """Decrease indent, and optionally add an extra blank line."""
+        self.set_indent(offset=-1)
+        if blank_line:
+            self.writeln(**kwargs)
+        return
+
+    def code_name(self, var, *args, **kwargs):
+        """Return the full name of var in a form suitable for inclusion in a source file.
+        
+        Overrides the base class version to access self.parameters for parameters.
+        """
+        if hasattr(var, '_cml_param_index'):
+            return self.vector_index('self.parameters', var._cml_param_index)
+        else:
+            return super(CellMLToPythonTranslator, self).code_name(var, *args, **kwargs)
+
+    def output_log(self, expr, paren):
+        """Output a logarithm to the given base, which defaults to base 10."""
+        if hasattr(expr, u'logbase'):
+            # A base is provided.
+            self.output_function('math.log', list(expr.operands()) + [expr.logbase], paren)
+        else:
+            # Use base 10
+            self.output_function('math.log10', expr.operands(), paren)
+
+    def output_piecewise(self, expr, paren):
+        """Output the piecewise expression expr.
+
+        We use a cascading ternary if expression for simplicity.
+        """
+        self.open_paren(paren)
+        for piece in getattr(expr, u'piece', []):
+            self.output_expr(child_i(piece, 1), True) # Result
+            self.write(' if ')
+            self.output_expr(child_i(piece, 2), True) # Condition
+            self.write(' else ')
+        if hasattr(expr, u'otherwise'):
+            self.output_expr(child_i(expr.otherwise, 1), True) # Default case
+        else:
+            self.write(self.NOT_A_NUMBER)
+        self.close_paren(paren)
+
+    def vector_create(self, vector, size):
+        """Return code for creating a new vector with the given size."""
+        return ''.join(map(str, [vector, self.EQ_ASSIGN, 'np.zeros(', size, ')', self.STMT_END]))
+
+    def vector_initialise(self, vector, size):
+        """Return code for creating an already-declared vector with the given size."""
+        return self.vector_create(vector, size)
+
+    def output_top_boilerplate(self):
+        """Output file content occurring before the model equations."""
+        # Figure out protocol inputs & outputs of interest
+        assert self.use_protocol
+        # Single-valued outputs
+        self._outputs = cellml_metadata.find_variables(self.model,
+                                                       ('pycml:output-variable', NSS['pycml']),
+                                                       'yes')
+        self._outputs.sort(key=lambda v: self.var_display_name(v))
+        # Vector-valued outputs
+        self._vector_outputs = {}
+        prop = ('pycml:output-vector', NSS['pycml'])
+        vector_names = set(cellml_metadata.get_targets(self.model, None,
+                                                       cellml_metadata.create_rdf_node(prop)))
+        for name in vector_names:
+            vector_outputs = cellml_metadata.find_variables(self.model, prop, name)
+            assert len(vector_outputs) > 0
+            vector_outputs.sort(key=lambda v: self.var_display_name(v))
+            self._vector_outputs[name] = vector_outputs
+        # Find model parameters that can be set from the protocol
+        self.cell_parameters = filter(
+            lambda v: v.is_modifiable_parameter,
+            cellml_metadata.find_variables(self.model,
+                                           ('pycml:modifiable-parameter', NSS['pycml']),
+                                           'yes'))
+        self.cell_parameters.sort(key=lambda v: self.var_display_name(v))
+        for i, var in enumerate(self.cell_parameters):
+            # Remember the var's index
+            var._cml_param_index = i
+
+        # Start file output
+        self.output_doxygen('@file\n\n',
+                            'This source file was generated from CellML.\n\n',
+                            'Model: ', self.model.name, '\n\n',
+                            version_comment(self.add_timestamp),
+                            '\n\n<autogenerated>')
+        self.writeln('import math')
+        self.writeln('import numpy as np')
+        self.writeln()
+        self.writeln('import Model')
+        self.writeln()
+        self.writeln('class ', self.class_name, '(Model.AbstractOdeModel):')
+        self.open_block()
+        # Constructor
+        self.writeln('def __init__(self, *args, **kwargs):')
+        self.open_block()
+        self.writeln('self.state_var_map = {}')
+        self.vector_create('self.initial_state', len(self.state_vars))
+        for i, var in enumerate(self.state_vars):
+            self.writeln('self.state_var_map["', self.var_display_name(var), '"] = ', i)
+            init_val = getattr(var, u'initial_value', None)
+            init_comm = ' # ' + var.units
+            if init_val is None:
+                init_comm += '; value not given in model'
+                # Don't want compiler error, but shouldn't be a real number
+                init_val = self.NOT_A_NUMBER
+            self.writeln('self.initial_state[', i, '] = ', init_val, init_comm)
+        self.writeln()
+        self.writeln('self.parameter_map = {}')
+        self.vector_create('self.parameters', len(self.cell_parameters))
+        for var in self.cell_parameters:
+            self.writeln('self.parameter_map["', self.var_display_name(var), '"] = ', var._cml_param_index)
+            self.writeln(self.vector_index('self.parameters', var._cml_param_index),
+                         self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ',
+                         self.COMMENT_START, var.units)
+        self.writeln()
+        #2390 TODO: Units info
+        self.writeln('super(', self.class_name, ', self).__init__(*args, **kwargs)')
+        self.close_block()
+
+    def output_mathematics(self):
+        """Output the mathematics in this model.
+        
+        This just generates the ODE right-hand side function, EvaluateRhs(self, t, y)
+        """
+        self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y)')
+        self.open_block()
+        self.vector_create('dy', len(self.state_vars))
+        # Work out what equations are needed to compute the derivatives
+        derivs = set(map(lambda v: (v, self.free_vars[0]), self.state_vars))
+        nodeset = self.calculate_extended_dependencies(derivs)
+        # Code to do the computation
+        for i, var in enumerate(self.state_vars):
+            self.writeln(self.code_name(var), self.EQ_ASSIGN, self.vector_index('y', i), self.STMT_END)
+        self.writeln()
+        self.output_comment('Mathematics')
+        self.output_equations(nodeset)
+        self.writeln()
+        # Assign to derivatives vector
+        for i, var in enumerate(self.state_vars):
+            self.writeln(self.vector_index('dy', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
+        self.writeln('return dy')
+        self.close_block()
+    
+    def output_bottom_boilerplate(self):
+        """Output file content occurring after the model equations."""
+        self.close_block()
+
+
 ###############################################
 # Register translation classes in this module #
 ###############################################
@@ -4441,6 +4632,7 @@ CellMLTranslator.register(CellMLToCvodeTranslator, 'CVODE')
 CellMLTranslator.register(CellMLToMapleTranslator, 'Maple')
 CellMLTranslator.register(CellMLToMatlabTranslator, 'Matlab')
 CellMLTranslator.register(CellMLToHaskellTranslator, 'Haskell')
+CellMLTranslator.register(CellMLToPythonTranslator, 'Python')
 
 
 
