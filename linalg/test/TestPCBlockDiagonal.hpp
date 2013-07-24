@@ -120,7 +120,8 @@ public:
         PetscTools::Destroy(rhs);
         PetscTools::Destroy(solution);
 
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 3) //PETSc 3.0 to PETSc 3.3
+        //The PETSc developers changed this one, but later changed it back again!
         const PCType pc;
 #else
         PCType pc;

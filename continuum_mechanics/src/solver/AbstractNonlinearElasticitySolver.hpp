@@ -2161,7 +2161,11 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
     SNESCreate(PETSC_COMM_WORLD, &snes);
     SNESSetFunction(snes, snes_residual_vec, &AbstractNonlinearElasticitySolver_ComputeResidual<DIM>, this);
     SNESSetJacobian(snes, mrJacobianMatrix, this->mPreconditionMatrix, &AbstractNonlinearElasticitySolver_ComputeJacobian<DIM>, this);
-    SNESSetType(snes,SNESLS);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
+    SNESSetType(snes, SNESNEWTONLS);
+#else
+    SNESSetType(snes, SNESLS);
+#endif
     SNESSetTolerances(snes,1e-5,1e-5,1e-5,PETSC_DEFAULT,PETSC_DEFAULT);
     SNESSetMaxLinearSolveFailures(snes,100);
 

@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 #include "ReplicatableVector.hpp"
 
-#include "Debug.hpp"
+//#include "Debug.hpp"
 
 
 // some useful typedefs

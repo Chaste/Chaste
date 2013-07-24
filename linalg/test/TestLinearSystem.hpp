@@ -829,7 +829,8 @@ public:
     {
         {
             // Test that small systems don't have preconditioning
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 3) //PETSc 3.0 to PETSc 3.3
+        //The PETSc developers changed this one, but later changed it back again!
             const PCType pc_small;
 #else
             PCType pc_small;
@@ -864,7 +865,8 @@ public:
         TS_ASSERT_EQUALS(dtol, 10000.0);
         TS_ASSERT_EQUALS(maxits, 1000); /// \todo #1695 Test against member variable in LinearSystem. At the moment this value depends on whether any previous test called ResetKspSolver() (maxits=1000) or not (maxits=10000).
 
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 3) //PETSc 3.0 to PETSc 3.3
+        //The PETSc developers changed this one, but later changed it back again!
         const KSPType solver;
         const PCType pc;
 #else
@@ -1163,7 +1165,8 @@ public:
             Vec solution_vector3;
             solution_vector3 = p_linear_system->Solve();
             PetscTools::Destroy(solution_vector3);
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 3) //PETSc 3.0 to PETSc 3.3
+            //The PETSc developers changed this one, but later changed it back again!
             const KSPType solver;
             const PCType pc;
 #else
@@ -1580,7 +1583,8 @@ public:
         solution_vector3 = ls.Solve();
         PetscTools::Destroy(solution_vector3);
 
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 3) //PETSc 3.0 to PETSc 3.3
+        //The PETSc developers changed this one, but later changed it back again!
         const KSPType solver;
         const PCType pc;
 #else

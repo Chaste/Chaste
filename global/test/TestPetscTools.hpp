@@ -108,7 +108,8 @@ public:
         TS_ASSERT_EQUALS(m, 10);
         TS_ASSERT_EQUALS(n, 11);
 
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 3) //PETSc 3.0 to PETSc 3.3
+        //The PETSc developers changed this one, but later changed it back again!
         const MatType type;
 #else
         MatType type;
