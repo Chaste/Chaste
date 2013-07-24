@@ -938,8 +938,8 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         {
             MatSetType(mSystemLhsMatrix, MATSEQAIJ);
             MatSetType(mPreconditionMatrix, MATSEQAIJ);
-            MatSeqAIJSetPreallocation(mSystemLhsMatrix,    PETSC_NULL, num_non_zeros_each_row);
-            MatSeqAIJSetPreallocation(mPreconditionMatrix, PETSC_NULL, num_non_zeros_each_row);
+            MatSeqAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row);
+            MatSeqAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row);
         }
         else
         {
@@ -957,8 +957,8 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
             MatSetType(mSystemLhsMatrix, MATMPIAIJ);
             MatSetType(mPreconditionMatrix, MATMPIAIJ);
-            MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_NULL, num_non_zeros_each_row_this_proc, PETSC_NULL, num_non_zeros_each_row_this_proc);
-            MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_NULL, num_non_zeros_each_row_this_proc, PETSC_NULL, num_non_zeros_each_row_this_proc);
+            MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row_this_proc, PETSC_DEFAULT, num_non_zeros_each_row_this_proc);
+            MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row_this_proc, PETSC_DEFAULT, num_non_zeros_each_row_this_proc);
         }
 
         MatSetFromOptions(mSystemLhsMatrix);
