@@ -4571,6 +4571,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         # Constructor
         self.writeln('def __init__(self, *args, **kwargs):')
         self.open_block()
+        self.writeln('self.freeVariableName = "', self.var_display_name(self.free_vars[0]), '"')
         self.writeln('self.stateVarMap = {}')
         self.vector_create('self.initialState', len(self.state_vars))
         for i, var in enumerate(self.state_vars):
@@ -4595,12 +4596,12 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln('super(', self.class_name, ', self).__init__(*args, **kwargs)')
         self.close_block()
     
-    def output_state_assignments(self, nodeset):
+    def output_state_assignments(self, nodeset, stateVectorName):
         """Assign state variables used by nodeset to local names."""
         self.output_comment('State variables')
         for i, var in enumerate(self.state_vars):
             if var in nodeset:
-                self.writeln(self.code_name(var), self.EQ_ASSIGN, self.vector_index('y', i), self.STMT_END)
+                self.writeln(self.code_name(var), self.EQ_ASSIGN, self.vector_index(stateVectorName, i), self.STMT_END)
         self.writeln()
 
     def output_mathematics(self):
@@ -4615,7 +4616,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         derivs = set(map(lambda v: (v, self.free_vars[0]), self.state_vars))
         nodeset = self.calculate_extended_dependencies(derivs)
         # Code to do the computation
-        self.output_state_assignments(nodeset)
+        self.output_state_assignments(nodeset, 'y')
         self.output_comment('Mathematics')
         self.output_equations(nodeset)
         self.writeln()
@@ -4636,7 +4637,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         nodeset = self.calculate_extended_dependencies(output_vars)
         # Do the calculations
         self.writeln(self.code_name(self.free_vars[0]), self.EQ_ASSIGN, 'self.freeVariable')
-        self.output_state_assignments(nodeset)
+        self.output_state_assignments(nodeset, 'self.state')
         self.output_comment('Mathematics computing outputs of interest')
         self.output_equations(nodeset)
         self.writeln()
