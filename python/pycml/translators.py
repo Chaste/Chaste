@@ -4563,28 +4563,30 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln('import numpy as np')
         self.writeln()
         self.writeln('import Model')
+        self.writeln('import Environment as Env')
+        self.writeln('import Values as V')
         self.writeln()
         self.writeln('class ', self.class_name, '(Model.AbstractOdeModel):')
         self.open_block()
         # Constructor
         self.writeln('def __init__(self, *args, **kwargs):')
         self.open_block()
-        self.writeln('self.state_var_map = {}')
-        self.vector_create('self.initial_state', len(self.state_vars))
+        self.writeln('self.stateVarMap = {}')
+        self.vector_create('self.initialState', len(self.state_vars))
         for i, var in enumerate(self.state_vars):
-            self.writeln('self.state_var_map["', self.var_display_name(var), '"] = ', i)
+            self.writeln('self.stateVarMap["', self.var_display_name(var), '"] = ', i)
             init_val = getattr(var, u'initial_value', None)
             init_comm = ' # ' + var.units
             if init_val is None:
                 init_comm += '; value not given in model'
                 # Don't want compiler error, but shouldn't be a real number
                 init_val = self.NOT_A_NUMBER
-            self.writeln('self.initial_state[', i, '] = ', init_val, init_comm)
+            self.writeln('self.initialState[', i, '] = ', init_val, init_comm)
         self.writeln()
-        self.writeln('self.parameter_map = {}')
+        self.writeln('self.parameterMap = {}')
         self.vector_create('self.parameters', len(self.cell_parameters))
         for var in self.cell_parameters:
-            self.writeln('self.parameter_map["', self.var_display_name(var), '"] = ', var._cml_param_index)
+            self.writeln('self.parameterMap["', self.var_display_name(var), '"] = ', var._cml_param_index)
             self.writeln(self.vector_index('self.parameters', var._cml_param_index),
                          self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ',
                          self.COMMENT_START, var.units)
@@ -4592,10 +4594,18 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         #2390 TODO: Units info
         self.writeln('super(', self.class_name, ', self).__init__(*args, **kwargs)')
         self.close_block()
+    
+    def output_state_assignments(self, nodeset):
+        """Assign state variables used by nodeset to local names."""
+        self.output_comment('State variables')
+        for i, var in enumerate(self.state_vars):
+            if var in nodeset:
+                self.writeln(self.code_name(var), self.EQ_ASSIGN, self.vector_index('y', i), self.STMT_END)
+        self.writeln()
 
     def output_mathematics(self):
         """Output the mathematics in this model.
-        
+
         This just generates the ODE right-hand side function, EvaluateRhs(self, t, y)
         """
         self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y)')
@@ -4605,9 +4615,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         derivs = set(map(lambda v: (v, self.free_vars[0]), self.state_vars))
         nodeset = self.calculate_extended_dependencies(derivs)
         # Code to do the computation
-        for i, var in enumerate(self.state_vars):
-            self.writeln(self.code_name(var), self.EQ_ASSIGN, self.vector_index('y', i), self.STMT_END)
-        self.writeln()
+        self.output_state_assignments(nodeset)
         self.output_comment('Mathematics')
         self.output_equations(nodeset)
         self.writeln()
@@ -4618,7 +4626,33 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.close_block()
     
     def output_bottom_boilerplate(self):
-        """Output file content occurring after the model equations."""
+        """Output file content occurring after the model equations, i.e. the GetOutputs method."""
+        self.writeln('def GetOutputs(self):')
+        self.open_block()
+        # Figure out what equations are needed to compute the outputs
+        output_vars = set(self._outputs)
+        for vars in self._vector_outputs.itervalues():
+            output_vars.update(vars)
+        nodeset = self.calculate_extended_dependencies(output_vars)
+        # Do the calculations
+        self.writeln(self.code_name(self.free_vars[0]), self.EQ_ASSIGN, 'self.freeVariable')
+        self.output_state_assignments(nodeset)
+        self.output_comment('Mathematics computing outputs of interest')
+        self.output_equations(nodeset)
+        self.writeln()
+        # Put them in an Environment
+        self.writeln('env = Env.Environment()')
+        for var in self._outputs:
+            self.writeln('env.DefineName("', self.var_display_name(var), '", V.Simple(', self.code_name(var), '))')
+        for name, vars in self._vector_outputs.iteritems():
+            self.writeln('env.DefineName("', name, '", V.Array(np.array([', nl=False)
+            for var in vars:
+                if not var is vars[0]:
+                    self.write(', ')
+                self.write(self.code_name(var))
+            self.writeln('])))', indent=False)
+        self.writeln('return env')
+        self.close_block()
         self.close_block()
 
 
