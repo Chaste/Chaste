@@ -112,7 +112,7 @@ public:
             std::vector<double> doubles(3);
             doubles[0] = 1.1;
             doubles[1] = 1.2;
-            doubles[2] = 1.3;
+            doubles[2] = 1.3 + PetscTools::GetMyRank();
 
             std::vector<bool> bools(2);
             bools[0] = true;
@@ -123,8 +123,9 @@ public:
             // Send the class
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
+                p_new_class->mVectorOfDoubles[1] = 1.2 + p;
                 // Arguments are object, destination, tag
-                communicator.ISendObject(p_new_class, p, 123);
+                communicator.ISendObject(p_new_class, p, 123 + PetscTools::GetMyRank());
             }
 
         }
@@ -134,7 +135,8 @@ public:
 
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
-                communicator.IRecvObject(p, 123);
+
+                communicator.IRecvObject(p, 123 + p);
                 p_recv_class = communicator.GetRecvObject();
 
                 // Check that the values are correct
@@ -144,14 +146,15 @@ public:
                 TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
 
                 TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
-                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
-                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
+                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2 + PetscTools::GetMyRank(),1e-12);
+                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3 + p,1e-12);
 
                 TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
                 TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
             }
 
         }
+        PetscTools::Barrier("Make sure that no ISendObject buffers are in use before proceeding");
     }
 
     /** We cannot pre-post Irecv because we need to know the (dynamic) size of the object being sent first */
@@ -177,6 +180,7 @@ public:
             for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
             {
                 // Arguments are object, destination, tag
+                p_new_class->mVectorOfDoubles[1] = 1.2 + p;
                 communicator.ISendObject(p_new_class, p, 123);
             }
         }
@@ -199,12 +203,13 @@ public:
             TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
 
             TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
-            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
+            TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2+PetscTools::GetMyRank(),1e-12);
             TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
             TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
             TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
         }
+        PetscTools::Barrier("Make sure that no ISendObject buffers are in use before proceeding");
     }
 
     void TestSendRecv() throw (Exception)

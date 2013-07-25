@@ -44,6 +44,7 @@ class ClassOfSimpleVariables
 {
 private:
     friend class boost::serialization::access;
+    friend class TestObjectCommunicator;
 
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
