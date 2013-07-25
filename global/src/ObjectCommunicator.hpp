@@ -61,11 +61,15 @@ private:
     /** A buffer for use in asynchronous communication */
     char* mRecvBuffer;
 
-    /** A buffer for use in asynchronous communication */
-    char* mSendBuffer;
+    /** A group of buffers for use in asynchronous communication.  There's one for each process so that
+     * a non-blocking send request won't accidentally overwrite a message which is actively being communicated
+     * to another remote process */
+    std::vector<char* > mSendBuffer;
 
-    /** A string member used to ensure buffer doesn't go out of scope in asynchronous communication */
-    std::string mSendString;
+    /** A group of strings for use in asynchronous communication.  There's one for each process so that
+     * a non-blocking send request won't accidentally overwrite a message which is actively being communicated
+     * to another remote process */
+    std::vector<std::string> mSendString;
 
     /** The size of a string we are waiting for in an asynchronous receive */
     unsigned mRecvBufferLength;
@@ -154,6 +158,8 @@ template<typename CLASS>
 ObjectCommunicator<CLASS>::ObjectCommunicator()
     : mIsWriting(false)
 {
+    mSendBuffer.resize(PetscTools::GetNumProcs());
+    mSendString.resize(PetscTools::GetNumProcs());
 }
 
 template<typename CLASS>
@@ -188,17 +194,17 @@ void ObjectCommunicator<CLASS>::ISendObject(boost::shared_ptr<CLASS> const pObje
 
     output_arch << pObject;
 
-    mSendString = ss.str();
-    mSendBufferLength = mSendString.size();
+    mSendString[destinationProcess] = ss.str();
+    mSendBufferLength = mSendString[destinationProcess].size();
 
     // Make sure we are not going to overrun the asynchronous buffer size.
     assert(mSendBufferLength < MAX_BUFFER_SIZE);
 
     // Send archive data
     // The buffer is treated as const, but not specified as such by MPI_Send's signature
-    mSendBuffer = const_cast<char*>(mSendString.data());
-    MPI_Isend(mSendBuffer, mSendBufferLength, MPI_BYTE, destinationProcess, tag, PetscTools::GetWorld(), &request);
-    MPI_Request_free(&request);
+    mSendBuffer[destinationProcess] = const_cast<char*>(mSendString[destinationProcess].data());
+    MPI_Isend(mSendBuffer[destinationProcess], mSendBufferLength, MPI_BYTE, destinationProcess, tag, PetscTools::GetWorld(), &request);
+    MPI_Request_free(&request); //This is evil because it allows for another non-blocking send to overwrite the buffer
 }
 
 template<typename CLASS>
