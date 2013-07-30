@@ -4573,7 +4573,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.open_block()
         self.writeln('self.freeVariableName = "', self.var_display_name(self.free_vars[0]), '"')
         self.writeln('self.stateVarMap = {}')
-        self.vector_create('self.initialState', len(self.state_vars))
+        self.writeln(self.vector_create('self.initialState', len(self.state_vars)))
         for i, var in enumerate(self.state_vars):
             self.writeln('self.stateVarMap["', self.var_display_name(var), '"] = ', i)
             init_val = getattr(var, u'initial_value', None)
@@ -4585,7 +4585,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
             self.writeln('self.initialState[', i, '] = ', init_val, init_comm)
         self.writeln()
         self.writeln('self.parameterMap = {}')
-        self.vector_create('self.parameters', len(self.cell_parameters))
+        self.writeln(self.vector_create('self.parameters', len(self.cell_parameters)))
         for var in self.cell_parameters:
             self.writeln('self.parameterMap["', self.var_display_name(var), '"] = ', var._cml_param_index)
             self.writeln(self.vector_index('self.parameters', var._cml_param_index),
@@ -4609,9 +4609,9 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
 
         This just generates the ODE right-hand side function, EvaluateRhs(self, t, y)
         """
-        self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y)')
+        self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y):')
         self.open_block()
-        self.vector_create('dy', len(self.state_vars))
+        self.writeln(self.vector_create('dy', len(self.state_vars)))
         # Work out what equations are needed to compute the derivatives
         derivs = set(map(lambda v: (v, self.free_vars[0]), self.state_vars))
         nodeset = self.calculate_extended_dependencies(derivs)
