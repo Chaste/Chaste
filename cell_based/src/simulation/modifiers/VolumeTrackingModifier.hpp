@@ -41,11 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 
-
 /**
- * An modifier class which at each simulation timestep calculates the volume of each cell
- * and stores it in in the CellData property as "volume". To be used in conjunction with contact
- * inhibition CCMs.
+ * A modifier class which at each simulation time step calculates the volume of each cell
+ * and stores it in in the CellData property as "volume". To be used in conjunction with
+ * contact inhibition cell cycle models.
  */
 template<unsigned DIM>
 class VolumeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
@@ -71,16 +70,16 @@ public:
     virtual ~VolumeTrackingModifier();
 
     /**
-     * Overriden UpdateAtEndOfTimeStep method
+     * Overridden UpdateAtEndOfTimeStep() method.
      *
-     * Specifies what to do in the simulation at the end of each timestep.
+     * Specifies what to do in the simulation at the end of each time step.
      *
      * @param rCellPopulation reference to the cell population
      */
     virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
-     * Overriden SetupSolve method
+     * Overridden SetupSolve() method.
      *
      * Specifies what to do in the simulation before the start of the time loop.
      *

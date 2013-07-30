@@ -41,11 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 
-
 /**
- * An modifier class in which the mean levels of Delta in neighbouring cells
+ * A modifier class in which the mean levels of Delta in neighbouring cells
  * are computed and stored in CellData. To be used in conjunction with Delta
- * Notch CCMs.
+ * Notch cell cycle models.
  */
 template<unsigned DIM>
 class DeltaNotchTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
@@ -71,16 +70,16 @@ public:
     virtual ~DeltaNotchTrackingModifier();
 
     /**
-     * Overriden UpdateAtEndOfTimeStep method
+     * Overridden UpdateAtEndOfTimeStep() method.
      *
-     * Specifies what to do in the simulation at the end of each timestep.
+     * Specifies what to do in the simulation at the end of each time step.
      *
      * @param rCellPopulation reference to the cell population
      */
     virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
-     * Overriden SetupSolve method
+     * Overridden SetupSolve() method.
      *
      * Specifies what to do in the simulation before the start of the time loop.
      *
