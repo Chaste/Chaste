@@ -943,22 +943,23 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         }
         else
         {
-            int* num_non_zeros_each_row_this_proc = new int[local_size];
-            int* zero = new int[local_size];
+            int* num_non_zeros_each_row_in_diag = new int[local_size];
+            int* num_non_zeros_each_row_off_diag = new int[local_size];
             for (unsigned i=0; i<unsigned(local_size); i++)
             {
-                num_non_zeros_each_row_this_proc[i] = num_non_zeros_each_row[lo+i];
-                if(num_non_zeros_each_row_this_proc[i] > local_size)
+                num_non_zeros_each_row_in_diag[i] = num_non_zeros_each_row[lo+i];
+                num_non_zeros_each_row_off_diag[i] = num_non_zeros_each_row[lo+i];
+                // In the on process ("diagonal block") there cannot be more non-zero columns specified than there are rows
+                if(num_non_zeros_each_row_in_diag[i] > local_size)
                 {
-                    num_non_zeros_each_row_this_proc[i] = local_size;
+                    num_non_zeros_each_row_in_diag[i] = local_size;
                 }
-                zero[i] = 0;
             }
 
             MatSetType(mSystemLhsMatrix, MATMPIAIJ);
             MatSetType(mPreconditionMatrix, MATMPIAIJ);
-            MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row_this_proc, PETSC_DEFAULT, num_non_zeros_each_row_this_proc);
-            MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row_this_proc, PETSC_DEFAULT, num_non_zeros_each_row_this_proc);
+            MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row_in_diag, PETSC_DEFAULT, num_non_zeros_each_row_off_diag);
+            MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row_in_diag, PETSC_DEFAULT, num_non_zeros_each_row_off_diag);
         }
 
         MatSetFromOptions(mSystemLhsMatrix);
