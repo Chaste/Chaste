@@ -83,6 +83,14 @@ public:
     {
         rDY[0] = -mA * rY[0];
     }
+
+    /**
+     * @return mA
+     */
+    double GetA()
+    {
+        return mA;
+    }
 };
 
 template<>
