@@ -987,8 +987,10 @@ public:
 
     /** Set the type of KSP solver as with the flag "-ksp_type"
      * @param kspSolver  a string from {"gmres", "cg", "symmlq"}
+     * @param warnOfChange  Warn if this set is changing the current value because the calling
+     * code may be (silently) overwriting a user setting
      */
-    void SetKSPSolver(const char* kspSolver);
+    void SetKSPSolver(const char* kspSolver, bool warnOfChange=false);
 
     /** Set the type of preconditioner as with the flag "-pc_type"
      * @param kspPreconditioner  a string from {"jacobi", "bjacobi", "hypre", "ml", "spai", "blockdiagonal", "ldufactorisation", "none"}

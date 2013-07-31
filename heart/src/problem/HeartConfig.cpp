@@ -2416,8 +2416,14 @@ void HeartConfig::SetUseAbsoluteTolerance(double absoluteTolerance)
     mpParameters->Numerical().KSPTolerances()->KSPAbsolute().set(absoluteTolerance);
 }
 
-void HeartConfig::SetKSPSolver(const char* kspSolver)
+void HeartConfig::SetKSPSolver(const char* kspSolver, bool warnOfChange)
 {
+    if (warnOfChange && strcmp(GetKSPSolver(), kspSolver) != 0)
+    {
+        //Warn
+        WARNING("Code has changed the KSP solver type from "<<GetKSPSolver()<<" to "<< kspSolver); 
+    }
+    
     /* Note that changes in these conditions need to be reflected in the Doxygen*/
     if ( strcmp(kspSolver, "gmres") == 0)
     {

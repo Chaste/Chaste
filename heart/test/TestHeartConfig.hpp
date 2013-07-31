@@ -1115,9 +1115,14 @@ public:
         TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "cg")==0);
 
         HeartConfig::Instance()->SetKSPSolver("gmres");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        HeartConfig::Instance()->SetKSPSolver("gmres", true); //Would warn of the change
         TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "gmres")==0);
 
-        HeartConfig::Instance()->SetKSPSolver("symmlq");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        HeartConfig::Instance()->SetKSPSolver("symmlq", true); //Warn of the change
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        Warnings::Instance()->QuietDestroy();
         TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "symmlq")==0);
 
         HeartConfig::Instance()->SetKSPSolver("chebychev");

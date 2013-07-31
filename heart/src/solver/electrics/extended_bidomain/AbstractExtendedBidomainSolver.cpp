@@ -137,7 +137,8 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem
         {
             // CG (default solver) won't work since the system isn't symmetric anymore. Switch to GMRES
             this->mpLinearSystem->SetKspType("gmres"); // Switches the solver
-            mpConfig->SetKSPSolver("gmres"); // Makes sure this change will be reflected in the XML file written to disk at the end of the simulation.
+            mpConfig->SetKSPSolver("gmres", true); // Makes sure this change will be reflected in the XML file written to disk at the end of the simulation.
+            //(If the user doesn't have gmres then the "true" warns the user about the switch)
 
             // Set average phi_e to zero
             unsigned matrix_size = this->mpLinearSystem->GetSize();
