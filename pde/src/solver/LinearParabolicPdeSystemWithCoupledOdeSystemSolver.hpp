@@ -146,7 +146,7 @@ private:
 
     /**
      * Update the member variable mInterpolatedOdeStateVariables by computing the
-     * interpolated value of each ODE state variable at each Gauss point
+     * interpolated value of each ODE state variable at each Gauss point.
      *
      * @param phiI
      * @param pNode pointer to a Node
@@ -211,7 +211,7 @@ public:
      * @param clearDirectory whether to clear outputDirectory or not. Note that the actual clearing happens when you call SolveAndWriteResultsToFile().
      *                       False by default.
      */
-    void SetOutputDirectory(std::string outputDirectory, bool clearDirectory = false);
+    void SetOutputDirectory(std::string outputDirectory, bool clearDirectory=false);
 
     /**
      * Set mSamplingTimeStep.
@@ -233,6 +233,14 @@ public:
      * @param numTimeStepsElapsed the number of timesteps that have elapsed
      */
     void WriteVtkResultsToFile(Vec solution, unsigned numTimeStepsElapsed);
+
+    /**
+     * Get a pointer to the ODE system defined at a given node.
+     *
+     * @param index the global index of a node in the mpMesh
+     * @return mOdeSystemsAtNodes[index]
+     */
+    AbstractOdeSystemForCoupledPdeSystem* GetOdeSystemAtNode(unsigned index);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -615,6 +623,12 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     *mpVtkMetaFile << numTimeStepsElapsed;
     *mpVtkMetaFile << ".vtu\"/>\n";
 #endif // CHASTE_VTK
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+AbstractOdeSystemForCoupledPdeSystem* LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetOdeSystemAtNode(unsigned index)
+{
+    return mOdeSystemsAtNodes[index];
 }
 
 #endif /*LINEARPARABOLICPDESYSTEMWITHCOUPLEDODESYSTEMSOLVER_HPP_*/

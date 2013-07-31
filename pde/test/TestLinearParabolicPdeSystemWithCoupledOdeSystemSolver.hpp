@@ -125,11 +125,22 @@ public:
         for (unsigned i=0; i<result_repl.GetSize(); i++)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
+
             double u = 1 + (1 - exp(-a*t_end))/a + exp(-M_PI*M_PI*t_end)*cos(M_PI*x);
             TS_ASSERT_DELTA(result_repl[i], u, 0.1);
 
+            double u_from_v = solver.GetOdeSystemAtNode(i)->rGetPdeSolution()[0];
+            TS_ASSERT_DELTA(result_repl[i], u_from_v, 0.1);
+
             double v = exp(-a*t_end);
             TS_ASSERT_DELTA(ode_systems[i]->rGetStateVariables()[0], v, 0.1);
+        }
+
+        // Test the method GetOdeSystemAtNode()
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            TS_ASSERT(solver.GetOdeSystemAtNode(i) != NULL);
+            TS_ASSERT_DELTA(static_cast<OdeSystemForCoupledHeatEquationWithSource*>(solver.GetOdeSystemAtNode(i))->GetA(), 5.0, 1e-6);
         }
 
         // Tidy up
