@@ -206,7 +206,7 @@ public:
 
         extended_problem.SetWriteInfo(false);
         extended_problem.SetIntracellularConductivitiesForSecondCell(Create_c_vector(0.0005));//shouldn't be necessary if it is the same as the first cell
-        extended_problem.SetNodeForAverageOfPhiZeroed(100u);
+        extended_problem.SetNodeForAverageOfPhiZeroed(50u);
         extended_problem.Initialise();
         extended_problem.Solve();
     }
@@ -221,7 +221,7 @@ public:
         StimulatedCellFactoryBidomain bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
 
-        bidomain_problem.SetNodeForAverageOfPhiZeroed(100u);
+        bidomain_problem.SetNodeForAverageOfPhiZeroed(50u);
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
     }
@@ -287,7 +287,7 @@ public:
         extended_problem.SetExtendedBidomainParameters(1400, 1400, 1400, 1.0 , 1.0, 0.0);
 
         extended_problem.SetIntracellularConductivitiesForSecondCell(Create_c_vector(0.0005));
-        extended_problem.SetNodeForAverageOfPhiZeroed(100u);
+        extended_problem.SetNodeForAverageOfPhiZeroed(50u);
         extended_problem.Initialise();
         extended_problem.Solve();
     }
