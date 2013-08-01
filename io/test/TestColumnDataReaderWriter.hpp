@@ -646,7 +646,7 @@ public:
      *  issues in reading it back.
      *
      */
-    void redoTestReadingFileWithVerySmallHighPrecisionNumbers() throw (Exception)
+    void TestReadingFileWithVerySmallHighPrecisionNumbers() throw (Exception)
     {
         ColumnDataReader reader("io/test/data", "lr91_chaste", false);
 
@@ -699,7 +699,7 @@ public:
 
     /**
      *
-     *  \todo #2411
+     *
      *  This test establishes that writing 3-digit exponents doesn't work properly (in Linux and Windows)
      *
      *  This test is also to highlight portability issues with the column data reader.
@@ -709,7 +709,7 @@ public:
      *  Meanwhile, Gnu/Linux is able to read back all small numbers and round to zero if the number is inexpressible
      *
      */
-    void redoTestWritingAndReadingWithThreeDigitExponents() throw (Exception)
+    void TestWritingAndReadingWithThreeDigitExponents() throw (Exception)
     {
         mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "widenumbers", false);
 
