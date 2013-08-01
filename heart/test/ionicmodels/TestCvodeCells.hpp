@@ -160,7 +160,12 @@ public:
         double max_timestep = 1.0;
         double sampling_time = max_timestep;
 
+        TS_ASSERT_DELTA(lr91_cvode_system.GetTimestep(), DOUBLE_UNSET, 1e-9);
         OdeSolution solution_cvode = lr91_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time);
+        // NB the timestep is not automatically set and recorded if we call Solve directly
+        // as this methods is on AbstractCvodeSystem, not AbstractCvodeCell which does store it!
+        TS_ASSERT_DELTA(lr91_cvode_system.GetTimestep(), DOUBLE_UNSET, 1e-9);
+
         OdeSolution solution_chaste = lr91_ode_system.Compute(start_time, end_time);
 
         TS_ASSERT_DELTA(lr91_ode_system.GetIIonic(), lr91_cvode_system.GetIIonic(), 1e-3);
@@ -197,6 +202,8 @@ public:
         TS_ASSERT_EQUALS(lr91_cvode_system.GetMaxSteps(), 10000);
         lr91_cvode_system.SetTimestep(DOUBLE_UNSET); // Use default (set from HeartConfig)
         lr91_cvode_system.SolveAndUpdateState(start_time, end_time);
+        // The max time step, which was unset, should now be set to printing time step.
+        TS_ASSERT_DELTA(lr91_cvode_system.GetTimestep(), HeartConfig::Instance()->GetPrintingTimeStep(), 1e-9);
         TS_ASSERT_DELTA(lr91_cvode_system.GetVoltage(), solution_cvode_2.rGetSolutions().back()[lr91_cvode_system.GetVoltageIndex()], 1e-4);
         // Note: adaptive solve takes different time steps when not sampling => can't use very tight tolerance
 

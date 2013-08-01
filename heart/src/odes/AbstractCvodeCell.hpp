@@ -140,6 +140,11 @@ public:
     void SetTimestep(double maxDt);
 
     /**
+     * @return The maximum timestep that is used by CVODE with this cell.
+     */
+    double GetTimestep();
+
+    /**
      * Simulate this cell's behaviour between the time interval [tStart, tEnd],
      * updating the internal state variable values.
      *

@@ -79,6 +79,11 @@ void AbstractCvodeCell::SetTimestep(double maxDt)
     mMaxDt = maxDt;
 }
 
+double AbstractCvodeCell::GetTimestep()
+{
+    return mMaxDt;
+}
+
 
 void AbstractCvodeCell::SolveAndUpdateState(double tStart, double tEnd)
 {
