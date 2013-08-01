@@ -375,7 +375,7 @@ public:
             AbstractCardiacCellInterface* const p_const_cell = p_cell;
             std::ofstream ofs(archive_filename1.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-            ///\todo #2349 this archiving throws exception on Mac OSX
+            ///\todo #2417 this archiving throws exception on Mac OSX
             try
             {
                 output_arch << p_const_cell;
@@ -383,7 +383,7 @@ public:
             catch(boost::archive::archive_exception& boost_exception)
             {
                 TS_ASSERT_EQUALS(boost_exception.code, boost::archive::archive_exception::unregistered_class);
-                TS_TRACE("Archiving cell models in unavailable.  Still working on #2349");
+                TS_FAIL("Archiving cell models in unavailable.  Please refer to  #2417");
                 //Bail out 
                 return;
             }
@@ -421,7 +421,7 @@ public:
         delete p_loaded_cell2;
         delete p_cell;
 #else
-        std::cout << "Note: this test can only actually test anything on Boost>=1.37." << std::endl;
+        std::cout << "Note: this test can only actually test anything on Boost>=1.37 (on non-Mac systems #2417)." << std::endl;
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
     }
 };
