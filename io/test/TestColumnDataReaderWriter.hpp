@@ -352,7 +352,7 @@ public:
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
 
-#ifdef	_MSC_VER
+#ifdef  _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testunlimitednegative.dat", "io/test/data/testunlimitednegative_good_Windows.dat"));
 #else
         TS_ASSERT(FilesMatch(output_dir + "testunlimitednegative.dat", "io/test/data/testunlimitednegative_good.dat"));
@@ -461,6 +461,19 @@ public:
         }
     }
 
+    // This test is abstracted from TestIonicModels::TestSolverForLR91WithRegularStimulus where data from a recently run
+    // cell model are checked against data from an ancient run of the same model
+    void TestReadingAnOlderFile() throw (Exception)
+    {
+        ColumnDataReader old_data_reader("io/test/data", "Lr91RegularStimValidData", false);
+        std::vector<double> oldstyle_v_values = old_data_reader.GetValues("V");
+        ColumnDataReader new_data_reader("io/test/data", "Lr91RegularStim", false);
+        std::vector<double> newstyle_v_values = new_data_reader.GetValues("membrane_voltage");
+        for (unsigned i=0; i<oldstyle_v_values.size(); i++)
+        {
+            TS_ASSERT_DELTA(oldstyle_v_values[i], newstyle_v_values[i], 1e-5);
+        }
+    }
     void TestPutNegativeVariableInFixedFile() throw(Exception)
     {
 
