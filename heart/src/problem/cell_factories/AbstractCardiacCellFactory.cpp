@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCellFactory.hpp"
 #include "FakeBathCell.hpp"
 #include "AbstractCvodeCell.hpp"
+#include "HeartConfig.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateCardiacCellForNode(
@@ -51,7 +52,10 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
 #ifdef CHASTE_CVODE
         if (dynamic_cast<AbstractCvodeCell*>(p_cell))
         {
+            // Tell the single cell model solver not to re-initialise on subsequent Solve calls.
             static_cast<AbstractCvodeCell*>(p_cell)->SetMinimalReset(true);
+            // Use the PDE timestep as the [maximum] CVODE timestep.
+            static_cast<AbstractCvodeCell*>(p_cell)->SetTimestep(HeartConfig::Instance()->GetPdeTimeStep());
         }
 #endif // CHASTE_CVODE
         return p_cell;
