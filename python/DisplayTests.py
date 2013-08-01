@@ -132,7 +132,7 @@ def testsuite(req, type, revision, machine, buildType, testsuite, status, runtim
     for suite_name in _test_suite_name_aliases(testsuite):
         if _isWindows(build):
             import glob
-            ctest_results = glob.glob(os.path.join(testSetDir, '*TestOutputs_*.txt*'))
+            ctest_results = glob.glob(os.path.join(test_set_dir, '*TestOutputs_*.txt*'))
             testsuite_file = ''.join(ctest_results) #TODO: Hack! (#2016)
         else:
             testsuite_file = build.ResultsFileName(test_set_dir, suite_name, status, runtime)
