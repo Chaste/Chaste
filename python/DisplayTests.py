@@ -1074,11 +1074,13 @@ The following tests FAILED:
             # Sanity check
             m = summary_re.match(line)
             if m:
-                assert m.group(2) == len(testsuite_status)
+                expected_num_tests = int(m.group(2))
     overall_status, colour = _overallStatus(testsuite_status, build)
     if not tests_completed:
         overall_status = "Tests didn't complete.  " + overall_status
         colour = 'red'
+    if expected_num_tests != len(testsuite_status):
+        overall_status = "Expected %d tests but found %d.  %s" % (expected_num_tests, len(testsuite_status), overall_status)
     # Check for build failure
     overall_status, colour = _checkBuildFailure(testSetDir, overall_status, colour)
     if summary:
