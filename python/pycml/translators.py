@@ -4914,6 +4914,68 @@ class SolverInfo(object):
                 elt.classify_variables(root=True)
             for elt in solver_info.jacobian.math.apply:
                 self._model.topological_sort(elt)
+        #2418 - check if any state variables have been units-converted
+        self._check_state_var_units_conversions()
+    
+    def _check_state_var_units_conversions(self):
+        """Check if any Jacobian entries need to be altered because the units of state variables have changed.
+        
+        If any variable considered a state variable by the Jacobian is now of type Computed then it has been
+        converted.  We figure out the conversion factor, update the Jacobian to reference the new state variable,
+        and units-convert the derivative.
+        """
+        if not hasattr(self._solver_info, u'jacobian'):
+            return
+        # Helper methods
+        def set_var_values(elt, vars=None):
+            """Fake all variables appearing in the given expression being set to 1.0, and return them."""
+            if vars is None:
+                vars = []
+            if isinstance(elt, mathml_ci):
+                elt.variable.set_value(1.0)
+                vars.append(elt.variable)
+            else:
+                for child in getattr(elt, 'xml_children', []):
+                    set_var_values(child, vars)
+            return vars
+        # Find any converted state variables
+        converted_state_vars = set()
+        for entry in getattr(self._solver_info.jacobian, u'entry', []):
+            var = self._get_variable(entry.var_i)
+            if var.get_type() == VarTypes.Computed:
+                converted_state_vars.add(var)
+        if not converted_state_vars:
+            return
+        # Figure out the conversion factor in each case
+        state_var_map = {}
+        for var in converted_state_vars:
+            defn = var.get_dependencies()[0]
+            defn_vars = set_var_values(defn.eq.rhs)
+            assert len(defn_vars) == 1, "Unexpected form of units conversion expression found"
+            factor = defn.eq.rhs.evaluate()
+            state_var_map[var] = (defn_vars[0], factor)
+            defn_vars[0].unset_values()
+        # Apply the conversion to relevant Jacobian entries
+        for entry in getattr(self._solver_info.jacobian, u'entry', []):
+            factor = 1
+            var_i = self._get_variable(entry.var_i)
+            if var_i in converted_state_vars:
+                var_i, factor_i = state_var_map[var_i]
+                var_i = var_i.get_source_variable(recurse=True)
+                entry.var_i = unicode(var_i.fullname())
+                factor /= factor_i
+            var_j = self._get_variable(entry.var_j)
+            if var_j in converted_state_vars:
+                var_j, factor_j = state_var_map[var_j]
+                var_j = var_j.get_source_variable(recurse=True)
+                entry.var_j = unicode(var_j.fullname())
+                factor *= factor_j
+            if factor != 1:
+                # Replace rhs with rhs * factor
+                rhs = list(entry.math.xml_element_children())[0]
+                entry.math.safe_remove_child(rhs)
+                new_rhs = mathml_apply.create_new(entry, 'times', [(factor, 'dimensionless'), rhs])
+                entry.math.xml_append(new_rhs)
     
     def do_binding_time_analysis(self):
         """Do a binding time analysis on the additional mathematics.
@@ -4925,7 +4987,7 @@ class SolverInfo(object):
     def _process_mathematics(self, func):
         """Apply func to each top-level mathematical construct in the solver info blocks.
         
-        func must be able to accept mathml_apply, mathml_ci and mathml_cn elements.
+        func must be able to accept mathml_piecewise, mathml_apply, mathml_ci and mathml_cn elements.
         """
         solver_info = self._solver_info
         # Jacobian
@@ -5329,7 +5391,7 @@ class ConfigurationStore(object):
         stimulus current (self.i_stim_var) and identifies these as transmembrane
         currents.  Will automatically exclude the stimulus current.
         
-        If self.V_variable or self.i_stim_var are not set, returns the empty list.
+        If self.V_variable is not set, returns the empty list.
         """
         if not self.V_variable:
             DEBUG('config', "Transmembrane potential not configured, so can't "
