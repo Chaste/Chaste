@@ -75,9 +75,8 @@ protected:
     std::vector<DataWriterVariable> mVariables; /**< The data variables */
 
     const unsigned mFieldWidth; /**< Width of each column in the text file (excludes column headers) */
-    const bool mIsWindowsExponentFormat; /**<Whether data uses the 3-digit MSVC exponent format*/
     const unsigned mPrecision; /**< Precision used in writing the data */
-    static const int SPACING = 2; /**< Space between columns (includes minus sign) */
+    static const int SPACING = 1; /**< Space between columns (includes minus sign) */
     static const int FIXED_DIMENSION_VAR_ID = -1; /**< id of fixed dimension variable */
     static const int UNLIMITED_DIMENSION_VAR_ID = -2; /**< id of unlimited dimension variable */
 

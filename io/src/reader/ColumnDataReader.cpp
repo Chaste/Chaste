@@ -86,7 +86,6 @@ ColumnDataReader::ColumnDataReader(const std::string& rDirectory,
 ColumnDataReader::ColumnDataReader(const FileFinder& rDirectory,
                                    const std::string& rBaseName)
 {
-    mIsWindowsExponentFormat = false;
     if (!rDirectory.IsDir() || !rDirectory.Exists())
     {
         EXCEPTION("Directory does not exist: " + rDirectory.GetAbsolutePath());
@@ -200,7 +199,8 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
 
     /*
      * Now read the first line of proper data to determine the field width used when this
-     * file was created. Do this by reading the first entry and measuring the distance from
+     * file was created. Do this by 
+     * 1. reading the first entry and measuring the distance from
      * the decimal point to the 'e'.  This gives the precision; the field width is then
      * precision + 7 (With MSVC on Windows, it's precision + 8).
      * e.g. if the first entry is
@@ -209,18 +209,30 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
      *  +1.00000000e+00     => field width = 15
      *  -1.20000000e+01     => field width = 15
      *  -1.12345678e-321    => field width = 15
+     * 2. Because the first column has a varying number of spaces read a few columns and 
+     *    do some modular arithmetic to work out the correct width
      */
     std::string first_line;
     std::string first_entry;
-
+    unsigned last_pos;
     // Read the first entry of the line. If there is no first entry, move to the next line..
     while (first_entry.length()==0 && !datafile.eof())
     {
         std::getline(datafile, first_line);
         std::stringstream stream(first_line);
         stream >> first_entry;
+        last_pos = stream.tellg(); // Where the first number ends (but it might be in the column 2 or 3)
+        while (stream.good())
+        {
+            std::string last_entry;
+            stream >> last_entry;
+            if (stream.tellg() > 0)
+            {
+                last_pos = stream.tellg();
+            } 
+        }
     }
-
+   
     if (datafile.eof() && first_entry.length()==0)
     {
         EXCEPTION("Unable to determine field width from file as cannot find any data entries");
@@ -233,24 +245,16 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
         EXCEPTION("Badly formatted scientific data field");
     }
 
-    mFieldWidth = e_pos - dot_pos - 1 + 7;
+    unsigned est_field_width = e_pos - dot_pos - 1 + 8; // = Precision + 8
 
-    if (first_entry.length()>(e_pos+4) && isdigit(first_entry[e_pos+4])) // MSVC only uses 3-digit exponents
+    if (last_pos % est_field_width == 0)
     {
-        mIsWindowsExponentFormat = true;
-        mFieldWidth++; // i.e. e_pos - dot_pos - 1 + 8
+        mFieldWidth = est_field_width;
     }
     else
     {
-      mIsWindowsExponentFormat = false;
-      // Attempt to account for old format files (which only allowed 2 characters for the exponent)
-      dot_pos = first_line.find(".");
-      size_t second_dot_pos = first_line.find(".", dot_pos+1);
-      if ((second_dot_pos != std::string::npos) &&
-          (second_dot_pos - dot_pos == mFieldWidth + SPACING - 1))
-      {
-          mFieldWidth--;
-      }
+        assert ( last_pos % (est_field_width+1) == 0  || (last_pos+1) % (est_field_width+1) == 0 );
+        mFieldWidth = est_field_width+1;
     }
     infofile.close();
     datafile.close();
@@ -403,17 +407,9 @@ void ColumnDataReader::ReadColumnFromFile(const std::string& rFilename, int col)
 void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col)
 {
     std::string value;
-    if (mIsWindowsExponentFormat)
-    {
-        int startpos = 1;
-        if (col != 0) startpos = col * (mFieldWidth + SPACING);
-        value = rLine.substr(startpos, mFieldWidth + 2);
-    }
-    else
-    {
-        int startpos = col * (mFieldWidth + SPACING) + SPACING - 1;
-        value = rLine.substr(startpos, mFieldWidth + 1);
-    }
+    unsigned startpos = col * mFieldWidth;
+    value = rLine.substr(startpos, mFieldWidth);
+
     std::stringstream variable_stream(value);
     double d_value;
     variable_stream >> d_value;

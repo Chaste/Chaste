@@ -38,15 +38,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 */
 
+#include <ctype.h>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
+
 #include "ColumnDataWriter.hpp"
 #include "ColumnDataConstants.hpp"
 #include "Exception.hpp"
 #include "Version.hpp"
 
-#include <ctype.h>
-#include <sstream>
-#include <iomanip>
-#include <fstream>
 
 ColumnDataWriter::ColumnDataWriter(const std::string& rDirectory,
                                    const std::string& rBaseName,
@@ -64,13 +65,7 @@ ColumnDataWriter::ColumnDataWriter(const std::string& rDirectory,
       mpCurrentAncillaryFile(NULL),
       mpUnlimitedDimensionVariable(NULL),
       mpFixedDimensionVariable(NULL),
-#ifdef _MSC_VER
-      mFieldWidth(precision+8), // Allow for numbers like -1.111e-321 (where precision=3),MSVC requires +1 for exponent format
-      mIsWindowsExponentFormat(true),
-#else
-      mFieldWidth(precision+7), // Allow for numbers like -1.111e-321 (where precision=3)
-      mIsWindowsExponentFormat(false),
-#endif
+      mFieldWidth(precision+8),
       mPrecision(precision),
       mHasPutVariable(false),
       mNeedAdvanceAlongUnlimitedDimension(false),
@@ -412,8 +407,6 @@ void ColumnDataWriter::AdvanceAlongUnlimitedDimension()
 
 void ColumnDataWriter::PutVariable(int variableID, double variableValue, long dimensionPosition)
 {
-    int OFFSET = 1;
-    if (mIsWindowsExponentFormat) OFFSET = 2;//MSVC adjustment
 
     if (mNeedAdvanceAlongUnlimitedDimension)
     {
@@ -466,13 +459,13 @@ void ColumnDataWriter::PutVariable(int variableID, double variableValue, long di
                 int position;
                 if (variableID == FIXED_DIMENSION_VAR_ID)
                 {
-                    position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition + SPACING - 1;
+                    position = mRowStartPosition + (mRowWidth+SPACING) * dimensionPosition;
                 }
                 else
                 {
                     // ordinary variables
-                    position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition +
-                               ((variableID + (mpFixedDimensionVariable != NULL)) * (mFieldWidth + SPACING)) + SPACING - 1;
+                    position = mRowStartPosition + (mRowWidth+SPACING) * dimensionPosition +
+                               ((variableID + (mpFixedDimensionVariable != NULL)) * (mFieldWidth + SPACING));
                 }
 
                 mpCurrentOutputFile->seekp(position);
@@ -486,17 +479,18 @@ void ColumnDataWriter::PutVariable(int variableID, double variableValue, long di
             int position;
             if (variableID == UNLIMITED_DIMENSION_VAR_ID)
             {
-                position = mRowStartPosition + SPACING - 1;
+                position = mRowStartPosition;
             }
             else
             {
                 position = (variableID + (mpUnlimitedDimensionVariable != NULL)) * (mFieldWidth + SPACING) +
-                           mRowStartPosition + SPACING - 1;
+                           mRowStartPosition;
             }
 
             mpCurrentOutputFile->seekp(position);
             mpCurrentOutputFile->width(mFieldWidth);
             (*mpCurrentOutputFile) << variableValue;
+
         }
     }
     else
@@ -505,12 +499,12 @@ void ColumnDataWriter::PutVariable(int variableID, double variableValue, long di
         int position;
         if (variableID == FIXED_DIMENSION_VAR_ID)
         {
-            position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition + SPACING - 1;
+            position = mRowStartPosition + (mRowWidth+SPACING) * dimensionPosition;
         }
         else
         {
-            position = mRowStartPosition + (mRowWidth+OFFSET) * dimensionPosition +
-                       ((variableID + (mpFixedDimensionVariable != NULL)) * (mFieldWidth + SPACING)) + SPACING - 1;
+            position = mRowStartPosition + (mRowWidth+SPACING) * dimensionPosition +
+                       ((variableID + (mpFixedDimensionVariable != NULL)) * (mFieldWidth + SPACING));
         }
         mpCurrentOutputFile->seekp(position);
         mpCurrentOutputFile->width(mFieldWidth);

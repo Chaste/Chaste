@@ -61,8 +61,6 @@ private:
     std::string mAncillaryFilename;                       /**< The name of the ancillary file.*/
     std::vector<double> mValues;                          /**< Vector to hold values for a variable.*/
     unsigned mFieldWidth;                                 /**< Width of each column in the text file (excludes column headers). Determined from the first data entry*/
-    static const int SPACING = 2;                         /**< Space between columns (includes minus sign) */
-    bool mIsWindowsExponentFormat;                        /**<Whether data uses the 3-digit MSVC exponent format*/
     /**
      * Push back an entry from the data file into #mValues.
      *
