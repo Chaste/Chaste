@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCvodeCell.hpp"
 #include "LuoRudy1991.hpp"
 #include "LuoRudy1991Cvode.hpp"
+//#include "LuoRudy1991BackwardEuler.hpp"
 #include "FaberRudy2000.hpp"
 #include "Hdf5DataReader.hpp"
 #include "ReplicatableVector.hpp"
@@ -119,6 +120,26 @@ public:
         mpStimulus(new SimpleStimulus(-70000.0, 1.0, 0.0))
         {
         }
+
+//    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+//    {
+//        AbstractCardiacCell* p_cell;
+//        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+//
+//        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+//
+//        if (x<0.3)
+//        {
+//            p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpStimulus);
+//        }
+//        else
+//        {
+//            p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpZeroStimulus);
+//        }
+//
+//
+//        return p_cell;
+//    }
 
     AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
     {
@@ -1327,6 +1348,9 @@ public:
     void DontTestOutputDoesNotDependOnPrintTimestep() throw(Exception)
     {
 #ifdef CHASTE_CVODE
+
+        PetscOptionsSetValue("-ksp_monitor", "");
+
         const double mesh_spacing = 0.01;
         const double x_size = 1.0;
         TetrahedralMesh<1,1> mesh;
@@ -1356,6 +1380,15 @@ public:
             monodomain_problem.SetWriteInfo();
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
+
+            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            {
+                AbstractCardiacCellInterface* p_cell = monodomain_problem.GetTissue()->GetCardiacCell(i);
+
+                // This checks the maximum timestep in each Cvode cell has been set correctly.
+                TS_ASSERT_EQUALS(static_cast<AbstractCvodeCell*>(p_cell)->GetTimestep(),
+                                 ode_and_pde_steps);
+            }
         }
 
         // Read results in and compare
@@ -1369,7 +1402,7 @@ public:
             std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index);
             V_to_compare.push_back(V_over_time.back()); // Voltage at final time.
         }
-        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-4);
+        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-12);
 #else
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE
