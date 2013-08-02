@@ -214,7 +214,7 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
      */
     std::string first_line;
     std::string first_entry;
-    unsigned last_pos;
+    unsigned last_pos=0u;
     // Read the first entry of the line. If there is no first entry, move to the next line..
     while (first_entry.length()==0 && !datafile.eof())
     {
@@ -237,7 +237,8 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
     {
         EXCEPTION("Unable to determine field width from file as cannot find any data entries");
     }
-
+    assert (last_pos > 0u);
+    
     size_t dot_pos = first_entry.find(".");
     size_t e_pos = first_entry.find("e");
     if (dot_pos == std::string::npos || e_pos == std::string::npos)
