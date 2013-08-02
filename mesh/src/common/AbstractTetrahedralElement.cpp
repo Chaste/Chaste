@@ -1,6 +1,5 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -218,7 +217,6 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateInverseJacobia
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::GetVolume(double determinant) const
 {
-    assert(SPACE_DIM == ELEMENT_DIM);
 
     if (this->mIsDeleted)
     {

@@ -594,7 +594,18 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             }
             if (this->mOutputCellMutationStates)
             {
-                cell_mutation_states[node_index] = cell_iter->GetMutationState()->GetColour();
+                double mutation_state = cell_iter->GetMutationState()->GetColour();
+
+                CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
+                CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
+
+                if (label_collection.GetSize() == 1)
+                {
+                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                    mutation_state = p_label->GetColour();
+                }
+
+                cell_mutation_states[node_index] = mutation_state;
             }
             if (this->mOutputCellAges)
             {
@@ -759,30 +770,56 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr pCell)
 {
-    // Ensure that the Voronoi tessellation exists
-    if (mpVoronoiTessellation == NULL)
-    {
-        CreateVoronoiTessellation();
-    }
+    double cell_volume = 0;
 
-    // Get the node index corresponding to this cell
-    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
-
-    // Try to get the element index of the Voronoi tessellation corresponding to this node index
-    double cell_volume;
-    try
+    if (ELEMENT_DIM == SPACE_DIM)
     {
+        // Ensure that the Voronoi tessellation exists
+        if (mpVoronoiTessellation == NULL)
+        {
+            CreateVoronoiTessellation();
+        }
+
+        // Get the node index corresponding to this cell
+        unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+
+        // Get the element index of the Voronoi tessellation corresponding to this node index
         unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
 
         // Get the cell's volume from the Voronoi tessellation
         cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
     }
-    catch (Exception&)
+    else if (SPACE_DIM==3 && ELEMENT_DIM==2)
     {
-        // If it doesn't exist this must be a boundary cell, so return infinite volume.
-        cell_volume = DBL_MAX;
-    }
+        unsigned node_index = this->GetLocationIndexUsingCell(pCell);
 
+        Node<SPACE_DIM>* p_node = rGetMesh().GetNode(node_index);
+
+        assert(p_node->rGetContainingElementIndices().size()>0);
+
+        for (typename Node<SPACE_DIM>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
+             elem_iter != p_node->ContainingElementsEnd();
+             ++elem_iter)
+        {
+            Element<ELEMENT_DIM,SPACE_DIM>* p_element = rGetMesh().GetElement(*elem_iter);
+
+            c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacob;
+            double det;
+
+            p_element->CalculateJacobian(jacob, det);
+
+            cell_volume += fabs(p_element->GetVolume(det));
+        }
+
+        // This calculation adds a third of each element to the total area.
+        cell_volume /= 3.0;
+    }
+    else
+    {
+        //Not implemented for other dimensions
+        NEVER_REACHED;
+
+    }
     return cell_volume;
 }
 

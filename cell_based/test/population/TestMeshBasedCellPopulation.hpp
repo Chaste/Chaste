@@ -395,6 +395,9 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_population.rGetCells().back()), old_num_nodes);
     }
 
+    /*
+     * This test is for 2D meshes in 3D (i.e. surfaces)
+     */
     void TestDivideLongSprings()
     {
         EXIT_IF_PARALLEL;    // Cannot read cell populations in parallel.
@@ -429,6 +432,13 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(2u)->GetCellId(), 454u);
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(3u)->GetCellId(), 455u);
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(4u)->GetCellId(), 456u);
+
+        // For coverage of GetCellVolume() for 2D in 3D
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(0u)), 1.0/6.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(1u)), 1.0/6.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(2u)), 1.0/6.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(3u)), 1.0/6.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(4u)), 1.0/3.0, 1e-6);
 
         // Check rest lengths
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
