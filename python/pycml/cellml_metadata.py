@@ -110,7 +110,8 @@ METADATA_NAMES = frozenset(
      'membrane_persistent_sodium_current', 
         'membrane_persistent_sodium_current_conductance', 
      # I Na,b (background)
-     'sodium_background_current_conductance',
+     'membrane_background_sodium_current',
+        'membrane_background_sodium_current_conductance',
      # ========================================================================
      # Potassium currents
      # ========================================================================
@@ -132,7 +133,7 @@ METADATA_NAMES = frozenset(
         'membrane_inward_rectifier_potassium_current_conductance',
         'membrane_transient_outward_current_s_gate', 
         'membrane_transient_outward_current_r_gate',
-     # I to
+     # I to, sometimes fast and slow components, sometimes not.
      'membrane_transient_outward_current',
         'membrane_transient_outward_current_conductance',
         'membrane_fast_transient_outward_current',
@@ -142,7 +143,18 @@ METADATA_NAMES = frozenset(
         'membrane_transient_outward_current_time_independent_rectification_gate_constant',
      # I katp
      'membrane_atp_dependent_potassium_current',
-        'membrane_atp_dependent_potassium_current_conductance',        
+        'membrane_atp_dependent_potassium_current_conductance',  
+     # ========================================================================
+     # Mixed Currents
+     # ========================================================================   
+     # I f (funny current)
+     # Generally, but not always, this is formulated as I_f = I_f_Na + I_f_K, with separate conductances.
+     # if it isn't try and figure out which ionic species is being modelled for tagging, and give two tags if necessary.
+     'membrane_hyperpolarisation_activated_funny_current',
+        'membrane_hyperpolarisation_activated_funny_current_potassium_component',
+           'membrane_hyperpolarisation_activated_funny_current_potassium_component_conductance',
+        'membrane_hyperpolarisation_activated_funny_current_sodium_component', 
+           'membrane_hyperpolarisation_activated_funny_current_sodium_component_conductance', 
      # ========================================================================
      # CALCIUM CURRENTS
      # ========================================================================
@@ -163,7 +175,8 @@ METADATA_NAMES = frozenset(
         'membrane_L_type_calcium_current_fCa2_gate_tau',
         'membrane_L_type_calcium_current_d_gate_power_tau',
      # I Ca,b (background)
-     'calcium_background_current_conductance', 
+     'membrane_background_calcium_current',
+        'membrane_background_calcium_current_conductance', 
      # ========================================================================
      # Calcium subsystem parameters
      # ========================================================================
@@ -176,15 +189,18 @@ METADATA_NAMES = frozenset(
      # ========================================================================
       # I NCX
       'membrane_sodium_calcium_exchanger_current', 
-        'membrane_sodium_calcium_exchanger_current_conductance',
+        'membrane_sodium_calcium_exchanger_current_conductance', # a.k.a. permeability
       # INaK
-      'membrane_sodium_potassium_pump_current_permeability',
+      'membrane_sodium_potassium_pump_current',
+          'membrane_sodium_potassium_pump_current_permeability', # often INaK_max
       # Ip,Ca
-      'calcium_pump_current_conductance',
+      'membrane_calcium_pump_current',
+         'membrane_calcium_pump_current_conductance', # a.k.a. permeability
       # Ip,K 
-      'membrane_potassium_pump_current_conductance',      
-     # Penny and Alan, protocol-specific stuff (to be replaced by Functional Curation in the end)
-     'concentration_clamp_onoff',
+      'membrane_potassium_pump_current',
+         'membrane_potassium_pump_current_conductance',      # a.k.a. permeability
+      # Penny and Alan, protocol-specific stuff (to be replaced by Functional Curation in the end)
+      'concentration_clamp_onoff',
 ])
 
 # Parameters for the stimulus current
