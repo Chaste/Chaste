@@ -222,7 +222,7 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
         std::stringstream stream(first_line);
         stream >> first_entry;
         last_pos = stream.tellg(); // Where the first number ends (but it might be in the column 2 or 3)
-        while (stream.good())
+        while (stream.good() && last_pos <170) //Avoid reading more than about 10 columns, because we want to avoid last_pos being divisible by too many factors
         {
             std::string last_entry;
             stream >> last_entry;
@@ -232,13 +232,13 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
             } 
         }
     }
-   
+
     if (datafile.eof() && first_entry.length()==0)
     {
         EXCEPTION("Unable to determine field width from file as cannot find any data entries");
     }
     assert (last_pos > 0u);
-    
+
     size_t dot_pos = first_entry.find(".");
     size_t e_pos = first_entry.find("e");
     if (dot_pos == std::string::npos || e_pos == std::string::npos)

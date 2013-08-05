@@ -476,6 +476,16 @@ public:
             TS_ASSERT_DELTA(oldstyle_v_values[i], newstyle_v_values[i], 1e-5);
         }
     }
+    // This test is abstracted from TestPyCmlNightly
+    void TestReadingAnotherOldFile() throw (Exception)
+    {
+        ColumnDataReader old_data_reader("io/test/data", "earm_noble_model_1990", false);
+        std::vector<double> oldstyle_v_values = old_data_reader.GetValues("membrane_voltage");
+        for (unsigned i=10; i<oldstyle_v_values.size(); i++)
+        {
+            TS_ASSERT_DELTA(oldstyle_v_values[i], -75, 25);
+        }
+    }
     void TestPutNegativeVariableInFixedFile() throw(Exception)
     {
 
