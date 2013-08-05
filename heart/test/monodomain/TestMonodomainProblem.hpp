@@ -1381,9 +1381,9 @@ public:
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
             {
-                AbstractCardiacCellInterface* p_cell = monodomain_problem.GetTissue()->GetCardiacCell(i);
+                AbstractCardiacCellInterface* p_cell = monodomain_problem.GetTissue()->GetCardiacCell(node_index);
 
                 // This checks the maximum timestep in each Cvode cell has been set correctly.
                 TS_ASSERT_EQUALS(static_cast<AbstractCvodeCell*>(p_cell)->GetTimestep(),
