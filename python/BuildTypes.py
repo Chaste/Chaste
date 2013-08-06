@@ -109,12 +109,16 @@ class BuildType(object):
     
     def _get_cpu_flags(self):
         """Get the optional extensions supported by this system's CPUs."""
-        cpuinfo = open('/proc/cpuinfo')
         flags = []
-        for line in cpuinfo:
-            if line.startswith('flags'):
-                flags = line[line.find(':')+1:].split()
-                break
+        try:
+            cpuinfo = open('/proc/cpuinfo')
+            for line in cpuinfo:
+                if line.startswith('flags'):
+                    flags = line[line.find(':')+1:].split()
+                    break
+        except IOError:
+            # Systems such as Mac OS X don't have /proc/cpuinfo
+            pass
         return flags
 
     def CompilerType(self):
