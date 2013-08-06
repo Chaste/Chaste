@@ -75,6 +75,8 @@ void PetscVecTools::AddToElement(Vec vector, PetscInt row, double value)
 
 void PetscVecTools::Display(Vec vector)
 {
+    //Give full precision, scientific notation
+    PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
     VecView(vector, PETSC_VIEWER_STDOUT_WORLD);
 }
 

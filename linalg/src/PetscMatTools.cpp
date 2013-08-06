@@ -78,6 +78,8 @@ void PetscMatTools::SwitchWriteMode(Mat matrix)
 
 void PetscMatTools::Display(Mat matrix)
 {
+    //Give full precision, scientific notation
+    PetscViewerSetFormat(PETSC_VIEWER_STDOUT_WORLD, PETSC_VIEWER_ASCII_MATLAB);
     MatView(matrix,PETSC_VIEWER_STDOUT_WORLD);
 }
 
