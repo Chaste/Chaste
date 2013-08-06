@@ -4579,16 +4579,19 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln('import numpy as np')
         self.writeln()
         self.writeln('import Model')
-        self.writeln('import numba')
-        self.writeln('from numba import autojit, jit, void, double, object_')
+        if self.options.numba:
+            self.writeln('import numba')
+            self.writeln('from numba import autojit, jit, void, double, object_')
         self.writeln('import Environment as Env')
         self.writeln('import Values as V')
         self.writeln()
-        self.writeln('@jit')
+        if self.options.numba:
+            self.writeln('@jit')
         self.writeln('class ', self.class_name, '(Model.AbstractOdeModel):')
         self.open_block()
         # Constructor
-        self.writeln('@void()')
+        if self.options.numba:
+            self.writeln('@void()')
         self.writeln('def __init__(self):')
         self.open_block()
         self.writeln('self.freeVariableName = "', self.var_display_name(self.free_vars[0]), '"')
@@ -4631,7 +4634,8 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
 
         This just generates the ODE right-hand side function, EvaluateRhs(self, t, y)
         """
-        self.writeln('@jit(double[:](object_, double, double[:]))')
+        if self.options.numba:
+            self.writeln('@jit(double[:](object_, double, double[:]))')
         self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y):')
         self.open_block()
         self.writeln(self.vector_create('dy', len(self.state_vars)))
@@ -4651,7 +4655,8 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     
     def output_bottom_boilerplate(self):
         """Output file content occurring after the model equations, i.e. the GetOutputs method."""
-        self.writeln('@object_()')
+        if self.options.numba:
+            self.writeln('@object_()')
         self.writeln('def GetOutputs(self):')
         self.open_block()
         # Figure out what equations are needed to compute the outputs
@@ -5911,6 +5916,9 @@ def get_options(args, default_options=None):
                       action='store_false', default=True,
                       help="make generated Maple code compute a Jacobian specific to a Newton solve"
                       " of the nonlinear portion of the ODE system, rather than the full system Jacobian")
+    # Options specific to Python output
+    parser.add_option('--no-numba', dest='numba', default=True, action='store_false',
+                      help="turn off using Numba to optimise code on-the-fly")
     # Options specific to Chaste output
     parser.add_option('-y', '--dll', '--dynamically-loadable',
                       dest='dynamically_loadable',
