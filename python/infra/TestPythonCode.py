@@ -200,11 +200,11 @@ class ChasteTestRunner:
                 stats = pstats.Stats(self.profiler, stream=self.stream)
                 self.stream.write('\n\nProfile report:\n\n')
                 stats.sort_stats('time')
-                stats.print_stats()
+                stats.print_stats(50)
                 self.stream.write('\n\n')
-                stats.print_callees(.2)
+                stats.print_callees(.2, 30)
                 self.stream.write('\n\n')
-                stats.print_callers(.2)
+                stats.print_callers(.2, 30)
         return result
 
 class ChasteTestLoader(unittest.TestLoader):

@@ -36,6 +36,7 @@ simulation protocol.
 """
 
 import os
+import sys
 
 import pycml
 from pycml import *
@@ -365,9 +366,9 @@ class Protocol(processors.ModelModifier):
             self._identify_referenced_variables(body_expr, bvar_name)
         except ValueError:
             # We can't apply this rule as some required variables are missing
-            print "Warning: unable to utilise units conversion rule below as required variables missing;",
-            print "this may lead to later units conversion errors:"
-            print "  From", from_units.description(), "to", to_units.description(), "via", conv_expr.xml()
+            print >>sys.stderr, "Warning: unable to utilise units conversion rule below as required variables missing;",
+            print >>sys.stderr, "this may lead to later units conversion errors:"
+            print >>sys.stderr, "  From", from_units.description(), "to", to_units.description(), "via", conv_expr.xml()
             return
         func = lambda assignment: self._apply_conversion_rule(assignment, body_expr, bvar_name)
         converter.add_special_conversion(from_units, to_units, func)
@@ -576,7 +577,7 @@ class Protocol(processors.ModelModifier):
                 # Update connections to the state variable
                 self._update_connections(old_var, new_var)
             else:
-                print "Ignoring state var", old_var
+                print >>sys.stderr, "Ignoring state var", old_var
                 raise NotImplementedError # TODO
         # Transform references to derivatives
         def xform(expr):

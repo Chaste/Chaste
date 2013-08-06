@@ -4462,7 +4462,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                     'sech': '1/math.cosh', 'csch': '1/math.sinh', 'coth': '1/math.tanh',
                     'arcsin': 'math.asin', 'arccos': 'math.acos', 'arctan': 'math.atan',
                     'arcsinh': 'math.asinh', 'arccosh': 'math.acosh', 'arctanh': 'math.atanh'}
-    special_roots = {2: 'sqrt'}
+    special_roots = {2: 'math.sqrt'}
     
     def output_file_name(self, model_filename):
         """Generate a name for our output file, based on the input file."""
@@ -4497,6 +4497,22 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         else:
             # Use base 10
             self.output_function('math.log10', expr.operands(), paren)
+
+    def output_root(self, expr, paren):
+        """Output a root taken to some degree.
+
+        If a degree qualifier element is not provided, uses default 2.
+        """
+        if hasattr(expr, u'degree'):
+            # A degree is given.  Compute x^(1/b)
+            self.write('math.pow(')
+            self.output_expr(expr.operands().next(), False)
+            self.write(', 1/')
+            self.output_expr(expr.degree, True)
+            self.write(')')
+        else:
+            # Compute square root
+            self.output_function('math.sqrt', expr.operands(), paren)
 
     def output_piecewise(self, expr, paren):
         """Output the piecewise expression expr.
@@ -4563,15 +4579,21 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln('import numpy as np')
         self.writeln()
         self.writeln('import Model')
+        self.writeln('import numba')
+        self.writeln('from numba import autojit, jit, void, double, object_')
         self.writeln('import Environment as Env')
         self.writeln('import Values as V')
         self.writeln()
+        self.writeln('@jit')
         self.writeln('class ', self.class_name, '(Model.AbstractOdeModel):')
         self.open_block()
         # Constructor
-        self.writeln('def __init__(self, *args, **kwargs):')
+        self.writeln('@void()')
+        self.writeln('def __init__(self):')
         self.open_block()
         self.writeln('self.freeVariableName = "', self.var_display_name(self.free_vars[0]), '"')
+        self.writeln('self.freeVariable = 0.0')
+        self.writeln(self.vector_create('self.state', len(self.state_vars)))
         self.writeln('self.stateVarMap = {}')
         self.writeln(self.vector_create('self.initialState', len(self.state_vars)))
         for i, var in enumerate(self.state_vars):
@@ -4593,7 +4615,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                          self.COMMENT_START, var.units)
         self.writeln()
         #2390 TODO: Units info
-        self.writeln('super(', self.class_name, ', self).__init__(*args, **kwargs)')
+        self.writeln('Model.AbstractOdeModel.__init__(self)')
         self.close_block()
     
     def output_state_assignments(self, nodeset, stateVectorName):
@@ -4609,6 +4631,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
 
         This just generates the ODE right-hand side function, EvaluateRhs(self, t, y)
         """
+        self.writeln('@jit(double[:](object_, double, double[:]))')
         self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y):')
         self.open_block()
         self.writeln(self.vector_create('dy', len(self.state_vars)))
@@ -4628,6 +4651,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     
     def output_bottom_boilerplate(self):
         """Output file content occurring after the model equations, i.e. the GetOutputs method."""
+        self.writeln('@object_()')
         self.writeln('def GetOutputs(self):')
         self.open_block()
         # Figure out what equations are needed to compute the outputs
