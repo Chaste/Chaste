@@ -121,10 +121,10 @@ void OutputFileHandler::CommonConstructor(const std::string &rDirectory,
         // Note: in Boost 1.48 and above we could use 'canonical' to check this better
     }
     //The notion of absolute path on Windows is rather different.
-    //For example, / and /foo are not absolute paths. 
+    //For example, / and /foo are not absolute paths.
     //However, fs::path.has_root_path() captures the intended semantics here as follows
-    
-    if(fs::path(rDirectory).has_root_path())
+
+    if (fs::path(rDirectory).has_root_path())
     {
         EXCEPTION("The constructor argument to OutputFileHandler must be a relative path; '"
                   << rDirectory << "' is absolute.");
@@ -165,7 +165,7 @@ std::string OutputFileHandler::GetChasteTestOutputDirectory()
         directory_root.SetPath(chaste_test_output, RelativeTo::AbsoluteOrCwd);
     }
     // Note that FileFinder::GetAbsolutePath adds a trailing slash, but only
-    // if the directory exists at the time of the call 
+    // if the directory exists at the time of the call
     std::string chaste_test_output_directory = directory_root.GetAbsolutePath();
     AddTrailingSlash(chaste_test_output_directory);
     return chaste_test_output_directory;
@@ -188,19 +188,16 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
         try
         {
             // If necessary make the ChasteTestOutputDirectory - don't make it deleteable by Chaste
-            if (!fs::exists(output_root))
-            {
-                fs::create_directories(output_root);
-            }
+            fs::create_directories(output_root); // Note that this is a no-op if the folder exists already
 
             // Now make all the sub-folders requested one-by-one and add the .chaste_deletable_folder file to them
             fs::path next_folder(output_root);
             for (fs::path::iterator path_iter = rel_path.begin(); path_iter != rel_path.end(); ++path_iter)
             {
                 next_folder /= *path_iter;
-                if (!fs::is_directory(next_folder))
+                bool created_dir = fs::create_directory(next_folder);
+                if (created_dir)
                 {
-                    fs::create_directory(next_folder);
                     // Add the Chaste signature file
                     fs::ofstream sig_file(next_folder / SIG_FILE_NAME);
                     sig_file.close();
