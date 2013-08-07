@@ -227,8 +227,8 @@ def SetTestOutput(module):
     """Set the CHASTE_TEST_OUTPUT attribute in the given test module, and ensure the folder exists."""
     module.CHASTE_TEST_OUTPUT = os.getenv('CHASTE_TEST_OUTPUT', 'testoutput')
     try:
-        os.mkdir(module.CHASTE_TEST_OUTPUT)
-    except:
+        os.makedirs(module.CHASTE_TEST_OUTPUT)
+    except os.error:
         pass
 
 def main(filepath, profile=False, lineProfile=False):
