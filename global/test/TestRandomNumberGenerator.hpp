@@ -42,10 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
 
-// We use a c_matrix for a bit of storage.  It's rather naughty using a linalg header
-// here, but since it doesn't have a corresponding .cpp file we get away with it!
-#include "UblasMatrixInclude.hpp"
-
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -288,7 +284,14 @@ public:
         }
 
         unsigned num_trials = 1000000;
-        c_matrix<unsigned,5,5> results = zero_matrix<unsigned>(5,5);
+        unsigned results[5][5];
+        for (unsigned i=0; i<5; i++)
+        {
+            for (unsigned j=0; j<5; j++)
+            {
+                results[i][j] = 0u;
+            }
+        }
 
         for (unsigned trial=0; trial<num_trials; trial++)
         {
@@ -299,7 +302,7 @@ public:
                 {
                     if (shuffled_results[j] == i)
                     {
-                        results(i,j)++;
+                        results[i][j]++;
                     }
                 }
             }
@@ -310,7 +313,7 @@ public:
             for (unsigned j=0; j<5; j++)
             {
                 // Probability of i going to position j
-                double prob = (double)results(i,j)/num_trials;
+                double prob = (double)results[i][j]/num_trials;
 
                 /*
                  * This test could fail with very low probability (just rerun).

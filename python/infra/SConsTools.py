@@ -275,7 +275,7 @@ def RegisterObjects(env, key, objs):
 def CloneEnv(env):
     """Clone a construction environment, but don't copy some objects.
     
-    There are a couple of special dictionaries which need to be the same object in all
+    There are a few special dictionaries which need to be the same object in all
     environments, to ensure that updates are shared.  So after calling the normal Clone
     we need to refer back to the original.
     """
@@ -283,6 +283,8 @@ def CloneEnv(env):
     newenv['CHASTE_OBJECTS'] = env['CHASTE_OBJECTS']
     newenv['CHASTE_COMP_DEPS'] = env['CHASTE_COMP_DEPS']
     newenv['CHASTE_LIBRARIES'] = env['CHASTE_LIBRARIES']
+    newenv['CHASTE_CPP_PATH'] = env['CHASTE_CPP_PATH']
+    newenv['CHASTE_CPP_PATHS'] = env['CHASTE_CPP_PATHS']
     return newenv
 
 
@@ -351,11 +353,18 @@ def DetermineLibraryDependencies(env, partialGraph):
         if comp != 'core':
             full_graph[comp] = []
             process_comp(comp, comp)
-            comp_lib = get_lib(comp)
-            if comp_lib:
-                deps = map(get_lib, full_graph[comp])
-                if deps:
-                    env.Depends(comp_lib, deps)
+            if library_mapping: # This may be empty if we're just compiling a dynamically loaded model
+                comp_lib = get_lib(comp)
+                if comp_lib:
+                    deps = map(get_lib, full_graph[comp])
+                    if deps:
+                        env.Depends(comp_lib, deps)
+    # Set up construction variables that can be used in CPPPATH
+    for comp in full_graph:
+        comp_name = comp
+        if comp_name.startswith(PROJECT_PREFIX):
+            comp_name = comp_name[len(PROJECT_PREFIX):]
+        env['CHASTE_CPP_PATH'][comp_name] = env.Flatten([env['CHASTE_CPP_PATHS'][c] for c in full_graph[comp]])
     # Early versions of SCons aren't as nice
     scons_ver = env._get_major_minor_revision(SCons.__version__)
     if scons_ver < (1,0,0):
@@ -368,6 +377,18 @@ def DetermineLibraryDependencies(env, partialGraph):
     # Transfer results to partialGraph
     partialGraph.clear()
     partialGraph.update(full_graph)
+
+
+def CompleteFolderPaths(folders):
+    """
+    Given a list of folders with the current, return a list suitable for use in the CPPPATH
+    for other components.  It must therefore contain full path information, and include the
+    copies with the build folder.  Using SCons' Dir objects makes this easier.
+    """
+    paths = []
+    for f in folders:
+        paths.extend([Dir(f), Dir(f).srcnode()])
+    return paths
 
 
 def FindTestsToRun(env, build, BUILD_TARGETS, otherVars,
@@ -900,25 +921,26 @@ def ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs):
     return runner_exe, runner_dummy
 
 
-def DoDynamicallyLoadableModules(otherVars):
+def DoDynamicallyLoadableModules(baseEnv, otherVars):
     """Logic to find and schedule for building any dynamically-loadable modules.
     
     These are generated from source files found in a 'dynamic' folder in a component
     or project.
     """
+    # Dynamically loadable modules need different flags
+    dyn_env = CloneEnv(baseEnv)
+    dyn_env.Append(LINKFLAGS=' '+otherVars['build'].rdynamic_link_flag)
     # Find any source files that should get made into dynamically loadable modules.
     curdir = os.getcwd()
     os.chdir('../..')
-    dyn_source, dyn_cpppath = FindSourceFiles(otherVars['env'], 'dynamic', includeRoot=True)
+    dyn_source, dyn_cpppath = FindSourceFiles(dyn_env, 'dynamic', includeRoot=True)
     os.chdir(curdir)
-    dyn_cpppath.extend(otherVars.get('extra_dyn_cpppath', []))
+    dyn_env.Prepend(CPPPATH=dyn_cpppath)
+    # Try to avoid likely conflicts
+    for path in [p for p in dyn_env['CPPPATH'] if 'cellml' in str(p)]:
+        dyn_env['CPPPATH'].remove(path)
     # Build any dynamically loadable modules
     dyn_libs = []
-    if dyn_cpppath:
-        dyn_env = CloneEnv(otherVars['dynenv'])
-        dyn_env.Prepend(CPPPATH=dyn_cpppath)
-    else:
-        dyn_env = otherVars['dynenv']
     for s in dyn_source:
         # Figure out if this is the single requested source, if there is one
         so_dir = os.path.join(curdir, os.pardir, os.pardir, os.path.dirname(s))
@@ -951,7 +973,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     if otherVars['debug']:
         print "Executing SConscript for project", projectName
     # Commonly used variables
-    env = otherVars['env']
+    env = CloneEnv(otherVars['env'])
     use_chaste_libs = otherVars['use_chaste_libs']
     project_path = os.path.join('projects', projectName)
     # Store our dependencies
@@ -962,26 +984,26 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     curdir = os.getcwd()
     # Look for .cpp files within the project's src folder
     os.chdir('../..') # This is so .o files are built in <project>/build/<something>/
-    files, extra_cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
-    otherVars['extra_dyn_cpppath'] = extra_cpppath[:]
+    files, cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
     pydirs = FindPyDirs(env)
     # Look for source files that tests depend on under <project>/test/.
     testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'])
-    extra_cpppath.extend(test_cpppath)
-    del test_cpppath
-    # Add project dependencies to the include search path
-    os.chdir(Dir('#').abspath)
-    for dep in chasteLibsUsed:
-        if dep.startswith('projects'):
-            proj_dirs = FindSourceFiles(env, os.path.join(dep, 'src'), ignoreDirs=['broken'],
-                                        dirsOnly=True, includeRoot=True)
-            extra_cpppath.extend(map(lambda s: os.path.join(Dir('#').abspath, s), proj_dirs))
     # Move back to the build dir
     os.chdir(curdir)
 
+    # Update CPPPATH for folders in this project, with a hook to pull in its dependencies later
+    env['CHASTE_CPP_PATHS'][projectName] = CompleteFolderPaths(cpppath)
+    all_cpppath = cpppath + test_cpppath
+    if all_cpppath:
+        env.Prepend(CPPPATH=all_cpppath)
+    env.Append(CPPPATH="${CHASTE_CPP_PATH['%s']}" % projectName)
+    # Python search path just considers this project at present
+    AddPyDirs(env, project_path, pydirs)
+
+    # Build any dynamically loadable modules
+    dyn_libs = DoDynamicallyLoadableModules(env, otherVars)
     if otherVars['dyn_libs_only']:
         # Short-circuit most stuff, and just build the requested .so
-        DoDynamicallyLoadableModules(otherVars)
         return []
 
     # Look for files containing a test suite
@@ -992,17 +1014,6 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
                                project=projectName)
     if otherVars['debug']:
         print "  Will run tests:", map(str, testfiles)
-
-    # Add extra source and test folders to CPPPATH only for this project
-    if extra_cpppath or pydirs:
-        env = CloneEnv(env)
-    if extra_cpppath:
-        env.Prepend(CPPPATH=extra_cpppath)
-    # Similarly for folders containing Python source
-    AddPyDirs(env, project_path, pydirs)
-
-    # Build any dynamically loadable modules
-    dyn_libs = DoDynamicallyLoadableModules(otherVars)
 
     # Build and install the library for this project
     project_lib = test_lib = libpath = None
@@ -1107,20 +1118,17 @@ def DoComponentSConscript(component, otherVars):
     """
     if otherVars['debug']:
         print "Executing SConscript for component", component
-    if otherVars['dyn_libs_only']:
-        # Short-circuit most stuff, and just build the requested .so
-        DoDynamicallyLoadableModules(otherVars)
-        return []
     # Commonly used variables
-    env = otherVars['env']
+    env = CloneEnv(otherVars['env'])
     use_chaste_libs = otherVars['use_chaste_libs']
+
     # Note that because we are using SCons' variant dir functionality, and the build
     # dir is created before the SConscript files are executed, that the working dir
     # will be set to <component>/build/<something>.
     curdir = os.getcwd()
     # Look for source files within the <component>/src folder
     os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
-    files, _ = FindSourceFiles(env, 'src', ignoreDirs=['broken'])
+    files, cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
     pydirs = FindPyDirs(env)
     # Look for source files that tests depend on under test/.
     # We also need to add any subfolders to the CPPPATH, so they are searched
@@ -1135,6 +1143,21 @@ def DoComponentSConscript(component, otherVars):
         env.Alias('install', t)
     # Move back to the buid dir
     os.chdir(curdir)
+    
+    # Update CPPPATH for folders in this component, with a hook to pull in its dependencies later
+    env['CHASTE_CPP_PATHS'][component] = CompleteFolderPaths(cpppath)
+    all_cpppath = cpppath + test_cpppath
+    if all_cpppath:
+        env.Prepend(CPPPATH=all_cpppath)
+    env.Append(CPPPATH='${CHASTE_CPP_PATH["%s"]}' % component)
+    # Python search path just considers this component at present
+    AddPyDirs(env, component, pydirs)
+
+    # Build any dynamically loadable modules
+    dyn_libs = DoDynamicallyLoadableModules(env, otherVars)
+    if otherVars['dyn_libs_only']:
+        # Short-circuit most stuff, and just build the requested .so
+        return []
 
     # Look for files containing a test suite
     # A list of test suites to run will be found in a test/<name>TestPack.txt
@@ -1145,19 +1168,9 @@ def DoComponentSConscript(component, otherVars):
                                component=component)
     if otherVars['debug']:
         print "  Will run tests:", map(str, testfiles)
-    
-    # Add test folders to CPPPATH only for this component; similarly for folders containing Python source
-    if test_cpppath or pydirs:
-        env = CloneEnv(env)
-    if test_cpppath:
-        env.Prepend(CPPPATH=test_cpppath)
-    AddPyDirs(env, component, pydirs)
 
-    # Build any dynamically loadable modules
-    dyn_libs = DoDynamicallyLoadableModules(otherVars)
-    
     special_objects = CheckForSpecialFiles(env, component, files, otherVars)
-    
+
     # Build and install the library for this component
     set_env_chaste_libs = True
     lib = test_lib = libpath = None

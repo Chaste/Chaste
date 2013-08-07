@@ -82,10 +82,10 @@ import hostconfig
 dyn_libs_only = int(ARGUMENTS.get('dyn_libs_only', 0))
 Export('dyn_libs_only')
 if dyn_libs_only:
-    #print sys.argv
     # Set some other options
     ARGUMENTS['test_summary'] = 0
     ARGUMENTS['do_inf_tests'] = 0
+    ARGUMENTS['chaste_libs'] = 1
     # Note what folder is being built
     dyn_folder = os.path.join(Dir('#').abspath, COMMAND_LINE_TARGETS[0])
     Export('dyn_folder')
@@ -224,7 +224,7 @@ comp_deps = {'cell_based': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'crypt': ['cell_based'],
              'notforrelease': ['heart'],
              'notforrelease_cell_based': ['crypt', 'cell_based'],
-             'notforrelease_lung': ['continuum_mechanics'],
+             'notforrelease_lung': ['heart', 'continuum_mechanics'],
              'heart': ['continuum_mechanics', 'pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'continuum_mechanics': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'pde': ['ode', 'mesh', 'linalg', 'io', 'global'],
@@ -305,16 +305,8 @@ env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
 env.Append(LINKFLAGS = link_flags)
 env.Append(CPPDEFINES = hostconfig.CppDefines() + ['TRILIBRARY', 'TETLIBRARY', 'ANSI_DECLARATORS'])
 
-# Search path for Chaste #includes
+# Base search path for Chaste #includes, common to all components
 cpppath = [Dir('.'), Dir('cxxtest')]
-for component in components:
-    src_folder = os.path.join(component, 'src')
-    src_dirs = SConsTools.FindSourceFiles(env, src_folder, dirsOnly=True, includeRoot=True)
-    bld_dir = os.path.join(component, 'build', build.build_dir)
-    clen = len(component)
-    for d in src_dirs:
-        cpppath.extend([Dir(d), Dir(bld_dir + d[clen:])])
-cpppath = map(lambda p: Dir(p), cpppath)
 env.Replace(CPPPATH = cpppath)
 
 # Some state needed by our build system
@@ -326,6 +318,8 @@ env['CHASTE_COMP_DEPS'] = comp_deps
 env['CHASTE_LIBRARIES'] = {}
 env['CHASTE_OBJECTS'] = {}
 env['UPDATE_CHASTE_PROVENANCE'] = update_provenance
+env['CHASTE_CPP_PATHS'] = {}
+env['CHASTE_CPP_PATH'] = {}
 
 if not requested_tests:
     # Default is to build all components, but not user projects
@@ -372,15 +366,8 @@ SConsTools.RecordBuildInfo(env, build_type, static_libs, use_chaste_libs)
 if hasattr(hostconfig.conf, 'ModifyEnv') and callable(hostconfig.conf.ModifyEnv):
     hostconfig.conf.ModifyEnv(env)
 
-# We need different linker flags when compiling dynamically loadable modules
-dynenv = SConsTools.CloneEnv(env)
-env.Append(LINKFLAGS=' '+build.rdynamic_link_flag)
-# Try to avoid likely conflicts
-for path in [p for p in dynenv['CPPPATH'] if 'cellml' in str(p)]:
-    dynenv['CPPPATH'].remove(path)
-
 # Export the build environment to SConscript files
-Export('env', 'dynenv')
+Export('env')
 
 # Test log files to summarise
 test_log_files = []
