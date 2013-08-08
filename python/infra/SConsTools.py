@@ -353,7 +353,8 @@ def DetermineLibraryDependencies(env, partialGraph):
         if comp != 'core':
             full_graph[comp] = []
             process_comp(comp, comp)
-            if library_mapping: # This may be empty if we're just compiling a dynamically loaded model
+            # If we're building libraries, make each depend on libraries from dependent components/projects
+            if library_mapping:
                 comp_lib = get_lib(comp)
                 if comp_lib:
                     deps = map(get_lib, full_graph[comp])
@@ -1221,8 +1222,18 @@ def DoComponentSConscript(component, otherVars):
     #lib_deps.extend(map(lambda lib: '#lib/lib%s.so' % lib, chaste_libs)) # all Chaste libs used
     if lib:
         lib_deps.append(lib)
-    
-    return ScheduleTests(env, all_libs, dyn_libs, lib_deps, libpath, testfiles, otherVars)
+
+    test_log_files = ScheduleTests(env, all_libs, dyn_libs, lib_deps, libpath, testfiles, otherVars)
+
+    if otherVars['build_exes']:
+        apps_path = os.path.join(Dir('#').abspath, component, 'apps')
+        if os.path.isdir(apps_path):
+            BuildExes(otherVars['build'], env, apps_path, components=chaste_libs, otherVars=otherVars)
+        if component == 'heart':
+            # Legacy special case!
+            BuildExes(otherVars['build'], env, Dir('#/apps').abspath, components=chaste_libs, otherVars=otherVars)
+
+    return test_log_files
 
 
 def ScheduleTests(env, allLibs, dynLibs, libDeps, libPath, testFiles, otherVars):

@@ -85,7 +85,6 @@ if dyn_libs_only:
     # Set some other options
     ARGUMENTS['test_summary'] = 0
     ARGUMENTS['do_inf_tests'] = 0
-    ARGUMENTS['chaste_libs'] = 1
     # Note what folder is being built
     dyn_folder = os.path.join(Dir('#').abspath, COMMAND_LINE_TARGETS[0])
     Export('dyn_folder')
@@ -442,8 +441,8 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
             test_log_files.append(SConscript(script, src_dir=project, build_dir=bld_dir, duplicate=0))
      
     # Calculate full library dependencies now we know what projects need
-    if use_chaste_libs:
-        SConsTools.DetermineLibraryDependencies(env, comp_deps)
+    # This also sets up the full include paths for each component & project
+    SConsTools.DetermineLibraryDependencies(env, comp_deps)
     
     # Make sure test executables get built if compile_only=1
     env.Default(env.Alias('test_exes'))
@@ -540,11 +539,6 @@ if test_summary and not compile_only:
     # Try to ensure it runs even if SCons thinks it's up-to-date, just to re-assure the user
     senv.AlwaysBuild(summary_index)
 
-
-if build_exes:
-    SConsTools.BuildExes(build, env, 'apps',
-                         components=['heart']+comp_deps['heart'],
-                         otherVars=globals())
 
 # Finally, tidy up the build targets if we modified the command-line list
 # to do 'nice' test suite specification
