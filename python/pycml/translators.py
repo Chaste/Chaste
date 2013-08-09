@@ -4635,10 +4635,11 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         This just generates the ODE right-hand side function, EvaluateRhs(self, t, y)
         """
         if self.options.numba:
-            self.writeln('@jit(double[:](object_, double, double[:]))')
-        self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y):')
+            self.writeln('@jit(double[:](object_, double, double[:], double[:]))')
+        self.writeln('def EvaluateRhs(self, ', self.code_name(self.free_vars[0]), ', y, ydot=np.empty(0)):')
         self.open_block()
-        self.writeln(self.vector_create('dy', len(self.state_vars)))
+        self.writeln('if not len(ydot):')
+        self.writeln(self.vector_create('ydot', len(self.state_vars)), indent_offset=1)
         # Work out what equations are needed to compute the derivatives
         derivs = set(map(lambda v: (v, self.free_vars[0]), self.state_vars))
         nodeset = self.calculate_extended_dependencies(derivs)
@@ -4649,8 +4650,8 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln()
         # Assign to derivatives vector
         for i, var in enumerate(self.state_vars):
-            self.writeln(self.vector_index('dy', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
-        self.writeln('return dy')
+            self.writeln(self.vector_index('ydot', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
+        self.writeln('return ydot')
         self.close_block()
     
     def output_bottom_boilerplate(self):
