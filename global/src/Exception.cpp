@@ -100,6 +100,10 @@ std::string Exception::CheckShortMessageContains(std::string expected) const
     return error;
 }
 
+Exception::~Exception()
+{
+}
+
 #define COVERAGE_IGNORE //Termination NEVER EVER happens under normal testing conditions.
 void Exception::Terminate(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber)
 {
@@ -123,5 +127,4 @@ void Exception::Terminate(const std::string& rMessage, const std::string& rFilen
         exit(EXIT_FAILURE);
     }
 }
-
 #undef COVERAGE_IGNORE // Termination NEVER EVER happens under normal testing conditions
