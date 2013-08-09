@@ -53,6 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TimeStepper.hpp"
 #include "NumericFileComparison.hpp"
 
+#include "FakePetscSetup.hpp"
+
 // This is a separate class to TestIonicModels as we don't want to be calling
 // RunAndCheckIonicModels, because we want to switch the SAC on at certain times..
 
