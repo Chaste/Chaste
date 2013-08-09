@@ -58,7 +58,7 @@ private:
 
     double ComputeTimeStep(double currentTime, Vec currentSolution)
     {
-        if(currentTime < mThresholdTime)
+        if (currentTime < mThresholdTime)
         {
             return 0.01; // ms
         }
@@ -133,7 +133,7 @@ public:
         Vec difference;
         VecDuplicate(voltage_adapt, &difference);
 
-        for(unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
         {
             reader_no_adapt.GetVariableOverNodes(voltage_no_adapt, "V", timestep);
             reader_adapt.GetVariableOverNodes(voltage_adapt, "V", timestep);
@@ -143,9 +143,9 @@ public:
             VecNorm(difference, NORM_INFINITY, &l_inf_norm);
 
             //std::cout << l_inf_norm << "\n";
-            if(timestep < 25)
+            if (timestep < 25)
             {
-                TS_ASSERT_DELTA(l_inf_norm, 0.0, 1e-12); // first 25 ms, there should be no difference
+                TS_ASSERT_DELTA(l_inf_norm, 0.0, 1e-10); // first 25 ms, there should be no difference
             }
             else
             {
