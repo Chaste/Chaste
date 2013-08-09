@@ -826,11 +826,19 @@ def RunAcceptanceTests(build, env, appsPath, testsPath, exes, otherVars):
     If appsPath is specifically requested on the command line,
     schedule its acceptance tests for running.
     """
-    if not (appsPath in otherVars['COMMAND_LINE_TARGETS'] or
-            appsPath+os.path.sep in otherVars['COMMAND_LINE_TARGETS']):
-        return
-    print "Running acceptance tests", map(str, exes)
     checkout_dir = Dir('#').abspath
+    assert os.path.isabs(appsPath)
+    for targ in otherVars['COMMAND_LINE_TARGETS']:
+        if not os.path.isabs(targ):
+            targ = os.path.join(checkout_dir, targ)
+        if targ.endswith(os.path.sep):
+            targ = targ[:-len(os.path.sep)]
+        if targ == appsPath:
+            break
+    else:
+        # Not found
+        return
+#    print "Running acceptance tests", map(str, exes)
     tests_dir = Dir(testsPath).abspath
     texttest = build.tools['texttest'] + ' -d ' + tests_dir
     texttest_output_dir = env['ENV']['CHASTE_TEST_OUTPUT'] + '/texttest_reports/chaste'

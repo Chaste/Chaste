@@ -113,6 +113,7 @@ Export('use_chaste_libs')
 
 # Specify test_summary=0 to scons to *NOT* generate a summary html page
 test_summary = int(ARGUMENTS.get('test_summary', 1))
+Export('test_summary')
 
 # Used by the automated build system
 run_infrastructure_tests = int(ARGUMENTS.get('do_inf_tests', getattr(hostconfig.conf, 'do_inf_tests', 0)))
