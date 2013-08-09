@@ -413,6 +413,11 @@ public:
 
         // Create a cell population, with no ghost nodes at the moment
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+
+        // coverage of SetRestLength
+        TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(0,1,1.0),"Tried to set a rest length in a simulation with fixed rest length. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+
+
         cell_population.CalculateRestLengths();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
@@ -423,6 +428,13 @@ public:
         TS_ASSERT_DELTA(cell_population.GetRestLength(2,3), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,3), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,2), sqrt(2.0), 1e-6);
+
+        // Coverage of SetRestLengthMethod
+        cell_population.SetRestLength(0,1,2.0);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 2.0, 1e-6);
+        cell_population.SetRestLength(0,1,1.0);
+        TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
+        TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(1,3,1.0),"Tried to set the rest length of an edge not in the mesh.");
 
         cell_population.DivideLongSprings(1.0);
 

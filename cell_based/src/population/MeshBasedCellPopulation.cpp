@@ -1285,6 +1285,30 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetRestLength(unsigned in
     }
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetRestLength(unsigned indexA, unsigned indexB, double restLength)
+{
+    if (mHasVariableRestLength)
+    {
+        std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(indexA, indexB);
+        std::map<std::pair<unsigned,unsigned>, double>::iterator iter = mSpringRestLengths.find(node_pair);
+
+        if (iter != mSpringRestLengths.end())
+        {
+            // modify the stored rest length
+            iter->second = restLength;
+        }
+        else
+        {
+            EXCEPTION("Tried to set the rest length of an edge not in the mesh.");
+        }
+    }
+    else
+    {
+    	EXCEPTION("Tried to set a rest length in a simulation with fixed rest length. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////

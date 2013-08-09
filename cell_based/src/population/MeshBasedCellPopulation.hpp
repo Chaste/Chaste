@@ -594,6 +594,16 @@ public:
      *  @param indexB index of second node in pair
      */
     double GetRestLength(unsigned indexA, unsigned indexB);
+
+    /**
+     *  Helper method to modify the rest length of a given spring
+     *
+     *  @param indexA index of first node in pair
+     *  @param indexB index of second node in pair
+     *  @param restLength the new rest length
+     */
+    void SetRestLength(unsigned indexA, unsigned indexB, double restLength);
+
 };
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 
