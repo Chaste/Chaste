@@ -118,9 +118,6 @@ public:
      */
     static void Terminate(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber);
 
-    /// Virtual destructor to make this class polymorphic.
-    virtual ~Exception();
-
 protected:
     /**
      * Allow subclasses to reset the exception message after construction of the base class,
