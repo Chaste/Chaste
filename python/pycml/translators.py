@@ -1724,7 +1724,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Constructor
         self.set_access('public')
         self.output_constructor([solver1, 'boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus'],
-                                [solver2, len(self.state_vars), self.v_index, 'pIntracellularStimulus'])
+                                [solver2, len(self.state_vars), self.unsigned_v_index, 'pIntracellularStimulus'])
         # Destructor
         self.output_method_start('~'+self.class_name, [], '')
         self.open_block()
@@ -1733,6 +1733,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.output_chaste_lut_methods()
         self.output_verify_state_variables()
         return
+    
+    @property
+    def unsigned_v_index(self):
+        if self.v_index == -1:
+            return 'UNSIGNED_UNSET'
+        else:
+            return str(self.v_index)
     
     def output_verify_state_variables(self):
         """Output the VerifyStateVariables method.
@@ -3351,7 +3358,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # Constructor
         self.output_constructor(['boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver /* unused; should be empty */',
                                  'boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus'],
-                                ['pOdeSolver', len(self.state_vars), self.v_index, 'pIntracellularStimulus'])
+                                ['pOdeSolver', len(self.state_vars), self.unsigned_v_index, 'pIntracellularStimulus'])
         # Destructor
         self.output_method_start('~'+self.class_name, [], '', access='public')
         self.open_block()
