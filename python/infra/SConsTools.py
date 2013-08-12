@@ -840,14 +840,17 @@ def RunAcceptanceTests(build, env, appsPath, testsPath, exes, otherVars):
         return
 #    print "Running acceptance tests", map(str, exes)
     tests_dir = Dir(testsPath).abspath
+    output_dir = env['ENV']['CHASTE_TEST_OUTPUT']
+    if not os.path.isabs(output_dir):
+        output_dir = os.path.join(checkout_dir, output_dir)
     texttest = build.tools['texttest'] + ' -d ' + tests_dir
-    texttest_output_dir = env['ENV']['CHASTE_TEST_OUTPUT'] + '/texttest_reports/chaste'
+    texttest_output_dir = os.path.join(output_dir, 'texttest_reports', 'chaste')
     time_eight_hours_ago = time.time() - 8*60*60
     canonical_test_date = time.strftime("%d%b%Y", time.localtime(time_eight_hours_ago))
     todays_file = os.path.join(texttest_output_dir, 'test_default_' + canonical_test_date + '.html')
     # The next 2 lines make sure the acceptance tests will get run, and the right results stored
     env.Execute(Delete(todays_file))
-    env.Execute(Delete(os.path.join(env['ENV']['CHASTE_TEST_OUTPUT'], 'texttest_output')))
+    env.Execute(Delete(os.path.join(output_dir, 'texttest_output')))
     env.Command(todays_file, exes,
                 ['-' + texttest + ' -b default -c ' + checkout_dir,
                  texttest + ' -b default -c ' + checkout_dir + ' -coll web'])
