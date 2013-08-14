@@ -102,6 +102,14 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
                     if not dirsOnly:
                         filepath = os.path.join(dirpath, filename)
                         source_files.append(filepath)
+                    if dirsOnly and source_exts == ['.py'] and filename == '__init__.py':
+                        # This is a Python package root, so don't recurse further, and use its parent instead
+                        dirnames[:] = []
+                        has_sources = False
+                        parent_dir = os.path.dirname(dirpath)
+                        if not parent_dir in source_dirs:
+                            source_dirs.append(parent_dir)
+                        break
         if has_sources and (includeRoot or dirpath != rootDir):
             source_dirs.append(dirpath)
     if dirsOnly:
@@ -112,8 +120,7 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
             # Special-case the version info files.
             file_name = os.path.join('src', 'Version.cpp')
             file_node = env.File(file_name)
-            if (not env['UPDATE_CHASTE_PROVENANCE'] and
-                os.path.exists(file_node.abspath)):
+            if not env['UPDATE_CHASTE_PROVENANCE'] and os.path.exists(file_node.abspath):
                 # Don't update provenance info - just use the existing file
                 version_value = Value(open(file_node.abspath).read())
             else:
