@@ -54,8 +54,36 @@ class TestBidomain3D :  public CxxTest::TestSuite
 {
 public:
 
+    void TestBidomain3dErrorHandling() throw (Exception)
+    {
+        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
+        HeartConfig::Instance()->SetSimulationDuration(4.0);  //ms
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
+        HeartConfig::Instance()->SetOutputDirectory("Bidomain3dWithErrors");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain3d");
+
+        // Check the linear system can be solved to a low tolerance (in particular, checks the null space
+        // stuff was implemented correctly
+        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-14);
+
+        // We put in a massive stimulus, and alter the printing timestep from default, to cover
+        // some memory handling in the case of exceptions being thrown (#1222).
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+
+        // 100x bigger stimulus than normal.
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> bidomain_cell_factory(-600.0*100000);
+        BidomainProblem<3> bidomain_problem( &bidomain_cell_factory );
+        bidomain_problem.Initialise();
+
+        TS_ASSERT_THROWS_CONTAINS(bidomain_problem.Solve(),
+           "has gone out of range. Check numerical parameters, for example time and space stepsizes");
+
+    }
+
     void TestBidomain3d() throw (Exception)
     {
+        HeartEventHandler::Reset();
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
         HeartConfig::Instance()->SetSimulationDuration(4.0);  //ms
@@ -73,8 +101,8 @@ public:
 
         bidomain_problem.Initialise();
 
-//bidomain_problem.SetNodeForAverageOfPhiZeroed(1330);
-//bidomain_problem.SetFixedExtracellularPotentialNodes(1330);
+        //bidomain_problem.SetNodeForAverageOfPhiZeroed(1330);
+        //bidomain_problem.SetFixedExtracellularPotentialNodes(1330);
 
         bidomain_problem.Solve();
 
@@ -124,11 +152,7 @@ public:
 
         HeartEventHandler::Headings();
         HeartEventHandler::Report();
-
     }
-
-
-
 
     ////////////////////////////////////////////////////////////
     // Compare Mono and Bidomain Simulations

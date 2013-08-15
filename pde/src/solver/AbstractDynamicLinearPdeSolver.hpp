@@ -411,8 +411,23 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
         PdeSimulationTime::SetPdeTimeStep(new_dt);
 
         // Solve
-
-        this->PrepareForSetupLinearSystem(solution);
+        try
+        {
+            // (This runs the cell ODE models in heart simulations)
+            this->PrepareForSetupLinearSystem(solution);
+        }
+        catch(Exception& e)
+        {
+            // We only need to clean up memory if we are NOT on the first PDE time step,
+            // as someone else cleans up the mInitialCondition vector in higher classes.
+            if (solution != mInitialCondition)
+            {
+                HeartEventHandler::BeginEvent(HeartEventHandler::COMMUNICATION);
+                PetscTools::Destroy(solution);
+                HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
+            }
+            throw e;
+        }
 
         bool compute_matrix = (!mMatrixIsConstant || !mMatrixIsAssembled || timestep_changed);
 
