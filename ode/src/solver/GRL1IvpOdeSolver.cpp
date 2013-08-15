@@ -56,36 +56,40 @@ void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
      * Calculates a vector containing the next Y value from the current one for each
      * equation in the system.
      */
-    const double delta = 1.0e-8; // The step for numerical jacobian calculation
+    const double delta = 1.0e-8; // The step for numerical Jacobian calculation
 
     const unsigned num_equations = pAbstractOdeSystem->GetNumberOfStateVariables();
 
-    std::vector<double> evalF(num_equations); ///\todo #1992 make members for efficiency?
-    std::vector<double> partialF(num_equations);
-    std::vector<double> temp(num_equations);
+    if (mEvalF.size() != num_equations)
+    {
+        mEvalF.resize(num_equations);
+        mPartialF.resize(num_equations);
+        mTemp.resize(num_equations);
+    }
+
     double tempY;
 
-    pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, evalF);
+    pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, mEvalF);
     for (unsigned i=0; i<num_equations; i++)
     {
         tempY= rCurrentYValues[i];
         rCurrentYValues[i]=tempY+delta;
-        pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, temp);
-        partialF[i]=(temp[i]-evalF[i])/delta;
+        pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, mTemp);
+        mPartialF[i]=(mTemp[i]-mEvalF[i])/delta;
         rCurrentYValues[i]=tempY;
     }
     // New solution
     for (unsigned i=0; i<num_equations; i++)
     {
-     // std::cout<<"Partial F"<< partialF[i]<<std::endl;
-      if(fabs(partialF[i])<delta)
-      {
-          rNextYValues[i]=rCurrentYValues[i]+evalF[i]*timeStep;
-      }
-      else
-      {
-          rNextYValues[i]=rCurrentYValues[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*timeStep)-1);
-      }
+        // std::cout<<"Partial F"<< mPartialF[i]<<std::endl;
+        if(fabs(mPartialF[i])<delta)
+        {
+            rNextYValues[i]=rCurrentYValues[i]+mEvalF[i]*timeStep;
+        }
+        else
+        {
+            rNextYValues[i]=rCurrentYValues[i]+(mEvalF[i]/mPartialF[i])*(exp(mPartialF[i]*timeStep)-1);
+        }
 
     }
 }

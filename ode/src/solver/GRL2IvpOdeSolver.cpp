@@ -61,61 +61,65 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     const double delta = 1.0e-8; // The step for numerical jacobian calculation
 
     const unsigned num_equations = pAbstractOdeSystem->GetNumberOfStateVariables();
-    std::vector<double> evalF(num_equations); ///\todo #1992 make members for efficiency?
-    std::vector<double> partialF(num_equations);
-    std::vector<double> temp(num_equations);
-    std::vector<double> yinit(num_equations);
+
+    if (mEvalF.size() != num_equations)
+    {
+        mEvalF.resize(num_equations);
+        mPartialF.resize(num_equations);
+        mTemp.resize(num_equations);
+        mYinit.resize(num_equations);
+    }
 
     rNextYValues = rCurrentYValues;
     double ysave;
 
-    yinit = rNextYValues;
-    pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, evalF);
+    mYinit = rNextYValues;
+    pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, mEvalF);
 
     for (unsigned i=0; i<num_equations; i++)
     {
-      rNextYValues[i]=rNextYValues[i]+delta;
-      pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, temp);
-      partialF[i]=(temp[i]-evalF[i])/delta;
-      rNextYValues[i]=rNextYValues[i]-delta;
+        rNextYValues[i]=rNextYValues[i]+delta;
+        pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, mTemp);
+        mPartialF[i]=(mTemp[i]-mEvalF[i])/delta;
+        rNextYValues[i]=rNextYValues[i]-delta;
     }
     // Midpoint
     for (unsigned i=0; i<num_equations; i++)
     {
-      if (fabs(partialF[i])<delta)
-      {
-          rNextYValues[i]=rNextYValues[i]+0.5*evalF[i]*timeStep;
-      }
-      else
-      {
-          rNextYValues[i]=rNextYValues[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*0.5*timeStep)-1);
-      }
+        if (fabs(mPartialF[i])<delta)
+        {
+            rNextYValues[i]=rNextYValues[i]+0.5*mEvalF[i]*timeStep;
+        }
+        else
+        {
+            rNextYValues[i]=rNextYValues[i]+(mEvalF[i]/mPartialF[i])*(exp(mPartialF[i]*0.5*timeStep)-1);
+        }
     }
     //Second half of the method
     for (unsigned i=0; i<num_equations; i++)
     {
-      ysave = rNextYValues[i];
-      rNextYValues[i]=yinit[i];
-      pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, temp);
-      evalF[i]=temp[i];
+        ysave = rNextYValues[i];
+        rNextYValues[i]=mYinit[i];
+        pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, mTemp);
+        mEvalF[i]=mTemp[i];
 
-      rNextYValues[i]=rNextYValues[i]+delta;
-      pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, temp);
-      partialF[i]=(temp[i]-evalF[i])/delta;
-      rNextYValues[i]=ysave;
+        rNextYValues[i]=rNextYValues[i]+delta;
+        pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, mTemp);
+        mPartialF[i]=(mTemp[i]-mEvalF[i])/delta;
+        rNextYValues[i]=ysave;
     }
 
     //Final step update
     for (unsigned i=0; i<num_equations; i++)
     {
-      if (fabs(partialF[i])<delta)
-      {
-          rNextYValues[i]=yinit[i]+evalF[i]*timeStep;
-      }
-      else
-      {
-          rNextYValues[i]=yinit[i]+(evalF[i]/partialF[i])*(exp(partialF[i]*timeStep)-1);
-      }
+        if (fabs(mPartialF[i])<delta)
+        {
+            rNextYValues[i]=mYinit[i]+mEvalF[i]*timeStep;
+        }
+        else
+        {
+            rNextYValues[i]=mYinit[i]+(mEvalF[i]/mPartialF[i])*(exp(mPartialF[i]*timeStep)-1);
+        }
     }
 }
 

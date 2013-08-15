@@ -75,6 +75,18 @@ private:
         archive & boost::serialization::base_object<AbstractOneStepIvpOdeSolver>(*this);
     }
 
+    /** Working memory for the solver */
+    std::vector<double> mEvalF;
+
+    /** Working memory for the solver */
+    std::vector<double> mPartialF;
+
+    /** Working memory for the solver */
+    std::vector<double> mTemp;
+
+    /** Working memory for the solver */
+    std::vector<double> mYinit;
+
 protected:
 
     /**

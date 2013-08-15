@@ -71,8 +71,11 @@ and the MITACS/Mprime Canadian Network of Centres of Excellence.
 class TestGRL2IvpOdeSolver : public CxxTest::TestSuite
 {
 private:
-      void MyTestGenericSolver(AbstractIvpOdeSolver& rSolver, double startTime,
-                               double endTime, double dt, double samplingTime)
+      void MyTestGenericSolver(AbstractIvpOdeSolver& rSolver,
+                               double startTime,
+                               double endTime,
+                               double dt,
+                               double samplingTime)
       {
         // Initialise the instances of our ODE system and solution classes
         Ode1 ode_system;
