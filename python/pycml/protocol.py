@@ -419,6 +419,24 @@ class Protocol(processors.ModelModifier):
         # This is a bit of a hack!
         for var, oxmeta_name in self._pending_oxmeta_assignments:
             var.set_oxmeta_name(oxmeta_name)
+        self.report_stats()
+    
+    def report_stats(self):
+        """Output a short report on what the modified model looks like.
+        
+        Write an output file listing the key features of the modified model: what were requested as inputs & outputs,
+        what state variables resulted, how many other equations were computed.  Counts of variables and equations are
+        also written to standard error.
+        """
+        inputs = [input for input in self.inputs if isinstance(input, cellml_variable)]
+        num_outputs = len(self.outputs | self._vector_outputs)
+        num_equations = len([e for e in self.model._cml_assignments if isinstance(e, mathml_apply)])
+        state_vars = self.model.find_state_vars()
+        print >>sys.stderr, 'Statistics about the modified model:'
+        print >>sys.stderr, '    # inputs:         ', len(inputs)
+        print >>sys.stderr, '    # total outputs:  ', num_outputs
+        print >>sys.stderr, '    # state variables:', len(state_vars)
+        print >>sys.stderr, '    # equations:      ', num_equations
     
     def add_alias(self, var, alias):
         """Add an alias name for a variable.
