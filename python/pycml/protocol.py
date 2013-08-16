@@ -904,14 +904,19 @@ class Protocol(processors.ModelModifier):
         assert expr.operator().localName == u'eq', 'Expression is not an assignment'
         self._identify_referenced_variables(expr)
         # Figure out what's on the LHS of the assignment
-        lhs = expr.operands().next()
+        lhs, rhs = list(expr.operands())
         if lhs.localName == u'ci':
             # Straight assignment to variable
             cname, vname = self._split_name(unicode(lhs))
             assigned_var = self.model.get_variable_by_name(cname, vname)
-            self.remove_definition(assigned_var, False)
-            self.add_expr_to_comp(cname, expr)
-            assigned_var._add_dependency(expr)
+            # Check for the special case of "var = var" which signifies clamping to initial value
+            clamping = isinstance(rhs, mathml_ci) and unicode(rhs) == unicode(lhs)
+            self.remove_definition(assigned_var, keep_initial_value=clamping)
+            if clamping:
+                self.inputs.remove(expr) # The equation isn't actually used in this case
+            else:
+                self.add_expr_to_comp(cname, expr)
+                assigned_var._add_dependency(expr)
         else:
             # This had better be an ODE
             assert lhs.localName == u'apply', 'Expression is not a straight assignment or ODE'

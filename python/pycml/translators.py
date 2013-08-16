@@ -6117,7 +6117,8 @@ def run():
 
     # Generate an interface component, if desired
     translator_klass = CellMLTranslator.translators[options.translate_type]
-    translator_klass.generate_interface(doc, solver_info)
+    if not options.protocol:
+        translator_klass.generate_interface(doc, solver_info)
     config.validate_metadata(options.assume_valid)
     DEBUG('translate', "+++ Generated interface")
     
