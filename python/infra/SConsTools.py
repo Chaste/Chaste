@@ -764,7 +764,7 @@ def CreatePyCmlBuilder(build, buildenv):
             env.Depends(target, conf_file)
         # Add dependency on pycml source code (ignoring .pyc files)
         pycml_code = glob.glob(os.path.join(Dir('#/python/pycml').abspath, '*'))
-        pycml_code = filter(lambda path: not path.endswith('.pyc'), pycml_code)
+        pycml_code = filter(lambda path: not (path.endswith('.pyc') or path.endswith('protocol.py')), pycml_code)
         env.Depends(target, pycml_code)
         env.Depends(target, script)
         # Install headers if requested
