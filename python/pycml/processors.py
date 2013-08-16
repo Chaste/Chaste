@@ -467,7 +467,7 @@ class ModelModifier(object):
         for dep in var.get_all_expr_dependencies():
             self.remove_expr(dep)
         # We know don't know how it will be defined
-        var._set_type(VarTypes.Unknown)
+        var.clear_dependency_info()
 
     def del_attr(self, elt, localName, ns=None):
         """Delete an XML attribute from an element, if it exists."""

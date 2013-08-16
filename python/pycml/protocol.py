@@ -74,6 +74,7 @@ class Protocol(processors.ModelModifier):
         self.add_protocol_namespaces(namespaces)
         self.model = model
         self.inputs = set()
+        self._input_specifications = []
         self.outputs = set()
         self._vector_outputs = set()
         self._vector_outputs_detail = []
@@ -270,8 +271,82 @@ class Protocol(processors.ModelModifier):
                 self._vector_outputs.add(var)
                 var.add_rdf_annotation(('pycml:output-vector', NSS['pycml']), vector_name)
     
+    def process_input_declarations(self):
+        """Finish processing input declarations after modifying the model equations.
+        
+        For each variable (identified by ontology term) specified as a model input, we ensure it
+        has the correct units and initial value.
+        
+        The variable must be a state variable, constant, or free variable, not computed by an
+        equation.  As a special case, a variable with type Computed that is defined by assigning
+        a single number is converted to be a Constant.
+        
+        If the units specified differ from the original units, they must be added to the model if
+        not present, and a new version of the variable added to the protocol component, with a
+        suitable assignment.  Connections and ODEs will be updated if needed.
+        
+        If an initial_value is given then this will be assigned as the attribute value.
+        """
+        for input in self._input_specifications:
+            try:
+                var = self._lookup_ontology_term(input['prefixed_name'])
+            except ValueError:
+                raise ProtocolError("There is no model variable annotated with the term " + prefixed_name)
+            # Check it has the correct type
+            deps = var.get_all_expr_dependencies()
+            if len(deps) > 1:
+                raise ProtocolError("Variable " + str(var) + " has been over-specified.")
+            if len(deps) == 1:
+                if isinstance(deps[0], cellml_variable):
+                    raise ProtocolError("The mapped variable " + str(var) + " may not be specified as an input - annotate its source instead.")
+                assert isinstance(deps[0], mathml_apply)
+                lhs, rhs = list(deps[0].operands())
+                if lhs.localName == u'ci':
+                    if not (isinstance(rhs, mathml_cn) or
+                            (hasattr(rhs.apply, 'minus') and len(rhs.apply.xml_children) == 2
+                             and isinstance(rhs.apply.xml_children[1], mathml_cn))):
+                        raise ProtocolError("The computed variable " + str(var) + " may not be specified as an input.")
+                    # It's the special Computed case - convert to a constant
+                    var.initial_value = unicode(rhs.evaluate())
+                    self.remove_definition(var, keep_initial_value=True)
+                    if deps[0] in self.inputs:
+                        self.inputs.remove(deps[0])
+                else:
+                    assert lhs.operator().localName == u'diff' # It's an ODE
+            if not input['initial_value'] and not hasattr(var, u'initial_value'):
+                raise ProtocolError("No value specified for protocol input " + input['prefixed_name'])
+            # Convert units if needed
+            units = self._get_units_object(input['units'] or var.get_units())
+            if units.equals(var.get_units()):
+                input_var = var
+            else:
+                input_var = self._replace_variable(var, units)
+                if not input['initial_value']:
+                    input_var.initial_value = unicode(self._convert_initial_value(var, units))
+                self.del_attr(var, u'initial_value', None)
+                # Set all variables connected to the original variable (including itself) to be mapped to the new one
+                # TODO: Would connect_variables be sufficient here?
+                self._update_connections(var, input_var)
+                # TODO: Do we need to do anything special for state variables?
+            # Update initial value if specified
+            if input['initial_value']:
+                input_var.initial_value = unicode(input['initial_value'])
+            # Ensure the oxmeta name annotation is correct (TODO: is the pending still needed here?)
+            oxmeta_name = input['prefixed_name'].split(':')[1]
+            input_var.set_oxmeta_name(oxmeta_name)
+            self._pending_oxmeta_assignments.append((input_var, oxmeta_name))
+            # Add to the old self.inputs collection for statistics calculation
+            self.inputs.add(input_var)
+
     def specify_input_variable(self, prefixed_name, units=None, initial_value=None):
         """Set the given variable as a protocol input, optionally in the given units.
+        
+        At this point we just note that it's going to become an input, and create the variable if
+        it doesn't exist (so that a later add_or_replace_equation call can define it if appropriate).
+        The model definition will only be replaced if specified using add_or_replace_equation.
+        After those parts have been processed, we will iterate through all specified inputs and
+        process the units and initial_value specifications, using the process_input_declarations
+        method.
         
         The variable will become a constant parameter that can be set from the protocol.  If units
         are given and differ from its original units, they must be added to the model if they don't
@@ -287,21 +362,17 @@ class Protocol(processors.ModelModifier):
         try:
             var = self._lookup_ontology_term(prefixed_name)
         except ValueError:
-            if initial_value is None or units is None:
-                raise ProtocolError("There is no model variable annotated with the term " + prefixed_name)
-            else:
-                var = None
-        if units is None:
-            units = var.get_units()
-        if var is None:
+            # Create the variable
+            if units is None:
+                raise ProtocolError("Units must be specified for input variables not appearing in the model; none are given for " + prefixed_name)
             oxmeta_name = prefixed_name.split(':')[1]
             var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
             var.set_oxmeta_name(oxmeta_name)
-            self._pending_oxmeta_assignments.append((var, oxmeta_name))
-        var = self.specify_as_input(var, units, copy_initial_value=not initial_value)
-        if initial_value:
-            var.initial_value = unicode(initial_value)
-        return var
+        # Flag for later processing
+        self._input_specifications.append({'prefixed_name': prefixed_name, 'units': units, 'initial_value': initial_value})
+        # Record for statistics output
+        var._cml_ok_as_input = True
+        self.inputs.add(var)
     
     def set_independent_variable_units(self, units, newVar=None):
         """Set the independent variable to occur in the given units.
@@ -411,6 +482,7 @@ class Protocol(processors.ModelModifier):
         for input in filter(lambda i: isinstance(i, mathml_apply), self.inputs):
             self._check_input(input)
             self._add_maths_to_model(input)
+        self.process_input_declarations()
         if self._free_var_has_changed:
             self._split_all_odes()
         self._fix_model_connections()
@@ -453,7 +525,7 @@ class Protocol(processors.ModelModifier):
         of this variable will be added to the protocol component, with a suitable connection.
         Otherwise, we can just record the existing variable as an output.
         
-        TODO: We can't yet specify a variable as both an output and an input but in different units.
+        TODO: We can't (yet?) specify a variable as both an output and an input but in different units.
         """
         units = self._get_units_object(units)
         if units.equals(var.get_units()):
@@ -475,6 +547,9 @@ class Protocol(processors.ModelModifier):
         
         The variable that is the input must be set as a modifiable parameter, and any existing definition
         removed.
+        
+        Note: this method is now only used by legacy low-level tests, not the new language support.
+        TODO: remove it!
         """
         if var.get_type() == VarTypes.Mapped:
             raise ProtocolError("Cannot specify a mapped variable (%s) as an input." % var.fullname())
@@ -836,6 +911,7 @@ class Protocol(processors.ModelModifier):
             assigned_var = self.model.get_variable_by_name(cname, vname)
             self.remove_definition(assigned_var, False)
             self.add_expr_to_comp(cname, expr)
+            assigned_var._add_dependency(expr)
         else:
             # This had better be an ODE
             assert lhs.localName == u'apply', 'Expression is not a straight assignment or ODE'
@@ -846,7 +922,10 @@ class Protocol(processors.ModelModifier):
             dep_var = self.model.get_variable_by_name(cname, dep_var_name)
             self.remove_definition(dep_var, True)
             self.add_expr_to_comp(cname, expr)
-        
+            indep_name = self._split_name(unicode(lhs.bvar.ci))
+            indep_var = self.model.get_variable_by_name(*indep_name)
+            dep_var._add_ode_dependency(indep_var, expr)
+
     def _filter_assignments(self):
         """Apply protocol outputs to reduce the model size.
         
