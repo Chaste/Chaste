@@ -37,9 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBIDOMAIN3D_HPP_
 #define TESTBIDOMAIN3D_HPP_
 
-
-
-
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
 #include "BidomainProblem.hpp"
@@ -50,18 +47,98 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
 
+/**
+ * This stimulus causes an exception to be thrown when normally a simple stimulus would activate.
+ *
+ * Used for testing exception handling in TestBidomain3dErrorHandling
+ */
+class ExceptionStimulus : public AbstractStimulusFunction
+{
+private:
+    /** Duration of initial stimulus, typically in milliseconds */
+    double mDuration;
+    /** The time at which the stimulus starts, typically in milliseconds */
+    double mTimeOfStimulus;
+
+public:
+
+    /**
+     * Constructor.
+     *
+     * @param duration  Duration of initial stimulus milliseconds
+     * @param timeOfStimulus  The time at which the stimulus starts (defaults to 0.0) milliseconds
+     */
+    ExceptionStimulus(double duration, double timeOfStimulus)
+    {
+        mDuration = duration;
+        mTimeOfStimulus = timeOfStimulus;
+
+        mDuration += (mDuration+mTimeOfStimulus)*DBL_EPSILON;
+    }
+
+    /**
+     * @param time  time at which to return the stimulus
+     * @return zero or throws an Exception at the time specified by constructor.
+     */
+    double GetStimulus(double time)
+    {
+        if (mTimeOfStimulus < time && time <= mDuration+mTimeOfStimulus)
+        {
+            EXCEPTION("Stimulus has caused a bad thing to happen in a cell model.");
+        }
+        return 0.0;
+    }
+};
+
+/**
+ * ExceptionStimulusCellFactory provides all cells with an ExceptionStimulus.
+ *
+ * Used for testing exception handling in TestBidomain3dErrorHandling
+ */
+template<class CELL, unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+class ExceptionStimulusCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
+{
+protected:
+    /** The stimulus to apply at stimulated nodes */
+    boost::shared_ptr<ExceptionStimulus> mpStimulus;
+
+public:
+    /**
+     * Constructor
+     * @param stimulusDuration  The duration of time the exception should be applied (defaults to 1ms).
+     * @param startTime When the exception should be introduced (defaults to 0.0).
+     */
+    ExceptionStimulusCellFactory(double stimulusDuration=1, double startTime = 0.0)
+        : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>()
+    {
+        mpStimulus.reset(new ExceptionStimulus(stimulusDuration, startTime));
+    }
+
+    /**
+     * @param node  The global index of a node
+     * @return  A cardiac cell which corresponds to this node.
+     */
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
+    {
+        return new CELL(this->mpSolver, mpStimulus);
+    }
+};
+
+
 class TestBidomain3D :  public CxxTest::TestSuite
 {
 public:
 
-    void TestBidomain3dErrorHandling() throw (Exception)
+    // Not actually a 3D test anymore for simplicity,
+    // but the #1222 problem first showed up based on the test below.
+    void TestBidomainErrorHandling() throw (Exception)
     {
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
-        HeartConfig::Instance()->SetSimulationDuration(4.0);  //ms
-        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
-        HeartConfig::Instance()->SetOutputDirectory("Bidomain3dWithErrors");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain3d");
+        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_1_element");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainWithErrors");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain");
 
         // Check the linear system can be solved to a low tolerance (in particular, checks the null space
         // stuff was implemented correctly
@@ -72,13 +149,12 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
 
         // 100x bigger stimulus than normal.
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> bidomain_cell_factory(-600.0*100000);
-        BidomainProblem<3> bidomain_problem( &bidomain_cell_factory );
+        ExceptionStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory(1, 0.02);
+        BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
         bidomain_problem.Initialise();
 
-        TS_ASSERT_THROWS_CONTAINS(bidomain_problem.Solve(),
-           "has gone out of range. Check numerical parameters, for example time and space stepsizes");
-
+        TS_ASSERT_THROWS_THIS(bidomain_problem.Solve(),
+           "Stimulus has caused a bad thing to happen in a cell model.");
     }
 
     void TestBidomain3d() throw (Exception)
