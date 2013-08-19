@@ -331,10 +331,9 @@ class Protocol(processors.ModelModifier):
             # Update initial value if specified
             if input['initial_value']:
                 input_var.initial_value = unicode(input['initial_value'])
-            # Ensure the oxmeta name annotation is correct (TODO: is the pending still needed here?)
+            # Ensure the oxmeta name annotation is correct
             oxmeta_name = input['prefixed_name'].split(':')[1]
             input_var.set_oxmeta_name(oxmeta_name)
-            self._pending_oxmeta_assignments.append((input_var, oxmeta_name))
             # Add to the old self.inputs collection for statistics calculation
             self.inputs.add(input_var)
 
