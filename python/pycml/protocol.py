@@ -991,6 +991,7 @@ class Protocol(processors.ModelModifier):
             var.set_pe_keep(True)
             if var.get_type() == VarTypes.Constant:
                 var.set_is_modifiable_parameter(True)
+            var.set_rdf_annotation_from_boolean(('pycml:input-variable', NSS['pycml']), True)
         for var in all_outputs:
             assert isinstance(var, cellml_variable)
             if var.get_type() == VarTypes.Constant:

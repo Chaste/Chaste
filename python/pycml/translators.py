@@ -1902,6 +1902,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln()
             self.writeln('ProcessOutputsInfo();')
             self.writeln()
+            #2428 - also record protocol inputs
+            inputs = cellml_metadata.find_variables(self.model, ('pycml:input-variable', NSS['pycml']), 'yes')
+            if inputs:
+                inputs.sort(key=lambda v: self.var_display_name(v))
+                self.writeln('this->mInputNames.reserve(', len(inputs), ');')
+                for input in inputs:
+                    self.writeln('this->mInputNames.push_back("', self.var_display_name(input), '");')
+
         # Lookup table generation, if not in a singleton
         if self.use_lookup_tables and not self.separate_lut_class:
             self.output_lut_generation()
