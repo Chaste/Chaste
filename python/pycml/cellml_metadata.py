@@ -71,9 +71,11 @@ METADATA_NAMES = frozenset(
      # basic 'intracellular' and 'extracellular'
      'extracellular_potassium_concentration', 'extracellular_calcium_concentration', 'extracellular_sodium_concentration', 
      'cytosolic_calcium_concentration','cytosolic_potassium_concentration', 'cytosolic_sodium_concentration',
-     # in Calcium subsystem
-     'JSR_calcium_concentration',
-     'diadicspace_calcium_concentration',
+     # in Calcium subsystem SR = sarcoplasmic reticulum
+     'SR_calcium_concentration', # Some models have just the SR,
+       'JSR_calcium_concentration', # Other models divide it into the Junctional SR (near RyRs),
+       'NSR_calcium_concentration', # and the Network SR (rest of SR),
+     'diadicspace_calcium_concentration', # Some models also have a separate diadic space (cytosol between JSR and t-tubules).
      # Others
      'bath_potassium_concentration',
      # =====================================================
