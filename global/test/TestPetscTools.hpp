@@ -213,9 +213,11 @@ public:
     void TestProcessIsolation() throw (Exception)
     {
         TS_ASSERT_EQUALS(PetscTools::GetWorld(), PETSC_COMM_WORLD); // No isolation at first
+        TS_ASSERT(!PetscTools::IsIsolated());
         bool really_parallel = PetscTools::IsParallel();
         PetscTools::IsolateProcesses();
         TS_ASSERT_EQUALS(PetscTools::GetWorld(), PETSC_COMM_SELF); // Each process is its own world
+        TS_ASSERT(PetscTools::IsIsolated());
         TS_ASSERT(PetscTools::AmMaster()); // All processes are masters
         // Note: this will deadlock in parallel if IsolateProcesses doesn't work
         if (PetscTools::AmTopMost())
@@ -237,6 +239,7 @@ public:
         TS_ASSERT(PetscTools::IsSequential()); // IsParallel() will tell the truth, however
         TS_ASSERT_EQUALS(PetscTools::IsParallel(), really_parallel);
         PetscTools::IsolateProcesses(false);
+        TS_ASSERT(!PetscTools::IsIsolated());
     }
 
     void TestDumpPetscObjects() throw (Exception)

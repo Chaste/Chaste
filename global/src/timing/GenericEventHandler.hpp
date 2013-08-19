@@ -394,7 +394,7 @@ private:
         PetscTools::EndRoundRobin();
 
         // If there is a collection of processes then report an average
-        if (PetscTools::IsParallel())
+        if (PetscTools::IsParallel() && PetscTools::IsIsolated())
         {
             double total_cpu_time[NUM_EVENTS];
             MPI_Reduce(&mWallTime[0], total_cpu_time, NUM_EVENTS, MPI_DOUBLE, MPI_SUM, 0, PetscTools::GetWorld());

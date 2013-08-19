@@ -90,6 +90,11 @@ bool PetscTools::IsParallel()
     return (mNumProcessors > 1);
 }
 
+bool PetscTools::IsIsolated()
+{
+    return mIsolateProcesses;
+}
+
 unsigned PetscTools::GetNumProcs()
 {
     CheckCache();
@@ -439,9 +444,9 @@ bool PetscTools::HasParMetis()
     MatPartitioning part;
     MatPartitioningCreate(PETSC_COMM_WORLD, &part);
 
-    
-    // We are expecting an error from PETSC on systems that don't have the interface, so suppress it 
-    // in case it aborts 
+
+    // We are expecting an error from PETSC on systems that don't have the interface, so suppress it
+    // in case it aborts
     PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
 
 #if (PETSC_VERSION_MAJOR == 2 || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2))
@@ -450,7 +455,7 @@ bool PetscTools::HasParMetis()
     PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part,MATPARTITIONINGPARMETIS);
 #endif
 
-    // Stop supressing error 
+    // Stop supressing error
     PetscPopErrorHandler();
 
     // Note that this method probably leaks memory inside PETSc because if MatPartitioningCreate fails

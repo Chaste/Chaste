@@ -163,6 +163,11 @@ public:
     static bool IsParallel();
 
     /**
+     * @return whether this process is isolated, i.e. IsolateProcesses has been called.
+     */
+    static bool IsIsolated();
+
+    /**
      * @return total number of processors.
      */
     static unsigned GetNumProcs();
