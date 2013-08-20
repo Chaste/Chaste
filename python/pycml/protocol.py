@@ -76,13 +76,11 @@ class Protocol(processors.ModelModifier):
         self.inputs = set()
         self._input_specifications = []
         self.outputs = set()
+        self._output_specifications = []
         self._vector_outputs = set()
         self._vector_outputs_detail = []
         warn_only = not model.get_option('fully_automatic') and model.get_option('warn_on_units_errors')
         self.set_units_converter(processors.UnitsConverter(self.model, warn_only))
-        # Annotate (initial) state variables with oxmeta:state_variable
-        for var in self.model.find_state_vars():
-            var.add_rdf_annotation(('bqbiol:isVersionOf', NSS['bqbiol']), ('oxmeta:state_variable', NSS['oxmeta']), allow_dup=True)
     
     @staticmethod
     def apply_protocol_file(doc, proto_file_path):
@@ -211,36 +209,51 @@ class Protocol(processors.ModelModifier):
                 self.specify_output_variable(output.name, get_units(output))
             for expr in getattr(proto_xml.protocol.modelInterface, u'addOrReplaceEquation', []):
                 self.add_or_replace_equation(expr.xml_element_children().next())
-            self.process_output_variable_vectors()
     
     def specify_output_variable(self, prefixed_name, units=None):
-        """Set the given variable as a protocol output, optionally in the given units.
+        """Specify the given variable as a protocol output, optionally in the given units.
         
-        The units must be added to the model if they don't exist.  If they differ from the
-        variable's original units, a conversion will be needed, and hence a new version
-        of the variable will be added to the protocol component, with a suitable connection.
-        Otherwise, we can just record the existing variable as an output.
-        
-        If units are not given, then keep the variable in its original units.
-        
-        The actual output variable is returned, although code shouldn't need to use it.
+        This method just notes the details given, ready for final processing after the model equations have been
+        modified (if needed) and in particular after the input variable declarations have been processed.  This
+        ordering is necessary to allow a variable to be both an input and an output.
         """
-        try:
-            vars = self._lookup_ontology_term(prefixed_name, False)
-        except ValueError, e:
-            raise ProtocolError(str(e))
-        if len(vars) > 1:
-            self._vector_outputs_detail.append((prefixed_name, units))
-            return None
-        else:
-            var = vars[0]
-        if units is None:
-            units = var.get_units()
-        new_var = self.specify_as_output(var, units)
-        if var.get_type() is VarTypes.Free:
-            self.set_independent_variable_units(units, new_var)
-        return new_var
-    
+        self._output_specifications.append({'prefixed_name': prefixed_name, 'units': units})
+
+    def process_output_declarations(self):
+        """Finish processing output variable declarations after modifying the model equations and processing inputs.
+        
+        For each output, the units it was requested in (if any were specified) must be added to the model if they
+        don't exist.  If they differ from the variable's original units, a conversion will be needed, and hence a
+        new version of the variable will be added to the protocol component, with a suitable connection.  Otherwise,
+        we can just record the existing variable as an output.
+        
+        When an ontology term matches multiple variables, then these should be treated as a single vector output.
+        These structures are set up after considering single outputs, in case an output occurs both individually
+        and within a vector.
+        """
+        # Annotate state variables with oxmeta:state_variable
+        prop, targ = ('bqbiol:isVersionOf', NSS['bqbiol']), ('oxmeta:state_variable', NSS['oxmeta'])
+        cellml_metadata.remove_statements(self.model, None, prop, targ)
+        for var in self._find_state_variables():
+            var.add_rdf_annotation(prop, targ, allow_dup=True)
+        for output_spec in self._output_specifications:
+            prefixed_name = output_spec['prefixed_name']
+            units = output_spec['units']
+            try:
+                vars = self._lookup_ontology_term(prefixed_name, False)
+            except ValueError, e:
+                raise ProtocolError(str(e))
+            if len(vars) > 1:
+                self._vector_outputs_detail.append((prefixed_name, units))
+            else:
+                var = vars[0]
+                if units is None:
+                    units = var.get_units()
+                new_var = self.specify_as_output(var, units)
+                if var.get_type() is VarTypes.Free:
+                    self.set_independent_variable_units(units, new_var)
+        self.process_output_variable_vectors()
+
     def process_output_variable_vectors(self):
         """Finish adding outputs that are vectors of variables.
         
@@ -249,12 +262,7 @@ class Protocol(processors.ModelModifier):
         structures.  It's called after all output variables have been specified, in case an
         output occurs both individually and within a vector.
         """
-        # Annotate just final state variables with oxmeta:state_variable
-        prop, targ = ('bqbiol:isVersionOf', NSS['bqbiol']), ('oxmeta:state_variable', NSS['oxmeta'])
-        cellml_metadata.remove_statements(self.model, None, prop, targ)
-        for var in self.model.find_state_vars():
-            var.add_rdf_annotation(prop, targ, allow_dup=True)
-        # Now re-lookup all the ontology terms that matched multiple variables
+        # Re-lookup all the ontology terms that matched multiple variables
         for prefixed_name, units in self._vector_outputs_detail:
             vars = self._lookup_ontology_term(prefixed_name, False)
             vector_name = prefixed_name.split(':')[1]
@@ -263,13 +271,46 @@ class Protocol(processors.ModelModifier):
                 desired_units = self._get_units_object(units or var.get_units())
                 if not desired_units.equals(var.get_units()):
                     if var.component is self._get_protocol_component():
-                        raise ProtocolError("You can't ask for an output in two different units!")
+                        raise ProtocolError("You can't ask for an output (%s) in two different units!" % var.fullname())
                     new_var = self._replace_variable(var, desired_units)
                     self.connect_variables(var, new_var)
                     var = new_var
                 # Ensure it gets computed and annotated
                 self._vector_outputs.add(var)
                 var.add_rdf_annotation(('pycml:output-vector', NSS['pycml']), vector_name)
+    
+    def _find_state_variables(self):
+        """Find all (likely) state variables by examining the model mathematics for ODEs."""
+        state_vars = []
+        for expr in self.model.search_for_assignments():
+            ode_vars = self._is_ode(expr, local_vars=True)
+            if ode_vars:
+                state_vars.append(ode_vars[0].get_source_variable(recurse=True))
+        return state_vars
+    
+    def _is_ode(self, expr, local_vars=False):
+        """Determine whether the given assignment expression is an ODE.
+        
+        If it is, return the tuple (dependent_var, independent_var).  Otherwise, return None.
+        """
+        assert isinstance(expr, mathml_apply)
+        assert expr.operator().localName == u'eq', 'Expression is not an assignment'
+        # Figure out what's on the LHS of the assignment
+        lhs, rhs = list(expr.operands())
+        if lhs.localName == u'ci':
+            return None
+        assert lhs.localName == u'apply', 'Expression is neither a straight assignment nor an ODE'
+        assert lhs.operator().localName == u'diff', 'Expression is neither a straight assignment nor an ODE'
+        dep_var = lhs.operands().next()
+        assert dep_var.localName == u'ci', 'ODE is malformed'
+        if local_vars:
+            comp = expr.component
+            dep_var = comp.get_variable_by_name(self._split_name(unicode(dep_var))[1])
+            indep_var = comp.get_variable_by_name(self._split_name(unicode(lhs.bvar.ci))[1])
+        else:
+            dep_var = self.model.get_variable_by_name(*self._split_name(unicode(dep_var)))
+            indep_var = self.model.get_variable_by_name(*self._split_name(unicode(lhs.bvar.ci)))
+        return (dep_var, indep_var)
     
     def process_input_declarations(self):
         """Finish processing input declarations after modifying the model equations.
@@ -482,6 +523,7 @@ class Protocol(processors.ModelModifier):
             self._check_input(input)
             self._add_maths_to_model(input)
         self.process_input_declarations()
+        self.process_output_declarations()
         if self._free_var_has_changed:
             self._split_all_odes()
         self._fix_model_connections()
@@ -531,7 +573,7 @@ class Protocol(processors.ModelModifier):
             output_var = var
         else:
             if var in self.inputs:
-                raise ProtocolError("You can't specify a variable as output and input in different units!")
+                raise ProtocolError("You can't specify a variable (%s) as output and input in different units!" % var.fullname())
             output_var = self._replace_variable(var, units)
             self.connect_variables(var, output_var)
         self.outputs.add(output_var)
@@ -608,8 +650,7 @@ class Protocol(processors.ModelModifier):
         else:
             exists = self.model is getattr(input, 'xml_parent', None)
         if exists and not getattr(input, '_cml_ok_as_input', False):
-            msg = "Inputs must not already exist in the model."
-            msg += " (Input %s exists.)" % repr(input)
+            msg = "Inputs must not already exist in the model. (Input %s exists.)" % repr(input)
             raise ProtocolError(msg)
         
     def _error_handler(self, errors):
