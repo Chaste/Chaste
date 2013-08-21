@@ -225,7 +225,10 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
             num_removed++;
             mpMutableVertexMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
             it = this->mCells.erase(it);
-            --it;
+            if (it != this->mCells.begin())
+            {
+                --it;
+            }
         }
     }
     return num_removed;

@@ -253,7 +253,10 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
 
             // Update vector of cells
             it = this->mCells.erase(it);
-            --it;
+            if (it != this->mCells.begin())
+            {
+                --it;
+            }
         }
     }
 
