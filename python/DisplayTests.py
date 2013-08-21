@@ -164,6 +164,7 @@ def graph(req, type, revision, machine, buildType, graphName):
     else:
         req.content_type = 'text/html'
         req.write(_header(), 0)
+        req.write('\n<pre>%s\n%s</pre>\n' % (graphName, _test_suite_name_aliases(os.path.basename(graphName))))
         req.write(_error('The requested graph file was not found.'))
         req.write(_footer())
 
@@ -1056,6 +1057,7 @@ The following tests FAILED:
     # Parse the output(s)
     testsuite_status, runtime, graphs = {}, {}, {}
     tests_completed = True
+    expected_num_tests = -1 # In case the summary line isn't present in the output
     for results in ctest_results:
         if results.endswith('.tmp'):
             tests_completed = False
