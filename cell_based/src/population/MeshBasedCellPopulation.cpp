@@ -210,7 +210,7 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
     unsigned num_removed = 0;
     for (std::list<CellPtr>::iterator it = this->mCells.begin();
          it != this->mCells.end();
-         ++it)
+         )
     {
         if ((*it)->IsDead())
         {
@@ -253,10 +253,10 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
 
             // Update vector of cells
             it = this->mCells.erase(it);
-            if (it != this->mCells.begin())
-            {
-                --it;
-            }
+        }
+        else
+        {
+            ++it;
         }
     }
 

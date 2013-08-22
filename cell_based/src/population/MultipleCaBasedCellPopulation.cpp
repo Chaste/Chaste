@@ -298,7 +298,7 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
 
     for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
-         ++cell_iter)
+         )
     {
         if ((*cell_iter)->IsDead())
         {
@@ -310,7 +310,10 @@ unsigned MultipleCaBasedCellPopulation<DIM>::RemoveDeadCells()
             // Erase cell and update counter
             num_removed++;
             cell_iter = this->mCells.erase(cell_iter);
-            --cell_iter;
+        }
+        else
+        {
+            ++cell_iter;
         }
     }
     return num_removed;

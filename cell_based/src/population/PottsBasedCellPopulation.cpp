@@ -191,7 +191,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
 
     for (std::list<CellPtr>::iterator it = this->mCells.begin();
          it != this->mCells.end();
-         ++it)
+         )
     {
         if ((*it)->IsDead())
         {
@@ -199,10 +199,10 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
             num_removed++;
             mpPottsMesh->DeleteElement(this->GetLocationIndexUsingCell((*it)));
             it = this->mCells.erase(it);
-            if (it != this->mCells.begin())
-            {
-                --it;
-            }
+        }
+        else
+        {
+            ++it;
         }
     }
     return num_removed;
@@ -278,7 +278,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
         std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
         // Only calculate Hamiltonian and update elements if the nodes are from different elements, or one is from the medium
         if (    ( !containing_elements.empty() && neighbour_containing_elements.empty() )
-             || ( containing_elements.empty() && !neighbour_containing_elements.empty() ) 
+             || ( containing_elements.empty() && !neighbour_containing_elements.empty() )
              || ( !containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin() ) )
         {
             double delta_H = 0.0; // This is H_1-H_0.

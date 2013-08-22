@@ -214,7 +214,7 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
     unsigned num_removed = 0;
     for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
-         ++cell_iter)
+         )
     {
         if ((*cell_iter)->IsDead())
         {
@@ -229,7 +229,10 @@ unsigned NodeBasedCellPopulation<DIM>::RemoveDeadCells()
 
             // Update vector of cells
             cell_iter = this->mCells.erase(cell_iter);
-            --cell_iter;
+        }
+        else
+        {
+            ++cell_iter;
         }
     }
 
