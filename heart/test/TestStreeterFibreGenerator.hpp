@@ -125,8 +125,6 @@ public:
         OutputFileHandler handler("shorter_streeter", false);
         fibre_generator.WriteData(handler, "box_heart_not_dist.ortho");
 
-        std::string fibre_file = handler.GetOutputDirectoryFullPath() + "box_heart_not_dist.ortho";
-
         FileFinder fibre_file1 = handler.FindFile("box_heart_not_dist.ortho");
         FileFinder fibre_file2("heart/test/data/box_shaped_heart/box_heart.ortho", RelativeTo::ChasteSourceRoot);
 
