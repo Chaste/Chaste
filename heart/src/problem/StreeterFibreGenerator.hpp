@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistanceMapCalculator.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 #include "HeartGeometryInformation.hpp"
+#include "AbstractPerElementWriter.hpp"
+#include "OutputFileHandler.hpp"
 
 /**
  * Generate fibre in a ventricular mesh using the description in
@@ -54,11 +56,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * IEEE Trans. Biomed. Eng. 53(12):2425-2435, 2006.
  */
 template<unsigned SPACE_DIM>
-class StreeterFibreGenerator
+class StreeterFibreGenerator : AbstractPerElementWriter<SPACE_DIM, SPACE_DIM, SPACE_DIM*SPACE_DIM>
 {
 private:
-    AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& mrMesh; /**< Reference to the mesh (used for calculating distances to epi and endo surfaces)*/
-
     HeartGeometryInformation<SPACE_DIM>* mpGeometryInfo; /**< Provides a method to calculate the relative position of a node with respect to two (or three) given surfaces*/
 
     c_vector <double, SPACE_DIM> mApexToBase; /**< Normalised direction from apex to base */
@@ -79,6 +79,35 @@ private:
      * @return  Pi/4 (if the element is in RV), Pi/3 otherwise
      */
    double GetFibreMaxAngle(const c_vector<HeartRegionType, SPACE_DIM+1>& nodesRegionsForElement) const;
+
+   /** Wall thickness at each node in the mesh. */
+   std::vector<double> mWallThickness;
+
+   /** Wall thickness at each node, smoothed by averaging over local nodes by #GetAveragedThicknessLocalNode().*/
+   std::vector<double> mAveragedWallThickness;
+
+   /** Whether to write Streeter generation log files for regions and wall thicknesses */
+   bool mLogInfo;
+
+protected:
+
+   /**
+    * Associate an element with a fibre direction.
+    *
+    * This is only called (by abstract class) on processes which own pElement.
+    *
+    * @param pElement  a locally-owned element for which to calculate or lookup some data
+    * @param localElementIndex  the index of pElement in the local vector.
+    * @param rData  the double-precision data to write to file (output from the method). Gives Fibre x 3 (space dim), sheet(3), normal(3) in one vector.
+    */
+   void Visit(Element<SPACE_DIM, SPACE_DIM>* pElement,
+                      unsigned localElementIndex,
+                      c_vector<double, SPACE_DIM*SPACE_DIM>& rData);
+
+   /**
+    * Overridden method to write the header line.
+    */
+   void WriteHeaderOnMaster();
 
 public:
     /**
@@ -117,12 +146,11 @@ public:
      * File format: The first line indicates the number of elements. Each of the following lines contain SPACE_DIM vectors of SPACE_DIM elements for the
      * direction of the myofibre, the transverse to it in the plane of the myocyte laminae and the normal to this laminae.
      *
-     * @param outputDirectory Output directory relative to CHASTE_TEST_OUTPUT
+     * @param rOutputDirectory Handler for output directory
      * @param fibreOrientationFile Output file
-     * @param logInfo Tells the method to output extra debug info. To be eliminated once it's fully tested
-     *
      */
-    void GenerateOrthotropicFibreOrientation(std::string outputDirectory, std::string fibreOrientationFile, bool logInfo=false);
+    void WriteData(OutputFileHandler& rOutputDirectory,
+                                             std::string fibreOrientationFile);
 
     /**
      * Set the direction from apex to base
@@ -135,6 +163,14 @@ public:
      * @param axis  is the Cartesian axis from apex to base.
      */
     void SetApexToBase(unsigned axis);
+
+    /**
+     * Tells the WriteData method to output extra debug info on nodes in particular regions,
+     * and wall thicknesses.
+     *
+     * @param logInfo  whether or not to write log files.
+     */
+    void SetLogInfo(bool logInfo = true);
 };
 
 #endif /*STREETERFIBREGENERATOR_HPP_*/

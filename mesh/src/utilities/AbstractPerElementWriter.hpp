@@ -49,9 +49,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned DATA_SIZE>
 class AbstractPerElementWriter
 {
 protected:
-    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh; /**< The mesh.  Set by the public method WriteData. */
-public:
-    out_stream mpMasterFile; /**< The output file (only valid on master process).   Set by the public method WriteData and used by WriteElementOnMaster*/
+    /**
+     * The mesh.
+     * Set by the public method WriteData.
+     */
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
+
+    /**
+     * The output file (only valid on master process).
+     * Set by the public method WriteData and used by WriteElementOnMaster
+     */
+    out_stream mpMasterFile;
+
     /**
      * How to associate an element with some data
      * Must be over-ridden by the derived class.
@@ -60,7 +69,9 @@ public:
      * @param localElementIndex the index of pElement in the local vector.  Used in subclasses which look up data from a separate structure ordered by local indices
      * @param rData  the double-precision data to write to file (output from the method)
      */
-    virtual void Visit(Element<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localElementIndex, c_vector<double, DATA_SIZE>& rData)=0;
+    virtual void Visit(Element<ELEMENT_DIM, SPACE_DIM>* pElement,
+                       unsigned localElementIndex,
+                       c_vector<double, DATA_SIZE>& rData)=0;
 
     /**
      * How to write an element's worth of data to the file.
@@ -73,7 +84,7 @@ public:
     {
         for (unsigned i=0; i<DATA_SIZE; i++)
         {
-            (*mpMasterFile)<<rData[i]<<"\t";
+            (*mpMasterFile) << rData[i] << "\t";
         }
         (*mpMasterFile)<<"\n";
     }
@@ -91,6 +102,16 @@ public:
 public:
 
     /**
+     * Constructor
+     */
+    AbstractPerElementWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+     : mpMesh(pMesh),
+       mpMasterFile(NULL)
+    {
+
+    }
+
+    /**
      * Writes data about each element in parallel
      * Data about each element is retrieved by the Visit() method.
      * Writing is done by the master process using the WriteElement() method.
@@ -98,11 +119,9 @@ public:
      *
      * @param rHandler  specify the directory in which to place the output file
      * @param rFileName  the file name
-     * @param pMesh the mesh, the elements of which are to be iterated over
      */
-    void WriteData(OutputFileHandler& rHandler, const std::string& rFileName, AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+    void WriteData(OutputFileHandler& rHandler, const std::string& rFileName)
     {
-        mpMesh = pMesh;
         c_vector<double, DATA_SIZE> data;
         if (PetscTools::AmMaster())
         {
@@ -159,9 +178,10 @@ public:
                 previous_index = element_index;
                 if (mpMesh->CalculateDesignatedOwnershipOfElement(element_index))
                 {
-                    //The master needs to know about this one
+                    // The master needs to know about this one.
                     Visit(&(*iter), local_index, data);
-                    MPI_Send(&data[0], DATA_SIZE, MPI_DOUBLE, 0, element_index, PETSC_COMM_WORLD);//Tag with element_index
+                    /// \todo See if this can be speeded up with #2351.
+                    MPI_Ssend(&data[0], DATA_SIZE, MPI_DOUBLE, 0, element_index, PETSC_COMM_WORLD);//Tag with element_index
                 }
             }
 

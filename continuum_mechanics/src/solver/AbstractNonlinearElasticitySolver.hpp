@@ -131,10 +131,13 @@ public:
     /** Constructor
      * @param pSolver  A pointer to the parent class, used to access data
      */
-    StressPerElementWriter(AbstractNonlinearElasticitySolver<DIM>* pSolver):
-        mpSolver(pSolver)
+    StressPerElementWriter(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
+                           AbstractNonlinearElasticitySolver<DIM>* pSolver)
+     : AbstractPerElementWriter<DIM, DIM, DIM*DIM>(pMesh),
+       mpSolver(pSolver)
     {
     }
+
     /**
      * How to associate an element with the stress data
      *
@@ -943,8 +946,8 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentAverageElementStresses(
     file_name << ".stress";
     assert(mAverageStressesPerElement.size()==this->mrQuadMesh.GetNumElements());
 
-    StressPerElementWriter<DIM> stress_writer(this);
-    stress_writer.WriteData(*(this->mpOutputFileHandler), file_name.str(), &(this->mrQuadMesh));
+    StressPerElementWriter<DIM> stress_writer(&(this->mrQuadMesh),this);
+    stress_writer.WriteData(*(this->mpOutputFileHandler), file_name.str());
 }
 
 

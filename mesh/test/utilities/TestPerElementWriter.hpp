@@ -48,17 +48,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class CentroidWriter : public AbstractPerElementWriter<3,3,3>
 {
+public:
+    CentroidWriter(AbstractTetrahedralMesh<3, 3>* pMesh)
+     : AbstractPerElementWriter<3,3,3>(pMesh)
+    {
+    }
+
+private:
     void Visit(Element<3,3>* pElement, unsigned localElementIndex, c_vector<double, 3>& rData)
     {
         rData = pElement->CalculateCentroid();
         //Check for a data invariant
         TS_ASSERT_EQUALS(mpMesh->mElements[localElementIndex], pElement);
     }
-
 };
 
 class CentroidWithIndexWriter : public AbstractPerElementWriter<3,3,4>
 {
+public:
+    CentroidWithIndexWriter(AbstractTetrahedralMesh<3, 3>* pMesh)
+     : AbstractPerElementWriter<3,3,4>(pMesh)
+    {
+    }
+
+private:
     void Visit(Element<3,3>* pElement, unsigned localElementIndex, c_vector<double, 4>& rData)
     {
         c_vector<double,3> centroid = pElement->CalculateCentroid();
@@ -68,6 +81,7 @@ class CentroidWithIndexWriter : public AbstractPerElementWriter<3,3,4>
             rData[i+1] = centroid[i];
         }
     }
+
     void WriteElementOnMaster(const c_vector<double, 4>& rData)
     {
         //Put square bracket on the first piece of data
@@ -96,13 +110,13 @@ public:
         mesh.ConstructCuboid(2, 3, 4);
         OutputFileHandler handler("TestPerElementWriter");
 
-        CentroidWriter writer;
-        writer.WriteData(handler, "centroid.dat", &mesh);
+        CentroidWriter writer(&mesh);
+        writer.WriteData(handler, "centroid.dat");
         NumericFileComparison(handler.GetOutputDirectoryFullPath() + "/centroid.dat",
                               "mesh/test/data/TestUtilities/centroid.dat").CompareFiles();
 
-        CentroidWithIndexWriter indexed_writer;
-        indexed_writer.WriteData(handler, "centroid_indexed.dat", &mesh);
+        CentroidWithIndexWriter indexed_writer(&mesh);
+        indexed_writer.WriteData(handler, "centroid_indexed.dat");
         NumericFileComparison(handler.GetOutputDirectoryFullPath() + "/centroid_indexed.dat",
                               "mesh/test/data/TestUtilities/centroid_indexed.dat").CompareFiles();
     }

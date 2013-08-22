@@ -66,9 +66,9 @@ public:
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
         fibre_generator.SetApexToBase(0);
 
-        fibre_generator.GenerateOrthotropicFibreOrientation("shorter_streeter", "box_heart.ortho", true);
-
         OutputFileHandler handler("shorter_streeter", false);
+        fibre_generator.WriteData(handler, "box_heart.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "box_heart.ortho";
 
         NumericFileComparison comp(fibre_file,"heart/test/data/box_shaped_heart/box_heart.ortho");
@@ -89,9 +89,9 @@ public:
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
         fibre_generator.SetApexToBase(0);
 
-        fibre_generator.GenerateOrthotropicFibreOrientation("shorter_streeter", "box_heart_not_dist.ortho", true);
-
         OutputFileHandler handler("shorter_streeter", false);
+        fibre_generator.WriteData(handler, "box_heart_not_dist.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "box_heart_not_dist.ortho";
 
         NumericFileComparison comp(fibre_file,"heart/test/data/box_shaped_heart/box_heart.ortho");
@@ -108,7 +108,8 @@ public:
         StreeterFibreGenerator<3> fibre_generator(mesh);
 
         // No surfaces defined
-        TS_ASSERT_THROWS_THIS(fibre_generator.GenerateOrthotropicFibreOrientation("streeter", "file.fibres"),
+        OutputFileHandler handler("streeter", false);
+        TS_ASSERT_THROWS_THIS(fibre_generator.WriteData(handler, "file.fibres"),
                 "Files defining the heart surfaces not set");
 
         // Wrong surface filename
@@ -121,7 +122,8 @@ public:
 
 
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
-        TS_ASSERT_THROWS_THIS(fibre_generator.GenerateOrthotropicFibreOrientation("shorter_streeter", "downsampled.ortho"),
+        OutputFileHandler shorter_handler("shorter_streeter", false);
+        TS_ASSERT_THROWS_THIS(fibre_generator.WriteData(shorter_handler, "downsampled.ortho"),
             "Apex to base vector has not been set");
         TS_ASSERT_THROWS_THIS(fibre_generator.SetApexToBase(999),
             "Apex to base coordinate axis was out of range");
@@ -152,9 +154,10 @@ public:
 
         fibre_generator.SetApexToBase(0);
 
-        fibre_generator.GenerateOrthotropicFibreOrientation("human_wedge_mesh/", "HumanWedgeMeshLeft.ortho", true);
-
         OutputFileHandler handler("human_wedge_mesh", false);
+
+        fibre_generator.WriteData(handler, "HumanWedgeMeshLeft.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "HumanWedgeMeshLeft.ortho";
 
         NumericFileComparison comp(fibre_file,"heart/test/data/human_wedge_mesh/HumanWedgeMeshLeft.ortho");
@@ -177,13 +180,49 @@ public:
 
         fibre_generator.SetApexToBase(0);
 
-        fibre_generator.GenerateOrthotropicFibreOrientation("human_wedge_mesh/", "HumanWedgeMeshRight.ortho", true);
-
         OutputFileHandler handler("human_wedge_mesh", false);
+
+        fibre_generator.WriteData(handler, "HumanWedgeMeshRight.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "HumanWedgeMeshRight.ortho";
 
         NumericFileComparison comp(fibre_file,"heart/test/data/human_wedge_mesh/HumanWedgeMeshRight.ortho");
         TS_ASSERT(comp.CompareFiles(1e-11));
+    }
+
+    void TestSetLogInfo() throw (Exception)
+    {
+        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
+        std::string rv_face_file = "heart/test/data/box_shaped_heart/rv.tri";
+        std::string lv_face_file = "heart/test/data/box_shaped_heart/lv.tri";
+
+        DistributedTetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        StreeterFibreGenerator<3> fibre_generator(mesh);
+        fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
+        fibre_generator.SetApexToBase(0);
+
+        OutputFileHandler handler("shorter_streeter_loginfo");
+
+        fibre_generator.WriteData(handler, "box_heart.ortho");
+
+        FileFinder node_regions_file = handler.FindFile("node_regions.data");
+        FileFinder wall_thickness_file = handler.FindFile("wall_thickness.data");
+        FileFinder averaged_thickness_file = handler.FindFile("averaged_thickness.data");
+
+        TS_ASSERT_EQUALS(node_regions_file.IsFile(), false);
+        TS_ASSERT_EQUALS(wall_thickness_file.IsFile(), false);
+        TS_ASSERT_EQUALS(averaged_thickness_file.IsFile(), false);
+
+        fibre_generator.SetLogInfo(true);
+
+        fibre_generator.WriteData(handler, "box_heart.ortho");
+
+        TS_ASSERT_EQUALS(node_regions_file.IsFile(), true);
+        TS_ASSERT_EQUALS(wall_thickness_file.IsFile(), true);
+        TS_ASSERT_EQUALS(averaged_thickness_file.IsFile(), true);
     }
 
 };

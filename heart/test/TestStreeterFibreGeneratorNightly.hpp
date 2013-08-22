@@ -100,10 +100,11 @@ public:
         StreeterFibreGenerator<3> fibre_generator(mesh);
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
         fibre_generator.SetApexToBase(0);
-
-        fibre_generator.GenerateOrthotropicFibreOrientation("streeter_parallel", "point50.ortho", true);
+        fibre_generator.SetLogInfo(true);
 
         OutputFileHandler handler("streeter_parallel", false);
+        fibre_generator.WriteData(handler, "point50.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "point50.ortho";
         std::string wall_file = handler.GetOutputDirectoryFullPath() + "wall_thickness.data";
 
@@ -126,10 +127,12 @@ public:
         StreeterFibreGenerator<3> fibre_generator(mesh);
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
         fibre_generator.SetApexToBase(0);
-
-        fibre_generator.GenerateOrthotropicFibreOrientation("streeter", "point50_not_dist.ortho", true);
+        fibre_generator.SetLogInfo(true);
 
         OutputFileHandler handler("streeter", false);
+
+        fibre_generator.WriteData(handler, "point50_not_dist.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "point50_not_dist.ortho";
         std::string wall_file = handler.GetOutputDirectoryFullPath() + "wall_thickness.data";
 
@@ -151,10 +154,11 @@ public:
         StreeterFibreGenerator<3> fibre_generator(mesh);
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, true);
         fibre_generator.SetApexToBase(2);
-
-        fibre_generator.GenerateOrthotropicFibreOrientation("streeter", "downsampled.ortho", true);
+        fibre_generator.SetLogInfo(true);
 
         OutputFileHandler handler("streeter", false);
+        fibre_generator.WriteData(handler, "downsampled.ortho");
+
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "downsampled.ortho";
 
         CompareOrthoFiles(fibre_file, "heart/test/data/fibre_tests/downsampled.ortho");
