@@ -245,6 +245,13 @@ public:
     Node<SPACE_DIM>* GetNodeOrHaloNode(unsigned index) const;
 
     /**
+     * A method to identify whether a location is owned in the parallel space decomposition.
+     * @param location the location to test
+     * @return whether the point is owned.
+     */
+    bool IsOwned(c_vector<double, SPACE_DIM>& location);
+
+    /**
      * @return the local number of nodes that are actually in use.
      * Does not include halo nodes.
      */
@@ -309,7 +316,16 @@ public:
      */
     void ReMesh(NodeMap& rMap);
 
-    /** Clear the old box collection and set up a new one if necessary. */
+    /**
+     * Set the initial box collection without passing nodes to the mesh. Used for memory efficient construction in parallel.
+     * @param domainSize the initial domain size of the mesh.
+     * @param maxInteractionDistance the max interaction distance between nodes.
+     */
+    void SetInitialBoxCollection(const c_vector<double, 2*SPACE_DIM> domainSize, double maxInteractionDistance);
+
+    /**
+     * Clear the old box collection and set up a new one if necessary.
+     */
     void UpdateBoxCollection();
 
     /**

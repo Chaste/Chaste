@@ -301,6 +301,12 @@ public:
     bool IsOwned(Node<DIM>* pNode);
 
     /**
+     * @param location the location to test.
+     * @return whether the point at location is owned on this process.
+     */
+    bool IsOwned(c_vector<double, DIM>& location);
+
+    /**
      * Get the process that should own this node.
      * Currently only returns +/-1 of this process so assumes nodes don't move too far. //\ todo this should be fixed.
      *

@@ -155,6 +155,12 @@ Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) con
 }
 
 template<unsigned SPACE_DIM>
+bool NodesOnlyMesh<SPACE_DIM>::IsOwned(c_vector<double, SPACE_DIM>& location)
+{
+    return mpBoxCollection->IsOwned(location);
+}
+
+template<unsigned SPACE_DIM>
 unsigned NodesOnlyMesh<SPACE_DIM>::GetNumNodes() const
 {
     return this->mNodes.size() - this->mDeletedNodeIndices.size();
@@ -518,6 +524,12 @@ void NodesOnlyMesh<SPACE_DIM>::ClearBoxCollection()
         delete mpBoxCollection;
     }
     mpBoxCollection = NULL;
+}
+
+template<unsigned SPACE_DIM>
+void NodesOnlyMesh<SPACE_DIM>::SetInitialBoxCollection(const c_vector<double, 2*SPACE_DIM> domainSize, double maxInteractionDistance)
+{
+    this->SetUpBoxCollection(maxInteractionDistance, domainSize);
 }
 
 template<unsigned SPACE_DIM>

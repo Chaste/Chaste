@@ -134,6 +134,41 @@ public:
         }
     }
 
+    void TestSetInitialBoxCollection() throw (Exception)
+    {
+        double cut_off = 1.0;
+
+        c_vector<double, 6> domain_size = zero_vector<double>(6);
+        domain_size[1] = 2.9;
+        domain_size[3] = 2.9;
+        domain_size[5] = 2.9;
+
+        NodesOnlyMesh<3> mesh;
+
+        // Set the initial box collection.
+        mesh.SetInitialBoxCollection(domain_size, cut_off);
+
+        c_vector<double, 6> set_domain_size = mesh.GetBoxCollection()->rGetDomainSize();
+        double box_width = mesh.GetBoxCollection()->GetBoxWidth();
+
+        // Check the correct domain size has been set (swelled to be a multiple of the box width)
+        for (unsigned i=0; i<3; i++)
+        {
+            TS_ASSERT_DELTA(set_domain_size[2*i], 0.0, 1e-4);
+            TS_ASSERT_DELTA(set_domain_size[2*i+1], 3.0, 1e-4);
+        }
+
+        // Make sure the boxes are the width of the cut-off distance.
+        TS_ASSERT_DELTA(box_width, cut_off, 1e-4);
+
+        if (PetscTools::AmMaster())
+        {
+            c_vector<double,3> location = zero_vector<double>(3);
+            location[2] = 0.1;    // This should be owned by process 0 in any space decomposition.
+            TS_ASSERT(mesh.IsOwned(location));
+        }
+    }
+
     void TestConstuctingAndEnlargingInitialBoxCollection() throw (Exception)
     {
         double cut_off = 0.5;

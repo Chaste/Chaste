@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
-
 // Static member for "fudge factor" is instantiated here
 template<unsigned DIM>
 const double DistributedBoxCollection<DIM>::msFudge = 5e-14;
@@ -1075,6 +1074,14 @@ template<unsigned DIM>
 bool DistributedBoxCollection<DIM>::IsOwned(Node<DIM>* pNode)
 {
     unsigned index = CalculateContainingBox(pNode);
+
+    return GetBoxOwnership(index);
+}
+
+template<unsigned DIM>
+bool DistributedBoxCollection<DIM>::IsOwned(c_vector<double, DIM>& location)
+{
+    unsigned index = CalculateContainingBox(location);
 
     return GetBoxOwnership(index);
 }
