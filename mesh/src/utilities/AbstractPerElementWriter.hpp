@@ -51,7 +51,7 @@ class AbstractPerElementWriter
 protected:
     /**
      * The mesh.
-     * Set by the public method WriteData.
+     * Set by the constructor.
      */
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
@@ -99,6 +99,16 @@ protected:
     {
     }
 
+    /**
+     * Method that can be overridden to do any pre-calculations necessary to
+     * write out data.
+     *
+     * @param rOutputDirectory  The folder data is going to be written into (mostly for debugging to be written into).
+     */
+    virtual void PreWriteCalculations(OutputFileHandler& rOutputDirectory)
+    {
+    }
+
 public:
 
     /**
@@ -117,11 +127,15 @@ public:
      * Writing is done by the master process using the WriteElement() method.
      * Any element not owned by the master is communicated by the unique designated owner.
      *
+     * MUST BE CALLED IN PARALLEL.
+     *
      * @param rHandler  specify the directory in which to place the output file
      * @param rFileName  the file name
      */
-    virtual void WriteData(OutputFileHandler& rHandler, const std::string& rFileName)
+    void WriteData(OutputFileHandler& rHandler, const std::string& rFileName)
     {
+        PreWriteCalculations(rHandler);
+
         c_vector<double, DATA_SIZE> data;
         if (PetscTools::AmMaster())
         {

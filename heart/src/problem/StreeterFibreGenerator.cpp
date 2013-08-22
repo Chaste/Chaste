@@ -168,8 +168,7 @@ void StreeterFibreGenerator<SPACE_DIM>::WriteHeaderOnMaster()
 }
 
 template<unsigned SPACE_DIM>
-void StreeterFibreGenerator<SPACE_DIM>::WriteData(OutputFileHandler& rOutputDirectory,
-                                                                            std::string fibreOrientationFile)
+void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& rOutputDirectory)
 {
     assert(SPACE_DIM == 3);
     if (mpGeometryInfo == NULL)
@@ -286,8 +285,6 @@ void StreeterFibreGenerator<SPACE_DIM>::WriteData(OutputFileHandler& rOutputDire
              *p_ave_thickness_file << mAveragedWallThickness[node_index] << "\n";
         }
     }
-
-    AbstractPerElementWriter<SPACE_DIM,SPACE_DIM,SPACE_DIM*SPACE_DIM>::WriteData(rOutputDirectory, fibreOrientationFile);
 
     if (logInfo)
     {

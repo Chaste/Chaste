@@ -54,9 +54,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A Comparison of Monodomain and Bidomain Reaction-Diffusion Models for Action Potential Propagation in the Human Heart
  * Mark Potse, Bruno Dubé, Jacques Richer, Alain Vinet, and Ramesh M. Gulrajani
  * IEEE Trans. Biomed. Eng. 53(12):2425-2435, 2006.
+ *
+ * File format: The first line indicates the number of elements.
+ * Each of the following lines contain SPACE_DIM vectors of SPACE_DIM elements for the
+ * direction of the myofibre, the transverse to it in the plane of
+ * the myocyte laminae and the normal to this laminae.
  */
 template<unsigned SPACE_DIM>
-class StreeterFibreGenerator : AbstractPerElementWriter<SPACE_DIM, SPACE_DIM, SPACE_DIM*SPACE_DIM>
+class StreeterFibreGenerator : public AbstractPerElementWriter<SPACE_DIM, SPACE_DIM, SPACE_DIM*SPACE_DIM>
 {
 private:
     HeartGeometryInformation<SPACE_DIM>* mpGeometryInfo; /**< Provides a method to calculate the relative position of a node with respect to two (or three) given surfaces*/
@@ -109,6 +114,18 @@ protected:
     */
    void WriteHeaderOnMaster();
 
+   /**
+    * Does calculations to generate an orthotropic fibre orientation model of the ventricular mesh provided.
+    * In particular - populates the member variables #mWallThickness and #mAveragedWallThickness.
+    *
+    * Also writes these to file if SetLogInfo() has been called.
+    *
+    * Assumes that the base-apex axis is x. Based on Streeter 1969 and Potse 2006
+    *
+    * @param rOutputDirectory Handler for output directory
+    */
+   void PreWriteCalculations(OutputFileHandler& rOutputDirectory);
+
 public:
     /**
      * Constructor
@@ -140,17 +157,7 @@ public:
                          const std::string &rLeftVentricleFile,
                          bool indexFromZero);
 
-    /**
-     * Generates an orthotropic fibre orientation model of the ventricular mesh provided. Assumes that the base-apex axis is x. Based on Streeter 1969 and Potse 2006
-     *
-     * File format: The first line indicates the number of elements. Each of the following lines contain SPACE_DIM vectors of SPACE_DIM elements for the
-     * direction of the myofibre, the transverse to it in the plane of the myocyte laminae and the normal to this laminae.
-     *
-     * @param rOutputDirectory Handler for output directory
-     * @param fibreOrientationFile Output file
-     */
-    void WriteData(OutputFileHandler& rOutputDirectory,
-                                             std::string fibreOrientationFile);
+
 
     /**
      * Set the direction from apex to base
