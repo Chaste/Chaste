@@ -120,7 +120,7 @@ public:
      * @param rHandler  specify the directory in which to place the output file
      * @param rFileName  the file name
      */
-    void WriteData(OutputFileHandler& rHandler, const std::string& rFileName)
+    virtual void WriteData(OutputFileHandler& rHandler, const std::string& rFileName)
     {
         c_vector<double, DATA_SIZE> data;
         if (PetscTools::AmMaster())
