@@ -261,6 +261,29 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElement(unsigned index)
+{
+    if (this->mElements[index]->IsDeleted())
+    {
+        EXCEPTION("Trying to delete a deleted element");
+    }
+    this->mElements[index]->MarkAsDeleted();
+    mDeletedElementIndices.push_back(index);
+
+    //Delete any nodes that are no longer attached to mesh.
+    for(unsigned node_index = 0; node_index < this->mElements[index]->GetNumNodes(); ++node_index)
+    {
+        if(this->mElements[index]->GetNode(node_index)->GetNumContainingElements() == 0u &&
+           this->mElements[index]->GetNode(node_index)->GetNumBoundaryElements() == 0u)
+        {
+            this->mElements[index]->GetNode(node_index)->MarkAsDeleted();
+            mDeletedNodeIndices.push_back(this->mElements[index]->GetNode(node_index)->GetIndex());
+        }
+    }
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNodePriorToReMesh(unsigned index)
 {
     this->mNodes[index]->MarkAsDeleted();

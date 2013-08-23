@@ -1111,6 +1111,47 @@ public:
         EdgeIteratorTest<1>("mesh/test/data/1D_0_to_1_10_elements");
     }
 
+
+    void TestDeleteElement() throw(Exception)
+    {
+        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
+        MutableMesh<2,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        unsigned num_old_nodes = mesh.GetNumNodes();
+        unsigned num_old_eles  = mesh.GetNumElements();
+
+        mesh.DeleteElement(18);
+        mesh.DeleteElement(0);
+
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), (unsigned)(num_old_eles-2));
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), (unsigned)(num_old_eles));
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes));
+
+        //Elements 18, 71, 74, 90, 380, 381 are the only elements using Node 241
+        mesh.DeleteElement(71);
+        mesh.DeleteElement(74);
+        mesh.DeleteElement(90);
+        mesh.DeleteElement(380);
+        mesh.DeleteElement(381);
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes - 1));
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes));
+
+        NodeMap map(num_old_nodes);
+
+        mesh.ReIndex(map);
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes - 1));
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes - 1));
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), (unsigned)(num_old_eles - 7));
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), (unsigned)(num_old_eles - 7));
+
+        TS_ASSERT_EQUALS(map.Size(), num_old_nodes);
+        TS_ASSERT_EQUALS(map.IsDeleted(241), true);
+    }
+
     void TestArchiving() throw(Exception)
     {
         FileFinder archive_dir("archive_mutable_mesh", RelativeTo::ChasteTestOutput);

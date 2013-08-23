@@ -260,6 +260,13 @@ public:
      * @param index is the index of the node to be deleted
      */
     virtual void DeleteNode(unsigned index);
+
+    /**
+     * Delete an element from the mesh. Any remaining nodes not connected to an element are also removed.
+     *
+     * @param index The index of the element to be deleted
+     */
+    virtual void DeleteElement(unsigned index);
 #undef COVERAGE_IGNORE
 
     /**
