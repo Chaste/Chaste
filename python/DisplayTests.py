@@ -922,14 +922,11 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
     """Check whether the build failed, and return a new status if it did."""
     found_semget = False
     found_done_building = False
-    checked_windows = False
     try:
         log = file(os.path.join(test_set_dir, 'build.log'), 'r')
+        if 'Windows' in test_set_dir:
+            return _checkWinBuildFailure(log, overall_status, colour)
         for line in log:
-            if not checked_windows:
-                checked_windows = True
-                if 'Windows' in line:
-                    return _checkWinBuildFailure(log, overall_status, colour)
             if (line.startswith('scons: building terminated because of errors.')
                 or line.strip().endswith('(errors occurred during build).')
                 or _sconstruct_traceback_re.match(line)):
@@ -1158,22 +1155,19 @@ _state_res = map(re.compile,
                   r"RunPyCml\(\[",
                   r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"])
 
-def _parseBuildTimings(logfilename):
+def _parseBuildTimings(logfilepath):
     """Parse a build log file to determine timings.
     
     Returns a dictionary mapping activity to time (in seconds).
     """
     times = [0] * len(_states)
-    checked_windows = False
     try:
-        logfile = open(logfilename, 'r')
+        logfile = open(logfilepath, 'r')
+        if 'Windows' in logfilepath:
+            return _parseWinBuildTimings(logfile)
+
         state = 0
-    
         for line in logfile:
-            if not checked_windows:
-                checked_windows = True
-                if 'Windows' in line:
-                    return _parseWinBuildTimings(logfile)
             m = _time_re.match(line)
             if m:
                 times[state] += float(m.group(1))
@@ -1185,7 +1179,7 @@ def _parseBuildTimings(logfilename):
                         state = i+1
                         break
         logfile.close()
-    
+
         result = dict(zip(_states, times))
     except IOError:
         result = dict.fromkeys(_states, -1.0)
