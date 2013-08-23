@@ -53,6 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RungeKuttaFehlbergIvpOdeSolver.hpp"
 #include "OutputFileHandler.hpp"
 
+#include "FakePetscSetup.hpp"
+
 class TestRungeKuttaFehlbergIvpOdeSolver: public CxxTest::TestSuite
 {
 public:
@@ -123,25 +125,13 @@ public:
         current_y_values[0] = 0.5;
         next_y_values = current_y_values;
 
-        unsigned number_of_variables = ode.GetNumberOfStateVariables();
+        // Ensure the internal data structures are the right size
+        rkf_solver.Solve(&ode, current_y_values, time, time+time_step, time_step, 1e-5);
 
-        /*
-         * These commands are all in the InternalSolve() method, which is
-         * the only thing that ever calls CalculateYValues.
-         */
-        rkf_solver.mError.reserve(number_of_variables);
-        rkf_solver.mk1.reserve(number_of_variables);
-        rkf_solver.mk2.reserve(number_of_variables);
-        rkf_solver.mk3.reserve(number_of_variables);
-        rkf_solver.mk4.reserve(number_of_variables);
-        rkf_solver.mk5.reserve(number_of_variables);
-        rkf_solver.mk6.reserve(number_of_variables);
-        rkf_solver.myk2.reserve(number_of_variables);
-        rkf_solver.myk3.reserve(number_of_variables);
-        rkf_solver.myk4.reserve(number_of_variables);
-        rkf_solver.myk5.reserve(number_of_variables);
-        rkf_solver.myk6.reserve(number_of_variables);
-
+        // Reset state
+        current_y_values = next_y_values;
+        
+        // Test internal method
         rkf_solver.CalculateNextYValue(&ode, time_step, time, current_y_values, next_y_values);
 
         TS_ASSERT_DELTA(current_y_values[0], 0.5, 1e-9);

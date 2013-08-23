@@ -219,11 +219,14 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create two cell pairs
-        std::pair<CellPtr,CellPtr> cell_pair1 = cell_population.CreateCellPair(cells[0], cells[1]);
-        std::pair<CellPtr,CellPtr> cell_pair2 = cell_population.CreateCellPair(cells[1], cells[0]);
+        std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+        CellPtr cell_0 = *cell_iter++;
+        CellPtr cell_1 = *cell_iter;
+        std::pair<CellPtr,CellPtr> cell_pair1 = cell_population.CreateCellPair(cell_0, cell_1);
+        std::pair<CellPtr,CellPtr> cell_pair2 = cell_population.CreateCellPair(cell_1, cell_0);
         TS_ASSERT_EQUALS(cell_pair1, cell_pair2);
-        TS_ASSERT_EQUALS((cell_pair1.first == cells[0] || cell_pair1.first == cells[1]), true);
-        TS_ASSERT_EQUALS((cell_pair1.second == cells[0] || cell_pair1.second == cells[1]), true);
+        TS_ASSERT_EQUALS((cell_pair1.first == cell_0 || cell_pair1.first == cell_1), true);
+        TS_ASSERT_EQUALS((cell_pair1.second == cell_0 || cell_pair1.second == cell_1), true);
         TS_ASSERT_DIFFERS(cell_pair1.first,  cell_pair1.second);
     }
 
@@ -282,14 +285,14 @@ public:
         TS_ASSERT_DELTA(cell_population.GetAreaBasedDampingConstantParameter(), 0.5, 1e-6);
 
         //test Get and Set methods for DampingConstantNormal and DampingConstantNormalMutant
-        TS_ASSERT_DELTA(cell_population.GetDampingConstantNormal(),1.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population.GetDampingConstantMutant(),23.57, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetDampingConstantNormal(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetDampingConstantMutant(), 23.57, 1e-6);
 
         cell_population.SetDampingConstantNormal(2.0);
         cell_population.SetDampingConstantMutant(3.0);
 
-        TS_ASSERT_DELTA(cell_population.GetDampingConstantNormal(),2.0, 1e-6);
-        TS_ASSERT_DELTA(cell_population.GetDampingConstantMutant(),3.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetDampingConstantNormal(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(cell_population.GetDampingConstantMutant(), 3.0, 1e-6);
     }
 
     void TestAreaBasedDampingConstant()
@@ -376,7 +379,7 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        cell_population.AddCell(p_cell, new_cell_location, cells[3] /*random choice of parent*/);
+        cell_population.AddCell(p_cell, new_cell_location, cell_population.rGetCells().front() /*random choice of parent*/);
 
         // CellPopulation should have updated mesh and cells
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), old_num_nodes+1);
@@ -415,8 +418,8 @@ public:
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
 
         // coverage of SetRestLength
-        TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(0,1,1.0),"Tried to set a rest length in a simulation with fixed rest length. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
-
+        TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(0,1,1.0),
+                              "Tried to set a rest length in a simulation with fixed rest length. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
 
         cell_population.CalculateRestLengths();
 
@@ -434,7 +437,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 2.0, 1e-6);
         cell_population.SetRestLength(0,1,1.0);
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
-        TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(1,3,1.0),"Tried to set the rest length of an edge not in the mesh.");
+        TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(1,3,1.0), "Tried to set the rest length of an edge not in the mesh.");
 
         cell_population.DivideLongSprings(1.0);
 
@@ -457,7 +460,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetRestLength(1,2), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(2,3), 1.0, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,3), 1.0, 1e-6);
-        TS_ASSERT_THROWS_THIS(cell_population.GetRestLength(0,2),"Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+        TS_ASSERT_THROWS_THIS(cell_population.GetRestLength(0,2),
+                              "Tried to get a rest length of an edge that doesn't exist. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,4), 0.5*sqrt(2.0), 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(1,4), 0.5*sqrt(2.0), 1e-6);
         TS_ASSERT_DELTA(cell_population.GetRestLength(2,4), 0.5*sqrt(2.0), 1e-6);

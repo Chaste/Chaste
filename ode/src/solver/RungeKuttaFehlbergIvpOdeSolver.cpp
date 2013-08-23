@@ -55,18 +55,18 @@ void RungeKuttaFehlbergIvpOdeSolver::InternalSolve(OdeSolution& rSolution,
                                                 bool outputSolution)
 {
     const unsigned number_of_variables = pOdeSystem->GetNumberOfStateVariables();
-    mError.reserve(number_of_variables);
-    mk1.reserve(number_of_variables);
-    mk2.reserve(number_of_variables);
-    mk3.reserve(number_of_variables);
-    mk4.reserve(number_of_variables);
-    mk5.reserve(number_of_variables);
-    mk6.reserve(number_of_variables);
-    myk2.reserve(number_of_variables);
-    myk3.reserve(number_of_variables);
-    myk4.reserve(number_of_variables);
-    myk5.reserve(number_of_variables);
-    myk6.reserve(number_of_variables);
+    mError.resize(number_of_variables);
+    mk1.resize(number_of_variables);
+    mk2.resize(number_of_variables);
+    mk3.resize(number_of_variables);
+    mk4.resize(number_of_variables);
+    mk5.resize(number_of_variables);
+    mk6.resize(number_of_variables);
+    myk2.resize(number_of_variables);
+    myk3.resize(number_of_variables);
+    myk4.resize(number_of_variables);
+    myk5.resize(number_of_variables);
+    myk6.resize(number_of_variables);
 
     double current_time = startTime;
     double time_step = maxTimeStep;
