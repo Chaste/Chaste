@@ -247,7 +247,7 @@ public:
 
         assert(cells.empty());
         cells.resize(mesh.GetNumNodes());
-        std::copy(node_based_cell_population.rGetCells().begin(), node_based_cell_population.end(), cells.begin());
+        std::copy(node_based_cell_population.rGetCells().begin(), node_based_cell_population.rGetCells().end(), cells.begin());
 
         if (PetscTools::AmMaster())
         {
