@@ -9,6 +9,7 @@ cell/TestCellPropertyRegistry.hpp
 cell/TestCellsGenerator.hpp
 cell/TestDeltaNotchCellCycleModel.hpp
 cell/TestOdeBasedCellCycleModels.hpp
+cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
 common/TestSimulationTime.hpp
 common/TestOdeLinearSystemSolver.hpp
