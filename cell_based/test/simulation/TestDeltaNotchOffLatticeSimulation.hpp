@@ -137,11 +137,12 @@ public:
         TS_ASSERT(generated.Exists());
 
         // Check levels in cell 0
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+        CellPtr cell0 = cell_population.rGetCells().front();
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
 
         // Avoid memory leaks
@@ -392,11 +393,12 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         // Check levels in cell 0
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+        CellPtr cell0 = cell_population.rGetCells().front();
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 0.9921, 1e-04);
     }
 
@@ -452,11 +454,12 @@ public:
         TS_ASSERT(generated.Exists());
 
         // Check levels in cell 0
-        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetNotch();
+        CellPtr cell0 = cell_population.rGetCells().front();
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
         TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
-        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetDelta();
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
-        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cells[0]->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 

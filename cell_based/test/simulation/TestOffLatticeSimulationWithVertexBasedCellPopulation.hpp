@@ -471,7 +471,7 @@ public:
         ///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
         TS_ASSERT_EQUALS(p_mesh->GetNode(13)->IsBoundaryNode(), true);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
-        TS_ASSERT_EQUALS(cells[0]->HasCellProperty<CellLabel>(), true);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().front()->HasCellProperty<CellLabel>(), true);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
@@ -531,7 +531,7 @@ public:
 
         ///\todo test against a saved simulation or something similar, i.e check the positions of some vertices.
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
-        TS_ASSERT_EQUALS(cells[0]->HasCellProperty<CellLabel>(), true);
+        TS_ASSERT_EQUALS(cell_population.rGetCells().front()->HasCellProperty<CellLabel>(), true);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);

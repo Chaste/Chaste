@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include <algorithm>
+
 #include "ArchiveOpener.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
@@ -242,6 +244,10 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
+
+        assert(cells.empty());
+        cells.resize(mesh.GetNumNodes());
+        std::copy(node_based_cell_population.rGetCells().begin(), node_based_cell_population.end(), cells.begin());
 
         if (PetscTools::AmMaster())
         {

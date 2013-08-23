@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
+#include <algorithm>
+
 #include "CellsGenerator.hpp"
 #include "MultipleCaBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
@@ -218,6 +220,8 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(3));
 
         // Now remove first cell from lattice 0 and move it to lattice 3
+        cells.resize(cell_population.rGetCells().size()); // Since the vector gets cleared by the population constructor
+        std::copy(cell_population.rGetCells().begin(), cell_population.rGetCells().end(), cells.begin());
         cell_population.RemoveCellUsingLocationIndex(0,cells[0]);
         cell_population.AddCellUsingLocationIndex(3,cells[0]);
 
