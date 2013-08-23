@@ -696,6 +696,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
 {
     // Make sure the map is big enough
     rElementMap.Resize(this->GetNumAllElements());
+    rElementMap.ResetToIdentity();
 
     // Remove any elements that have been marked for deletion and store all other elements in a temporary structure
     std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> live_elements;

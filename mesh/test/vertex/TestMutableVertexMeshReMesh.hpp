@@ -1161,12 +1161,12 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
+        TS_ASSERT_EQUALS(map.Size(), 5u);
         TS_ASSERT_EQUALS(map.GetNewIndex(0), 0u);
         TS_ASSERT_EQUALS(map.GetNewIndex(1), 1u);
         TS_ASSERT_EQUALS(map.GetNewIndex(2), 2u);
         TS_ASSERT_EQUALS(map.GetNewIndex(3), 3u);
         TS_ASSERT_EQUALS(map.IsDeleted(4), true);
-        TS_ASSERT_EQUALS(map.IsDeleted(5), true);
 
         // Test that each merged node is correctly located at the centroid of the element it has replaced
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 1.0/3.0, 1e-3);
