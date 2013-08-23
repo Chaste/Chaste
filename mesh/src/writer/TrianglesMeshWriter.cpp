@@ -394,8 +394,13 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
         // Write raw data out of std::vector into the file
         pFile->write((char*)&dataPacket[0], dataPacket.size()*sizeof(T_DATA));
 
-        // Write raw attribute
-        pFile->write((char*)&rAttributes[0], rAttributes.size()*sizeof(T_ATTR));
+        // Write raw attribute(s)
+        // MSVC 10 will trip an assertion on accessing the 0th element if the vector is empty.
+        // Note that C++11 gives vectors a .data() method which would be a better way of doing this!
+        if (!rAttributes.empty())
+        {
+            pFile->write((char*)&rAttributes[0], rAttributes.size()*sizeof(T_ATTR));
+        }
     }
     else
     {

@@ -639,7 +639,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
     if (shared_elements.size()==1)
     {
         // If only one shared element then must be on the boundary.
-        assert((pNodeA->IsBoundaryNode())&&(pNodeB->IsBoundaryNode()));
+        assert((pNodeA->IsBoundaryNode()) && (pNodeB->IsBoundaryNode()));
         is_boundary_node = true;
     }
 

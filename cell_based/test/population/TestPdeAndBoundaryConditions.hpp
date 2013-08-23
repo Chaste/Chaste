@@ -326,6 +326,7 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        assert(cells.empty());
 
         // Create a coarse mesh - element 1 contains all the cells,
         // element 0 contains none
@@ -387,7 +388,7 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        cell_population.AddCell(p_cell, new_cell_location, cells[0] /*random choice of parent*/);
+        cell_population.AddCell(p_cell, new_cell_location, cell_population.rGetCells().front() /*random choice of parent*/);
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
 
@@ -472,7 +473,7 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        cell_population.AddCell(p_cell, new_cell_location, cells[0] /*random choice of parent*/);
+        cell_population.AddCell(p_cell, new_cell_location, cell_population.rGetCells().front() /*random choice of parent*/);
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
 

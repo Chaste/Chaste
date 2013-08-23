@@ -388,7 +388,8 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
             {
                 elem_vector.push_back(default_marker);
             }
-            assert (elem_vector.size() == max_elements_all);
+            assert(elem_vector.size() == max_elements_all);
+            assert(max_elements_all > 0u);
             // Write raw data out of std::vector into the file
             p_ncl_file->write((char*)&elem_vector[0], elem_vector.size()*sizeof(unsigned));
         }

@@ -871,7 +871,10 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
 {
     if (mFilesAreBinary)
     {
-        rFileStream.read((char*)&rDataPacket[0], rDataPacket.size()*sizeof(T_DATA));
+        if (!rDataPacket.empty()) // Avoid MSVC 10 assertion
+        {
+            rFileStream.read((char*)&rDataPacket[0], rDataPacket.size()*sizeof(T_DATA));
+        }
         if (rNumAttributes > 0)
         {
             for (unsigned i = 0; i < rNumAttributes; i++)

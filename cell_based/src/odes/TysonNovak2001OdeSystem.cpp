@@ -228,7 +228,7 @@ bool TysonNovak2001OdeSystem::CalculateStoppingEvent(double time, const std::vec
 
     // Only call this a stopping condition if the mass of the cell is over 0.6
     // (normally cycles from 0.5-1.0 ish!)
-    return ( (rY[5] > 0.6 )&& (rY[0] < mCycB_threshold) && dy[0] < 0.0 );
+    return ( (rY[5] > 0.6 ) && (rY[0] < mCycB_threshold) && dy[0] < 0.0 );
 }
 
 double TysonNovak2001OdeSystem::CalculateRootFunction(double time, const std::vector<double>& rY)
