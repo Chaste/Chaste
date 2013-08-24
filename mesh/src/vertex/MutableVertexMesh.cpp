@@ -694,39 +694,23 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(VertexElementMap& rElementMap)
 {
-    // Make sure the map is big enough
+    // Make sure the map is big enough.  Each entry will be set in the loop below.
     rElementMap.Resize(this->GetNumAllElements());
-    rElementMap.ResetToIdentity();
 
     // Remove any elements that have been marked for deletion and store all other elements in a temporary structure
     std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> live_elements;
-    unsigned map_index = 0;
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
-        /*
-         * Here we assume that element indices run from 0 to mElements.size()-1. We allow
-         * for the possibility that this is not the first time we have removed an element
-         * through this method at the present time step. This means that we must be careful
-         * in specifying which entry of rElementMap to set as deleted, hence the use of
-         * map_index.
-         */
-        while (rElementMap.IsDeleted(map_index))
-        {
-            map_index++;
-        }
-
         if (this->mElements[i]->IsDeleted())
         {
             delete this->mElements[i];
-            rElementMap.SetDeleted(map_index);
+            rElementMap.SetDeleted(i);
         }
         else
         {
             live_elements.push_back(this->mElements[i]);
-            rElementMap.SetNewIndex(map_index, (unsigned)(live_elements.size()-1));
+            rElementMap.SetNewIndex(i, (unsigned)(live_elements.size()-1));
         }
-
-        map_index++;
     }
 
     // Sanity check

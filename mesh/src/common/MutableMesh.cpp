@@ -263,18 +263,15 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElement(unsigned index)
 {
-    if (this->mElements[index]->IsDeleted())
-    {
-        EXCEPTION("Trying to delete a deleted element");
-    }
+    assert(!this->mElements[index]->IsDeleted());
     this->mElements[index]->MarkAsDeleted();
     mDeletedElementIndices.push_back(index);
 
     //Delete any nodes that are no longer attached to mesh.
-    for(unsigned node_index = 0; node_index < this->mElements[index]->GetNumNodes(); ++node_index)
+    for (unsigned node_index = 0; node_index < this->mElements[index]->GetNumNodes(); ++node_index)
     {
-        if(this->mElements[index]->GetNode(node_index)->GetNumContainingElements() == 0u &&
-           this->mElements[index]->GetNode(node_index)->GetNumBoundaryElements() == 0u)
+        if (this->mElements[index]->GetNode(node_index)->GetNumContainingElements() == 0u
+            && this->mElements[index]->GetNode(node_index)->GetNumBoundaryElements() == 0u)
         {
             this->mElements[index]->GetNode(node_index)->MarkAsDeleted();
             mDeletedNodeIndices.push_back(this->mElements[index]->GetNode(node_index)->GetIndex());
@@ -806,10 +803,10 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
     assert(SPACE_DIM == 3);
 
     std::vector<c_vector<unsigned, 5> > history;
-    
-    
+
+
     bool long_edge_exists = true;
-    
+
     while(long_edge_exists)
     {
         std::set<std::pair<unsigned, unsigned> > long_edges;
@@ -908,16 +905,16 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
     std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
                           elements_of_node_b.begin(), elements_of_node_b.end(),
                           std::inserter(intersection_elements, intersection_elements.begin()));
-    
+
     // Create the new node
     c_vector<double, SPACE_DIM> new_node_location = pNodeA->rGetLocation() + 0.5*this->GetVectorFromAtoB(pNodeA->rGetLocation(), pNodeB->rGetLocation());
-    
+
     bool is_boundary_node =  intersection_elements.size() == 1; // If only in one element then its on the boundary
-    
+
     Node<SPACE_DIM>* p_new_node = new Node<SPACE_DIM>(0u,new_node_location,is_boundary_node); // Index is rewritten once added to mesh
-    
+
     unsigned new_node_index = this->AddNode(p_new_node);
-    
+
     new_node_index_vector[0] = new_node_index;
 
     unsigned counter = 1;
