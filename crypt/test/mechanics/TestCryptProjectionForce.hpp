@@ -324,7 +324,8 @@ public:
         c_vector<double,2> new_force = cell_population.GetNode(11)->rGetAppliedForce();
 
         double wnt_chemotaxis_strength = crypt_projection_force.GetWntChemotaxisStrength();
-        c_vector<double,2> wnt_component = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(cells[11]);
+        CellPtr p_cell = cell_population.GetCellUsingLocationIndex(11u);
+        c_vector<double,2> wnt_component = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(p_cell);
 
         TS_ASSERT_DELTA(new_force[0], old_force[0]+wnt_component[0], 1e-4);
         TS_ASSERT_DELTA(new_force[1], old_force[1]+wnt_component[1], 1e-4);
