@@ -473,7 +473,7 @@ public:
         if (PetscTools::AmMaster())
         {
             // Make one cell start apoptosis
-            cells[27]->StartApoptosis();
+            node_based_cell_population.GetCellUsingLocationIndex(27)->StartApoptosis();
 
             // Test we have the right numbers of nodes and cells
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 81u);

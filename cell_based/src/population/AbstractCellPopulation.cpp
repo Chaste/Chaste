@@ -70,8 +70,10 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
       mOutputCellVolumes(false),
       mOutputNodeVelocities(false)
 {
-    // To avoid double-counting problems, clear the passed-in cells vector
-    rCells.clear();
+    // To avoid double-counting problems, clear the passed-in cells vector.
+    // We force a reallocation of memory so that subsequent usage of the vector is more likely
+    // to give an error.
+    std::vector<CellPtr>().swap(rCells);
 
     if (!locationIndices.empty())
     {
