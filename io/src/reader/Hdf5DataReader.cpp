@@ -412,17 +412,9 @@ std::vector<double> Hdf5DataReader::GetUnlimitedDimensionValues()
         ret[0] = 0.0;
         return ret;
     }
-    // Define hyperslab in the dataset
-    hid_t time_dataspace = H5Dget_space(mUnlimitedDatasetId);
 
-    // Define a simple memory dataspace
-    hid_t memspace = H5Screate_simple(1, &mNumberTimesteps ,NULL);
-
-    // Read data from hyperslab in the file into the hyperslab in memory
-    H5Dread(mUnlimitedDatasetId, H5T_NATIVE_DOUBLE, memspace, time_dataspace, H5P_DEFAULT, &ret[0]);
-
-    H5Sclose(time_dataspace);
-    H5Sclose(memspace);
+    // Read data from hyperslab in the file into memory
+    H5Dread(mUnlimitedDatasetId, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &ret[0]);
 
     return ret;
 }
