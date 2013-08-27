@@ -54,10 +54,11 @@ class AbstractPottsUpdateRule : public Identifiable
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Serialize the object.
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
      *
-     * @param archive the archive
-     * @param version the current version of this class
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)

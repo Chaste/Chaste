@@ -92,25 +92,26 @@ public:
     //
     // \todo 2370 The methods below are likely to be required for the final version of this class.
     // Thus the definitions have been left in place commented out
+    // You'll also need to re-doxygen the comments!
     //
 
-    /**
-     * May be overridden by subclasses to perform any necessary work after all cells
-     * have been created.
-     *
-     * @..param pCellsDistributed  Pointer to a vector of cardiac cell pointers.
-     * @..param lo  Lowest index owned by this process.
-     * @..param hi  Highest index owned by this process.
-     */
-    //virtual void FinaliseCellCreation(std::vector< AbstractCardiacCellInterface* >* pCellsDistributed,
-    //                                  unsigned lo, unsigned hi);
+//    /*
+//     * May be overridden by subclasses to perform any necessary work after all cells
+//     * have been created.
+//     *
+//     * @param pCellsDistributed  Pointer to a vector of cardiac cell pointers.
+//     * @param lo  Lowest index owned by this process.
+//     * @param hi  Highest index owned by this process.
+//     */
+//    virtual void FinaliseCellCreation(std::vector< AbstractCardiacCellInterface* >* pCellsDistributed,
+//                                      unsigned lo, unsigned hi);
 
-    /**
-     * Default constructor.
-     *
-     * @..param pSolver  the ODE solver to use to simulate this cell.
-     */
-   // AbstractContractionCellFactory(boost::shared_ptr<AbstractIvpOdeSolver> pSolver = boost::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
+//    /*
+//     * Default constructor.
+//     *
+//     * @param pSolver  the ODE solver to use to simulate this cell.
+//     */
+//    AbstractContractionCellFactory(boost::shared_ptr<AbstractIvpOdeSolver> pSolver = boost::shared_ptr<AbstractIvpOdeSolver>(new EulerIvpOdeSolver));
 
     /**
      * Destructor

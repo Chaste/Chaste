@@ -50,8 +50,7 @@ class AbstractPerElementWriter
 {
 protected:
     /**
-     * The mesh.
-     * Set by the constructor.
+     * The mesh. Set by the constructor.
      */
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
@@ -113,6 +112,8 @@ public:
 
     /**
      * Constructor
+     *
+     * @param pMesh  The mesh whose elements we are going to write out data for.
      */
     AbstractPerElementWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
      : mpMesh(pMesh),

@@ -51,6 +51,13 @@ class CryptProjectionForce : public GeneralisedLinearSpringForce<2>
 private:
 
     friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing.
+     * Archives the object and its member variables.
+     *
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {

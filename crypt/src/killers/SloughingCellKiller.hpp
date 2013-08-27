@@ -91,7 +91,10 @@ public:
      * @param sloughSides whether to slough cells at the side of the domain
      * @param sloughWidth the width of the domain (note slough on left and right)
      */
-    SloughingCellKiller(AbstractCellPopulation<DIM>* pCrypt, double sloughHeight, bool sloughSides=false, double sloughWidth = 10.0);
+    SloughingCellKiller(AbstractCellPopulation<DIM>* pCrypt,
+                        double sloughHeight,
+                        bool sloughSides = false,
+                        double sloughWidth = 10.0);
 
     /**
      * Destructor

@@ -116,7 +116,7 @@ template <unsigned DIM>
 class  AbstractNonlinearElasticitySolver; //Forward declaration
 
 /**
- * Helper class for dumping the stresses to file
+ * Helper class for dumping the stresses to file.
  * 
  * Currently located here so that it's easy to feed a pointer to the main
  * class AbstractNonlinearElasticitySolver
@@ -129,6 +129,7 @@ private:
 public:    
     
     /** Constructor
+     * @param pMesh  A pointer to the mesh whose elements we want to calculate data on.
      * @param pSolver  A pointer to the parent class, used to access data
      */
     StressPerElementWriter(AbstractTetrahedralMesh<DIM, DIM>* pMesh,

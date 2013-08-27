@@ -53,6 +53,11 @@ class SimpleOxygenBasedCellCycleModel : public AbstractSimpleCellCycleModel
 private:
 
     friend class boost::serialization::access;
+    /**
+     * Boost Serialization method for archiving/checkpointing
+     * @param archive  The boost archive.
+     * @param version  The current version of this class.
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
