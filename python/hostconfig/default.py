@@ -42,6 +42,11 @@ import sys
 # dependencies.
 ############################################################
 
+# If you are an active developer, committing back to the trunk, 
+# please uncomment the following line to run tests on duplicate file names, 
+# orphaned tests and copyright notices.
+# do_inf_tests = 1
+
 #EDIT HERE
 #For a simple installation all paths will be below this directory
 chaste_libs_path = '/home/scratch/chaste-libs/'
