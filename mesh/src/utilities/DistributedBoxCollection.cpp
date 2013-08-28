@@ -413,7 +413,7 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
     MPI_Send(&num_local_rows, 1, MPI_UNSIGNED, proc_right, 123, PETSC_COMM_WORLD);
     MPI_Recv(&rows_on_left_process, 1, MPI_UNSIGNED, proc_left, 123, PETSC_COMM_WORLD, &status);
 
-    node_distr_on_left_process.resize(rows_on_left_process);
+    node_distr_on_left_process.resize(rows_on_left_process > 0 ? rows_on_left_process : 1);
 
     MPI_Send(&localDistribution[0], num_local_rows, MPI_INT, proc_right, 123, PETSC_COMM_WORLD);
     MPI_Recv(&node_distr_on_left_process[0], rows_on_left_process, MPI_INT, proc_left, 123, PETSC_COMM_WORLD, &status);
