@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <sstream>
 #include <string>
+#include <iterator>
+#include <algorithm>
 #include <boost/scoped_array.hpp>
 
 #include "Exception.hpp"
@@ -169,22 +171,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
 
             // Subtract off the rNodesOwned set to produce rHaloNodesOwned.
             // Note that rNodesOwned is a subset of node_index_set.
-            // std::set_difference can't be used to fill a set...
-            std::set<unsigned>::iterator iter_all = node_index_set.begin();
-            std::set<unsigned>::iterator iter_owned = rNodesOwned.begin();
-            while (iter_all != node_index_set.end() && iter_owned != rNodesOwned.end())
-            {
-                if (*iter_all < *iter_owned) // Elements in sets are ordered
-                {
-                    rHaloNodesOwned.insert(*iter_all++); // This node doesn't appear in rNodesOwned
-                }
-                else
-                {
-                    iter_all++;
-                    iter_owned++;
-                }
-            }
-            rHaloNodesOwned.insert(iter_all, node_index_set.end()); // Anything left over is halo
+            std::set_difference(node_index_set.begin(), node_index_set.end(),
+                                rNodesOwned.begin(), rNodesOwned.end(),
+                                std::inserter(rHaloNodesOwned, rHaloNodesOwned.begin()));
         }
         else
         {
