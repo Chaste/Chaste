@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "NumericFileComparison.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -232,7 +233,7 @@ public:
         // ... and checking visualization of labelled cells against previous run
         OutputFileHandler handler(output_directory, false);
         std::string results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.viznodes";
-        FileComparison( results_file, "crypt/test/data/MakeMeinekeGraphs/results.viznodes").CompareFiles();
+        TS_ASSERT(NumericFileComparison( results_file, "crypt/test/data/MakeMeinekeGraphs/results.viznodes").CompareFiles());
 
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "results_from_time_0/results.vizcelltypes";
         FileComparison( results_file2, "crypt/test/data/MakeMeinekeGraphs/results.vizcelltypes").CompareFiles();

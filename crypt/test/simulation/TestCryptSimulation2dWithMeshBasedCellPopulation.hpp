@@ -1927,10 +1927,6 @@ public:
         NumericFileComparison comp_celltypes(results_file3, "crypt/test/data/AncestorCrypt/results.vizcelltypes");
         TS_ASSERT(comp_celltypes.CompareFiles());
 
-        FileComparison( results_file1, "crypt/test/data/AncestorCrypt/results.viznodes").CompareFiles();
-        FileComparison( results_file2, "crypt/test/data/AncestorCrypt/results.vizancestors").CompareFiles();
-        FileComparison( results_file3, "crypt/test/data/AncestorCrypt/results.vizcelltypes").CompareFiles();
-
         // Tidy up
         WntConcentration<2>::Destroy();
         delete p_crypt;
