@@ -136,6 +136,11 @@ public:
                                   double ghostSpringStiffness=15.0);
 
     /**
+     * Empty destructor so archiving works with static libraries.
+     */
+    virtual ~MeshBasedCellPopulationWithGhostNodes();
+
+    /**
      * Overridden UpdateNodeLocation() method.
      *
      * Update the location of each node in the cell population given

@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
 #include "CellBetaCateninWriter.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
 
 CryptSimulation2d::CryptSimulation2d(AbstractCellPopulation<2>& rCellPopulation,

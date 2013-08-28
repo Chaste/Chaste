@@ -497,7 +497,7 @@ public:
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false); // don't erase contents of folder
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CryptSimulationBoundaryCondition<1>.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CryptSimulationBoundaryCondition1.arch";
 
         {
             // Create an output archive
@@ -534,7 +534,7 @@ public:
     {
         // Set up singleton classes
         OutputFileHandler handler("archive", false); // don't erase contents of folder
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CryptSimulationBoundaryCondition<2>.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CryptSimulationBoundaryCondition2.arch";
 
         {
             // Create an output archive

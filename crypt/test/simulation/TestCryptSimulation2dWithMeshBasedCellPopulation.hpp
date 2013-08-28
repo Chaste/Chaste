@@ -43,14 +43,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CryptSimulation2d.hpp"
 #include "CryptCellsGenerator.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "TargetedCellKiller.hpp"
 #include "RandomCellKiller.hpp"
 #include "SloughingCellKiller.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
-#include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -65,7 +65,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "FileComparison.hpp"
+#include "NumericFileComparison.hpp"
 
+#include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestCryptSimulation2dWithMeshBasedCellPopulation : public AbstractCellBasedTestSuite

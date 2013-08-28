@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before any other cell_based or crypt headers
 #include "CellBasedSimulationArchiver.hpp"
 
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "SimpleDataWriter.hpp"
 #include "CryptStatistics.hpp"
 #include "CryptSimulation2d.hpp"

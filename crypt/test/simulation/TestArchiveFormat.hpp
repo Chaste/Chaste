@@ -78,7 +78,7 @@ public:
      * with build=GccOpt to speed up the test.
      *
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
-     * The earliest version of Boost supported in 1.34
+     * The earliest version of Boost supported is 1.34
      *
      * NB: Produce archives with
        scons build=GccOpt_hostconfig,boost=1-34,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
@@ -97,7 +97,7 @@ public:
         double t = 150;
 
         // The archive must be copied from crypt/test/data/<test_to_profile>
-        FileFinder test_data_directory("crypt/test/data/" + test_to_profile + "/archive",RelativeTo::ChasteSourceRoot);
+        FileFinder test_data_directory("crypt/test/data/" + test_to_profile + "/archive", RelativeTo::ChasteSourceRoot);
         TS_ASSERT(test_data_directory.IsDir());
 
         // to the testoutput/archive directory to continue running the simulation
@@ -111,7 +111,7 @@ public:
         }
 
         // Load and run crypt simulation
-        CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile,t);
+        CryptSimulation2d* p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load(test_to_profile, t);
         p_simulator->SetEndTime(t + 1);
 
         ///\todo we should also test the rest of the simulation setup

@@ -35,6 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellData.hpp"
 
+CellData::~CellData()
+{
+}
+
 void CellData::SetItem(const std::string& variableName, double data)
 {
     mCellData[variableName] = data;

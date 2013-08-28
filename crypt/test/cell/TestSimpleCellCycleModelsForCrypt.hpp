@@ -38,15 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include <fstream>
 
+#include "AbstractCellBasedTestSuite.hpp"
 #include "SimpleWntCellCycleModel.hpp"
+#include "Cell.hpp"
 #include "OutputFileHandler.hpp"
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
@@ -369,7 +369,7 @@ public:
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_stem_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
-            std::ofstream ofs(archive_filename.c_str());
+            std::ofstream ofs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_oarchive output_arch(ofs);
 
             CellPtr const p_const_cell = p_stem_cell;
@@ -478,7 +478,7 @@ public:
             TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->ReadyToDivide(), false);
             TS_ASSERT_EQUALS(p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase(), G_TWO_PHASE);
 
-            std::ofstream ofs(archive_filename.c_str());
+            std::ofstream ofs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_oarchive output_arch(ofs);
 
             CellPtr const p_const_cell = p_cell;

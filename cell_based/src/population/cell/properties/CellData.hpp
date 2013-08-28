@@ -85,8 +85,10 @@ private:
 public:
 
     /**
-     * Constructor/destructor are default.
+     * We need the empty virtual destructor in this class to ensure Boost
+     * serialization works correctly with static libraries.
      */
+    virtual ~CellData();
 
     /**
      * This assigns the cell data.

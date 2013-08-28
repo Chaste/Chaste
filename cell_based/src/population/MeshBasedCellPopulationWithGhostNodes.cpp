@@ -84,6 +84,11 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 }
 
 template<unsigned DIM>
+MeshBasedCellPopulationWithGhostNodes<DIM>::~MeshBasedCellPopulationWithGhostNodes()
+{
+}
+
+template<unsigned DIM>
 std::vector<bool>& MeshBasedCellPopulationWithGhostNodes<DIM>::rGetGhostNodes()
 {
     return this->mIsGhostNode;
