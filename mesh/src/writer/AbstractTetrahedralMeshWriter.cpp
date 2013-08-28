@@ -358,7 +358,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         if (PetscTools::AmMaster())
         {
             //Open the file for the first time
-            p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(node_connect_list_file_name);
+            p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(node_connect_list_file_name, std::ios::binary | std::ios::trunc);
 
             // Write the ncl header
             *p_ncl_file << rMesh.GetNumNodes() << "\t";
@@ -368,7 +368,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         else
         {
             // Append to the existing file
-            p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(node_connect_list_file_name, std::ios::app);
+            p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(node_connect_list_file_name, std::ios::binary | std::ios::app);
         }
 
         // Write each node's data
@@ -409,7 +409,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
     {
         // Open files
         const std::string real_node_connect_list_file_name = this->mBaseName + ".ncl";
-        out_stream p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(real_node_connect_list_file_name);
+        out_stream p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(real_node_connect_list_file_name, std::ios::binary | std::ios::trunc);
         FileFinder temp_ncl_path = this->mpOutputFileHandler->FindFile(node_connect_list_file_name);
         std::ifstream temp_ncl_file(temp_ncl_path.GetAbsolutePath().c_str());
         // Copy the header
