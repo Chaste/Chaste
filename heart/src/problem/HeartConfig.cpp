@@ -1381,6 +1381,7 @@ void HeartConfig::GetOutputVariables(std::vector<std::string>& rOutputVariables)
         rOutputVariables.push_back(r_var.name());
     }
 }
+
 bool HeartConfig::GetOutputUsingOriginalNodeOrdering()
 {
     CheckSimulationIsDefined("OutputUsingOriginalNodeOrdering");

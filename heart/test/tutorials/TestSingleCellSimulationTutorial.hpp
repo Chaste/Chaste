@@ -123,10 +123,28 @@ public:
          * Cardiac cell models can be pretty tricky to deal with, as they are very stiff and sometimes full
          * of singularities.
          *
-         * EMPTYLINE
+         * A common error from CVODE is '''TOO_MUCH_WORK'''this means CVODE tried to exceed the maximum number of
+         * internal time steps it is allowed to do. You can try using the method SetMaxSteps to change
+         * the default (500) to a larger value, with a command like:
          *
-         * To try to deal with this you can change the absolute and relative tolerances of the CVODE solver,
-         * the default being (1e-5,1e-7).
+         * {{{p_model->SetMaxSteps(1e5);}}}
+         *
+         * We have found that 1e5 should be enough for a single pace of all models we've tried so far,
+         * but if you were running for a long time (e.g. 1000 paces in one Solve call) you would need to increase this.
+         *
+         * Another common error from CVODE is:
+         * '''the error test failed repeatedly or with |h| = hmin.'''
+         *
+         * Since we don't change hmin (and it defaults to a very small value), this generally means the
+         * ODE system has got to a situation where refining the timestep is not helping the convergence.
+         *
+         * This generally indicates that you are hitting some sort of singularity, or divide by zero, in
+         * the model. Unfortunately cardiac models are full of these, they can sometimes be manually edited out
+         * by changing the cellML file, for instance using [http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule L'Hopital's rule].
+         *
+         * In this case, one other thing you can try is to change the absolute and relative
+         * tolerances of the CVODE solver, the default being (1e-5,1e-7), although it isn't clear whether
+         * refining sometimes makes things worse, as CVODE goes to look for trouble in areas with steep gradients.
          *
          * EMPTYLINE
          *
@@ -142,9 +160,8 @@ public:
          * EMPTYLINE
          *
          * {{{p_model->ForceUseOfNumericalJacobian();}}}
+         *
          */
-
-
 
         /*
          * == Changing Parameters in the Cell Model ==
