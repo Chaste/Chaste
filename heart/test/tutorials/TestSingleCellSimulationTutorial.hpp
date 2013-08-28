@@ -123,8 +123,8 @@ public:
          * Cardiac cell models can be pretty tricky to deal with, as they are very stiff and sometimes full
          * of singularities.
          *
-         * A common error from CVODE is '''TOO_MUCH_WORK'''this means CVODE tried to exceed the maximum number of
-         * internal time steps it is allowed to do. You can try using the method SetMaxSteps to change
+         * A common error from CVODE is '''TOO_MUCH_WORK''', this means CVODE tried to exceed the maximum number of
+         * internal time steps it is allowed to do. You can try using the method `SetMaxSteps` to change
          * the default (500) to a larger value, with a command like:
          *
          * {{{p_model->SetMaxSteps(1e5);}}}
@@ -193,14 +193,14 @@ public:
         result = steady_runner.RunToSteadyState();
 
         /*
-         * Check that the model has NOT reached steady state.
-         * The model needs more than a 100 paces to reach steady state.
+         * Check that the model has NOT reached steady state
+         * (this model needs more than 100 paces to reach steady state).
          *
          */
         TS_ASSERT_EQUALS(result,false);
 
         /*
-         * == Solving model for paces of interest ==
+         * == Getting detail for paces of interest ==
          *
          * Now we solve for the number of paces we are interested in
          * max_timestep and sampling time step should generally be the same for CVODE cells.
