@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLBASEDPDEHANDLER_HPP_
 
 #include <map>
+#include <memory>
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/vector.hpp>
@@ -242,7 +243,9 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
+    virtual std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
+            PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+            TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Find the solution of one of the PDEs at a point in space

@@ -340,7 +340,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
 
         // Set up boundary conditions
-        BoundaryConditionsContainer<DIM,DIM,1> bcc = ConstructBoundaryConditionsContainer(p_pde_and_bc, p_mesh);
+        std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(p_pde_and_bc, p_mesh);
 
         // If the solution at the previous timestep exists...
         PetscInt previous_solution_size = 0;
@@ -380,7 +380,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             p_pde_and_bc->SetUpSourceTermsForAveragedSourcePde(p_mesh, &mCellPdeElementMap);
 
 
-            SimpleLinearEllipticSolver<DIM,DIM> solver(p_mesh, p_pde_and_bc->GetPde(), &bcc);
+            SimpleLinearEllipticSolver<DIM,DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
 
             // If we have an initial guess, use this when solving the system...
             if (is_previous_solution_size_correct)
@@ -395,7 +395,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
         }
         else
         {
-            CellBasedPdeSolver<DIM> solver(p_mesh, p_pde_and_bc->GetPde(), &bcc);
+            CellBasedPdeSolver<DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
 
             // If we have an initial guess, use this...
             if (is_previous_solution_size_correct)
@@ -470,9 +470,11 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
 }
 
 template<unsigned DIM>
-BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
+std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandler<DIM>::ConstructBoundaryConditionsContainer(
+        PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+        TetrahedralMesh<DIM,DIM>* pMesh)
 {
-    BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     AbstractBoundaryCondition<DIM>* p_bc = pPdeAndBc->GetBoundaryCondition();
 
@@ -483,7 +485,7 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandler<DIM>::ConstructBounda
              elem_iter != pMesh->GetBoundaryElementIteratorEnd();
              ++elem_iter)
         {
-            bcc.AddNeumannBoundaryCondition(*elem_iter, p_bc);
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, p_bc);
         }
     }
     else // assume that if the BC is not of Neumann type, then it is Dirichlet
@@ -521,7 +523,7 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandler<DIM>::ConstructBounda
                  iter != coarse_mesh_boundary_node_indices.end();
                  ++iter)
             {
-                bcc.AddDirichletBoundaryCondition(pMesh->GetNode(*iter), p_bc, 0, false);
+                p_bcc->AddDirichletBoundaryCondition(pMesh->GetNode(*iter), p_bc, 0, false);
             }
         }
         else // apply BC at boundary nodes of (population-level or coarse) mesh
@@ -530,12 +532,12 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandler<DIM>::ConstructBounda
                  node_iter != pMesh->GetBoundaryNodeIteratorEnd();
                  ++node_iter)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter, p_bc);
+                p_bcc->AddDirichletBoundaryCondition(*node_iter, p_bc);
             }
         }
     }
 
-    return bcc;
+    return p_bcc;
 }
 
 template<unsigned DIM>

@@ -54,12 +54,14 @@ CellBasedPdeHandlerOnCuboid<DIM>::~CellBasedPdeHandlerOnCuboid()
 }
 
 template<unsigned DIM>
-BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh)
+std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandlerOnCuboid<DIM>::ConstructBoundaryConditionsContainer(
+        PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+        TetrahedralMesh<DIM,DIM>* pMesh)
 {
     // Not using the inputs as there's only one BC
     assert(DIM==2);
 
-    BoundaryConditionsContainer<DIM,DIM,1> bcc(false);
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
     // Use these two vectors to define what's happening on the top right bottom and left boundaries
 
@@ -112,14 +114,14 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
 //        {
 //            if ( (y_1  > (top-fudge_factor) ) &&  (y_2 > (top-fudge_factor) ))
 //            {
-//                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[0]);
+//                p_bcc->AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[0]);
 //            }
 //        }
         if (are_neumann_boundaries[1]) // Right is Neumann boundary
         {
             if ( (x_1  > (right-fudge_factor) ) &&  (x_2 > (right-fudge_factor) ))
             {
-                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[1]);
+                p_bcc->AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[1]);
             }
         }
         assert(!are_neumann_boundaries[2]);
@@ -127,14 +129,14 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
 //        {
 //            if ( (y_1  < (bottom+fudge_factor) ) &&  (y_2 < (bottom+fudge_factor) ))
 //            {
-//                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[2]);
+//                p_bcc->AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[2]);
 //            }
 //        }
         if (are_neumann_boundaries[3]) // Left is Neumann Boundary
         {
             if ( (x_1  > (left+fudge_factor) ) &&  (x_2 < (left+fudge_factor) ))
             {
-                bcc.AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[3]);
+                p_bcc->AddNeumannBoundaryCondition(*elem_iter, mConstBoundaryConditions[3]);
             }
         }
     }
@@ -152,7 +154,7 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
         {
             if (y > top-fudge_factor)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[0]);
+                p_bcc->AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[0]);
             }
         }
         assert(are_neumann_boundaries[1]);
@@ -160,14 +162,14 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
 //        {
 //            if (x > right-fudge_factor)
 //            {
-//                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[1]);
+//                p_bcc->AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[1]);
 //            }
 //        }
         if (!are_neumann_boundaries[2]) // Bottom is Dirichlet boundary
         {
             if (y < bottom+fudge_factor)
             {
-                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[2]);
+                p_bcc->AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[2]);
             }
         }
         assert(are_neumann_boundaries[3]);
@@ -175,12 +177,12 @@ BoundaryConditionsContainer<DIM,DIM,1> CellBasedPdeHandlerOnCuboid<DIM>::Constru
 //        {
 //            if (x < left+fudge_factor)
 //            {
-//                bcc.AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[3]);
+//                p_bcc->AddDirichletBoundaryCondition(*node_iter, mConstBoundaryConditions[3]);
 //            }
 //        }
     }
 
-    return bcc;
+    return p_bcc;
 }
 
 template<unsigned DIM>

@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include <set>
+#include <boost/utility.hpp>
 #include "AbstractBoundaryCondition.hpp"
 #include "Node.hpp"
 //#include "ConstBoundaryCondition.hpp"
@@ -68,7 +69,7 @@ struct LessThanNode
  * Abstract boundary conditions container.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-class AbstractBoundaryConditionsContainer
+class AbstractBoundaryConditionsContainer : boost::noncopyable
 {
 protected:
 

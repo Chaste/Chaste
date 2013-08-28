@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLBASEDPDEHANDLERONCUBOID_HPP_
 
 #include <map>
+#include <memory>
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/vector.hpp>
@@ -60,7 +61,7 @@ class CellBasedPdeHandlerOnCuboid : public CellBasedPdeHandler<DIM>
     friend class TestOnLatticeSimulationWithPdes;
 
 private:
-    
+
     /** Container for pointers to boundary conditions that are passed into the boundary condition containers. */
     std::vector<ConstBoundaryCondition<DIM>* > mConstBoundaryConditions;
 
@@ -101,7 +102,9 @@ public:
      * @param pMesh the mesh on which to solve the PDE
      * @return The full boundary conditions container
      */
-    BoundaryConditionsContainer<DIM,DIM,1> ConstructBoundaryConditionsContainer(PdeAndBoundaryConditions<DIM>* pPdeAndBc,TetrahedralMesh<DIM,DIM>* pMesh);
+    std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ConstructBoundaryConditionsContainer(
+            PdeAndBoundaryConditions<DIM>* pPdeAndBc,
+            TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Output parameters to file.
