@@ -502,7 +502,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenNodeFile()
 {
     // Nodes definition
     std::string file_name = mFilesBaseName + NODES_FILE_EXTENSION;
-    mNodesFile.open(file_name.c_str());
+    mNodesFile.open(file_name.c_str(), std::ios::binary);
     if (!mNodesFile.is_open())
     {
         EXCEPTION("Could not open data file: " + file_name);
@@ -534,7 +534,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenElementsFile()
         }
     }
 
-    mElementsFile.open(file_name.c_str());
+    mElementsFile.open(file_name.c_str(), std::ios::binary);
     if (!mElementsFile.is_open())
     {
         EXCEPTION("Could not open data file: " + file_name);
@@ -560,7 +560,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenFacesFile()
         return;
     }
 
-    mFacesFile.open(file_name.c_str());
+    mFacesFile.open(file_name.c_str(), std::ios::binary);
     if (!mFacesFile.is_open())
     {
         EXCEPTION("Could not open data file: " + file_name);
@@ -571,7 +571,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenNclFile()
 {
     std::string file_name = mFilesBaseName + NCL_FILE_EXTENSION;
-    mNclFile.open(file_name.c_str());
+    mNclFile.open(file_name.c_str(), std::ios::binary);
 
     mNclFileAvailable = mNclFile.is_open();
 }
@@ -580,7 +580,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::OpenCableElementsFile()
 {
     std::string file_name = mFilesBaseName + CABLE_FILE_EXTENSION;
-    mCableElementsFile.open(file_name.c_str());
+    mCableElementsFile.open(file_name.c_str(), std::ios::binary);
     if (!mCableElementsFile.is_open())
     {
         mNumCableElements = 0u;
@@ -849,7 +849,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextLineFromStream(std::ifs
     mEofException = false;
     do
     {
-        getline(rFileStream, rRawLine);
+        getline(rFileStream, rRawLine, '\n');
         if (rFileStream.eof())
         {
             mEofException = true;

@@ -72,14 +72,14 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
     // Write node file
     std::string node_file_name = this->mBaseName + ".node";
-    out_stream p_node_file = this->mpOutputFileHandler->OpenOutputFile(node_file_name);
+    out_stream p_node_file = this->mpOutputFileHandler->OpenOutputFile(node_file_name, std::ios::binary | std::ios::trunc);
 
     // Write the node header
     unsigned num_attr = 0;
 
-    if(this->mpMesh && !this->mFilesAreBinary) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
+    if (this->mpMesh && !this->mFilesAreBinary) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
     {
-        //Assumes that all nodes have the same number of attributes as the first node in the mesh.
+        // Assumes that all nodes have the same number of attributes as the first node in the mesh.
         num_attr = this->mpMesh->GetNumNodeAttributes();
     }
     ///\todo #1949
@@ -104,7 +104,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     // Write each node's data
     for (unsigned item_num=0; item_num<num_nodes; item_num++)
     {
-        if(this->mpMesh && !this->mFilesAreBinary && num_attr!=0) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
+        if (this->mpMesh && !this->mFilesAreBinary && num_attr!=0) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
         {
 
             ///\todo #1949 Will deadlock on GetNode(global ID) in parallel since this code is run on the master process
@@ -129,7 +129,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
     // Write element file
     std::string element_file_name = this->mBaseName + ".ele";
-    out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
+    out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name, std::ios::binary | std::ios::trunc);
 
     // Write the element header
     unsigned num_elements = this->GetNumElements();
@@ -213,7 +213,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     {
         face_file_name = face_file_name + ".face";
     }
-    out_stream p_face_file = this->mpOutputFileHandler->OpenOutputFile(face_file_name);
+    out_stream p_face_file = this->mpOutputFileHandler->OpenOutputFile(face_file_name, std::ios::binary | std::ios::trunc);
 
     // Write the boundary face header
     if (num_elements != 0)
@@ -246,7 +246,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         {
             // Write cable element file
             std::string cable_element_file_name = this->mBaseName + ".cable";
-            out_stream p_cable_element_file = this->mpOutputFileHandler->OpenOutputFile(cable_element_file_name);
+            out_stream p_cable_element_file = this->mpOutputFileHandler->OpenOutputFile(cable_element_file_name, std::ios::binary | std::ios::trunc);
 
             // Write the cable element header
             unsigned num_cable_elements = this->GetNumCableElements();
@@ -298,7 +298,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
         element_file_name = element_file_name + ".face";
     }
 
-    out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
+    out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name, std::ios::binary | std::ios::trunc);
 
     // Write the element header
     unsigned num_elements = this->GetNumElements();
@@ -341,7 +341,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
     std::string face_file_name = this->mBaseName;
     face_file_name = face_file_name + ".edge";
 
-    out_stream p_face_file = this->mpOutputFileHandler->OpenOutputFile(face_file_name);
+    out_stream p_face_file = this->mpOutputFileHandler->OpenOutputFile(face_file_name, std::ios::binary | std::ios::trunc);
 
     // Write the boundary face header
     unsigned num_faces = this->GetNumBoundaryFaces();

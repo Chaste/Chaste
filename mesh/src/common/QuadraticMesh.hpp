@@ -157,8 +157,8 @@ public:
 
     /**
      * Create a quadratic mesh on a slab (on a line in 1D, rectangle in 2d, cuboid in 3D),
-     * with the given widths and given spacestep. In 1D height and depth need to passed in
-     * as 0 (the default value), in 2D depth must be zero
+     * with the given widths and given space step. In 1D height and depth need to be passed in
+     * as 0 (the default value); in 2D depth must be zero
      *
      * @param spaceStep The spatial stepsize
      * @param width the width of the cuboid
