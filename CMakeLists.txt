@@ -46,7 +46,8 @@ else()
 			OUTPUT_VARIABLE date_time
 		)
 	string(REGEX REPLACE "[:/. \n]" "_" date_time "${date_time}")
-	execute_process(COMMAND ctest -C Debug --output-on-failure -O ${TEST_FAMILY}TestOutputs_${date_time}.txt -R ${tests}
+	# Note: set 6 minute (360s) timeout for each test
+	execute_process(COMMAND ctest -C Debug --output-on-failure -O ${TEST_FAMILY}TestOutputs_${date_time}.txt --timeout 360 -R ${tests}
 			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 			OUTPUT_VARIABLE t_out
 			RESULT_VARIABLE t_res
