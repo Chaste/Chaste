@@ -171,11 +171,11 @@ c_vector<double, 2*DIM> ParallelCellsGenerator<CELL_CYCLE_MODEL, DIM>::GetArchiv
 
     while (std::getline(infile, line))
     {
-        std::istringstream iss(line);
+        std::stringstream new_iss(line);
         for (unsigned i=0; i<DIM; i++)
         {
             double point;
-            iss >> point;
+            new_iss >> point;
             bounding_box[2*i] = (point < bounding_box[2*i]) ? point : bounding_box[2*i];
             bounding_box[2*i+1] = (point > bounding_box[2*i+1]) ? point : bounding_box[2*i+1];
         }
