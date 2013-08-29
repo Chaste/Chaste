@@ -52,10 +52,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestStreeterFibreGenerator : public CxxTest::TestSuite
 {
 private:
-    void CompareGeneratedWithReferenceFile(FileFinder& rGeneratedFile, FileFinder& rReferenceFile) throw (Exception)
+    void CompareGeneratedWithReferenceFile(FileFinder& rGeneratedFile, FibreFileType generatedFileType, FileFinder& rReferenceFile, FibreFileType referenceFileType) throw (Exception)
     {
-        FibreReader<3> fibre_reader1(rGeneratedFile, ORTHO);
-        FibreReader<3> fibre_reader2(rReferenceFile, ORTHO);
+        FibreReader<3> fibre_reader1(rGeneratedFile, generatedFileType);
+        FibreReader<3> fibre_reader2(rReferenceFile, referenceFileType);
 
         double tol = 1e-11;
 
@@ -72,20 +72,42 @@ private:
         std::vector< c_vector<double, 3> > second2;
         std::vector< c_vector<double, 3> > third2;
 
-        fibre_reader1.GetAllOrtho(fibres1, second1, third1);
-        fibre_reader2.GetAllOrtho(fibres2, second2, third2);
+        if (generatedFileType == ORTHO)
+        {
+            fibre_reader1.GetAllOrtho(fibres1, second1, third1);
+        }
+        else
+        {
+            fibre_reader1.GetAllAxi(fibres1);
+        }
+
+        if (referenceFileType == ORTHO)
+        {
+            fibre_reader2.GetAllOrtho(fibres2, second2, third2);
+        }
+        else
+        {
+            fibre_reader2.GetAllAxi(fibres2);
+        }
+
 
         TS_ASSERT_EQUALS(fibres1.size(), fibres2.size());
-        TS_ASSERT_EQUALS(second1.size(), second2.size());
-        TS_ASSERT_EQUALS(third1.size(), third2.size());
+        if (generatedFileType == ORTHO && referenceFileType == ORTHO)
+        {
+            TS_ASSERT_EQUALS(second1.size(), second2.size());
+            TS_ASSERT_EQUALS(third1.size(), third2.size());
+        }
 
         for (unsigned i = 0u; i < fibres1.size(); i++)
         {
             for (unsigned j=0u; j<3u; j++)
             {
                 TS_ASSERT_DELTA( fibres1[i][j] , fibres2[i][j] , tol);
-                TS_ASSERT_DELTA( second1[i][j] , second2[i][j] , tol);
-                TS_ASSERT_DELTA( third1[i][j] , third2[i][j] , tol);
+                if (generatedFileType == ORTHO && referenceFileType == ORTHO)
+                {
+                    TS_ASSERT_DELTA( second1[i][j] , second2[i][j] , tol);
+                    TS_ASSERT_DELTA( third1[i][j] , third2[i][j] , tol);
+                }
             }
         }
     }
@@ -112,14 +134,14 @@ public:
         FileFinder fibre_file_ascii = handler.FindFile("box_heart.ortho");
         FileFinder fibre_file_reference("heart/test/data/box_shaped_heart/box_heart.ortho", RelativeTo::ChasteSourceRoot);
 
-        CompareGeneratedWithReferenceFile(fibre_file_ascii, fibre_file_reference);
+        CompareGeneratedWithReferenceFile(fibre_file_ascii, ORTHO, fibre_file_reference, ORTHO);
 
         fibre_generator.SetWriteFileAsBinary();
         fibre_generator.WriteData(handler, "box_heart_binary.ortho");
 
         FileFinder fibre_file_binary = handler.FindFile("box_heart_binary.ortho");
 
-        CompareGeneratedWithReferenceFile(fibre_file_binary, fibre_file_reference);
+        CompareGeneratedWithReferenceFile(fibre_file_binary, ORTHO, fibre_file_reference, ORTHO);
     }
 
     void TestSimpleOrthotropicNotDistributed() throw (Exception)
@@ -142,7 +164,7 @@ public:
         FileFinder fibre_file1 = handler.FindFile("box_heart_not_dist.ortho");
         FileFinder fibre_file2("heart/test/data/box_shaped_heart/box_heart.ortho", RelativeTo::ChasteSourceRoot);
 
-        CompareGeneratedWithReferenceFile(fibre_file1, fibre_file2);
+        CompareGeneratedWithReferenceFile(fibre_file1, ORTHO, fibre_file2, ORTHO);
     }
 
     void TestExceptions()
@@ -208,7 +230,7 @@ public:
         FileFinder fibre_file1 = handler.FindFile("HumanWedgeMeshLeft.ortho");
         FileFinder fibre_file2("heart/test/data/human_wedge_mesh/HumanWedgeMeshLeft.ortho", RelativeTo::ChasteSourceRoot);
 
-        CompareGeneratedWithReferenceFile(fibre_file1, fibre_file2);
+        CompareGeneratedWithReferenceFile(fibre_file1, ORTHO, fibre_file2, ORTHO);
     }
 
     void TestConstructStreeterOnRightWedge() throw(Exception)
@@ -235,7 +257,7 @@ public:
         FileFinder fibre_file1 = handler.FindFile("HumanWedgeMeshRight.ortho");
         FileFinder fibre_file2("heart/test/data/human_wedge_mesh/HumanWedgeMeshRight.ortho", RelativeTo::ChasteSourceRoot);
 
-        CompareGeneratedWithReferenceFile(fibre_file1, fibre_file2);
+        CompareGeneratedWithReferenceFile(fibre_file1, ORTHO, fibre_file2, ORTHO);
     }
 
     void TestSetLogInfo() throw (Exception)

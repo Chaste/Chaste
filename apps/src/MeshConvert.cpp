@@ -87,9 +87,9 @@ int main(int argc, char *argv[])
                 //If dot found, then make the string smaller
                 base_for_output.resize(pos);
             }
-            base_for_output=base_for_output+"_bin";
+            base_for_output = base_for_output + "_bin";
             TrianglesMeshWriter<3,3> mesh_writer("", base_for_output);
-            ExecutableSupport::Print("Writing  "+base_for_output+".node etc. mesh file in "+mesh_writer.GetOutputDirectory());
+            ExecutableSupport::Print("Writing  " + base_for_output + ".node etc. mesh file in " + mesh_writer.GetOutputDirectory());
             mesh_writer.SetWriteFilesAsBinary();
             mesh_writer.WriteFilesUsingMesh(mesh);
             ExecutableSupport::Print("Done.");

@@ -232,7 +232,7 @@ public:
      */
      void SetWriteFileAsBinary(bool binary=true)
      {
-         mFileIsBinary=binary;
+         mFileIsBinary = binary;
      }
 
     /**

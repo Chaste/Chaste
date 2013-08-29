@@ -60,7 +60,7 @@ public:
         std::vector< c_vector<double, 3> > fibre_vector;
         fibre_reader.GetAllAxi(fibre_vector);
 
-        //Write ascii file
+        // Write ascii file
         FibreWriter<3> fibre_writer("TestFibreWriter", "SimpleAxisymmetric2", true);
         fibre_writer.WriteAllAxi(fibre_vector);
 
