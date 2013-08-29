@@ -1334,14 +1334,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     else
     {
         // Advance the file pointer to the first element before the ones I own.
-        for (unsigned element_index = 0; element_index < first_local_element; element_index++)
+        for (idxtype element_index = 0; element_index < first_local_element; element_index++)
         {
             rMeshReader.GetNextElementData();
         }
     }
 
     unsigned counter = 0;
-    for (unsigned element_index = 0; element_index < num_local_elements; element_index++)
+    for (idxtype element_index = 0; element_index < num_local_elements; element_index++)
     {
         ElementData element_data;
 
