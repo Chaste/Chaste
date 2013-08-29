@@ -525,6 +525,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
             }
             catch (Exception &e)
             {
+                std::cout << std::setprecision(16);
                 std::cout << "Global node " << index.Global << " had problems with ODE solve between "
                         "t = " << time << " and " << nextTime << "ms.\n";
 
@@ -535,6 +536,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 std::cout << "Stimulus current (NB converted to micro-Amps per cm^3) applied here is equal to:\n\t"
                     << mCellsDistributed[index.Local]->GetIntracellularStimulus(time) << " at t = " << time     << "ms,\n\t"
                     << mCellsDistributed[index.Local]->GetIntracellularStimulus(nextTime) << " at t = " << nextTime << "ms.\n";
+
+                std::cout << "Cell model: " << dynamic_cast<AbstractUntemplatedParameterisedSystem*>(mCellsDistributed[index.Local])->GetSystemName() << "\n";
 
                 std::cout << "All state variables are now:\n";
                 std::vector<double> state_vars = mCellsDistributed[index.Local]->GetStdVecStateVariables();
