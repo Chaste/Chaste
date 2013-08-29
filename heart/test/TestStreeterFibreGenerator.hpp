@@ -57,12 +57,7 @@ private:
         FibreReader<3> fibre_reader1(rGeneratedFile, generatedFileType);
         FibreReader<3> fibre_reader2(rReferenceFile, referenceFileType);
 
-        double tol = 1e-11;
-
-        if (!(fibre_reader1.IsBinary()==fibre_reader2.IsBinary()))
-        {
-            tol = 1e-6;
-        }
+        double tol = 1e-14;
 
         std::vector< c_vector<double, 3> > fibres1;
         std::vector< c_vector<double, 3> > second1;
@@ -89,7 +84,6 @@ private:
         {
             fibre_reader2.GetAllAxi(fibres2);
         }
-
 
         TS_ASSERT_EQUALS(fibres1.size(), fibres2.size());
         if (generatedFileType == ORTHO && referenceFileType == ORTHO)
@@ -222,6 +216,7 @@ public:
         fibre_generator.SetSurfaceFiles(epi_face_file, "", endo_face_file, true);
 
         fibre_generator.SetApexToBase(0);
+        fibre_generator.SetWriteFileAsBinary();
 
         OutputFileHandler handler("human_wedge_mesh", false);
 
@@ -248,11 +243,11 @@ public:
         fibre_generator.SetSurfaceFiles(epi_face_file, endo_face_file, "", true);
 
         fibre_generator.SetApexToBase(0);
+        fibre_generator.SetWriteFileAsBinary();
 
         OutputFileHandler handler("human_wedge_mesh", false);
 
         fibre_generator.WriteData(handler, "HumanWedgeMeshRight.ortho");
-
 
         FileFinder fibre_file1 = handler.FindFile("HumanWedgeMeshRight.ortho");
         FileFinder fibre_file2("heart/test/data/human_wedge_mesh/HumanWedgeMeshRight.ortho", RelativeTo::ChasteSourceRoot);

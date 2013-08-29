@@ -166,6 +166,7 @@ template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::WriteHeaderOnMaster()
 {
     *(this->mpMasterFile) << this->mpMesh->GetNumElements();
+    *(this->mpMasterFile) << std::setprecision(16);
 }
 
 template<unsigned SPACE_DIM>

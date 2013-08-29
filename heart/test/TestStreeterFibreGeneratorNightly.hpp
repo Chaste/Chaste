@@ -73,13 +73,13 @@ private:
         //Compare data
         TS_ASSERT_EQUALS(fibres1.size(), fibres2.size());
 
-        for (unsigned i = 431980; i< fibres1.size(); i++)
+        for (unsigned i = 0u; i< fibres1.size(); i++)
         {
             for (unsigned j = 0; j< 3u ; j++)
             {
-                TS_ASSERT_DELTA(fibres1[i][j], fibres2[i][j], 1e-16);
-                TS_ASSERT_DELTA(second1[i][j], second2[i][j], 1e-16);
-                TS_ASSERT_DELTA(third1[i][j], third2[i][j], 1e-16);
+                TS_ASSERT_DELTA(fibres1[i][j], fibres2[i][j], 1e-14);
+                TS_ASSERT_DELTA(second1[i][j], second2[i][j], 1e-14);
+                TS_ASSERT_DELTA(third1[i][j], third2[i][j], 1e-14);
             }
         }
     }
@@ -132,6 +132,7 @@ public:
         OutputFileHandler handler("streeter", false);
 
         fibre_generator.WriteData(handler, "point50_not_dist.ortho");
+        fibre_generator.SetWriteFileAsBinary();
 
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "point50_not_dist.ortho";
         std::string wall_file = handler.GetOutputDirectoryFullPath() + "wall_thickness.data";
@@ -155,6 +156,7 @@ public:
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, true);
         fibre_generator.SetApexToBase(2);
         fibre_generator.SetLogInfo(true);
+        fibre_generator.SetWriteFileAsBinary();
 
         OutputFileHandler handler("streeter", false);
         fibre_generator.WriteData(handler, "downsampled.ortho");
