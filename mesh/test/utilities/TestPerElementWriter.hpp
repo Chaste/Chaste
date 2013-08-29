@@ -95,7 +95,7 @@ private:
 
     void WriteHeaderOnMaster()
     {
-        *(this->mpMasterFile)<<"This one has indices\n";
+        *(this->mpMasterFile)<<"This one has indices";
     }
 };
 

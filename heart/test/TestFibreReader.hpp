@@ -71,6 +71,8 @@ public:
         FileFinder file_finder("heart/test/data/fibre_tests/random_fibres.ortho", RelativeTo::ChasteSourceRoot);
         FibreReader<2> fibre_reader(file_finder, ORTHO);
 
+        TS_ASSERT_EQUALS(fibre_reader.IsBinary(), false);
+
         TS_ASSERT_EQUALS(fibre_reader.GetNumLinesOfData(), 5u);
 
         c_matrix<double, 2, 2> fibre_matrix;
@@ -328,6 +330,9 @@ public:
         // Read in a binary fibres file.
         FileFinder file_finder_bin("heart/test/data/fibre_tests/SimpleAxisymmetric2Bin.axi", RelativeTo::ChasteSourceRoot);
         FibreReader<3> fibre_reader_bin(file_finder_bin, AXISYM);
+
+        TS_ASSERT_EQUALS(fibre_reader_bin.IsBinary(), true);
+
         std::vector< c_vector<double, 3> > fibre_vector_bin;
         fibre_reader_bin.GetAllAxi(fibre_vector_bin);
 

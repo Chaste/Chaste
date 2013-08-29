@@ -179,6 +179,14 @@ public:
                          std::vector< c_vector<double, DIM> >& second_direction,
                          std::vector< c_vector<double, DIM> >& third_direction);
 
+    /**
+     * @return Whether the fibre file contains binary data.
+     */
+    bool IsBinary()
+    {
+        return mFileIsBinary;
+    }
+
 };
 
 #endif /*FIBREREADER_HPP_*/

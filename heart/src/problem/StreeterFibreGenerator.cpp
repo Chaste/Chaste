@@ -164,7 +164,7 @@ void StreeterFibreGenerator<SPACE_DIM>::SetSurfaceFiles(
 template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::WriteHeaderOnMaster()
 {
-    *(this->mpMasterFile) << this->mpMesh->GetNumElements() << std::endl;
+    *(this->mpMasterFile) << this->mpMesh->GetNumElements();
 }
 
 template<unsigned SPACE_DIM>

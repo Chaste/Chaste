@@ -48,6 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned DATA_SIZE>
 class AbstractPerElementWriter
 {
+private:
+    bool mFileIsBinary;  /**< Whether all data is to be written as binary*/
+
 protected:
     /**
      * The mesh. Set by the constructor.
@@ -81,18 +84,27 @@ protected:
      */
     virtual void WriteElementOnMaster(const c_vector<double, DATA_SIZE>& rData)
     {
-        for (unsigned i=0; i<DATA_SIZE; i++)
+        if (mFileIsBinary)
         {
-            (*mpMasterFile) << rData[i] << "\t";
+            //The binary file is row-major
+            mpMasterFile->write((char*)&rData[0], DATA_SIZE*sizeof(double));
         }
-        (*mpMasterFile)<<"\n";
+        else
+        {
+            for (unsigned i=0; i<DATA_SIZE; i++)
+            {
+                (*mpMasterFile) << rData[i] << "\t";
+            }
+            (*mpMasterFile)<<"\n";
+        }
     }
 
     /**
      * How to write the header information to the file.
      * By default writes nothing.
      * This is only called by the master process.
-     *
+     * This should NOT end the line (eg: \n or std::endl)
+     * as we need to say whether the file is binary or not.
      */
     virtual void WriteHeaderOnMaster()
     {
@@ -116,7 +128,8 @@ public:
      * @param pMesh  The mesh whose elements we are going to write out data for.
      */
     AbstractPerElementWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-     : mpMesh(pMesh),
+     : mFileIsBinary(false),
+       mpMesh(pMesh),
        mpMasterFile(NULL)
     {
 
@@ -144,6 +157,15 @@ public:
             MPI_Status status;
             status.MPI_ERROR = MPI_SUCCESS; //For MPICH2
             WriteHeaderOnMaster();
+            // say whether the fibres are binary in the header line (not ended yet!)
+            if (mFileIsBinary)
+            {
+                *mpMasterFile << "\tBIN\n";
+            }
+            else
+            {
+                *mpMasterFile << "\n";
+            }
             // The master process needs to keep track of both the global element list
             // (so that all elements are concentrated) and the local element list (so that
             // a local element index can be applied
@@ -202,6 +224,16 @@ public:
 
         }
     }
+
+    /**
+     * Switch to write binary fibre file
+     *
+     * (set to write ascii files in the constructor)
+     */
+     void SetWriteFileAsBinary(bool binary=true)
+     {
+         mFileIsBinary=binary;
+     }
 
     /**
      * Empty virtual destructor for abstract class

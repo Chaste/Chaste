@@ -57,6 +57,13 @@ private:
         FibreReader<3> fibre_reader1(rGeneratedFile, ORTHO);
         FibreReader<3> fibre_reader2(rReferenceFile, ORTHO);
 
+        double tol = 1e-11;
+
+        if (!(fibre_reader1.IsBinary()==fibre_reader2.IsBinary()))
+        {
+            tol = 1e-6;
+        }
+
         std::vector< c_vector<double, 3> > fibres1;
         std::vector< c_vector<double, 3> > second1;
         std::vector< c_vector<double, 3> > third1;
@@ -76,9 +83,9 @@ private:
         {
             for (unsigned j=0u; j<3u; j++)
             {
-                TS_ASSERT_DELTA( fibres1[i][j] , fibres2[i][j] , 1e-11);
-                TS_ASSERT_DELTA( second1[i][j] , second2[i][j] , 1e-11);
-                TS_ASSERT_DELTA( third1[i][j] , third2[i][j] , 1e-11);
+                TS_ASSERT_DELTA( fibres1[i][j] , fibres2[i][j] , tol);
+                TS_ASSERT_DELTA( second1[i][j] , second2[i][j] , tol);
+                TS_ASSERT_DELTA( third1[i][j] , third2[i][j] , tol);
             }
         }
     }
@@ -102,10 +109,17 @@ public:
         OutputFileHandler handler("shorter_streeter", false);
         fibre_generator.WriteData(handler, "box_heart.ortho");
 
-        FileFinder fibre_file1 = handler.FindFile("box_heart.ortho");
-        FileFinder fibre_file2("heart/test/data/box_shaped_heart/box_heart.ortho", RelativeTo::ChasteSourceRoot);
+        FileFinder fibre_file_ascii = handler.FindFile("box_heart.ortho");
+        FileFinder fibre_file_reference("heart/test/data/box_shaped_heart/box_heart.ortho", RelativeTo::ChasteSourceRoot);
 
-        CompareGeneratedWithReferenceFile(fibre_file1, fibre_file2);
+        CompareGeneratedWithReferenceFile(fibre_file_ascii, fibre_file_reference);
+
+        fibre_generator.SetWriteFileAsBinary();
+        fibre_generator.WriteData(handler, "box_heart_binary.ortho");
+
+        FileFinder fibre_file_binary = handler.FindFile("box_heart_binary.ortho");
+
+        CompareGeneratedWithReferenceFile(fibre_file_binary, fibre_file_reference);
     }
 
     void TestSimpleOrthotropicNotDistributed() throw (Exception)
