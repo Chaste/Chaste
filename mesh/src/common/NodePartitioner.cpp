@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "petscao.h"
 #include "petscmat.h"
 
+#include "Debug.hpp"
+
 /*
  * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
  * the library was compiled with a plain-C compiler, it fails to link using a C++ compiler.
@@ -75,6 +77,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                std::set<unsigned>& rNodesOwned)
 {
+    MARK;
     //Note that if there is not DistributedVectorFactory in the mesh, then a dumb partition based
     //on rMesh.GetNumNodes() is applied automatically.
     //If there is a DistributedVectorFactory then that one will be returned
@@ -92,13 +95,13 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEM
 }
 
 
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                                                            std::vector<unsigned>& rNodesPermutation,
                                                                            std::set<unsigned>& rNodesOwned,
                                                                            std::vector<unsigned>& rProcessorsOffset)
 {
+    MARK;
     assert(PetscTools::IsParallel());
     ///\todo #2250 Direct calls to METIS are to be deprecated
     WARNING("METIS_LIBRARY partitioning is deprecated and will be removed from later versions of Chaste");
@@ -120,14 +123,14 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
         EXCEPTION("Metis cannot partition a quadratic mesh.");
     }
 
-    int nn = rMeshReader.GetNumNodes();
+    idxtype nn = rMeshReader.GetNumNodes();
     idxtype* npart = new idxtype[nn];
     assert(npart != NULL);
 
     //Only the master process will access the element data and perform the partitioning
     if (PetscTools::AmMaster())
     {
-        int ne = rMeshReader.GetNumElements();
+        idxtype ne = rMeshReader.GetNumElements();
         idxtype* elmnts = new idxtype[ne * (ELEMENT_DIM+1)];
         assert(elmnts != NULL);
 
@@ -143,8 +146,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
         }
         rMeshReader.Reset();
 
-        int nparts = PetscTools::GetNumProcs();
-        int edgecut;
+        idxtype nparts = PetscTools::GetNumProcs();
+        idxtype edgecut;
         idxtype* epart = new idxtype[ne];
         assert(epart != NULL);
 
@@ -155,11 +158,11 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
         idxtype* eptr = new idxtype[ne+1];
         for (idxtype i=0; i<=ne; i++)
         {
-            eptr[i]= i * (ELEMENT_DIM+1);
+            eptr[i] = i * (ELEMENT_DIM+1);
         }
-        METIS_PartMeshNodal((idxtype*)&ne, (idxtype*)&nn,  eptr, elmnts,
-                NULL /*vwgt*/, NULL /*vsize*/, (idxtype*)&nparts, NULL /*tpwgts*/,
-                NULL /*options*/,(idxtype*) &edgecut /*aka objval*/, epart, npart);
+        METIS_PartMeshNodal(&ne, &nn, eptr, elmnts,
+                NULL /*vwgt*/, NULL /*vsize*/, &nparts, NULL /*tpwgts*/,
+                NULL /*options*/, &edgecut /*aka objval*/, epart, npart);
 #else
         //Old interface
         int numflag = 0; //0 means C-style numbering is assumed
@@ -183,9 +186,13 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
     }
 
     //Here's the new bottle-neck: share all the node ownership data
-    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22)
-    assert(sizeof(idxtype) == sizeof(int));
-    MPI_Bcast(npart /*data*/, nn /*size*/, MPI_INT, 0 /*From Master*/, PETSC_COMM_WORLD);
+    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
+    MPI_Datatype mpi_idxtype = MPI_LONG_LONG_INT;
+    if (sizeof(idxtype) == sizeof(int))
+    {
+        mpi_idxtype = MPI_INT;
+    }
+    MPI_Bcast(npart /*data*/, nn /*size*/, mpi_idxtype, 0 /*From Master*/, PETSC_COMM_WORLD);
 
     assert(rProcessorsOffset.size() == 0); // Making sure the vector is empty. After calling resize() only newly created memory will be initialised to 0.
     rProcessorsOffset.resize(PetscTools::GetNumProcs(), 0);
@@ -235,6 +242,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
                                               std::set<unsigned>& rNodesOwned,
                                               std::vector<unsigned>& rProcessorsOffset)
 {
+    MARK;
     assert(PetscTools::IsParallel());
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
@@ -466,6 +474,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
                                     std::vector<unsigned>& rProcessorsOffset,
                                     ChasteCuboid<SPACE_DIM>* pRegion)
 {
+    MARK;
     PetscTools::Barrier();
 
     unsigned num_nodes =  rMeshReader.GetNumNodes();
@@ -534,6 +543,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
     }
     assert(rNodesPermutation.size() == num_nodes);
 }
+
 ////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////////////

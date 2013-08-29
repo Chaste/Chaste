@@ -413,6 +413,7 @@ public:
 
     void TestForceOutputParameters()
     {
+        EXIT_IF_PARALLEL;
         std::string output_directory = "TestNotForReleaseForcesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 

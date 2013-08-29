@@ -66,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define real_t float
 #endif
 
+#include "Debug.hpp"
 /////////////////////////////////////////////////////////////////////////////////////
 //   IMPLEMENTATION
 /////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +111,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     std::set<unsigned>& rElementsOwned,
     std::vector<unsigned>& rProcessorsOffset)
 {
+    MARK;
     ///\todo #1293 add a timing event for the partitioning
     if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
     {
@@ -222,6 +224,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
 {
+    MARK;
     std::set<unsigned> nodes_owned;
     std::set<unsigned> halo_nodes_owned;
     std::set<unsigned> elements_owned;
@@ -1288,6 +1291,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::set<unsigned>& rHaloNodesOwned,
         std::vector<unsigned>& rProcessorsOffset)
 {
+    MARK;
     assert(PetscTools::IsParallel());
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
@@ -1299,7 +1303,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      *  Work out initial element distribution
      */
     boost::scoped_array<idxtype> element_distribution(new idxtype[num_procs+1]);
-    boost::scoped_array<idxtype> element_counts(new idxtype[num_procs]);
+    boost::scoped_array<int> element_counts(new int[num_procs]);
 
     element_distribution[0] = 0;
 
@@ -1315,9 +1319,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     /*
      *  Create distributed mesh data structure
      */
-    unsigned first_local_element = element_distribution[local_proc_index];
-    unsigned last_plus_one_element = element_distribution[local_proc_index+1];
-    unsigned num_local_elements = last_plus_one_element - first_local_element;
+    idxtype first_local_element = element_distribution[local_proc_index];
+    idxtype last_plus_one_element = element_distribution[local_proc_index+1];
+    idxtype num_local_elements = last_plus_one_element - first_local_element;
 
     boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
     boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
@@ -1325,7 +1329,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     if ( rMeshReader.IsFileFormatBinary() && first_local_element > 0)
     {
         // Advance the file pointer to the first element before the ones I own.
-        rMeshReader.GetElementData(first_local_element  - 1);
+        rMeshReader.GetElementData(first_local_element - 1);
     }
     else
     {
@@ -1417,8 +1421,19 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     boost::scoped_array<idxtype> global_element_partition(new idxtype[num_elements]);
 
-    MPI_Allgatherv(local_partition.get(), num_local_elements, MPI_INT,
-                   global_element_partition.get(), (int*)element_counts.get(), (int*)element_distribution.get(), MPI_INT, PETSC_COMM_WORLD);
+    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
+    MPI_Datatype mpi_idxtype = MPI_LONG_LONG_INT;
+    if (sizeof(idxtype) == sizeof(int))
+    {
+        mpi_idxtype = MPI_INT;
+    }
+    boost::scoped_array<int> int_element_distribution(new int[num_procs+1]);
+    for (unsigned i=0; i<num_procs+1; ++i)
+    {
+        int_element_distribution[i] = element_distribution[i];
+    }
+    MPI_Allgatherv(local_partition.get(), num_local_elements, mpi_idxtype,
+                   global_element_partition.get(), element_counts.get(), int_element_distribution.get(), mpi_idxtype, PETSC_COMM_WORLD);
 
     local_partition.reset();
 
@@ -1464,7 +1479,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      *  See
      *  https://chaste.cs.ox.ac.uk/trac/browser/trunk/mesh/src/common/DistributedTetrahedralMesh.cpp?rev=19291#L1459
      */
-
 
     for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
     {
@@ -1513,7 +1527,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         }
     }
 
-    global_element_partition.get();
 
     /*
      * Refine element distribution. Add extra elements that parMETIS didn't consider initially but
@@ -1568,7 +1581,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
         local_index[partition]++;
     }
-
+    MARK;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -766,7 +766,10 @@ public:
 
         XdmfMeshWriter<3,3> writer_from_reader("TestXdmfMeshWriter", "simple_cube", false);
 #ifdef _MSC_VER
-        TS_ASSERT_THROWS_THIS(writer_from_reader.WriteFilesUsingMeshReader(reader), "XDMF is not supported under Windows at present.");
+        if (PetscTools::AmMaster()) // Only the master does anything when using a mesh reader
+        {
+            TS_ASSERT_THROWS_THIS(writer_from_reader.WriteFilesUsingMeshReader(reader), "XDMF is not supported under Windows at present.");
+        }
 #else
         writer_from_reader.WriteFilesUsingMeshReader(reader);
 
