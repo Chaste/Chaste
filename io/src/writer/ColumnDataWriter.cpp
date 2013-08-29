@@ -256,7 +256,7 @@ void ColumnDataWriter::EndDefineMode()
             if (mpUnlimitedDimensionVariable != NULL)
             {
                 std::string ancillary_filename = mBaseName + "_unlimited.dat";
-                mpCurrentAncillaryFile = mOutputFileHandler.OpenOutputFile(ancillary_filename, std::ios::out);
+                mpCurrentAncillaryFile = mOutputFileHandler.OpenOutputFile(ancillary_filename, std::ios::out | std::ios::binary);
                 (*mpCurrentAncillaryFile) << std::setiosflags(std::ios::scientific);
                 (*mpCurrentAncillaryFile) << std::setprecision(mPrecision);
                 if (mpUnlimitedDimensionVariable != NULL)
@@ -322,7 +322,7 @@ void ColumnDataWriter::EndDefineMode()
 void ColumnDataWriter::CreateFixedDimensionFile(const std::string& rFileName)
 {
     // Create new data file
-    mpCurrentOutputFile = mOutputFileHandler.OpenOutputFile(rFileName, std::ios::out);
+    mpCurrentOutputFile = mOutputFileHandler.OpenOutputFile(rFileName, std::ios::out | std::ios::binary);
     (*mpCurrentOutputFile) << std::setiosflags(std::ios::scientific);
     (*mpCurrentOutputFile) << std::setprecision(mPrecision);
     if (mpFixedDimensionVariable != NULL)
@@ -351,7 +351,7 @@ void ColumnDataWriter::CreateFixedDimensionFile(const std::string& rFileName)
 void ColumnDataWriter::CreateInfoFile(const std::string& rFileName)
 {
     // Create new info file
-    out_stream p_info_file = mOutputFileHandler.OpenOutputFile(rFileName, std::ios::out);
+    out_stream p_info_file = mOutputFileHandler.OpenOutputFile(rFileName, std::ios::out | std::ios::binary);
     (*p_info_file) << "FIXED " << mFixedDimensionSize << std::endl;
     (*p_info_file) << "UNLIMITED " << mIsUnlimitedDimensionSet << std::endl;
     (*p_info_file) << "VARIABLES " << mVariables.size() << std::endl;
