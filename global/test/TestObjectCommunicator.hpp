@@ -123,11 +123,13 @@ public:
             // Send the class
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
-                p_new_class->mVectorOfDoubles[1] = 1.2 + p;
-                // Arguments are object, destination, tag
-                communicator.ISendObject(p_new_class, p, 123 + PetscTools::GetMyRank());
+                if (p != PetscTools::GetMyRank())
+                {
+                    p_new_class->mVectorOfDoubles[1] = 1.2 + p;
+                    // Arguments are object, destination, tag
+                    communicator.ISendObject(p_new_class, p, 123 + PetscTools::GetMyRank());
+                }
             }
-
         }
 
         {
@@ -135,24 +137,25 @@ public:
 
             for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
             {
+                if (p != PetscTools::GetMyRank())
+                {
+                    communicator.IRecvObject(p, 123 + p);
+                    p_recv_class = communicator.GetRecvObject();
 
-                communicator.IRecvObject(p, 123 + p);
-                p_recv_class = communicator.GetRecvObject();
+                    // Check that the values are correct
+                    TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
+                    TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
+                    TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
+                    TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
 
-                // Check that the values are correct
-                TS_ASSERT_EQUALS(p_recv_class->GetNumber(),42);
-                TS_ASSERT_EQUALS(p_recv_class->GetString(),"hello");
-                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfDoubles().size(),3u);
-                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools().size(),2u);
+                    TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
+                    TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2 + PetscTools::GetMyRank(),1e-12);
+                    TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3 + p,1e-12);
 
-                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[0],1.1,1e-12);
-                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2 + PetscTools::GetMyRank(),1e-12);
-                TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3 + p,1e-12);
-
-                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
-                TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+                    TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
+                    TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+                }
             }
-
         }
         PetscTools::Barrier("Make sure that no ISendObject buffers are in use before proceeding");
     }
