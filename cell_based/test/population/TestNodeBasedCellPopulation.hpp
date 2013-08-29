@@ -473,7 +473,9 @@ public:
         if (PetscTools::AmMaster())
         {
             // Make one cell start apoptosis
-            node_based_cell_population.GetCellUsingLocationIndex(27)->StartApoptosis();
+            cells.resize(p_mesh->GetNumNodes());
+            std::copy(node_based_cell_population.rGetCells().begin(), node_based_cell_population.rGetCells().end(), cells.begin());
+            cells[27]->StartApoptosis();
 
             // Test we have the right numbers of nodes and cells
             TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), 81u);
