@@ -45,8 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "petscao.h"
 #include "petscmat.h"
 
-#include "Debug.hpp"
-
 /*
  * The following definition fixes an odd incompatibility of METIS 4.0 and Chaste. Since
  * the library was compiled with a plain-C compiler, it fails to link using a C++ compiler.
@@ -77,7 +75,6 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                std::set<unsigned>& rNodesOwned)
 {
-    MARK;
     //Note that if there is not DistributedVectorFactory in the mesh, then a dumb partition based
     //on rMesh.GetNumNodes() is applied automatically.
     //If there is a DistributedVectorFactory then that one will be returned
@@ -101,10 +98,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
                                                                            std::set<unsigned>& rNodesOwned,
                                                                            std::vector<unsigned>& rProcessorsOffset)
 {
-    MARK;
     assert(PetscTools::IsParallel());
     ///\todo #2250 Direct calls to METIS are to be deprecated
-    WARNING("METIS_LIBRARY partitioning is deprecated and will be removed from later versions of Chaste");
+    WARN_ONCE_ONLY("METIS_LIBRARY partitioning is deprecated and will be removed from later versions of Chaste");
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
     TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>* p_mesh_reader=dynamic_cast<TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>*>(&rMeshReader);
@@ -242,14 +238,13 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
                                               std::set<unsigned>& rNodesOwned,
                                               std::vector<unsigned>& rProcessorsOffset)
 {
-    MARK;
     assert(PetscTools::IsParallel());
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
-    if(!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
+    if (!PetscTools::HasParMetis()) //We must have ParMetis support compiled into Petsc
     {
 #define COVERAGE_IGNORE
-        WARNING("PETSc support for ParMetis is not installed.");
+        WARN_ONCE_ONLY("PETSc support for ParMetis is not installed.");
 #undef COVERAGE_IGNORE
     }
 
@@ -474,7 +469,6 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
                                     std::vector<unsigned>& rProcessorsOffset,
                                     ChasteCuboid<SPACE_DIM>* pRegion)
 {
-    MARK;
     PetscTools::Barrier();
 
     unsigned num_nodes =  rMeshReader.GetNumNodes();

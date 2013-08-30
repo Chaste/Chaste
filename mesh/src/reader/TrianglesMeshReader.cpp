@@ -376,7 +376,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetElementData(unsigned
     {
         EXCEPTION("Random access is only implemented in mesh readers for binary mesh files.");
     }
-    if (index >=mNumElements)
+    if (index >= mNumElements)
     {
         EXCEPTION("Element " << index << " does not exist - not enough elements (only " << mNumElements << ").");
     }

@@ -66,7 +66,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define real_t float
 #endif
 
-#include "Debug.hpp"
 /////////////////////////////////////////////////////////////////////////////////////
 //   IMPLEMENTATION
 /////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +110,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
     std::set<unsigned>& rElementsOwned,
     std::vector<unsigned>& rProcessorsOffset)
 {
-    MARK;
     ///\todo #1293 add a timing event for the partitioning
     if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY && PetscTools::IsParallel())
     {
@@ -224,7 +222,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
 {
-    MARK;
     std::set<unsigned> nodes_owned;
     std::set<unsigned> halo_nodes_owned;
     std::set<unsigned> elements_owned;
@@ -1291,7 +1288,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::set<unsigned>& rHaloNodesOwned,
         std::vector<unsigned>& rProcessorsOffset)
 {
-    MARK;
     assert(PetscTools::IsParallel());
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // Metis works with triangles and tetras
 
@@ -1581,7 +1577,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
         local_index[partition]++;
     }
-    MARK;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

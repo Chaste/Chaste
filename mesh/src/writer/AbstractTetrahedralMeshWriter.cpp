@@ -353,7 +353,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
 
     PetscTools::BeginRoundRobin();
     {
-        out_stream p_ncl_file=out_stream(NULL);
+        out_stream p_ncl_file = out_stream(NULL);
 
         if (PetscTools::AmMaster())
         {
@@ -411,10 +411,10 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         const std::string real_node_connect_list_file_name = this->mBaseName + ".ncl";
         out_stream p_ncl_file = this->mpOutputFileHandler->OpenOutputFile(real_node_connect_list_file_name, std::ios::binary | std::ios::trunc);
         FileFinder temp_ncl_path = this->mpOutputFileHandler->FindFile(node_connect_list_file_name);
-        std::ifstream temp_ncl_file(temp_ncl_path.GetAbsolutePath().c_str());
+        std::ifstream temp_ncl_file(temp_ncl_path.GetAbsolutePath().c_str(), std::ios::binary);
         // Copy the header
         std::string header_line;
-        getline(temp_ncl_file, header_line);
+        getline(temp_ncl_file, header_line, '\n');
         (*p_ncl_file) << header_line << "\n";
         const std::streampos data_start = temp_ncl_file.tellg();
         const std::streamoff item_width = max_elements_all * sizeof(unsigned);
