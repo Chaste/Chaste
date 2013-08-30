@@ -157,7 +157,7 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
     // Create master archive for replicated data
     if (PetscTools::AmMaster())
     {
-        mpCommonStream = new std::ofstream(common_path.str().c_str());
+        mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
         if (!mpCommonStream->is_open())
         {
             delete mpCommonStream;
@@ -168,9 +168,9 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
     {
         // Non-master processes need to go through the serialization methods, but not write any data
 #ifdef _MSC_VER
-        mpCommonStream = new std::ofstream("NUL");
+        mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
 #else
-        mpCommonStream = new std::ofstream("/dev/null");
+        mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
 #endif
         #define COVERAGE_IGNORE
         if (!mpCommonStream->is_open())
@@ -183,7 +183,7 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
     mpCommonArchive = new boost::archive::text_oarchive(*mpCommonStream);
 
     // Create secondary archive for distributed data
-    mpPrivateStream = new std::ofstream(private_path.c_str());
+    mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
     if (!mpPrivateStream->is_open())
     {
         delete mpPrivateStream;

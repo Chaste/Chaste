@@ -820,6 +820,7 @@ public:
 
     void TestUpdateRuleOutputUpdateRuleInfo()
     {
+        EXIT_IF_PARALLEL;
         std::string output_directory = "TestPottsUpdateRulesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 

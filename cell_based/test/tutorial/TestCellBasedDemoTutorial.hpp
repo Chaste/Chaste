@@ -47,11 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = Examples showing how to create, run and cell-based simulations in Chaste =
  *
- * EMPTYLINE
- *
  * == Introduction ==
- *
- * EMPTYLINE
  *
  * This tutroial is designed to give you a quick introduction to running cell-based
  * simulations in Chaste. Full details are postponed until later tutorials.
@@ -63,11 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *   * how to specify how to remove cells; and
  *   * how to change cell-cycle models.
  *
- * EMPTYLINE
- *
  * == The test ==
- *
- * EMPTYLINE
  *
  * We begin by including the necessary header files. These will be described in detail in
  * subsequent cell-based tutorials.
@@ -76,7 +68,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "PetscSetupAndFinalize.hpp"
 
 #include "AdhesionPottsUpdateRule.hpp"
 #include "CellsGenerator.hpp"
@@ -99,6 +90,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TysonNovakCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
+
+#include "FakePetscSetup.hpp"
+
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods. We are using {{{AbstractCellBasedTestSuite}}} instead of {{{CxxTest::TestSuite}}} as this
@@ -108,11 +102,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCellBasedDemoTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /*
      * == Test 1 - a basic vertex-based simulation ==
-     *
-     * EMPTYLINE
      *
      * In the first test, we run a simple vertex-based simulation of an epithelial monolayer.
      * Each cell in the simulation is assigned a simple stochastic cell-cycle model, the cells will divide randomly and never stop proliferating.
@@ -159,18 +150,12 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
      * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo1/results_from_time_0}}}.
      * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * == Test 2 - basic node-based simulation ==
-     *
-     * EMPTYLINE
      *
      * We next show how to modify the previous test to implement a 'node-based' simulation,
      * in which cells are represented by overlapping spheres (actually circles, since we're
@@ -226,14 +211,10 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
      * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dCentreCells /tmp/$USER/testoutput/CellBasedDemo2/results_from_time_0}}}.
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.
-     *
-     * EMPTYLINE
      *
      * == Test 3 - basic mesh-based simulation ==
      *
@@ -275,12 +256,8 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo2}}} to {{{CellBasedDemo3}}}.
-     *
-     * EMPTYLINE
      *
      * == Test 4 - basic mesh-based simulation with ghost nodes ==
      *
@@ -327,12 +304,8 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo3}}} to {{{CellBasedDemo4}}}.
-     *
-     * EMPTYLINE
      *
      * == Test 5 - basic periodic mesh-based simulation ==
      *
@@ -368,12 +341,8 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo4}}} to {{{CellBasedDemo5}}}.
-     *
-     * EMPTYLINE
      *
      * == Test 6 - basic periodic mesh-based simulation with obstructions ==
      *
@@ -416,16 +385,10 @@ public:
         simulator.Solve();
     }
     /*
-     * EMPTYLINE
-     *
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo5}}} to {{{CellBasedDemo6}}}.
      *
-     * EMPTYLINE
-     *
      * == Test 7 - basic Potts-based simulation ==
-     *
-     * EMPTYLINE
      *
      * In the final test we show how to modify the earlier tests (using off lattice models) to implement a 'Potts-based' simulation,
      * in which cells are represented by collections of sites on a fixed lattice.
@@ -478,14 +441,10 @@ public:
        simulator.Solve();
    }
    /*
-    * EMPTYLINE
-    *
     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0}}}.
     * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
     * java executable.
-    *
-    * EMPTYLINE
     */
 };
 
