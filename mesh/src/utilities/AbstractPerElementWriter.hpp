@@ -229,6 +229,8 @@ public:
      * Switch to write binary fibre file
      *
      * (set to write ascii files in the constructor)
+     *
+     * @param binary  Whether to write as binary (defaults to true).
      */
      void SetWriteFileAsBinary(bool binary=true)
      {
