@@ -398,11 +398,7 @@ inline void save_construct_data(
     // Save the number of rows that each process owns, so that on loading we can resume with
     // good load balance
     int num_local_rows = (int)(t->GetNumRowsOfBoxes());
-    std::vector<int> num_rows;
-    if (PetscTools::AmMaster())
-    {
-        num_rows.resize(PetscTools::GetNumProcs());
-    }
+    std::vector<int> num_rows(PetscTools::GetNumProcs());
     MPI_Gather(&num_local_rows, 1, MPI_INT, &num_rows[0], 1, MPI_INT, 0, PETSC_COMM_WORLD);
     
     if (PetscTools::AmMaster())
@@ -411,7 +407,6 @@ inline void save_construct_data(
         ar << are_boxes_set;
 
         c_vector<double, 2*DIM> domain_size = t->rGetDomainSize();
-
         for (unsigned i=0; i<2*DIM; i++)
         {
             ar << domain_size[i];

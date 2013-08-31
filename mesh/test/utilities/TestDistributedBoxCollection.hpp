@@ -37,8 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "TetrahedralMesh.hpp"
 #include "DistributedBoxCollection.hpp"
@@ -1974,6 +1973,7 @@ public:
              DistributedBoxCollection<3>* p_box_collection = new DistributedBoxCollection<3>(cut_off_length, domain_size);
              p_box_collection->SetupLocalBoxesHalfOnly();
              num_boxes = p_box_collection->GetNumBoxes();
+
              {
                  // Create an output archive
                  ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -1997,6 +1997,7 @@ public:
 
              (*p_arch) >> p_box_collection;
              TS_ASSERT_EQUALS(num_boxes, p_box_collection->GetNumBoxes());
+
              for (unsigned i=0; i<3; i++)
              {
                  TS_ASSERT_DELTA(0.0, p_box_collection->rGetDomainSize()[2*i], 1e-4);
