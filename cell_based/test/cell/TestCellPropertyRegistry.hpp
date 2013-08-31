@@ -36,8 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTCELLLABEL_HPP_
 #define TESTCELLLABEL_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 
@@ -52,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "SmartPointers.hpp"
+
+#include "FakePetscSetup.hpp"
 
 class TestCellLabel : public AbstractCellBasedTestSuite
 {
