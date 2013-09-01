@@ -213,20 +213,18 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::RecvObject(unsigned sourcePr
     unsigned string_length = 0;
     MPI_Recv(&string_length, 1, MPI_UNSIGNED, sourceProcess, tag, PetscTools::GetWorld(), &status);
 
-    char* recv_string = new char[string_length];
-    MPI_Recv(recv_string, string_length, MPI_BYTE, sourceProcess , tag, PetscTools::GetWorld(), &status);
+    char* recv_array = new char[string_length];
+    MPI_Recv(recv_array, string_length, MPI_BYTE, sourceProcess , tag, PetscTools::GetWorld(), &status);
 
     // Extract a proper object from the buffer
-    std::istringstream ss(std::ios::binary);
-    ss.rdbuf()->pubsetbuf(recv_string, string_length);
+    std::string recv_string(recv_array, string_length);
+    delete[] recv_array;
+    std::istringstream ss(recv_string, std::ios::binary);
 
     boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(ss);
 
     input_arch >> p_recv_object;
-
-    // Tidy up
-    delete[] recv_string;
 
     return p_recv_object;
 }
@@ -258,8 +256,8 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::GetRecvObject()
     MPI_Get_count(&return_status, MPI_BYTE, &recv_size);
 
     // Extract a proper object from the buffer
-    std::istringstream ss(std::ios::binary);
-    ss.rdbuf()->pubsetbuf(mRecvBuffer, recv_size);
+    std::string recv_string(mRecvBuffer, recv_size);
+    std::istringstream ss(recv_string, std::ios::binary);
 
     boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(ss);
@@ -291,15 +289,15 @@ boost::shared_ptr<CLASS> ObjectCommunicator<CLASS>::SendRecvObject(boost::shared
 
     MPI_Sendrecv(&send_string_length, 1, MPI_UNSIGNED, destinationProcess, sendTag, &recv_string_length, 1, MPI_UNSIGNED, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
 
-    boost::scoped_array<char> recv_string(new char[recv_string_length]);
+    boost::scoped_array<char> recv_array(new char[recv_string_length]);
 
     // Send archive data
     char* send_buf = const_cast<char*>(send_msg.data());
-    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_string.get(), recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
+    MPI_Sendrecv(send_buf, send_string_length, MPI_BYTE, destinationProcess, sendTag, recv_array.get(), recv_string_length, MPI_BYTE, sourceProcess, sourceTag, PetscTools::GetWorld(), &status);
 
     // Extract received object
-    std::istringstream iss(std::ios::binary);
-    iss.rdbuf()->pubsetbuf(recv_string.get(), recv_string_length);
+    std::string recv_string(recv_array.get(), recv_string_length);
+    std::istringstream iss(recv_string, std::ios::binary);
 
     boost::shared_ptr<CLASS> p_recv_object(new CLASS);
     boost::archive::binary_iarchive input_arch(iss);
