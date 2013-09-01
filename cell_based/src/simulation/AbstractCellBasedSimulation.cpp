@@ -577,55 +577,58 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationSetup()
     ExecutableSupport::SetOutputDirectory(output_file_handler.GetOutputDirectoryFullPath());
     ExecutableSupport::WriteMachineInfoFile("system_info");
 
-    // Output Chaste provenance information
-    out_stream build_info_file = output_file_handler.OpenOutputFile("build.info");
-    std::string build_info;
-    ExecutableSupport::GetBuildInfo(build_info);
-    *build_info_file << build_info;
-    build_info_file->close();
-
-    // Output simulation parameter and setup details
-    out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
-
-    // Output simulation details
-    std::string simulation_type = GetIdentifier();
-
-    *parameter_file << "<Chaste>\n";
-    *parameter_file << "\n\t<" << simulation_type << ">\n";
-    OutputSimulationParameters(parameter_file);
-    *parameter_file << "\t</" << simulation_type << ">\n";
-    *parameter_file << "\n";
-
-    // Output cell population details (includes cell-cycle model details)
-    mrCellPopulation.OutputCellPopulationInfo(parameter_file);
-
-    // Loop over cell killers
-    *parameter_file << "\n\t<CellKillers>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator iter = mCellKillers.begin();
-         iter != mCellKillers.end();
-         ++iter)
+    if (PetscTools::AmMaster())
     {
-        // Output cell killer details
-        (*iter)->OutputCellKillerInfo(parameter_file);
+        // Output Chaste provenance information
+        out_stream build_info_file = output_file_handler.OpenOutputFile("build.info");
+        std::string build_info;
+        ExecutableSupport::GetBuildInfo(build_info);
+        *build_info_file << build_info;
+        build_info_file->close();
+
+        // Output simulation parameter and setup details
+        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+
+        // Output simulation details
+        std::string simulation_type = GetIdentifier();
+
+        *parameter_file << "<Chaste>\n";
+        *parameter_file << "\n\t<" << simulation_type << ">\n";
+        OutputSimulationParameters(parameter_file);
+        *parameter_file << "\t</" << simulation_type << ">\n";
+        *parameter_file << "\n";
+
+        // Output cell population details (includes cell-cycle model details)
+        mrCellPopulation.OutputCellPopulationInfo(parameter_file);
+
+        // Loop over cell killers
+        *parameter_file << "\n\t<CellKillers>\n";
+        for (typename std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > >::iterator iter = mCellKillers.begin();
+             iter != mCellKillers.end();
+             ++iter)
+        {
+            // Output cell killer details
+            (*iter)->OutputCellKillerInfo(parameter_file);
+        }
+        *parameter_file << "\t</CellKillers>\n";
+
+        // Iterate over simulationmodifiers
+        *parameter_file << "\n\t<SimulationModifiers>\n";
+        for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
+             iter != mSimulationModifiers.end();
+             ++iter)
+        {
+            // Output simulation modifier details
+            (*iter)->OutputSimulationModifierInfo(parameter_file);
+        }
+        *parameter_file << "\t</SimulationModifiers>\n";
+
+        // This is used to output information about subclasses
+        OutputAdditionalSimulationSetup(parameter_file);
+
+        *parameter_file << "\n</Chaste>\n";
+        parameter_file->close();
     }
-    *parameter_file << "\t</CellKillers>\n";
-
-    // Iterate over simulationmodifiers
-    *parameter_file << "\n\t<SimulationModifiers>\n";
-    for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
-         iter != mSimulationModifiers.end();
-         ++iter)
-    {
-        // Output simulation modifier details
-        (*iter)->OutputSimulationModifierInfo(parameter_file);
-    }
-    *parameter_file << "\t</SimulationModifiers>\n";
-
-    // This is used to output information about subclasses
-    OutputAdditionalSimulationSetup(parameter_file);
-
-    *parameter_file << "\n</Chaste>\n";
-    parameter_file->close();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

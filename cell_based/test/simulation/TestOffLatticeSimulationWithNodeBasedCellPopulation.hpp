@@ -241,7 +241,7 @@ public:
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(node_based_cell_population);
-        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationAndVariableRadi");
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationAndVariableRadii");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(10.0);
 
@@ -266,8 +266,7 @@ public:
             TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()), 4.70670, 1e-1);
             TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(3)->rGetLocation()), 2.0, 1e-1);
 
-
-            // Now set all the Radi to 2.0 Note this could be done inside a cell cycle model.
+            // Now set all the Radii to 2.0 Note this could be done inside a cell cycle model.
             for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
                  cell_iter != simulator.rGetCellPopulation().End();
                  ++cell_iter)
@@ -277,7 +276,6 @@ public:
 
             simulator.SetEndTime(12.0);
             simulator.Solve();
-
 
             for (unsigned i=0; i<simulator.rGetCellPopulation().GetNumNodes(); i++)
             {
