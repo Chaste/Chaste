@@ -116,7 +116,8 @@ test_summary = int(ARGUMENTS.get('test_summary', 1))
 Export('test_summary')
 
 # Used by the automated build system
-run_infrastructure_tests = int(ARGUMENTS.get('do_inf_tests', getattr(hostconfig.conf, 'do_inf_tests', 0)))
+# Infrastructure tests default to only checking orphaned tests & duplicate file names, unless do_inf_tests=1 is given
+run_infrastructure_tests = int(ARGUMENTS.get('do_inf_tests', getattr(hostconfig.conf, 'do_inf_tests', 2)))
 check_failing_tests = int(ARGUMENTS.get('check_failing_tests', 0))
 
 # Specifying extra run-time flags
@@ -389,18 +390,19 @@ if run_infrastructure_tests and not GetOption('clean'):
     out = File(build.GetTestReportDir() + 'DuplicateFileNames.log')
     run_infra('CheckForDuplicateFileNames.py', out)
     test_log_files.append(out)
-    # Check for duplicate file names in multiple directories
-    out = File(build.GetTestReportDir() + 'Copyrights.log')
-    run_infra('CheckForCopyrights.py', out)
-    test_log_files.append(out)
-    ## Do not check for stale semaphores - it's only important on MPICH with Gnu Linux
-    #out = File(build.GetTestReportDir() + 'Semaphores.log')
-    #run_infra('CheckSemaphores.py', out)
-    #test_log_files.append(out)
-    # Check for stray schemas
-    out = File(build.GetTestReportDir() + 'Schemas.log')
-    run_infra('CheckSchemas.py', out)
-    test_log_files.append(out)
+    if run_infrastructure_tests == 1:
+        # These infrastructure tests don't run by default, just for core developer machines/people
+        out = File(build.GetTestReportDir() + 'Copyrights.log')
+        run_infra('CheckForCopyrights.py', out)
+        test_log_files.append(out)
+        ## Do not check for stale semaphores - it's only important on MPICH with Gnu Linux
+        #out = File(build.GetTestReportDir() + 'Semaphores.log')
+        #run_infra('CheckSemaphores.py', out)
+        #test_log_files.append(out)
+        # Check for stray schemas
+        out = File(build.GetTestReportDir() + 'Schemas.log')
+        run_infra('CheckSchemas.py', out)
+        test_log_files.append(out)
 if check_failing_tests:
     out = File(build.GetTestReportDir() + 'FailingTests.log')
     run_infra('CheckForFailingTests.py', out)
