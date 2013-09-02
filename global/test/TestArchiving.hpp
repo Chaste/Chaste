@@ -49,68 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "OutputFileHandler.hpp"
+#include "ClassOfSimpleVariables.hpp"
 #include "ForTestArchiving.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class ClassOfSimpleVariables
-{
-private:
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        // If Archive is an output archive, then & resolves to <<
-        // If Archive is an input archive, then & resolves to >>
-        archive & mNumber;
-        archive & mString;
-        archive & mVectorOfDoubles; // include <boost/serialization/vector.hpp> for this
-        archive & mVectorOfBools;
-    }
-
-    int mNumber;
-    std::string mString;
-    std::vector<double> mVectorOfDoubles;
-    std::vector<bool> mVectorOfBools;
-
-public:
-
-    ClassOfSimpleVariables()
-    {
-        // Do nothing. Used when loading into a pointer.
-    }
-    ClassOfSimpleVariables(int initial,
-                           std::string string,
-                           std::vector<double> doubles,
-                           std::vector<bool> bools)
-        : mString(string),
-          mVectorOfDoubles(doubles),
-          mVectorOfBools(bools)
-    {
-        mNumber = initial;
-    }
-
-    int GetNumber() const
-    {
-        return mNumber;
-    }
-
-    std::string GetString()
-    {
-        return mString;
-    }
-
-    std::vector<double>& GetVectorOfDoubles()
-    {
-        return mVectorOfDoubles;
-    }
-
-    std::vector<bool>& GetVectorOfBools()
-    {
-        return mVectorOfBools;
-    }
-};
 
 class TestArchiving : public CxxTest::TestSuite
 {
@@ -402,6 +345,41 @@ public:
             input_arch >> p_base;
 
             TS_ASSERT_EQUALS(p_base->mTagInBaseClass, 6u);
+        }
+    }
+
+    void TestArchivingSubChild() throw (Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename;
+        archive_filename = handler.GetOutputDirectoryFullPath() + "subchild.arch";
+
+        // Save
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            boost::shared_ptr<BaseClass> p_base(new SubChildClass());
+
+            p_base->mTagInBaseClass = 6;
+
+            output_arch << p_base;
+        }
+
+        // Load
+        {
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            boost::shared_ptr<BaseClass> p_base;
+
+            input_arch >> p_base;
+
+            TS_ASSERT_EQUALS(p_base->mTagInBaseClass, 6u);
+            TS_ASSERT(dynamic_cast<ChildClass*>(p_base.get()));
+            TS_ASSERT(dynamic_cast<SubChildClass*>(p_base.get()));
         }
     }
 };

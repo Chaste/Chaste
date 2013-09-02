@@ -45,9 +45,9 @@ BaseClass::~BaseClass()
 {
 }
 
-ChildClass::ChildClass() : mTag(1)
+ChildClass::ChildClass() : mTag(1), mpParent(NULL)
 {
-    assert(mTagInBaseClass==4);
+    assert(mTagInBaseClass == 4);
 }
 void ChildClass::SetParent(ParentClass* pParent)
 {
@@ -59,8 +59,19 @@ void ChildClass::Hello()
     std::cout << "Hello!\n";
 }
 
+SubChildClass::SubChildClass() : mSubTag(2)
+{
+    assert(mTag == 1);
+}
+
+void SubChildClass::Hello()
+{
+    std::cout << "Hello from subclass tagged " << mSubTag << std::endl;
+}
+
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(ChildClass)
+CHASTE_CLASS_EXPORT(SubChildClass)
 
 ParentClass::ParentClass(ChildClass* pChild)
     : mTag(0), mpChild(pChild)

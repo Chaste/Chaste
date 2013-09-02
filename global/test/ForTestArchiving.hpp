@@ -82,8 +82,26 @@ public:
     }
 };
 
+class SubChildClass : public ChildClass
+{
+public:
+    unsigned mSubTag;
+
+    SubChildClass();
+
+    void Hello();
+
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<ChildClass>(*this);
+        archive & mSubTag;
+    }
+};
+
 #include "SerializationExportWrapper.hpp"
 CHASTE_CLASS_EXPORT(ChildClass)
+CHASTE_CLASS_EXPORT(SubChildClass)
 
 class ParentClass
 {
