@@ -80,8 +80,13 @@ public:
             std::string abs_path = handler.GetOutputDirectoryFullPath() + file_name;
             TS_ASSERT_EQUALS(file_finder.GetAbsolutePath(), abs_path);
             // Create the file
-            out_stream fp = handler.OpenOutputFile(file_name);
-            fp->close();
+            PetscTools::Barrier("TestHeartFileFinderOpening-1");
+            if (PetscTools::AmMaster())
+            {
+                out_stream fp = handler.OpenOutputFile(file_name);
+                fp->close();
+            }
+            PetscTools::Barrier("TestHeartFileFinderOpening-2");
             TS_ASSERT(file_finder.Exists());
 
             // Check when providing an absolute path
