@@ -75,6 +75,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ODE systems are specified primarily by the EvaluateYDerivatives() method,
  * which calculates the right-hand side of the system.
  *
+ * You can also specify an EvaluateAnalyticJacobian() method which will
+ * allow CVODE to evaluate the Jacobian matrix precisely instead of using
+ * multiple calls to  EvaluateYDerivatives() to make an approximation to it.
+ * This generally provides extra accuracy and better convergence, and so
+ * gives a speed up for a given tolerance. Cardiac action potential
+ * model Jacobians are calculated automatically by PyCML (see python/pycml)
+ * via Maple for symbolic differentiation.
+ *
  * Instances can store their state internally in the mStateVariables vector
  * in our base class AbstractParameterisedSystem (see also
  * GetNumberOfStateVariables(), SetStateVariables() and rGetStateVariables()),
