@@ -38,23 +38,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "AbstractCellProliferativeType.hpp"
 #include "DefaultCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
-
 #include "CellPropertyRegistry.hpp"
+
+#include "OutputFileHandler.hpp"
+#include "SmartPointers.hpp"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
 #include "AbstractCellBasedTestSuite.hpp"
-#include "OutputFileHandler.hpp"
-#include "SmartPointers.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestCellProliferativeTypes : public AbstractCellBasedTestSuite
 {
@@ -144,7 +144,7 @@ public:
     void TestArchiveTransitCellProliferativeType() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DifferentiatedCellProliferativeType.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "TransitCellProliferativeType.arch";
 
         // Archive a cell proliferative type
         {
