@@ -1,15 +1,12 @@
 project(testcell_based)
 
 if(ENABLE_CHASTE_TESTING)
-#copy test data
-file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/cell_based/test")
 
 #Create testcell_based library to link cell_based's tests against
 file(GLOB_RECURSE CHASTE_TEST_CELL_BASED_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
 add_library(testcell_based STATIC ${CHASTE_TEST_CELL_BASED_SOURCES})
 
 add_definitions(-D_USE_MATH_DEFINES)#cmath and M_PI
-
 
 include_directories("${CHASTE_CELL_BASED_INCLUDE_DIRS}" 
 "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/simulation" "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" 

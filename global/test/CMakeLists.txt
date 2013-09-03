@@ -1,8 +1,5 @@
 project(testglobal)
 
-#Copy test data
-file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/global/test")
-
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CHASTE_GLOBAL_INCLUDE_DIRS}")
 
 #Create testglobal library to link global's tests against
@@ -19,4 +16,3 @@ foreach(test ${TEST_SUITES})
  target_link_libraries("${testName}Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
  set_target_properties("${testName}Runner" PROPERTIES LINK_FLAGS /NODEFAULTLIB:LIBCMT)
 endforeach(test)
-

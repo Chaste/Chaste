@@ -1,8 +1,6 @@
 project(testcrypt)
 
 if(ENABLE_CHASTE_TESTING)
-#copy test data
-file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/crypt/test")
 
 #Create testcrypt library to link crypt's tests against
 file(GLOB_RECURSE CHASTE_TEST_CRYPT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)

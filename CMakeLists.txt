@@ -31,14 +31,14 @@ foreach(type ${TestPackTypes})
 		list(REMOVE_AT result 0)#remove the first empty string.
 		list(SORT result)
 		string(REPLACE ";" "\n" result "${result}")
-	file(WRITE "test_runner/${type}TestsToRun.txt" "${result}") 
+	file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_runner/${type}TestsToRun.txt" "${result}") 
 endforeach(type ${TestPackTypes})
 
 list(FIND TestPackTypes ${TEST_FAMILY} found)
 if(found EQUAL -1)
 	message(FATAL_ERROR "Test family ${TEST_FAMILY} does not exist. Must be one of ${TestPackTypes}. Aborting.")
 else()
-	file(STRINGS "test_runner/${TEST_FAMILY}TestsToRun.txt" tests)
+	file(STRINGS "${CMAKE_CURRENT_BINARY_DIR}/test_runner/${TEST_FAMILY}TestsToRun.txt" tests)
 	string(REPLACE ";" "|" tests "${tests}")
 	#get date and time, to append to test result filename
 	execute_process(COMMAND cmd /c echo %DATE% %TIME%
@@ -74,16 +74,14 @@ include(AdditionalIncludes.cmake)
 #Chaste source root
 set(CHASTE_SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 #Chaste build directory 
-set(CHASTE_BUILD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build" CACHE PATH 
-"The root directory of Chaste build. Used in generated code!")
+set(CHASTE_BUILD_ROOT "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "The root directory of Chaste build.")
 
 #Chaste build directory name
-set(CHASTE_BUILD_DIR_NAME "Debug" CACHE STRING 
-"The name of Chaste build directory.")
+set(CHASTE_BUILD_DIR_NAME "Debug" CACHE STRING "The name of Chaste build directory.")
 
 #Chaste Build Type 
 set(CHASTE_BUILD_TYPE "Windows_Debug" CACHE PATH
-"The build type. Options are Windows_Debug and Windows_Release")
+    "The build type. Options are Windows_Debug and Windows_Release")
 
 #Set whether we are set whether this is a statically or dynamically-linked build
 option(CHASTE_SHARED_LIBRARY OFF 
@@ -125,6 +123,9 @@ set(CHASTE_INCLUDES #These are now mainly set externally in AdditionalIncludes.c
 	#"${PARMETIS_INCLUDES}" "${METIS_INCLUDES}"
 )
 include_directories("${CHASTE_INCLUDES}")
+
+# Where generated source/header files are put
+include_directories("${CHASTE_BUILD_ROOT}/src")
 
 # A macro to recursively find Chaste header locations
 macro(HEADER_DIRS base_dir return_list)
@@ -269,10 +270,10 @@ if(ENABLE_CHASTE_TESTING)
 	    	# See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
 	    	add_test(
 	    		NAME ${_testname} 
-	    		WORKING_DIRECTORY "${CHASTE_BUILD_ROOT_DIR}/" 
+	    		WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" 
 	    		COMMAND "${MPIEXEC}" /np 2 ${test_location})
 	    else()
-	    	add_test(NAME ${_testname} WORKING_DIRECTORY "${CHASTE_BUILD_ROOT_DIR}/" COMMAND ${test_location})
+	    	add_test(NAME ${_testname} WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" COMMAND ${test_location})
 	    endif(TEST_MPIEXEC_ENABLED)
 	endmacro() 
 

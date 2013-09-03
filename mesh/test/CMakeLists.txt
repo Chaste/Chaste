@@ -1,8 +1,6 @@
 project(testmesh)
 
 if(ENABLE_CHASTE_TESTING)
-#copy test data
-file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/mesh/test")
 
 include_directories("${CHASTE_MESH_INCLUDE_DIRS}" "${CMAKE_CURRENT_SOURCE_DIR}" 
 "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" "${CHASTE_LINALG_INCLUDE_DIRS}" )

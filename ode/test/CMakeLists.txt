@@ -1,8 +1,6 @@
 project(testode)
 
 if(ENABLE_CHASTE_TESTING)
-#copy test data
-file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/ode/test")
 
 add_definitions(-D_USE_MATH_DEFINES)
 

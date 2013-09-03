@@ -1,9 +1,12 @@
 project(global)
 
+# The auto-generated source files
+set(version_cpp "${CHASTE_BUILD_ROOT}/src/Version.cpp")
+set(build_root_cpp "${CHASTE_BUILD_ROOT}/src/GetChasteBuildRoot.cpp")
 
 #Generate Version.cpp
 set(CHASTE_WC_MODIFIED "false")
-set(version_file "${CHASTE_SOURCE_ROOT}/ReleaseVersion.txt")
+set(version_file "${CMAKE_CURRENT_BINARY_DIR}/ReleaseVersion.txt")
 if(EXISTS "${version_file}")
 	file(STRINGS "${version_file}" v_data)
 	list(GET v_data 0 full_version)
@@ -30,7 +33,7 @@ else()
     endif()
 	endif(SUBVERSION_FOUND)
 endif()
-file(STRINGS "${CHASTE_BUILD_ROOT_DIR}/build_timestamp" time_stamp)
+file(STRINGS "${CHASTE_BUILD_ROOT}/build_timestamp" time_stamp)
 set(compiler_type "${CMAKE_CXX_COMPILER}")
 set(compiler_version "${CMAKE_CXX_COMPILER_VERSION}")
 set(xsd_version "undertermined")
@@ -43,10 +46,6 @@ string(REPLACE "\nThis file is part of Chaste.\n" "" licence "${licence}")
 string(REPLACE "\n" "\\n" licence "${licence}")
 set(quote "\"")
 string(REPLACE ${quote} "\\${quote}" licence "${licence}")
-
-#There seems to be an assumption that SOURCE==BUILD directories. Changing this to make tests pass, may come to bite!
-#set(CHASTE_BUILD_ROOT_DIR "${CHASTE_SOURCE_ROOT}")
-
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in" template)
 string(REPLACE "%(licence)s" "${licence}" template "${template}")
@@ -63,11 +62,11 @@ string(REPLACE "%(compiler_version)s" "${compiler_version}" template "${template
 string(REPLACE "%(cc_flags)s" "${CMAKE_CXX_FLAGS}" template "${template}")
 string(REPLACE "%(project_versions)s" "\"TODO\"" template "${template}")
 string(REPLACE "%(xsd_version)s" "${xsd_version}" template "${template}")
-file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp" "${template}")
+file(WRITE "${version_cpp}" "${template}")
 
 
 #generate GetChasteBuildRoot.cpp
-file(WRITE "src/GetChasteBuildRoot.cpp" 
+file(WRITE "${build_root_cpp}" 
 "#include \"ChasteBuildRoot.hpp\" 
 
 const char* ChasteBuildRootDir() 
@@ -98,7 +97,7 @@ int __cdecl _purecall(void){return 0;}
 #Build the global library
 include_directories("${CHASTE_GLOBAL_INCLUDE_DIRS}")
 file(GLOB_RECURSE CHASTE_GLOBAL_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
-add_library(global STATIC ${CHASTE_GLOBAL_SOURCES})
+add_library(global STATIC ${CHASTE_GLOBAL_SOURCES} ${version_cpp} ${build_root_cpp})
 install(TARGETS global DESTINATION lib)
 
 #Component testing for global

@@ -1,8 +1,6 @@
 project(testio)
 
 if(ENABLE_CHASTE_TESTING)
-#copy test data
-file(COPY data DESTINATION "${CHASTE_BUILD_ROOT_DIR}/io/test")
 
 include_directories("${CHASTE_IO_INCLUDE_DIRS}" 
 "${CMAKE_CURRENT_SOURCE_DIR}" "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" )
