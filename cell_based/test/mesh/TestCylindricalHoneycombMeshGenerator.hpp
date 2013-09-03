@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CylindricalHoneycombMeshGenerator.hpp"
 
+#include "FakePetscSetup.hpp"
+
 class TestCylindricalHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 private:
