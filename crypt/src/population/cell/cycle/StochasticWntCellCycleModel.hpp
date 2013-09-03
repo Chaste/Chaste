@@ -87,13 +87,15 @@ private:
     void GenerateStochasticG2Duration();
 
 public:
-
     /**
      * The standard constructor called in tests.
      *
      * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
      */
     StochasticWntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+
+    /** Empty virtual destructor so archiving works with static libraries. */
+    virtual ~StochasticWntCellCycleModel();
 
     /**
      * Overridden builder method to create new copies of

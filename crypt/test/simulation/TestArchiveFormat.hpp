@@ -90,6 +90,16 @@ public:
         // Set start time
         SimulationTime::Instance()->SetStartTime(0.0);
 
+        {
+            // Horrendous hack to get this test to pass when using static libraries!
+            Cylindrical2dMesh* p_mesh = new Cylindrical2dMesh(1.0);
+            // Each of the following classes gives an 'unregistered class' error if not instantiated here...
+            MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh);
+            StochasticWntCellCycleModel ccm;
+            SloughingCellKiller<2> killer(&crypt, 1.0);
+            GeneralisedLinearSpringForce<2> force;
+        }
+
         // Directory in which the stored results were archived
         std::string test_to_profile = "SteadyStateCrypt";
 

@@ -42,7 +42,7 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
      const std::vector<unsigned> locationIndices,
      bool deleteMesh,
      double ghostSpringStiffness)
-             : MeshBasedCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh, false), // do not call the base class Validate()
+             : MeshBasedCellPopulation<DIM,DIM>(rMesh, rCells, locationIndices, deleteMesh, false), // do not call the base class Validate()
                mGhostSpringStiffness(ghostSpringStiffness)
 {
     if (!locationIndices.empty())
@@ -78,7 +78,7 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
                                                                   double ghostSpringStiffness)
-             : MeshBasedCellPopulation<DIM>(rMesh),
+             : MeshBasedCellPopulation<DIM,DIM>(rMesh),
                mGhostSpringStiffness(ghostSpringStiffness)
 {
 }
@@ -202,7 +202,7 @@ template<unsigned DIM>
 CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
     // Add new cell to cell population
-    CellPtr p_created_cell = MeshBasedCellPopulation<DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
+    CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, rCellDivisionVector, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Update size of mIsGhostNode if necessary
@@ -226,7 +226,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
     assert(mIsGhostNode.size()==this->GetNumNodes());
 
     // Look through all of the cells and record what node they are associated with.
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
     {
         unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
 
@@ -275,7 +275,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
     UpdateGhostPositions(dt);
 
     // Then call the base class method
-    AbstractCentreBasedCellPopulation<DIM>::UpdateNodeLocations(dt);
+    AbstractCentreBasedCellPopulation<DIM,DIM>::UpdateNodeLocations(dt);
 }
 
 template<unsigned DIM>

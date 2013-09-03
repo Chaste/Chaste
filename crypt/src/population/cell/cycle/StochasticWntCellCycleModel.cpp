@@ -53,6 +53,9 @@ StochasticWntCellCycleModel::StochasticWntCellCycleModel(boost::shared_ptr<Abstr
     }
 }
 
+StochasticWntCellCycleModel::~StochasticWntCellCycleModel()
+{}
+
 void StochasticWntCellCycleModel::GenerateStochasticG2Duration()
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();

@@ -97,7 +97,7 @@ public:
     /**
      * Destructor.
      */
-    ~AbstractWntOdeBasedCellCycleModel();
+    virtual ~AbstractWntOdeBasedCellCycleModel();
 
     /**
      * Resets the Wnt Model to the start of the cell cycle (this model does not cycle naturally)

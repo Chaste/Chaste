@@ -52,6 +52,9 @@ WntCellCycleModel::WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOde
     }
 }
 
+WntCellCycleModel::~WntCellCycleModel()
+{}
+
 AbstractCellCycleModel* WntCellCycleModel::CreateCellCycleModel()
 {
     // Create a new cell-cycle model

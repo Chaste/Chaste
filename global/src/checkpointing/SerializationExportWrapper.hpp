@@ -347,8 +347,7 @@ template<class T> struct pack<void (T)> {
     EXPORT_TEMPLATE_CLASS2(CLASS, 3, 3)
 
 /**
- * Export a class templated over both element and space dimension, for combinations
- * where ELEMENT_DIM == SPACE_DIM.
+ * Export a class templated over a single dimension, for 1, 2 and 3 dimensions.
  * This is the definition of EXPORT_TEMPLATE_CLASS_SAME_DIMS when it isn't a no-op.
  * @param CLASS the class (without parameters)
  */
@@ -385,8 +384,7 @@ template<class T> struct pack<void (T)> {
  */
 #define CHASTE_CLASS_EXPORT(T)                 CHASTE_CLASS_EXPORT_INTERNAL(T)
 /**
- * Export a class templated over both element and space dimension, for combinations
- * where ELEMENT_DIM == SPACE_DIM.
+ * Export a class templated over a single dimension, for 1, 2 and 3 dimensions.
  * @param CLASS the class (without parameters)
  */
 #define EXPORT_TEMPLATE_CLASS_SAME_DIMS(CLASS) EXPORT_TEMPLATE_CLASS_SAME_DIMS_INTERNAL(CLASS)

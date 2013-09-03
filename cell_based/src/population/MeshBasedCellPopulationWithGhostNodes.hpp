@@ -36,12 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MESHBASEDCELLPOPULATIONWITHGHOSTNODES_HPP_
 #define MESHBASEDCELLPOPULATIONWITHGHOSTNODES_HPP_
 
-#include "MeshBasedCellPopulation.hpp"
-#include "TrianglesMeshReader.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+
+#include "MeshBasedCellPopulation.hpp"
 
 /**
  * A facade class encapsulating a mesh-based cell population with ghost nodes.
@@ -88,7 +87,7 @@ private:
         // This needs to be first so that MeshBasedCellPopulation::Validate() doesn't go mental.
         archive & mIsGhostNode;
         archive & mGhostSpringStiffness;
-        archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM> >(*this);
+        archive & boost::serialization::base_object<MeshBasedCellPopulation<DIM, DIM> >(*this);
     }
 
     /**
@@ -121,10 +120,10 @@ public:
      * @param ghostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                  std::vector<CellPtr>& rCells,
-                                  const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                                  bool deleteMesh=false,
-                                  double ghostSpringStiffness=15.0);
+                                          std::vector<CellPtr>& rCells,
+                                          const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
+                                          bool deleteMesh=false,
+                                          double ghostSpringStiffness=15.0);
 
     /**
      * Constructor for use by the de-serializer.
@@ -133,7 +132,7 @@ public:
      * @param ghostSpringStiffness spring stiffness used to move the ghost nodes defaults to 15.0.
      */
     MeshBasedCellPopulationWithGhostNodes(MutableMesh<DIM, DIM>& rMesh,
-                                  double ghostSpringStiffness=15.0);
+                                          double ghostSpringStiffness=15.0);
 
     /**
      * Empty destructor so archiving works with static libraries.
@@ -260,7 +259,6 @@ inline void load_construct_data(
 
     // Invoke inplace constructor to initialise instance
     ::new(t)MeshBasedCellPopulationWithGhostNodes<DIM>(*p_mesh);
-
 }
 }
 } // namespace

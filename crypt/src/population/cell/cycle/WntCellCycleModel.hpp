@@ -100,6 +100,9 @@ public:
      */
     WntCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
+    /** Empty virtual destructor so archiving works with static libraries. */
+    ~WntCellCycleModel();
+
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
