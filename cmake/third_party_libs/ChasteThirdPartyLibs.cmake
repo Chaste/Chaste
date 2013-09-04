@@ -10,3 +10,4 @@ set(SUNDIALS_URLS "https://computation.llnl.gov/casc/sundials/download/code/sund
 set(BOOST_URLS "http://kent.dl.sourceforge.net/project/boost/boost/1.53.0/boost_1_53_0.tar.gz" 
 			   #"http://kent.dl.sourceforge.net/project/boost/boost/1.52.0/boost_1_52_0.tar.gz" 
 			)
+set(VTK_URLS "http://www.vtk.org/files/release/5.8/vtk-5.8.0.tar.gz")

@@ -71,8 +71,10 @@ endforeach(flag_var)
 
 
 include(AdditionalIncludes.cmake)
+
 #Chaste source root
 set(CHASTE_SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+
 #Chaste build directory 
 set(CHASTE_BUILD_ROOT "${CMAKE_CURRENT_BINARY_DIR}" CACHE PATH "The root directory of Chaste build.")
 
@@ -83,9 +85,13 @@ set(CHASTE_BUILD_DIR_NAME "Debug" CACHE STRING "The name of Chaste build directo
 set(CHASTE_BUILD_TYPE "Windows_Debug" CACHE PATH
     "The build type. Options are Windows_Debug and Windows_Release")
 
-#Set whether we are set whether this is a statically or dynamically-linked build
+#Set whether this is a statically or dynamically-linked build
 option(CHASTE_SHARED_LIBRARY OFF 
 	"Set whether we are set whether this is a statically or dynamically-linked build. OFF by default")
+
+#Some Chaste-specific #defines
+add_definitions(-DCHASTE_CVODE -DCHASTE_SUNDIALS_VERSION=20500)
+#add_definitions(-DCHASTE_VTK)
 
 #Third-party libraries
 set(THIRD_PARTY_LIBS "${CMAKE_CURRENT_SOURCE_DIR}/../external_libs" CACHE PATH "Location of external libraries used by Chaste.")
@@ -205,6 +211,8 @@ if(MSVC10)
 		msmpi
 		hdf5d)
 endif(MSVC10)
+
+#set(CHASTE_LINK_LIBRARIES "${CHASTE_LINK_LIBRARIES} vtkFiltering vtkIO vtkCommon vtksys vtkzlib vtkexpat vtkGraphics")
 
 #A bunch of compiler flags, 
 add_definitions(-Z7 # => embed debugging info in library as opposed to using an external .pdb database
