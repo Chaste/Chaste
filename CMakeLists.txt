@@ -91,7 +91,7 @@ option(CHASTE_SHARED_LIBRARY OFF
 
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CVODE -DCHASTE_SUNDIALS_VERSION=20500)
-#add_definitions(-DCHASTE_VTK)
+add_definitions(-DCHASTE_VTK)
 
 #Third-party libraries
 set(THIRD_PARTY_LIBS "${CMAKE_CURRENT_SOURCE_DIR}/../external_libs" CACHE PATH "Location of external libraries used by Chaste.")
@@ -212,7 +212,7 @@ if(MSVC10)
 		hdf5d)
 endif(MSVC10)
 
-#set(CHASTE_LINK_LIBRARIES "${CHASTE_LINK_LIBRARIES} vtkFiltering vtkIO vtkCommon vtksys vtkzlib vtkexpat vtkGraphics")
+set(CHASTE_LINK_LIBRARIES ${CHASTE_LINK_LIBRARIES} vtkFiltering vtkIO vtkCommon vtksys vtkzlib vtkexpat vtkGraphics)
 
 #A bunch of compiler flags, 
 add_definitions(-Z7 # => embed debugging info in library as opposed to using an external .pdb database
