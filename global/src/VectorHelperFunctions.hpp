@@ -436,7 +436,7 @@ inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
 {
     // Check for no-op
     realtype* p_src = NV_DATA_S(rSrc);
-    if (p_src == &(rDest[0])) return;
+    if (!rDest.empty() && p_src == &(rDest[0])) return;
     // Set dest size
     long size = NV_LENGTH_S(rSrc);
     rDest.resize(size);

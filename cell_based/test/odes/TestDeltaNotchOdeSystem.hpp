@@ -61,11 +61,10 @@ public:
 
     void TestDeltaNotchOdeSystemSetup() throw(Exception)
     {
-//        EXIT_IF_PARALLEL;
 #ifdef CHASTE_CVODE
         DeltaNotchOdeSystem ode_system;
 
-        double h_value = 0.0001;
+        double h_value = 1.0; // Was 0.0001 for some utterly bizarre reason
         CvodeAdaptor cvode_solver;
         OdeSolution solutions;
 
@@ -96,7 +95,6 @@ public:
 
     void TestArchiving()
     {
-//        EXIT_IF_PARALLEL;
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "delta_notch_ode.arch";
@@ -162,7 +160,6 @@ public:
 
     void TestSetStateVariables()
     {
- //       EXIT_IF_PARALLEL;
 #ifdef CHASTE_CVODE
 
         std::vector<double> state_vars;

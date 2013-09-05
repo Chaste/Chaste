@@ -64,10 +64,9 @@ public:
         double wnt_level = 0.5;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_state);
-        // Solve system using rk4 solver
+        // Solve system using CVODE solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits.
-
-        double h_value = 0.0001;
+        double h_value = 0.1;
 
         CvodeAdaptor cvode_solver;
 
@@ -105,10 +104,9 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_apc2);
 
-        // Solve system using rk4 solver
+        // Solve system using CVODE solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits
-
-        double h_value = 0.0001;
+        double h_value = 0.01;
         CvodeAdaptor cvode_solver;
         OdeSolution solutions;
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
@@ -143,10 +141,9 @@ public:
         boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         Mirams2010WntOdeSystem wnt_system(wnt_level, p_bcat1);
 
-        // Solve system using rk4 solver
+        // Solve system using CVODE solver
         // Matlab's strictest bit uses 0.01 below and relaxes it on flatter bits
-
-        double h_value = 0.0001;
+        double h_value = 0.1;
         CvodeAdaptor cvode_solver;
         OdeSolution solutions;
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
