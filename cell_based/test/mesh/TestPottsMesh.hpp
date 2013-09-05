@@ -1678,6 +1678,83 @@ public:
         //TS_ASSERT_EQUALS(basic_potts_mesh.GetElement(1)->GetNodeGlobalIndex(0), 3u);
     }
 
+    void TestDeleteNode() throw(Exception)
+	{
+    	// Create simle mesh with 2 pots elements and connectivities
+    	PottsMeshGenerator<2> generator(2, 2, 1, 2, 1, 2);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 4u);
+
+		// Delete node 0, note this decreases the index of all nodes greater than 0
+		p_mesh->DeleteNode(0);
+
+		TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
+		TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 3u);
+
+
+		// Test Node Locations
+		TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 1.0, 1e-3);
+		TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[1], 0.0, 1e-3);
+		TS_ASSERT_DELTA(p_mesh->GetNode(1)->rGetLocation()[0], 0.0, 1e-3);
+		TS_ASSERT_DELTA(p_mesh->GetNode(1)->rGetLocation()[1], 1.0, 1e-3);
+		TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[0], 1.0, 1e-3);
+		TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[1], 1.0, 1e-3);
+
+
+		// Test elements have correct nodes
+		TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumNodes(), 1u);
+		TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNodeGlobalIndex(0), 1u);
+
+		TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNumNodes(), 2u);
+		TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNodeGlobalIndex(0), 0u);
+		TS_ASSERT_EQUALS(p_mesh->GetElement(1)->GetNodeGlobalIndex(1), 2u);
+
+		//Test Neighbourhoods
+		// Test Node 0
+		std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
+		TS_ASSERT_EQUALS(neighbouring_sites.size(), 1u);
+		std::set<unsigned> expected_neighbouring_sites;
+		expected_neighbouring_sites.insert(2u);
+		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+		expected_neighbouring_sites.insert(1u);
+		neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
+		TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
+		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+		//Test Node 1
+		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(1);
+		TS_ASSERT_EQUALS(neighbouring_sites.size(), 1u);
+		expected_neighbouring_sites.clear();
+		expected_neighbouring_sites.insert(2);
+		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+		neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(1);
+		expected_neighbouring_sites.insert(0);
+		TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
+		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+		// Test Node 3
+		neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(2);
+		TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
+		expected_neighbouring_sites.clear();
+		expected_neighbouring_sites.insert(0);
+		expected_neighbouring_sites.insert(1);
+		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+		neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(2);
+		TS_ASSERT_EQUALS(neighbouring_sites.size(), 2u);
+		TS_ASSERT_EQUALS(neighbouring_sites, expected_neighbouring_sites);
+
+		//For coverage delete all nodes in an element.
+		p_mesh->DeleteNode(1);
+
+		TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1u);
+		TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 1u);
+		TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetIndex(), 0u);
+
+		TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 2u);
+	}
+
     void TestArchive2dPottsMesh()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);

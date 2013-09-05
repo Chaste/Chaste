@@ -251,6 +251,120 @@ void PottsMesh<DIM>::DeleteElement(unsigned index)
 }
 
 template<unsigned DIM>
+void PottsMesh<DIM>::DeleteNode(unsigned index)
+{
+	//Mark node as deleted so we don't consider it when iterating over nodes
+	this->mNodes[index]->MarkAsDeleted();
+
+    //Remove from Elements
+	std::set<unsigned> containing_element_indices = this->mNodes[index]->rGetContainingElementIndices();
+
+	for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+		 iter != containing_element_indices.end();
+		 iter++)
+	{
+		assert(mElements[*iter]->GetNumNodes() > 0);
+		if(mElements[*iter]->GetNumNodes() == 1)
+		{
+			DeleteElement(*iter);
+		}
+		else
+		{
+			this->mElements[*iter]->DeleteNode(this->mElements[*iter]->GetNodeLocalIndex(index));
+		}
+	}
+
+	//Remove from connectivity
+	mVonNeumannNeighbouringNodeIndices[index].clear();
+	mMooreNeighbouringNodeIndices[index].clear();
+
+	assert(mVonNeumannNeighbouringNodeIndices.size()==mMooreNeighbouringNodeIndices.size());
+	for( unsigned node_index = 0;
+	     node_index < mVonNeumannNeighbouringNodeIndices.size();
+         node_index++)
+	{
+		// Remove node "index" from the Von Neuman neighbourhood of node "node_index".
+		mVonNeumannNeighbouringNodeIndices[node_index].erase(index);
+		mMooreNeighbouringNodeIndices[node_index].erase(index);
+
+		// Check there's still connectivity for the other non-deleted nodes
+		if (!this->mNodes[index]->IsDeleted())
+		{
+			assert(mVonNeumannNeighbouringNodeIndices[index].size()>0);
+			assert(mMooreNeighbouringNodeIndices[index].size()>0);
+		}
+	}
+
+
+	// Remove node from mNodes and renumber all the elements and nodes
+
+	this->mNodes.erase(this->mNodes.begin()+index);
+	unsigned num_nodes = GetNumNodes();
+	mVonNeumannNeighbouringNodeIndices.erase(mVonNeumannNeighbouringNodeIndices.begin()+index);
+	mMooreNeighbouringNodeIndices.erase(mMooreNeighbouringNodeIndices.begin()+index);
+
+	assert(mVonNeumannNeighbouringNodeIndices.size()==num_nodes);
+    assert(mMooreNeighbouringNodeIndices.size()==num_nodes);
+
+    for( unsigned node_index = 0; node_index < num_nodes; node_index++)
+	{
+    	// Reduce the index of all nodes greater than  node "index"
+    	if (node_index >= index)
+    	{
+    		assert(this->mNodes[node_index]->GetIndex() == node_index+1);
+			this->mNodes[node_index]->SetIndex(node_index);
+    	}
+    	assert(this->mNodes[node_index]->GetIndex() == node_index);
+
+		// Reduce the index of all nodes greater than  node "index"
+    	// in the Moore and Von Neuman neighbourhoods.
+    	std::set<unsigned> von_neuman = mVonNeumannNeighbouringNodeIndices[node_index];
+    	mVonNeumannNeighbouringNodeIndices[node_index].clear();
+    	for (std::set<unsigned>::iterator iter = von_neuman.begin();
+    	      iter != von_neuman.end();
+    	      iter++)
+    	{
+    		if (*iter >= index)
+    		{
+    			mVonNeumannNeighbouringNodeIndices[node_index].insert(*iter-1);
+    		}
+    		else
+    		{
+    			mVonNeumannNeighbouringNodeIndices[node_index].insert(*iter);
+    		}
+    	}
+       	std::set<unsigned> moore = mMooreNeighbouringNodeIndices[node_index];
+       	mMooreNeighbouringNodeIndices[node_index].clear();
+		for (std::set<unsigned>::iterator iter = moore.begin();
+			  iter != moore.end();
+			  iter++)
+		{
+			if (*iter >= index)
+			{
+				mMooreNeighbouringNodeIndices[node_index].insert(*iter-1);
+			}
+			else
+			{
+				mMooreNeighbouringNodeIndices[node_index].insert(*iter);
+			}
+		}
+   	}
+    // Finally remove any elememts that have been removed
+    assert(mDeletedElementIndices.size() <= 1); // Should have at most one element to remove
+    if(mDeletedElementIndices.size() == 1)
+    {
+    	unsigned elem_index = mDeletedElementIndices[0];
+    	mElements.erase(mElements.begin()+elem_index);
+    	mDeletedElementIndices.clear();
+
+    	for (unsigned index=elem_index; index<GetNumElements(); index++)
+    	{
+    		mElements[index]->ResetIndex(index);
+    	}
+    }
+}
+
+template<unsigned DIM>
 unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                   bool placeOriginalElementBelow)
 {
