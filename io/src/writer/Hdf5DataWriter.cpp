@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "Version.hpp"
+#include "Warnings.hpp"
 
 Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                                const std::string& rDirectory,
@@ -528,7 +529,7 @@ void Hdf5DataWriter::EndDefineMode()
         dataset_max_dims[2] = mDatasetDims[2];
         max_dims = dataset_max_dims;
 
-        hsize_t chunk_size;
+        hsize_t ntimesteps_in_chunk;
         if (mUseOptimalChunkSizeAlgorithm)
         {
             /*
@@ -538,15 +539,16 @@ void Hdf5DataWriter::EndDefineMode()
              * won't apply if the chunks are too large, but this seems to have less of
              * an impact.
              */
-            chunk_size = mEstimatedUnlimitedLength/100;
-            if (chunk_size < 100)
+            ntimesteps_in_chunk = mEstimatedUnlimitedLength/100;
+            // Make sure that the chunks aren't too small
+            if (ntimesteps_in_chunk * mDatasetDims[1] * mDatasetDims[2] * sizeof(double) < 4096) //4KiB (a quarter of an inode?)
             {
-                chunk_size = 100;
+                ntimesteps_in_chunk = 4096 /( mDatasetDims[1] * mDatasetDims[2] * sizeof(double) );
             }
         }
         else
         {
-            chunk_size = mFixedChunkSize;
+            ntimesteps_in_chunk = mFixedChunkSize;
         }
         /*
          * If the size of a chunk in bytes is bigger than 4GB then there may be problems.
@@ -554,18 +556,29 @@ void Hdf5DataWriter::EndDefineMode()
          * HDF5 1.8.x does more error checking and produces std::cout errors and a file with
          * no data in it.
          */
-        if (chunk_size * mDatasetDims[1] * mDatasetDims[2] > (uint64_t)0xffffffff)
+        if (ntimesteps_in_chunk * mDatasetDims[1] * mDatasetDims[2] * sizeof(double) > (uint64_t)0xffffffff)
         {
-            /*
-             * Note: this exception can be avoided by altering the lines above
-             * where chunk_size is set (at a loss of efficiency).
-             */
-            mIsInDefineMode = true; // To stop things that would be created below from being deleted on Close()
-            H5Fclose(mFileId); // This is the one thing which we have made
-            EXCEPTION("HDF5 may be writing more than 4GB to disk at any time and would fail. It may be possible to tune the Chaste code to get around this");
+            hsize_t new_ntimesteps_in_chunk = (uint64_t)0xffffffff / ( mDatasetDims[1] * mDatasetDims[2] * sizeof(double) );
+            if (!mUseOptimalChunkSizeAlgorithm)
+            {
+                WARNING("HDF5 can't write chunks bigger than 4GB, so chunksize altered from "<<ntimesteps_in_chunk<<" to "<<new_ntimesteps_in_chunk);
+            }
+#define COVERAGE_IGNORE
+            // The following code is uncovered because in order to test it we would be required
+            // to have a 4GB vector (or similar) to represent data on nodes.  This is likely to hit
+            // swap on some of our build machines.
+            if (new_ntimesteps_in_chunk == 0)
+            {
+                mIsInDefineMode = true; // To stop things that would be created below from being deleted on Close()
+                H5Fclose(mFileId); // This is the one thing which we have made
+                ///\todo Change the other dimensions in the chunk_dims
+                EXCEPTION("HDF5 may be writing more than 4GB to disk at any time and would fail. It may be possible to tune the Chaste code to get around this");
+            }
+#undef COVERAGE_IGNORE
+            ntimesteps_in_chunk = new_ntimesteps_in_chunk;
         }
 
-        hsize_t chunk_dims[DATASET_DIMS] = {chunk_size, mDatasetDims[1], mDatasetDims[2]};
+        hsize_t chunk_dims[DATASET_DIMS] = {ntimesteps_in_chunk, mDatasetDims[1], mDatasetDims[2]};
         cparms = H5Pcreate (H5P_DATASET_CREATE);
 
         H5Pset_chunk( cparms, DATASET_DIMS, chunk_dims);

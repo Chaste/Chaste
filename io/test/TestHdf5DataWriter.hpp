@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "ChasteSyscalls.hpp"
+#include "MathsCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 #include "CompareHdf5ResultsFiles.hpp"
 
@@ -1617,11 +1619,17 @@ public:
     void TestHdf5BigFiles() throw(Exception)
     {
         /*
-         * With a chunk size of 100 the chunk size in bytes will be 2^32*100/99 > 4GB
+         * With a chunksize of 64 the actual chunk size in bytes
+         * for 2^23 nodes will be 2^23*8*64 = 4GB
          * which would result in an error in HDF5 1.8.x, and bad files in previous
-         * versions - Hdf5DataWriter checks for this and throws an Exception.
+         * versions - Hdf5DataWriter checks for this and reduces the chunksize to 63.
+         *
+         * Note that if the number of nodes was greater than 2^29 (500 million) with one variable per node
+         * then a chunksize of 1 would be too big and an exception would be thrown.  We can't test for this
+         * because we would need a DistributedVectorFactory which takes up 4GB and is likely to hit swap.
+         *
          */
-        int number_nodes = 43383508; // 2^32/99
+        unsigned number_nodes = SmallPow(2u, 23u);
 
         DistributedVectorFactory vec_factory(number_nodes);
 
@@ -1629,10 +1637,14 @@ public:
         writer.DefineFixedDimension(number_nodes);
 
         writer.DefineVariable("index", "nondimensional");
-
+        writer.SetFixedChunkSize(64);
         writer.DefineUnlimitedDimension("Time", "msec");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        writer.EndDefineMode();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"HDF5 can\'t write chunks bigger than 4GB, so chunksize altered from 64 to 63");
 
-        TS_ASSERT_THROWS_CONTAINS(writer.EndDefineMode(), "HDF5 may be writing more than 4GB");
+        Warnings::Instance()->QuietDestroy();
         writer.Close();
     }
 };
