@@ -37,7 +37,7 @@ endforeach(type ${TestPackTypes})
 list(FIND TestPackTypes ${TEST_FAMILY} found)
 if(found EQUAL -1)
 	message(FATAL_ERROR "Test family ${TEST_FAMILY} does not exist. Must be one of ${TestPackTypes}. Aborting.")
-else()
+else(found EQUAL -1)
 	file(STRINGS "${CMAKE_CURRENT_BINARY_DIR}/test_runner/${TEST_FAMILY}TestsToRun.txt" tests)
 	string(REPLACE ";" "|" tests "${tests}")
 	#get date and time, to append to test result filename
@@ -55,8 +55,8 @@ else()
 		)
 message("STDOUT______________\n${t_out}")
 message("STDERR______________\n${t_err}")
+endif(found EQUAL -1)
 
-endif()
 else(RUN_TESTS)
 
 #For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build. 
@@ -258,17 +258,12 @@ if(ENABLE_CHASTE_TESTING)
 	    add_custom_command(
 	        OUTPUT  "${_test_real_output_filename}"
 	        DEPENDS ${ARGN}
-	        COMMAND ${CXXTEST_TESTGEN_INTERPRETER}
-	        ${CXXTEST_TESTGEN_EXECUTABLE} ${CXXTEST_TESTGEN_ARGS} -o "${_test_real_output_filename}" ${ARGN}
+	        COMMAND ${CXXTEST_TESTGEN_INTERPRETER} ${CXXTEST_TESTGEN_EXECUTABLE} ${CXXTEST_TESTGEN_ARGS} -o "${_test_real_output_filename}" ${ARGN}
 	    )
 
 	    set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
 	    add_executable(${_testname} "${_test_real_output_filename}" ${ARGN})
-	    if("${CHASTE_BUILD_TYPE}" STREQUAL "Windows_Debug")
-	    	get_property(test_location TARGET ${_testname} PROPERTY LOCATION_Debug) 
-	    else()
-	    	get_property(test_location TARGET ${_testname} PROPERTY LOCATION_Release) 
-	    endif()
+	  	get_property(test_location TARGET ${_testname} PROPERTY LOCATION)
 
 	    if(TEST_MPIEXEC_ENABLED)
 	    	#Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes 
@@ -303,8 +298,7 @@ macro(CHASTE_GENERATE_TEST_SUITES)
 		set(testPath "")
 		chaste_add_test("${testName}Runner" "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testName}.hpp")
 		target_link_libraries("${testName}Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-		set_target_properties("${testName}Runner" PROPERTIES LINK_FLAGS 
-		"${LINKER_FLAGS}")
+		set_target_properties("${testName}Runner" PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
 	  else()
 		math(EXPR index "${pathLength} - 1")
 		list(GET testPath ${index} testName)
@@ -313,8 +307,7 @@ macro(CHASTE_GENERATE_TEST_SUITES)
 		string(REPLACE ";" "/" testPath "${testPath}")
 		chaste_add_test("${testName}_${_testPath_}_Runner" "${testName}_${_testPath_}_.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testPath}/${testName}.hpp")
 		target_link_libraries("${testName}_${_testPath_}_Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-		set_target_properties("${testName}_${_testPath_}_Runner" PROPERTIES LINK_FLAGS 
-		"${LINKER_FLAGS}")
+		set_target_properties("${testName}_${_testPath_}_Runner" PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
 	  endif()	
 	endforeach(test)
 endmacro()
