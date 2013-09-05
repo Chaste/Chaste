@@ -545,6 +545,10 @@ void Hdf5DataWriter::EndDefineMode()
             {
                 ntimesteps_in_chunk = 4096 /( mDatasetDims[1] * mDatasetDims[2] * sizeof(double) );
             }
+            if (ntimesteps_in_chunk == 0)
+            {
+                ntimesteps_in_chunk = 1;
+            }
         }
         else
         {
