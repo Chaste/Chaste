@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GenericMeshReader.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshWriter.hpp"
+#include "FileFinder.hpp"
+#include "FibreConverter.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -92,6 +94,10 @@ int main(int argc, char *argv[])
             ExecutableSupport::Print("Writing  " + base_for_output + ".node etc. mesh file in " + mesh_writer.GetOutputDirectory());
             mesh_writer.SetWriteFilesAsBinary();
             mesh_writer.WriteFilesUsingMesh(mesh);
+            // Convert fibres if present
+            FibreConverter fibre_converter;
+            FileFinder mesh_file(argv[1], RelativeTo::AbsoluteOrCwd);
+            fibre_converter.Convert(mesh_file, "");
             ExecutableSupport::Print("Done.");
         }
     }

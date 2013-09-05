@@ -45,6 +45,8 @@ link_test_path:OxfordRabbitHeart_482um.axi
 link_test_path:simple_cube.node
 link_test_path:simple_cube.face
 link_test_path:simple_cube.ele
+link_test_path:simple_cube.axi
+link_test_path:simple_cube.ortho
 
 
 

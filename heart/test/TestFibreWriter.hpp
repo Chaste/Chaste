@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "UblasIncludes.hpp"
 #include "FileComparison.hpp"
+#include "FibreConverter.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -130,6 +131,7 @@ private:
     void ConvertToBinaryOrtho(std::string fullPath, std::string baseName, bool copyOutput) throw (Exception)
     {
         FileFinder file_finder(fullPath+"/"+baseName+".ortho", RelativeTo::ChasteSourceRoot);
+
         FibreReader<3> fibre_reader(file_finder, ORTHO);
         std::vector< c_vector<double, 3> > fibres;
         std::vector< c_vector<double, 3> > second;
@@ -137,11 +139,10 @@ private:
         fibre_reader.GetAllOrtho(fibres, second, third);
         TS_ASSERT_EQUALS(fibres.size(), second.size());
         TS_ASSERT_EQUALS(fibres.size(), third.size());
-        std::string dir =   "FibreConverter";
-        //Write binary file
-        FibreWriter<3> fibre_writer(dir, baseName+"_bin", false);
-        fibre_writer.SetWriteFileAsBinary();
-        fibre_writer.WriteAllOrtho(fibres, second, third);
+
+        std::string dir = "FibreConverter";
+        FibreConverter ortho_converter;
+        ortho_converter.Convert(file_finder, dir);
 
         //Read it back
         FileFinder file_finder_bin(dir+"/"+baseName+"_bin.ortho", RelativeTo::ChasteTestOutput);
@@ -178,11 +179,10 @@ private:
         FibreReader<3> fibre_reader(file_finder, AXISYM);
         std::vector< c_vector<double, 3> > fibres;
         fibre_reader.GetAllAxi(fibres);
-        std::string dir =   "FibreConverter";
-        //Write binary file
-        FibreWriter<3> fibre_writer(dir, baseName+"_bin", false);
-        fibre_writer.SetWriteFileAsBinary();
-        fibre_writer.WriteAllAxi(fibres);
+
+        std::string dir = "FibreConverter";
+        FibreConverter axi_converter;
+        axi_converter.Convert(file_finder, dir);
 
         //Read it back
         FileFinder file_finder_bin(dir+"/"+baseName+"_bin.axi", RelativeTo::ChasteTestOutput);

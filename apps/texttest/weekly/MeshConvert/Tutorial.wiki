@@ -1,4 +1,4 @@
-= Making the `MeshConvert` utility and using it the help produce scalable mesh loading =
+= Making the `MeshConvert` utility and using it to help produce scalable mesh loading =
 
 === What it's for ===
 
@@ -9,10 +9,11 @@ scale least well is the initial mesh load.
  * This means each file is read in its entirety by all processes causing file contention
  
 This page shows you how to convert from a given 3D mesh format (Tetgen/Memfem/CARP/VTK) to 
-our a special binary version of the Triangle/Tetgen format.
+our special binary version of the Triangle/Tetgen format.
  * This allows for random access when running in parallel
  * This also produces a "node connectivity list" {{{(.ncl)}}} file which is a map from node indices
  to containing element indices.  The presence of this file cuts the calculation cost at mesh load time.
+ * If a Chaste format fibre file (.axi or .ortho) is associated with the mesh then this will also be converted to our binary format.
 
 === Making the executable(s) ===
 
@@ -36,7 +37,7 @@ unpack the files for testing purposes. Either use an Archive Manager to extract 
 tar xvfz  MeshConvert.tgz
 }}}
 
-These files are just ASCII mesh data for the UCSD ventricular mesh.  Run the converter like so:
+These files are just test ASCII mesh data.  Run the converter like so:
 {{{
 #!sh
 ./apps/src/MeshConvert MeshConvert/simple_cube
@@ -60,7 +61,7 @@ labelled {{{[PATH_TO_OUTPUT]}}} in the above will be taken from the environmenta
 {{{$CHASTE_TEST_OUTPUT}}}, if it is set, but will be {{{./testoutput}}} otherwise.
 {{{
 ls ./testoutput
-simple_cube_bin.ele  simple_cube_bin.face  simple_cube_bin.ncl  simple_cube_bin.node
+simple_cube_bin.axi  simple_cube_bin.ele  simple_cube_bin.face  simple_cube_bin.ncl  simple_cube_bin.node
 }}}
 
 === Running in parallel ===
