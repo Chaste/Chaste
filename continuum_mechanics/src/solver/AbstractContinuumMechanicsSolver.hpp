@@ -933,6 +933,13 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         MatSetSizes(mSystemLhsMatrix,local_size,local_size,mNumDofs,mNumDofs);
         MatSetSizes(mPreconditionMatrix,local_size,local_size,mNumDofs,mNumDofs);
 #endif
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+#else
+        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
+        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
+#endif
 
         if (PetscTools::IsSequential())
         {
