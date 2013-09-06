@@ -172,6 +172,11 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
     VecCreateMPI(PETSC_COMM_WORLD, stride*(mHi-mLo), stride*mProblemSize, &vec);
     VecSetBlockSize(vec, stride);
 #endif
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+        VecSetOption(vec, VEC_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+#else
+        VecSetOption(vec, VEC_IGNORE_OFF_PROC_ENTRIES);
+#endif
     return vec;
 }
 
