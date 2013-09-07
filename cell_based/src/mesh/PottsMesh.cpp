@@ -288,10 +288,10 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
         mMooreNeighbouringNodeIndices[node_index].erase(index);
 
         // Check there's still connectivity for the other non-deleted nodes
-        if (!this->mNodes[index]->IsDeleted())
+        if (!this->mNodes[node_index]->IsDeleted())
         {
-            assert(mVonNeumannNeighbouringNodeIndices[index].size()>0);
-            assert(mMooreNeighbouringNodeIndices[index].size()>0);
+            assert(!mVonNeumannNeighbouringNodeIndices[node_index].empty());
+            assert(!mMooreNeighbouringNodeIndices[node_index].empty());
         }
     }
 
