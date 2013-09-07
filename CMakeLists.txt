@@ -263,7 +263,11 @@ if(ENABLE_CHASTE_TESTING)
 
 	    set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
 	    add_executable(${_testname} "${_test_real_output_filename}" ${ARGN})
-	  	get_property(test_location TARGET ${_testname} PROPERTY LOCATION)
+        if("${CHASTE_BUILD_TYPE}" STREQUAL "Windows_Debug")
+            get_property(test_location TARGET ${_testname} PROPERTY LOCATION_Debug)
+        else()
+            get_property(test_location TARGET ${_testname} PROPERTY LOCATION_Release)
+        endif()
 
 	    if(TEST_MPIEXEC_ENABLED)
 	    	#Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes 
