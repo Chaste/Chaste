@@ -39,8 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <iostream>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "Cvode1.hpp"
 #include "ParameterisedCvode.hpp"
@@ -50,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OdeSolution.hpp"
 #include "VectorHelperFunctions.hpp"
 #include "OutputFileHandler.hpp"
+
+#include "FakePetscSetup.hpp"
 
 double tol = 1e-6;
 
