@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include <fstream>
 
@@ -49,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "TrianglesMeshReader.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 /**
  * This class contains tests for methods on the class CellwiseDataGradient.

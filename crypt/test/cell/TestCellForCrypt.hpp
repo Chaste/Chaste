@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Cell.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "CellLabel.hpp"
@@ -51,6 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "StochasticWntCellCycleModel.hpp"
 
+#include "AbstractCellBasedTestSuite.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestCell: public AbstractCellBasedTestSuite
 {

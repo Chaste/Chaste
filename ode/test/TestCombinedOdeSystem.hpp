@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "OdeSolution.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 /**
  * dy/dt = x, y(0) = 0. Here x is a parameter.
  */

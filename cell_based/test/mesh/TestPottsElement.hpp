@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PottsElement.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestPottsElement : public CxxTest::TestSuite
 {
 public:

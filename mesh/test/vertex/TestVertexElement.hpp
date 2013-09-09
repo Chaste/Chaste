@@ -38,9 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <cmath> //for M_PI
+
 #include "VertexElement.hpp"
 #include "Element.hpp"
-#include <cmath> //for M_PI
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestVertexElement : public CxxTest::TestSuite
 {

@@ -37,12 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTNODE_HPP_
 #define _TESTNODE_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <cxxtest/TestSuite.h>
+
+#include "CheckpointArchiveTypes.hpp"
 
 #include "Node.hpp"
 #include "TetrahedralMesh.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestNode : public CxxTest::TestSuite
 {
@@ -289,6 +291,8 @@ public:
 
     void TestArchiveNode()
     {
+        EXIT_IF_PARALLEL;
+        
         OutputFileHandler handler("TestNode", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "node.arch";
 

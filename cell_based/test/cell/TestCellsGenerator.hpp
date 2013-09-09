@@ -44,11 +44,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestCellsGenerator : public AbstractCellBasedTestSuite
 {
@@ -93,6 +95,7 @@ public:
 
     void TestGenerateGivenLocationIndicesWithFixedDurationGenerationBasedCellCycleModel() throw(Exception)
     {
+        EXIT_IF_PARALLEL;
         // Use a mesh generator to generate some location indices corresponding to real cells
         HoneycombMeshGenerator mesh_generator(6, 7, 2);
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -114,6 +117,7 @@ public:
 
     void TestGenerateGivenLocationIndicesWithSpecifiedCellProliferativeType() throw(Exception)
     {
+        EXIT_IF_PARALLEL;
         // Use a mesh generator to generate some location indices corresponding to real cells
         HoneycombMeshGenerator mesh_generator(6, 7, 2);
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -194,6 +198,7 @@ public:
 
     void TestGenerateBasicRandomWithFixedDurationGenerationBasedCellCycleModelandVertexCells() throw(Exception)
     {
+        EXIT_IF_PARALLEL;
         // Create mesh
         HoneycombVertexMeshGenerator mesh_generator(2, 2);
         VertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();

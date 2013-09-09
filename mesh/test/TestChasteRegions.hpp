@@ -37,8 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTCHASTEREGIONS_HPP_
 #define TESTCHASTEREGIONS_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include <cxxtest/TestSuite.h>
 #include "ChastePoint.hpp"
@@ -48,6 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractChasteRegion.hpp"
 #include "OutputFileHandler.hpp"
 #include "Node.hpp"
+#include "PetscTools.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 typedef ChasteCuboid<3> POINT_3D;
 
@@ -222,7 +224,9 @@ public:
 
     void TestArchivingRegions() throw(Exception)
     {
-        OutputFileHandler handler("archive",false);
+        EXIT_IF_PARALLEL;
+        
+        OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "regions.arch";
 

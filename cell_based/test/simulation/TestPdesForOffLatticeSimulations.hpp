@@ -45,8 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestPdesForOffLatticeSimulations : public AbstractCellBasedTestSuite
 {

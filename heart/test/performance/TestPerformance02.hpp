@@ -34,8 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef TESTPERFORMANCE_HPP_
-#define TESTPERFORMANCE_HPP_
+#ifndef TESTPERFORMANCE02_HPP_
+#define TESTPERFORMANCE02_HPP_
 
 #include <cxxtest/TestSuite.h>
 #include "BidomainProblem.hpp"
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "PerformanceTester.hpp"
 
-class TestPerformance : public CxxTest::TestSuite
+class TestPerformance02 : public CxxTest::TestSuite
 {
 public:
 
@@ -71,4 +71,4 @@ public:
     }
 };
 
-#endif /*TESTPERFORMANCE_HPP_*/
+#endif /*TESTPERFORMANCE02_HPP_*/

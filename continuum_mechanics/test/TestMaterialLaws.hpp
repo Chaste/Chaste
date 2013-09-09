@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <cassert>
+
 #include "MooneyRivlinMaterialLaw.hpp"
 #include "ExponentialMaterialLaw.hpp"
 #include "PolynomialMaterialLaw3d.hpp"
@@ -47,7 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
 #include "ToyCompressibleMaterialLaw.hpp"
 #include "CompressibleExponentialLaw.hpp"
-#include <cassert>
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestMaterialLaws : public CxxTest::TestSuite
 {

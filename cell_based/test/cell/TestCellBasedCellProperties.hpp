@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "CellId.hpp"
 #include "CellData.hpp"
@@ -49,9 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
-#include "AbstractCellBasedTestSuite.hpp"
 #include "OutputFileHandler.hpp"
 #include "SmartPointers.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestCellBasedCellProperties : public AbstractCellBasedTestSuite
 {
@@ -62,7 +63,7 @@ public:
         // Resetting the Maximum cell Id to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
-           MAKE_PTR(CellId, p_cell_id);
+        MAKE_PTR(CellId, p_cell_id);
 
         TS_ASSERT_THROWS_THIS(p_cell_id->GetCellId(), "AssignCellId must be called before using the CellID");
         TS_ASSERT_THROWS_THIS(p_cell_id->GetMaxCellId(), "AssignCellId must be called before using the CellID");

@@ -44,6 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MooneyRivlinMaterialLaw.hpp"
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 c_vector<double,2> SomeFunction(c_vector<double,2>& rX, double t)
 {
     c_vector<double,2> body_force;

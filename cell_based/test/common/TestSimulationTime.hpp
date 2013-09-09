@@ -38,15 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include <fstream>
 
 #include "OutputFileHandler.hpp"
 #include "SimulationTime.hpp"
-//This test is always run sequentially (never in parallel)
-#include "FakePetscSetup.hpp"
+#include "PetscTools.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestSimulationTime : public CxxTest::TestSuite
 {
@@ -202,6 +202,8 @@ public:
 
     void TestArchiveSimulationTime()
     {
+        EXIT_IF_PARALLEL;
+        
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "time.arch";
 

@@ -38,10 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "PottsMeshGenerator.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestPottsMeshGenerator : public CxxTest::TestSuite
 {
@@ -135,7 +136,7 @@ public:
     }
 
     void TestPottsMeshGenerator2dInCentre() throw(Exception)
-        {
+    {
         PottsMeshGenerator<2> generator(6, 2, 2, 7, 2, 2); //should have a gap of one on the left right and bottom and 2 on the top
 
         // Create mesh

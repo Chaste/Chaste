@@ -37,13 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTMOCKEULERIVPODESOLVER_HPP_
 #define _TESTMOCKEULERIVPODESOLVER_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <cxxtest/TestSuite.h>
+
+#include "CheckpointArchiveTypes.hpp"
 
 #include "MockEulerIvpOdeSolver.hpp"
 #include "Ode1.hpp"
 #include "OutputFileHandler.hpp"
+#include "PetscTools.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestMockEulerIvpOdeSolver: public CxxTest::TestSuite
 {
@@ -89,7 +92,9 @@ public:
 
     void TestArchivingMockEulerSolver() throw(Exception)
     {
-        OutputFileHandler handler("archive",false);
+        EXIT_IF_PARALLEL;
+        
+        OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "mock_euler_solver.arch";
 

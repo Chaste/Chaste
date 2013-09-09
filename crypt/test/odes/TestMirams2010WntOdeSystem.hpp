@@ -38,14 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include <fstream>
 #include <ctime>
 
 #include "OutputFileHandler.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "Mirams2010WntOdeSystem.hpp"
 #include "RungeKutta4IvpOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
@@ -53,6 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestMirams2010WntOdeSystem : public AbstractCellBasedTestSuite
 {
@@ -173,6 +174,7 @@ public:
 
     void TestArchiving()
     {
+        EXIT_IF_PARALLEL;
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mirams_ode.arch";

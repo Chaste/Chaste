@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractTimeAdaptivityController.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 // Very simple toy time-adaptivity controller
 class ToyController : public AbstractTimeAdaptivityController
 {

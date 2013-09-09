@@ -43,6 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Testing some methods is kind of tricky, since we really want to check
  * if they work when PETSc isn't set up as well.  Hence this file.
+ *
+ * \todo #2228 - should we include FakePetscSetup.hpp here?
  */
 class TestPetscTools2 : public CxxTest::TestSuite
 {

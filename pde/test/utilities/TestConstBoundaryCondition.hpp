@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "ConstBoundaryCondition.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestConstDirichletBoundaryCondition : public CxxTest::TestSuite
 {
 public:

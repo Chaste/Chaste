@@ -37,10 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTQUADRATICBASISFUNCTION_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <vector>
 #include "QuadraticBasisFunction.hpp"
 #include "BasisFunctionsCheckers.hpp"
 #include "Element.hpp"
-#include <vector>
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestQuadraticBasisFunction : public CxxTest::TestSuite
 {

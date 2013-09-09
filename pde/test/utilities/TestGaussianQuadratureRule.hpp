@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Node.hpp"
 #include "Element.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestGaussianQuadratureRule : public CxxTest::TestSuite
 {
 public:

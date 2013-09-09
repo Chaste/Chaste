@@ -45,10 +45,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "StochasticWntCellCycleModel.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 
 // For archiving?
 #include "WildTypeCellMutationState.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestCryptCellsGenerator : public AbstractCellBasedTestSuite
 {

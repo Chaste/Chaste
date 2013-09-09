@@ -41,6 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MemfemMeshReader.hpp"
 #include "GenericMeshReader.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 typedef MemfemMeshReader<3,3> READER_3D;
 typedef MemfemMeshReader<2,2> READER_2D; // For exception coverage
 

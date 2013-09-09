@@ -37,12 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "TetrahedralMesh.hpp"
 #include "BoxCollection.hpp"
 #include "TrianglesMeshReader.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestBoxCollection : public CxxTest::TestSuite
 {

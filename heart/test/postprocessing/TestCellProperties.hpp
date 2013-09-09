@@ -50,7 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "FileFinder.hpp"
 #include "ColumnDataReader.hpp"
+#include "PetscTools.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Compute action potential properties (APD50, APD90, max upstroke velocities, etc) given voltage traces.
@@ -191,6 +193,8 @@ public:
 
     void TestCellPhysiologicalPropertiesForRegularLr91(void)
     {
+        EXIT_IF_PARALLEL;
+        
         /*
          * Set stimulus
          */
@@ -219,7 +223,7 @@ public:
         solution.WriteToFile("", __FUNCTION__, "ms");
 
         // Now calculate the properties
-        std::vector<double> voltage=solution.GetVariableAtIndex(lr91_ode_system.GetStateVariableIndex("membrane_voltage"));
+        std::vector<double> voltage = solution.GetVariableAtIndex(lr91_ode_system.GetStateVariableIndex("membrane_voltage"));
         CellProperties cell_props(voltage, solution.rGetTimes()); // Use default threshold
         double timestep = solution.rGetTimes()[1] - solution.rGetTimes()[0];
         unsigned size = cell_props.GetMaxUpstrokeVelocities().size();
@@ -255,7 +259,7 @@ public:
         }
         apd_file.close();
 
-        CellProperties  cell_properties(voltages, times); // Use default threshold
+        CellProperties cell_properties(voltages, times); // Use default threshold
         std::vector<double> apds = cell_properties.GetAllActionPotentialDurations(50);
         unsigned size = apds.size();
 
@@ -327,7 +331,7 @@ public:
         ead_file.close();
 
         double threshold = -40;
-        CellProperties  cell_properties(voltages, times, threshold);
+        CellProperties cell_properties(voltages, times, threshold);
 
         //first, we calculate how many full Aps we have here
         std::vector<double> apds = cell_properties.GetAllActionPotentialDurations(90);
@@ -389,7 +393,7 @@ public:
             std::vector<double> times = reader.GetValues("Time");
             std::vector<double> voltages = reader.GetValues("membrane_voltage");
 
-            CellProperties  cell_properties(voltages, times, threshold);
+            CellProperties cell_properties(voltages, times, threshold);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), target_apd_50, tolerance);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }
@@ -400,7 +404,7 @@ public:
             std::vector<double> times = reader.GetValues("Time");
             std::vector<double> voltages = reader.GetValues("membrane_voltage");
 
-            CellProperties  cell_properties(voltages, times, threshold);
+            CellProperties cell_properties(voltages, times, threshold);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), target_apd_50, tolerance);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }
@@ -418,7 +422,7 @@ public:
             std::vector<double> times;
             LoadMeshalyzerOutputTraces(finder, 5001, times, voltages);
 
-            CellProperties  cell_properties(voltages, times, threshold);
+            CellProperties cell_properties(voltages, times, threshold);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), target_apd_50, tolerance);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }
@@ -433,7 +437,7 @@ public:
             std::vector<double> times;
             LoadMeshalyzerOutputTraces(finder, 5001, times, voltages);
 
-            CellProperties  cell_properties(voltages, times, threshold);
+            CellProperties cell_properties(voltages, times, threshold);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), target_apd_50, tolerance);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }
@@ -451,7 +455,7 @@ public:
             std::vector<double> times;
             LoadMeshalyzerOutputTraces(finder, 5001, times, voltages);
 
-            CellProperties  cell_properties(voltages, times, threshold);
+            CellProperties cell_properties(voltages, times, threshold);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), target_apd_50, tolerance);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }
@@ -463,7 +467,7 @@ public:
             std::vector<double> times;
             LoadMeshalyzerOutputTraces(finder, 5001, times, voltages);
 
-            CellProperties  cell_properties(voltages, times, threshold);
+            CellProperties cell_properties(voltages, times, threshold);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), target_apd_50, tolerance);
             TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(90), target_apd_90, tolerance);
         }

@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExecutableSupport.hpp"
 #include "CommandLineArguments.hpp"
 
+// NB: PETSc is set up in the test itself, so don't include a setup header!
+
 /**
  * This doesn't really do any testing - it's just here for coverage.
  */

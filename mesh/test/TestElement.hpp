@@ -37,13 +37,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTELEMENT_HPP_
 #define _TESTELEMENT_HPP_
 
-#include "MutableMesh.hpp"
-
-#include "Exception.hpp"
-#include "TrianglesMeshReader.hpp"
 #include <cxxtest/TestSuite.h>
 
 #include <vector>
+
+#include "MutableMesh.hpp"
+#include "Exception.hpp"
+#include "TrianglesMeshReader.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 typedef BoundaryElement<2,3> BOUNDARY_ELEMENT_2_3;
 

@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QuadraticMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestNonlinearElasticityTools : public CxxTest::TestSuite
 {
 public:

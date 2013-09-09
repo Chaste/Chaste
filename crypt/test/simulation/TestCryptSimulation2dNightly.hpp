@@ -48,13 +48,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCellKiller.hpp"
 #include "SloughingCellKiller.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "WntCellCycleModel.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestCryptSimulation2dNightly : public AbstractCellBasedTestSuite
 {

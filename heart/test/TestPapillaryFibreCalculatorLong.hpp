@@ -38,14 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPAPILLARYFIBRECALCULATORLONG_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
-#include "SimpleDataWriter.hpp"
-#include "UblasCustomFunctions.hpp"
+#include "UblasIncludes.hpp"
 #include "PapillaryFibreCalculator.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestPapillaryFibreCalculatorLong : public CxxTest::TestSuite
 {

@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "Cell.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -61,6 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 
+#include "AbstractCellBasedTestSuite.hpp"
+#include "FakePetscSetup.hpp"
 
 class TestCell: public AbstractCellBasedTestSuite
 {
@@ -1147,6 +1148,7 @@ public:
         TS_ASSERT_EQUALS(p_cell->GetCellId(), 0u);
         TS_ASSERT_EQUALS(p_cell2->GetCellId(), 1u);
     }
+
     void TestCellData() throw (Exception)
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();

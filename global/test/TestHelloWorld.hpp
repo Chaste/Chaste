@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "Exception.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 // This doesn't test anything, it is just a first test for new users to run immediately after installation
 

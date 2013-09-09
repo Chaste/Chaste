@@ -37,13 +37,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTNODEATTRIBUTES_HPP_
 #define _TESTNODEATTRIBUTES_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <cxxtest/TestSuite.h>
 
 #include "CheckpointArchiveTypes.hpp"
+
 #include "OutputFileHandler.hpp"
 #include "NodeAttributes.hpp"
+#include "PetscTools.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestNodeAttributes : public CxxTest::TestSuite
 {
@@ -159,6 +161,8 @@ public:
 
     void TestArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL;
+        
         OutputFileHandler handler("TestNodeAttributes", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "node_attributes.arch";
 
@@ -212,31 +216,33 @@ public:
 
     void TestArchivingNullPointer() throw (Exception)
     {
-         OutputFileHandler handler("TestNodeAttributes", false);
-         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "null_node_attributes.arch";
+        EXIT_IF_PARALLEL;
+        
+        OutputFileHandler handler("TestNodeAttributes", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "null_node_attributes.arch";
 
-         {
-             std::ofstream ofs(archive_filename.c_str());
-             boost::archive::text_oarchive output_arch(ofs);
+        {
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
 
-             NodeAttributes<3>* const p_node_attributes = NULL;
+            NodeAttributes<3>* const p_node_attributes = NULL;
 
-             output_arch << p_node_attributes;
+            output_arch << p_node_attributes;
 
-             delete p_node_attributes;
-         }
+            delete p_node_attributes;
+        }
 
-         {
-             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-             boost::archive::text_iarchive input_arch(ifs);
+        {
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
 
-             NodeAttributes<3>* p_node_attributes;
-             input_arch >> p_node_attributes;
+            NodeAttributes<3>* p_node_attributes;
+            input_arch >> p_node_attributes;
 
-             TS_ASSERT(!p_node_attributes);
+            TS_ASSERT(!p_node_attributes);
 
-             delete p_node_attributes;
-         }
+            delete p_node_attributes;
+        }
     }
 };
 

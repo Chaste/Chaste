@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimplePoissonEquation.hpp"
 #include "VaryingDiffusionAndSourceTermPde.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestPdeTestClasses : public CxxTest::TestSuite
 {
 public:

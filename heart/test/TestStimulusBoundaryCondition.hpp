@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StimulusBoundaryCondition.hpp"
 #include "SimpleStimulus.hpp"
 #include "PdeSimulationTime.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestStimulusBoundaryCondition : public CxxTest::TestSuite
 {

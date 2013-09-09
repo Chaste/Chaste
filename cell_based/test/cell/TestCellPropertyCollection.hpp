@@ -36,10 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTCELLPROPERTYCOLLECTION_HPP_
 #define TESTCELLPROPERTYCOLLECTION_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
-#include "AbstractCellBasedTestSuite.hpp"
+#include "CheckpointArchiveTypes.hpp"
 
 #include <boost/shared_ptr.hpp>
 
@@ -53,6 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 
 #include "OutputFileHandler.hpp"
+
+#include "AbstractCellBasedTestSuite.hpp"
+#include "FakePetscSetup.hpp"
 
 #define NEW_PROP(type, name) boost::shared_ptr<AbstractCellProperty> name(new type)
 

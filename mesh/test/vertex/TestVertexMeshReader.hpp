@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "VertexMeshReader.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 /*
  * This typedef is just because we can't have lines such as

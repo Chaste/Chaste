@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "FemlabMeshReader.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 typedef FemlabMeshReader<2,2> READER_2D;
 typedef FemlabMeshReader<1,1> READER_1D;
 

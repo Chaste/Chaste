@@ -40,8 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <cmath>
 #include "MutableMesh.hpp"
-#include "OutputFileHandler.hpp"
 #include "TrianglesMeshReader.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 //Jonathan Shewchuk's triangle
 #define REAL double
@@ -62,8 +63,6 @@ public:
      */
     void TestRemesh3dMoveNodes() throw (Exception)
     {
-        OutputFileHandler handler("");
-
         TrianglesMeshReader<3,3> mesh_reader2("mesh/test/data/cube_1626_elements");
         TetrahedralMesh<3,3> old_mesh;
         old_mesh.ConstructFromMeshReader(mesh_reader2);

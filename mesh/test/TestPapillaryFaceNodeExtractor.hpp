@@ -43,7 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include "TrianglesMeshReader.hpp"
 #include "TetrahedralMesh.hpp"
-using namespace std;
+
+#include "FakePetscSetup.hpp"
+
 class TestPapillaryExtractor : public CxxTest::TestSuite
 {
 public:
@@ -60,9 +62,9 @@ public:
 
         std::string epi_face_file = "/home/chaste/heart_data/pap_face_n.tri";
 
-        ifstream nodesfile;
-        ifstream coordsfile;
-        ifstream pap_facefile;
+        std::ifstream nodesfile;
+        std::ifstream coordsfile;
+        std::ifstream pap_facefile;
         nodesfile.open("/home/chaste/heart_data/heartT_renum_i.tetras");
         coordsfile.open("/home/chaste/heart_data/heartT_renum_i.pts");
         pap_facefile.open("/home/chaste/heart_data/pap_face_n.dat");
@@ -108,7 +110,7 @@ public:
             nodes[i][3] = node3;
             nodes[i][4] = tag;
         }
-        cout << nodes[10][0] << " " << nodes[10][4] << std::endl;
+        std::cout << nodes[10][0] << " " << nodes[10][4] << std::endl;
 
         // Defines scaling factors for coords file
         double x_factor = 0.053/1000;
@@ -126,7 +128,7 @@ public:
             coords[i][2] = z*z_factor;
 
         }
-        cout << coords[10][0] << " " << coords[10][2] << "\n ";
+        std::cout << coords[10][0] << " " << coords[10][2] << "\n ";
 
 
         // Reads in list of papillary nodes
@@ -136,7 +138,7 @@ public:
             pap_facefile >> pap_face_value;
             pap_face[i] = pap_face_value;
         }
-        cout << pap_face[10] << "\n ";
+        std::cout << pap_face[10] << "\n ";
 
         // Defines a list into which radial vectors are stored
         double **gradients;
@@ -200,14 +202,14 @@ public:
 
 
         // Writes-out the radius vector file
-        ofstream vectorfile("/home/chaste/heart_data/radius_vector.dat");
+        std::ofstream vectorfile("/home/chaste/heart_data/radius_vector.dat");
         for (int i=0;i<num_elements;i++)
         {
             vectorfile << gradients[i][0] << " " << gradients[i][1] << " " << gradients[i][2] << "\n";
         }
         vectorfile.close();
 
-        cout << "done! \n";
+        std::cout << "done! \n";
 
         nodesfile.close();
         coordsfile.close();

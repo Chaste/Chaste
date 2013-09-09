@@ -36,10 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTCVODEADAPTOR_HPP_
 #define _TESTCVODEADAPTOR_HPP_
 
-
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
 #include <cxxtest/TestSuite.h>
+
+#include "CheckpointArchiveTypes.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -47,12 +46,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CvodeAdaptor.hpp"
 #include "OutputFileHandler.hpp"
 #include "OdeSolution.hpp"
+#include "PetscTools.hpp"
 
 #include "Ode1.hpp"
 #include "OdeFirstOrder.hpp"
 #include "OdeSecondOrder.hpp"
 #include "OdeSecondOrderWithEvents.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 class OdeWithRootFunction : public OdeSecondOrderWithEvents
 {
@@ -436,8 +437,10 @@ public:
 
     void TestArchivingCvodeAdaptorSolver() throw(Exception)
     {
+        EXIT_IF_PARALLEL;
+        
 #ifdef CHASTE_CVODE
-        OutputFileHandler handler("archive",false);
+        OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "cvode_adaptor_solver.arch";
 

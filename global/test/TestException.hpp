@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "Exception.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 class TestException : public CxxTest::TestSuite
 {
@@ -60,7 +61,7 @@ public:
         }
 
         TS_ASSERT_THROWS_EQUALS(EXCEPTION("Hello. I'm an exception"), const Exception &err,
-                        err.GetShortMessage(), "Hello. I'm an exception" );
+                                err.GetShortMessage(), "Hello. I'm an exception" );
         /*
          * Note: The following test will fail if the number of lines above is changed drastically
          * (that's why method GetShortMessage() was introduced).

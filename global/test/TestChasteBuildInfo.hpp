@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "ExecutableSupport.hpp"
+#include "FakePetscSetup.hpp"
 
 /**
  * The ChasteBuildInfo class isn't really amenable to testing.
