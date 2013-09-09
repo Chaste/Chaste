@@ -1152,6 +1152,31 @@ public:
         TS_ASSERT_EQUALS(map.IsDeleted(241), true);
     }
 
+    void TestDeleteElement1DIn3D() throw(Exception)
+    {
+        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        MutableMesh<1,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 3u);
+
+        mesh.DeleteElement(1u);
+
+        NodeMap node_map(mesh.GetNumAllNodes());
+        mesh.ReIndex(node_map);
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 3u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 2u);
+
+        //Check that nodes have been shuffled to fill in the indexing
+        TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetLocation()[0], 1.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetLocation()[1], -1.0, 1e-6);
+        TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetLocation()[2], 0.0, 1e-6);
+    }
+
     void TestArchiving() throw(Exception)
     {
         FileFinder archive_dir("archive_mutable_mesh", RelativeTo::ChasteTestOutput);

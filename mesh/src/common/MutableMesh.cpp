@@ -269,11 +269,23 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElement(unsigned index)
     //Delete any nodes that are no longer attached to mesh.
     for (unsigned node_index = 0; node_index < this->mElements[index]->GetNumNodes(); ++node_index)
     {
-        if (this->mElements[index]->GetNode(node_index)->GetNumContainingElements() == 0u
-            && this->mElements[index]->GetNode(node_index)->GetNumBoundaryElements() == 0u)
+        if (this->mElements[index]->GetNode(node_index)->GetNumContainingElements() == 0u)
         {
-            this->mElements[index]->GetNode(node_index)->MarkAsDeleted();
-            mDeletedNodeIndices.push_back(this->mElements[index]->GetNode(node_index)->GetIndex());
+            if (this->mElements[index]->GetNode(node_index)->GetNumBoundaryElements() == 0u)
+            {
+                this->mElements[index]->GetNode(node_index)->MarkAsDeleted();
+                mDeletedNodeIndices.push_back(this->mElements[index]->GetNode(node_index)->GetIndex());
+            }
+            else if (this->mElements[index]->GetNode(node_index)->GetNumBoundaryElements() == 1u && ELEMENT_DIM == 1)
+            {
+                std::set<unsigned> indices = this->mElements[index]->GetNode(node_index)->rGetContainingBoundaryElementIndices();
+                assert(indices.size() == 1u);
+                this->mBoundaryElements[*indices.begin()]->MarkAsDeleted();
+                mDeletedBoundaryElementIndices.push_back(*indices.begin());
+
+                this->mElements[index]->GetNode(node_index)->MarkAsDeleted();
+                mDeletedNodeIndices.push_back(this->mElements[index]->GetNode(node_index)->GetIndex());
+            }
         }
     }
 }
@@ -644,11 +656,13 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     {
         this->mNodes[i]->SetIndex(i);
     }
+
     for (unsigned i=0; i<this->mElements.size(); i++)
     {
 
         this->mElements[i]->ResetIndex(i);
     }
+
     for (unsigned i=0; i<this->mBoundaryElements.size(); i++)
     {
         this->mBoundaryElements[i]->ResetIndex(i);
