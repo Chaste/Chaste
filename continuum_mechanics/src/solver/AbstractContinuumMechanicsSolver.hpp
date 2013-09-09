@@ -922,7 +922,6 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
         // possible todo: create a PetscTools::SetupMatNoAllocation()
 
-        // In the future, when parallelising, remember to think about MAT_IGNORE_OFF_PROC_ENTRIES (see #1682)
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
         MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mSystemLhsMatrix);
@@ -932,13 +931,6 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
         MatCreate(PETSC_COMM_WORLD,&mPreconditionMatrix);
         MatSetSizes(mSystemLhsMatrix,local_size,local_size,mNumDofs,mNumDofs);
         MatSetSizes(mPreconditionMatrix,local_size,local_size,mNumDofs,mNumDofs);
-#endif
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
-        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
-        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
-#else
-        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
-        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
 #endif
 
         if (PetscTools::IsSequential())
@@ -971,6 +963,13 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 
         MatSetFromOptions(mSystemLhsMatrix);
         MatSetFromOptions(mPreconditionMatrix);
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+#else
+        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
+        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
+#endif
 
         //unsigned total_non_zeros = 0;
         //for (unsigned i=0; i<mNumDofs; i++)
