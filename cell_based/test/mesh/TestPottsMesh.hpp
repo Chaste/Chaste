@@ -1681,7 +1681,7 @@ public:
 
     void TestDeleteNode() throw(Exception)
     {
-        // Create simle mesh with 2 pots elements and connectivities
+        // Create simle mesh with 2 potts elements and connectivities
         PottsMeshGenerator<2> generator(2, 2, 1, 2, 1, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -1694,7 +1694,6 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 3u);
 
-
         // Test Node Locations
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[0], 1.0, 1e-3);
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->rGetLocation()[1], 0.0, 1e-3);
@@ -1702,7 +1701,6 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(1)->rGetLocation()[1], 1.0, 1e-3);
         TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[0], 1.0, 1e-3);
         TS_ASSERT_DELTA(p_mesh->GetNode(2)->rGetLocation()[1], 1.0, 1e-3);
-
 
         // Test elements have correct nodes
         TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumNodes(), 1u);

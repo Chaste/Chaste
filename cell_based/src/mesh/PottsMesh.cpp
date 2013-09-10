@@ -264,7 +264,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
          iter++)
     {
         assert(mElements[*iter]->GetNumNodes() > 0);
-        if(mElements[*iter]->GetNumNodes() == 1)
+        if (mElements[*iter]->GetNumNodes() == 1)
         {
             DeleteElement(*iter);
         }
@@ -297,7 +297,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
 
 
     // Remove node from mNodes and renumber all the elements and nodes
-
+    delete this->mNodes[index];
     this->mNodes.erase(this->mNodes.begin()+index);
     unsigned num_nodes = GetNumNodes();
     mVonNeumannNeighbouringNodeIndices.erase(mVonNeumannNeighbouringNodeIndices.begin()+index);
@@ -354,6 +354,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
     if (mDeletedElementIndices.size() == 1)
     {
         unsigned deleted_elem_index = mDeletedElementIndices[0];
+        delete mElements[deleted_elem_index];
         mElements.erase(mElements.begin()+deleted_elem_index);
         mDeletedElementIndices.clear();
 
