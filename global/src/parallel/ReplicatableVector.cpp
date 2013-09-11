@@ -144,6 +144,11 @@ void ReplicatableVector::Replicate(unsigned lo, unsigned hi)
 #else
     VecCreateMPIWithArray(PETSC_COMM_WORLD, hi-lo, this->GetSize(), &mpData[lo], &distributed_vec);
 #endif
+#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+    VecSetOption(distributed_vec, VEC_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+#else
+    VecSetOption(distributed_vec, VEC_IGNORE_OFF_PROC_ENTRIES);
+#endif
     // Now do the real replication
     ReplicatePetscVector(distributed_vec);
 
