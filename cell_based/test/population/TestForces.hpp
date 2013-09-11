@@ -529,6 +529,7 @@ public:
 
     void TestGeneralisedLinearSpringForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GeneralisedLinearSpringForce.arch";
 
@@ -629,6 +630,7 @@ public:
 
     void TestChemotacticForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ChemotacticForce.arch";
 
@@ -768,6 +770,7 @@ public:
 
     void TestRepulsionForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RepulsionForce.arch";
 
@@ -1052,6 +1055,7 @@ public:
 
     void TestNagaiHondaForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NagaiHondaForce.arch";
 
@@ -1161,6 +1165,7 @@ public:
 
     void TestNagaiHondaDifferentialAdhesionForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NagaiHondaDifferentialAdhesionForce.arch";
 
@@ -1271,6 +1276,7 @@ public:
 
     void TestWelikyOsterForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "WelikyOsterForce.arch";
 
@@ -1589,6 +1595,7 @@ public:
 
     void TestDiffusionForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionForce.arch";
 
