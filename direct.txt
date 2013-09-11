@@ -1,0 +1,236 @@
+[?1034hscons: Reading SConscript files ...
+Using hostconfig settings from python/hostconfig/machines/raf.py
+Running infrastructure tests...
+scons: done reading SConscript files.
+scons: Building targets ...
+/home/scratch/chaste-libs/bin/mpicxx -o continuum_mechanics/build/debug/TestMoreMechanicsRunner.o -c <flags etc. omitted> continuum_mechanics/build/debug/TestMoreMechanicsRunner.cpp
+/home/scratch/chaste-libs/bin/mpicxx -o continuum_mechanics/build/debug/src/solver/CompressibleNonlinearElasticitySolver.os -c <flags etc. omitted> continuum_mechanics/src/solver/CompressibleNonlinearElasticitySolver.cpp
+/home/scratch/chaste-libs/bin/mpicxx -o continuum_mechanics/build/debug/src/solver/IncompressibleNonlinearElasticitySolver.os -c <flags etc. omitted> continuum_mechanics/src/solver/IncompressibleNonlinearElasticitySolver.cpp
+Generating global/build/debug/src/Version.cpp from build information.
+/home/scratch/chaste-libs/bin/mpicxx -o global/build/debug/src/Version.os -c <flags etc. omitted> global/build/debug/src/Version.cpp
+/home/scratch/chaste-libs/bin/mpicxx -o global/build/debug/libglobal.so -rdynamic -shared global/build/debug/src/RandomNumberGenerator.os global/build/debug/src/TimeStepper.os global/build/debug/src/CommandLineArguments.os global/build/debug/src/ExecutableSupport.os global/build/debug/src/Debug.os global/build/debug/src/Warnings.os global/build/debug/src/OutputFileHandler.os global/build/debug/src/OutputDirectoryFifoQueue.os global/build/debug/src/Exception.os global/build/debug/src/FileFinder.os global/build/debug/src/GetCurrentWorkingDirectory.os global/build/debug/src/LogFile.os global/build/debug/src/ProgressReporter.os global/build/debug/src/MathsCustomFunctions.os global/build/debug/src/fortests/CommandLineArgumentsMocker.os global/build/debug/src/checkpointing/Identifiable.os global/build/debug/src/checkpointing/ArchiveLocationInfo.os global/build/debug/src/checkpointing/ProcessSpecificArchive.os global/build/debug/src/checkpointing/ArchiveOpener.os global/build/debug/src/timing/CellBasedEventHandler.os global/build/debug/src/timing/Timer.os global/build/debug/src/timing/HeartEventHandler.os global/build/debug/src/timing/MechanicsEventHandler.os global/build/debug/src/parallel/PetscTools.os global/build/debug/src/parallel/DistributedVectorException.os global/build/debug/src/parallel/DistributedVector.os global/build/debug/src/parallel/ReplicatableVector.os global/build/debug/src/parallel/DistributedVectorFactory.os global/build/debug/src/parallel/PetscException.os global/build/debug/src/Version.os global/build/debug/src/ChasteBuildRoot.os
+scons: `test_exes' is up to date.
+Install file: "global/build/debug/libglobal.so" as "lib/libglobal.so"
+nm --extern-only lib/libglobal.so | cut -c 12- | sort > global/build/debug/global.if
+/home/scratch/chaste-libs/bin/mpicxx -o continuum_mechanics/build/debug/libcontinuum_mechanics.so -rdynamic -shared continuum_mechanics/build/debug/src/problem/SolidMechanicsProblemDefinition.os continuum_mechanics/build/debug/src/problem/ContinuumMechanicsProblemDefinition.os continuum_mechanics/build/debug/src/problem/material_laws/CompressibleExponentialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/SchmidCostaExponentialLaw2d.os continuum_mechanics/build/debug/src/problem/material_laws/NashHunterPoleZeroLaw.os continuum_mechanics/build/debug/src/problem/material_laws/ExponentialMaterialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/MooneyRivlinMaterialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/AbstractIsotropicIncompressibleMaterialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/PoleZeroMaterialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/AbstractMaterialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/AbstractIsotropicCompressibleMaterialLaw.os continuum_mechanics/build/debug/src/problem/material_laws/PolynomialMaterialLaw3d.os continuum_mechanics/build/debug/src/common/NonlinearElasticityTools.os continuum_mechanics/build/debug/src/solver/CompressibleNonlinearElasticitySolver.os continuum_mechanics/build/debug/src/solver/IncompressibleNonlinearElasticitySolver.os
+Install file: "continuum_mechanics/build/debug/libcontinuum_mechanics.so" as "lib/libcontinuum_mechanics.so"
+nm --extern-only lib/libcontinuum_mechanics.so | cut -c 12- | sort > continuum_mechanics/build/debug/continuum_mechanics.if
+Copy("linklib/libcontinuum_mechanics.so", "/home/scratch/airprom_workspace/Chaste/lib/libcontinuum_mechanics.so")
+/home/scratch/chaste-libs/bin/mpicxx -o continuum_mechanics/build/debug/TestMoreMechanicsRunner -rdynamic continuum_mechanics/build/debug/TestMoreMechanicsRunner.o -Llinklib -Lcontinuum_mechanics/build/debug -Lcontinuum_mechanics -L/home/scratch/chaste-libs/petsc-3.0.0-p9/linux-gnu/lib -L/home/scratch/chaste-libs/lib -L/home/scratch/chaste-libs/rdf/lib -Llib -ltestcontinuum_mechanics -lcontinuum_mechanics -lpde -lmesh -lode -lio -llinalg -lglobal -lpetscts -lpetscsnes -lpetscksp -lpetscdm -lpetscmat -lpetscvec -lpetsc -lboost_serialization -lboost_filesystem -lboost_system -lxerces-c -lhdf5 -lz -lparmetis -lmetis -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lparmetis -lmetis -lhdf5 -lz -lflapack -lfblas -lmpi_f77 -lgsl -lgslcblas -lvtkFiltering -lvtkIO -lvtkCommon -lvtksys -lvtkGraphics -lGmsh -lflapack -lfblas -lgfortran -lgfortranbegin -ldl
+Running 'continuum_mechanics/build/debug/TestMoreMechanicsRunner'
+Running 2 tests
+
+ ***** TestMoreMechanics.hpp *****
+
+
+Entering TestBarPressureOnUnderside
+
+Norm of residual is 2.17126e-06
+Solving with tolerance 2.17126e-10
+
+-------------------
+Newton iteration 1:
+-------------------
+AssembleSystem time: 0.12s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 8
+	Initial |f| [corresponding to s=0] is 2.17126e-06
+	Testing s = 1, |f| = 0.000464873
+	Testing s = 0.9, |f| = 0.000379021
+	Testing s = 0.8, |f| = 0.000301206
+	Testing s = 0.7, |f| = 0.00023173
+	Testing s = 0.6, |f| = 0.000170875
+	Testing s = 0.5, |f| = 0.000118897
+	Testing s = 0.4, |f| = 7.60245e-05
+	Testing s = 0.3, |f| = 4.24523e-05
+	Testing s = 0.2, |f| = 1.83538e-05
+	Testing s = 0.1, |f| = 4.0546e-06
+	Testing s = 0.05, |f| = 1.70078e-06
+	Taking full first Newton step...
+	Choosing s = 1
+Norm of residual is 1.70078e-06
+
+-------------------
+Newton iteration 2:
+-------------------
+AssembleSystem time: 0.11s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 7
+	Initial |f| [corresponding to s=0] is 0.000464873
+	Testing s = 1, |f| = 9.81725e-06
+	Testing s = 0.9, |f| = 4.05866e-05
+	Choosing s = 1
+Norm of residual is 9.81725e-06
+
+-------------------
+Newton iteration 3:
+-------------------
+AssembleSystem time: 0.11s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 8
+	Initial |f| [corresponding to s=0] is 9.81725e-06
+	Testing s = 1, |f| = 1.32759e-06
+	Testing s = 0.9, |f| = 6.59595e-07
+	Testing s = 0.8, |f| = 1.38335e-06
+	Choosing s = 0.9
+Norm of residual is 6.59595e-07
+
+-------------------
+Newton iteration 4:
+-------------------
+AssembleSystem time: 0.1s
+KSP Setup time: 0.02s
+KSP Solve time: 0s
+[0]: Num iterations = 8
+	Initial |f| [corresponding to s=0] is 6.59595e-07
+	Testing s = 1, |f| = 2.65373e-07
+	Testing s = 0.9, |f| = 2.49953e-07
+	Testing s = 0.8, |f| = 2.55132e-07
+	Choosing s = 0.9
+Norm of residual is 2.49953e-07
+
+-------------------
+Newton iteration 5:
+-------------------
+AssembleSystem time: 0.11s
+KSP Setup time: 0.01s
+KSP Solve time: 0.01s
+[0]: Num iterations = 8
+	Initial |f| [corresponding to s=0] is 2.49953e-07
+	Testing s = 1, |f| = 2.8254e-09
+	Testing s = 0.9, |f| = 2.72264e-08
+	Choosing s = 1
+Norm of residual is 2.8254e-09
+
+-------------------
+Newton iteration 6:
+-------------------
+AssembleSystem time: 0.11s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 8
+	Initial |f| [corresponding to s=0] is 2.8254e-09
+	Testing s = 1, |f| = 4.36557e-13
+	Testing s = 0.9, |f| = 2.82893e-10
+	Choosing s = 1
+Norm of residual is 4.36557e-13
+
+Norm of residual is 1.17159e-05
+Solving with tolerance 1.17159e-09
+
+-------------------
+Newton iteration 1:
+-------------------
+AssembleSystem time: 0.82s
+KSP Setup time: 0.28s
+KSP Solve time: 0.03s
+[0]: Num iterations = 12
+	Initial |f| [corresponding to s=0] is 1.17159e-05
+	Testing s = 1, |f| = 1.32291e-07
+	Testing s = 0.9, |f| = 1.16312e-06
+	Taking full first Newton step...
+	Choosing s = 1
+Norm of residual is 1.32291e-07
+
+-------------------
+Newton iteration 2:
+-------------------
+AssembleSystem time: 0.82s
+KSP Setup time: 0.27s
+KSP Solve time: 0.03s
+[0]: Num iterations = 10
+	Initial |f| [corresponding to s=0] is 1.32291e-07
+	Testing s = 1, |f| = 4.48645e-11
+	Testing s = 0.9, |f| = 1.3237e-08
+	Choosing s = 1
+Norm of residual is 4.48645e-11
+Passed
+Entering TestBarPressureOnUndersideCompressible
+
+Norm of residual is 2.89502e-06
+Solving with tolerance 2.89502e-10
+
+-------------------
+Newton iteration 1:
+-------------------
+AssembleSystem time: 0.12s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 2.89502e-06
+	Testing s = 1, |f| = 0.00489406
+	Testing s = 0.9, |f| = 0.00396228
+	Testing s = 0.8, |f| = 0.00312927
+	Testing s = 0.7, |f| = 0.00239482
+	Testing s = 0.6, |f| = 0.00175869
+	Testing s = 0.5, |f| = 0.00122072
+	Testing s = 0.4, |f| = 0.000780742
+	Testing s = 0.3, |f| = 0.000438641
+	Testing s = 0.2, |f| = 0.00019432
+	Testing s = 0.1, |f| = 4.77448e-05
+	Testing s = 0.05, |f| = 1.12776e-05
+	Taking full first Newton step...
+	Choosing s = 1
+Norm of residual is 1.12776e-05
+
+-------------------
+Newton iteration 2:
+-------------------
+AssembleSystem time: 0.13s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 0.00489406
+	Testing s = 1, |f| = 2.68073e-05
+	Testing s = 0.9, |f| = 0.00050622
+	Choosing s = 1
+Norm of residual is 2.68073e-05
+
+-------------------
+Newton iteration 3:
+-------------------
+AssembleSystem time: 0.13s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 2.68073e-05
+	Testing s = 1, |f| = 6.39897e-07
+	Testing s = 0.9, |f| = 2.31388e-06
+	Choosing s = 1
+Norm of residual is 6.39897e-07
+
+-------------------
+Newton iteration 4:
+-------------------
+AssembleSystem time: 0.13s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 6.39897e-07
+	Testing s = 1, |f| = 2.8897e-08
+	Testing s = 0.9, |f| = 4.17433e-08
+	Choosing s = 1
+Norm of residual is 2.8897e-08
+
+-------------------
+Newton iteration 5:
+-------------------
+AssembleSystem time: 0.13s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 2.8897e-08
+	Testing s = 1, |f| = 7.35168e-11
+	Testing s = 0.9, |f| = 2.949e-09
+	Choosing s = 1
+Norm of residual is 7.35168e-11
+Passed
+OK!
+python python/DisplayTests.py test_summary/clpc13.cs.ox.ac.uk.default default
+Test summary generated in file:///home/scratch/airprom_workspace/Chaste/test_summary/clpc13.cs.ox.ac.uk.default/index.html
+Overall test status: Failed 75 out of 346 test suites (OrphanedTests, crypt, global, mesh, notforrelease, io, pde, cell_based, notforrelease_lung, ode, projects)
+Test output written to: /tmp/rafb/testoutput/
+scons: done building targets.

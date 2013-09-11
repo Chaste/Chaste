@@ -1,0 +1,106 @@
+Running 1 test
+
+ ***** TestEmVerification.hpp *****
+
+
+Entering TestBarPressureOnUnderside
+
+Norm of residual is 0.00983333
+Solving with tolerance 1e-07
+
+-------------------
+Newton iteration 1:
+-------------------
+AssembleSystem time: 0.27s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 0.00983333
+	Testing s = 1, |f| = 4.0992
+	Testing s = 0.9, |f| = 3.30143
+	Testing s = 0.8, |f| = 2.58932
+	Testing s = 0.7, |f| = 1.96423
+	Testing s = 0.6, |f| = 1.42701
+	Testing s = 0.5, |f| = 0.977477
+	Testing s = 0.4, |f| = 0.614632
+	Testing s = 0.3, |f| = 0.337394
+	Testing s = 0.2, |f| = 0.143495
+	Testing s = 0.1, |f| = 0.0313492
+	Testing s = 0.05, |f| = 0.0123341
+	Taking full first Newton step...
+	Choosing s = 1
+l_inf_disp, l_inf_pressure = 2.32047 0.263843
+Norm of residual is 0.0123341
+
+-------------------
+Newton iteration 2:
+-------------------
+AssembleSystem time: 0.32s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 4.0992
+	Testing s = 1, |f| = 0.082871
+	Testing s = 0.9, |f| = 0.361421
+	Choosing s = 1
+l_inf_disp, l_inf_pressure = 0.2981 0.00757985
+Norm of residual is 0.082871
+
+-------------------
+Newton iteration 3:
+-------------------
+AssembleSystem time: 0.28s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 0.082871
+	Testing s = 1, |f| = 0.0112963
+	Testing s = 0.9, |f| = 0.00409408
+	Testing s = 0.8, |f| = 0.0114255
+	Choosing s = 0.9
+l_inf_disp, l_inf_pressure = 0.0930727 0.00623982
+Norm of residual is 0.00409408
+
+-------------------
+Newton iteration 4:
+-------------------
+AssembleSystem time: 0.27s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 0.00409408
+	Testing s = 1, |f| = 0.00221261
+	Testing s = 0.9, |f| = 0.00210759
+	Testing s = 0.8, |f| = 0.00205061
+	Testing s = 0.7, |f| = 0.00206198
+	Choosing s = 0.8
+l_inf_disp, l_inf_pressure = 0.0384532 0.00249934
+Norm of residual is 0.00205061
+
+-------------------
+Newton iteration 5:
+-------------------
+AssembleSystem time: 0.28s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 0.00205061
+	Testing s = 1, |f| = 9.12858e-05
+	Testing s = 0.9, |f| = 0.000278821
+	Choosing s = 1
+l_inf_disp, l_inf_pressure = 0.00973286 0.000629219
+Norm of residual is 9.12858e-05
+
+-------------------
+Newton iteration 6:
+-------------------
+AssembleSystem time: 0.27s
+KSP Setup time: 0.01s
+KSP Solve time: 0s
+[0]: Num iterations = 1
+	Initial |f| [corresponding to s=0] is 9.12858e-05
+	Testing s = 1, |f| = 1.01041e-08
+	Testing s = 0.9, |f| = 9.13675e-06
+	Choosing s = 1
+l_inf_disp, l_inf_pressure = 9.97157e-05 6.12178e-06
+Norm of residual is 1.01041e-08
