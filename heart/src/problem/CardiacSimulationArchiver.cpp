@@ -103,7 +103,7 @@ void CardiacSimulationArchiver<PROBLEM_CLASS>::Save(PROBLEM_CLASS& rSimulationTo
             EXCEPTION("Unable to open archive information file: " + info_path);
         }
         PetscTools::ReplicateBool(false);
-        unsigned archive_version = 0; /// \todo #1026 get a real version number!
+        unsigned archive_version = 0; // Note that Boost version numbers are per-class; this only needs to change if we change the Load/Save methods here
         info_file << PetscTools::GetNumProcs() << " " << archive_version;
     }
     else
