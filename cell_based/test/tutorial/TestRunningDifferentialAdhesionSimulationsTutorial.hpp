@@ -109,6 +109,7 @@ public:
         HoneycombVertexMeshGenerator generator(5, 5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
+        PRINT_VARIABLE(p_mesh->GetNumElements())
 
         /* We then create some cells using the helper class {{{CellsGenerator}}}. Note that in this simulation
          * the cells are all differentiated, and thus no cell division occurs; if we wished, we could modify
@@ -118,6 +119,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+        PRINT_VARIABLE(cells.size())
 
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */
@@ -131,13 +133,17 @@ public:
 
         /* We randomly label some cells using the cell property {{{CellLabel}}}. We begin by creating a shared pointer to
          * this cell property using the helper singleton {{{CellPropertyRegistry}}}. We then loop over the cells and label
-         * each cell independently with probability 0.5. */
+         * each cell independently with probability 0.5. Note that since the cells have been passed to the
+         * {{{VertexBasedCellPopulation}}} object, the vector {{{cells}}} above is now empty, so we must use the
+         * {{{Iterator}}} to loop over cells. */
          boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-         for (unsigned i=0; i<cells.size(); i++)
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
          {
              if (RandomNumberGenerator::Instance()->ranf() < 0.5)
              {
-                 cells[i]->AddCellProperty(p_label);
+                    cell_iter->AddCellProperty(p_label);
              }
          }
 
