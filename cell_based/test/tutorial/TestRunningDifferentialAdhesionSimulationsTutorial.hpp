@@ -109,7 +109,6 @@ public:
         HoneycombVertexMeshGenerator generator(5, 5);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
-        PRINT_VARIABLE(p_mesh->GetNumElements())
 
         /* We then create some cells using the helper class {{{CellsGenerator}}}. Note that in this simulation
          * the cells are all differentiated, and thus no cell division occurs; if we wished, we could modify
@@ -119,7 +118,6 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
-        PRINT_VARIABLE(cells.size())
 
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */
@@ -140,12 +138,12 @@ public:
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
-         {
-             if (RandomNumberGenerator::Instance()->ranf() < 0.5)
-             {
-                    cell_iter->AddCellProperty(p_label);
-             }
-         }
+        {
+            if (RandomNumberGenerator::Instance()->ranf() < 0.5)
+            {
+                cell_iter->AddCellProperty(p_label);
+            }
+        }
 
         /* We are now in a position to create and configure the cell-based simulation object.
          * We can make the simulation run for longer to see more cell sorting by increasing the end time. */
