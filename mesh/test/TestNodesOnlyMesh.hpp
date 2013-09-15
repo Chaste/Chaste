@@ -568,10 +568,6 @@ public:
         }
         else
         {
-            if (PetscTools::GetMyRank() == 0)
-            {
-                TS_ASSERT_THROWS_CONTAINS(p_mesh->AddNode(new Node<2>(2, true, 0.0, 2.0)), " which doesn't belong on this process.");
-            }
             if (PetscTools::GetMyRank() == 1)
             {
                 p_mesh->AddNode(new Node<2>(2, true, 0.0, 2.0)); // This node pointer is added to the mesh and deleted by the destructor

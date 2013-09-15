@@ -319,11 +319,6 @@ std::vector<unsigned>& NodesOnlyMesh<SPACE_DIM>::rGetHaloNodesToSendLeft()
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddNodeWithFixedIndex(Node<SPACE_DIM>* pNewNode)
 {
-    if(!mpBoxCollection->IsOwned(pNewNode))
-    {
-        EXCEPTION("Trying to add node to process " << PetscTools::GetMyRank() << " which doesn't belong on this process.");
-    }
-
     unsigned location_in_nodes_vector = 0;
 
     if (this->mDeletedNodeIndices.empty())
@@ -629,7 +624,6 @@ void NodesOnlyMesh<SPACE_DIM>::LoadBalanceMesh()
         current_domain_size[2*d] = current_domain_size[2*d] + fudge;
         current_domain_size[2*d+1] = current_domain_size[2*d+1] - fudge;
     }
-
     SetUpBoxCollection(mMaximumInteractionDistance, current_domain_size, new_rows);
 }
 

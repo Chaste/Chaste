@@ -133,9 +133,6 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     UpdateCellProcessLocation();
 
-    NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
-    mpNodesOnlyMesh->ReMesh(map);
-
     mpNodesOnlyMesh->UpdateBoxCollection();
 
     if (mLoadBalanceMesh)
@@ -146,9 +143,6 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
             UpdateCellProcessLocation();
 
-            NodeMap another_map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());///\todo conflicts with Dan?
-            mpNodesOnlyMesh->ReMesh(another_map);
-
             mpNodesOnlyMesh->UpdateBoxCollection();
         }
     }
@@ -157,6 +151,32 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs, mNodeNeighbours);
 
+    AddReceivedHaloCells();
+
+    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs, mNodeNeighbours);
+
+    /*
+     * Update cell radii based on CellData
+     */
+    if (mUseVariableRadii)
+    {
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+             cell_iter != this->End();
+             ++cell_iter)
+        {
+            double cell_radius = cell_iter->GetCellData()->GetItem("Radius");
+            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            this->GetNode(node_index)->SetRadius(cell_radius);
+        }
+    }
+
+    // Make sure that everyone exits update together so that all asynchronous communications are complete.
+    PetscTools::Barrier("Update");
+}
+
+template<unsigned DIM>
+void NodeBasedCellPopulation<DIM>::UpdateMapsAfterRemesh(NodeMap& map)
+{
     if (!map.IsIdentityMap())
     {
         UpdateParticlesAfterReMesh(map);
@@ -184,28 +204,6 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
         this->Validate();
     }
-
-    AddReceivedHaloCells();
-
-    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs, mNodeNeighbours);
-
-    /*
-     * Update cell radii based on CellData
-     */
-    if (mUseVariableRadii)
-    {
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
-        {
-            double cell_radius = cell_iter->GetCellData()->GetItem("Radius");
-            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-            this->GetNode(node_index)->SetRadius(cell_radius);
-        }
-    }
-
-    // Make sure that everyone exits update together so that all asynchronous communications are complete.
-    PetscTools::Barrier("Update");
 }
 
 template<unsigned DIM>
@@ -676,12 +674,20 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
 
     mpNodesOnlyMesh->DeleteMovedNode(index);
 
-    // Update mappings between cells and location indices
-    this->mCellLocationMap.erase((p_cell).get());
-    this->mLocationCellMap.erase(index);
-
     // Update vector of cells
-    this->mCells.remove(p_cell);
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
+         ++cell_iter)
+    {
+        if (this->GetLocationIndexUsingCell(*cell_iter) == index)
+        {
+            // Update mappings between cells and location indices
+            this->RemoveCellUsingLocationIndex(index, (*cell_iter));
+            cell_iter = this->mCells.erase(cell_iter);
+
+            break;
+        }
+    }
 }
 
 /**
@@ -839,10 +845,10 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
     AddCellsToSendLeft(nodes_to_send_left);
 
     // Post non-blocking send / receives so communication on both sides can start.
-    NonBlockingSendCellsToNeighbourProcesses();
+    SendCellsToNeighbourProcesses();
 
     // Post blocking receive calls that wait until communication complete.
-    GetReceivedCells();
+    //GetReceivedCells();
 
     for (std::vector<unsigned>::iterator iter = nodes_to_send_right.begin();
          iter != nodes_to_send_right.end();
@@ -859,6 +865,10 @@ void NodeBasedCellPopulation<DIM>::UpdateCellProcessLocation()
     }
 
     AddReceivedCells();
+
+    NodeMap map(1 + mpNodesOnlyMesh->GetMaximumNodeIndex());
+    mpNodesOnlyMesh->ReMesh(map);
+    UpdateMapsAfterRemesh(map);
 }
 
 template<unsigned DIM>

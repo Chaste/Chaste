@@ -208,6 +208,13 @@ private:
      */
     void AddHaloCell(CellPtr pCell, boost::shared_ptr<Node<DIM> > pNode);
 
+    /**
+     * Update the map between nodes and cells after a call to remesh.
+     *
+     * @param map The node map from ReMesh.
+     */
+    void UpdateMapsAfterRemesh(NodeMap& map);
+
 protected:
 
 #undef COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
