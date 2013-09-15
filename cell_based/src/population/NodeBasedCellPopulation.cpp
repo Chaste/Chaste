@@ -670,8 +670,6 @@ void NodeBasedCellPopulation<DIM>::AddMovedCell(CellPtr pCell, boost::shared_ptr
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
 {
-    CellPtr p_cell = this->GetCellUsingLocationIndex(index);
-
     mpNodesOnlyMesh->DeleteMovedNode(index);
 
     // Update vector of cells
