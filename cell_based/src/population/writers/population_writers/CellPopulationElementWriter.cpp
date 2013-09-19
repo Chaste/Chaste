@@ -92,6 +92,38 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPop
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+	// Loop over cells and find associated elements so in the same order as the cells in output files
+	for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+		 cell_iter != pCellPopulation->End();
+		 ++cell_iter)
+	{
+		unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+
+		// Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
+		bool elem_corresponds_to_dead_cell = false;
+
+		if (pCellPopulation->IsCellAttachedToLocationIndex(elem_index))
+		{
+			elem_corresponds_to_dead_cell = pCellPopulation->GetCellUsingLocationIndex(elem_index)->IsDead();
+		}
+
+		// Write element data to file
+		if (!(pCellPopulation->GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+		{
+			PottsElement<SPACE_DIM>* p_element = pCellPopulation->rGetMesh().GetElement(elem_index);
+			unsigned num_nodes_in_element = p_element->GetNumNodes();
+
+			// First write the number of Nodes belonging to this VertexElement
+			*this->mpOutStream << num_nodes_in_element << " ";
+
+			// Then write the global index of each Node in this element
+			for (unsigned i=0; i<num_nodes_in_element; i++)
+			{
+				*this->mpOutStream << p_element->GetNodeGlobalIndex(i) << " ";
+			}
+		}
+	}
+
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
