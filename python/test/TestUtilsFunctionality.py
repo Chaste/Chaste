@@ -36,7 +36,7 @@ import unittest
 import sys
 import filecmp
 
-class TestAddingVtuTimeAnnotations(unittest.TestCase):
+class TestUtilsFunctionality(unittest.TestCase):
     
     def TestAddingVtuAnnotationsMonodomain2d(self):
         #without suffices (input and output file names)
@@ -87,4 +87,23 @@ class TestAddingVtuTimeAnnotations(unittest.TestCase):
         #Extra file from post-processing_map_output_Apd_90_minus_30_Map.
         output_post_vtu = os.path.join(CHASTE_TEST_OUTPUT, 'bidomain2d_with_apd_map_output_Apd_90_minus_30_Map.vtu')
         self.assertTrue(filecmp.cmp(output_post_vtu,'python/test/data/output/bidomain2d_with_apd_map_output_Apd_90_minus_30_Map.vtu'))
+
+
+    def TestConvertBinaryAttributes(self):
+        # Original (pre version 3.2) has unsigned attributes (in binary and ascii files)
+        # Newer Chaste has double attributes and can't cope with old binary file (each data item is 4 bytes shorter than expected)
+
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py')
+        self.assertEqual(rc, 256) #Not enough arguments
+
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py SomeFile.node Output.node')
+        self.assertEqual(rc, 256) #Not correct extension
+
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py mesh/test/data/trivial_1d_mesh.ele output.ele')
+        #Todo self.assertEqual(rc, 256) #An ascii mesh file
+
+        original = 'python/test/data/input/trivial_1d_mesh_binary.ele'
+        output = os.path.join(CHASTE_TEST_OUTPUT, 'trivial_1d_mesh_binary.ele')
+
+                     
         
