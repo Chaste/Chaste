@@ -89,21 +89,29 @@ class TestUtilsFunctionality(unittest.TestCase):
         self.assertTrue(filecmp.cmp(output_post_vtu,'python/test/data/output/bidomain2d_with_apd_map_output_Apd_90_minus_30_Map.vtu'))
 
 
-    def TestConvertBinaryAttributes(self):
+    def TestConvertBinaryAttributesForChaste_3_2(self):
         # Original (pre version 3.2) has unsigned attributes (in binary and ascii files)
         # Newer Chaste has double attributes and can't cope with old binary file (each data item is 4 bytes shorter than expected)
 
         rc = os.system('python/utils/ConvertBinaryElementAttributes.py')
-        self.assertEqual(rc, 256) #Not enough arguments
+        self.assertEqual(rc, 256) #Not enough arguments - return 1
 
-        rc = os.system('python/utils/ConvertBinaryElementAttributes.py SomeFile.node Output.node')
-        self.assertEqual(rc, 256) #Not correct extension
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py SomeFile.node output.node')
+        self.assertEqual(rc, 256*2) #Not correct extension - return 2
 
-        rc = os.system('python/utils/ConvertBinaryElementAttributes.py mesh/test/data/trivial_1d_mesh.ele output.ele')
-        #Todo self.assertEqual(rc, 256) #An ascii mesh file
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py mesh/test/data/simple_cube.ele output.ele')
+        self.assertEqual(rc, 256*3) #An ascii mesh file - return 3
 
-        original = 'python/test/data/input/trivial_1d_mesh_binary.ele'
-        output = os.path.join(CHASTE_TEST_OUTPUT, 'trivial_1d_mesh_binary.ele')
+        converted = 'python/test/data/output/simple_cube_binary.ele'
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py ' + converted +' output.ele')
+        self.assertEqual(rc, 256*4) #A file which is already in the new format - return 4
+
+        original = 'python/test/data/input/simple_cube_binary.ele'
+        output = os.path.join(CHASTE_TEST_OUTPUT, 'simple_cube_binary.ele')
+	
+        rc = os.system('python/utils/ConvertBinaryElementAttributes.py ' +  original + ' ' +  output)
+        # Byte-for-byte comparion
+        self.assertTrue(filecmp.cmp(output, converted))
 
                      
         
