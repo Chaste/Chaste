@@ -78,7 +78,9 @@ if __name__ == "__main__":
     
     # Remember the place on disk
     data_start = in_file.tell()
+    # TODO: This doesn't work because \n == 0a == 10 is almost certain to appear in the data
     size_on_disk = len(in_file.readline())  # Todo Does this use memory?  If so, we may as well read once and keep it in memory
+    #print size_on_disk, old_data_size, new_data_size
     if size_on_disk == new_data_size:
         print >> sys.stderr, "This file looks like it has already been converted"
         sys.exit(4)
