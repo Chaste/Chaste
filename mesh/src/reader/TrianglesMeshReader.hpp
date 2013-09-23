@@ -313,12 +313,12 @@ private:
      * @param expectedItemNumber  To check file syntax, what item is expected to be on the next line.
      * @param rDataPacket  Assumed to be of the right size but is allowed to contain dirty data on entry.
      * @param rNumAttributes  The number of attributes per item that we expect to read. Either #mNumFaceAttributes or #mNumElementAttributes.
-     * @param rAttributes  Will be filled with the attribute values if rNumAttributes > 0, otherwise empty.  Note that floating point attributes are allowed
+     * @param rAttributes  Will be filled with the attribute values if rNumAttributes > 0, otherwise empty.  Note that floating point attributes are now standard
      */
-    template<class T_DATA, class T_ATTR>
+    template<class T_DATA>
     void GetNextItemFromStream(std::ifstream& rFileStream, unsigned expectedItemNumber,
                                std::vector<T_DATA>& rDataPacket, const unsigned& rNumAttributes,
-                               std::vector<T_ATTR>& rAttributes);
+                               std::vector<double>& rAttributes);
 
     /** @return #mFilesBaseName. */
     std::string GetMeshFileBaseName();

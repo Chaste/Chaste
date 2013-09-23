@@ -187,7 +187,6 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             {
                 element_data = this->GetNextElement();
             }
-            //Note: Cable element has a double attribute for radius but regular element have always had an unsigned region marker
             attribute_values[0] = (unsigned) element_data.AttributeValue;
             WriteItem(p_element_file, item_num, element_data.NodeIndices, attribute_values);
         }
@@ -270,7 +269,6 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             for (unsigned item_num=0; item_num<num_cable_elements; item_num++)
             {
                 ElementData cable_element_data = this->GetNextCableElement();
-                //Cable element has a double attribute for radius
                 attribute_values[0] = cable_element_data.AttributeValue;
                 WriteItem(p_cable_element_file, item_num, cable_element_data.NodeIndices, attribute_values);
             }
@@ -347,7 +345,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
     unsigned num_faces = this->GetNumBoundaryFaces();
 
     unsigned max_bdy_marker = 0;
-    std::vector<int> default_marker(0);
+    std::vector<double> default_marker(0);
 
     *p_face_file << num_faces << "\t";
     *p_face_file << max_bdy_marker;
@@ -378,15 +376,15 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
 {
     //Writing with no attribute
     //Instantiates the attribute variety with the attribute type set to unsigned
-    WriteItem(pFile, itemNumber, dataPacket, std::vector<int>());
+    WriteItem(pFile, itemNumber, dataPacket, std::vector<double>());
 }
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-template<class T_DATA, class T_ATTR>
+template<class T_DATA>
 void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, unsigned itemNumber,
                                                             const std::vector<T_DATA> &dataPacket,
-                                                            const std::vector<T_ATTR> &rAttributes)
+                                                            const std::vector<double> &rAttributes)
 {
     if (this->mFilesAreBinary)
     {
@@ -399,7 +397,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
         // Note that C++11 gives vectors a .data() method which would be a better way of doing this!
         if (!rAttributes.empty())
         {
-            pFile->write((char*)&rAttributes[0], rAttributes.size()*sizeof(T_ATTR));
+            pFile->write((char*)&rAttributes[0], rAttributes.size()*sizeof(double));
         }
     }
     else

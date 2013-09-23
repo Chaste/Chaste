@@ -89,11 +89,11 @@ public:
      * @param pFile Pointer to file stream
      * @param itemNumber Index of the element, node or face
      * @param dataPacket List of unsigneds (for node indices) or doubles (for node locations)
-     * @param rAttributes A vector of attributes.  Usually unsigned, but double for cable elements
+     * @param rAttributes A vector of attributes (double precision).
      */
 
-     template<class  T_DATA, class T_ATTR>
-     void WriteItem(out_stream &pFile, unsigned itemNumber, const std::vector<T_DATA> &dataPacket, const std::vector<T_ATTR> &rAttributes);
+     template<class  T_DATA>
+     void WriteItem(out_stream &pFile, unsigned itemNumber, const std::vector<T_DATA> &dataPacket, const std::vector<double> &rAttributes);
 
      /**
       * Write a line (ascii format) to a specific file stream

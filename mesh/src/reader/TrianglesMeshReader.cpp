@@ -212,7 +212,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
     GetNextItemFromStream(mElementsFile, mElementsRead, element_data.NodeIndices, mNumElementAttributes, element_attributes);
     if (mNumElementAttributes > 0)
     {
-        element_data.AttributeValue = (double) element_attributes[0];///only one element attribute registered for the moment
+        element_data.AttributeValue = element_attributes[0];///only one element attribute registered for the moment
     }
 
     EnsureIndexingFromZero(element_data.NodeIndices);
@@ -305,7 +305,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
                 if (mNumFaceAttributes > 0)
                 {
-                    face_data.AttributeValue = (double) face_attributes[0]; //only one face attribute registered for the moment
+                    face_data.AttributeValue = face_attributes[0]; //only one face attribute registered for the moment
                 }
             }
 
@@ -313,7 +313,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
             mFacesRead++;
         }
-        while (ELEMENT_DIM==2 && face_data.AttributeValue==0); //In triangles format we ignore internal edges (which are marked with attribute 0)
+        while (ELEMENT_DIM==2 && face_data.AttributeValue==0.0); //In triangles format we ignore internal edges (which are marked with attribute 0)
     }
 
     mBoundaryFacesRead++;
@@ -698,7 +698,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
         element_header_line >> mNumElements >> mNumFaceAttributes;
 
         extra_attributes = mNumFaceAttributes;
-        
+
         if (ELEMENT_DIM == 1)
         {
             mNumElementAttributes = mNumFaceAttributes;
@@ -865,9 +865,9 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextLineFromStream(std::ifs
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-template<class T_DATA, class T_ATTR>
+template<class T_DATA>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifstream& rFileStream, unsigned expectedItemNumber,
-                               std::vector<T_DATA>& rDataPacket, const unsigned& rNumAttributes, std::vector<T_ATTR>& rAttributes)
+                               std::vector<T_DATA>& rDataPacket, const unsigned& rNumAttributes, std::vector<double>& rAttributes)
 {
     if (mFilesAreBinary)
     {
@@ -879,8 +879,8 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
         {
             for (unsigned i = 0; i < rNumAttributes; i++)
             {
-                T_ATTR attribute;
-                rFileStream.read((char*) &attribute, sizeof(T_ATTR));
+                double attribute;
+                rFileStream.read((char*) &attribute, sizeof(double));
                 rAttributes.push_back(attribute);
             }
         }
@@ -916,7 +916,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
         {
             for (unsigned i = 0; i < rNumAttributes; i++)
             {
-                T_ATTR attribute;
+                double attribute;
                 buffer_stream >> attribute;
                 if (buffer_stream.fail())
                 {
@@ -1045,16 +1045,24 @@ template class TrianglesMeshReader<2,2>;
 template class TrianglesMeshReader<2,3>;
 template class TrianglesMeshReader<3,3>;
 
+
 /**
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
+template void TrianglesMeshReader<0,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<0,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<1,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<1,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<1,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<2,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<2,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<2,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<2,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<3,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
 template void TrianglesMeshReader<3,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
 /**
  * \endcond
