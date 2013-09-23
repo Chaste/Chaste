@@ -33,14 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
  
 """
-Convert a .ele .cable .edge or .face file which is in binary format and has (integer) attributes
+Convert a .ele .edge or .face file which is in binary format and has (integer) attributes
 
 This is needed because 
  * Chaste 3.2 and later use 8-byte double precision floats for element attributes
  * Chaste 3.1 and previous used 4-byte unsigned integers for element attributes
 
 Note that Ascii files are unaffected by the change because the integer is automatically converted on reading
-
+Note that .cable files previous to this release already had double precision attributes (for radius information) but
+this utility may be used to check .cable files.
 """
 import fileinput
 import sys

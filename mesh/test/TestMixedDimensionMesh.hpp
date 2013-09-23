@@ -488,9 +488,17 @@ public:
             {
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
                 boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                AbstractTetrahedralMesh<2,2>* p_mesh3 = NULL;
-                (*p_arch) >> p_mesh3;
-                delete p_mesh3;
+                AbstractTetrahedralMesh<2,2>* p_mesh_abstract3 = NULL;
+                (*p_arch) >> p_mesh_abstract3;
+
+                //Double check that the cables are intact
+                MixedDimensionMesh<2,2>* p_mesh3 = static_cast<MixedDimensionMesh<2,2>*>(p_mesh_abstract3);
+                Element<1,2>* p_element = p_mesh3->GetCableElement(9);
+                TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), 64u);
+                TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(1), 65u);
+                TS_ASSERT_DELTA(p_element->GetAttribute(), 10.5, 1e-8);
+
+                delete p_mesh_abstract3;
             }
             else
             {
