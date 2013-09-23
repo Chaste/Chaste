@@ -176,7 +176,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
 
         // Write each element's data
-        std::vector<unsigned> attribute_values(1);
+        std::vector<double> attribute_values(1);
         for (unsigned item_num=0; item_num<num_elements; item_num++)
         {
             /*
@@ -233,7 +233,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
 
         // Write each face's data
-        std::vector<int> default_marker(0);
+        std::vector<double> default_marker(0);
         for (unsigned item_num=0; item_num<num_faces; item_num++)
         {
             ElementData face_data = this->GetNextBoundaryElement();
@@ -432,29 +432,17 @@ template class TrianglesMeshWriter<3,3>;
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
-template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<1, 1>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
-template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
-template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<1, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
-template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
-template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<1, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
-template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
-template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<2, 2>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
-template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
-template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<2, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
-template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<unsigned> &, const std::vector<double>   & );
-template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<unsigned> & );
 template void TrianglesMeshWriter<3, 3>::WriteItem(out_stream &, unsigned, const std::vector<double>   &, const std::vector<double>   & );
 /**
  * \endcond
