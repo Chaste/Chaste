@@ -820,7 +820,6 @@ public:
     /**
      * This test is based on TestTrianglesMeshReader.hpp TestReadingElementAttributes.
      */
-    ///\todo #2146 Deprecate
     void TestWritingElementAttributesInTrianglesFormat() throw (Exception)
     {
         std::string source_mesh = "mesh/test/data/1D_0_to_1_10_elements_with_attributes";
@@ -834,7 +833,6 @@ public:
             TrianglesMeshReader<1,1> mesh_reader(source_mesh);
             TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
             TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
-
             TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_reader, true);
             mesh_writer.WriteFilesUsingMeshReader(mesh_reader);
         }
@@ -847,7 +845,7 @@ public:
 
             TetrahedralMesh<1,1> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
-
+            TS_ASSERT_DELTA(mesh.GetElement(5u)->GetAttribute(), 1.1, 1e-8);
             TrianglesMeshWriter<1,1> mesh_writer(output_dir, file_from_mesh, false);
             mesh_writer.WriteFilesUsingMesh(mesh);
         }
@@ -879,20 +877,25 @@ public:
         TS_ASSERT_EQUALS(reader3.GetNumElementAttributes(), 1u);
         for (unsigned i=0; i<10; i++)
         {
+            double expected_attribute = i+1;
+            if (i>=5)
+            {
+                expected_attribute -= 4.9;
+            }
             ElementData next_element_info = reader1.GetNextElementData();
             std::vector<unsigned> nodes = next_element_info.NodeIndices;
             TS_ASSERT_EQUALS(nodes.size(), 2u);
-            TS_ASSERT_EQUALS(next_element_info.AttributeValue, i%5 + 1);
+            TS_ASSERT_DELTA(next_element_info.AttributeValue, expected_attribute, 1e-8);
 
             next_element_info = reader2.GetNextElementData();
             nodes = next_element_info.NodeIndices;
             TS_ASSERT_EQUALS(nodes.size(), 2u);
-            TS_ASSERT_EQUALS(next_element_info.AttributeValue, i%5 + 1);
+            TS_ASSERT_DELTA(next_element_info.AttributeValue, expected_attribute, 1e-8);
 
             next_element_info = reader3.GetNextElementData();
             nodes = next_element_info.NodeIndices;
             TS_ASSERT_EQUALS(nodes.size(), 2u);
-            TS_ASSERT_EQUALS(next_element_info.AttributeValue, i%5 + 1);
+            TS_ASSERT_DELTA(next_element_info.AttributeValue, expected_attribute, 1e-8);
         }
     }
 

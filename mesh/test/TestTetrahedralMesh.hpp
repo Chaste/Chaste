@@ -1582,7 +1582,8 @@ public:
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElementAttributes(), 1u);
 
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        // The first few are unsigned
+        for (unsigned i=0; i<5; i++)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetUnsignedAttribute(), i%5+1);
         }

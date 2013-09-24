@@ -491,7 +491,16 @@ public:
             ElementData next_element_info = mesh_reader.GetNextElementData();
             std::vector<unsigned> nodes = next_element_info.NodeIndices;
             TS_ASSERT_EQUALS(nodes.size(), 2u);
-            TS_ASSERT_EQUALS(next_element_info.AttributeValue, i%5+1);
+            if (i<5)
+            {
+                //unsigned
+                TS_ASSERT_EQUALS(next_element_info.AttributeValue, i+1);
+            }
+            else
+            {
+                //floating point
+                TS_ASSERT_EQUALS(next_element_info.AttributeValue, i%5+1.1);
+            }
         }
     }
 

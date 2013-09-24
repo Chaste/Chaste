@@ -187,7 +187,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             {
                 element_data = this->GetNextElement();
             }
-            attribute_values[0] = (unsigned) element_data.AttributeValue;
+            attribute_values[0] =  element_data.AttributeValue;
             WriteItem(p_element_file, item_num, element_data.NodeIndices, attribute_values);
         }
         *p_element_file << comment << "\n";
