@@ -6,5 +6,5 @@ install(TARGETS linalg DESTINATION lib)
 
 #Component testing for linalg
 if(ENABLE_LINALG_TESTING)
-	add_subdirectory(test)
+    add_subdirectory(test)
 endif(ENABLE_LINALG_TESTING)

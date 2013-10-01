@@ -2,8 +2,8 @@ project(testmesh)
 
 if(ENABLE_CHASTE_TESTING)
 
-include_directories("${CHASTE_MESH_INCLUDE_DIRS}" "${CMAKE_CURRENT_SOURCE_DIR}" 
-"${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" "${CHASTE_LINALG_INCLUDE_DIRS}" )
+include_directories("${CHASTE_MESH_INCLUDE_DIRS}" "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" "${CHASTE_LINALG_INCLUDE_DIRS}" )
 
 add_definitions(-D_USE_MATH_DEFINES)#cmath and M_PI
 
@@ -12,7 +12,7 @@ set(COMPONENT_LIBRARIES mesh linalg global)
 file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
 
 set(HAS_OWN_LINKER_FLAGS TRUE)
-#GKLib uses/does C-style structured exception handling, using longjmp, 
+#GKLib uses/does C-style structured exception handling, using longjmp,
 #which caused untold headaches -- with MSVC linker errors.
 #In the end the solution was to comment out the line
 #longjmp(gk_jbufs[gk_cur_jbufs], signum);
