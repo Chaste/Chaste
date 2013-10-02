@@ -1,5 +1,7 @@
 project(testglobal)
 
+if(ENABLE_CHASTE_TESTING)
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}" "${CHASTE_GLOBAL_INCLUDE_DIRS}")
 
 #Create testglobal library to link global's tests against
@@ -9,10 +11,6 @@ add_library(testglobal STATIC ${CHASTE_TEST_GLOBAL_SOURCES})
 #Auto-generate test suites
 set(COMPONENT_LIBRARIES global testglobal)
 file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
+chaste_generate_test_suites()
 
-foreach(test ${TEST_SUITES})
-    string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.]hpp" "\\1" testName "${test}")
-    chaste_add_test("${testName}Runner" "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${testName}.hpp")
-    target_link_libraries("${testName}Runner" ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-    set_target_properties("${testName}Runner" PROPERTIES LINK_FLAGS /NODEFAULTLIB:LIBCMT)
-endforeach(test)
+endif(ENABLE_CHASTE_TESTING)
