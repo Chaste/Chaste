@@ -6,5 +6,5 @@ install(TARGETS io DESTINATION lib)
 
 #Component testing for io
 if(ENABLE_IO_TESTING)
-	add_subdirectory(test)
+    add_subdirectory(test)
 endif()

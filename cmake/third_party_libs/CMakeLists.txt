@@ -1,21 +1,10 @@
 #This CMake build file automatically builds Chaste's third-party libraries.
 cmake_minimum_required (VERSION 2.8.10)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE
-   ${CMAKE_CURRENT_SOURCE_DIR}/c_flag_overrides.cmake)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-   ${CMAKE_CURRENT_SOURCE_DIR}/cxx_flag_overrides.cmake)
 project(ChasteThirdPartyLibraries)
 include(ExternalProject)
 
-#For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
-#The cmake CMAKE_USER_MAKE_RULES_OVERRIDEs above takes care of non GUI builds.
-foreach(flag_var
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-   if(${flag_var} MATCHES "/MD")
-      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-   endif(${flag_var} MATCHES "/MD")
-endforeach(flag_var)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../definitions.cmake)
+
 
 # A bunch of compiler flags. Since we now propagate the compiler and linker flags to all external projects
 # this should be one place to set all the flags.

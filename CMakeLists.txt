@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 2.8.10)
 
-set(CMAKE_USER_MAKE_RULES_OVERRIDE
-   ${CMAKE_CURRENT_SOURCE_DIR}/c_flag_overrides.cmake)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-   ${CMAKE_CURRENT_SOURCE_DIR}/cxx_flag_overrides.cmake)
-
 project(Chaste)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/definitions.cmake)
 
 
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
@@ -58,17 +55,6 @@ message("STDERR______________\n${t_err}")
 endif(found EQUAL -1)
 
 else(RUN_TESTS)
-
-#For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
-#The cmake CMAKE_USER_MAKE_RULES_OVERRIDEs above takes care of non GUI builds.
-foreach(flag_var
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-   if(${flag_var} MATCHES "/MD")
-      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-   endif(${flag_var} MATCHES "/MD")
-endforeach(flag_var)
-
 
 include(AdditionalIncludes.cmake)
 
@@ -214,18 +200,6 @@ endif(MSVC10)
 
 set(CHASTE_LINK_LIBRARIES ${CHASTE_LINK_LIBRARIES} vtkFiltering vtkIO vtkCommon vtksys vtkzlib vtkexpat vtkGraphics)
 
-#A bunch of compiler flags,
-add_definitions(-Z7 # => embed debugging info in library as opposed to using an external .pdb database
--wd4996 # => disable insecure api warnings
--wd4267 # => disable "possible loss of data due to 'narrowing' conversion, e.g. size_t to int"
--wd4290 # => disable warning "C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
--wd4005 # => 'identifier' : macro redefinition
--wd4018 # => 'expression' : signed/unsigned mismatch
--wd4244 # => 'argument' : conversion from 'type1' to 'type2', possible loss of data
--wd4101 # => 'identifier' : unreferenced local variable
--wd4661 # => 'identifier' : no suitable definition provided for explicit template instantiation request
-)#warnings disabled, comment out if unsure of what you are doing
-
 #This is for a 64-bit build. 32-bit may need to be manually set. Would be nice to automate
 #These switches were required due to import of time.h, Windows.h and Winsock2.h in "mesh"
 add_definitions(-D_WIN64 -D_AMD64_)
@@ -249,7 +223,7 @@ if(ENABLE_CHASTE_TESTING)
     enable_testing()
     find_package(CxxTest)
     #Selective configuration of which components to test
-    include(ConfigureComponentTesting.cmake)
+    include(cmake/ConfigureComponentTesting.cmake)
 
     #Chaste Testing Macro. The predefined cxxtest_add_test is not suitable because of little control over
     #the test's working directory
