@@ -95,7 +95,7 @@ int __cdecl _purecall(void){return 0;}
 ")
 
 #Build the global library
-include_directories("${CHASTE_GLOBAL_INCLUDE_DIRS}")
+include_directories("${CHASTE_global_INCLUDE_DIRS}")
 file(GLOB_RECURSE CHASTE_GLOBAL_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
 add_library(global STATIC ${CHASTE_GLOBAL_SOURCES} ${version_cpp} ${build_root_cpp})
 install(TARGETS global DESTINATION lib)

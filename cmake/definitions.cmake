@@ -29,7 +29,7 @@ add_definitions(
     -wd4661 # => 'identifier' : no suitable definition provided for explicit template instantiation request
 )
 
-if(NOT PROJECT_NAME EQUAL "Chaste")
+if(NOT "${PROJECT_NAME}" MATCHES "Chaste")
     # Some third party libaries need further suppressions
     add_definitions(
         -MTd    # => static debug build
@@ -40,4 +40,4 @@ if(NOT PROJECT_NAME EQUAL "Chaste")
         -wd4305 # => truncation from type1 to type2
         -wd4133 # => 'type' : incompatible types - from 'type1' to 'type2'
     )
-endif(NOT PROJECT_NAME EQUAL "Chaste")
+endif()

@@ -1,11 +1,3 @@
 project(crypt)
-include_directories("${CHASTE_CRYPT_INCLUDE_DIRS}" "${CHASTE_CELL_BASED_INCLUDE_DIRS}" 
-    "${CHASTE_GLOBAL_INCLUDE_DIRS}" "${CHASTE_MESH_INCLUDE_DIRS}" 
-    "${CHASTE_LINALG_INCLUDE_DIRS}" "${CHASTE_ODE_INCLUDE_DIRS}" "${CHASTE_PDE_INCLUDE_DIRS}")
-file(GLOB_RECURSE CHASTE_CRYPT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
-add_library(crypt STATIC ${CHASTE_CRYPT_SOURCES})
 
-#Component testing for crypt
-if(ENABLE_CRYPT_TESTING)
-    add_subdirectory(test)
-endif(ENABLE_CRYPT_TESTING)
+chaste_do_component(crypt)

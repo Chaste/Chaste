@@ -1,14 +1,5 @@
 project(testmesh)
 
-if(ENABLE_CHASTE_TESTING)
-
-include_directories("${CHASTE_MESH_INCLUDE_DIRS}" "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" "${CHASTE_LINALG_INCLUDE_DIRS}" )
-
-#Auto-generate test suites
-set(COMPONENT_LIBRARIES mesh linalg global)
-file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
-
 set(HAS_OWN_LINKER_FLAGS TRUE)
 #GKLib uses/does C-style structured exception handling, using longjmp,
 #which caused untold headaches -- with MSVC linker errors.
@@ -32,5 +23,4 @@ set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:MSVCRTD") # undefined __imp
 #set(LINKER_FLAGS "/NODEFAULTLIB:MSVCRT /NODEFAULTLIB:MSVCRTD /NODEFAULTLIB:LIBCMTD /NODEFAULTLIB:LIBCMT")#unresolved externa; new
 #set(LINKER_FLAGS "/NODEFAULTLIB:MSVCRTD /NODEFAULTLIB:LIBCMTD /NODEFAULTLIB:LIBCMT")# unresolved externals new etc
 
-chaste_generate_test_suites()
-endif(ENABLE_CHASTE_TESTING)
+chaste_do_test_component(mesh)

@@ -1,15 +1,6 @@
 project(testlinalg)
 
-if(ENABLE_CHASTE_TESTING)
-
-include_directories("${CHASTE_LINALG_INCLUDE_DIRS}"
-    "${CMAKE_CURRENT_SOURCE_DIR}" "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}" )
-
-#Auto-generate test suites
-set(COMPONENT_LIBRARIES linalg global )
-file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
 set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:MSVCRTD")
 set(HAS_OWN_LINKER_FLAGS TRUE)
-chaste_generate_test_suites()
 
-endif(ENABLE_CHASTE_TESTING)
+chaste_do_test_component(linalg)

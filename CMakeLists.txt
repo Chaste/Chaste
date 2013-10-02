@@ -128,40 +128,11 @@ macro(HEADER_DIRS base_dir return_list)
         set(dir_list ${dir_list} ${dir_path})
     endforeach()
     list(REMOVE_DUPLICATES dir_list)
-    list(APPEND dir_list "${CHASTE_INCLUDES}")
+    if(NOT ${PROJECT_NAME} MATCHES "^test")
+        list(APPEND dir_list "${CHASTE_INCLUDES}")
+    endif()
     set(${return_list} ${dir_list})
 endmacro()
-
-#set up the component source and include directories
-set(CHASTE_GLOBAL_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/global/src")
-HEADER_DIRS(${CHASTE_GLOBAL_SOURCE_DIR} CHASTE_GLOBAL_INCLUDE_DIRS)
-
-set(CHASTE_IO_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/io/src")
-HEADER_DIRS(${CHASTE_IO_SOURCE_DIR} CHASTE_IO_INCLUDE_DIRS)
-
-set(CHASTE_LINALG_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/linalg/src")
-HEADER_DIRS(${CHASTE_LINALG_SOURCE_DIR} CHASTE_LINALG_INCLUDE_DIRS)
-
-set(CHASTE_MESH_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mesh/src")
-HEADER_DIRS(${CHASTE_MESH_SOURCE_DIR} CHASTE_MESH_INCLUDE_DIRS)
-
-set(CHASTE_ODE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ode/src")
-HEADER_DIRS(${CHASTE_ODE_SOURCE_DIR} CHASTE_ODE_INCLUDE_DIRS)
-
-set(CHASTE_PDE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/pde/src")
-HEADER_DIRS(${CHASTE_PDE_SOURCE_DIR} CHASTE_PDE_INCLUDE_DIRS)
-
-set(CHASTE_CELL_BASED_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cell_based/src")
-HEADER_DIRS(${CHASTE_CELL_BASED_SOURCE_DIR} CHASTE_CELL_BASED_INCLUDE_DIRS)
-
-set(CHASTE_CRYPT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/crypt/src")
-HEADER_DIRS(${CHASTE_CRYPT_SOURCE_DIR} CHASTE_CRYPT_INCLUDE_DIRS)
-
-set(CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/continuum_mechanics/src")
-HEADER_DIRS(${CHASTE_CONTINUUM_MECHANICS_SOURCE_DIR} CHASTE_CONTINUUM_MECHANICS_INCLUDE_DIRS)
-
-set(CHASTE_HEART_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/heart/src")
-HEADER_DIRS(${CHASTE_HEART_SOURCE_DIR} CHASTE_HEART_INCLUDE_DIRS)
 
 #Third-party libraries linked against chaste test executables
 if(MSVC11)
@@ -256,7 +227,7 @@ if(ENABLE_CHASTE_TESTING)
         else()
             add_test(NAME ${_testname} WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" COMMAND ${test_location})
         endif(TEST_MPIEXEC_ENABLED)
-    endmacro()
+    endmacro(CHASTE_ADD_TEST)
 
   macro(CHASTE_GENERATE_TEST_SUITES)
     if(NOT HAS_OWN_LINKER_FLAGS)
@@ -288,8 +259,45 @@ if(ENABLE_CHASTE_TESTING)
         set_target_properties("${testName}_${_testPath_}_Runner" PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
       endif()
     endforeach(test)
-  endmacro()
+  endmacro(CHASTE_GENERATE_TEST_SUITES)
 
+  macro(CHASTE_DO_COMPONENT component)
+    # Figure out include path
+    include_directories("${CHASTE_${component}_INCLUDE_DIRS}")
+    foreach(dep ${CHASTE_DEPENDS_${component}})
+        include_directories("${CHASTE_${dep}_INCLUDE_DIRS}")
+    endforeach(dep)
+    # Make & install component library
+    file(GLOB_RECURSE CHASTE_${component}_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
+    add_library(${component} STATIC ${CHASTE_${component}_SOURCES})
+    install(TARGETS ${component} DESTINATION lib)
+    # Do testing if requested
+    if(ENABLE_${component}_TESTING)
+        add_subdirectory(test)
+    endif()
+  endmacro(CHASTE_DO_COMPONENT)
+
+  macro(CHASTE_DO_TEST_COMPONENT component)
+    if(ENABLE_CHASTE_TESTING)
+        # Figure out include path for tests
+        header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" CHASTE_${component}_TEST_DIRS)
+        include_directories("${CHASTE_${component}_TEST_DIRS}" "${CHASTE_${component}_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")
+        foreach(dep ${CHASTE_DEPENDS_${component}})
+            include_directories("${CHASTE_${dep}_INCLUDE_DIRS}")
+        endforeach(dep)
+        # Make test library if sources exist
+        set(COMPONENT_LIBRARIES ${component})
+        file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+        if(test_sources)
+            add_library(test${component} STATIC ${test_sources})
+            set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
+        endif()
+        set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} ${CHASTE_DEPENDS_${component}})
+        # Generate test suites
+        file(GLOB_RECURSE TEST_SUITES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Test*.hpp)
+        chaste_generate_test_suites()
+    endif(ENABLE_CHASTE_TESTING)
+  endmacro(CHASTE_DO_TEST_COMPONENT)
 
 endif(ENABLE_CHASTE_TESTING)
 
@@ -316,63 +324,39 @@ execute_process(COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${CHASTE_BUILD_DIR_NAME}/ti
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     OUTPUT_FILE build_timestamp)
 
+# List the available Chaste components
+set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
 
-#build each component as a project
-add_subdirectory(global)
-add_subdirectory(io)
-add_dependencies(io global)
-add_subdirectory(linalg)
-add_dependencies(linalg global)
-add_subdirectory(mesh)
-add_dependencies(mesh linalg global)
-add_subdirectory(ode)
-add_dependencies(ode linalg io global)
-add_subdirectory(pde)
-add_dependencies(pde ode mesh linalg io global)
-add_subdirectory(cell_based)
-add_dependencies(cell_based pde ode mesh linalg io global)
-add_subdirectory(crypt)
-add_dependencies(crypt cell_based)
-add_subdirectory(continuum_mechanics)
-add_dependencies(continuum_mechanics pde ode mesh linalg io global)
-#add_subdirectory(heart)
-#add_dependencies(heart continuum_mechanics pde ode mesh linalg io global)
+# Specify which other components each depends on.
+# This information is used to set up CMake dependencies, include search paths and libraries to link against.
+set(CHASTE_DEPENDS_global "")
+set(CHASTE_DEPENDS_io global)
+set(CHASTE_DEPENDS_linalg global)
+set(CHASTE_DEPENDS_mesh linalg global)
+set(CHASTE_DEPENDS_ode linalg io global)
+set(CHASTE_DEPENDS_pde ode mesh linalg io global)
+set(CHASTE_DEPENDS_cell_based pde ode mesh linalg io global)
+set(CHASTE_DEPENDS_crypt cell_based pde ode mesh linalg io global)
+set(CHASTE_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 
-#install Chaste headers for Chaste developers
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/global/src/"
-    DESTINATION include/global
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+foreach(component ${CHASTE_COMPONENTS})
+    # Set up the component source & include directories
+    #string(TOUPPER ${component} c_upper)
+    set(CHASTE_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
+    header_dirs(${CHASTE_${component}_SOURCE_DIR} CHASTE_${component}_INCLUDE_DIRS)
+endforeach(component)
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/io/src/"
-    DESTINATION include/io
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+foreach(component ${CHASTE_COMPONENTS})
+    # Build each component as a project
+    add_subdirectory(${component})
+    if(CHASTE_DEPENDS_${component})
+        add_dependencies(${component} ${CHASTE_DEPENDS_${component}})
+    endif()
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/linalg/src/"
-    DESTINATION include/linalg
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/mesh/src/"
-    DESTINATION include/mesh
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/ode/src/"
-    DESTINATION include/ode
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/pde/src/"
-    DESTINATION include/pde
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/crypt/src/"
-    DESTINATION include/crypt
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cell_based/src/"
-    DESTINATION include/cell_based
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
-
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/continuum_mechanics/src/"
-    DESTINATION include/continuum_mechanics
-    FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    # Install Chaste headers for Chaste developers
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src/"
+            DESTINATION include/${component}
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+endforeach(component)
 
 endif(RUN_TESTS)
