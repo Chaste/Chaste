@@ -9,7 +9,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         "Default install directory. Change as required." FORCE)
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
-set(CHASTE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/chaste" CACHE PATH "Specify the path to the root of Chaste sources.")
+set(CHASTE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/.." CACHE PATH "Specify the path to the root of Chaste sources.")
 
 set(THIRD_PARTY_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party_libs" CACHE PATH
     "Specify the path to the root of the directory containing CMakeLists.txt that builds the third-party libraries.")
@@ -19,9 +19,9 @@ set(THIRD_PARTY_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party_libs" CACHE PATH
 externalproject_add(ThirdPartyLibraryBuilder
     SOURCE_DIR ${THIRD_PARTY_SOURCE_DIR}
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
-    BINARY_DIR ${THIRD_PARTY_SOURCE_DIR}/build
-    #INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/third_party_libs
+    BINARY_DIR ${CMAKE_BINARY_DIR}/third_party_libs
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}/third_party_libs
+        -DCMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT:BOOL=OFF
         -DCHASTE_SOURCE_DIR:PATH=${CHASTE_SOURCE_DIR}
         -DBUILD_BOOST:BOOL=ON
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}

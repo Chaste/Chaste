@@ -5,30 +5,8 @@ include(ExternalProject)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../definitions.cmake)
 
-
-# A bunch of compiler flags. Since we now propagate the compiler and linker flags to all external projects
-# this should be one place to set all the flags.
-add_definitions(
--MTd    # => static debug build
--Z7     # => embed debugging info in library as opposed to using an external .pdb database
--Yu     # => use precompiled headers: this prevents a linker warning: "H5FDdirect.obj : warning LNK4221: This object
-        # file does not define any previously undefined public symbols, so it will not be used by any link operation
-        # that consumes this library".
--wd4996 # => disable insecure api warnings
--wd4267 # => disable "possible loss of data due to 'narrowing' conversion, e.g. size_t to int"
--wd4290 # => disable warning "C++ exception specification ignored except to indicate a function is not __declspec(nothrow)"
--wd4005 # => 'identifier' : macro redefinition
--wd4018 # => 'expression' : signed/unsigned mismatch
--wd4244 # => 'argument' : conversion from 'type1' to 'type2', possible loss of data
--wd4101 # => 'identifier' : unreferenced local variable
--wd4554 # => possible operator precedence error warning
--wd4305 # => truncation from type1 to type2
--wd4133 # => 'type' : incompatible types - from 'type1' to 'type2'
--wd4661 # => 'identifier' : no suitable definition provided for explicit template instantiation request
-)
-
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install" CACHE PATH "Default install directory. Change as required." FORCE)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Default install directory. Change as required." FORCE)
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 set(MS_HPC_PACK_DIR "C:/MS_HPC_PACK_2012" CACHE PATH
@@ -514,11 +492,11 @@ add_definitions(-U__LAPACK_PRECISION_QUAD) #remove dependency on quadmath.h
 #and -Z7 => embed debugging info in library as opposed to using an external .pdb database
 add_definitions (-MTd -wd4996 -wd4244 -wd4554 -Z7)
 set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)#Allows us to change the default ordering of include directory searches
-include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/blas)
+include_directories(\${CMAKE_CURRENT_BINARY_DIR}/blas)
 set(BLAS_SOURCES ${blasmakematch})
 set(LAPACK_SOURCES ${lapackmakematch})
 add_library(f2cblas STATIC \${BLAS_SOURCES})
-include_directories(BEFORE \${CMAKE_CURRENT_SOURCE_DIR}/lapack) #prepend this directory so it is searched first
+include_directories(BEFORE \${CMAKE_CURRENT_BINARY_DIR}/lapack) #prepend this directory so it is searched first
 add_library(f2clapack STATIC \${LAPACK_SOURCES})
 install(TARGETS f2cblas f2clapack DESTINATION lib)
 ")
@@ -875,10 +853,10 @@ endforeach(url ${VTK_URLS})
 
 
 
-
+# Write a file in the Chaste source tree containing include and link paths for all the libraries installed
 
 if(NOT CHASTE_SOURCE_DIR)
-    set(CHASTE_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+    set(CHASTE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 endif()
 
 file(WRITE "${CHASTE_SOURCE_DIR}/AdditionalIncludes.cmake"
