@@ -212,6 +212,9 @@ else()
     add_definitions(-MDd)
 endif()
 
+# Ensure M_PI is always defined in cmath
+add_definitions(-D_USE_MATH_DEFINES)
+
 #Locate MPI
 find_package(MPI)
 

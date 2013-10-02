@@ -4,7 +4,6 @@ if(ENABLE_CHASTE_TESTING)
 
 #Create testcrypt library to link crypt's tests against
 file(GLOB_RECURSE CHASTE_TEST_CRYPT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.hpp)
-add_definitions(-D_USE_MATH_DEFINES)#cmath and M_PI
 
 include_directories("${CHASTE_CRYPT_INCLUDE_DIRS}"
     "${CMAKE_CURRENT_SOURCE_DIR}" "${CXXTEST_INCLUDES}" "${CHASTE_GLOBAL_INCLUDE_DIRS}"
