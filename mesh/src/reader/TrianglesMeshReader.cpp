@@ -294,14 +294,14 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
                 if (face_attributes.size() > 0)
                 {
-                    face_data.ContainingElement = face_attributes[0];// only one face attribute registered for the moment
+                    face_data.ContainingElement = (unsigned) face_attributes[0];// only one face attribute registered for the moment
                 }
 
             }
             else
             {
                 GetNextItemFromStream(mFacesFile, mFacesRead, ret_indices, mNumFaceAttributes,
-                                        face_attributes);
+                                      face_attributes);
 
                 if (mNumFaceAttributes > 0)
                 {
