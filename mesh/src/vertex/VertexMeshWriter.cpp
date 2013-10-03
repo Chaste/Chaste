@@ -440,17 +440,9 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
 
     // Write the element header
+    num_attr = 1; //Always write element attributes
     unsigned num_elements = this->GetNumElements();
-
-    ///\todo #2146 - bug in the making? If this attribute is supposed to be zero we will assume there isn't one!
-    double first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
-    if (first_elem_attribute_value != 0)
-    {
-        num_attr = 1;
-    }
-
-    *p_element_file << num_elements << "\t";
-    *p_element_file << num_attr << "\n";
+    *p_element_file << num_elements << "\t" << num_attr << "\n";
 
     // Write each element's data
     for (unsigned item_num=0; item_num<num_elements; item_num++)
@@ -472,11 +464,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                 *p_element_file << "\t" << node_indices[i];
             }
 
-            // Write the element attribute
-            if (elem_data.AttributeValue != 0)
-            {
-                *p_element_file << "\t" << elem_data.AttributeValue;
-            }
+            *p_element_file << "\t" << elem_data.AttributeValue;
 
             // New line
             *p_element_file << "\n";
@@ -523,11 +511,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                 ///\todo Store face orientations? (#1076/#1377)
             }
 
-            // Write the element attribute if necessary
-            if (elem_data_with_faces.AttributeValue != 0)
-            {
-                *p_element_file << "\t" << elem_data_with_faces.AttributeValue;
-            }
+            *p_element_file << "\t" << elem_data_with_faces.AttributeValue;
 
             // New line
             *p_element_file << "\n";

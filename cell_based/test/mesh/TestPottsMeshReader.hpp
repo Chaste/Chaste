@@ -106,7 +106,7 @@ public:
        TS_ASSERT_EQUALS(data2.NodeIndices[2], 6u);
        TS_ASSERT_EQUALS(data2.NodeIndices[3], 7u);
 
-       TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
+       TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
        mesh_reader.Reset();
        for (unsigned i=1; i<mesh_reader.GetNumElements(); i++)
@@ -197,7 +197,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
-        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
         std::vector<double> next_node;
         next_node = mesh_reader.GetNextNode();

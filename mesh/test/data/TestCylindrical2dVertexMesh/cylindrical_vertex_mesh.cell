@@ -1,19 +1,19 @@
-16	0
-0	6	0	5	9	12	8	4
-1	6	1	6	10	13	9	5
-2	6	2	7	11	14	10	6
-3	6	3	4	8	15	11	7
-4	6	9	13	17	21	16	12
-5	6	10	14	18	22	17	13
-6	6	11	15	19	23	18	14
-7	6	8	12	16	20	19	15
-8	6	16	21	25	28	24	20
-9	6	17	22	26	29	25	21
-10	6	18	23	27	30	26	22
-11	6	19	20	24	31	27	23
-12	6	25	29	33	37	32	28
-13	6	26	30	34	38	33	29
-14	6	27	31	35	39	34	30
-15	6	24	28	32	36	35	31
-# Created by Chaste version 1.1.8527 on Wed, 31 Mar 2010 15:52:15 +0000.  Chaste was built on Wed, 31 Mar 2010 15:40:16 +0000 by machine (uname) 'Linux userpc59.comlab.ox.ac.uk 2.6.24-27-generic #1 SMP Fri Mar 12 00:52:19 UTC 2010 x86_64' using settings: default, shared libraries.
+16	1
+0	6	0	5	9	12	8	4	0
+1	6	1	6	10	13	9	5	0
+2	6	2	7	11	14	10	6	0
+3	6	3	4	8	15	11	7	0
+4	6	9	13	17	21	16	12	0
+5	6	10	14	18	22	17	13	0
+6	6	11	15	19	23	18	14	0
+7	6	8	12	16	20	19	15	0
+8	6	16	21	25	28	24	20	0
+9	6	17	22	26	29	25	21	0
+10	6	18	23	27	30	26	22	0
+11	6	19	20	24	31	27	23	0
+12	6	25	29	33	37	32	28	0
+13	6	26	30	34	38	33	29	0
+14	6	27	31	35	39	34	30	0
+15	6	24	28	32	36	35	31	0
+# Created by Chaste version 3.1.20215 (with uncommitted modifications) on Thu, 03 Oct 2013 09:27:02 +0000.  Chaste was built on Mon, 23 Sep 2013 13:49:33 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: default, shared libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
 

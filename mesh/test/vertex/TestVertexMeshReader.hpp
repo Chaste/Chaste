@@ -108,7 +108,7 @@ public:
         TS_ASSERT_EQUALS(data2.NodeIndices[1], 5u);
         TS_ASSERT_EQUALS(data2.NodeIndices[2], 6u);
 
-        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
         mesh_reader.Reset();
         for (unsigned i=1; i<mesh_reader.GetNumElements(); i++)

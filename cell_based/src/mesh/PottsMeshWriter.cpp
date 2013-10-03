@@ -208,7 +208,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
     // Write the element header
     unsigned num_elements = this->GetNumElements();
     *p_element_file << num_elements << "\t";
-
+    num_attr = 1; // Always write attributes by default
     /*
      * Note that in contrast to other mesh classes, it is perfectly reasonable for
      * a PottsMesh to have no elements, particularly in when it is being used in
@@ -216,12 +216,6 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
      */
     if (num_elements != 0)
     {
-        /// \todo  #2146 - this looks like a bug in the making - what if the attribute IS zero!?!?
-        double first_elem_attribute_value = (*(mpIters->pElemIter))->GetAttribute();
-        if (first_elem_attribute_value != 0)
-        {
-            num_attr = 1;
-        }
         *p_element_file << num_attr << "\n";
     }
     else
@@ -247,11 +241,8 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
             *p_element_file << "\t" << node_indices[i];
         }
 
-        // Write the element attribute if necessary
-        if (elem_data.AttributeValue != 0)
-        {
-            *p_element_file << "\t" << elem_data.AttributeValue;
-        }
+        // Write the element attribute
+        *p_element_file << "\t" << elem_data.AttributeValue;
 
         // New line
         *p_element_file << "\n";
