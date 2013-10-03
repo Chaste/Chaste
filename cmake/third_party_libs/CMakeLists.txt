@@ -1,9 +1,13 @@
 #This CMake build file automatically builds Chaste's third-party libraries.
 cmake_minimum_required (VERSION 2.8.10)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../overrides.cmake)
+
 project(ChasteThirdPartyLibraries)
 include(ExternalProject)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../definitions.cmake)
+
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Default install directory. Change as required." FORCE)
@@ -813,7 +817,14 @@ endforeach(url ${SUNDIALS_URLS})
 foreach(url ${VTK_URLS})
 
     download_from_url(${url} "vtk")
-    set(vtk_basicname "${bname}")
+    set(vtk_basicname "VTK")
+
+    #message("Building VTK with flags:")
+    #message("   C: ${CMAKE_C_FLAGS}; debug: ${CMAKE_C_FLAGS_DEBUG}")
+    #message("   CXX: ${CMAKE_CXX_FLAGS}; debug: ${CMAKE_CXX_FLAGS_DEBUG}")
+    #get_directory_property(DirDefs DEFINITIONS)
+    #string(REPLACE "-" "/" DirDefs "${DirDefs}")
+    #message("   DEFS: ${DirDefs}")
 
     externalproject_add(Vtk_${vtk_basicname}
         SOURCE_DIR ${DOWNLOAD_DIR}/vtk/${vtk_basicname}
@@ -825,18 +836,18 @@ foreach(url ${VTK_URLS})
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
             -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
             -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-            -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG}
+            -DCMAKE_C_FLAGS_DEBUG:STRING=${CMAKE_C_FLAGS_DEBUG} /Z7
             -DCMAKE_C_FLAGS_MINSIZEREL:STRING=${CMAKE_C_FLAGS_MINSIZEREL}
             -DCMAKE_C_FLAGS_RELEASE:STRING=${CMAKE_C_FLAGS_RELEASE}
             -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_C_FLAGS_RELWITHDEBINFO}
             -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-            -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG}
+            -DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG} /Z7
             -DCMAKE_CXX_FLAGS_MINSIZEREL:STRING=${CMAKE_CXX_FLAGS_MINSIZEREL}
             -DCMAKE_CXX_FLAGS_RELEASE:STRING=${CMAKE_CXX_FLAGS_RELEASE}
             -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}
             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
             -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
-
+            -DCOMPILE_DEFINITIONS:STRING=${COMPILE_DEFINITIONS}
         )
 
 #    file(GLOB_RECURSE VTK_INC ${CMAKE_INSTALL_PREFIX}/vtk_${vtk_basicname}/include/*)

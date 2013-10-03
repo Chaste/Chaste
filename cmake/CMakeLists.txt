@@ -1,8 +1,13 @@
 #This CMake build file automatically builds Chaste and its third party library dependencies as external projects.
 cmake_minimum_required (VERSION 2.8.10)
+
+include(${CMAKE_CURRENT_LIST_DIR}/overrides.cmake)
+
 project(BuildChastePlusThirdPartyLibraries)
 include(ExternalProject)
+
 include(${CMAKE_CURRENT_LIST_DIR}/definitions.cmake)
+
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH

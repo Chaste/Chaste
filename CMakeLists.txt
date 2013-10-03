@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8.10)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
+
 project(Chaste)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/definitions.cmake)
-
 
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")

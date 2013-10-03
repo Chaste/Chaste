@@ -1,12 +1,7 @@
 # Compiler flag definitions common to Chaste & third party library builds
 
-set(CMAKE_USER_MAKE_RULES_OVERRIDE
-   ${CMAKE_CURRENT_LIST_DIR}/c_flag_overrides.cmake)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-   ${CMAKE_CURRENT_LIST_DIR}/cxx_flag_overrides.cmake)
-
 #For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
-#The cmake CMAKE_USER_MAKE_RULES_OVERRIDEs above takes care of non GUI builds.
+#The overrides.cmake include takes care of non GUI builds.
 foreach(flag_var
         CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
         CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
@@ -29,8 +24,9 @@ add_definitions(
     -wd4661 # => 'identifier' : no suitable definition provided for explicit template instantiation request
 )
 
-if(NOT "${PROJECT_NAME}" MATCHES "Chaste")
+if(NOT "${PROJECT_NAME}" STREQUAL "Chaste")
     # Some third party libaries need further suppressions
+    message("Adding further compiler flags for third-party libraries")
     add_definitions(
         -MTd    # => static debug build
         -Yu     # => use precompiled headers: this prevents a linker warning: "H5FDdirect.obj : warning LNK4221: This object
@@ -41,3 +37,10 @@ if(NOT "${PROJECT_NAME}" MATCHES "Chaste")
         -wd4133 # => 'type' : incompatible types - from 'type1' to 'type2'
     )
 endif()
+
+#message("Set standard compiler flags.")
+#message("  C: ${CMAKE_C_FLAGS}; debug: ${CMAKE_C_FLAGS_DEBUG}")
+#message("  CXX: ${CMAKE_CXX_FLAGS}; debug: ${CMAKE_CXX_FLAGS_DEBUG}")
+#message("  LINK: ${CMAKE_EXE_LINKER_FLAGS}; debug: ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+#get_directory_property(DirDefs DEFINITIONS)
+#message("  DEFS: ${DirDefs}")
