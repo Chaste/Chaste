@@ -990,7 +990,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
         HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
-        HeartConfig::Instance()->SetOutputDirectory("BidomainSimple1d");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainSimple1dInOneGo");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
