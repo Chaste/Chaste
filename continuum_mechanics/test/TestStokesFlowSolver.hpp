@@ -402,7 +402,7 @@ public:
         // set up a mesh on [-1 1]x[-1 1]
         for(unsigned run=0; run<num_runs; run++)
         {
-            num_elem[run] = unsigned(round(pow(2.0, (double)(run+1))));
+            num_elem[run] = SmallPow(2u, run+1u);
             QuadraticMesh<2> mesh(2.0/num_elem[run], 2.0, 2.0);
             mesh.Translate(-1.0, -1.0);
 
