@@ -262,6 +262,7 @@ if(ENABLE_CHASTE_TESTING)
   endmacro(CHASTE_GENERATE_TEST_SUITES)
 
   macro(CHASTE_DO_COMPONENT component)
+    message("Configuring component ${component}")
     # Figure out include path
     include_directories("${CHASTE_${component}_INCLUDE_DIRS}")
     foreach(dep ${CHASTE_DEPENDS_${component}})
@@ -279,6 +280,7 @@ if(ENABLE_CHASTE_TESTING)
 
   macro(CHASTE_DO_TEST_COMPONENT component)
     if(ENABLE_CHASTE_TESTING)
+        message("Configuring tests for ${component}")
         # Figure out include path for tests
         header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" CHASTE_${component}_TEST_DIRS)
         include_directories("${CHASTE_${component}_TEST_DIRS}" "${CHASTE_${component}_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")

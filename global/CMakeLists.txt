@@ -101,6 +101,6 @@ add_library(global STATIC ${CHASTE_GLOBAL_SOURCES} ${version_cpp} ${build_root_c
 install(TARGETS global DESTINATION lib)
 
 #Component testing for global
-if(ENABLE_GLOBAL_TESTING)
+if(ENABLE_global_TESTING)
     add_subdirectory(test)
 endif()
