@@ -1220,7 +1220,7 @@ public:
             }
             // check output file contains results for the whole simulation
             TS_ASSERT(CompareFilesViaHdf5DataReader("BiProblemArchive", "BidomainLR91_1d", true,
-                                                    "BidomainSimple1d", "BidomainLR91_1d", true));
+                                                    "BidomainSimple1dInOneGo", "BidomainLR91_1d", true));
 
             // Free memory
             delete p_bidomain_problem;
