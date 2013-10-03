@@ -1133,7 +1133,7 @@ public:
 
         // Check output file contains results for the whole simulation and agree with normal test
         TS_ASSERT(CompareFilesViaHdf5DataReader("BidomainSimple1dInTwoHalves", "BidomainLR91_1d", true,
-                                                "BidomainSimple1d", "BidomainLR91_1d", true));
+                                                "BidomainSimple1dInOneGo", "BidomainLR91_1d", true));
 
         // Test that we can keep solving even if the results have been deleted (i.e. by creating a new
         // .h5 file when we realize that there isn't one to extend)
