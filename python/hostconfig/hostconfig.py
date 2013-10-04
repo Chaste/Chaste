@@ -427,6 +427,8 @@ def OptionalLibraryDefines():
 
 def Configure(build):
     """Given a build object (BuildTypes.BuildType instance), configure the build."""
+    if not build.quiet:
+        print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
     prefs = build.GetPreferedVersions()
     if hasattr(conf, 'Configure') and callable(conf.Configure):
         # The machine config has a method to do its configuration, so call that first.
@@ -484,8 +486,6 @@ def Configure(build):
     if hasattr(conf, 'ModifyBuild') and callable(conf.ModifyBuild):
         conf.ModifyBuild(build)
     
-    if not build.quiet:
-        print "Using hostconfig settings from", os.path.splitext(conf.__file__)[0] + ".py"
     if build.debug:
         for name in dir(conf):
             item = getattr(conf, name)
