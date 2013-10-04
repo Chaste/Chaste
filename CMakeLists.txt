@@ -58,7 +58,7 @@ else(found EQUAL -1)
     message("STDERR______________\n${t_err}")
 endif(found EQUAL -1)
 
-else(RUN_TESTS)
+endif(RUN_TESTS)
 
 include(AdditionalIncludes.cmake)
 
@@ -366,5 +366,3 @@ foreach(component ${CHASTE_COMPONENTS})
             DESTINATION include/${component}
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
 endforeach(component)
-
-endif(RUN_TESTS)
