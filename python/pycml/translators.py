@@ -6055,6 +6055,12 @@ def get_options(args, default_options=None):
         options.grl2 = False
     if options.rush_larsen or options.backward_euler or options.grl1 or options.grl2:
         options.translate_type = 'Chaste'
+    # Numba may not be available
+    if options.numba:
+        try:
+            import numba
+        except:
+            options.numba = False
 
     return options, args[0]
 
