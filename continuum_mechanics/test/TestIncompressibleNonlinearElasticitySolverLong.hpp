@@ -39,9 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "UblasCustomFunctions.hpp"
 #include "IncompressibleNonlinearElasticitySolver.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "ExponentialMaterialLaw.hpp"
 #include "MooneyRivlinMaterialLaw.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 /*
  * Defines the body force and surface traction for a 3d problem

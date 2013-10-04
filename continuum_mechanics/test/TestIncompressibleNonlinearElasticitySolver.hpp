@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "UblasCustomFunctions.hpp"
 #include "IncompressibleNonlinearElasticitySolver.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "ExponentialMaterialLaw.hpp"
 #include "MooneyRivlinMaterialLaw.hpp"
 #include "NashHunterPoleZeroLaw.hpp"
@@ -47,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompressibleMooneyRivlinMaterialLaw.hpp"
 #include "NumericFileComparison.hpp"
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 double MATERIAL_PARAM = 1.0;
 double ALPHA = 0.2;

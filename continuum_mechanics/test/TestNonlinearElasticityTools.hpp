@@ -75,8 +75,8 @@ public:
             TS_ASSERT_DELTA(mesh3d.GetNode(indices3d[i])->rGetLocation()[2], 6.23435, 1e-12);
         }
 
-        TS_ASSERT_THROWS_THIS(NonlinearElasticityTools<3>::GetNodesByComponentValue(mesh3d,2,6.234),
-                "Could not find any nodes on requested surface (note: tolerance = 1e-08)");
+        TS_ASSERT_THROWS_CONTAINS(NonlinearElasticityTools<3>::GetNodesByComponentValue(mesh3d, 2, 6.234),
+                "Could not find any nodes on requested surface (note: tolerance = 1e-0");
     }
 };
 
