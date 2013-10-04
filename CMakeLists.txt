@@ -19,8 +19,11 @@ foreach(type ${TestPackTypes})
         foreach(testp ${TEST_PACKS})
             file(STRINGS "${testp}" testpack)
                 foreach(s ${testpack})
-                    string(REGEX REPLACE "(.*/)?([a-zA-Z0-9_]+)[.]hpp" "\\2" s2 "${s}")
-                     string(REGEX MATCH ".*[.]py" match "${s2}")
+                    # Note that we append an underscore to test names, to ensure that ctest's regexp
+                    # match doesn't grab more tests than we want!  This needs to match what we do in
+                    # the chaste_add_test macro too.
+                    string(REGEX REPLACE "(.*/)?([a-zA-Z0-9_]+)[.]hpp" "\\2_" s2 "${s}")
+                    string(REGEX MATCH ".*[.]py" match "${s2}")
                     if(NOT match)
                         set(result "${result}" "${s2}")
                     endif(NOT match)
@@ -40,19 +43,19 @@ else(found EQUAL -1)
     string(REPLACE ";" "|" tests "${tests}")
     #get date and time, to append to test result filename
     execute_process(COMMAND cmd /c echo %DATE% %TIME%
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            OUTPUT_VARIABLE date_time
-        )
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                    OUTPUT_VARIABLE date_time
+                    )
     string(REGEX REPLACE "[:/. \n]" "_" date_time "${date_time}")
     # Note: set 6 minute (360s) timeout for each test
     execute_process(COMMAND ctest -C Debug --output-on-failure -O ${TEST_FAMILY}TestOutputs_${date_time}.txt --timeout 360 -R ${tests}
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            OUTPUT_VARIABLE t_out
-            RESULT_VARIABLE t_res
-            ERROR_VARIABLE t_err
-        )
-message("STDOUT______________\n${t_out}")
-message("STDERR______________\n${t_err}")
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                    OUTPUT_VARIABLE t_out
+                    RESULT_VARIABLE t_res
+                    ERROR_VARIABLE t_err
+                    )
+    message("STDOUT______________\n${t_out}")
+    message("STDERR______________\n${t_err}")
 endif(found EQUAL -1)
 
 else(RUN_TESTS)
@@ -224,9 +227,11 @@ if(ENABLE_CHASTE_TESTING)
             # Here we are using the form ${MPIEXEC} /np 2 ${test}.
             # A figure-it-out-yourself form would be ${MPIEXEC} /np * ${test} which runs on all available cores
             # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
-            add_test(NAME ${_testname} WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" COMMAND "${MPIEXEC}" /np 2 ${test_location})
+            # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
+            # run more tests than intended!
+            add_test(NAME "${_testname}_" WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" COMMAND "${MPIEXEC}" /np 2 ${test_location})
         else()
-            add_test(NAME ${_testname} WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" COMMAND ${test_location})
+            add_test(NAME "${_testname}_" WORKING_DIRECTORY "${CHASTE_SOURCE_ROOT}/" COMMAND ${test_location})
         endif(TEST_MPIEXEC_ENABLED)
     endmacro(CHASTE_ADD_TEST)
 
