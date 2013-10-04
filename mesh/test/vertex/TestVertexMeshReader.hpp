@@ -262,6 +262,17 @@ public:
         TS_ASSERT_THROWS_THIS(mesh_reader3.GetNextElementDataWithFaces(), "Data for element 0 missing");
     }
 
+    void TestReadingWithNoElementAttributes() throw(Exception)
+    {
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_no_element_attributes");
+
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
+
+        TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
+        ElementData next_element_info = mesh_reader.GetNextElementData();
+        TS_ASSERT_EQUALS(next_element_info.AttributeValue, 0u);
+    }
+
     void TestReadingElementAttributes() throw(Exception)
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
@@ -278,7 +289,7 @@ public:
         next_element_info = mesh_reader.GetNextElementData();
         nodes = next_element_info.NodeIndices;
         TS_ASSERT_EQUALS(nodes.size(), 3u);
-        TS_ASSERT_EQUALS(next_element_info.AttributeValue, 152u)
+        TS_ASSERT_EQUALS(next_element_info.AttributeValue, 152u);
 
         /*
          * Coverage
