@@ -383,9 +383,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 {
     mDirPath = rDirectory;
 
-    // Destroy any writers that are already open.
-    DeleteWriters();
-
     if (mOutputResultsForChasteVisualizer)
     {
         AddPopulationWriter(new NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
