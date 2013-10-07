@@ -53,12 +53,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class CellLabel : public AbstractCellProperty
 {
-private:
+protected:
 
     /**
      * Colour for use by visualizer.
      */
     unsigned mColour;
+
+private:
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
