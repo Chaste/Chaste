@@ -29,7 +29,8 @@ install-indep:
 		  -path './docs' -o \
 		  -path './doxygen' -o \
 		  -path './*lib/*' -o \
-		  -path './testoutput/*' -o \
+		  -path './testoutput' -o \
+		  -path './test_summary/*' -o \
 		  -path './.*' -o \
 		  -name '.svn' -o \
 		  -name '*.patch' -o \
