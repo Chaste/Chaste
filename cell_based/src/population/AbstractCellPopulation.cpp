@@ -383,6 +383,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateOutputFiles(const std
 {
     mDirPath = rDirectory;
 
+    ///\todo modify this so that additional cell writers aren't just deleted as soon as a simulation starts (#2447)
+    DeleteWriters();
+
     if (mOutputResultsForChasteVisualizer)
     {
         AddPopulationWriter(new NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
