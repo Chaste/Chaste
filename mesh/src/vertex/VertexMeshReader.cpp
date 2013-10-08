@@ -170,9 +170,7 @@ ElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
     {
         assert(mNumElementAttributes == 1);
 
-        unsigned attribute_value;
-        buffer_stream >> attribute_value;
-        element_data.AttributeValue = attribute_value;
+        buffer_stream >>  element_data.AttributeValue;
     }
     else
     {
@@ -248,17 +246,13 @@ VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWi
         element_data.Faces[j] = face_data;
     }
 
+    //For back compatibility (we always store attributes on elements now)
+    element_data.AttributeValue = 0;
     if (mNumElementAttributes > 0)
     {
         assert(mNumElementAttributes==1);
 
-        unsigned attribute_value;
-        buffer_stream >> attribute_value;
-        element_data.AttributeValue = attribute_value;
-    }
-    else
-    {
-        element_data.AttributeValue = 0;
+        buffer_stream >> element_data.AttributeValue;
     }
 
     mElementsRead++;
