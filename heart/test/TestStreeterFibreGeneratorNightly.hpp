@@ -35,11 +35,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSTREETERFIBREGENERATORNIGHTLY_HPP_
 #define TESTSTREETERFIBREGENERATORNIGHTLY_HPP_
 
+#include <cxxtest/TestSuite.h>
+
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "StreeterFibreGenerator.hpp"
 #include "OutputFileHandler.hpp"
-#include "MemfemMeshReader.hpp"
+#include "TrianglesMeshReader.hpp"
 #include "NumericFileComparison.hpp"
 #include "VtkMeshWriter.hpp"
 #include "FibreReader.hpp"
@@ -89,7 +91,7 @@ private:
 public:
     void TestSimpleOrthotropic() throw (Exception)
     {
-        MemfemMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50");
+        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
         std::string epi_face_file = "heart/test/data/point50_heart_mesh/epi.tri";
         std::string rv_face_file = "heart/test/data/point50_heart_mesh/rv.tri";
         std::string lv_face_file = "heart/test/data/point50_heart_mesh/lv.tri";
@@ -108,15 +110,15 @@ public:
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "point50.ortho";
         std::string wall_file = handler.GetOutputDirectoryFullPath() + "wall_thickness.data";
 
-        CompareOrthoFiles(fibre_file, "heart/test/data/point50_heart_mesh/point50.ortho");
+        CompareOrthoFiles(fibre_file, "heart/test/data/point50_heart_mesh/point50_bin.ortho");
 
-        NumericFileComparison comp_wall(wall_file,"heart/test/data/point50_heart_mesh/wall_thickness.data");
+        NumericFileComparison comp_wall(wall_file, "heart/test/data/point50_heart_mesh/wall_thickness.data");
         TS_ASSERT(comp_wall.CompareFiles(1e-11));
     }
 
     void TestSimpleOrthotropicNotDistributed() throw (Exception)
     {
-        MemfemMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50");
+        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
         std::string epi_face_file = "heart/test/data/point50_heart_mesh/epi.tri";
         std::string rv_face_file = "heart/test/data/point50_heart_mesh/rv.tri";
         std::string lv_face_file = "heart/test/data/point50_heart_mesh/lv.tri";
@@ -137,8 +139,8 @@ public:
         std::string fibre_file = handler.GetOutputDirectoryFullPath() + "point50_not_dist.ortho";
         std::string wall_file = handler.GetOutputDirectoryFullPath() + "wall_thickness.data";
 
-        CompareOrthoFiles(fibre_file, "heart/test/data/point50_heart_mesh/point50.ortho");
-        NumericFileComparison comp_wall(wall_file,"heart/test/data/point50_heart_mesh/wall_thickness.data");
+        CompareOrthoFiles(fibre_file, "heart/test/data/point50_heart_mesh/point50_bin.ortho");
+        NumericFileComparison comp_wall(wall_file, "heart/test/data/point50_heart_mesh/wall_thickness.data");
         TS_ASSERT(comp_wall.CompareFiles(1e-11));
     }
 
@@ -200,7 +202,7 @@ public:
         writer.WriteFilesUsingMesh(mesh);
 #else
         std::cout << "This test ran, but did not test VTK-dependent methods." << std::endl;
-        std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on Chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
 };
