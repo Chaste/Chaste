@@ -53,7 +53,7 @@
 	</Physiological>
 
 	<Numerical>
-		<TimeSteps ode="0.01" pde="0.1" printing="0.1" unit="ms"/>
+		<TimeSteps ode="0.01" pde="0.1" printing="1.0" unit="ms"/>
 		<KSPTolerances>
 			<KSPAbsolute>2e-4</KSPAbsolute>
 		</KSPTolerances>
