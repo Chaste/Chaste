@@ -2,4 +2,4 @@ Number of timesteps 9
 timestep 1
 First timestep 102
 Last timestep 110
-Created by Chaste version 3.1.16797 (with uncommitted modifications.... blah blah)
+Created by Chaste version 3.1.20327 (with uncommitted modifications) on Thu, 10 Oct 2013 11:46:06 +0000.  Chaste was built on Thu, 10 Oct 2013 11:45:44 +0000 by machine (uname) 'Linux skip.cs.ox.ac.uk 3.8.0-31-generic #46-Ubuntu SMP Tue Sep 10 20:03:44 UTC 2013 x86_64' using settings: GccOptNative, shared libraries.  Checked-out project versions: ApPredict=20282M; BethM=20228M; CardiacEpValidation=20228; FunctionalCuration=20228M; GaryM=20282M; JohnW=20228M; KenW=20228; KylieB=20228; LouiseB=20228M; SimpleSensitivity=20228; smalyala=20228.
