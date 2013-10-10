@@ -56,7 +56,7 @@ class TestRestitutionStimuli : public CxxTest::TestSuite
 {
 private:
     void DoesSteadyStateStimulusPerformCorrectly(SteadyStateRestitutionStimulus* pStimulus, double magnitude, double duration_of_stimulus,
-                                                double startTime, std::vector<double> pacing_cycle_lengths, unsigned number_of_pulses)
+                                                 double startTime, const std::vector<double>& pacing_cycle_lengths, unsigned number_of_pulses)
     {
         double time = startTime;
         for (unsigned pacing_length_index = 0; pacing_length_index<pacing_cycle_lengths.size(); pacing_length_index++)
@@ -75,36 +75,41 @@ private:
     }
 
     void DoesStimulusPerformCorrectly(S1S2Stimulus* pStimulus, double magnitude, double duration_of_stimulus,
-                                       double duration_of_s1, double s1_period, double startTime, std::vector<double> s2_periods)
+                                      double duration_of_s1, double s1_period, double startTime, const std::vector<double>& s2_periods)
     {
         for (unsigned experiment_index=0 ; experiment_index<s2_periods.size() ; experiment_index++)
         {
             std::cout << "Experiment = " << experiment_index << "\n" << std::flush;
             pStimulus->SetS2ExperimentPeriodIndex(experiment_index);
 
-            double time = 0.0;
             // First S1 Pulse
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),0.0, 1e-9);
-            time = startTime + 0.1;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),magnitude, 1e-9);
-            time = startTime + duration_of_stimulus + 0.1;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),0.0, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(0.0), 0.0, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(startTime), magnitude, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(startTime + 0.1), magnitude, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(startTime + duration_of_stimulus), magnitude, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(startTime + duration_of_stimulus + 0.1), 0.0, 1e-9);
 
             // First S2 Pulse (or final S1 pulse for physiologists)
-            time = duration_of_s1 + startTime + 0.1;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),magnitude, 1e-9);
-            time = duration_of_s1 + startTime + duration_of_stimulus + 0.1;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),0.0, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(duration_of_s1 + startTime - 0.1), 0.0, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(duration_of_s1 + startTime), magnitude, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(duration_of_s1 + startTime + 0.1), magnitude, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(duration_of_s1 + startTime + duration_of_stimulus), magnitude, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(duration_of_s1 + startTime + duration_of_stimulus + 0.1), 0.0, 1e-9);
 
             // Second S2 Pulse (or S2 pulse for physiologists!)
+            double time;
             time = duration_of_s1 + s2_periods[experiment_index] + startTime - 0.1;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),0.0, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(time), 0.0, 1e-9);
+            time = duration_of_s1 + s2_periods[experiment_index] + startTime;
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(time), magnitude, 1e-9);
             time = duration_of_s1 + s2_periods[experiment_index] + startTime + 0.1;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),magnitude, 1e-9);
-            time = duration_of_s1 + s2_periods[experiment_index] + duration_of_stimulus + startTime - 0.1 ;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),magnitude, 1e-9);
-            time = duration_of_s1 + 2*s2_periods[experiment_index]+ duration_of_stimulus + startTime + 0.1 ;
-            TS_ASSERT_DELTA(pStimulus->GetStimulus(time),0.0, 1e-9);
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(time), magnitude, 1e-9);
+            time = duration_of_s1 + s2_periods[experiment_index] + duration_of_stimulus + startTime - 0.1;
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(time), magnitude, 1e-9);
+            time = duration_of_s1 + s2_periods[experiment_index] + duration_of_stimulus + startTime;
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(time), magnitude, 1e-9);
+            time = duration_of_s1 + 2*s2_periods[experiment_index]+ duration_of_stimulus + startTime + 0.1;
+            TS_ASSERT_DELTA(pStimulus->GetStimulus(time), 0.0, 1e-9);
         }
     }
 
@@ -126,7 +131,7 @@ public:
         S1S2Stimulus stimulus(magnitude, duration_of_stimulus, duration_of_s1, s1_period, startTime, s2_periods);
 
         DoesStimulusPerformCorrectly(&stimulus, magnitude, duration_of_stimulus,
-                                      duration_of_s1, s1_period, startTime, s2_periods);
+                                     duration_of_s1, s1_period, startTime, s2_periods);
 
         TS_ASSERT_THROWS_THIS(stimulus.SetS2ExperimentPeriodIndex(s2_periods.size()),
                               "There are fewer S2 frequency values than the one you have requested.");

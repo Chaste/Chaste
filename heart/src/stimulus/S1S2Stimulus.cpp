@@ -32,7 +32,9 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "S1S2Stimulus.hpp"
+#include "Exception.hpp"
 
 S1S2Stimulus::S1S2Stimulus(double magnitude, double stimulusDuration, double s1Duration, double s1Period, double startTime, std::vector<double> s2Periods)
     : MultiStimulus()
@@ -42,7 +44,8 @@ S1S2Stimulus::S1S2Stimulus(double magnitude, double stimulusDuration, double s1D
     {
         boost::shared_ptr<MultiStimulus> p_experiment_stimulus(new MultiStimulus());
 
-        boost::shared_ptr<RegularStimulus> p_s1(new RegularStimulus(magnitude, stimulusDuration, s1Period, startTime, s1Duration+startTime));
+        // The 0.5*(s1Period-stimulusDuration) taken off the stop time is to avoid getting a double stimulus at the instant s1Duration+startTime (#2442).
+        boost::shared_ptr<RegularStimulus> p_s1(new RegularStimulus(magnitude, stimulusDuration, s1Period, startTime, s1Duration+startTime-0.5*(s1Period-stimulusDuration)));
         boost::shared_ptr<RegularStimulus> p_s2(new RegularStimulus(magnitude, stimulusDuration, s2Periods[i], s1Duration+startTime, s1Duration + 2*s2Periods[i]+startTime));
 
         p_experiment_stimulus->AddStimulus(p_s1);
@@ -64,11 +67,11 @@ void S1S2Stimulus::SetS2ExperimentPeriodIndex(unsigned index)
 {
     if (index < mNumS2FrequencyValues)
     {
-     mS2Index = index;
+        mS2Index = index;
     }
     else
     {
-     EXCEPTION("There are fewer S2 frequency values than the one you have requested.");
+        EXCEPTION("There are fewer S2 frequency values than the one you have requested.");
     }
 }
 

@@ -58,7 +58,7 @@ RegularStimulus::RegularStimulus(double magnitudeOfStimulus, double duration, do
 double RegularStimulus::GetStimulus(double time)
 {
     /*
-     *  This covers a borderline case where start time is larger than period
+     * This covers a borderline case where start time is larger than period
      * and period divides start time, e.g. start_time=2 period=1.
      *
      * fmod() will return -0 in this case and will therefore switch the stimulus on.
@@ -68,7 +68,7 @@ double RegularStimulus::GetStimulus(double time)
         return 0.0;
     }
 
-    double beatTime = fmod(time-mStartTime,mPeriod);
+    double beatTime = fmod(time-mStartTime, mPeriod);
 
     if (beatTime >=0 && beatTime <= mDuration && time <= mStopTime)
     {

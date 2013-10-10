@@ -89,7 +89,7 @@ private:
     /**
      * Private constructor - for archiving's eyes only.
      */
-    S1S2Stimulus(){};
+    S1S2Stimulus() {};
 
 public:
 
