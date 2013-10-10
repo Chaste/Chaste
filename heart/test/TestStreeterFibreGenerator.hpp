@@ -186,7 +186,7 @@ public:
 
         fibre_generator.SetSurfaceFiles(epi_face_file, rv_face_file, lv_face_file, false);
         OutputFileHandler shorter_handler("shorter_streeter", false);
-        TS_ASSERT_THROWS_THIS(fibre_generator.WriteData(shorter_handler, "downsampled.ortho"),
+        TS_ASSERT_THROWS_THIS(fibre_generator.WriteData(shorter_handler, "vector_not_set.ortho"),
             "Apex to base vector has not been set");
         TS_ASSERT_THROWS_THIS(fibre_generator.SetApexToBase(999),
             "Apex to base coordinate axis was out of range");

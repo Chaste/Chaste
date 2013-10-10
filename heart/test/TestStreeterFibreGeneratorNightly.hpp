@@ -163,21 +163,35 @@ public:
         OutputFileHandler handler("streeter", false);
         fibre_generator.WriteData(handler, "downsampled.ortho");
 
-        std::string fibre_file = handler.GetOutputDirectoryFullPath() + "downsampled.ortho";
 
-        CompareOrthoFiles(fibre_file, "heart/test/data/fibre_tests/downsampled.ortho");
-#ifdef CHASTE_VTK
-        //Output to VTK.
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "downsampled_fibres", false);
-        FileFinder filename("heart/test/data/fibre_tests/downsampled.ortho", RelativeTo::ChasteSourceRoot);
-        FibreReader<3> fibre_reader(filename, ORTHO);
+        //CompareOrthoFiles(fibre_file, "heart/test/data/fibre_tests/downsampled.ortho");
+        // These elements came from random.randint(0, 431989)
+
+        FileFinder file_finder( handler.GetOutputDirectoryFullPath() + "downsampled.ortho", RelativeTo::Absolute);
+        FibreReader<3> fibre_reader1(file_finder, ORTHO);
         std::vector< c_vector<double, 3> > fibres;
         std::vector< c_vector<double, 3> > second;
         std::vector< c_vector<double, 3> > third;
-        fibre_reader.GetAllOrtho(fibres, second, third);
+        fibre_reader1.GetAllOrtho(fibres, second, third);
         TS_ASSERT_EQUALS(fibres.size(), mesh.GetNumElements());
         TS_ASSERT_EQUALS(second.size(), mesh.GetNumElements());
         TS_ASSERT_EQUALS(third.size(), mesh.GetNumElements());
+        double tolerance = 1e-4;
+
+        TS_ASSERT_DELTA(fibres[136708][0],  0.3942, tolerance);
+        TS_ASSERT_DELTA(fibres[136708][1], -0.9189, tolerance);
+        TS_ASSERT_DELTA(fibres[136708][2], -0.0011, tolerance);
+        TS_ASSERT_DELTA(fibres[73380][0],  -0.2397, tolerance);
+        TS_ASSERT_DELTA(fibres[73380][1],   0.7673, tolerance);
+        TS_ASSERT_DELTA(fibres[73380][2],   0.5947, tolerance);
+        TS_ASSERT_DELTA(fibres[127320][0], -0.8803, tolerance);
+        TS_ASSERT_DELTA(fibres[127320][1], -0.4742, tolerance);
+        TS_ASSERT_DELTA(fibres[127320][2],  0.0023, tolerance);
+
+
+#ifdef CHASTE_VTK
+        //Output to VTK.
+        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "downsampled_fibres", false);
         writer.AddCellData("OrthoFibres", fibres);
         writer.AddCellData("OrthoSecond", second);
         writer.AddCellData("OrthoThird", third);
