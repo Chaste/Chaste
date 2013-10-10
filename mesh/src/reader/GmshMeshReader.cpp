@@ -342,7 +342,7 @@ ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 
     unsigned ele_index;
     unsigned ele_type;
-    unsigned ele_attributes;
+    unsigned ele_attributes=0;
     bool volume_element_found = false;
 
     while(!volume_element_found)
@@ -402,7 +402,7 @@ ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
     unsigned face_index;
     unsigned face_type;
-    unsigned face_attributes;
+    unsigned face_attributes=0;
     bool surface_element_found = false;
 
     while(!surface_element_found)
