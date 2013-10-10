@@ -3,7 +3,8 @@ bidomain/TestBidomainWithBathLong.hpp
 convergence/TestConvergenceEfficiency.hpp
 convergence/TestConvergenceNeumannStimulus.hpp
 convergence/TestConvergenceNightly.hpp
-TestCardiacSimulationNightly.hpp
+fibres/TestStreeterFibreGeneratorNightly.hpp
+fibres/TestPapillaryFibreCalculatorLong.hpp
 ionicmodels/TestIonicModelsLong.hpp
 monodomain/TestMonodomainProblemLong.hpp
 monodomain/TestMonodomainNoStimulus.hpp
@@ -13,7 +14,6 @@ monodomain/TestOperatorSplittingMonodomainSolverLong.hpp
 monodomain/TestMonodomainWithTimeAdaptivityLong.hpp
 mechanics/TestCardiacElectroMechanicsProblemLong.hpp
 mechanics/TestCardiacElectroMechanicsOnAnnulus.hpp
-TestPapillaryFibreCalculatorLong.hpp
 performance/Test1dBidomainProblemForEfficiency.hpp
 performance/TestPerformance.hpp
 performance/TestPerformanceOfAssembly.hpp
@@ -28,4 +28,4 @@ tutorials/TestCardiacCheckpointingAndRestartingTutorial.hpp
 tutorials/TestCardiacElectroMechanicsTutorial.hpp
 tutorials/TestAnotherCardiacElectroMechanicsTutorial.hpp
 tutorials/TestSingleCellSimulationTutorial.hpp
-TestStreeterFibreGeneratorNightly.hpp
+TestCardiacSimulationNightly.hpp
