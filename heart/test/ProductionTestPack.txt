@@ -10,4 +10,4 @@ monodomain/TestMonodomainTissue.hpp
 postprocessing/TestCellProperties.hpp
 postprocessing/TestPropagationPropertiesCalculator.hpp
 stimuli/TestStimulus.hpp
-TestPlaneStimulusCellFactory.hpp
+stimuli/TestPlaneStimulusCellFactory.hpp
