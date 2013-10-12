@@ -38,8 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CellsGenerator.hpp"
@@ -410,6 +409,7 @@ public:
 
     void TestForceOutputParameters()
     {
+        EXIT_IF_PARALLEL;
         std::string output_directory = "TestForcesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
