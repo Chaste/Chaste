@@ -101,7 +101,9 @@ public:
         vec[3] = 3.1;
         PRINT_VECTOR(vec);
 
-        MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 95"
+        MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 104"
+
+        MARK_IN_ORDER; // Something like: "DEBUG: proc 0 ./global/test/TestDebug.hpp at line 106" etc
 
         // Check interaction with process isolation
         PetscTools::IsolateProcesses();

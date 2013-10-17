@@ -128,4 +128,15 @@ std::string FormDebugHead();
           std::cout << (_i==0?"":",") << v[_i]; } \
       std::cout << "}" << std::endl << std::flush; }
 
+/** (For debugging on a seriously large number of processes)
+ * Show the mark that we have reached this line of code, but do it in process order, which
+ * is important if we suspect that one or more processes are missing.
+ *
+ * This will also isolate all the MARKs which appear for a particular line of code, since all process have to synchronise at
+ * the beginning of the round-robin.
+ *
+ * Note that this will change the parallel behaviour of the code -- if one process really is missing then the first barrier inside
+ * the round-robin will cause deadlock.
+ */
+#define MARK_IN_ORDER PetscTools::BeginRoundRobin(); MARK; PetscTools::EndRoundRobin();
 #endif /*DEBUG_HPP_*/
