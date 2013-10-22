@@ -153,6 +153,11 @@ class Protocol(processors.ModelModifier):
             source = proto_import.source
             if not os.path.isabs(source):
                 source = os.path.join(base, source)
+            if not os.path.exists(source):
+                # Try resolving relative to the library folder
+                library = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, os.pardir,
+                                       'projects', 'FunctionalCuration', 'src', 'proto', 'library')
+                source = os.path.join(library, proto_import.source)
             if getattr(proto_import, u'mergeDefinitions', u'0') in [u'true', u'1']:
                 # Process this import immediately
                 self.parse_protocol(source, proto_units)
