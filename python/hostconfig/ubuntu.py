@@ -96,7 +96,7 @@ if petsc_ver >= 3.1:
 boost_libs = ['boost_serialization', 'boost_filesystem']
 if ubuntu_ver >= [10,10]:
     boost_libs.append('boost_system')
-if ubuntu_ver >= [9,10]:
+if ubuntu_ver >= [9,10] and ubuntu_ver <= [12,10]:
     boost_libs = map(lambda l: l+'-mt', boost_libs)
 
 other_libraries = libs_for_petsc + boost_libs + \
