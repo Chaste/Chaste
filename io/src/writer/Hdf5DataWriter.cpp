@@ -659,8 +659,8 @@ void Hdf5DataWriter::EndDefineMode()
         hsize_t time_dataset_max_dims[1] = {H5S_UNLIMITED};
 
         /*
-         * Modify dataset creation properties to enable chunking.
-         * Set the chunk size in the "Time" dataset to 128 doubles, i.e. 1 KiB.
+         * Modify dataset creation properties to enable chunking.  Set the chunk size in the "Time"
+         * dataset to 128 doubles, i.e. 1 KiB.  See #2336.
          */
         hsize_t time_chunk_dims[1] = {128u};
         hid_t time_cparms = H5Pcreate (H5P_DATASET_CREATE);
