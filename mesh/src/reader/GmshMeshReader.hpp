@@ -85,7 +85,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~GmshMeshReader();
+    ~GmshMeshReader();
 
     /** @return the number of elements in the mesh */
     unsigned GetNumElements() const;

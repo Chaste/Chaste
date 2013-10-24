@@ -147,7 +147,7 @@ public:
     /**
      * Destructor
      */
-    virtual ~TrianglesMeshReader();
+    ~TrianglesMeshReader();
 
     /** @return the number of elements in the mesh */
     unsigned GetNumElements() const;
@@ -277,7 +277,7 @@ public:
     /**
      * @return true if a node permutation has been applied by SetNodePermutation.
      */
-     virtual bool HasNodePermutation();
+    bool HasNodePermutation();
 
     /**
      * @return the node permutation if a node permutation has been applied to this reader (or an empty permutation)
