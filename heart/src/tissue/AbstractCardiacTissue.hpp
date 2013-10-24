@@ -605,25 +605,24 @@ public:
         // Track fake cells (which might have multiple pointers to the same object) to make sure we only delete non-local ones
         std::set<FakeBathCell*> fake_cells_non_local, fake_cells_local;
 
-        const std::vector<unsigned>& r_permutation = this->mpMesh->rGetNodePermutation();
+//        const std::vector<unsigned>& r_permutation = this->mpMesh->rGetNodePermutation();
         for (unsigned local_index=0; local_index<num_cells; local_index++)
         {
             // If we're permuting, figure out where this cell goes
             unsigned original_global_index = index_low + local_index;
             unsigned new_global_index;
-            if (r_permutation.empty())
+            //if (r_permutation.empty())
             {
                 new_global_index = original_global_index;
             }
-            else
+            //else
             {
+                ///\todo #2452 Note that the permutation here is NOT to be applied!
                 ///\todo #1199 test this
-//                new_global_index = r_permutation[original_global_index];
-                NEVER_REACHED;
             }
             unsigned new_local_index = new_global_index - p_mesh_factory->GetLow();
             bool local = p_mesh_factory->IsGlobalIndexLocal(new_global_index);
-
+  
             // Check if this will be a halo cell
             std::map<unsigned, unsigned>::const_iterator halo_position;
             bool halo = ((halo_position=mHaloGlobalToLocalIndexMap.find(new_global_index)) != mHaloGlobalToLocalIndexMap.end());
