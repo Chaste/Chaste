@@ -147,7 +147,7 @@ public:
     /**
      * Destructor
      */
-     ~TrianglesMeshReader();
+    virtual ~TrianglesMeshReader();
 
     /** @return the number of elements in the mesh */
     unsigned GetNumElements() const;

@@ -142,8 +142,6 @@ public:
      */
     VtkMeshReader(vtkUnstructuredGrid* p_vtkUnstructuredGrid);
 
-
-
     /**
      * Destructor
      */
