@@ -66,11 +66,11 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
     {
         ElementData element_data = rMeshReader.GetNextCableElementData();
         //Convert the node indices from the original to the permuted
-        if (!this->mNodesPermutation.empty())
+        if (!this->mNodePermutation.empty())
         {
             for (unsigned j=0; j<2; j++) // cables are always 1d
             {
-                element_data.NodeIndices[j] = this->mNodesPermutation[ element_data.NodeIndices[j] ];
+                element_data.NodeIndices[j] = this->mNodePermutation[ element_data.NodeIndices[j] ];
             }
         }
 

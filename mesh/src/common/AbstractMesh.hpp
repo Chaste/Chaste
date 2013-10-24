@@ -104,9 +104,9 @@ protected:  // Give access of these variables to subclasses
     /** Vector containing node permutation information.
      *  When empty (most meshes) there is no node permutation
      *  When non-empty (parallel distributed meshes) then for a given original_index
-     *  #mNodesPermutation[original_index] holds the new assigned index of that node in memory
+     *  #mNodePermutation[original_index] holds the new assigned index of that node in memory
      */
-    std::vector<unsigned> mNodesPermutation;
+    std::vector<unsigned> mNodePermutation;
 
     /**
      * If the mesh is constructed from file using a MeshReader, this member
@@ -279,11 +279,11 @@ public:
     bool IsMeshOnDisk() const;
 
     /**
-     * @return #mNodesPermutation.
+     * @return #mNodePermutation.
      *
      *  When empty (most meshes) there is no node permutation
      *  When non-empty (parallel distributed meshes) then for a given original_index
-     *  #mNodesPermutation[original_index] holds the new assigned index of that node in memory
+     *  #mNodePermutation[original_index] holds the new assigned index of that node in memory
      *
      */
     const std::vector<unsigned>& rGetNodePermutation() const;

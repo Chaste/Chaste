@@ -94,7 +94,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEM
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                                                           std::vector<unsigned>& rNodesPermutation,
+                                                                           std::vector<unsigned>& rNodePermutation,
                                                                            std::set<unsigned>& rNodesOwned,
                                                                            std::vector<unsigned>& rProcessorsOffset)
 {
@@ -217,13 +217,13 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
      */
     std::vector<unsigned> local_index(PetscTools::GetNumProcs(), 0);
 
-    rNodesPermutation.resize(rMeshReader.GetNumNodes());
+    rNodePermutation.resize(rMeshReader.GetNumNodes());
 
     for (unsigned node_index=0; node_index<rMeshReader.GetNumNodes(); node_index++)
     {
         unsigned part_read = npart[node_index];
 
-        rNodesPermutation[node_index] = rProcessorsOffset[part_read] + local_index[part_read];
+        rNodePermutation[node_index] = rProcessorsOffset[part_read] + local_index[part_read];
 
         local_index[part_read]++;
     }
@@ -234,7 +234,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(AbstractM
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                              std::vector<unsigned>& rNodesPermutation,
+                                              std::vector<unsigned>& rNodePermutation,
                                               std::set<unsigned>& rNodesOwned,
                                               std::vector<unsigned>& rProcessorsOffset)
 {
@@ -447,8 +447,8 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     }
     AOPetscToApplication(ordering, num_nodes, global_range);
 
-    rNodesPermutation.resize(num_nodes);
-    std::copy(global_range, global_range+num_nodes, rNodesPermutation.begin());
+    rNodePermutation.resize(num_nodes);
+    std::copy(global_range, global_range+num_nodes, rNodePermutation.begin());
     delete[] global_range;
 
     AODestroy(PETSC_DESTROY_PARAM(ordering));
@@ -464,7 +464,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                    std::vector<unsigned>& rNodesPermutation,
+                                    std::vector<unsigned>& rNodePermutation,
                                     std::set<unsigned>& rNodesOwned,
                                     std::vector<unsigned>& rProcessorsOffset,
                                     ChasteCuboid<SPACE_DIM>* pRegion)
@@ -525,17 +525,17 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 
     for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
     {
-        rProcessorsOffset.push_back(rNodesPermutation.size());
+        rProcessorsOffset.push_back(rNodePermutation.size());
         for (unsigned node=0; node<num_nodes; node++)
         {
             if (global_index_ownership[node] == proc)
             {
-                rNodesPermutation.push_back(node);
+                rNodePermutation.push_back(node);
             }
         }
 
     }
-    assert(rNodesPermutation.size() == num_nodes);
+    assert(rNodePermutation.size() == num_nodes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

@@ -403,9 +403,9 @@ private:
 
     /**
      * Reorder the node indices in this mesh by applying the permutation
-     * give in mNodesPermutation.
+     * give in mNodePermutation.
      *
-     * The node indexed with "i" will be re-assigned with the new index mNodesPermutation[i]
+     * The node indexed with "i" will be re-assigned with the new index mNodePermutation[i]
      */
     void ReorderNodes();
 

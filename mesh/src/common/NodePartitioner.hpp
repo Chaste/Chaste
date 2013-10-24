@@ -64,13 +64,13 @@ public:
      * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning
      *
      * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodesPermutation is the vector to be filled with node permutation information.
+     * @param rNodePermutation is the vector to be filled with node permutation information.
      * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
      * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
      *
      */
     static void MetisLibraryPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                         std::vector<unsigned>& rNodesPermutation,
+                                         std::vector<unsigned>& rNodePermutation,
                                          std::set<unsigned>& rNodesOwned,
                                          std::vector<unsigned>& rProcessorsOffset);
 
@@ -79,27 +79,27 @@ public:
      * Method to compute a parallel partitioning of a given mesh.
      *
      * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodesPermutation is the vector to be filled with node permutation information.
+     * @param rNodePermutation is the vector to be filled with node permutation information.
      * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
      * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
      *
      */
     static void PetscMatrixPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                        std::vector<unsigned>& rNodesPermutation,
+                                        std::vector<unsigned>& rNodePermutation,
                                         std::set<unsigned>& rNodesOwned,
                                         std::vector<unsigned>& rProcessorsOffset);
     /**
      * Specialised method to compute the partition of a mesh based on geometric partitioning
      *
      * @param rMeshReader is the reader pointing to the mesh to be read in and partitioned
-     * @param rNodesPermutation is the vector to be filled with node permutation information.
+     * @param rNodePermutation is the vector to be filled with node permutation information.
      * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
      * @param rProcessorsOffset a vector of length NumProcs to be filled with the index of the lowest indexed node owned by each process
      * @param pRegion the local region owned by this process.
      *
      */
     static void GeometricPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
-                                        std::vector<unsigned>& rNodesPermutation,
+                                        std::vector<unsigned>& rNodePermutation,
                                         std::set<unsigned>& rNodesOwned,
                                         std::vector<unsigned>& rProcessorsOffset,
                                         ChasteCuboid<SPACE_DIM>* pRegion);

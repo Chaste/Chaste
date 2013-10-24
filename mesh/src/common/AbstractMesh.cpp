@@ -105,13 +105,13 @@ Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeOrHaloNode(unsigne
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeFromPrePermutationIndex(unsigned index) const
 {
-    if (mNodesPermutation.empty())
+    if (mNodePermutation.empty())
     {
         return GetNode(index);
     }
     else
     {
-        return GetNode(mNodesPermutation[index]);
+        return GetNode(mNodePermutation[index]);
     }
 }
 
@@ -193,7 +193,7 @@ bool AbstractMesh<ELEMENT_DIM, SPACE_DIM>::IsMeshOnDisk() const
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 const std::vector<unsigned>& AbstractMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodePermutation() const
 {
-    return mNodesPermutation;
+    return mNodePermutation;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

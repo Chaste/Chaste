@@ -1358,7 +1358,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
         DistributedTetrahedralMesh<1,1> permuted_mesh;
         permuted_mesh.ConstructFromMeshReader(mesh_reader);
         ///\todo #2452 This should be recorded by the previous method
-        //permuted_mesh.mNodesPermutation = permutation;
+        //permuted_mesh.mNodePermutation = permutation;
 
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));

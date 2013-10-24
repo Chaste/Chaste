@@ -126,11 +126,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
          */
         if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::METIS_LIBRARY && PetscTools::IsParallel())
         {
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset);
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::MetisLibraryPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset);
         }
         else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && PetscTools::IsParallel())
         {
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset);
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset);
         }
         else if (mMetisPartitioning==DistributedTetrahedralMeshPartitionType::GEOMETRIC && PetscTools::IsParallel())
         {
@@ -138,7 +138,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
             {
                 EXCEPTION("Using GEOMETRIC partition for DistributedTetrahedralMesh with local regions not set. Call SetProcessRegion(ChasteCuboid)");
             }
-            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(rMeshReader, this->mNodesPermutation, rNodesOwned, rProcessorsOffset, mpSpaceRegion);
+            NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(rMeshReader, this->mNodePermutation, rNodesOwned, rProcessorsOffset, mpSpaceRegion);
         }
         else
         {
@@ -416,7 +416,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
     if (mMetisPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
     {
-        assert(this->mNodesPermutation.size() != 0);
+        assert(this->mNodePermutation.size() != 0);
         // We reorder so that each process owns a contiguous set of the indices and we can then build a distributed vector factory.
         ReorderNodes();
 
@@ -657,7 +657,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
     for (unsigned index=0; index<this->mNodes.size(); index++)
     {
         unsigned old_index = this->mNodes[index]->GetIndex();
-        unsigned new_index = this->mNodesPermutation[old_index];
+        unsigned new_index = this->mNodePermutation[old_index];
 
         this->mNodes[index]->SetIndex(new_index);
         mNodesMapping[new_index] = index;
@@ -666,7 +666,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
     for (unsigned index=0; index<mHaloNodes.size(); index++)
     {
         unsigned old_index = mHaloNodes[index]->GetIndex();
-        unsigned new_index = this->mNodesPermutation[old_index];
+        unsigned new_index = this->mNodePermutation[old_index];
 
         mHaloNodes[index]->SetIndex(new_index);
         mHaloNodesMapping[new_index] = index;
@@ -1566,14 +1566,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      */
     std::vector<unsigned> local_index(PetscTools::GetNumProcs(), 0);
 
-    this->mNodesPermutation.resize(this->GetNumNodes());
+    this->mNodePermutation.resize(this->GetNumNodes());
 
     for (unsigned node_index=0; node_index<this->GetNumNodes(); node_index++)
     {
         unsigned partition = global_node_partition[node_index];
         assert(partition != UNASSIGNED_NODE);
 
-        this->mNodesPermutation[node_index] = rProcessorsOffset[partition] + local_index[partition];
+        this->mNodePermutation[node_index] = rProcessorsOffset[partition] + local_index[partition];
 
         local_index[partition]++;
     }

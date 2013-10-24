@@ -363,7 +363,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(const std::vector<uns
     }
 
     // Copy the permutation vector into the mesh
-    this->mNodesPermutation = perm;
+    this->mNodePermutation = perm;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
