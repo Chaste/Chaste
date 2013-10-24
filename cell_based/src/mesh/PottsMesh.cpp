@@ -512,7 +512,7 @@ unsigned PottsMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement)
 template<unsigned DIM>
 void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
 {
-    assert(MeshReader.HasNodePermutation() == false);
+    assert(rMeshReader.HasNodePermutation() == false);
 
     // Store numbers of nodes and elements
     unsigned num_nodes = rMeshReader.GetNumNodes();

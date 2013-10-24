@@ -220,7 +220,7 @@ public:
      * Note, this will always throw an exception unless over-ridden by a derived class that is able to support NCL files.
      *
      */
-    const std::vector<unsigned>& rGetNodePermutation();
+    virtual const std::vector<unsigned>& rGetNodePermutation();
 
 
     // Iterator classes

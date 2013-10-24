@@ -417,6 +417,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     if (mMetisPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
     {
         assert(this->mNodePermutation.size() != 0);
+        assert(rMeshReader.HasNodePermutation() == false);
+
         // We reorder so that each process owns a contiguous set of the indices and we can then build a distributed vector factory.
         ReorderNodes();
 
@@ -438,6 +440,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     {
         // Dumb or sequential partition
         assert(this->mpDistributedVectorFactory);
+
+        if (rMeshReader.HasNodePermutation())
+        {
+            // This is probably an unarchiving operation where the original run applied a permutation to the mesh
+            // We need to re-record that the permutation has happened (so that we can archive it correctly later).
+            this->mNodePermutation = rMeshReader.rGetNodePermutation();
+        }
     }
     rMeshReader.Reset();
 }
