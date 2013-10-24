@@ -114,7 +114,7 @@ private:
     char* mElementFileReadBuffer; /**< Buffer for element file read with std::ifstream */
     char* mFaceFileReadBuffer; /**< Buffer for face file read with std::ifstream */
 
-    bool mNodePermutationDefined; /**< Wheter to consider a user-defined node permutation when reading a mesh from file.*/
+    bool mNodePermutationDefined; /**< Whether to consider a user-defined node permutation when reading a mesh from file.*/
     std::vector<unsigned> mPermutationVector; /**< Permutation to be considered, i-th entry of the vector contains new index for original node i.*/
     std::vector<unsigned> mInversePermutationVector; /**< Permutation inverse, stored for performance reasons.*/
 
@@ -267,6 +267,8 @@ public:
 
     /**
      * Sets a node permutation to use when reading in node file.
+     * \todo #2452 We need a way of propagating this back to the mesh
+     * (and insuring that the mesh is NOT being re-partitioned)
      *
      * @param rPermutationVector Permutation vector
      */

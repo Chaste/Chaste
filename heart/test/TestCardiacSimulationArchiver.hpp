@@ -117,13 +117,16 @@ public:
         // Check some voltages
         ReplicatableVector solution_replicated(bidomain_problem.GetSolution());
         double atol=5e-3;
-        TS_ASSERT_DELTA(solution_replicated[1], -16.4861, atol);
-        TS_ASSERT_DELTA(solution_replicated[2], 22.8117, atol);
+        //Evens are the Vm voltages
+        TS_ASSERT_DELTA(solution_replicated[2], 22.8117, atol); // V at 1
+        TS_ASSERT_DELTA(solution_replicated[10], 25.3148, atol); // V at 5
+        TS_ASSERT_DELTA(solution_replicated[20], -83.3582, atol); // V at 10
+        //Odds are Phi_e
+        TS_ASSERT_DELTA(solution_replicated[1], -16.4861, atol); // Phi_e at 0
         TS_ASSERT_DELTA(solution_replicated[3], -16.4893, atol);
         TS_ASSERT_DELTA(solution_replicated[5], -16.5617, atol);
         TS_ASSERT_DELTA(solution_replicated[7], -16.6761, atol);
         TS_ASSERT_DELTA(solution_replicated[9], -16.8344, atol);
-        TS_ASSERT_DELTA(solution_replicated[10], 25.3148, atol);
 
         // Save for checking in the next test
         for (unsigned index=0; index<solution_replicated.GetSize(); index++)
@@ -1327,6 +1330,61 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
         }
 
         DoSimulationsAfterMigrationAndCompareResults(p_problem, source_directory, ref_archive_dir, new_archive_dir, 1, 0.2);
+    }
+
+    /*
+     *  Check that we can read for a permuted mesh (or permuted archive) and then correctly record that it was permuted
+     */
+    void TestPermutedBidomain1D() throw(Exception)
+    {
+        std::string archive_dir("ArchiveBidomainPermuted");
+        OutputFileHandler handler("PermutedBidomain1d",true);
+        //In order to apply a permutation, we need to have a binary mesh
+        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1mm_10_elements_binary");
+        std::vector<unsigned> permutation(11);
+        permutation[0]=0;
+        permutation[1]=10; // 1->10
+        permutation[2]=2;
+        permutation[3]=3;
+        permutation[4]=4;
+        permutation[5]=1;  // 5->1
+        permutation[6]=6;
+        permutation[7]=7;
+        permutation[8]=8;
+        permutation[9]=9;
+        permutation[10]=5; // 10->5
+        mesh_reader.SetNodePermutation(permutation);
+
+        DistributedTetrahedralMesh<1,1> permuted_mesh;
+        permuted_mesh.ConstructFromMeshReader(mesh_reader);
+        ///\todo #2452 This should be recorded by the previous method
+        //permuted_mesh.mNodesPermutation = permutation;
+
+        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
+        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
+        HeartConfig::Instance()->SetCapacitance(1.0);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+        HeartConfig::Instance()->SetOutputDirectory("PermutedBidomain1d");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        BidomainProblem<1> bidomain_problem( &cell_factory );
+        bidomain_problem.SetMesh(&permuted_mesh);
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        // Check some voltages
+        ReplicatableVector solution_replicated(bidomain_problem.GetSolution());
+        double atol=5e-3;
+        TS_ASSERT_DELTA(solution_replicated[2], 25.3148 , atol); // V at 1 (is the original 5)
+        TS_ASSERT_DELTA(solution_replicated[10],-83.3582, atol); // V at 5 (is the original 10)
+        TS_ASSERT_DELTA(solution_replicated[20], 22.8117, atol); // V at 10 (is the original 1)
+
+        CardiacSimulationArchiver<BidomainProblem<1> >::Save(bidomain_problem, archive_dir, false);
+
+        ///\todo #2452 Check that the archiver has recorded a permutation...
     }
 };
 
