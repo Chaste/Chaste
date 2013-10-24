@@ -144,6 +144,17 @@ bool AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::HasNclFile()
     return false;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::HasNodePermutation()
+{
+    return false;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::vector<unsigned>& AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::rGetNodePermutation()
+{
+    EXCEPTION("Node permutations aren't supported by this reader");
+}
 
 // Cable elements aren't supported in most formats
 

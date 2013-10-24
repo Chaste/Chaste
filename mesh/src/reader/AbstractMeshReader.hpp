@@ -206,6 +206,23 @@ public:
      */
     virtual bool HasNclFile();
 
+    /**
+     * @return true if there is a node permutation applied.
+     *
+     * Note, this will always return false unless over-ridden by a derived class that is able to support NCL files.
+     *
+     */
+    virtual bool HasNodePermutation();
+
+    /**
+     * @return the node permutation if a node permutation has been applied to this reader (or an empty permutation)
+     *
+     * Note, this will always throw an exception unless over-ridden by a derived class that is able to support NCL files.
+     *
+     */
+    const std::vector<unsigned>& rGetNodePermutation();
+
+
     // Iterator classes
 
     /**

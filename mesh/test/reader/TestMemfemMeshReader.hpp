@@ -107,6 +107,8 @@ public:
                 "You have asked to read non-3D data. All Memfem data is in 3D.");
 
         MemfemMeshReader<3,3> mesh_reader2("mesh/test/data/Memfem_slab");
+        TS_ASSERT_EQUALS(mesh_reader2.HasNodePermutation(), false);
+        TS_ASSERT_THROWS_THIS(mesh_reader2.rGetNodePermutation(), "Node permutations aren't supported by this reader");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetNode(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetElementData(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetFaceData(0), "Random access is only implemented in mesh readers for binary mesh files.");

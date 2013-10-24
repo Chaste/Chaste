@@ -274,6 +274,17 @@ public:
      */
     void SetNodePermutation(std::vector<unsigned>& rPermutationVector);
 
+    /**
+     * @return true if a node permutation has been applied by SetNodePermutation.
+     */
+     virtual bool HasNodePermutation();
+
+    /**
+     * @return the node permutation if a node permutation has been applied to this reader (or an empty permutation)
+     */
+    const std::vector<unsigned>& rGetNodePermutation();
+
+
 private:
 
     /** Open mesh files. */

@@ -1032,6 +1032,22 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::SetNodePermutation(std::vector
         mInversePermutationVector[mPermutationVector[index]]=index;
     }
 }
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::HasNodePermutation()
+{
+    return(mNodePermutationDefined);
+}
+
+
+
+/**
+* @return the node permutation if a node permutation has been applied to this reader (or an empty permutation)
+*/
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::vector<unsigned>& TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::rGetNodePermutation()
+{
+    return mPermutationVector;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

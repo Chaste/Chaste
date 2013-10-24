@@ -930,7 +930,15 @@ public:
         TS_ASSERT_THROWS_THIS(mesh_reader_3d_ascii.SetNodePermutation(permutation),
                               "Permuted read can only be used with binary files since it requires random access to the node file.");
 
+        TS_ASSERT_EQUALS(mesh_reader_3d_permuted.HasNodePermutation(), false);
+        TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation().size(), 0u);
+
         mesh_reader_3d_permuted.SetNodePermutation(permutation);
+
+        TS_ASSERT_EQUALS(mesh_reader_3d_permuted.HasNodePermutation(), true);
+        TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation().size(), 9u);
+        TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation()[8], 0u);
+        TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation()[0], 8u);
 
         for (unsigned node_index=0; node_index < num_nodes; node_index++)
         {

@@ -839,6 +839,7 @@ template<>
 void VertexMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    assert(MeshReader.HasNodePermutation() == false);
     // Store numbers of nodes and elements
     unsigned num_nodes = rMeshReader.GetNumNodes();
     unsigned num_elements = rMeshReader.GetNumElements();
@@ -896,6 +897,8 @@ template<>
 void VertexMesh<3,3>::ConstructFromMeshReader(AbstractMeshReader<3,3>& rMeshReader)
 /// \endcond Get Doxygen to ignore, since it's confused by these templates
 {
+    assert(MeshReader.HasNodePermutation() == false);
+
     // Store numbers of nodes and elements
     unsigned num_nodes = rMeshReader.GetNumNodes();
     unsigned num_elements = rMeshReader.GetNumElements();
