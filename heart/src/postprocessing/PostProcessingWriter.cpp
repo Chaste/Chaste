@@ -368,9 +368,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
         output_data.push_back(output_item);
     }
 
-    WriteGenericFile(output_data,
-                     "AboveThresholdDepolarisations" + ConvertToHdf5FriendlyString(threshold) +
-                     ".dat");
+    // we just use meshalyzer format so that something is generated in simple column format for use with gnuplot etc.
+    WriteGenericFileToMeshalyzer(output_data, "", "AboveThresholdDepolarisations" + ConvertToHdf5FriendlyString(threshold) +
+                                 ".dat");
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -440,26 +440,8 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
         }
         std::stringstream filename_stream;
         filename_stream << "NodalTraces_" << variable_names[name_index] << ".dat";
-        WriteGenericFile(output_data, filename_stream.str());
-    }
-}
-
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFile(std::vector<std::vector<double> >& rDataPayload, const std::string& rFileName)
-{
-    ///\todo #1660 this whole method to be removed.
-    // At present there are no cmgui-format postprocessing maps,
-    // we just use meshalyzer format so that something is generated.
-
-    if ( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() )
-    {
-        WriteGenericFileToMeshalyzer(rDataPayload, "output", rFileName);
-    }
-
-    if ( HeartConfig::Instance()->GetVisualizeWithCmgui() )
-    {
-        WriteGenericFileToMeshalyzer(rDataPayload, "cmgui_output", rFileName);
+        // we just use meshalyzer format so that something is generated in simple column format for use with gnuplot etc.
+        WriteGenericFileToMeshalyzer(output_data, "", filename_stream.str());
     }
 }
 

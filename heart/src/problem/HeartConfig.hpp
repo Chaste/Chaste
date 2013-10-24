@@ -1031,7 +1031,7 @@ public:
     void SetConductionVelocityMaps(std::vector<unsigned>& rConductionVelocityMaps);
 
     /**
-     * Sets the requested nodes for extrapolation of the time trace.
+     * Sets some requested nodes for printing of their variables over time in separate files.
      * The node numbering is referred to the original numbering (unpermuted).
      *
      * @param requestedNodes the node indices (in the unpermuted mesh) where we want the plot over time

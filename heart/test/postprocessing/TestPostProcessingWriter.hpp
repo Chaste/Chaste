@@ -274,12 +274,12 @@ public:
         NumericFileComparison comp9(file1, file2);
         TS_ASSERT(comp9.CompareFiles(1e-12));
 
-        file1 = FileFinder("output/AboveThresholdDepolarisations_minus_40.dat", test_dir).GetAbsolutePath();
+        file1 = FileFinder("AboveThresholdDepolarisations_minus_40.dat", test_dir).GetAbsolutePath();
         file2 = "heart/test/data/PostProcessorWriter/AboveThresholdDepolarisations-40.dat";
         NumericFileComparison comp10(file1, file2);
         TS_ASSERT(comp10.CompareFiles(1e-12));
 
-        file1 = FileFinder("output/NodalTraces_V.dat", test_dir).GetAbsolutePath();
+        file1 = FileFinder("NodalTraces_V.dat", test_dir).GetAbsolutePath();
         file2 = "heart/test/data/PostProcessorWriter/NodalTrace_V_Valid.dat";
         NumericFileComparison comp_nodes(file1, file2);
         TS_ASSERT(comp_nodes.CompareFiles(1e-12));
@@ -320,14 +320,14 @@ public:
         // in order to consider the file "valid".
 
         //check the file with V (assuming default variable name was V)
-        std::string file1 = FileFinder("output/NodalTraces_V.dat", output_dir).GetAbsolutePath();
+        std::string file1 = FileFinder("NodalTraces_V.dat", output_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/NodalTrace_V_WithPermutationValid.dat";
 
         NumericFileComparison comp_V(file1, file2);
         TS_ASSERT(comp_V.CompareFiles(1e-3));
 
         //check file with Phi_e (assuming default variable name was Phi_e)
-        file1 = FileFinder("output/NodalTraces_Phi_e.dat", output_dir).GetAbsolutePath();
+        file1 = FileFinder("NodalTraces_Phi_e.dat", output_dir).GetAbsolutePath();
         file2 = "heart/test/data/PostProcessorWriter/NodalTrace_Phi_e_WithPermutationValid.dat";
 
         NumericFileComparison comp_phie(file1, file2);
@@ -348,7 +348,7 @@ public:
         PostProcessingWriter<1,1> writer(mesh, output_dir, "Ead");
         writer.WriteAboveThresholdDepolarisationFile(-30.0);
 
-        std::string file1 = FileFinder("output/AboveThresholdDepolarisations_minus_30.dat", output_dir).GetAbsolutePath();
+        std::string file1 = FileFinder("AboveThresholdDepolarisations_minus_30.dat", output_dir).GetAbsolutePath();
         std::string file2 = "heart/test/data/PostProcessorWriter/AboveThresholdDepolarisations-30.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
@@ -398,15 +398,10 @@ public:
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
 
-        file1 = FileFinder("output/AboveThresholdDepolarisations_minus_30.dat", test_dir).GetAbsolutePath();
+        file1 = FileFinder("AboveThresholdDepolarisations_minus_30.dat", test_dir).GetAbsolutePath();
         file2 = "heart/test/data/PostProcessorWriter/good_ead_postprocessing.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
-
-        file1 = FileFinder("cmgui_output/AboveThresholdDepolarisations_minus_30.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/good_ead_postprocessing.dat";
-        NumericFileComparison comp3(file1, file2);
-        TS_ASSERT(comp3.CompareFiles(1e-12));
 
         for (unsigned i=0; i<451u; i++)
         {
