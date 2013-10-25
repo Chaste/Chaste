@@ -3,6 +3,7 @@ The following new files/directories were created:
 ----ChasteResults
 --------.chaste_deletable_folder
 --------3dResults.h5
+--------NodalTraces_V.dat
 --------machine_info_0.txt
 --------progress_status.txt
 --------provenance_info_0.txt
@@ -57,7 +58,6 @@ The following new files/directories were created:
 ------------ConductionVelocityFromNode10_times.info
 ------------ConductionVelocityFromNode20_times.info
 ------------LoadSolutions.com
-------------NodalTraces_V.dat
 --------output
 ------------.chaste_deletable_folder
 ------------3dResults_V.dat
@@ -74,7 +74,6 @@ The following new files/directories were created:
 ------------ConductionVelocityFromNode20_times.info
 ------------MaxUpstrokeVelocityMap_minus_30.dat
 ------------MaxUpstrokeVelocityMap_minus_30_times.info
-------------NodalTraces_V.dat
 ------------UpstrokeTimeMap_minus_30.dat
 ------------UpstrokeTimeMap_minus_30_times.info
 --------vtk_output

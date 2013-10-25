@@ -85,7 +85,7 @@ ConductionVelocityFromNode10_dat:ChasteResults/output/ConductionVelocityFromNode
 ConductionVelocityFromNode20_dat:ChasteResults/output/ConductionVelocityFromNode20.dat
 MaxUpstrokeVelocityMap_minus_30_dat:ChasteResults/output/MaxUpstrokeVelocityMap_minus_30.dat
 UpstrokeTimeMap_minus_30_dat:ChasteResults/output/UpstrokeTimeMap_minus_30.dat
-NodalTraces_V_dat:ChasteResults/output/NodalTraces_V.dat
+NodalTraces_V_dat:ChasteResults/NodalTraces_V.dat
 
 #[collate_file] Extra file to test against in save_monodomain and save_bidomain
 AbstractCardiacProblem_mSolution_h5:ChasteResults_checkpoints/10ms/ChasteResults_10ms/AbstractCardiacProblem_mSolution.h5
