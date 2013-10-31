@@ -71,8 +71,6 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
 {
     //Check that post-processing is really needed
     assert(HeartConfig::Instance()->IsPostProcessingRequested());
-    //Check that it's safe to send the results to the (hard-coded) subfolder for Meshalyzer/CMGui
-    assert(HeartConfig::Instance()->GetVisualizeWithMeshalyzer() || HeartConfig::Instance()->GetVisualizeWithCmgui());
 
     // Please note that only the master processor should write to file.
     // Each of the private methods called here takes care of checking.
