@@ -68,6 +68,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
 {
+    assert(rMeshReader.HasNodePermutation() == false);
     this->mMeshFileBaseName = rMeshReader.GetMeshFileBaseName();
 
     // Record number of corner nodes

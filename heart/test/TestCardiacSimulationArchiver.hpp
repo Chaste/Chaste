@@ -1338,9 +1338,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
     void TestPermutedBidomain1D() throw(Exception)
     {
         std::string archive_dir("ArchiveBidomainPermuted");
-        OutputFileHandler handler("PermutedBidomain1d",true);
-        //In order to apply a permutation, we need to have a binary mesh
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1mm_10_elements_binary");
+
         std::vector<unsigned> permutation(11);
         permutation[0]=0;
         permutation[1]=10; // 1->10
@@ -1353,38 +1351,62 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
         permutation[8]=8;
         permutation[9]=9;
         permutation[10]=5; // 10->5
-        mesh_reader.SetNodePermutation(permutation);
+        {
+            // Run permuted simulation and archive it
+            OutputFileHandler handler("PermutedBidomain1d",true);
+            //In order to apply a permutation, we need to have a binary mesh
+            TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1mm_10_elements_binary");
+            mesh_reader.SetNodePermutation(permutation);
 
-        DistributedTetrahedralMesh<1,1> permuted_mesh;
-        permuted_mesh.ConstructFromMeshReader(mesh_reader);
-        ///\todo #2452 This should be recorded by the previous method
-        //permuted_mesh.mNodePermutation = permutation;
+            DistributedTetrahedralMesh<1,1> permuted_mesh;
+            permuted_mesh.ConstructFromMeshReader(mesh_reader);
 
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
-        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
-        HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
-        HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
-        HeartConfig::Instance()->SetOutputDirectory("PermutedBidomain1d");
-        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
+            std::vector<unsigned> stored_perm = permuted_mesh.rGetNodePermutation();
+            TS_ASSERT_EQUALS(stored_perm.size(), 11u);
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
-        BidomainProblem<1> bidomain_problem( &cell_factory );
-        bidomain_problem.SetMesh(&permuted_mesh);
-        bidomain_problem.Initialise();
-        bidomain_problem.Solve();
+            HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
+            HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(0.0005));
+            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
+            HeartConfig::Instance()->SetCapacitance(1.0);
+            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
+            HeartConfig::Instance()->SetSimulationDuration(2.0); //ms
+            HeartConfig::Instance()->SetOutputDirectory("PermutedBidomain1d");
+            HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
 
-        // Check some voltages
-        ReplicatableVector solution_replicated(bidomain_problem.GetSolution());
-        double atol=5e-3;
-        TS_ASSERT_DELTA(solution_replicated[2], 25.3148 , atol); // V at 1 (is the original 5)
-        TS_ASSERT_DELTA(solution_replicated[10],-83.3582, atol); // V at 5 (is the original 10)
-        TS_ASSERT_DELTA(solution_replicated[20], 22.8117, atol); // V at 10 (is the original 1)
+            PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+            BidomainProblem<1> bidomain_problem( &cell_factory );
+            bidomain_problem.SetMesh(&permuted_mesh);
+            bidomain_problem.Initialise();
+            bidomain_problem.Solve();
 
-        CardiacSimulationArchiver<BidomainProblem<1> >::Save(bidomain_problem, archive_dir, false);
+            // Check some voltages
+            ReplicatableVector solution_replicated(bidomain_problem.GetSolution());
+            double atol=5e-3;
+            TS_ASSERT_DELTA(solution_replicated[2], 25.3148 , atol); // V at 1 (is the original 5)
+            TS_ASSERT_DELTA(solution_replicated[10],-83.3582, atol); // V at 5 (is the original 10)
+            TS_ASSERT_DELTA(solution_replicated[20], 22.8117, atol); // V at 10 (is the original 1)
 
-        ///\todo #2452 Check that the archiver has recorded a permutation...
+            CardiacSimulationArchiver<BidomainProblem<1> >::Save(bidomain_problem, archive_dir, false);
+        }
+        {
+            // Unarchive and check that the archiver has recorded a permutation
+            BidomainProblem<1> *p_bidomain_problem;
+            p_bidomain_problem = CardiacSimulationArchiver<BidomainProblem<1> >::Load(archive_dir);
+
+            // This part will pass (regardless of whether the permutation has been saved)
+            ReplicatableVector solution_replicated(p_bidomain_problem->GetSolution());
+            double atol=5e-3;
+            TS_ASSERT_DELTA(solution_replicated[2], 25.3148 , atol); // V at 1 (is the original 5)
+            TS_ASSERT_DELTA(solution_replicated[10],-83.3582, atol); // V at 5 (is the original 10)
+            TS_ASSERT_DELTA(solution_replicated[20], 22.8117, atol); // V at 10 (is the original 1)
+
+            std::vector<unsigned> archived_permutation = p_bidomain_problem->rGetMesh().rGetNodePermutation();
+            TS_ASSERT_EQUALS(archived_permutation.size(), 11u);
+            for (unsigned i=0; i<archived_permutation.size(); i++)  //We use "size" rather than 11 in case the previous test failed
+            {
+                TS_ASSERT_EQUALS(archived_permutation[i], permutation[i]);
+            }
+        }
     }
 };
 

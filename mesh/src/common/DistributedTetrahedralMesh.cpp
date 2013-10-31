@@ -417,6 +417,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     if (mMetisPartitioning != DistributedTetrahedralMeshPartitionType::DUMB && PetscTools::IsParallel())
     {
         assert(this->mNodePermutation.size() != 0);
+        // If we are partitioning (and permuting) a mesh, we need to be certain that we aren't doing it twice
         assert(rMeshReader.HasNodePermutation() == false);
 
         // We reorder so that each process owns a contiguous set of the indices and we can then build a distributed vector factory.

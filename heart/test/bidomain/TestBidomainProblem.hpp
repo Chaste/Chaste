@@ -1021,12 +1021,9 @@ public:
     }
 
     /*
-     * Simple bidomain simulation to test against in the archiving tests below
+     * Simple bidomain simulation with a straight permutation applied.
      *
-     * NOTE: This test uses NON-PHYSIOLOGICAL parameters values (conductivities,
-     * surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
-     * the equations have been divided through by the surface-area-to-volume ratio.
-     * (Historical reasons...)
+     * NOTE: This test uses NON-PHYSIOLOGICAL parameters values.
      */
     void TestPermutedBidomain1D() throw(Exception)
     {

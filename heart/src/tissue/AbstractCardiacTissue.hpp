@@ -605,27 +605,28 @@ public:
         // Track fake cells (which might have multiple pointers to the same object) to make sure we only delete non-local ones
         std::set<FakeBathCell*> fake_cells_non_local, fake_cells_local;
 
-//        const std::vector<unsigned>& r_permutation = this->mpMesh->rGetNodePermutation();
+        /*
+         * Historical note:
+         *
+         * We always do a dumb partition when we unarchive.
+         *
+         * When unarchive was first implemented in parallel (migration #1199) it was thought that we might want to repartition the mesh. This would be feasible and would give
+         * better partitions when we move to different numbers of processes.  However it would require us to apply a new permutation to entire data structure.
+         *
+         * In the case where the original mesh was permuted and *copied* into the archive, we need to apply the stored permutation to the mesh but not to the archive (cells).  That
+         * is, any permutation stored with the mesh can be safely ignored.  (If we also had to repartition/permute the archive, then we would be applying a double permutation to the
+         * mesh and a single permutation to archive.)
+         *
+         */
         for (unsigned local_index=0; local_index<num_cells; local_index++)
         {
-            // If we're permuting, figure out where this cell goes
-            unsigned original_global_index = index_low + local_index;
-            unsigned new_global_index;
-            //if (r_permutation.empty())
-            {
-                new_global_index = original_global_index;
-            }
-            //else
-            {
-                ///\todo #2452 Note that the permutation here is NOT to be applied!
-                ///\todo #1199 test this
-            }
-            unsigned new_local_index = new_global_index - p_mesh_factory->GetLow();
-            bool local = p_mesh_factory->IsGlobalIndexLocal(new_global_index);
-  
+            // Figure out where this cell goes
+            unsigned global_index = index_low + local_index;
+            bool local = p_mesh_factory->IsGlobalIndexLocal(global_index);
+
             // Check if this will be a halo cell
             std::map<unsigned, unsigned>::const_iterator halo_position;
-            bool halo = ((halo_position=mHaloGlobalToLocalIndexMap.find(new_global_index)) != mHaloGlobalToLocalIndexMap.end());
+            bool halo = ((halo_position=mHaloGlobalToLocalIndexMap.find(global_index)) != mHaloGlobalToLocalIndexMap.end());
             // halo_position->second is local halo index
 
             bool is_dynamic;
@@ -679,14 +680,15 @@ public:
                 }
             }
             // Add real cells to the local or halo vectors
+            unsigned local_index = global_index - p_mesh_factory->GetLow();
             if (local)
             {
-                assert(mCellsDistributed[new_local_index] == NULL);
-                mCellsDistributed[new_local_index] = p_cell;
+                assert(mCellsDistributed[local_index] == NULL);
+                mCellsDistributed[local_index] = p_cell;
                 if (mHasPurkinje)
                 {
-                    assert(mPurkinjeCellsDistributed[new_local_index] == NULL);
-                    mPurkinjeCellsDistributed[new_local_index] = p_purkinje_cell;
+                    assert(mPurkinjeCellsDistributed[local_index] == NULL);
+                    mPurkinjeCellsDistributed[local_index] = p_purkinje_cell;
                 }
             }
             else if (halo)
