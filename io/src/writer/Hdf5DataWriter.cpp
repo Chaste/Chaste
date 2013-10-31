@@ -75,9 +75,12 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mDoublePermutation(NULL),
       mSingleIncompleteOutputMatrix(NULL),
       mDoubleIncompleteOutputMatrix(NULL),
-      mUseOptimalChunkSizeAlgorithm(true),
-      mFixedChunkSize(0)
+      mUseOptimalChunkSizeAlgorithm(true)
 {
+    mFixedChunkSize[0] = 0;
+    mFixedChunkSize[1] = 0;
+    mFixedChunkSize[2] = 0;
+
     if (mUseExistingFile && mCleanDirectory)
     {
         EXCEPTION("You are asking to delete a file and then extend it, change arguments to constructor.");
@@ -529,60 +532,53 @@ void Hdf5DataWriter::EndDefineMode()
         dataset_max_dims[2] = mDatasetDims[2];
         max_dims = dataset_max_dims;
 
-        hsize_t ntimesteps_in_chunk;
+        // Chunk dimensions
+        hsize_t timesteps_per_chunk;
+        hsize_t nodes_per_chunk;
+        hsize_t vars_per_chunk;
+
         if (mUseOptimalChunkSizeAlgorithm)
         {
-            /*
-             * Modify dataset creation properties to enable chunking. We don't want
-             * more than 100 chunks, as performance degrades significantly if there
-             * are too many, where "too many" appears to be about 1000. HDF5's caching
-             * won't apply if the chunks are too large, but this seems to have less of
-             * an impact.
-             */
-            ntimesteps_in_chunk = mEstimatedUnlimitedLength/100;
-            // Make sure that the chunks aren't too small
-            if (ntimesteps_in_chunk * mDatasetDims[1] * mDatasetDims[2] * sizeof(double) < 4096) //4KiB (a quarter of an inode?)
+            double avg_nodes_per_proc = mDatasetDims[1]/PetscTools::GetNumProcs();
+
+            // This is the number of variables to print at each node.
+            // We can't imagine a case where this is not the smallest of the three.
+            vars_per_chunk = mDatasetDims[2];
+
+            unsigned data_t_divisor = 1;
+            /* Each process sees 25 chunks in "node" direction (ASSUMPTION: user has
+             * picked a number of processors which results in 100s-1000s of nodes per
+             * process) */
+            nodes_per_chunk = ceil(avg_nodes_per_proc/32.0);
+
+            unsigned counter = 0;
+            unsigned chunk_size_bytes = UINT_MAX;
+            while (chunk_size_bytes > 1024*1024)
             {
-                ntimesteps_in_chunk = 4096 /( mDatasetDims[1] * mDatasetDims[2] * sizeof(double) );
-            }
-            if (ntimesteps_in_chunk == 0)
-            {
-                ntimesteps_in_chunk = 1;
+                // Get as close to a whole fraction of time (round up if needed for efficiency)
+                timesteps_per_chunk = ceil(mEstimatedUnlimitedLength/data_t_divisor);
+
+                // Calculate chunk size
+                chunk_size_bytes = timesteps_per_chunk*nodes_per_chunk*vars_per_chunk*sizeof(double);
+
+                // Divide more
+                data_t_divisor++;
+                counter++;
+                // Sanity
+                if (counter==100)
+                {
+                    break;
+                }
             }
         }
         else
         {
-            ntimesteps_in_chunk = mFixedChunkSize;
-        }
-        /*
-         * If the size of a chunk in bytes is bigger than 4GB then there may be problems.
-         * HDF5 1.6.x does not check for this - but there may be snags further down the line.
-         * HDF5 1.8.x does more error checking and produces std::cout errors and a file with
-         * no data in it.
-         */
-        if (ntimesteps_in_chunk * mDatasetDims[1] * mDatasetDims[2] * sizeof(double) > (uint64_t)0xffffffff)
-        {
-            hsize_t new_ntimesteps_in_chunk = (uint64_t)0xffffffff / ( mDatasetDims[1] * mDatasetDims[2] * sizeof(double) );
-            if (!mUseOptimalChunkSizeAlgorithm)
-            {
-                WARNING("HDF5 can't write chunks bigger than 4GB, so chunksize altered from "<<ntimesteps_in_chunk<<" to "<<new_ntimesteps_in_chunk);
-            }
-#define COVERAGE_IGNORE
-            // The following code is uncovered because in order to test it we would be required
-            // to have a 4GB vector (or similar) to represent data on nodes.  This is likely to hit
-            // swap on some of our build machines.
-            if (new_ntimesteps_in_chunk == 0)
-            {
-                mIsInDefineMode = true; // To stop things that would be created below from being deleted on Close()
-                H5Fclose(mFileId); // This is the one thing which we have made
-                ///\todo Change the other dimensions in the chunk_dims
-                EXCEPTION("HDF5 may be writing more than 4GB to disk at any time and would fail. It may be possible to tune the Chaste code to get around this");
-            }
-#undef COVERAGE_IGNORE
-            ntimesteps_in_chunk = new_ntimesteps_in_chunk;
+            timesteps_per_chunk = mFixedChunkSize[0];
+            nodes_per_chunk = mFixedChunkSize[1];
+            vars_per_chunk = mFixedChunkSize[2];
         }
 
-        hsize_t chunk_dims[DATASET_DIMS] = {ntimesteps_in_chunk, mDatasetDims[1], mDatasetDims[2]};
+        hsize_t chunk_dims[DATASET_DIMS] = {timesteps_per_chunk, nodes_per_chunk, vars_per_chunk};
         cparms = H5Pcreate (H5P_DATASET_CREATE);
 
         H5Pset_chunk( cparms, DATASET_DIMS, chunk_dims);
@@ -590,8 +586,9 @@ void Hdf5DataWriter::EndDefineMode()
 
     hid_t filespace = H5Screate_simple(DATASET_DIMS, mDatasetDims, max_dims);
 
-    // Create the dataset and close filespace
+    // Create the dataset, chunk cache size, and close filespace
     mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace, cparms);
+    SetMainDatasetRawChunkCache();
     H5Sclose(filespace);
 
     // Create dataspace for the name, unit attribute
@@ -1189,11 +1186,15 @@ bool Hdf5DataWriter::ApplyPermutation(const std::vector<unsigned>& rPermutation)
     return true;
 }
 
-void Hdf5DataWriter::SetFixedChunkSize(unsigned chunkSize)
+void Hdf5DataWriter::SetFixedChunkSize(const unsigned& rTimestepsPerChunk,
+                                       const unsigned& rNodesPerChunk,
+                                       const unsigned& rVariablesPerChunk)
 {
     assert(mIsInDefineMode);
 
     mUseOptimalChunkSizeAlgorithm = false;
-    mFixedChunkSize = chunkSize;
+    mFixedChunkSize[0] = rTimestepsPerChunk;
+    mFixedChunkSize[1] = rNodesPerChunk;
+    mFixedChunkSize[2] = rVariablesPerChunk;
 }
 

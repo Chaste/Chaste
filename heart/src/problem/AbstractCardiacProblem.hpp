@@ -171,11 +171,7 @@ private:
             /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods for Mono and BidomainProblem
             Hdf5DataWriter writer(*mpMesh->GetDistributedVectorFactory(), ArchiveLocationInfo::GetArchiveRelativePath(), "AbstractCardiacProblem_mSolution", false);
             writer.DefineFixedDimension(mpMesh->GetDistributedVectorFactory()->GetProblemSize());
-
             writer.DefineUnlimitedDimension("Time", "msec", 1);
-
-            // Make sure the file does not take more disc space than really needed (related to #1200)
-            writer.SetFixedChunkSize(1);
 
             int vm_col = writer.DefineVariable("Vm","mV");
 

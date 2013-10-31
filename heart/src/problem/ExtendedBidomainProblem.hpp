@@ -140,9 +140,6 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             writer.DefineFixedDimension(this->mpMesh->GetDistributedVectorFactory()->GetProblemSize());
             writer.DefineUnlimitedDimension("Time", "msec", 1);
 
-            // Make sure the file does not take more disc space than really needed (#1200)
-            writer.SetFixedChunkSize(1);
-
             ///\todo #1369
             assert(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() == false );
 

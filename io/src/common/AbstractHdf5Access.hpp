@@ -89,6 +89,18 @@ protected:
      */
     void SetUnlimitedDatasetId();
 
+    /**
+     * Sets the raw dataset chunk cache for our main dataset (#mVariablesDatasetId).
+     * The default in HDF5 is 1 MB, which is too small for many problems, plus our
+     * algorithm (see Hdf5DataWriter::EndDefineMode()) aims to make the chunks
+     * up to 1 MB. For maximum performance the reader or writer should be able to
+     * cache as many chunks as possible, so this is currently set to 128 MB (enough
+     * for at least 128 chunks).
+     *
+     * If system memory is at a premium you may wish to reduce the size of this cache.
+     */
+    void SetMainDatasetRawChunkCache();
+
 
 public:
     /**

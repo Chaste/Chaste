@@ -499,8 +499,8 @@ public:
         int ina_id = writer.DefineVariable("I_Na", "milliamperes");
         writer.DefineUnlimitedDimension("Time", "msec", 10);
 
-        // Suggested unlimited dimension size above (10) is smaller than the minimum chunk size, you can save some memory here...
-        writer.SetFixedChunkSize(10);
+        // Set the chunk sizes (mostly for coverage)
+        writer.SetFixedChunkSize(10,10,3);
 
         writer.EndDefineMode();
 
@@ -1155,10 +1155,6 @@ public:
             writer.DefineFixedDimension(number_nodes);
             writer.DefineVariable("Phase", "dimensionless");
             writer.DefineUnlimitedDimension("Time", "msec", 10);
-
-            // Suggested unlimited dimension size above (10) is smaller than the minimum chunk size, you can save some memory here...
-            writer.SetFixedChunkSize(10);
-
             writer.EndDefineMode();
         }
 
@@ -1616,37 +1612,6 @@ public:
         PetscTools::Destroy(petsc_data_long);
     }
 
-    void TestHdf5BigFiles() throw(Exception)
-    {
-        /*
-         * With a chunksize of 64 the actual chunk size in bytes
-         * for 2^23 nodes will be 2^23*8*64 = 4GB
-         * which would result in an error in HDF5 1.8.x, and bad files in previous
-         * versions - Hdf5DataWriter checks for this and reduces the chunksize to 63.
-         *
-         * Note that if the number of nodes was greater than 2^29 (500 million) with one variable per node
-         * then a chunksize of 1 would be too big and an exception would be thrown.  We can't test for this
-         * because we would need a DistributedVectorFactory which takes up 4GB and is likely to hit swap.
-         *
-         */
-        unsigned number_nodes = SmallPow(2u, 23u);
-
-        DistributedVectorFactory vec_factory(number_nodes);
-
-        Hdf5DataWriter writer(vec_factory, "TestHdf5DataWriter", "hdf5_file_no_data", false);
-        writer.DefineFixedDimension(number_nodes);
-
-        writer.DefineVariable("index", "nondimensional");
-        writer.SetFixedChunkSize(64);
-        writer.DefineUnlimitedDimension("Time", "msec");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
-        writer.EndDefineMode();
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"HDF5 can\'t write chunks bigger than 4GB, so chunksize altered from 64 to 63");
-
-        Warnings::Instance()->QuietDestroy();
-        writer.Close();
-    }
 };
 
 #endif /*TESTHDF5DATAWRITER_HPP_*/

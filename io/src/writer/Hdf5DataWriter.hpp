@@ -86,7 +86,8 @@ private:
     Mat mDoubleIncompleteOutputMatrix;              /**< Stores striped nodes to be output as a matrix */
 
     bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
-    unsigned mFixedChunkSize;                       /**< User-provided chunk size */
+    hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
+
 
     /**
      * Check name of variable is allowed, i.e. contains only alphanumeric & _, and isn't blank.
@@ -249,13 +250,22 @@ public:
     void DefineFixedDimensionUsingMatrix(const std::vector<unsigned>& rNodesToOuput, long vecSize);
 
     /**
-     * Use a particular chunk size, ignoring the algorithm that figures out the optimal value.
+     * Use a particular chunk size, ignoring the algorithm that figures out a sensible value.
      *
-     * Useful for reducing the size of checkpoints. USE WITH CAUTION - as it can degrade performance.
+     * This method may be useful in very specific circumstances, e.g. if you want chunks to align
+     * perfectly with stripes on a Lustre file system, or if you have a parallel problem where
+     * every process can be assigned the same size and shape hyperslab of the HDF5 file (thus
+     * getting rid of contention between processes when reading/writing).
      *
-     * @param chunkSize  The number of unlimited dimension steps (usually time steps) to include in each chunk.
+     * USE WITH CAUTION - as it can degrade performance.
+     *
+     * @param rTimestepsPerChunk  The number of unlimited dimension steps (usually time steps) per chunk.
+     * @param rNodesPerChunk  The number of objects (usually nodes) per chunk in the second dimension.
+     * @param rVariablesPerChunk  The number of objects (usually output variables) per chunk in the third dimension.
      */
-    void SetFixedChunkSize(unsigned chunkSize);
+    void SetFixedChunkSize(const unsigned& rTimestepsPerChunk,
+                           const unsigned& rNodesPerChunk,
+                           const unsigned& rVariablesPerChunk);
 
 
 };
