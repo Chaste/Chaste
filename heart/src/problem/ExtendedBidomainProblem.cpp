@@ -409,7 +409,8 @@ void ExtendedBidomainProblem<DIM>::WriteOneStep(double time, Vec voltageVec)
     this->mpWriter->PutStripedVector(mVariablesIDs, ordered_voltages);
     PetscTools::Destroy(ordered_voltages);
     //write any extra variable. Note that this method in the parent class will
-    //take the extra variable only from the first cell. ///\todo write a specific method for this class
+    //take the extra variable only from the first cell.
+    ///\todo write a specific method for this class
     AbstractCardiacProblem<DIM,DIM,3>::WriteExtraVariablesOneStep();
 }
 

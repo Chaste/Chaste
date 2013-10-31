@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "SimpleBathProblemSetup.hpp"
 #include "HeartConfig.hpp"
+#include "NumericFileComparison.hpp"
 
 class TestBidomainWithBathProblem : public CxxTest::TestSuite
 {
@@ -476,7 +477,6 @@ public:
         double duration = 1.0; // of the stimulus, in ms
 
         HeartConfig::Instance()->SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);
-
 
         bidomain_problem.SetMesh(&mesh);
         bidomain_problem.Initialise();
@@ -1008,6 +1008,41 @@ public:
         {
             TS_ASSERT_DELTA(sol_small_repl[i], sol_large_repl[i], 1e-4);
         }
+    }
+
+    void TestBidomainWithBathCanOutputVariables() throw(Exception)
+    {
+        HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
+        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
+        HeartConfig::Instance()->SetOutputDirectory("BidomainBathOutputVariables");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
+
+        std::vector<std::string> output_variables;
+        output_variables.push_back("cytosolic_calcium_concentration");
+        HeartConfig::Instance()->SetOutputVariables(output_variables);
+
+        std::set<unsigned> tissue_ids;
+        tissue_ids.insert(0); // Same as default value defined in HeartConfig
+        std::set<unsigned> bath_ids;
+        bath_ids.insert(1);
+        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
+        BidomainWithBathProblem<1> bidomain_problem(&cell_factory);
+
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
+
+        FileFinder calcium_results("BidomainBathOutputVariables/output/BidomainLR91_1d_cytosolic_calcium_concentration.dat",
+                                   RelativeTo::ChasteTestOutput);
+
+        TS_ASSERT_EQUALS(calcium_results.IsFile(), true);
+
+        FileFinder reference_results("heart/test/data/BidomainBathOutputVariables/BidomainLR91_1d_cytosolic_calcium_concentration.dat",
+                                     RelativeTo::ChasteSourceRoot);
+
+        NumericFileComparison comparer(calcium_results, reference_results);
+        TS_ASSERT_EQUALS(comparer.CompareFiles(), true);
     }
 };
 

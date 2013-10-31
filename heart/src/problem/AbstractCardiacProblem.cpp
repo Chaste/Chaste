@@ -711,7 +711,9 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineExtraVaria
             }
             else
             {
-                column_id = this->mpWriter->DefineVariable(var_name, "");
+                // Difficult to specify the units, as different cell models
+                // at different points in the mesh could be using different units.
+                column_id = this->mpWriter->DefineVariable(var_name, "unknown_units");
             }
 
             // Store column id
@@ -744,9 +746,19 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::WriteExtraVariab
              index!= distributed_var_data.End();
              ++index)
         {
-            // Find the variable in the cell model and store its value
-            distributed_var_data[index] = this->mpCardiacTissue->GetCardiacCell(index.Global)->
+            // If the region is in the bath
+            if (HeartRegionCode::IsRegionBath( this->mpMesh->GetNode( index.Global )->GetRegion() ))
+            {
+                // Then we just pad the output with zeros, user currently needs to find a nice
+                // way to deal with this in processing and visualization.
+                distributed_var_data[index] = 0.0;
+            }
+            else
+            {
+                // Find the variable in the cell model and store its value
+                distributed_var_data[index] = this->mpCardiacTissue->GetCardiacCell(index.Global)->
                                                 GetAnyVariable(output_variables[var_index], mCurrentTime);
+            }
         }
         distributed_var_data.Restore();
 
@@ -845,6 +857,7 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::GetHasBath()
 {
     return false;
 }
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::SetElectrodes()
 {
