@@ -542,13 +542,13 @@ void Hdf5DataWriter::EndDefineMode()
             double avg_nodes_per_proc = mDatasetDims[1]/PetscTools::GetNumProcs();
 
             // This is the number of variables to print at each node.
-            // We can't imagine a case where this is not the smallest of the three.
+            // We can't imagine a case where this is not the smallest of the three so set it first.
             vars_per_chunk = mDatasetDims[2];
 
             unsigned data_t_divisor = 1;
-            /* Each process sees 25 chunks in "node" direction (ASSUMPTION: user has
-             * picked a number of processors which results in 100s-1000s of nodes per
-             * process) */
+            /* Each process gets on average 32 chunks in "node" direction, reducing contention
+             * for chunks at processor boundaries. (The assumption here is that the user has
+             * picked a number of processors which results in 100s-1000s of nodes per process) */
             nodes_per_chunk = ceil(avg_nodes_per_proc/32.0);
 
             unsigned counter = 0;
