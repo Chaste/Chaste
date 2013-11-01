@@ -558,15 +558,15 @@ void Hdf5DataWriter::EndDefineMode()
             {
                 if (chunk_dims[0] > reduce_to_size)
                 {
-                    chunk_dims[0] = ceil(mEstimatedUnlimitedLength/divisor);
+                    chunk_dims[0] = ceil(double(mEstimatedUnlimitedLength)/divisor);
                 }
                 if (chunk_dims[1] > reduce_to_size)
                 {
-                    chunk_dims[1] = ceil(mDatasetDims[1]/divisor);
+                    chunk_dims[1] = ceil(double(mDatasetDims[1])/divisor);
                 }
                 if (chunk_dims[2] > reduce_to_size)
                 {
-                    chunk_dims[2] = ceil(mDatasetDims[2]/divisor);
+                    chunk_dims[2] = ceil(double(mDatasetDims[2])/divisor);
                 }
 
                 divisor++;
@@ -583,7 +583,6 @@ void Hdf5DataWriter::EndDefineMode()
         }
 
         cparms = H5Pcreate (H5P_DATASET_CREATE);
-
         H5Pset_chunk( cparms, DATASET_DIMS, chunk_dims);
     }
 
