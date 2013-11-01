@@ -682,13 +682,15 @@ public:
             // Add real cells to the local or halo vectors
             if (local)
             {
-                assert( local_index == global_index - p_mesh_factory->GetLow() );
-                assert(mCellsDistributed[local_index] == NULL);
-                mCellsDistributed[local_index] = p_cell;
+                // Note that the original local_index was relative to the archived partition (distributed vector)
+                // The new_local_index is local relative to the new partition in memory
+                unsigned new_local_index = global_index - p_mesh_factory->GetLow();
+                assert(mCellsDistributed[new_local_index] == NULL);
+                mCellsDistributed[new_local_index] = p_cell;
                 if (mHasPurkinje)
                 {
-                    assert(mPurkinjeCellsDistributed[local_index] == NULL);
-                    mPurkinjeCellsDistributed[local_index] = p_purkinje_cell;
+                    assert(mPurkinjeCellsDistributed[new_local_index] == NULL);
+                    mPurkinjeCellsDistributed[new_local_index] = p_purkinje_cell;
                 }
             }
             else if (halo)
