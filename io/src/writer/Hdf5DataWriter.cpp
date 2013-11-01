@@ -533,52 +533,55 @@ void Hdf5DataWriter::EndDefineMode()
         max_dims = dataset_max_dims;
 
         // Chunk dimensions
-        hsize_t timesteps_per_chunk;
-        hsize_t nodes_per_chunk;
-        hsize_t vars_per_chunk;
+        hsize_t chunk_dims[DATASET_DIMS];
 
+        /*
+         * This simple algorithm determines sensible dimensions for the chunking based only on the size
+         * of the dataset and a target chunk size (set to 1 MB) by repeatedly dividing (and rounding up
+         * to maximise efficiency) the dataset dimensions until the target size is reached, or the size
+         * of the dimension goes below a limit.
+         */
         if (mUseOptimalChunkSizeAlgorithm)
         {
-            double avg_nodes_per_proc = mDatasetDims[1]/PetscTools::GetNumProcs();
-
-            // This is the number of variables to print at each node.
-            // We can't imagine a case where this is not the smallest of the three so set it first.
-            vars_per_chunk = mDatasetDims[2];
-
-            unsigned data_t_divisor = 1;
-            /* Each process gets on average 32 chunks in "node" direction, reducing contention
-             * for chunks at processor boundaries. (The assumption here is that the user has
-             * picked a number of processors which results in 100s-1000s of nodes per process) */
-            nodes_per_chunk = ceil(avg_nodes_per_proc/32.0);
-
-            unsigned counter = 0;
+            unsigned divisor = 1;
+            /* Initialise high */
             unsigned chunk_size_bytes = UINT_MAX;
-            while (chunk_size_bytes > 1024*1024)
+            chunk_dims[0] = UINT_MAX;
+            chunk_dims[1] = UINT_MAX;
+            chunk_dims[2] = UINT_MAX;
+            /* Stop when chunks are < 1 MB */
+            unsigned target_chunk_size = 1024*1024;
+            /* The limit below guarantees convergence of the while loop, so no need for sanity check */
+            double reduce_to_size = pow(double(target_chunk_size)/sizeof(double), 1.0/DATASET_DIMS);
+
+            while (chunk_size_bytes > target_chunk_size)
             {
-                // Get as close to a whole fraction of time (round up if needed for efficiency)
-                timesteps_per_chunk = ceil(mEstimatedUnlimitedLength/data_t_divisor);
-
-                // Calculate chunk size
-                chunk_size_bytes = timesteps_per_chunk*nodes_per_chunk*vars_per_chunk*sizeof(double);
-
-                // Divide more
-                data_t_divisor++;
-                counter++;
-                // Sanity
-                if (counter==100)
+                if (chunk_dims[0] > reduce_to_size)
                 {
-                    break;
+                    chunk_dims[0] = ceil(mEstimatedUnlimitedLength/divisor);
                 }
+                if (chunk_dims[1] > reduce_to_size)
+                {
+                    chunk_dims[1] = ceil(mDatasetDims[1]/divisor);
+                }
+                if (chunk_dims[2] > reduce_to_size)
+                {
+                    chunk_dims[2] = ceil(mDatasetDims[2]/divisor);
+                }
+
+                divisor++;
+
+                /* Update the chunk size in bytes and loop */
+                chunk_size_bytes = chunk_dims[0]*chunk_dims[1]*chunk_dims[2]*sizeof(double);
             }
         }
         else
         {
-            timesteps_per_chunk = mFixedChunkSize[0];
-            nodes_per_chunk = mFixedChunkSize[1];
-            vars_per_chunk = mFixedChunkSize[2];
+            chunk_dims[0] = mFixedChunkSize[0];
+            chunk_dims[1] = mFixedChunkSize[1];
+            chunk_dims[2] = mFixedChunkSize[2];
         }
 
-        hsize_t chunk_dims[DATASET_DIMS] = {timesteps_per_chunk, nodes_per_chunk, vars_per_chunk};
         cparms = H5Pcreate (H5P_DATASET_CREATE);
 
         H5Pset_chunk( cparms, DATASET_DIMS, chunk_dims);
