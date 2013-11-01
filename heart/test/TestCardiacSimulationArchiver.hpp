@@ -1406,6 +1406,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForMigrateAfterSolve/archive/?* ./hear
             {
                 TS_ASSERT_EQUALS(archived_permutation[i], permutation[i]);
             }
+            delete p_bidomain_problem;
         }
     }
 };
