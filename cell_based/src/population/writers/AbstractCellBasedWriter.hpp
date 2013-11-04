@@ -89,12 +89,12 @@ public:
     /**
      * Write the current time stamp to the file.
      */
-    void WriteTimeStamp();
+    virtual void WriteTimeStamp();
 
     /**
      * Add a newline character to the stream.
      */
-    void WriteNewline();
+    virtual void WriteNewline();
 };
 
 #endif /*ABSTRACTCELLBASEDWRITER_HPP_*/
