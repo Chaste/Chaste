@@ -9,3 +9,4 @@ TestProblemDefinitions.hpp
 TestStokesFlowAssembler.hpp
 TestStokesFlowSolver.hpp
 TestVtkNonlinearElasticitySolutionWriter.hpp
+ventilation/TestVentilationProblem.hpp
