@@ -482,6 +482,9 @@ public:
         HeartConfig::Instance()->SetCapacitance(1.0);
         HeartConfig::Instance()->SetSimulationDuration(2); //ms
         HeartConfig::Instance()->SetVisualizeWithVtk();
+        // Switch off meshalyzer to make sure we don't need the "/output" directory.
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(false);
+        HeartConfig::Instance()->SetVisualizeWithCmgui(false);
         HeartConfig::Instance()->SetOutputDirectory("TestPostProcessingWriter_VtkOutput");
 
         std::vector<std::pair<double,double> > apd_maps;
