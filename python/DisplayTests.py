@@ -536,7 +536,8 @@ def _profileHistory(req, n=20, buildTypes=None):
 
     # These are the build types representing profile builds
     if not buildTypes:
-        buildTypes = ['Profile_ndebug', 'GoogleProfile_ndebug']
+        # Note that the name of the GNU Profile build was switch in r19306 because of a bad configuration on the machine (bob@scoop)  
+        buildTypes = ['Profile_ndebug', 'Profile_ndebug_hostconfig,petsc=3-2', 'GoogleProfile_ndebug']
     if not isinstance(buildTypes, list):
         buildTypes = [buildTypes]
     qmarks = ','.join(['?'] * len(buildTypes))
