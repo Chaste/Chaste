@@ -87,7 +87,7 @@ private:
 
     bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
     hsize_t mChunkSize[DATASET_DIMS];               /**< Stores chunk dimensions */
-    unsigned mNumberOfChunks;                       /**< The total number of chunks in the dataset */
+    long unsigned mNumberOfChunks;                       /**< The total number of chunks in the dataset */
     hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
 
 

@@ -1192,7 +1192,7 @@ void Hdf5DataWriter::SetChunkSize()
         // 128 M by default which should be plenty.
         unsigned target_size_bytes = 1024*1024/8;
         unsigned target_size = 0;
-        unsigned divisors[DATASET_DIMS];
+        long unsigned divisors[DATASET_DIMS];
         unsigned chunk_size_bytes = 0;
 
         while ( chunk_size_bytes < target_size_bytes )
