@@ -91,13 +91,15 @@ protected:
 
     /**
      * Sets the raw dataset chunk cache for our main dataset (#mVariablesDatasetId).
-     * The default in HDF5 is 1 MB, which is too small for many problems, plus our
-     * algorithm (see Hdf5DataWriter::EndDefineMode()) aims to make the chunks
-     * up to 1 MB. For maximum performance the reader or writer should be able to
-     * cache as many chunks as possible, so this is currently set to 128 MB (enough
-     * for at least 128 chunks).
+     * The default in HDF5 is 1 MB, which is too small for many problems, so we've
+     * bumped it up to 128 M.
      *
-     * If system memory is at a premium you may wish to reduce the size of this cache.
+     * Note: this cache is not currently used with the parallel (MPIO and MPIPOSIX)
+     * drivers in read/write mode (as we have in #Hdf5DataWriter). However it should
+     * be used by the #Hdf5DataReader (which uses the default driver).
+     *
+     * If system memory is at a premium you may find you need to reduce the size of
+     * this cache by reducing max_bytes_in_cache.
      */
     void SetMainDatasetRawChunkCache();
 

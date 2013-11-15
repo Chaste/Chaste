@@ -75,8 +75,12 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
       mDoublePermutation(NULL),
       mSingleIncompleteOutputMatrix(NULL),
       mDoubleIncompleteOutputMatrix(NULL),
-      mUseOptimalChunkSizeAlgorithm(true)
+      mUseOptimalChunkSizeAlgorithm(true),
+      mNumberOfChunks(0u)
 {
+    mChunkSize[0] = 0;
+    mChunkSize[1] = 0;
+    mChunkSize[2] = 0;
     mFixedChunkSize[0] = 0;
     mFixedChunkSize[1] = 0;
     mFixedChunkSize[2] = 0;
@@ -118,7 +122,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             hid_t variables_dataspace = H5Dget_space(mVariablesDatasetId);
             //unsigned variables_dataset_rank = H5Sget_simple_extent_ndims(variables_dataspace);
             hsize_t dataset_max_sizes[DATASET_DIMS];
-            H5Sget_simple_extent_dims(variables_dataspace, mDatasetDims, dataset_max_sizes);
+            H5Sget_simple_extent_dims(variables_dataspace, mDatasetDims, dataset_max_sizes); // put dims into mDatasetDims
             H5Sclose(variables_dataspace);
 
             // Check that an unlimited dimension is defined
@@ -286,22 +290,37 @@ void Hdf5DataWriter::OpenFile()
     }
 
     // Set up a property list saying how we'll open the file
-    hid_t property_list_id = H5Pcreate(H5P_FILE_ACCESS);
-    H5Pset_fapl_mpiposix(property_list_id, PETSC_COMM_WORLD, 0);
+    hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
+    H5Pset_fapl_mpiposix(fapl, PETSC_COMM_WORLD, 0);
+
+    // Set size of each dimension in main dataset.
+    mDatasetDims[0] = mEstimatedUnlimitedLength; // While developing we got a non-documented "only the first dimension can be extendible" error.
+    mDatasetDims[1] = mFileFixedDimensionSize; // or should this be mDataFixedDimensionSize?
+    mDatasetDims[2] = mVariables.size();
 
     // Open the file and free the property list
     std::string attempting_to;
     if (mUseExistingFile)
     {
-        mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, property_list_id);
+        mFileId = H5Fopen(file_name.c_str(), H5F_ACC_RDWR, fapl);
         attempting_to = "open";
     }
     else
     {
-        mFileId = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, property_list_id);
+        // Do chunk size calculation now as it lets us optimise the size of the B tree (via H5Pset_istore_k), see:
+        // http://hdf-forum.184993.n3.nabble.com/size-of-quot-write-operation-quot-with-pHDF5-td2636129.html#a2647633
+        SetChunkSize();
+        hid_t fcpl = H5Pcreate(H5P_FILE_CREATE);
+        if (mNumberOfChunks>64) // Default parameter is 32, so don't go lower than that
+        {
+            H5Pset_istore_k(fcpl, (mNumberOfChunks+1)/2);
+        }
+        mFileId = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, fcpl, fapl);
         attempting_to = "create";
+        H5Pclose(fcpl);
     }
-    H5Pclose(property_list_id);
+
+    H5Pclose(fapl);
 
     if (mFileId < 0)
     {
@@ -515,83 +534,33 @@ void Hdf5DataWriter::EndDefineMode()
      * Create "Data" dataset
      */
 
-    // Create the dataspace for the dataset.
-    mDatasetDims[0] = 1; // While developing we got a non-documented "only the first dimension can be extendible" error.
-    mDatasetDims[1] = mFileFixedDimensionSize;
-    mDatasetDims[2] = mVariables.size();
-
-    hsize_t* max_dims = NULL;
-    hsize_t dataset_max_dims[DATASET_DIMS]; // dataset max dimensions
-
-    hid_t cparms = H5P_DEFAULT;
-
+    // Set max dims of dataset
+    hsize_t dataset_max_dims[DATASET_DIMS];
     if (mIsUnlimitedDimensionSet)
     {
         dataset_max_dims[0] = H5S_UNLIMITED;
-        dataset_max_dims[1] = mDatasetDims[1];
-        dataset_max_dims[2] = mDatasetDims[2];
-        max_dims = dataset_max_dims;
+    }
+    else
+    {
+        dataset_max_dims[0] = 1;
+    }
+    dataset_max_dims[1] = mDatasetDims[1];
+    dataset_max_dims[2] = mDatasetDims[2];
 
-        // Chunk dimensions
-        hsize_t chunk_dims[DATASET_DIMS];
-
-        /*
-         * This simple algorithm determines sensible dimensions for the chunking based only on the size
-         * of the dataset and a target chunk size (set to 1 MB) by repeatedly dividing (and rounding up
-         * to maximise efficiency) the dataset dimensions until the target size is reached, or the size
-         * of the dimension goes below a limit.
-         */
-        if (mUseOptimalChunkSizeAlgorithm)
-        {
-            unsigned divisor = 1;
-            /* Initialise high */
-            unsigned chunk_size_bytes = UINT_MAX;
-            chunk_dims[0] = UINT_MAX;
-            chunk_dims[1] = UINT_MAX;
-            chunk_dims[2] = UINT_MAX;
-            /* Stop when chunks are < 1 MB */
-            unsigned target_chunk_size = 1024*1024;
-            /* The limit below guarantees convergence of the while loop, so no need for sanity check */
-            double reduce_to_size = pow(double(target_chunk_size)/sizeof(double), 1.0/DATASET_DIMS);
-
-            while (chunk_size_bytes > target_chunk_size)
-            {
-                if (chunk_dims[0] > reduce_to_size)
-                {
-                    chunk_dims[0] = ceil(double(mEstimatedUnlimitedLength)/divisor);
-                }
-                if (chunk_dims[1] > reduce_to_size)
-                {
-                    chunk_dims[1] = ceil(double(mDatasetDims[1])/divisor);
-                }
-                if (chunk_dims[2] > reduce_to_size)
-                {
-                    chunk_dims[2] = ceil(double(mDatasetDims[2])/divisor);
-                }
-
-                divisor++;
-
-                /* Update the chunk size in bytes and loop */
-                chunk_size_bytes = chunk_dims[0]*chunk_dims[1]*chunk_dims[2]*sizeof(double);
-            }
-        }
-        else
-        {
-            chunk_dims[0] = mFixedChunkSize[0];
-            chunk_dims[1] = mFixedChunkSize[1];
-            chunk_dims[2] = mFixedChunkSize[2];
-        }
-
-        cparms = H5Pcreate (H5P_DATASET_CREATE);
-        H5Pset_chunk( cparms, DATASET_DIMS, chunk_dims);
+    // If we didn't already do the chunk calculation (e.g. we're adding a dataset to an existing H5 file)
+    if (mNumberOfChunks==0)
+    {
+        SetChunkSize();
     }
 
-    hid_t filespace = H5Screate_simple(DATASET_DIMS, mDatasetDims, max_dims);
-
-    // Create the dataset, chunk cache size, and close filespace
+    // Create chunked dataset and clean up
+    hid_t cparms = H5Pcreate (H5P_DATASET_CREATE);
+    H5Pset_chunk( cparms, DATASET_DIMS, mChunkSize);
+    hid_t filespace = H5Screate_simple(DATASET_DIMS, mDatasetDims, dataset_max_dims);
     mVariablesDatasetId = H5Dcreate(mFileId, mDatasetName.c_str(), H5T_NATIVE_DOUBLE, filespace, cparms);
-    SetMainDatasetRawChunkCache();
+    SetMainDatasetRawChunkCache(); // Set large cache (even though parallel drivers don't currently use it!)
     H5Sclose(filespace);
+    H5Pclose(cparms);
 
     // Create dataspace for the name, unit attribute
     const unsigned MAX_STRING_SIZE = 100;
@@ -654,7 +623,7 @@ void Hdf5DataWriter::EndDefineMode()
      */
     if (mIsUnlimitedDimensionSet)
     {
-        hsize_t time_dataset_dims[1] = {1u};
+        hsize_t time_dataset_dims[1] = {mEstimatedUnlimitedLength};
         hsize_t time_dataset_max_dims[1] = {H5S_UNLIMITED};
 
         /*
@@ -697,6 +666,7 @@ void Hdf5DataWriter::EndDefineMode()
         H5Awrite(name_attr, string_type, name_string);
 
         // Close the filespace
+        H5Pclose(time_cparms);
         H5Sclose(one_column_space);
         H5Aclose(unit_attr);
         H5Aclose(name_attr);
@@ -1074,8 +1044,15 @@ void Hdf5DataWriter::PossiblyExtend()
 {
     if (mNeedExtend)
     {
-        H5Dextend (mVariablesDatasetId, mDatasetDims);
-        H5Dextend (mUnlimitedDatasetId, mDatasetDims);
+#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 // HDF5 1.8+
+        H5Dset_extent( mVariablesDatasetId, mDatasetDims );
+        H5Dget_space( mVariablesDatasetId );
+        H5Dset_extent( mUnlimitedDatasetId, &mDatasetDims[0] );
+        H5Dget_space( mVariablesDatasetId );
+#else // Deprecated
+        H5Dextend( mVariablesDatasetId, mDatasetDims );
+        H5Dextend( mUnlimitedDatasetId, mDatasetDims );
+#endif
     }
     mNeedExtend = false;
 }
@@ -1200,3 +1177,60 @@ void Hdf5DataWriter::SetFixedChunkSize(const unsigned& rTimestepsPerChunk,
     mFixedChunkSize[2] = rVariablesPerChunk;
 }
 
+void Hdf5DataWriter::SetChunkSize()
+{
+    /*
+     * The size in each dimension is increased in step until the size of
+     * the chunk exceeds a limit, or we end up with one big chunk...
+     */
+    if (mUseOptimalChunkSizeAlgorithm)
+    {
+        // The line below shoots for at least 128 K chunks, which seems
+        // to be a good compromise. For large problems, performance usually
+        // improves with increased chunk size, so the user may wish to
+        // increase this to 1 M (or more) chunks. The chunk cache is set to
+        // 128 M by default which should be plenty.
+        unsigned target_size_bytes = 1024*1024/8;
+        unsigned target_size = 0;
+        unsigned divisors[DATASET_DIMS];
+        unsigned chunk_size_bytes = 0;
+
+        while ( chunk_size_bytes < target_size_bytes )
+        {
+            target_size++;
+            chunk_size_bytes = 8u;
+            bool all_ones = true;
+            for (unsigned i=0; i<DATASET_DIMS; ++i)
+            {
+                divisors[i] = ceil(double(mDatasetDims[i])/target_size);
+                mChunkSize[i] = ceil(double(mDatasetDims[i])/divisors[i]);
+                chunk_size_bytes *= mChunkSize[i];
+                all_ones = all_ones && divisors[i]==1u;
+            }
+            // Check if all divisors==1, which means we have one big chunk
+            if (all_ones)
+            {
+                break;
+            }
+        }
+    }
+    /*
+     * ... unless the user has set chunk dimensions explicitly, in which
+     * case use those.
+     */
+    else
+    {
+        for (unsigned i=0; i<DATASET_DIMS; ++i)
+        {
+            mChunkSize[i] = mFixedChunkSize[i];
+        }
+    }
+
+    // Save the number of chunks for file creation command
+    mNumberOfChunks = 1;
+    for (unsigned i=0; i<DATASET_DIMS; ++i)
+    {
+        mNumberOfChunks *= ceil(double(mDatasetDims[i])/mChunkSize[i]);
+    }
+
+}

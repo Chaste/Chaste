@@ -171,22 +171,24 @@ std::string AbstractHdf5Access::GetUnlimitedDimensionUnit()
 
 void AbstractHdf5Access::SetMainDatasetRawChunkCache()
 {
-    // 128 M cache for raw data. 134217728 is the number of bytes in 128 MB.
-    // 6397 is a prime number which is 50 x larger than the number of 1 MB
-    // chunks which could fit into the 128 M cache. 0.75 for the last argument
-    // is the default. See:
-    // http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetChunkCache
-    hsize_t max_objects_in_chunk_cache = 6397u; // A prime
-    hsize_t max_bytes_in_cache = 134217728u; // 1024*1024*128
-#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 && H5_VERS_RELEASE>=3
+    // 128 M cache for raw data. 12799 is a prime number which is 100 x larger
+    // than the number of 1 MB chunks (the largest we have tested with) which
+    // could fit into the 128 M cache. 0.75 for the last argument is the default.
+    // See: http://www.hdfgroup.org/HDF5/doc/RM/RM_H5P.html#Property-SetChunkCache
+
+    hsize_t max_objects_in_chunk_cache = 12799u;
+    hsize_t max_bytes_in_cache = 128u*1024u*1024u;
+#if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 && H5_VERS_RELEASE>=3 // HDF5 1.8.3+
+    // These methods set the cache on a dataset basis
     hid_t dapl_id = H5Dget_access_plist( mVariablesDatasetId );
     H5Pset_chunk_cache( dapl_id,
                         max_objects_in_chunk_cache ,
                         max_bytes_in_cache ,
                         H5D_CHUNK_CACHE_W0_DEFAULT);
 #else
-    hid_t dapl_id = H5Fget_access_plist( mFileId );
-    H5Pset_cache( dapl_id,
+    // These older methods set the cache on a file basis
+    hid_t fapl_id = H5Fget_access_plist( mFileId );
+    H5Pset_cache( fapl_id,
                   0, // unused
                   max_objects_in_chunk_cache,
                   max_bytes_in_cache,
