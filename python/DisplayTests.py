@@ -536,18 +536,24 @@ def _profileHistory(req, n=20, buildTypes=None):
 
     # These are the build types representing profile builds
     if not buildTypes:
-        # Note that the name of the GNU Profile build was switch in r19306 because of a bad configuration on the machine (bob@scoop)  
-        buildTypes = ['Profile_ndebug', 'Profile_ndebug_hostconfig,petsc=3-2', 'GoogleProfile_ndebug']
+        # Wildcard match on anything containing Profile
+        buildTypes = ['*Profile*']
     if not isinstance(buildTypes, list):
         buildTypes = [buildTypes]
-    qmarks = ','.join(['?'] * len(buildTypes))
+    if len(buildTypes) == 1 and '*' in buildTypes[0]:
+        where = 'glob ?'
+        glob_match = True
+    else:
+        qmarks = ','.join(['?'] * len(buildTypes))
+        where = 'in (%s)' % qmarks
+        glob_match = False
 
     # Find the last n revisions
-    if _db_module and not req.form.getfirst('nocache', False):
+    if _db_module:
         db = _db_module.TestResultsDatabase('nightly', verbose=False)
         db.FastUpdate()
         cur = db.conn.execute('select distinct revision from summary '
-                              'where build_type in (%s) order by revision desc limit ?' % qmarks,
+                              'where build_type %s order by revision desc limit ?' % where,
                               tuple(buildTypes + [n]))
         revisions = [row[0] for row in cur]
         revisions.reverse()
@@ -563,9 +569,9 @@ def _profileHistory(req, n=20, buildTypes=None):
     builds = {}
     run_times = {}
     inf_test_names = ['Copyrights', 'DuplicateFileNames', 'OrphanedTests', 'Schemas']
-    if _db_module:
+    if _db_module and not req.form.getfirst('nocache', False):
         cur = db.conn.execute('select revision, machine, build_type, suite_name, suite_status, run_time from details'
-                              ' where build_type in (%s) and revision between ? and ?' % qmarks,
+                              ' where build_type %s and revision between ? and ?' % where,
                               tuple(buildTypes + [revisions[0], revisions[-1]]))
         for row in cur:
             # The builds dictionary
@@ -580,21 +586,31 @@ def _profileHistory(req, n=20, buildTypes=None):
                     run_times[row['suite_name']] = {}
                 k = (row['revision'], row['build_type'], machine)
                 run_times[row['suite_name']][k] = (row['run_time'], row['suite_status'])
+        buildTypes = set()
         for k in builds:
             builds[k] = list(builds[k])
             builds[k].sort()
+            buildTypes.add(k[1])
+        buildTypes = list(buildTypes)
     else:
+        if glob_match:
+            from fnmatch import fnmatch
         for revision in revisions:
             rev_dir = os.path.join(tests_dir, str(revision))
             for machine_and_build_type in os.listdir(rev_dir):
                 machine, build_type = _extractDotSeparatedPair(machine_and_build_type)
                 machine = _canonical_machine_name(machine)
-                if build_type in buildTypes:
+                if (glob_match and fnmatch(build_type, buildTypes[0])) or build_type in buildTypes:
                     k = (revision, build_type)
                     if not builds.has_key(k):
                         builds[k] = []
                     builds[k].append(machine)
     
+        buildTypes = set()
+        for k in builds:
+            buildTypes.add(k[1])
+        buildTypes = list(buildTypes)
+
         build = FakeBuildType()
         for revision in revisions:
             for build_type in buildTypes:
@@ -612,8 +628,9 @@ def _profileHistory(req, n=20, buildTypes=None):
     output.append('\n\n<!-- Raw data:\n\n%s\n\n%s\n\n-->\n\n'
                   % (str(builds).replace(', (', ',\n ('),
                      str(run_times).replace('}, u', '},\n u')))
-
+    
     # Display table headings
+    buildTypes.sort()
     output.append('<table border="1">\n  <tr><th>Revision</th>\n')
     revbts = []
     for revision in revisions:
