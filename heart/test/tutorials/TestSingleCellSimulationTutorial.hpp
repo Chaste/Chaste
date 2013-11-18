@@ -170,7 +170,7 @@ public:
          *
          * Instructions for annotating parameters can be found at [wiki:ChasteGuides/CodeGenerationFromCellML]
          *
-         * Here we show how to change the parameter dictating the maximal conductance of the IKr current.
+         * Here we show how to change the parameter dictating the maximal conductance of the IKs current.
          * Note this call actually leaves it unchanged from the default,
          * you can experiment with changing it and examine the impact on APD.
          */
