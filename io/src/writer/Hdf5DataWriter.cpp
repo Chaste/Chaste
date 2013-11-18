@@ -1048,7 +1048,7 @@ void Hdf5DataWriter::PossiblyExtend()
         H5Dset_extent( mVariablesDatasetId, mDatasetDims );
         H5Dget_space( mVariablesDatasetId );
         H5Dset_extent( mUnlimitedDatasetId, &mDatasetDims[0] );
-        H5Dget_space( mVariablesDatasetId );
+        H5Dget_space( mUnlimitedDatasetId );
 #else // Deprecated
         H5Dextend( mVariablesDatasetId, mDatasetDims );
         H5Dextend( mUnlimitedDatasetId, mDatasetDims );
