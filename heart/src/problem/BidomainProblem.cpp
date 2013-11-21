@@ -84,6 +84,16 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
            EXCEPTION("No bath element found");
         }
     }
+    else
+    {
+        // The problem hasn't been set up with a bath, so check that the user hasn't set any options
+        // which would suggest they're expecting there to be a bath!
+        std::set<unsigned> bath_identifiers = HeartConfig::Instance()->rGetBathIdentifiers();
+        if ( !(bath_identifiers.size()==1 && bath_identifiers.find(1)==bath_identifiers.begin()) ) // IF NOT only 1 in the bath identifiers set
+        {
+            EXCEPTION("User has set bath identifiers, but the BidomainProblem isn't expecting a bath. Did you mean to use BidomainProblem(..., true)? Or alternatively, BidomainWithBathProblem(...)?");
+        }
+    }
 }
 
 

@@ -509,6 +509,27 @@ public:
         TS_ASSERT(PetscTools::ReplicateBool(ap_triggered));
     }
 
+    void TestProblemChecksUsingBathWithMultipleBathConductivities()
+    {
+        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        std::set<unsigned> tissue_ids;
+        tissue_ids.insert(0);
+
+        std::set<unsigned> bath_ids;
+        bath_ids.insert(1);
+        bath_ids.insert(2); // non-default identifier!
+
+        HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids, bath_ids);
+
+        BathCellFactory<2> cell_factory( 0.0, Create_c_vector(0.0, 0.0) );
+        BidomainProblem<2> bidomain_problem( &cell_factory ); // non-bath problem, despite specifying bath stuff above!
+        bidomain_problem.SetMesh( &mesh );
+        TS_ASSERT_THROWS_THIS( bidomain_problem.Initialise() , "User has set bath identifiers, but the BidomainProblem isn't expecting a bath. Did you mean to use BidomainProblem(..., true)? Or alternatively, BidomainWithBathProblem(...)?");
+    }
+
 
     void Test2dBathGroundedElectrodeStimulusSwitchesOnOff() throw (Exception)
     {
