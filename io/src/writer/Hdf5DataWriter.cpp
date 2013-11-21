@@ -1021,18 +1021,9 @@ void Hdf5DataWriter::AdvanceAlongUnlimitedDimension()
     mCurrentTimeStep++;
 
     /*
-     * Extend the dataset.
-     *
-     * If the user provided an estimate for the length of the
-     * unlimited dimension, allocate all that space.
+     * Extend the dataset (only reached when adding to an existing dataset,
+     * or if mEstimatedUnlimitedLength hasn't been set and has defaulted to 1).
      */
-    if ( mEstimatedUnlimitedLength > mDatasetDims[0] )
-    {
-        mDatasetDims[0] = mEstimatedUnlimitedLength;
-        mNeedExtend = true;
-    }
-
-    // If you are beyond the user estimate increment step by step
     if ( mCurrentTimeStep >= (long unsigned) mEstimatedUnlimitedLength )
     {
         mDatasetDims[0]++;

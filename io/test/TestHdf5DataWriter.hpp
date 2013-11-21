@@ -500,7 +500,7 @@ public:
         writer.DefineUnlimitedDimension("Time", "msec", 10);
 
         // Set the chunk sizes (mostly for coverage)
-        writer.SetFixedChunkSize(10,10,3);
+        writer.SetFixedChunkSize(3,5,3);
 
         writer.EndDefineMode();
 
