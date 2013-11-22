@@ -293,6 +293,15 @@ public :
     virtual void OnEndOfTimeStep(unsigned counter)
     {
     }
+
+    /**
+     *  Get the mechanics solver used in the solve. Only call after a solve.
+     */
+    AbstractNonlinearElasticitySolver<DIM>* GetMechanicsSolver()
+    {
+        assert(mpMechanicsSolver);
+        return mpMechanicsSolver;
+    }
 };
 
 

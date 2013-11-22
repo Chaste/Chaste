@@ -69,7 +69,7 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
         TS_ASSERT_EQUALS(problem_defn.GetMechanicsSolveTimestep(), 1.0);
 
-        TS_ASSERT_THROWS_THIS(problem_defn.Validate(), "Contraction model hasn't been set yet");
+        TS_ASSERT_THROWS_CONTAINS(problem_defn.Validate(), "Contraction model or contraction model ODE timestep have not been set");
 
         // This should be the default
         TS_ASSERT_EQUALS(problem_defn.GetSolverType(), IMPLICIT);

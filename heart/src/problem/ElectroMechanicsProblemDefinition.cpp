@@ -173,7 +173,10 @@ void ElectroMechanicsProblemDefinition<DIM>::Validate()
 
     if(mContractionModelOdeTimeStep < 0.0)
     {
-        EXCEPTION("Contraction model hasn't been set yet");
+        std::string message =  "Contraction model or contraction model ODE timestep have not been set. "
+                               "Make sure SetContractionModel(), or SetContractionCellFactory() AND SetContractionModelOdeTimestep "
+                               "are called. (Pass in a timestep even if contraction model is algebraic and won't use it). ";
+        EXCEPTION(message);
     }
 
     if(mDeformationAffectsConductivity && this->GetCompressibilityType()==COMPRESSIBLE)

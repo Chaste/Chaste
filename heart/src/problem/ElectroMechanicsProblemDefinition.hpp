@@ -277,7 +277,7 @@ public:
      */
     double GetContractionModelOdeTimestep()
     {
-        assert(mContractionModelOdeTimeStep>0.0); // if this fails SetContractionModel() probably hasn't been called - call Validate() to check
+        assert(mContractionModelOdeTimeStep>0.0); // see exception message in Validate()
         return mContractionModelOdeTimeStep;
     }
 

@@ -208,6 +208,10 @@ public:
             TS_ASSERT_DELTA( r_deformed_position[i](0), X * X_scale_factor, 1e-6);
             TS_ASSERT_DELTA( r_deformed_position[i](1), Y * Y_scale_factor, 1e-6);
         }
+
+
+        // coverage
+        TS_ASSERT(problem.GetMechanicsSolver()!=NULL);
     }
 
     /* HOW_TO_TAG Cardiac/Electro-mechanics
