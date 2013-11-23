@@ -78,7 +78,10 @@ public:
         BidomainProblem<3> problem( &cell_factory );
         problem.SetMesh(&mesh);
 
-        /*tissue properties*/
+        /*
+        * HOW_TO_TAG Cardiac/Problem definition
+        * Set discrete '''cuboid''' areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
+        */
         std::vector<ChasteCuboid<3> > input_areas;
         std::vector< c_vector<double,3> > intra_conductivities;
         std::vector< c_vector<double,3> > extra_conductivities;
