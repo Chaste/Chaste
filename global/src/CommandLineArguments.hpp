@@ -82,17 +82,17 @@ private:
      * option does not have any following arguments, or the option does not exist.
      * So you can use OptionExists() to avoid Exceptions in your code when using the other public methods.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      * @return the number of arguments following this option.
      */
-    int GetNumberOfArgumentsForOption(std::string option);
+    int GetNumberOfArgumentsForOption(const std::string& rOption);
 
     /**
      * Throw an exception if the option is not of the required form: '-' followed by a non-numeric character.
      *
-     * @param option  the option name to check the format of.
+     * @param rOption  the option name to check the format of.
      */
-    void TestOptionFormat(std::string option);
+    void TestOptionFormat(const std::string& rOption);
 
 public:
 
@@ -105,13 +105,12 @@ public:
     /** @return the single instance of this class. */
     static CommandLineArguments* Instance();
 
-
     /**
      * @return true if a given option exists in the command line arguments.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      */
-    bool OptionExists(std::string option);
+    bool OptionExists(const std::string& rOption);
 
     /**
      * @return the value for a given option, i.e. the argument after the option name in
@@ -124,30 +123,30 @@ public:
      * Use atoi or atof to convert the char* to an int or a double(float) respectively,
      * or call one of our convenience methods for common types.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
      */
-    char* GetValueCorrespondingToOption(std::string option, int valueNumber=1);
+    char* GetValueCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
     /**
      * @return the double for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to a double.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
      */
-    double GetDoubleCorrespondingToOption(std::string option, int valueNumber=1);
+    double GetDoubleCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
     /**
      * @return the int for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to an int.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
      */
-    int GetIntCorrespondingToOption(std::string option, int valueNumber=1);
+    int GetIntCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
     /**
      * @return the unsigned for a given option.
@@ -155,56 +154,65 @@ public:
      * This uses GetValueCorrespondingToOption and converts the char* to an unsigned.
      * Throws an exception if the option converts to a negative integer.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
      */
-    unsigned GetUnsignedCorrespondingToOption(std::string option, int valueNumber=1);
+    unsigned GetUnsignedCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
     /**
      * @return the string for a given option.
      *
      * This uses GetValueCorrespondingToOption and converts the char* to a std::string.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
      */
-    std::string GetStringCorrespondingToOption(std::string option, int valueNumber=1);
+    std::string GetStringCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
     /**
      * @return a collection of strings for a given option (useful for inputting a list of files for example).
      *
      * This uses GetStringCorrespondingToOption repeatedly.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      */
-    std::vector<std::string> GetStringsCorrespondingToOption(std::string option);
+    std::vector<std::string> GetStringsCorrespondingToOption(const std::string& rOption);
 
     /**
      * @return a collection of doubles for a given option.
      *
      * This uses GetDoubleCorrespondingToOption repeatedly.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      */
-    std::vector<double> GetDoublesCorrespondingToOption(std::string option);
+    std::vector<double> GetDoublesCorrespondingToOption(const std::string& rOption);
 
     /**
      * @return a collection of ints for a given option.
      *
      * This uses GetIntCorrespondingToOption repeatedly.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      */
-    std::vector<int> GetIntsCorrespondingToOption(std::string option);
+    std::vector<int> GetIntsCorrespondingToOption(const std::string& rOption);
 
     /**
      * @return a collection of unsigneds for a given option.
      *
      * This uses GetUnsignedCorrespondingToOption repeatedly.
      *
-     * @param option  the option name as a string.
+     * @param rOption  the option name as a string.
      */
-    std::vector<unsigned> GetUnsignedsCorrespondingToOption(std::string option);
+    std::vector<unsigned> GetUnsignedsCorrespondingToOption(const std::string& rOption);
+
+    /**
+     * Read bools from the command line. This accepts 0 or 1, and
+     * also true/True/TRUE and false/False/FALSE.
+     *
+     * @param rOption  The option name as a string.
+     * @return Whether the option was set to true or false.
+     */
+    bool GetBoolCorrespondingToOption(const std::string& rOption);
 };
 
 #endif // COMMANDLINEARGUMENTS_HPP_

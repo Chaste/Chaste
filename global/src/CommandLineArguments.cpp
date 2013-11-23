@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 #include <cstddef>
+#include <algorithm>
 
 CommandLineArguments::CommandLineArguments()
     : p_argc(NULL),
@@ -57,41 +58,41 @@ CommandLineArguments* CommandLineArguments::Instance()
 
 CommandLineArguments* CommandLineArguments::mpInstance = NULL;
 
-bool CommandLineArguments::OptionExists(std::string option)
+bool CommandLineArguments::OptionExists(const std::string& rOption)
 {
-    int index = GetIndexForArgument(option);
+    int index = GetIndexForArgument(rOption);
     assert(index!=0);
 
     return (index > 0);
 }
 
-char* CommandLineArguments::GetValueCorrespondingToOption(std::string option, int valueNumber)
+char* CommandLineArguments::GetValueCorrespondingToOption(const std::string& rOption, int valueNumber)
 {
     EXCEPT_IF_NOT(valueNumber>0);
-    TestOptionFormat(option);
+    TestOptionFormat(rOption);
 
-    int num_args = GetNumberOfArgumentsForOption(option);
-    int index = GetIndexForArgument(option);
+    int num_args = GetNumberOfArgumentsForOption(rOption);
+    int index = GetIndexForArgument(rOption);
     EXCEPT_IF_NOT(index>0);
     EXCEPT_IF_NOT(num_args>=valueNumber);
     return (*p_argv)[index+valueNumber];
 }
 
-double CommandLineArguments::GetDoubleCorrespondingToOption(std::string option, int valueNumber)
+double CommandLineArguments::GetDoubleCorrespondingToOption(const std::string& rOption, int valueNumber)
 {
-    char* val = GetValueCorrespondingToOption(option, valueNumber);
+    char* val = GetValueCorrespondingToOption(rOption, valueNumber);
     return atof(val);
 }
 
-int CommandLineArguments::GetIntCorrespondingToOption(std::string option, int valueNumber)
+int CommandLineArguments::GetIntCorrespondingToOption(const std::string& rOption, int valueNumber)
 {
-    char* val = GetValueCorrespondingToOption(option, valueNumber);
+    char* val = GetValueCorrespondingToOption(rOption, valueNumber);
     return atoi(val);
 }
 
-unsigned CommandLineArguments::GetUnsignedCorrespondingToOption(std::string option, int valueNumber)
+unsigned CommandLineArguments::GetUnsignedCorrespondingToOption(const std::string& rOption, int valueNumber)
 {
-    char* val = GetValueCorrespondingToOption(option, valueNumber);
+    char* val = GetValueCorrespondingToOption(rOption, valueNumber);
     int i = atoi(val);
     if (i < 0)
     {
@@ -114,12 +115,12 @@ int CommandLineArguments::GetIndexForArgument(std::string argument)
     return -1;
 }
 
-int CommandLineArguments::GetNumberOfArgumentsForOption(std::string option)
+int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOption)
 {
-    int start_idx = GetIndexForArgument(option);
+    int start_idx = GetIndexForArgument(rOption);
     if (start_idx < 0)
     {
-        EXCEPTION("Command line option '" + option + "' does not exist");
+        EXCEPTION("Command line option '" + rOption + "' does not exist");
     }
 
     int end_idx = start_idx;
@@ -135,66 +136,91 @@ int CommandLineArguments::GetNumberOfArgumentsForOption(std::string option)
 
     if (end_idx == start_idx)
     {
-        EXCEPTION("No value(s) given after command line option '" + option + "'");
+        EXCEPTION("No value(s) given after command line option '" + rOption + "'");
     }
 
     return end_idx - start_idx;
 }
 
-std::string CommandLineArguments::GetStringCorrespondingToOption(std::string option, int valueNumber)
+std::string CommandLineArguments::GetStringCorrespondingToOption(const std::string& rOption, int valueNumber)
 {
-    char* val = GetValueCorrespondingToOption(option, valueNumber);
+    char* val = GetValueCorrespondingToOption(rOption, valueNumber);
     std::string string_arg(val);
     return string_arg;
 }
 
-std::vector<std::string> CommandLineArguments::GetStringsCorrespondingToOption(std::string option)
+std::vector<std::string> CommandLineArguments::GetStringsCorrespondingToOption(const std::string& rOption)
 {
     std::vector<std::string> strings;
-    int num_args = GetNumberOfArgumentsForOption(option);
+    int num_args = GetNumberOfArgumentsForOption(rOption);
     for(int i=1; i<=num_args; ++i)
     {
-        strings.push_back(GetStringCorrespondingToOption(option, i));
+        strings.push_back(GetStringCorrespondingToOption(rOption, i));
     }
     return strings;
 }
 
-std::vector<double> CommandLineArguments::GetDoublesCorrespondingToOption(std::string option)
+std::vector<double> CommandLineArguments::GetDoublesCorrespondingToOption(const std::string& rOption)
 {
     std::vector<double> doubles;
-    int num_args = GetNumberOfArgumentsForOption(option);
+    int num_args = GetNumberOfArgumentsForOption(rOption);
     for(int i=1; i<=num_args; ++i)
     {
-        doubles.push_back(GetDoubleCorrespondingToOption(option, i));
+        doubles.push_back(GetDoubleCorrespondingToOption(rOption, i));
     }
     return doubles;
 }
 
-std::vector<unsigned> CommandLineArguments::GetUnsignedsCorrespondingToOption(std::string option)
+std::vector<unsigned> CommandLineArguments::GetUnsignedsCorrespondingToOption(const std::string& rOption)
 {
     std::vector<unsigned> unsigneds;
-    int num_args = GetNumberOfArgumentsForOption(option);
+    int num_args = GetNumberOfArgumentsForOption(rOption);
     for(int i=1; i<=num_args; ++i)
     {
-        unsigneds.push_back(GetUnsignedCorrespondingToOption(option, i));
+        unsigneds.push_back(GetUnsignedCorrespondingToOption(rOption, i));
     }
     return unsigneds;
 }
 
-std::vector<int> CommandLineArguments::GetIntsCorrespondingToOption(std::string option)
+std::vector<int> CommandLineArguments::GetIntsCorrespondingToOption(const std::string& rOption)
 {
     std::vector<int> ints;
-    int num_args = GetNumberOfArgumentsForOption(option);
+    int num_args = GetNumberOfArgumentsForOption(rOption);
     for(int i=1; i<=num_args; ++i)
     {
-        ints.push_back(GetIntCorrespondingToOption(option, i));
+        ints.push_back(GetIntCorrespondingToOption(rOption, i));
     }
     return ints;
 }
 
-void CommandLineArguments::TestOptionFormat(std::string option)
+bool CommandLineArguments::GetBoolCorrespondingToOption(const std::string& rOption)
 {
-    if ( !( option.substr(0,1) == "-" && option.substr(1,1).find_first_of("0123456789")==std::string::npos ) )
+    bool result;
+    std::string string_result = GetStringCorrespondingToOption(rOption);
+
+    // Convert to lowercase
+    std::transform(string_result.begin(), string_result.end(), string_result.begin(), ::tolower);
+
+    if (string_result=="0" || string_result=="false")
+    {
+        result = false;
+    }
+    else if (string_result=="1" || string_result=="true")
+    {
+        result = true;
+    }
+    else
+    {
+        EXCEPTION("The option '" << rOption << "' argument '" <<
+            GetStringCorrespondingToOption(rOption) << "' cannot be converted to a bool.");
+    }
+
+    return result;
+}
+
+void CommandLineArguments::TestOptionFormat(const std::string& rOption)
+{
+    if ( !( rOption.substr(0,1) == "-" && rOption.substr(1,1).find_first_of("0123456789")==std::string::npos ) )
     {
         EXCEPTION("A command line option must begin with '-' followed by a non-numeric character.");
     }

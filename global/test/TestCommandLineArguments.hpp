@@ -91,7 +91,9 @@ public:
         //
         // To test the methods we overwrite the arg_c and arg_v contained in the
         // singleton with the arguments that were needed.
-        int new_argc = 15;
+        int new_argc = 25;
+        char** new_argv = new char*[25];
+
         char new_argv0[] = "..";
         char new_argv1[] = "-myoption";
         char new_argv2[] = "-myintval";
@@ -107,8 +109,17 @@ public:
         char new_argv12[] = "Gibbons";
         char new_argv13[] = "-mystring";
         char new_argv14[] = "more_baboons";
+        char new_argv15[] = "-mybool";
+        char new_argv16[] = "0";
+        char new_argv17[] = "-mybool2";
+        char new_argv18[] = "fAlSe";
+        char new_argv19[] = "-mybool3";
+        char new_argv20[] = "1";
+        char new_argv21[] = "-mybool4";
+        char new_argv22[] = "TrUe";
+        char new_argv23[] = "-mybool5";
+        char new_argv24[] = "doDgy";
 
-        char** new_argv = new char*[15];
         new_argv[0] = new_argv0;
         new_argv[1] = new_argv1;
         new_argv[2] = new_argv2;
@@ -124,6 +135,16 @@ public:
         new_argv[12] = new_argv12;
         new_argv[13] = new_argv13;
         new_argv[14] = new_argv14;
+        new_argv[15] = new_argv15;
+        new_argv[16] = new_argv16;
+        new_argv[17] = new_argv17;
+        new_argv[18] = new_argv18;
+        new_argv[19] = new_argv19;
+        new_argv[20] = new_argv20;
+        new_argv[21] = new_argv21;
+        new_argv[22] = new_argv22;
+        new_argv[23] = new_argv23;
+        new_argv[24] = new_argv24;
 
         // Save the real args to be restored at the end
         int* p_real_argc = CommandLineArguments::Instance()->p_argc;
@@ -147,12 +168,10 @@ public:
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->GetStringsCorrespondingToOption("-mynonsense"),
                 "Command line option '-mynonsense' does not exist");
 
-
         // Test GetValueCorrespondingToOption()
         char* val = CommandLineArguments::Instance()->GetValueCorrespondingToOption("-myintval");
         unsigned i = atol(val);
         TS_ASSERT_EQUALS(i, 24u);
-
 
         val = CommandLineArguments::Instance()->GetValueCorrespondingToOption("-m2intval");
         int j = atol(val);
@@ -203,6 +222,21 @@ public:
         std::vector<int> int_args = CommandLineArguments::Instance()->GetIntsCorrespondingToOption("-m2intval");
         TS_ASSERT_EQUALS(int_args.size(), 1u);
         TS_ASSERT_EQUALS(int_args[0],-42);
+
+        // Check the bool methods
+        // (NB alternatively just check for the presence of an option,
+        // but this is nicer for checking all arguments have been specified).
+        bool result = CommandLineArguments::Instance()->GetBoolCorrespondingToOption("-mybool");
+        TS_ASSERT_EQUALS(result, false);
+        result = CommandLineArguments::Instance()->GetBoolCorrespondingToOption("-mybool2");
+        TS_ASSERT_EQUALS(result, false);
+        result = CommandLineArguments::Instance()->GetBoolCorrespondingToOption("-mybool3");
+        TS_ASSERT_EQUALS(result, true);
+        result = CommandLineArguments::Instance()->GetBoolCorrespondingToOption("-mybool4");
+        TS_ASSERT_EQUALS(result, true);
+
+        TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->GetBoolCorrespondingToOption("-mybool5"),
+                "The option '-mybool5' argument 'doDgy' cannot be converted to a bool.");
 
         // Fool the arguments into thinking that the options end at 5 entries to check an exception:
         new_argc = 5;
