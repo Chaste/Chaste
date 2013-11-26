@@ -301,7 +301,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
     // Write the element header
     unsigned num_elements = this->GetNumElements();
     assert(SPACE_DIM != ELEMENT_DIM);
-    unsigned num_attr = 0;
+    unsigned num_attr = 1;
 
     *p_element_file << num_elements << "\t";
     //*p_element_file << nodes_per_element << "\t";
@@ -316,10 +316,14 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
     }
 
     // Write each element's data
+    std::vector<double> attribute_values(1);
     for (unsigned item_num=0; item_num<num_elements; item_num++)
     {
-         WriteItem(p_element_file, item_num, this->GetNextElement().NodeIndices);
+        ElementData element_data = this->GetNextElement();
+        attribute_values[0] =  element_data.AttributeValue;
+        WriteItem(p_element_file, item_num, element_data.NodeIndices, attribute_values);
     }
+
     *p_element_file << comment << "\n";
     p_element_file->close();
 
