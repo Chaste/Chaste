@@ -209,10 +209,11 @@ public:
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
     {
         /*
-         * HOW_TO_TAG Continuum mechanics
-         * Solve a simple ventilation problem with no time variation
-         * Pressure is prescribed at the root (trachea) and at the leaves (acina)
-         * Dynamic (Pedley) resistance is used at higher Reynolds numbers
+         * HOW_TO_TAG Continuum mechanics/Ventilation
+         * Solve a simple ventilation problem with no time variation.
+         * Pressure is prescribed at the root (trachea) and at the leaves (acini).
+         * Dynamic (Pedley) resistance is used at higher Reynolds numbers.
+         * There is no coupled acinus compliance model in this version.
          */
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
