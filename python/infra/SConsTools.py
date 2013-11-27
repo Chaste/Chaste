@@ -110,6 +110,12 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
                         if not parent_dir in source_dirs:
                             source_dirs.append(parent_dir)
                         break
+        if source_exts == ['.py'] and 'setup.py' in filenames:
+            # Special case hack for building Python package extension modules
+            # TODO: Set environment variables so libraries like SUNDIALS can be found if not in standard locations
+            setup_py_path = os.path.join(os.getcwd(), dirpath, 'setup.py')
+            env.Execute(SCons.Action.Action('python %s build_ext --inplace' % setup_py_path,
+                                            chdir=os.path.dirname(setup_py_path)))
         if has_sources and (includeRoot or dirpath != rootDir):
             source_dirs.append(dirpath)
     if dirsOnly:
@@ -778,18 +784,48 @@ def CreatePyCmlBuilder(build, buildenv):
     c_file, cxx_file = SCons.Tool.createCFileBuilders(buildenv)
     cxx_file.add_action('.cellml', PyCmlAction)
     cxx_file.add_emitter('.cellml', PyCmlEmitter)
-    
+
 class PyScanner(SCons.Scanner.Classic):
-    """A scanner for import lines in Python source code."""
+    """A scanner for import lines in Python source code.
+    
+    This partly supports "import module", "from module import ...", package imports and relative imports.
+    It doesn't handle cases like "from .package import module" properly, as it makes the package the dependency.
+    """
     base = SCons.Scanner.Classic # old-style class so can't super()
     def __init__(self, *args, **kw):
         name = kw.get('name', 'PyScanner')
         suffixes = ['.py']
         path_variable = 'PYINCPATH'
-        regex = r'^[ \t]*import ([a-zA-Z0-9_]+)[ \t]*$'
+        subst = {'ws': r'[ \t]+',         # required whitespace
+                 'ows': r'[ \t]*',        # optional whitespace
+                 'nm': r'[a-zA-Z0-9_.]+'} # a module/package/entity name
+        regex = r'^%(ows)s(?:import%(ws)s(%(nm)s)|from%(ws)s(%(nm)s)%(ws)simport%(ws)s%(nm)s)(?:%(ws)sas%(ws)s%(nm)s)?%(ows)s$' % subst
         self.base.__init__(self, name, suffixes, path_variable, regex, *args, **kw)
+
+    def find_include_names(self, node):
+        # Our regex has 2 groups, only 1 of which will ever match, so join them together
+        return [''.join(n) for n in self.cre.findall(node.get_text_contents())]
+
     def find_include(self, include, source_dir, path):
-        return self.base.find_include(self, include + '.py', source_dir, path)
+        if '.' in include:
+            # It's a package or relative include
+            if include == ".":
+                # Special case for "from . import name"
+                return (None, include)
+            while include[0] == '.':
+                include = include[1:]
+                if include[0] == '.':
+                    source_dir = source_dir.Dir('..')
+                path = ()
+            include = include.replace('.', os.sep)
+            n, i = self.base.find_include(self, include + '.py', source_dir, path)
+        else:
+            # Simple case
+            n, i = self.base.find_include(self, include + '.py', source_dir, path)
+        if n is None:
+            # The name might be a package, so look for a nested __init__.py
+            n, i = self.base.find_include(self, os.path.join(include, '__init__.py'), source_dir, path)
+        return n, i
 
 
 def CreateTexttestBuilder(build, env, otherVars):
@@ -1121,7 +1157,7 @@ def FindPyDirs(env):
 def AddPyDirs(env, basePath, pydirs):
     """Add folders containing Python sources, if any, to the module search path."""
     if pydirs:
-        pydir_paths = map(lambda d: os.path.join(basePath, d), pydirs)
+        pydir_paths = map(lambda d: os.path.join('#', basePath, d), pydirs)
         env.Append(PYINCPATH=pydir_paths)
 
 def DoComponentSConscript(component, otherVars):
