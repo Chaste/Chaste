@@ -208,6 +208,12 @@ public:
 
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
     {
+        /*
+         * HOW_TO_TAG Continuum mechanics
+         * Solve a simple ventilation problem with no time variation
+         * Pressure is prescribed at the root (trachea) and at the leaves (acina)
+         * Dynamic (Pedley) resistance is used at higher Reynolds numbers
+         */
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15);
@@ -223,6 +229,9 @@ public:
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-8); //BC
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-8); //BC
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-8); //BC
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
+#endif
     }
 
     void TestTimeVaryingThreeBifurcations() throw (Exception)
