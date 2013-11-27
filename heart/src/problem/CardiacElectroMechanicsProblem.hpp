@@ -295,7 +295,9 @@ public :
     }
 
     /**
-     *  Get the mechanics solver used in the solve. Only call after a solve.
+     * Get the mechanics solver used in the solve. Only call after a solve.
+     *
+     * @return The mechanics (nonlinear elasticity) PDE solver.
      */
     AbstractNonlinearElasticitySolver<DIM>* GetMechanicsSolver()
     {
