@@ -76,7 +76,9 @@ if sys.version_info[:2] < (2,7):
             cmd = kwargs.get("args")
             if cmd is None:
                 cmd = popenargs[0]
-            raise subprocess.CalledProcessError(retcode, cmd, output=output)
+            print >>sys.stderr, "Called process failed; output was:"
+            print >>sys.stderr, output
+            raise subprocess.CalledProcessError(retcode, cmd)
         return output
     subprocess.check_output = check_output
 
