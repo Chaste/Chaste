@@ -4764,6 +4764,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.analyse_model()
         self.write_setup_py()
         # Start file output
+        self.writeln('# cython: profile=True')
         self.output_common_imports()
         self.writeln('cimport libc.math as math')
         self.writeln('cimport numpy as np')
@@ -4809,7 +4810,12 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('self.dirty = False')
         self.writeln('self.AssociateWithModel(self)')
         self.writeln('self._parameters = Sundials.N_VMake_Serial(len(self.state), <Sundials.realtype*>(<np.ndarray>self.state).data)')
-        self.writeln('Sundials.CVodeInit(self.cvode_mem, _EvaluateRhs, 0.0, self._state)')
+        # Initialise CVODE
+        self.close_block()
+        self.writeln('def SetRhsWrapper(self):')
+        self.open_block()
+        self.writeln('flag = Sundials.CVodeInit(self.cvode_mem, _EvaluateRhs, 0.0, self._state)')
+        self.writeln('self.CheckFlag(flag, "CVodeInit")')
         self.close_block()
         # Cython-level destructor
         self.writeln('def __dealloc__(self):')
