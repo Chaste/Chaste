@@ -77,7 +77,7 @@ private:
 
     std::vector<DataWriterVariable> mVariables;     /**< The data variables */
 
-    long unsigned mCurrentTimeStep;                          /**< The current time step. */
+    long unsigned mCurrentTimeStep;                 /**< The current time step. */
 
     Mat mSinglePermutation;                         /**< Stores a permutation as a matrix */
     Mat mDoublePermutation;                         /**< Stores a permutation of a striped structure (u_0 v_0 u_1 v_1) as a matrix */
@@ -87,7 +87,7 @@ private:
 
     bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
     hsize_t mChunkSize[DATASET_DIMS];               /**< Stores chunk dimensions */
-    long unsigned mNumberOfChunks;                       /**< The total number of chunks in the dataset */
+    long unsigned mNumberOfChunks;                  /**< The total number of chunks in the dataset */
     hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
 
 
