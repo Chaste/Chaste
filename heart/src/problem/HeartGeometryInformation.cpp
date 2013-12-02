@@ -155,7 +155,9 @@ HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (std::string nodeH
 
 template<unsigned SPACE_DIM>
 void HeartGeometryInformation<SPACE_DIM>::ProcessLine(
-        const std::string& line, std::set<unsigned>& rSurfaceNodeIndexSet, unsigned offset) const
+        const std::string& line,
+        std::set<unsigned>& rSurfaceNodeIndexSet,
+        unsigned offset) const
 {
     std::stringstream line_stream(line);
     while (!line_stream.eof())
@@ -174,7 +176,9 @@ void HeartGeometryInformation<SPACE_DIM>::ProcessLine(
 
 template<unsigned SPACE_DIM>
 void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
-        const std::string& surfaceFile, std::vector<unsigned>& rSurfaceNodes, bool indexFromZero) const
+        const std::string& surfaceFile,
+        std::vector<unsigned>& rSurfaceNodes,
+        bool indexFromZero) const
 {
     // Open the file defining the surface
     std::ifstream file_stream;
@@ -406,7 +410,8 @@ void HeartGeometryInformation<SPACE_DIM>::WriteLayerForEachNode(std::string outp
 
 
 template<unsigned SPACE_DIM>
-ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBoxOfSurface(const std::vector<unsigned>& rSurfaceNodes)
+ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBoxOfSurface(
+        const std::vector<unsigned>& rSurfaceNodes)
 {
 
     assert(rSurfaceNodes.size()>0);

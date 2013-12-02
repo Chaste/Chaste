@@ -56,7 +56,7 @@ typedef unsigned HeartRegionType;
 
 /**
  * This class provides a method to calculate the relative position of a node with respect to two (or three)
- * given surfaces
+ * given surfaces.
  */
 template<unsigned SPACE_DIM>
 class HeartGeometryInformation
@@ -81,23 +81,31 @@ private:
     std::vector<unsigned> mRVSurface;
 
     /**
-     *  Takes in a file of all the surface elements on ONE PARTICULAR surface of the
+     *  Takes in a file of all the nodes on ONE PARTICULAR surface of the
      *  mesh (eg the right ventricular endo-cardial surface) and collects all the nodes
-     *  on that surface in one vector
+     *  on that surface in one vector.
      *
-     *  @param surfaceFile The surface file
-     *  @param rSurfaceNodes The returned vector of nodes indices on this surface
-     *  @param indexFromZero  true for native triangles files. false for Memfem files which are indexed from 1.
+     *  @param surfaceFile  The surface file, lists global node indices on this surface.
+     *         The number of lines in this file and entries per line doesn't matter. Just have to
+     *         be separated by whitespace and returns. But these files would tend to be:
+     *         EITHER: multiple entries on one line -- all nodes in each boundary element,
+     *         OR: simply a list of the nodes on the surface.
+     *  @param rSurfaceNodes  The returned vector of nodes indices on this surface
+     *  @param indexFromZero  True for native triangles files. False for Memfem files which are indexed from 1.
      */
-    void GetNodesAtSurface(const std::string& surfaceFile, std::vector<unsigned>& rSurfaceNodes, bool indexFromZero=true) const;
+    void GetNodesAtSurface(const std::string& surfaceFile,
+                           std::vector<unsigned>& rSurfaceNodes,
+                           bool indexFromZero=true) const;
 
     /**
      *  Helper function for GetNodesAtSurface
-     *  @param line A line in a surface file
-     *  @param rSurfaceNodeIndexSet The nodes in the element corresponding to this line
-     *  @param offset is the lowest index of a node in the original mesh (0 for native triangles or 1 for MEMFEM)
+     *  @param line  A line in a surface file.
+     *  @param rSurfaceNodeIndexSet  The nodes in the element corresponding to this line.
+     *  @param offset  is the lowest index of a node in the original mesh (0 for native triangles or 1 for MEMFEM).
      */
-    void ProcessLine(const std::string& line, std::set<unsigned>& rSurfaceNodeIndexSet, unsigned offset) const;
+    void ProcessLine(const std::string& line,
+                     std::set<unsigned>& rSurfaceNodeIndexSet,
+                     unsigned offset) const;
 
     /**
      * Helper method to calculate the distance between the node and the Endocardial surface
@@ -162,11 +170,12 @@ public:
     static const HeartRegionType UNKNOWN=1007;
 
     /**
-     * Constructor for a two surface mesh
+     * Constructor for a two surface mesh.
+     * File formats: list of nodes, either one per line or multiple (e.g. nodes in each boundary element on surface).
      *
      * @param rMesh: reference to the mesh
-     * @param rEpiFile: file of elements on the epicardial surface
-     * @param rEndoFile: file of elements on the endocardial surface
+     * @param rEpiFile: a file containing a list of global node indices on the epicardial surface
+     * @param rEndoFile: a file containing a list of global node indices on the endocardial surface
      * @param indexFromZero  true for native triangles files. false for Memfem files which are indexed from 1.
      */
     HeartGeometryInformation (AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
@@ -176,12 +185,13 @@ public:
 
 
     /**
-     * Constructor for a three surface mesh
+     * Constructor for a three surface mesh.
+     * File formats: list of nodes, either one per line or multiple (e.g. nodes in each boundary element on surface).
      *
      * @param rMesh: reference to the mesh
-     * @param rEpiFile: file of elements on the epicardial surface
-     * @param rRVFile: file of elements on the endocardial right ventricular surface (can be empty string)
-     * @param rLVFile: file of elements on the endocardial left ventricular surface (can be empty string)
+     * @param rEpiFile: a file containing a list of global node indices on the epicardial surface
+     * @param rRVFile: a file containing a list of global node indices on the endocardial right ventricular surface (can be empty string)
+     * @param rLVFile: a file containing a list of global node indices on the endocardial left ventricular surface (can be empty string)
      * @param indexFromZero  true for native triangles files. false for Memfem files which are indexed from 1.
      *
      * If either rRVFile or rLVfile are the empty string, then it is assumed that this is a

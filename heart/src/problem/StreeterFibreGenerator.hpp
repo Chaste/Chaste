@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Mark Potse, Bruno Dubé, Jacques Richer, Alain Vinet, and Ramesh M. Gulrajani
  * IEEE Trans. Biomed. Eng. 53(12):2425-2435, 2006.
  *
- * File format: The first line indicates the number of elements.
+ * Output file format: The first line indicates the number of elements.
  * Each of the following lines contain SPACE_DIM vectors of SPACE_DIM elements for the
  * direction of the myofibre, the transverse to it in the plane of
  * the myocyte laminae and the normal to this laminae.
@@ -76,7 +76,8 @@ private:
      * @param wallThickness  vector of thickness of all nodes in node index order
      * @return Neighbourhood average thickness (will return 0 if the node is not local to this process)
      */
-    double GetAveragedThicknessLocalNode(const unsigned nodeIndex, const std::vector<double>& wallThickness) const;
+    double GetAveragedThicknessLocalNode(const unsigned nodeIndex,
+                                         const std::vector<double>& wallThickness) const;
 
     /**
      * R is the maximum angle between the fibre and the v axis (heart region dependant)
@@ -130,7 +131,7 @@ public:
     /**
      * Constructor
      *
-     * @param  rMesh reference to the tetrahedral mesh of the ventricles
+     * @param rMesh  Reference to the tetrahedral mesh of the ventricles.
      */
     StreeterFibreGenerator(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh);
 
@@ -141,12 +142,12 @@ public:
 
     /**
      * Uses the names of files defining the different surfaces of the mesh to construct the geometry information class
-     * File format: list of triangles
+     * File formats: list of nodes, either one per line or multiple (e.g. nodes in each boundary element on surface).
      *
-     * @param rEpicardiumFile Epicardium surface
-     * @param rRightVentricleFile Right Ventricle surface.
-     * @param rLeftVentricleFile Left Ventricle surface
-     * @param indexFromZero  Are the nodes in the original mesh file/surfaces indexed from 0?
+     * @param rEpicardiumFile  Epicardium surface nodes (global indices).
+     * @param rRightVentricleFile  Right Ventricle surface nodes (global indices).
+     * @param rLeftVentricleFile  Left Ventricle surface nodes (global indices).
+     * @param indexFromZero  Are the nodes in the original mesh file/surface files indexed from 0?
      *
      * If either rRightVentricleFile or rLeftVentricleFile are the empty string, then it is assumed that this is a
      * wedge preparation for left or right ventricle, respectively.  That is, the ventricle with a non-empty string.
