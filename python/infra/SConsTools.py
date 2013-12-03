@@ -113,6 +113,7 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
         if source_exts == ['.py'] and 'setup.py' in filenames:
             # Special case hack for building Python package extension modules
             # TODO: Set environment variables so libraries like SUNDIALS can be found if not in standard locations
+            # TODO: Don't run when building dynamic libs only
             setup_py_path = os.path.join(os.getcwd(), dirpath, 'setup.py')
             env.Execute(SCons.Action.Action('python %s build_ext --inplace' % setup_py_path,
                                             chdir=os.path.dirname(setup_py_path)))
