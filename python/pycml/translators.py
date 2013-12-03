@@ -4797,9 +4797,9 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('cdef public char* freeVariableName')
         self.writeln('cdef public double freeVariable')
         self.writeln('cdef public object stateVarMap')
-        self.writeln('cdef public object initialState')
+        self.writeln('cdef public np.ndarray initialState')
         self.writeln('cdef public object parameterMap')
-        self.writeln('cdef public object parameters')
+        self.writeln('cdef public np.ndarray parameters')
         self.writeln()
         self.writeln('cdef public object savedStates')
         self.writeln('cdef public object env')
@@ -4863,14 +4863,9 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('cpdef ResetState(self, name=None):')
         self.open_block()
         self.writeln('if name is None:')
-        self.writeln(base_class, '.ResetSolver(self, self.initialState.copy())', indent_offset=1)
+        self.writeln(base_class, '.ResetSolver(self, self.initialState)', indent_offset=1)
         self.writeln('else:')
-        self.writeln(base_class, '.ResetSolver(self, self.savedStates[name].copy())', indent_offset=1)
-        self.close_block()
-        self.writeln('cpdef Simulate(self, double endPoint):')
-        self.open_block()
-        self.writeln(base_class, '.Simulate(self, endPoint)')
-        self.writeln('self.freeVariable = endPoint')
+        self.writeln(base_class, '.ResetSolver(self, self.savedStates[name])', indent_offset=1)
         self.close_block()
         self.writeln('cpdef GetOutputs(self):')
         self.output_get_outputs_content()
@@ -4885,7 +4880,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
                      ', Sundials.N_Vector y, Sundials.N_Vector ydot, void* user_data):')
         self.open_block()
         self.writeln('model = <object>user_data')
-        self.writeln('cdef np.ndarray parameters = <np.ndarray>model.parameters')
+        self.writeln('cdef np.ndarray[Sundials.realtype, ndim=1] parameters = <np.ndarray>model.parameters')
         self.param_vector_name = 'parameters'
         # Work out what equations are needed to compute the derivatives
         derivs = set(map(lambda v: (v, self.free_vars[0]), self.state_vars))
@@ -4901,7 +4896,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln()
         # Assign to derivatives vector
         for i, var in enumerate(self.state_vars):
-            self.writeln('(<Sundials.N_VectorContent_Serial>ydot.content).data[', i, '] =', self.code_name(var, True))
+            self.writeln('(<Sundials.N_VectorContent_Serial>ydot.content).data[', i, '] = ', self.code_name(var, True))
         self.param_vector_name = 'self.parameters'
         self.close_block()
         
