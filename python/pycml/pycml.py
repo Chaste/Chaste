@@ -4208,6 +4208,7 @@ class mathml_ci(mathml, mathml_units_mixin_tokens):
         """Cache & return the variable object refered to by this element."""
         if self._cml_variable is None:
             vname = unicode(self).strip()
+            self._rename(vname) # Remove excess whitespace from our text content
             self._cml_variable = self.component.get_variable_by_name(vname)
         return self._cml_variable
     
