@@ -155,6 +155,7 @@ METADATA_NAMES = frozenset(
      # Generally, but not always, this is formulated as I_f = I_f_Na + I_f_K, with separate conductances.
      # if it isn't try and figure out which ionic species is being modelled for tagging, and give two tags if necessary.
      'membrane_hyperpolarisation_activated_funny_current',
+        'membrane_hyperpolarisation_activated_funny_current_single_gate',
         'membrane_hyperpolarisation_activated_funny_current_potassium_component',
            'membrane_hyperpolarisation_activated_funny_current_potassium_component_conductance',
         'membrane_hyperpolarisation_activated_funny_current_sodium_component', 
