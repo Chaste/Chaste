@@ -4655,7 +4655,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.output_comment('State variables')
         for i, var in enumerate(self.state_vars):
             if var in nodeset:
-                self.writeln(self.code_name(var), self.EQ_ASSIGN, self.vector_index(stateVectorName, i), self.STMT_END)
+                self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(var), self.EQ_ASSIGN, self.vector_index(stateVectorName, i), self.STMT_END)
         self.writeln()
 
     def output_mathematics(self):
@@ -4700,7 +4700,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
             output_vars.update(vars)
         nodeset = self.calculate_extended_dependencies(output_vars)
         # Do the calculations
-        self.writeln(self.code_name(self.free_vars[0]), self.EQ_ASSIGN, 'self.freeVariable')
+        self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.free_vars[0]), self.EQ_ASSIGN, 'self.freeVariable')
         self.output_state_assignments(nodeset, 'self.state')
         self.output_comment('Mathematics computing outputs of interest')
         self.output_equations(nodeset)
