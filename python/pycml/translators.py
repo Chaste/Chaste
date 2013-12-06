@@ -4706,17 +4706,17 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.output_equations(nodeset)
         self.writeln()
         # Put them in an Environment
-        self.writeln('env = Env.Environment()')
+        self.writeln('outputs = {}')
         for var in self._outputs:
-            self.writeln('env.DefineName("', self.var_display_name(var), '", V.Simple(', self.code_name(var), '))')
+            self.writeln('outputs["', self.var_display_name(var), '"] = np.array(', self.code_name(var), ')')
         for name, vars in self._vector_outputs.iteritems():
-            self.writeln('env.DefineName("', name, '", V.Array(np.array([', nl=False)
+            self.writeln('outputs["', name, '"] = np.array([', nl=False)
             for var in vars:
                 if not var is vars[0]:
                     self.write(', ')
                 self.write(self.code_name(var))
-            self.writeln('])))', indent=False)
-        self.writeln('return env')
+            self.writeln('])', indent=False)
+        self.writeln('return outputs')
         self.close_block()
 
 
@@ -4817,10 +4817,10 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.output_common_constructor_content()
         self.writeln('self.state = self.initialState.copy()')
         self.writeln('self.savedStates = {}')
-        self.writeln('self.env = Env.ModelWrapperEnvironment(self)')
         self.writeln('self.dirty = False')
         self.writeln('self.AssociateWithModel(self)')
         self.writeln('self._parameters = Sundials.N_VMake_Serial(len(self.state), <Sundials.realtype*>(<np.ndarray>self.state).data)')
+        self.writeln('self.env = Env.ModelWrapperEnvironment(self)')
         # Initialise CVODE
         self.close_block()
         self.writeln('def SetRhsWrapper(self):')
