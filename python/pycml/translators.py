@@ -4688,12 +4688,12 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         if self.options.numba:
             self.writeln('@object_()')
         self.writeln('def GetOutputs(self):')
+        self.open_block()
         self.output_get_outputs_content()
         self.close_block()
     
     def output_get_outputs_content(self):
         """Output the content and open/close block for the GetOutputs method."""
-        self.open_block()
         # Figure out what equations are needed to compute the outputs
         output_vars = set(self._outputs)
         for vars in self._vector_outputs.itervalues():
@@ -4868,7 +4868,11 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln(base_class, '.ResetSolver(self, self.savedStates[name])', indent_offset=1)
         self.close_block()
         self.writeln('cpdef GetOutputs(self):')
+        self.open_block()
+        self.writeln('cdef np.ndarray[Sundials.realtype, ndim=1] parameters = self.parameters')
+        self.param_vector_name = 'parameters'
         self.output_get_outputs_content()
+        self.param_vector_name = 'self.parameters'
         self.close_block()
     
     def output_mathematics(self):
