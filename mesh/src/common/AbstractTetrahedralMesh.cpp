@@ -806,19 +806,21 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
         std::vector <unsigned> nodes_on_this_process;
         std::vector <unsigned> nodes_not_on_this_process;
         //Calculate local and non-local node indices
+        unsigned total_local_nodes = 0;  //Count for sanity
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
             unsigned node_index=iter->GetNodeGlobalIndex(i);
             if (this->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
             {
                 nodes_on_this_process.push_back(node_index);
+                total_local_nodes++;
             }
             else
             {
                 nodes_not_on_this_process.push_back(node_index);
             }
         }
-
+        assert(total_local_nodes > 0);
         /*
          * If this is a TetrahedralMesh (not distributed) then it's possible that we own none
          * of the nodes in this element.  In that case we must skip the element.
