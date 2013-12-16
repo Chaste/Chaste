@@ -791,7 +791,10 @@ public:
                 std::string file_1 = handler.GetOutputDirectoryFullPath()+"/"+test_file_names[i];
                 std::string file_2 = "heart/test/data/Monodomain2d/" + test_file_names[i];
 
-                FileComparison comparer(file_1, file_2);
+                /* In parallel, we want result (below) to be consistent across processes.  For this to happen no process
+                 * should abort the file check.  This is why we pretend not to be called collectively.
+                 */
+                FileComparison comparer(file_1, file_2, false /*Pretend that it's not called collectively*/);
                 comparer.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
 
                 bool result = comparer.CompareFiles(0,false); // Don't throw a TS_ASSERT
@@ -799,7 +802,7 @@ public:
                 if (!result && (i == 3))
                 {
                     // For "ChasteParameters.xml" there is an alternative file
-                    // This is because different version of XSD produce rounded/full precision floating point numbers
+                    // This is because different versions of XSD produce rounded/full precision floating point numbers
                     FileComparison comparer2(file_1, file_2 + "_alt");
                     comparer2.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
                     TS_ASSERT(comparer2.CompareFiles());
