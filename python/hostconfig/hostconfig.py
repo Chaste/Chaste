@@ -221,6 +221,7 @@ def AddXsd(basePath):
 
 def DetermineCvodeVersion(includePath):
     """Figure out which version of CVODE is installed by grepping its version header."""
+    CheckPathExists(includePath, 'CVODE')
     config_h = os.path.join(includePath, 'sundials', 'sundials_config.h')
     if os.path.exists(config_h):
         version_re = re.compile(r'#define SUNDIALS_PACKAGE_VERSION "(\d+).(\d+).(\d+)"')
