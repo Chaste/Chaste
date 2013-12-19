@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "Version.hpp"
-#include "Warnings.hpp"
 
 Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                                const std::string& rDirectory,
@@ -1174,20 +1173,21 @@ void Hdf5DataWriter::SetChunkSize()
      * The size in each dimension is increased in step until the size of
      * the chunk exceeds a limit, or we end up with one big chunk...
      */
+    const unsigned recommended_max_number_chunks = 75000; // See note below and link to confluence website
     if (mUseOptimalChunkSizeAlgorithm)
     {
-        // The line below intially shoots for > 128 K chunks, which seems
+        // The line below initially shoots for > 128 K chunks, which seems
         // to be a good compromise. For large problems, performance usually
         // improves with increased chunk size, so the user may wish to
         // increase this to 1 M (or more) chunks. The chunk cache is set to
         // 128 M by default which should be plenty.
         unsigned target_size_bytes = 1024*1024/8;
         // Also make sure we don't have too many chunks. Over 75 K makes the
-        // H5Pset_istore_k optimsation above very detrimental to performance
+        // H5Pset_istore_k optimisation above very detrimental to performance
         // according to "Notes from 31 July 2013" at:
         // http://confluence.diamond.ac.uk/display/Europroj/Ulrik+Pederson+-+Excalibur+Notes
         mNumberOfChunks = UINT_MAX;
-        while ( mNumberOfChunks > 75000 )
+        while ( mNumberOfChunks > recommended_max_number_chunks )
         {
             unsigned target_size = 0;
             long unsigned divisors[DATASET_DIMS];
@@ -1232,17 +1232,20 @@ void Hdf5DataWriter::SetChunkSize()
         {
             mChunkSize[i] = mFixedChunkSize[i];
         }
-        // Number of chunks for istore_k optimsation
+        // Number of chunks for istore_k optimisation
         mNumberOfChunks = 1;
         for (unsigned i=0; i<DATASET_DIMS; ++i)
         {
             mNumberOfChunks *= ceil(double(mDatasetDims[i])/mChunkSize[i]);
         }
-        if ( mNumberOfChunks > 75000)
+        if ( mNumberOfChunks > recommended_max_number_chunks)
         {
-            WARN_ONCE_ONLY("The user-defined HDF5 chunk size has resulted in over 75,000 chunks, "
-                           "which is known to be extremely detrimental to performance. Try "
-                           "increasing the chunk dimensions.");
+            /*
+             * The user-defined HDF5 chunk size has resulted in over 75,000 chunks,
+             * which is known to be extremely detrimental to performance. Try
+             * increasing the chunk dimensions or (better) not using fixed chunk sizes.
+             */
+            NEVER_REACHED;
         }
     }
 }

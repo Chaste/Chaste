@@ -1611,21 +1611,6 @@ public:
 
         PetscTools::Destroy(petsc_data_long);
     }
-
-    void TestWarnAboutTooManyChunks() throw(Exception)
-    {
-        long unsigned number_nodes = 75001;
-        DistributedVectorFactory factory(number_nodes);
-
-        Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_warn_many_chunks", false);
-        writer.DefineFixedDimension(number_nodes);
-        writer.DefineVariable("FakeVar","dimensionless");
-        writer.SetFixedChunkSize(1,1,1); // Horrendously small chunks to trigger warning in the line below
-        writer.EndDefineMode();
-
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        Warnings::QuietDestroy();
-    }
 };
 
 #endif /*TESTHDF5DATAWRITER_HPP_*/
