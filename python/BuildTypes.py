@@ -395,7 +395,8 @@ class Gcc(BuildType):
             # On Mac OSX we assume that the underlying compiler is actually the clang frontend to LLVM
             self._compiler_type = 'clang'
             # clang mistakes an instantiation of a class (with no method calls) as an 'unused variable'
-            self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wno-unused-variable'])
+            self._cc_flags.extend(['-Wnon-virtual-dtor', '-Woverloaded-virtual', '-Wextra', '-Wno-unused-parameter', '-Wno-unused-variable', '-ftemplate-depth=512'])
+            # \todo #2481 What is the default template-depth with Moutain Lion?
             self.rdynamic_link_flag = ''
         else:
             self._compiler_type = 'gcc'
