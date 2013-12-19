@@ -59,7 +59,7 @@ struct LessThanNode
      * @param n1 pointer to a node
      * @param n2 pointer to a node
      */
-    bool operator()(const Node<SPACE_DIM> * const &n1, const Node<SPACE_DIM> * const &n2)
+    bool operator()(const Node<SPACE_DIM> * const &n1, const Node<SPACE_DIM> * const &n2) const
     {
         return (n1->GetIndex() < n2->GetIndex() );
     }
