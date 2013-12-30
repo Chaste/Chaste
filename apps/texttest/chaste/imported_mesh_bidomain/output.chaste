@@ -1,4 +1,4 @@
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2014, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -28,8 +28,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 This version of Chaste was compiled on:
-Tue, 06 Mar 2012 10:26:06 +0000 by Linux userpc58.cs.ox.ac.uk 2.6.32-38-generic #83-Ubuntu SMP Wed Jan 4 11:12:07 UTC 2012 x86_64 (uname)
-from revision number 15076 with build type GccOptNative, shared libraries.
+Tue, 17 Dec 2013 12:21:10 +0000 by Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64 (uname)
+from revision number 20729 with build type default, shared libraries.
 
          InMesh             Init           AssSys              Ode            Comms           AssRhs           NeuBCs           DirBCs              Ksp           Output   DataConversion         PostProc            User1            User2            User3            Total  
-   0.036 (  3%)     0.006 (  1%)     0.095 (  9%)     0.456 ( 44%)     0.004 (  0%)     0.008 (  1%)     0.000 (  0%)     0.000 (  0%)     0.230 ( 22%)     0.082 (  8%)     0.112 ( 11%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     1.039 (100%)  (seconds) 
+   0.043 (  6%)     0.002 (  0%)     0.046 (  6%)     0.377 ( 51%)     0.002 (  0%)     0.004 (  1%)     0.000 (  0%)     0.000 (  0%)     0.148 ( 20%)     0.019 (  3%)     0.093 ( 13%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.000 (  0%)     0.740 (100%)  (seconds) 
