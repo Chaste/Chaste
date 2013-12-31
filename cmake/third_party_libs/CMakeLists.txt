@@ -26,6 +26,7 @@ string(REGEX REPLACE "([a-zA-Z]):" "/cygdrive/\\1" CYG_DOWNLOAD_DIR "${DOWNLOAD_
 set(patch_message "#Patched by Chaste\n") # used to prevent re-patching what we've already patched
 
 #Automatic install of Cygwin and the required software, if the user requests it.
+option(AUTO_INSTALL_CYGWIN "Install Cygwin and required packages automatically" OFF)
 if(AUTO_INSTALL_CYGWIN)
     if(NOT EXISTS "${DOWNLOAD_DIR}/cygwin_installer")
         file(MAKE_DIRECTORY "${DOWNLOAD_DIR}/cygwin_installer")
