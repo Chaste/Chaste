@@ -349,7 +349,7 @@ class Protocol(processors.ModelModifier):
                 lhs, rhs = list(deps[0].operands())
                 if lhs.localName == u'ci':
                     if not (isinstance(rhs, mathml_cn) or
-                            (hasattr(rhs.apply, 'minus') and len(rhs.apply.xml_children) == 2
+                            (hasattr(rhs, 'apply') and hasattr(rhs.apply, 'minus') and len(rhs.apply.xml_children) == 2
                              and isinstance(rhs.apply.xml_children[1], mathml_cn))):
                         raise ProtocolError("The computed variable " + str(var) + " may not be specified as an input.")
                     # It's the special Computed case - convert to a constant
@@ -517,7 +517,7 @@ class Protocol(processors.ModelModifier):
         Finally, the protocol outputs will be used to prune the model's assignments
         list so only assignments of interest are used to generate code.
         """
-        # Add units before variables before maths so the order of inputs doesn't matter so much.
+        # Add units before variables before maths so the order of inputs etc. doesn't matter so much.
         for input in filter(lambda i: isinstance(i, cellml_units), self.inputs):
             #self._check_input(input)
             self.add_units(input)
@@ -947,9 +947,23 @@ class Protocol(processors.ModelModifier):
         """
         assert isinstance(expr, mathml_apply)
         assert expr.operator().localName == u'eq', 'Expression is not an assignment'
+        lhs, rhs = list(expr.operands())
+        # Check for the case of assigning to a variable declared with an ontology term that isn't in the model,
+        # but is an output
+        if lhs.localName == u'ci' and u':' in unicode(lhs):
+            try:
+                vname = unicode(lhs)
+                var = self._lookup_ontology_term(vname)
+            except ValueError:
+                # Is this declared just as an output with units? In which case, add var to model
+                for output_spec in self._output_specifications:
+                    if output_spec['prefixed_name'] == vname:
+                        units = output_spec['units']
+                        oxmeta_name = vname.split(':')[1]
+                        var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
+                        var.set_oxmeta_name(oxmeta_name)
         self._identify_referenced_variables(expr)
         # Figure out what's on the LHS of the assignment
-        lhs, rhs = list(expr.operands())
         if lhs.localName == u'ci':
             # Straight assignment to variable
             cname, vname = self._split_name(unicode(lhs))
