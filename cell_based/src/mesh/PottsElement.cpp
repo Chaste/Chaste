@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsElement.hpp"
 #include "RandomNumberGenerator.hpp"
 #include <cassert>
+#include "Exception.hpp"
+#include "Debug.hpp"
 
 
 template<unsigned DIM>
@@ -58,6 +60,64 @@ void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
     // Add pNode to mNodes
     this->mNodes.push_back(pNode);
 }
+
+template<unsigned DIM>
+double PottsElement<DIM>::GetAspectRatio()
+{
+	assert(DIM==2);
+
+	// See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
+
+	// Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
+	double mean_x=0;
+	double mean_y=0;
+
+	for (unsigned i=0; i<this->GetNumNodes(); i++)
+	{
+		mean_x += this->mNodes[i]->rGetLocation()[0];
+		mean_y += this->mNodes[i]->rGetLocation()[1];
+	}
+	mean_x /= this->GetNumNodes();
+	mean_y /= this->GetNumNodes();
+
+	double variance_x = 0;
+	double variance_y = 0;
+	double covariance_xy = 0;
+
+	for (unsigned i=0; i<this->GetNumNodes(); i++)
+	{
+		variance_x += pow((this->mNodes[i]->rGetLocation()[0]-mean_x),2);
+		variance_y += pow((this->mNodes[i]->rGetLocation()[1]-mean_y),2);
+		covariance_xy += (this->mNodes[i]->rGetLocation()[0]-mean_x)*(this->mNodes[i]->rGetLocation()[1]-mean_y);
+	}
+	variance_x /= this->GetNumNodes();
+	variance_y /= this->GetNumNodes();
+	covariance_xy /= this->GetNumNodes();
+
+	// Calculate max/min eigenvalues
+	double trace = variance_x+variance_y;
+	double det = variance_x*variance_y - covariance_xy*covariance_xy;
+
+	double eig_max = 0.5*(trace+sqrt(trace*trace - 4*det));
+	double eig_min = 0.5*(trace-sqrt(trace*trace - 4*det));
+
+
+	// As matrix is Symmetric Positive Definate
+	assert(eig_min >=0);
+	assert(eig_max >=0);
+
+
+    // This trips because all nodes in an element are in a line so you get an infinite aspect ratio.
+    if(eig_min==0)
+	{
+    	EXCEPTION("All nodes in an element are in a line so you get an infinite aspect ratio terms and this interferes with calculating the Hamiltonian.");
+	}
+
+	return eig_max/eig_min;
+
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation

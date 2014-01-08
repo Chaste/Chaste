@@ -142,6 +142,9 @@ public:
         Node<2>* p_node_2 = new Node<2>(2, false, 1.0, 0.0);
         element.UpdateNode(0, p_node_2);
 
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 1u);
+
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[0], 1.0, 1e-12);
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[1], 0.0, 1e-12);
 
@@ -168,6 +171,36 @@ public:
         TS_ASSERT_EQUALS(element.GetNodeLocalIndex(1), UINT_MAX);
         TS_ASSERT_EQUALS(element.GetNodeLocalIndex(2), 0u);
         TS_ASSERT_EQUALS(element.GetNodeLocalIndex(3), 1u);
+
+        // Test GetAspectRatio()
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 3u);
+        TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element are in a line so you get an infinite aspect ratio terms and this interferes with calculating the Hamiltonian.");
+
+        element.AddNode(nodes[0]);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 3u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(2), 0u);
+        TS_ASSERT_DELTA(element.GetAspectRatio(), 3.0,1e-5);
+
+        element.AddNode(nodes[1]);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 3u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(2), 0u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(3), 1u);
+        TS_ASSERT_EQUALS(element.GetAspectRatio(), 1);
+
+        element.DeleteNode(element.GetNodeLocalIndex(2));
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 0u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(2), 1u);
+        TS_ASSERT_DELTA(element.GetAspectRatio(), 3.0,1e-5);
+
+        element.DeleteNode(element.GetNodeLocalIndex(1));
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 3u);
+        TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 0u);
+        TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element are in a line so you get an infinite aspect ratio terms and this interferes with calculating the Hamiltonian.");
+
 
         // Test MarkAsDeleted()
         element.MarkAsDeleted();

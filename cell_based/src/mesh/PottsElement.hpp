@@ -97,6 +97,13 @@ public:
      * @param rIndex the location in this->mNodes to place node. Defaults to the end.
      */
     void AddNode(Node<DIM>* pNode,  const unsigned& rIndex = UINT_MAX);
+
+    /**
+     * Method to calculate the aspect ratio of the element. Currently only works on 2D
+     *
+     * @return the aspect ratio
+     */
+    double GetAspectRatio();
 };
 
 #endif /*POTTSELEMENT_HPP_*/
