@@ -54,9 +54,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * EMPTYLINE
  *
  * In this tutorial we show how Chaste is used to generate simulations
- * that can be viewed in Paraview, and how to use Paraview itself. Two examples
- * are provided - one using a cell-centre based model, and the second using
- * a vertex model. To be able to view these simulations, we must first have
+ * that can be viewed in Paraview, and how to use Paraview itself. Three examples
+ * are provided: the first uses a `MeshBasedCellPopulation` (a cell-centre model
+ * based on a Delaunay triangulation description of cell neighbours);
+ * the second uses a `NodeBasedCellPopulation` (a cell-centre model based on an
+ * 'overlapping spheres' description of cell neighbours); and the third uses a
+ * `VertexBasedCellPopulation` (in which each cell is represented by a polygon).
+ * To be able to view these simulations, we must first have
  * downloaded and installed VTK and Paraview, and updated our hostconfig file
  * to ensure that it knows to use VTK.
  *
@@ -81,6 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
@@ -97,11 +102,12 @@ class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
 public:
     /* EMPTYLINE
      *
-     * == Test 1 - a cell-based monolayer simulation ==
+     * == Test 1 - a mesh-based cell centre monolayer simulation ==
      *
      * EMPTYLINE
      *
-     * In the first test, we run a simple cell-based simulation, in which we use
+     * In the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
+     * in which we use
      * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model.
      */
     void Test2DMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
@@ -177,10 +183,58 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 2 - a basic vertex-based simulation ==
+    * == Test 2 - a node-based simulation ==
+    *
+     * EMPTYLINE
+     *
+    * We next run a similar simulation to the first example, but now use a `NodeBasedCellPopulation`,
+    * in which cells are represented as 'overlapping spheres'.
+    */
+    void Test2DNodeBasedMonolayerSimulationForVisualizing() throw (Exception)
+    {
+        /* We set up the simulation in much the same way as above, except now using a `NodesOnlyMesh` and
+         * `NodeBasedCellPopulation`. Further details on how to set up a node-based simulation can be found in
+         * UserTutorials/RunningNodeBasedSimulations.
+         */
+        HoneycombMeshGenerator generator(10, 10, 0);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("Test2DNodeBasedMonolayerSimulationForVisualizing");
+        simulator.SetEndTime(1.0);
+
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+    }
+
+    /*
+    * EMPTYLINE
+    *
+    * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
+    * test output from the new folder, {{{Test2DNodeBasedMonolayerSimulationForVisualizing}}}.
+    * After opening Paraview, load the file results.pvd, then click "Apply" in the object inspector panel.
+    * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
+    * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
     *
     * EMPTYLINE
     *
+    * == Test 3 - a basic vertex-based simulation ==
+    *
+     * EMPTYLINE
+     *
     * Here, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells using a mutable vertex mesh. Each cell is assigned a fixed cell-cycle model.
     */
