@@ -126,10 +126,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell)
 {
     /**
-     * \todo Could remove this dynamic_cast by moving the code block below into
+     * \todo #2400 Could remove this dynamic_cast by moving the code block below into
      * AbstractCentreBasedCellPopulation::AddCell(), allowing it to be overruled by
      * this method when overridden in subclasses. See also comment on #1093.
      */
+    // If it is not vertex based...
     if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)))
     {
         // Location of parent and daughter cells
@@ -200,8 +201,13 @@ c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::Calcula
     }
     else
     {
-        ///\todo do something for vertex models here (see #2400)
-        return zero_vector<double>(SPACE_DIM);
+        // Check this is a Vertex based cell population (in case new types are added later!).
+        assert(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation)));
+
+        VertexBasedCellPopulation<SPACE_DIM>* p_vertex_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&(this->mrCellPopulation));
+        boost::shared_ptr<ShortAxisDivisionRule<SPACE_DIM> > p_division_rule = p_vertex_population->GetDivisionRule();
+
+        return p_division_rule->CalculateCellDivisionVector(pParentCell, *p_vertex_population);
     }
 }
 

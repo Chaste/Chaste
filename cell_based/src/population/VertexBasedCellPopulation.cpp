@@ -57,6 +57,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
       mOutputCellRearrangementLocations(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
+    mpDivisionRule.reset(new ShortAxisDivisionRule<DIM>());
 
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();
@@ -182,24 +183,17 @@ unsigned VertexBasedCellPopulation<DIM>::GetNumElements()
 }
 
 template<unsigned DIM>
-CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
+CellPtr VertexBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell,
+                                                const c_vector<double,DIM>& rCellDivisionVector,
+                                                CellPtr pParentCell)
 {
     // Get the element associated with this cell
     VertexElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
 
     // Divide the element
-    unsigned new_element_index;
-    if (norm_2(rCellDivisionVector) < DBL_EPSILON)
-    {
-        // If the cell division vector is the default zero vector, divide the element along the short axis
-        new_element_index = mpMutableVertexMesh->DivideElementAlongShortAxis(p_element, true);
-    }
-    else
-    {
-        // If the cell division vector has any non-zero component, divide the element along this axis
-        new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element, rCellDivisionVector, true);
-    }
-
+    unsigned new_element_index = mpMutableVertexMesh->DivideElementAlongGivenAxis(p_element,
+                                                                                  rCellDivisionVector,
+                                                                                  true);
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -566,6 +560,12 @@ template<unsigned DIM>
 std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
     return mpMutableVertexMesh->GetNeighbouringNodeIndices(index);
+}
+
+template<unsigned DIM>
+boost::shared_ptr<ShortAxisDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetDivisionRule()
+{
+    return mpDivisionRule;
 }
 
 template<unsigned DIM>

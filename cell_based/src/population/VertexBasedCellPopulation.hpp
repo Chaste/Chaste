@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
+#include "ShortAxisDivisionRule.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -46,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "WildTypeCellMutationState.hpp"
+
+template<unsigned DIM> class ShortAxisDivisionRule; // Circular definition thing.
 
 /**
  * A facade class encapsulating a vertex-based cell population.
@@ -74,6 +77,10 @@ private:
     /** Whether to output the locations of T1 swaps and T3 swaps to files. Defaults to true. */
     bool mOutputCellRearrangementLocations;
 
+    /** A pointer to a division rule that is used to generate the axis when dividing cells.
+     * This is a specialisation for Vertex models. */
+    boost::shared_ptr<ShortAxisDivisionRule<DIM> > mpDivisionRule;
+
     /**
      * Overridden WriteVtkResultsToFile() method.
      */
@@ -96,6 +103,7 @@ private:
     {
         archive & boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
         archive & mOutputCellRearrangementLocations;
+        archive & mpDivisionRule;
     }
 
     /**
@@ -354,6 +362,11 @@ public:
      * This method only works in 2D.
      */
     TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshUsingVertexMesh();
+
+    /**
+     * @return The Vertex division rule that is currently being used.
+     */
+    boost::shared_ptr<ShortAxisDivisionRule<DIM> > GetDivisionRule();
 };
 
 #include "SerializationExportWrapper.hpp"

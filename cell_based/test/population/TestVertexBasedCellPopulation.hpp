@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "ShortAxisDivisionRule.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -366,7 +367,13 @@ public:
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);
 
-        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, cell_division_vector, p_cell0);
+        boost::shared_ptr<ShortAxisDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
+        c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+
+        TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
+        TS_ASSERT_DELTA(short_axis[1], 1.0, 1e-9);
+
+        CellPtr p_new_cell = cell_population.AddCell(p_temp_cell, short_axis, p_cell0);
 
         // Check that the new cell was successfully added to the cell population
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
@@ -560,7 +567,8 @@ public:
 
         CellPtr p_new_cell = cell_population.GetCellUsingLocationIndex(4)->Divide();
 
-        c_vector<double, 2> new_location = zero_vector<double>(2);
+        c_vector<double, 2> new_location = cell_population.GetDivisionRule()
+                ->CalculateCellDivisionVector(p_cell4, cell_population);
 
         // Add new cell to the cell population
         cell_population.AddCell(p_new_cell, new_location, p_cell4);

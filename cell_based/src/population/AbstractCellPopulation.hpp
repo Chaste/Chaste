@@ -327,7 +327,9 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way).
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell=CellPtr())=0;
+    virtual CellPtr AddCell(CellPtr pNewCell,
+                            const c_vector<double,SPACE_DIM>& rCellDivisionVector,
+                            CellPtr pParentCell=CellPtr())=0;
 
     class Iterator; // Forward declaration; see below
 
