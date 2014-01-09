@@ -64,123 +64,123 @@ void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
 template<unsigned DIM>
 double PottsElement<DIM>::GetAspectRatio()
 {
-	assert(DIM==2 || DIM==3);
+    assert(DIM==2 || DIM==3);
 
-	// See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
+    // See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
 
-	if(DIM == 2)
-	{
-		// Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
-		double mean_x=0;
-		double mean_y=0;
+    if(DIM == 2)
+    {
+        // Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
+        double mean_x=0;
+        double mean_y=0;
 
-		for (unsigned i=0; i<this->GetNumNodes(); i++)
-		{
-			mean_x += this->mNodes[i]->rGetLocation()[0];
-			mean_y += this->mNodes[i]->rGetLocation()[1];
-		}
-		mean_x /= this->GetNumNodes();
-		mean_y /= this->GetNumNodes();
+        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        {
+            mean_x += this->mNodes[i]->rGetLocation()[0];
+            mean_y += this->mNodes[i]->rGetLocation()[1];
+        }
+        mean_x /= this->GetNumNodes();
+        mean_y /= this->GetNumNodes();
 
-		double variance_x = 0;
-		double variance_y = 0;
-		double covariance_xy = 0;
+        double variance_x = 0;
+        double variance_y = 0;
+        double covariance_xy = 0;
 
-		for (unsigned i=0; i<this->GetNumNodes(); i++)
-		{
-			variance_x += pow((this->mNodes[i]->rGetLocation()[0]-mean_x),2);
-			variance_y += pow((this->mNodes[i]->rGetLocation()[1]-mean_y),2);
-			covariance_xy += (this->mNodes[i]->rGetLocation()[0]-mean_x)*(this->mNodes[i]->rGetLocation()[1]-mean_y);
-		}
-		variance_x /= this->GetNumNodes();
-		variance_y /= this->GetNumNodes();
-		covariance_xy /= this->GetNumNodes();
+        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        {
+            variance_x += pow((this->mNodes[i]->rGetLocation()[0]-mean_x),2);
+            variance_y += pow((this->mNodes[i]->rGetLocation()[1]-mean_y),2);
+            covariance_xy += (this->mNodes[i]->rGetLocation()[0]-mean_x)*(this->mNodes[i]->rGetLocation()[1]-mean_y);
+        }
+        variance_x /= this->GetNumNodes();
+        variance_y /= this->GetNumNodes();
+        covariance_xy /= this->GetNumNodes();
 
-		// Calculate max/min eigenvalues
-		double trace = variance_x+variance_y;
-		double det = variance_x*variance_y - covariance_xy*covariance_xy;
+        // Calculate max/min eigenvalues
+        double trace = variance_x+variance_y;
+        double det = variance_x*variance_y - covariance_xy*covariance_xy;
 
-		double eig_max = 0.5*(trace+sqrt(trace*trace - 4*det));
-		double eig_min = 0.5*(trace-sqrt(trace*trace - 4*det));
-
-
-		// As matrix is Symmetric Positive Definate
-		assert(eig_min >=0);
-		assert(eig_max >=0);
+        double eig_max = 0.5*(trace+sqrt(trace*trace - 4*det));
+        double eig_min = 0.5*(trace-sqrt(trace*trace - 4*det));
 
 
-		// This trips because all nodes in an element are in a line so you get an infinite aspect ratio.
-		if(eig_min==0)
-		{
-			EXCEPTION("All nodes in an element are in a line so you get an infinite aspect ratio terms and this interferes with calculating the Hamiltonian.");
-		}
+        // As matrix is Symmetric Positive Definate
+        assert(eig_min >=0);
+        assert(eig_max >=0);
 
-		return eig_max/eig_min;
-	}
-	else if (DIM==3)
-	{
-//		// Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
-//		double mean_x=0;
-//		double mean_y=0;
-//		double mean_z=0;
+
+        // This trips because all nodes in an element are in a line so you get an infinite aspect ratio.
+        if(eig_min==0)
+        {
+            EXCEPTION("All nodes in an element are in a line so you get an infinite aspect ratio terms and this interferes with calculating the Hamiltonian.");
+        }
+
+        return eig_max/eig_min;
+    }
+    else
+    {
+        //(DIM==3)
+        assert(DIM == 3);
+//        // Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
+//        double mean_x=0;
+//        double mean_y=0;
+//        double mean_z=0;
 //
-//		for (unsigned i=0; i<this->GetNumNodes(); i++)
-//		{
-//			mean_x += this->mNodes[i]->rGetLocation()[0];
-//			mean_y += this->mNodes[i]->rGetLocation()[1];
-//			mean_z += this->mNodes[i]->rGetLocation()[2];
-//		}
-//		mean_x /= this->GetNumNodes();
-//		mean_y /= this->GetNumNodes();
-//		mean_z /= this->GetNumNodes();
+//        for (unsigned i=0; i<this->GetNumNodes(); i++)
+//        {
+//            mean_x += this->mNodes[i]->rGetLocation()[0];
+//            mean_y += this->mNodes[i]->rGetLocation()[1];
+//            mean_z += this->mNodes[i]->rGetLocation()[2];
+//        }
+//        mean_x /= this->GetNumNodes();
+//        mean_y /= this->GetNumNodes();
+//        mean_z /= this->GetNumNodes();
 //
-//	    double variance_x = 0;
-//	    double variance_y = 0;
-//	    double variance_z = 0;
+//        double variance_x = 0;
+//        double variance_y = 0;
+//        double variance_z = 0;
 //
-//	    double covariance_xy = 0;
-//		double covariance_xz = 0;
-//		double covariance_yz = 0;
+//        double covariance_xy = 0;
+//        double covariance_xz = 0;
+//        double covariance_yz = 0;
 //
-//		for (unsigned i=0; i<this->GetNumNodes(); i++)
-//		{
-//			double diff_x =this->mNodes[i]->rGetLocation()[0]-mean_x;
-//			double diff_y =this->mNodes[i]->rGetLocation()[1]-mean_y;
-//			double diff_z =this->mNodes[i]->rGetLocation()[2]-mean_z;
+//        for (unsigned i=0; i<this->GetNumNodes(); i++)
+//        {
+//            double diff_x =this->mNodes[i]->rGetLocation()[0]-mean_x;
+//            double diff_y =this->mNodes[i]->rGetLocation()[1]-mean_y;
+//            double diff_z =this->mNodes[i]->rGetLocation()[2]-mean_z;
 //
-//			variance_x += diff_x*diff_x;
-//			variance_y += diff_y*diff_y;
-//			variance_z += diff_z*diff_z;
-//			covariance_xy += diff_x*diff_y;
-//			covariance_xz += diff_x*diff_z;
-//			covariance_yz += diff_y*diff_z;
-//		}
-//		variance_x /= this->GetNumNodes();
-//		variance_y /= this->GetNumNodes();
-//		variance_z /= this->GetNumNodes();
-//		covariance_xy /= this->GetNumNodes();
-//		covariance_xz /= this->GetNumNodes();
-//		covariance_yz /= this->GetNumNodes();
+//            variance_x += diff_x*diff_x;
+//            variance_y += diff_y*diff_y;
+//            variance_z += diff_z*diff_z;
+//            covariance_xy += diff_x*diff_y;
+//            covariance_xz += diff_x*diff_z;
+//            covariance_yz += diff_y*diff_z;
+//        }
+//        variance_x /= this->GetNumNodes();
+//        variance_y /= this->GetNumNodes();
+//        variance_z /= this->GetNumNodes();
+//        covariance_xy /= this->GetNumNodes();
+//        covariance_xz /= this->GetNumNodes();
+//        covariance_yz /= this->GetNumNodes();
 //
-//		c_matrix<double, 3, 3> covariance_matrix;
+//        c_matrix<double, 3, 3> covariance_matrix;
 //
-//		covariance_matrix(0,0)=variance_x;
-//		covariance_matrix(0,1)=covariance_xy;
-//		covariance_matrix(0,2)=covariance_xz;
+//        covariance_matrix(0,0)=variance_x;
+//        covariance_matrix(0,1)=covariance_xy;
+//        covariance_matrix(0,2)=covariance_xz;
 //
-//		covariance_matrix(1,0)=covariance_xy;
-//		covariance_matrix(1,1)=variance_y;
-//		covariance_matrix(1,2)=covariance_yz;
+//        covariance_matrix(1,0)=covariance_xy;
+//        covariance_matrix(1,1)=variance_y;
+//        covariance_matrix(1,2)=covariance_yz;
 //
-//		covariance_matrix(2,0)=covariance_xz;
-//		covariance_matrix(2,1)=covariance_yz;
-//		covariance_matrix(2,2)=variance_z;
+//        covariance_matrix(2,0)=covariance_xz;
+//        covariance_matrix(2,1)=covariance_yz;
+//        covariance_matrix(2,2)=variance_z;
 //
 
-		return 0;
-	}
-
-
+        return 0.0;
+    }
 }
 
 
