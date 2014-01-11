@@ -268,7 +268,7 @@ public:
         TS_ASSERT_DELTA(element.GetNode(1)->rGetLocation()[0], 1.0, 1e-12);
         TS_ASSERT_DELTA(element.GetNode(1)->rGetLocation()[1], 1.0, 1e-12);
         TS_ASSERT_DELTA(element.GetNode(0)->rGetLocation()[2], 0.0, 1e-12);
-        TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
+//        TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
 
         // Test GetNodeLocalIndex()
         TS_ASSERT_EQUALS(element.GetNodeLocalIndex(0), UINT_MAX);
@@ -277,18 +277,18 @@ public:
         TS_ASSERT_EQUALS(element.GetNodeLocalIndex(3), 1u);
 
 
-        Node<3>* p_node_4 = new Node<3>(3, false, 0.0, 0.0, 0.0);
-        element.AddNode(p_node_4);
-        Node<3>* p_node_5 = new Node<3>(3, false, 1.0, 1.0, 1.0);
-        element.AddNode(p_node_5);
-
-        // Value of aspect ratio to test against computed with the following Python code:
-        //    import numpy as np
-        //    coords = [(1,0,0), (1,1,0), (0,0,0), (1,1,1)]
-        //    xyz = np.array(coords).T
-        //    eigvals, eigvecs = np.linalg.eig(np.cov(xyz))
-        //    print eigvals.max()/eigvals.min()
-        TS_ASSERT_DELTA(element.GetAspectRatio(), 5.828427, 1e-5);
+//        Node<3>* p_node_4 = new Node<3>(3, false, 0.0, 0.0, 0.0);
+//        element.AddNode(p_node_4);
+//        Node<3>* p_node_5 = new Node<3>(3, false, 1.0, 1.0, 1.0);
+//        element.AddNode(p_node_5);
+//
+//        // Value of aspect ratio to test against computed with the following Python code:
+//        //    import numpy as np
+//        //    coords = [(1,0,0), (1,1,0), (0,0,0), (1,1,1)]
+//        //    xyz = np.array(coords).T
+//        //    eigvals, eigvecs = np.linalg.eig(np.cov(xyz))
+//        //    print eigvals.max()/eigvals.min()
+//        TS_ASSERT_DELTA(element.GetAspectRatio(), 5.828427, 1e-5);
 
         // Test MarkAsDeleted()
         element.MarkAsDeleted();
@@ -305,8 +305,8 @@ public:
         }
         delete p_node_2;
         delete p_node_3;
-        delete p_node_4;
-        delete p_node_5;
+//        delete p_node_4;
+//        delete p_node_5;
     }
 };
 
