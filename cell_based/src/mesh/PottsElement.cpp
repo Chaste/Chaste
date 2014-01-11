@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include "Exception.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "petscsys.h"
+#include "petscblaslapack.h"
 
 
 template<unsigned DIM>
@@ -66,9 +68,13 @@ double PottsElement<DIM>::GetAspectRatio()
 {
     assert(DIM==2 || DIM==3);
 
-    // See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
+    double eig_max;
+    double eig_min;
 
-    if(DIM == 2)
+    // See http://stackoverflow.com/questions/7059841/estimating-aspect-ratio-of-a-convex-hull for how to do it.
+    switch(DIM)
+    {
+    case 2:
     {
         // Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
         double mean_x=0;
@@ -100,87 +106,100 @@ double PottsElement<DIM>::GetAspectRatio()
         double trace = variance_x+variance_y;
         double det = variance_x*variance_y - covariance_xy*covariance_xy;
 
-        double eig_max = 0.5*(trace+sqrt(trace*trace - 4*det));
-        double eig_min = 0.5*(trace-sqrt(trace*trace - 4*det));
+        eig_max = 0.5*(trace+sqrt(trace*trace - 4*det));
+        eig_min = 0.5*(trace-sqrt(trace*trace - 4*det));
 
-
-        // As matrix is Symmetric Positive Definate
-        assert(eig_min >=0);
-        assert(eig_max >=0);
-
-
-        // This trips because all nodes in an element are in a line so you get an infinite aspect ratio.
-        if(eig_min==0)
-        {
-            EXCEPTION("All nodes in an element are in a line so you get an infinite aspect ratio terms and this interferes with calculating the Hamiltonian.");
-        }
-
-        return eig_max/eig_min;
+        break;
     }
-    else
+    case 3:
     {
-        //(DIM==3)
-        assert(DIM == 3);
-//        // Calculate entries of covariance matrix (var_x,cov_xy;cov_xy,var_y)
-//        double mean_x=0;
-//        double mean_y=0;
-//        double mean_z=0;
-//
-//        for (unsigned i=0; i<this->GetNumNodes(); i++)
-//        {
-//            mean_x += this->mNodes[i]->rGetLocation()[0];
-//            mean_y += this->mNodes[i]->rGetLocation()[1];
-//            mean_z += this->mNodes[i]->rGetLocation()[2];
-//        }
-//        mean_x /= this->GetNumNodes();
-//        mean_y /= this->GetNumNodes();
-//        mean_z /= this->GetNumNodes();
-//
-//        double variance_x = 0;
-//        double variance_y = 0;
-//        double variance_z = 0;
-//
-//        double covariance_xy = 0;
-//        double covariance_xz = 0;
-//        double covariance_yz = 0;
-//
-//        for (unsigned i=0; i<this->GetNumNodes(); i++)
-//        {
-//            double diff_x =this->mNodes[i]->rGetLocation()[0]-mean_x;
-//            double diff_y =this->mNodes[i]->rGetLocation()[1]-mean_y;
-//            double diff_z =this->mNodes[i]->rGetLocation()[2]-mean_z;
-//
-//            variance_x += diff_x*diff_x;
-//            variance_y += diff_y*diff_y;
-//            variance_z += diff_z*diff_z;
-//            covariance_xy += diff_x*diff_y;
-//            covariance_xz += diff_x*diff_z;
-//            covariance_yz += diff_y*diff_z;
-//        }
-//        variance_x /= this->GetNumNodes();
-//        variance_y /= this->GetNumNodes();
-//        variance_z /= this->GetNumNodes();
-//        covariance_xy /= this->GetNumNodes();
-//        covariance_xz /= this->GetNumNodes();
-//        covariance_yz /= this->GetNumNodes();
-//
-//        c_matrix<double, 3, 3> covariance_matrix;
-//
-//        covariance_matrix(0,0)=variance_x;
-//        covariance_matrix(0,1)=covariance_xy;
-//        covariance_matrix(0,2)=covariance_xz;
-//
-//        covariance_matrix(1,0)=covariance_xy;
-//        covariance_matrix(1,1)=variance_y;
-//        covariance_matrix(1,2)=covariance_yz;
-//
-//        covariance_matrix(2,0)=covariance_xz;
-//        covariance_matrix(2,1)=covariance_yz;
-//        covariance_matrix(2,2)=variance_z;
-//
+        double mean_x = 0;
+        double mean_y = 0;
+        double mean_z = 0;
 
-        return 0.0;
+        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        {
+            mean_x += this->mNodes[i]->rGetLocation()[0];
+            mean_y += this->mNodes[i]->rGetLocation()[1];
+            mean_z += this->mNodes[i]->rGetLocation()[2];
+        }
+        mean_x /= this->GetNumNodes();
+        mean_y /= this->GetNumNodes();
+        mean_z /= this->GetNumNodes();
+
+        double variance_x = 0;
+        double variance_y = 0;
+        double variance_z = 0;
+
+        double covariance_xy = 0;
+        double covariance_xz = 0;
+        double covariance_yz = 0;
+
+        for (unsigned i=0; i<this->GetNumNodes(); i++)
+        {
+            double diff_x = this->mNodes[i]->rGetLocation()[0]-mean_x;
+            double diff_y = this->mNodes[i]->rGetLocation()[1]-mean_y;
+            double diff_z = this->mNodes[i]->rGetLocation()[2]-mean_z;
+
+            variance_x += diff_x*diff_x;
+            variance_y += diff_y*diff_y;
+            variance_z += diff_z*diff_z;
+            covariance_xy += diff_x*diff_y;
+            covariance_xz += diff_x*diff_z;
+            covariance_yz += diff_y*diff_z;
+        }
+        variance_x /= this->GetNumNodes();
+        variance_y /= this->GetNumNodes();
+        variance_z /= this->GetNumNodes();
+        covariance_xy /= this->GetNumNodes();
+        covariance_xz /= this->GetNumNodes();
+        covariance_yz /= this->GetNumNodes();
+
+        c_matrix<PetscScalar, 3, 3> covariance_matrix;
+
+        covariance_matrix(0,0) = variance_x;
+        covariance_matrix(0,1) = covariance_xy;
+        covariance_matrix(0,2) = covariance_xz;
+
+        covariance_matrix(1,0) = covariance_xy;
+        covariance_matrix(1,1) = variance_y;
+        covariance_matrix(1,2) = covariance_yz;
+
+        covariance_matrix(2,0) = covariance_xz;
+        covariance_matrix(2,1) = covariance_yz;
+        covariance_matrix(2,2) = variance_z;
+
+        const char N = 'N';
+        const char L = 'L';
+        PetscBLASInt size = DIM;
+        PetscReal eigs[DIM];
+        // Optimal work_size (102 entries) computed with a special call to LAPACKsyev_ (see documentation)
+        // and rounded to the next power of 2
+        const PetscBLASInt work_size = 128;
+        PetscScalar workspace[work_size];
+        PetscBLASInt info;
+        LAPACKsyev_(&N, &L, &size, covariance_matrix.data(), &size, eigs, workspace, (PetscBLASInt*) &work_size, &info);
+        assert(info == 0);
+
+        // Lapack returns eigenvalues in ascending order
+        eig_max = eigs[DIM-1];
+        eig_min = eigs[0];
+        break;
     }
+    default:
+    	NEVER_REACHED;
+    }
+
+    // As matrix is symmetric positive semidefinite
+    assert(eig_min >=0);
+    assert(eig_max >=0);
+
+    if(eig_min==0)
+    {
+        EXCEPTION("All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
+    }
+
+    return eig_max/eig_min;
 }
 
 
