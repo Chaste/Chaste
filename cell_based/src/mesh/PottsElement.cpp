@@ -178,7 +178,7 @@ double PottsElement<DIM>::GetAspectRatio()
         const PetscBLASInt work_size = 128;
         PetscScalar workspace[work_size];
         PetscBLASInt info;
-        LAPACKsyev_(&N, &L, &size, covariance_matrix.data(), &size, eigs, workspace, (PetscBLASInt*) &work_size, &info);
+        dsyev_(&N, &L, &size, covariance_matrix.data(), &size, eigs, workspace, (PetscBLASInt*) &work_size, &info);
         assert(info == 0);
 
         // Lapack returns eigenvalues in ascending order
