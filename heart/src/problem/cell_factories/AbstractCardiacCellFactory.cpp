@@ -40,15 +40,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateCardiacCellForNode(
-    const unsigned& rNodeIndex)
+    unsigned nodeIndex)
 {
-    if (HeartRegionCode::IsRegionBath( mpMesh->GetNodeOrHaloNode(rNodeIndex)->GetRegion() ))
+    if (HeartRegionCode::IsRegionBath( mpMesh->GetNodeOrHaloNode(nodeIndex)->GetRegion() ))
     {
         return new FakeBathCell(this->mpSolver, this->mpZeroStimulus);
     }
     else
     {
-        AbstractCardiacCellInterface* p_cell = CreateCardiacCellForTissueNode(rNodeIndex);
+        AbstractCardiacCellInterface* p_cell = CreateCardiacCellForTissueNode(nodeIndex);
 #ifdef CHASTE_CVODE
         if (dynamic_cast<AbstractCvodeCell*>(p_cell))
         {

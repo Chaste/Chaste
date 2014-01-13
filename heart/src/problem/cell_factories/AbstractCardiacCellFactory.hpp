@@ -88,9 +88,9 @@ public:
      * case a pointer to a (unique) fake cell is returned) and if not, calls
      * CreateCardiacCellForTissueNode (which must be defined by subclasses).
      *
-     * @param rNodeIndex  Global node index.
+     * @param nodeIndex  Global node index.
      */
-    virtual AbstractCardiacCellInterface* CreateCardiacCellForNode(const unsigned& rNodeIndex);
+    virtual AbstractCardiacCellInterface* CreateCardiacCellForNode(unsigned nodeIndex);
 
     /**
      * Must be overridden by subclasses to return a cell object for the given node.

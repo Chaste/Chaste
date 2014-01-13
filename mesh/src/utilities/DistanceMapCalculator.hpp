@@ -132,6 +132,7 @@ public:
      * @param rMesh the mesh for which to compute maps
      */
     DistanceMapCalculator(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+
      /**
      * Destructor - cleans up mNumHalosPerProcess (which is normally set to NULL anyway).
      */
@@ -151,6 +152,7 @@ public:
      */
     void ComputeDistanceMap(const std::vector<unsigned>& rSourceNodeIndices,
                             std::vector<double>& rNodeDistances);
+
     /**
      *  @return calculated single point-to-point distance
      *
