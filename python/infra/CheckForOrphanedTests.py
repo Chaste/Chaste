@@ -110,7 +110,7 @@ if test_packs:
 not_found = []
 for test_dir in local_found_tests.keys():
     for test_file in local_found_tests[test_dir]:
-        not_found.append(test_dir + test_file)
+        not_found.append(os.path.join(test_dir,test_file))
 
 # Display results
 if orphans or not_found:
