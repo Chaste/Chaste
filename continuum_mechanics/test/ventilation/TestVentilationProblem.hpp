@@ -204,6 +204,34 @@ public:
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-8); //BC
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-8); //BC
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-4); // (Inflow flux)
+    }
+
+    void TestThreeBifurcationsWithRadiusOnNodeFileFluxBoundaries() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowFluxes(-71.0176);
+        problem.Solve();
+        const unsigned num_edge = problem.rGetMesh().GetNumElements();
+        ReplicatableVector solution_vector_repl( problem.GetSolution());
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6666,   1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-4); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-4); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-4); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-4); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-8); // BC (Inflow flux)
     }
 
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)

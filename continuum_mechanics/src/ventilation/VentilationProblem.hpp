@@ -58,7 +58,8 @@ class VentilationProblem {
     LinearSystem* mpLinearSystem; /**< Linear system for pressure (at nodes) and flux (in edges).  Allocated by constructor */
     bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
     bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
-
+    bool mFluxBoundary; /**< Use a known flux boundary condition at the leaves (rather than a pressure condition).  This false (pressure BC) by default.*/
+    std::set<unsigned> mLeafEdgeIndices; /**< When mFluxBoundary== true then keep track of which edge have this type of boundary condition */
     /** (Dynamic) viscosity in kg/(mm*second).
      * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
      *  mu = 1.92e-5 Pa*s
@@ -114,10 +115,15 @@ public:
      */
     void SetOutflowPressure(double pressure);
 
-    /** Sets the pressure at the outflow/root of the tree
+    /** Sets the pressure at each inflow/leaf of the tree
      * @param pressure  The pressure value
      */
     void SetConstantInflowPressures(double pressure);
+
+    /** Sets the flux at each inflow/leaf-edge of the tree
+     * @param flux  The flux value
+     */
+    void SetConstantInflowFluxes(double flux);
 
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes

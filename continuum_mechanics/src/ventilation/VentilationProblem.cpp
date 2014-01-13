@@ -36,8 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VentilationProblem.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "ReplicatableVector.hpp"
-
-
+#include "Debug.hpp"
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
       mpLinearSystem(NULL),
@@ -91,6 +90,26 @@ void VentilationProblem::SetConstantInflowPressures(double pressure)
              //Boundary conditions at each boundary/leaf node
              mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
              mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
+         }
+     }
+}
+
+void VentilationProblem::SetConstantInflowFluxes(double flux)
+{
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
+          iter != mMesh.GetBoundaryNodeIteratorEnd();
+          ++iter)
+     {
+         if ((*iter)->GetIndex() != mOutletNodeIndex)
+         {
+             unsigned pressure_index =  mMesh.GetNumElements() +  (*iter)->GetIndex();
+             unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
+             mLeafEdgeIndices.insert(edge_index);
+             // Boundary conditions at each boundary/leaf edge.  Note that this goes into the
+             // row associated with the leaf node so that the edge's row can still be used
+             // for flux/pressure.
+             mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
+             mpLinearSystem->SetRhsVectorElement(pressure_index, flux);
          }
      }
 }
