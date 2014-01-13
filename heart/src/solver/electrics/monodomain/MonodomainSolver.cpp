@@ -88,7 +88,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
     DistributedVector dist_vec_matrix_based = p_factory->CreateDistributedVector(mVecForConstructingRhs);
 
     double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
-    double Cm  = HeartConfig::Instance()->GetCapacitance();
+    double Cm = HeartConfig::Instance()->GetCapacitance();
 
     for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
          index!= dist_vec_matrix_based.End();
