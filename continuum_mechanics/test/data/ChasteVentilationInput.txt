@@ -1,0 +1,6 @@
+RHO_AIR       1.138 kg.m-3
+MU_AIR        1.920 Pa.s
+PRESSURE_IN   0     Pa
+PRESSURE_OUT  -1    Pa
+#RHO_BLOOD     1050  kg.m-3
+#MU_BLOOD        3.36E-03  Pa.s
