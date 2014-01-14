@@ -281,6 +281,21 @@ public:
         TimeStepper stepper(0.0, 25.0, 0.1);
         problem.Solve(stepper, &SineBCs, "TestVentilation", "three_bifurcations_sine");
     }
+    /*
+     * HOW_TO_TAG Continuum mechanics/Ventilation
+     * Solve a simple ventilation problem defined in a file.
+     *
+     * The file prescribes pressure at the root (trachea) and at the leaves (acini).
+     * The file sets density and viscosity
+     *
+     * Output file names are given to the function (but might instead be given in the file)
+     *
+     */
+    void TestSolveProblemDefinedInFile() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations");
+        problem.SolveProblemFromFile("continuum_mechanics/test/data/ChasteVentilationInput.txt", "VentilationOutput", "3_bifurcations");
+    }
     void TestReadFile()  throw (Exception)
     {
         ReadDataFromFile("continuum_mechanics/test/data/Pdata-Normal.txt");
@@ -335,6 +350,10 @@ public:
     {
         TS_ASSERT_THROWS_THIS(VentilationProblem bad_problem("mesh/test/data/y_branch_3d_mesh", 1u),
                 "Outlet node is not a boundary node");
+
+        VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations");
+        TS_ASSERT_THROWS_THIS(problem.SolveProblemFromFile("DoesNotExist.txt", "out", "out"), "Could not open file DoesNotExist.txt");
+
     }
 
 };

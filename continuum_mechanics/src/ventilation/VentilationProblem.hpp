@@ -58,8 +58,7 @@ class VentilationProblem {
     LinearSystem* mpLinearSystem; /**< Linear system for pressure (at nodes) and flux (in edges).  Allocated by constructor */
     bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
     bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
-    bool mFluxBoundary; /**< Use a known flux boundary condition at the leaves (rather than a pressure condition).  This false (pressure BC) by default.*/
-    std::set<unsigned> mLeafEdgeIndices; /**< When mFluxBoundary== true then keep track of which edge have this type of boundary condition */
+
     /** (Dynamic) viscosity in kg/(mm*second).
      * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
      *  mu = 1.92e-5 Pa*s
@@ -75,7 +74,7 @@ class VentilationProblem {
      *  Default to Swan (page 224)
      *  rho = 1.51e-6 g/mm^3
      *      = 1.51e-9 kg/mm^3
-     * \todo #2300 This is UNUSED.
+     *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;
 
@@ -94,6 +93,17 @@ class VentilationProblem {
     void Assemble(bool dynamicReassemble=false);
 
 public:
+    /** Default constructor
+     * Attempts to read all parameters from a hard-coded file
+     * Loads a mesh from file(s)
+     * Identifies the outlet node (a.k.a root of tree or the mouth end)
+     *   A check is made that it is a boundary node.  We could also check that
+     *   on trees with more than one bifurcation there are no boundary nodes in
+     *   its 2nd generation successors.
+     * Creates a linear system of the appropriate size to match the mesh
+     */
+    VentilationProblem();
+
     /** Constructor
      * Loads a mesh from file(s)
      * Identifies the outlet node (a.k.a root of tree or the mouth end)
@@ -180,6 +190,15 @@ public:
      *  @param rFileBaseName The base name of the new VTK file.
      */
     void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(VentilationProblem*, double), const std::string& rDirName, const std::string& rFileBaseName);
+
+    /**
+     * Read a problem definition from a file and use then solve that problem
+     *
+     * @param rInFilePath  Path to file which contains the problem definition
+     * @param rOutFileDir  Path to folder for output (relative to CHASTE_TEST_OUTPUT)
+     * @param rOutFileName  Name for VTK output
+     */
+    void SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir,const std::string& rOutFileName);
 
     /**
      * @return the viscosity in kg/(mm*sec)

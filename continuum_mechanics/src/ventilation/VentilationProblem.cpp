@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VentilationProblem.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "ReplicatableVector.hpp"
-#include "Debug.hpp"
+#include "Warnings.hpp"
+
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
       mpLinearSystem(NULL),
@@ -54,7 +55,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
         EXCEPTION("Outlet node is not a boundary node");
     }
 
-    //Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
+    // We solve for flux at every edge and for pressure at each node/bifurcation
+    // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
     // preallocating 5 non-zeros allows for 4-way branching
     mpLinearSystem = new LinearSystem(mMesh.GetNumNodes()+mMesh.GetNumElements(), 5u);
 }
@@ -104,7 +106,7 @@ void VentilationProblem::SetConstantInflowFluxes(double flux)
          {
              unsigned pressure_index =  mMesh.GetNumElements() +  (*iter)->GetIndex();
              unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
-             mLeafEdgeIndices.insert(edge_index);
+
              // Boundary conditions at each boundary/leaf edge.  Note that this goes into the
              // row associated with the leaf node so that the edge's row can still be used
              // for flux/pressure.
@@ -351,7 +353,46 @@ void VentilationProblem::Solve(TimeStepper& rTimeStepper,
 #endif
 }
 
-
+void VentilationProblem::SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir, const std::string& rOutFileName)
+{
+    std::ifstream file(FileFinder(rInFilePath).GetAbsolutePath().c_str(), std::ios::binary);
+    if (!file.is_open())
+    {
+        EXCEPTION("Could not open file "+rInFilePath);
+    }
+    std::string key, unit;
+    double value;
+    while (!file.eof())
+    {
+        file >> key >> value >> unit;
+        if (file.fail())
+        {
+            break;
+        }
+        if (key == "RHO_AIR")
+        {
+            SetDensity(value);
+        }
+        else if (key == "MU_AIR")
+        {
+            SetViscosity(value);
+        }
+        else if (key == "PRESSURE_OUT")
+        {
+            SetOutflowPressure(value);
+        }
+        else if (key == "PRESSURE_IN")
+        {
+            SetConstantInflowPressures(value);
+        }
+        else
+        {
+            WARNING("The key "+ key+ " is not recognised yet");
+        }
+    }
+    Solve();
+    WriteVtk(rOutFileDir, rOutFileName);
+}
 
 
 
