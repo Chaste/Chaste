@@ -218,6 +218,9 @@ public:
         simulator.AddForce(p_linear_force);
 
         simulator.Solve();
+
+        /* The mesh was created dynamically (above) with the keyword 'new'.  Therefore on finishing the test we delete the mesh to avoid a memory leak. */
+        delete p_mesh;
     }
 
     /*
