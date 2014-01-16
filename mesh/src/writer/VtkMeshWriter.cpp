@@ -134,10 +134,13 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         p_cell->Delete(); //Reference counted
     }
 
-    /// \todo #2351 Temporary workaround for parallel writer
-    for (unsigned item_num=0; item_num<this->GetNumBoundaryFaces(); item_num++)
+    if (SPACE_DIM > 1)
     {
-        this->GetNextBoundaryElement();
+        /// \todo #2351 Temporary workaround for parallel writer
+        for (unsigned item_num=0; item_num<this->GetNumBoundaryFaces(); item_num++)
+        {
+            this->GetNextBoundaryElement();
+        }
     }
 
     //If necessary, construct cables
@@ -615,7 +618,18 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
              ++node_iter)
         {
             c_vector<double, SPACE_DIM> current_item = node_iter->rGetLocation();
-            p_pts->InsertNextPoint(current_item[0], (SPACE_DIM>1)?current_item[1]:0.0, (SPACE_DIM>2)?current_item[2]:0.0);
+            if (SPACE_DIM == 3)
+            {
+                p_pts->InsertNextPoint(current_item[0], current_item[1], current_item[2]);
+            }
+            else if (SPACE_DIM == 2)
+            {
+                p_pts->InsertNextPoint(current_item[0], current_item[1], 0.0);
+            }
+            else // (SPACE_DIM == 1)
+            {
+                p_pts->InsertNextPoint(current_item[0], 0.0, 0.0);
+            }
         }
 
         // Halo nodes
@@ -626,7 +640,18 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
                     ++halo_iter)
             {
                 c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
-                p_pts->InsertNextPoint(current_item[0], (SPACE_DIM>1)?current_item[1]:0.0, (SPACE_DIM>2)?current_item[2]:0.0);
+                if (SPACE_DIM == 3)
+                {
+                    p_pts->InsertNextPoint(current_item[0], current_item[1], current_item[2]);
+                }
+                else if (SPACE_DIM == 2)
+                {
+                    p_pts->InsertNextPoint(current_item[0], current_item[1], 0.0);
+                }
+                else // (SPACE_DIM == 1)
+                {
+                    p_pts->InsertNextPoint(current_item[0], 0.0, 0.0);
+                }
             }
         }
 

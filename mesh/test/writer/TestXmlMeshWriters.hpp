@@ -497,6 +497,62 @@ public:
 #endif //CHASTE_VTK
     }
 
+    void TestVtkMeshWriter1D() throw(Exception)
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        VtkMeshWriter<1,1> writer("TestVtkMeshWriter", "1D_0_to_1_10_elements", false);
+
+        writer.WriteFilesUsingMesh(mesh);
+
+//        {
+//            // Check that the reader can see it
+//            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/2D_0_to_1mm_200_elements.vtu");
+//            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+//            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+//
+//            // Check that it has the correct data
+//            std::vector<double> distance_read;
+//            vtk_reader.GetPointData("Distance from origin", distance_read);
+//            for (unsigned i=0; i<distance_read.size(); i++)
+//            {
+//                TS_ASSERT_EQUALS(distance[i], distance_read[i]);
+//            }
+//            std::vector<c_vector<double,2> > location_read;
+//            vtk_reader.GetPointData("Location", location_read);
+//            for (unsigned i=0; i<location_read.size(); i++)
+//            {
+//                for (unsigned j=0; j<2; j++)
+//                {
+//                    TS_ASSERT_EQUALS(location[i][j], location_read[i][j]);
+//                }
+//            }
+//            std::vector<double> quality_read;
+//            vtk_reader.GetCellData("Quality", quality_read);
+//            for (unsigned i=0; i<quality_read.size(); i++)
+//            {
+//                TS_ASSERT_EQUALS(quality[i], quality_read[i]);
+//            }
+//            std::vector<c_vector<double,2> > centroid_read;
+//            vtk_reader.GetCellData("Centroid", centroid_read);
+//            for (unsigned i=0; i<centroid_read.size(); i++)
+//            {
+//                for (unsigned j=0; j<2; j++)
+//                {
+//                    TS_ASSERT_EQUALS(centroid[i][j], centroid_read[i][j]);
+//                }
+//            }
+//        }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
+    }
+
 
     void TestVtkMeshWriterWithData() throw(Exception)
     {
