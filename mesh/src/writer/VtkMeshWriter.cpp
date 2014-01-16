@@ -33,12 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <boost/scoped_array.hpp>
 #include "VtkMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
 #include "NodesOnlyMesh.hpp"
-
-#include <boost/scoped_array.hpp>
 
 #ifdef CHASTE_VTK
 #include "vtkQuadraticTetra.h"
@@ -70,17 +69,16 @@ VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::~VtkMeshWriter()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 {
-    assert(SPACE_DIM==3 || SPACE_DIM == 2);
-
     //Construct nodes aka as Points
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
     for (unsigned item_num=0; item_num<this->GetNumNodes(); item_num++)
     {
         std::vector<double> current_item = this->GetNextNode(); //this->mNodeData[item_num];
-        if (SPACE_DIM==2)
+        // Add zeroes if the dimension is below 3
+        for (unsigned dim=SPACE_DIM; dim<3; dim++)
         {
-            current_item.push_back(0.0);//For z-coordinate
+            current_item.push_back(0.0);//For y and z-coordinates if necessary
         }
         assert(current_item.size() == 3);
         p_pts->InsertPoint(item_num, current_item[0], current_item[1], current_item[2]);
@@ -278,6 +276,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > dataPayload)
 {
+    assert(SPACE_DIM != 1);
+
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
@@ -312,6 +312,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
+    assert(SPACE_DIM != 1);
+
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
@@ -505,6 +507,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
+    assert(SPACE_DIM != 1);
+
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
@@ -602,7 +606,6 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     else
     {
         //Make the local mesh into a VtkMesh
-        assert(SPACE_DIM==3 || SPACE_DIM == 2);
         vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
         p_pts->GetData()->SetName("Vertex positions");
 
@@ -612,7 +615,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
              ++node_iter)
         {
             c_vector<double, SPACE_DIM> current_item = node_iter->rGetLocation();
-            p_pts->InsertNextPoint(current_item[0], current_item[1], (SPACE_DIM==3)?current_item[2]:0.0);
+            p_pts->InsertNextPoint(current_item[0], (SPACE_DIM>1)?current_item[1]:0.0, (SPACE_DIM>2)?current_item[2]:0.0);
         }
 
         // Halo nodes
@@ -623,7 +626,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
                     ++halo_iter)
             {
                 c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
-                p_pts->InsertNextPoint(current_item[0], current_item[1], (SPACE_DIM==3)?current_item[2]:0.0);
+                p_pts->InsertNextPoint(current_item[0], (SPACE_DIM>1)?current_item[1]:0.0, (SPACE_DIM>2)?current_item[2]:0.0);
             }
         }
 
@@ -636,13 +639,18 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
         {
 
             vtkCell* p_cell=NULL;
-            if (SPACE_DIM == 3)
+            ///\todo This ought to look exactly like the other MakeVtkMesh
+            if (ELEMENT_DIM == 3)
             {
                 p_cell = vtkTetra::New();
             }
-            if (SPACE_DIM == 2)
+            else if (ELEMENT_DIM == 2)
             {
                 p_cell = vtkTriangle::New();
+            }
+            else //(ELEMENT_DIM == 1)
+            {
+                p_cell = vtkLine::New();
             }
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
             for (unsigned j = 0; j < ELEMENT_DIM+1; ++j)

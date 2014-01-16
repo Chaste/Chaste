@@ -430,6 +430,74 @@ public:
 #endif //CHASTE_VTK
     }
 
+    void TestParallelVtkMeshWriter1d() throw(Exception)
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructFromMeshReader(reader);
+
+        VtkMeshWriter<1,1> writer("TestVtkMeshWriter", "1D_0_to_1_10_elements_parallel_data", false);
+        writer.SetParallelFiles(mesh);
+        // Add distance from origin into the node "point" data
+        std::vector<double> rank;
+        // Real rank for the owned nodes
+        for (unsigned i=0; i<mesh.GetNumLocalNodes(); i++)
+        {
+            rank.push_back(PetscTools::GetMyRank());
+        }
+        writer.AddPointData("Process rank", rank);
+
+        writer.WriteFilesUsingMesh(mesh);
+
+        PetscTools::Barrier("Wait for files to be written");
+
+        std::stringstream filepath;
+        filepath << OutputFileHandler::GetChasteTestOutputDirectory() << "TestVtkMeshWriter/1D_0_to_1_10_elements_parallel_data";
+        // Add suffix to VTK vtu file.
+        if (PetscTools::IsSequential())
+        {
+            filepath <<  ".vtu";
+        }
+        else
+        {
+            /*
+             * Check that the pvtu file exists. Note that checking its content is hard
+             * because the number of processes (.vtu file references) will vary.
+             */
+            FileFinder vtk_file(filepath.str() + ".pvtu", RelativeTo::Absolute);
+            TS_ASSERT(vtk_file.Exists());
+            // Add suffix to VTK vtu file
+            filepath << "_" << PetscTools::GetMyRank() << ".vtu";
+        }
+        ///\todo #2468 Make sure that we can read back a 1D mesh
+/*
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(filepath.str());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumLocalNodes() + mesh.GetNumHaloNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumLocalElements());
+
+            // Check that it has the correct data
+            std::vector<double> rank_read;
+            vtk_reader.GetPointData("Process rank", rank_read);
+            TS_ASSERT_EQUALS(rank.size(), mesh.GetNumLocalNodes() );
+            TS_ASSERT_EQUALS(rank_read.size(), mesh.GetNumLocalNodes()  + mesh.GetNumHaloNodes());
+            for (unsigned i=0; i<rank.size(); i++)
+            {
+                TS_ASSERT_EQUALS(rank[i], rank_read[i]);
+                TS_ASSERT_EQUALS(rank_read[i], PetscTools::GetMyRank());
+            }
+        }
+*/
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
+    }
+
+
     void TestVtkMeshWriterWithData() throw(Exception)
     {
 #ifdef CHASTE_VTK
