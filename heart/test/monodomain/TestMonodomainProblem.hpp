@@ -820,8 +820,13 @@ public:
         HeartConfig::Instance()->SetSpaceDimension(1);
         HeartConfig::Instance()->SetFibreLength(1, 0.01);
         HeartConfig::Instance()->SetSimulationDuration(5.0);  //ms
-        HeartConfig::Instance()->SetOutputDirectory("MonodomainCreatesGeometry");
+        HeartConfig::Instance()->SetOutputDirectory("MonodomainCreates1dGeometry");
         HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain1d");
+
+        // Switch on 1D VTK output
+        ///\todo #2468 deadlocks in parallel
+        //HeartConfig::Instance()->SetVisualizeWithVtk(true);
+        HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory(-600 * 5000);
 
@@ -838,6 +843,22 @@ public:
         TS_ASSERT_DELTA(voltage_replicated[3], 13.9149, atol);
         TS_ASSERT_DELTA(voltage_replicated[5], 13.8216, atol);
         TS_ASSERT_DELTA(voltage_replicated[7], 13.7275, atol);
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+
+        std::string filepath = OutputFileHandler::GetChasteTestOutputDirectory() + "MonodomainCreates1dGeometry/vtk_output/";
+        std::string basename = filepath + "monodomain1d";
+        if (PetscTools::IsParallel())
+        {
+            FileFinder pvtk_file(basename + ".pvtu", RelativeTo::Absolute);
+            TS_ASSERT(pvtk_file.Exists());
+        }
+        else
+        {
+            FileFinder vtu_file(basename + ".vtu", RelativeTo::Absolute);
+            TS_ASSERT(vtu_file.Exists());
+        }
+#endif //CHASTE_VTK
     }
 
     void TestMonodomainProblemCreates2DGeometry()
