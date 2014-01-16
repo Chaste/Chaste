@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "ChasteSyscalls.hpp"
 #include "IsNan.hpp"
+#include "ShortAxisDivisionRule.hpp"
 
 // Cell writer definitions
 #include "AbstractCellPopulationWriter.hpp"
@@ -543,6 +544,12 @@ void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& 
     *rParamsFile << "\t\t<CellRearrangementRatio>" << mpMutableVertexMesh->GetCellRearrangementRatio() << "</CellRearrangementRatio>\n";
     *rParamsFile << "\t\t<OutputCellRearrangementLocations>" << mOutputCellRearrangementLocations << "</OutputCellRearrangementLocations>\n";
 
+    //Add the division rule parameters
+    *rParamsFile << "\t\t<DivisionRule>\n";
+    mpDivisionRule->OutputCellDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</DivisionRule>\n";
+
+
     // Call method on direct parent class
     AbstractOffLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
@@ -563,9 +570,15 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(un
 }
 
 template<unsigned DIM>
-boost::shared_ptr<ShortAxisDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetDivisionRule()
+boost::shared_ptr<AbstractCellDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetDivisionRule()
 {
     return mpDivisionRule;
+}
+
+template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::SetDivisionRule(boost::shared_ptr<AbstractCellDivisionRule<DIM> > pDivisionRule)
+{
+	mpDivisionRule = pDivisionRule;
 }
 
 template<unsigned DIM>

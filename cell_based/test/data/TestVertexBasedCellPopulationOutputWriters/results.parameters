@@ -2,6 +2,10 @@
 		<T2Threshold>0.001</T2Threshold>
 		<CellRearrangementRatio>1.5</CellRearrangementRatio>
 		<OutputCellRearrangementLocations>1</OutputCellRearrangementLocations>
+		<DivisionRule>
+			<ShortAxisDivisionRule-2>
+			</ShortAxisDivisionRule-2>
+		</DivisionRule>
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

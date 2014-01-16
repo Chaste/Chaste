@@ -354,9 +354,7 @@ public:
         unsigned old_num_elements = vertex_mesh.GetNumElements();
         unsigned old_num_cells = cell_population.rGetCells().size();
 
-        // Add new cell by dividing element 0 along short axis
-
-        c_vector<double,2> cell_division_vector = zero_vector<double>(2);
+        // Add new cell by dividing element 0 along short axis (this is the standard division rule)
 
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -367,7 +365,7 @@ public:
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);
 
-        boost::shared_ptr<ShortAxisDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
+        boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
         c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
         TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);

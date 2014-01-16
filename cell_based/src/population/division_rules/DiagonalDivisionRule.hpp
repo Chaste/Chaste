@@ -33,44 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SHORTAXISDIVISIONRULE_HPP_
-#define SHORTAXISDIVISIONRULE_HPP_
+#ifndef DIAGONALDIVISIONRULE_HPP_
+#define DIAGONALDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "AbstractCellDivisionRule.hpp"
 
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
+template<unsigned SPACE_DIM> class AbstractCellDivisionRule;
 
 /**
- * A class for Vertex-based cell populations to use to generate the short axis of
- * a vertex cell, for use in cell division. This is the default rule that is used
- * in most of the vertex simulations.
+ * A division rule for Vertex-based cell populations to generate a division vector
+ * in direction (1,1).
  */
 template <unsigned SPACE_DIM>
-class ShortAxisDivisionRule
+class DiagonalDivisionRule  : public AbstractCellDivisionRule<SPACE_DIM>
 {
 public:
     /**
      * Default Constructor.
      */
-    ShortAxisDivisionRule(){};
+    DiagonalDivisionRule(){};
 
     /**
      * Empty destructor.
      */
-    virtual ~ShortAxisDivisionRule(){};
+    virtual ~DiagonalDivisionRule(){};
 
     /**
-     * Calculate the vector that will divide the two halves of the existing Vertex cell
-     * to form the boundary between parent and daughter cell.
+     * This function returns the diagonal division vector.
      *
      * @param pParentCell  The existing vertex cell
      * @param rCellPopulation  The Vertex cell population
      * @return the division vector.
      */
-    c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
                                                             VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 
 private:
@@ -78,23 +78,17 @@ private:
     /**
      * Serialize the object and its member variables.
      *
-     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
-     *
-     * Note also that member data related to writers is not saved - output must
-     * be set up again by the caller after a restart.
-     *
      * @param archive the archive
      * @param version the current version of this class
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // When this is in an inheritance tree it will want to call a method like this:
-        //archive & boost::serialization::base_object<AbstractVertexDivisionRule<SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellDivisionRule<SPACE_DIM> >(*this);
     }
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShortAxisDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiagonalDivisionRule)
 
-#endif // SHORTAXISDIVISIONRULE_HPP_
+#endif // DIAGONALDIVISIONRULE_HPP_

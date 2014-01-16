@@ -35,6 +35,7 @@ population/TestCellwiseDataGradient.hpp
 population/TestDiscreteSystemForceCalculator.hpp
 population/TestForces.hpp
 population/TestBuskeForces.hpp
+population/TestDivisionRules.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestMeshBasedCellPopulationWithGhostNodes.hpp
 population/TestMultipleCaBasedCellPopulation.hpp

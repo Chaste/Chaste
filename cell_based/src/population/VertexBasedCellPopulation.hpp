@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
-#include "ShortAxisDivisionRule.hpp"
+#include "AbstractCellDivisionRule.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "WildTypeCellMutationState.hpp"
 
-template<unsigned DIM> class ShortAxisDivisionRule; // Circular definition thing.
+template<unsigned DIM> class AbstractCellDivisionRule; // Circular definition thing.
 
 /**
  * A facade class encapsulating a vertex-based cell population.
@@ -61,6 +61,11 @@ template<unsigned DIM>
 class VertexBasedCellPopulation : public AbstractOffLatticeCellPopulation<DIM>
 {
 private:
+
+    /**
+     * This test uses the private constructor to simplify testing.
+     */
+    friend class TestDivisionRules;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -79,7 +84,7 @@ private:
 
     /** A pointer to a division rule that is used to generate the axis when dividing cells.
      * This is a specialisation for Vertex models. */
-    boost::shared_ptr<ShortAxisDivisionRule<DIM> > mpDivisionRule;
+    boost::shared_ptr<AbstractCellDivisionRule<DIM> > mpDivisionRule;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
@@ -133,7 +138,7 @@ public:
                               const std::vector<unsigned> locationIndices=std::vector<unsigned>());
 
     /**
-     * Constructor for use by the de-serializer.
+     * Constructor for use by boost serialization ONLY!
      *
      * @param rMesh a vertex mesh.
      */
@@ -366,7 +371,14 @@ public:
     /**
      * @return The Vertex division rule that is currently being used.
      */
-    boost::shared_ptr<ShortAxisDivisionRule<DIM> > GetDivisionRule();
+    boost::shared_ptr<AbstractCellDivisionRule<DIM> > GetDivisionRule();
+
+    /**
+     * Set the division rule for this population.
+     *
+     * @param pDivisionRule  pointer to the new division rule
+     */
+    void SetDivisionRule(boost::shared_ptr<AbstractCellDivisionRule<DIM> > pDivisionRule);
 };
 
 #include "SerializationExportWrapper.hpp"

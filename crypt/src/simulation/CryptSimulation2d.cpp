@@ -143,7 +143,8 @@ c_vector<double, 2> CryptSimulation2d::CalculateCellDivisionVector(CellPtr pPare
         assert(dynamic_cast<VertexBasedCellPopulation<2>*>(&(this->mrCellPopulation)));
 
         VertexBasedCellPopulation<2>* p_vertex_population = dynamic_cast<VertexBasedCellPopulation<2>*>(&(this->mrCellPopulation));
-        c_vector<double, 2> axis_of_division = p_vertex_population->GetDivisionRule()->CalculateCellDivisionVector(pParentCell, *p_vertex_population);
+        c_vector<double, 2> axis_of_division = p_vertex_population->
+                GetDivisionRule()->CalculateCellDivisionVector(pParentCell, *p_vertex_population);
 
         // We don't need to prescribe how 'stem' cells divide if Wnt is present
         bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();

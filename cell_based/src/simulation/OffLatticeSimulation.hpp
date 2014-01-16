@@ -131,7 +131,8 @@ protected:
      * the daughter cell. The new locations are found by picking a random direction
      * and placing the parent and daughter in opposing directions along this axis.
      *
-     * For a vertex-based cell population, the method returns the zero vector.
+     * For a vertex-based cell population, the method calls the AbstractCellDivisionRule which
+     * is a member of the cell population.
      *
      * @param pParentCell the parent cell
      *

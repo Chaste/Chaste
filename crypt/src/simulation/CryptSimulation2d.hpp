@@ -89,7 +89,7 @@ protected:
      * opposing directions along this axis.
      *
      * In the case of a VertexBasedCellPopulation, by default this method
-     * returns the zero vector. If the parent cell is a stem cell, then
+     * calls the AbstractCellDivisionRule. If the parent cell is a stem cell, then
      * this method returns the vector (0,1). This is then used by the
      * VertexBasedCellPopulation method AddCell() as the axis along which
      * the cell divides.
