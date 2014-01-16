@@ -226,16 +226,16 @@ public:
          */
         HoneycombMeshGenerator generator(5, 5);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
+        NodesOnlyMesh<2> mesh;
         /* The mechanics cut-off length (second argument) is used in this simulation to determine nearest
          * neighbours for the purpose of the Delta/Notch intercellular signalling model.
          */
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
             p_model->SetDimension(2);
@@ -247,7 +247,7 @@ public:
             cells.push_back(p_cell);
         }
 
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         cell_population.SetOutputCellProliferativeTypes(true);
         cell_population.SetOutputCellMutationStates(true);
@@ -280,9 +280,6 @@ public:
         simulator.AddForce(p_force);
 
         simulator.Solve();
-
-        /* To avoid memory leaks, we also delete any pointers we created in the test. */
-        delete p_mesh;
     }
     /*
      * EMPTYLINE

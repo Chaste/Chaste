@@ -199,15 +199,15 @@ public:
         HoneycombMeshGenerator generator(10, 10, 0);
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DNodeBasedMonolayerSimulationForVisualizing");
@@ -218,9 +218,6 @@ public:
         simulator.AddForce(p_linear_force);
 
         simulator.Solve();
-
-        /* The mesh was created dynamically (above) with the keyword 'new'.  Therefore on finishing the test we delete the mesh to avoid a memory leak. */
-        delete p_mesh;
     }
 
     /*

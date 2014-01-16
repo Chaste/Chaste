@@ -1189,14 +1189,14 @@ public:
         temp_mesh.ConstructFromMeshReader(mesh_reader);
         temp_mesh.Scale(5.0,1.0);
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -1210,7 +1210,7 @@ public:
         }
 
         // Set up cell population
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1234,9 +1234,6 @@ public:
         simulator.AddForce(p_linear_force);
 
         TS_ASSERT_THROWS_THIS(simulator.Solve(), "Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
-
-        // Avoid memory leaks
-        delete p_mesh;
     }
 
     void TestNodeBasedWithCoarseMesh() throw(Exception)
@@ -1249,14 +1246,14 @@ public:
         temp_mesh.ConstructFromMeshReader(mesh_reader);
         temp_mesh.Scale(20.0,20.0);
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -1270,7 +1267,7 @@ public:
         }
 
         // Set up cell population
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -1342,9 +1339,6 @@ public:
             TS_ASSERT_LESS_THAN(containing_element_index, p_coarse_mesh->GetNumElements());
             TS_ASSERT_EQUALS(containing_element_index, simulator.GetCellBasedPdeHandler()->FindCoarseElementContainingCell(*cell_iter));
         }
-    
-        // Avoid memory leaks
-        delete p_mesh;
     }
 
     void TestVertexBasedWithCoarseMesh() throw(Exception)
@@ -1436,13 +1430,13 @@ public:
         TetrahedralMesh<2,2> temp_mesh;
         temp_mesh.ConstructRegularSlabMesh(2.0,2,2);
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set some cell radius
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            p_mesh->GetNode(i)->SetRadius( 0.9);
+            mesh.GetNode(i)->SetRadius( 0.9);
         }
 
         // Set up cells
@@ -1450,7 +1444,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -1464,7 +1458,7 @@ public:
         }
 
         // Set up cell population
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
         c_vector<double,2> centre_of_mesh;
@@ -1525,9 +1519,6 @@ public:
 
             TS_ASSERT_DELTA(uptake_rate, expected_uptake, 1e-4);
         }
-    
-        // Avoid memory leaks
-        delete p_mesh;
     }
 
     void TestCoarsePdeSolutionOnNodeBased1d() throw(Exception)
@@ -1538,14 +1529,14 @@ public:
         std::vector<Node<1>*> nodes;
         nodes.push_back(new Node<1>(0, true,  0.0));
 
-        NodesOnlyMesh<1>* p_mesh = new NodesOnlyMesh<1>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Set up differentiated cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(1);
@@ -1558,7 +1549,7 @@ public:
         }
 
         // Set up cell population
-        NodeBasedCellPopulation<1> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
@@ -1591,9 +1582,6 @@ public:
         {
             delete nodes[i];
         }
-
-        // Avoid memory leaks
-        delete p_mesh;
     }
 
     void TestCoarsePdeSolutionOnNodeBased2d() throw(Exception)
@@ -1604,15 +1592,15 @@ public:
         TetrahedralMesh<2,2> temp_mesh;
         temp_mesh.ConstructRectangularMesh(10,10);
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(2);
@@ -1626,7 +1614,7 @@ public:
         }
 
         // Set up cell population
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
         c_vector<double,2> centre_of_mesh;
@@ -1660,9 +1648,6 @@ public:
         // Test solution is unchanged at first two cells
         TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem("nutrient"), 0.9543, 1e-4);
         TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem("nutrient"), 0.9589, 1e-4);
-    
-        // Avoid memory leaks
-        delete p_mesh;
     }
 
     void TestCoarsePdeSolutionOnNodeBased3d() throw(Exception)
@@ -1673,15 +1658,15 @@ public:
         TetrahedralMesh<3,3> temp_mesh;
         temp_mesh.ConstructCuboid(5,5,5);
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(temp_mesh, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(temp_mesh, 1.5);
 
         // Set up cells
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
             p_model->SetDimension(3);
@@ -1695,7 +1680,7 @@ public:
         }
 
         // Set up cell population
-        NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
         // Set up cell data on the cell population
         c_vector<double,3> centre_of_mesh;
@@ -1729,9 +1714,6 @@ public:
         // Test solution is unchanged at first two cells
         TS_ASSERT_DELTA(  (cell_population.Begin())->GetCellData()->GetItem("nutrient"), 1.0, 1e-4);
         TS_ASSERT_DELTA((++cell_population.Begin())->GetCellData()->GetItem("nutrient"), 1.0, 1e-4);
-    
-        // Avoid memory leaks
-        delete p_mesh;
     }
 };
 

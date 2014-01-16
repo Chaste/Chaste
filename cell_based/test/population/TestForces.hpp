@@ -674,20 +674,20 @@ public:
         nodes.push_back(new Node<2>(2, true, 3.0, 0.0));
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 100.0);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         RepulsionForce<2> repulsion_force;
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
             node_iter->ClearAppliedForce();
@@ -711,13 +711,13 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
 
             // Tests the calculation of the force with different cell radii
-            p_mesh->GetNode(zero_index)->SetRadius(10);
-            p_mesh->GetNode(one_index)->SetRadius(10);
-            p_mesh->GetNode(two_index)->SetRadius(10);
+            mesh.GetNode(zero_index)->SetRadius(10);
+            mesh.GetNode(one_index)->SetRadius(10);
+            mesh.GetNode(two_index)->SetRadius(10);
 
             // Reset the vector of node forces
-            for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                    node_iter != p_mesh->GetNodeIteratorEnd();
+            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                    node_iter != mesh.GetNodeIteratorEnd();
                     ++node_iter)
             {
                 node_iter->ClearAppliedForce();
@@ -734,13 +734,13 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
 
             // Tests the calculation of the force with different cell radii
-            p_mesh->GetNode(zero_index)->SetRadius(0.2);
-            p_mesh->GetNode(one_index)->SetRadius(0.2);
-            p_mesh->GetNode(two_index)->SetRadius(0.2);
+            mesh.GetNode(zero_index)->SetRadius(0.2);
+            mesh.GetNode(one_index)->SetRadius(0.2);
+            mesh.GetNode(two_index)->SetRadius(0.2);
 
             // Reset the vector of node forces
-            for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                    node_iter != p_mesh->GetNodeIteratorEnd();
+            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                    node_iter != mesh.GetNodeIteratorEnd();
                     ++node_iter)
             {
                 node_iter->ClearAppliedForce();
@@ -760,8 +760,6 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
         }
 
-        // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -1368,14 +1366,14 @@ public:
         }
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Test that NagaiHondaForce throws the correct exception
         NagaiHondaForce<2> nagai_honda_force;
@@ -1388,7 +1386,6 @@ public:
                 "WelikyOsterForce is to be used with a VertexBasedCellPopulation only");
 
         // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -1404,24 +1401,24 @@ public:
         MutableMesh<1,1> generating_mesh;
         generating_mesh.ConstructLinearMesh(5);
 
-        NodesOnlyMesh<1>* p_mesh = new NodesOnlyMesh<1>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes(), std::vector<unsigned>(), p_diff_type);
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes(), std::vector<unsigned>(), p_diff_type);
 
         // Create cell population
         std::vector<CellPtr> cells_copy(cells);
-        NodeBasedCellPopulation<1> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Create force law object
         DiffusionForce<1> diffusion_force;
 
-        for (AbstractMesh<1,1>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (AbstractMesh<1,1>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
             node_iter->ClearAppliedForce();
@@ -1448,9 +1445,6 @@ public:
         diffusion_force.SetDiffusionConstant(0.01);
         diffusion_force.SetViscosity(3.204e-6);
         diffusion_force.SetAbsoluteTemperature(296.0);
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestDiffusionForceIn2D()
@@ -1466,27 +1460,27 @@ public:
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 100.0);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         // Create force law object
         DiffusionForce<2> force;
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
             node_iter->ClearAppliedForce();
         }
 
-        if (p_mesh->GetNumNodes() > 0)
+        if (mesh.GetNumNodes() > 0)
         {
             // Loop over time iterations
             double variance = 0.0;
@@ -1494,24 +1488,23 @@ public:
             for (unsigned i=0; i<num_iterations; i++)
             {
                 // Re-initialize the force on node zero
-                p_mesh->GetNodeIteratorBegin()->ClearAppliedForce();
+                mesh.GetNodeIteratorBegin()->ClearAppliedForce();
 
                 // Compute forces on nodes
                 force.AddForceContribution(cell_population);
 
                 // Calculate the variance
-                variance += pow(norm_2(p_mesh->GetNodeIteratorBegin()->rGetAppliedForce()),2);
+                variance += pow(norm_2(mesh.GetNodeIteratorBegin()->rGetAppliedForce()),2);
             }
 
             double correct_diffusion_coefficient =
-                    1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * p_mesh->GetNodeIteratorBegin()->GetRadius() );
+                    1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
             unsigned dim = 2;
             variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
         }
 
         // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -1535,21 +1528,21 @@ public:
         nodes.push_back(new Node<3>(0, true, 0.0, 0.0));
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 100.0);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 100.0);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        NodeBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
         cell_population.Update(); //Needs to be called separately as not in a simulation
 
         // Create force law object
         DiffusionForce<3> force;
 
-        for (AbstractMesh<3,3>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (AbstractMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
             node_iter->ClearAppliedForce();
@@ -1558,31 +1551,29 @@ public:
         double variance = 0.0;
 
         // Loop over time iterations
-        if (p_mesh->GetNumNodes() > 0)
+        if (mesh.GetNumNodes() > 0)
         {
             unsigned num_iterations = 1000;
             for (unsigned i=0; i<num_iterations; i++)
             {
                 // Re-initialize the force on node zero
-                p_mesh->GetNodeIteratorBegin()->ClearAppliedForce();
+                mesh.GetNodeIteratorBegin()->ClearAppliedForce();
 
                 // Compute forces on nodes
                 force.AddForceContribution(cell_population);
 
                 // Calculate the variance
-                variance += pow(norm_2(p_mesh->GetNodeIteratorBegin()->rGetAppliedForce()),2);
+                variance += pow(norm_2(mesh.GetNodeIteratorBegin()->rGetAppliedForce()),2);
             }
 
 
             double correct_diffusion_coefficient =
-                            1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * p_mesh->GetNodeIteratorBegin()->GetRadius() );
+                            1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
             unsigned dim = 3;
             variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
         }
 
-        // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];

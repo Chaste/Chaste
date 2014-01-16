@@ -65,33 +65,31 @@ public:
         nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;    // All nodes will lie on the master process.
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), num_nodes);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_nodes);
 
         // Check that the nodes mapping is set up correctly
         if (PetscTools::AmMaster())
         {
             for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
             {
-                TS_ASSERT(!(p_mesh->mNodesMapping.find(i) == p_mesh->mNodesMapping.end()));
-                TS_ASSERT_EQUALS(p_mesh->SolveNodeMapping(i), p_mesh->mNodesMapping[i]);
+                TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
+                TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
             }
         }
 
-        TS_ASSERT_THROWS_CONTAINS(p_mesh->SolveNodeMapping(8*PetscTools::GetNumProcs() + PetscTools::GetMyRank() + 1), " does not belong to process ");
+        TS_ASSERT_THROWS_CONTAINS(mesh.SolveNodeMapping(8*PetscTools::GetNumProcs() + PetscTools::GetMyRank() + 1), " does not belong to process ");
 
         // Cover being able to set the maximum interation distance.
-        p_mesh->SetMaximumInteractionDistance(5.0);
-        TS_ASSERT_DELTA(p_mesh->GetMaximumInteractionDistance(), 5.0, 1e-4);
+        mesh.SetMaximumInteractionDistance(5.0);
+        TS_ASSERT_DELTA(mesh.GetMaximumInteractionDistance(), 5.0, 1e-4);
 
-        // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -323,23 +321,21 @@ public:
         nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         unsigned num_nodes = PetscTools::AmMaster() ? 8 : 0;
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
 
-        p_mesh->Clear();
+        mesh.Clear();
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllBoundaryElements(), 0u);
 
-        // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -353,17 +349,14 @@ public:
         TetrahedralMesh<2,2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         unsigned num_boxes = PetscTools::AmMaster() ? 5 : 0;
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_boxes);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 0u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumAllNodes(), num_boxes);
-
-        // Avoid memory leak
-        delete p_mesh;
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_boxes);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), num_boxes);
     }
 
     void TestGetNextAvailableIndex()
@@ -447,40 +440,39 @@ public:
         nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Note in my version of Paraview, you need data on points before you can view with Glyphs
         VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "just_nodes", false);
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            distance.push_back(norm_2(p_mesh->GetNode(i)->rGetLocation()));
+            distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
         }
         writer.AddPointData("Distance from origin", distance);
 
         // Add boundary node "point" data
         std::vector<double> boundary;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            boundary.push_back(p_mesh->GetNode(i)->IsBoundaryNode());
+            boundary.push_back(mesh.GetNode(i)->IsBoundaryNode());
         }
         writer.AddPointData("Boundary", boundary);
 
         // Add fibre type to "point" data
         std::vector< c_vector<double, 3> > location;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            location.push_back(p_mesh->GetNode(i)->rGetLocation());
+            location.push_back(mesh.GetNode(i)->rGetLocation());
         }
         writer.AddPointData("Location", location);
 
-        writer.WriteFilesUsingMesh(*p_mesh);
+        writer.WriteFilesUsingMesh(mesh);
 
         // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -504,14 +496,12 @@ public:
         nodes.push_back(new Node<3>(6, false, 0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(7, false, 1.0, 1.0, 1.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         TrianglesMeshWriter<3,3> writer("TestMeshWriter", "3dNodesOnlyMesh");
-        TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(*p_mesh));
+        TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
-        // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -523,19 +513,16 @@ public:
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         if (PetscTools::AmMaster())
         {
-            p_mesh->GetNode(0)->SetRadius(1.0);
+            mesh.GetNode(0)->SetRadius(1.0);
 
-            TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.0, 1e-6);
 
         }
-
-        // Avoid memory leak
-        delete p_mesh;
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -551,39 +538,36 @@ public:
         Node<2> node1(1, true, 0.0, 0.5);
         nodes.push_back(&node1);
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         if (PetscTools::IsSequential())
         {
             // Test add node
-            p_mesh->AddNode(new Node<2>(2, true, 0.0, 0.25)); // This node pointer is added to the mesh and deleted by the destructor
+            mesh.AddNode(new Node<2>(2, true, 0.0, 0.25)); // This node pointer is added to the mesh and deleted by the destructor
 
             unsigned num_nodes = 3;
-            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
-            TS_ASSERT_DELTA(p_mesh->GetNode(2)->GetRadius(), 0.5, 1e-4);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
+            TS_ASSERT_DELTA(mesh.GetNode(2)->GetRadius(), 0.5, 1e-4);
 
             // Cover an exception.
-            TS_ASSERT_THROWS_CONTAINS(p_mesh->GetNode(3)->SetRadius(1.0), " does not belong to process ");
+            TS_ASSERT_THROWS_CONTAINS(mesh.GetNode(3)->SetRadius(1.0), " does not belong to process ");
         }
         else
         {
             if (PetscTools::GetMyRank() == 1)
             {
-                p_mesh->AddNode(new Node<2>(2, true, 0.0, 2.0)); // This node pointer is added to the mesh and deleted by the destructor
+                mesh.AddNode(new Node<2>(2, true, 0.0, 2.0)); // This node pointer is added to the mesh and deleted by the destructor
             }
 
             unsigned num_nodes = PetscTools::AmMaster() ? 2 : ((PetscTools::GetMyRank() == 1) ? 1 : 0);
-            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), num_nodes);
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), num_nodes);
 
             if (PetscTools::GetMyRank() == 1)
             {
-                TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 0.5, 1e-4);
+                TS_ASSERT_DELTA(mesh.GetNode(1)->GetRadius(), 0.5, 1e-4);
             }
         }
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestDeleteNodesAndRemesh() throw (Exception)
@@ -820,25 +804,22 @@ public:
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
-            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
-            p_mesh->GetNode(0)->SetRadius(1.12);
-            p_mesh->GetNode(1)->SetRadius(2.34);
+            mesh.GetNode(0)->SetRadius(1.12);
+            mesh.GetNode(1)->SetRadius(2.34);
 
-            TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetRadius(), 1.12, 1e-6);
-            TS_ASSERT_DELTA(p_mesh->GetNode(1)->GetRadius(), 2.34, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.12, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1)->GetRadius(), 2.34, 1e-6);
 
-            AbstractTetrahedralMesh<2,2>* const p_const_mesh = p_mesh;
+            AbstractTetrahedralMesh<2,2>* const p_const_mesh = &mesh;
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             (*p_arch) << p_const_mesh;
-
-            // Avoid memory leak
-            delete p_mesh;
         }
 
         {
@@ -952,15 +933,15 @@ public:
             nodes.push_back(new Node<1>(6, false, 5.5));
             nodes.push_back(new Node<1>(7, false, 11.0));
 
-            NodesOnlyMesh<1>* p_mesh = new NodesOnlyMesh<1>;
-            p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+            NodesOnlyMesh<1> mesh;
+            mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-            unsigned old_num_rows = p_mesh->mpBoxCollection->CalculateNumberOfNodesInEachStrip().size();
+            unsigned old_num_rows = mesh.mpBoxCollection->CalculateNumberOfNodesInEachStrip().size();
 
-            p_mesh->AddNodesToBoxes();
-            p_mesh->LoadBalanceMesh();
+            mesh.AddNodesToBoxes();
+            mesh.LoadBalanceMesh();
 
-            unsigned new_num_rows = p_mesh->mpBoxCollection->CalculateNumberOfNodesInEachStrip().size();
+            unsigned new_num_rows = mesh.mpBoxCollection->CalculateNumberOfNodesInEachStrip().size();
 
             if (PetscTools::AmMaster())
             {

@@ -67,15 +67,15 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population, with no ghost nodes at the moment
-        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(mesh, cells);
         cell_population.Update();
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithBuskeUpdate-2");
@@ -85,12 +85,12 @@ public:
         // Make up some forces
         std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
 
-        for (NodesOnlyMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (NodesOnlyMesh<2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
             unsigned node_index = node_iter->GetIndex();
-            unsigned i = p_mesh->SolveNodeMapping(node_index);
+            unsigned i = mesh.SolveNodeMapping(node_index);
 
             c_vector<double, 2> force;
             old_posns[i][0] = node_iter->rGetLocation()[0];
@@ -109,11 +109,11 @@ public:
         cell_population.UpdateNodeLocations(time_step);
 
         // Check that node locations were correctly updated
-        for (NodesOnlyMesh<2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (NodesOnlyMesh<2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
-            unsigned i = p_mesh->SolveNodeMapping(node_iter->GetIndex());
+            unsigned i = mesh.SolveNodeMapping(node_iter->GetIndex());
             TS_ASSERT_DELTA(node_iter->rGetLocation()[0], old_posns[i][0] +   i*0.01*0.01, 1e-9);
             TS_ASSERT_DELTA(node_iter->rGetLocation()[1], old_posns[i][1] + 2*i*0.01*0.01, 1e-9);
         }
@@ -135,9 +135,6 @@ public:
                 RelativeTo::ChasteSourceRoot);
         FileComparison comparer(generated, reference);
         TS_ASSERT(comparer.CompareFiles());
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestArchivingCellPopulation() throw (Exception)
@@ -160,16 +157,16 @@ public:
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
-            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
             // Create cells
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             // Create a cell population
-            NodeBasedCellPopulationWithBuskeUpdate<2>* const p_cell_population = new NodeBasedCellPopulationWithBuskeUpdate<2>(*p_mesh, cells);
+            NodeBasedCellPopulationWithBuskeUpdate<2>* const p_cell_population = new NodeBasedCellPopulationWithBuskeUpdate<2>(mesh, cells);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
@@ -189,7 +186,6 @@ public:
             (*p_arch) << p_cell_population;
 
             // Avoid memory leak
-            delete p_mesh;
             SimulationTime::Destroy();
             delete p_cell_population;
         }

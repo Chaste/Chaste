@@ -83,15 +83,15 @@ public:
         nodes.push_back(new Node<3>(0, false,  0.5, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, -0.5, 0.0, 0.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
-        NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
 
         // Set output options
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
@@ -129,12 +129,10 @@ public:
                       ++cell_iter)
         {
             c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
-
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);
         }
 
         // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -150,15 +148,15 @@ public:
         nodes.push_back(new Node<3>(0, false,  1.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, -1.0, 0.0, 0.0));
 
-        NodesOnlyMesh<3>* p_mesh = new NodesOnlyMesh<3>;
-        p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
-        NodeBasedCellPopulation<3> node_based_cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetOutputCellProliferativeTypes(true);
 
         // Set up cell-based simulation
@@ -204,7 +202,6 @@ public:
         }
 
         // Avoid memory leak
-        delete p_mesh;
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];

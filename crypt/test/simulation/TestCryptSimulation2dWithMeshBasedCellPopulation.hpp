@@ -144,23 +144,20 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a node based cell population
-        NodeBasedCellPopulation<2> node_based_cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         // Try to set up off lattice simulation
         TS_ASSERT_THROWS_THIS(CryptSimulation2d simulator(node_based_cell_population),
             "CryptSimulation2d is to be used with MeshBasedCellPopulation or VertexBasedCellPopulation (or subclasses) only");
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     /**

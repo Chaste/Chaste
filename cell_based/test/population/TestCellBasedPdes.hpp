@@ -356,12 +356,12 @@ public:
         // Create a cell population
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create a PDE object
         VolumeDependentAveragedSourcePde<2> pde(cell_population, 0.05);
@@ -399,9 +399,6 @@ public:
         pde.SetupSourceTerms(coarse_mesh, &cell_pde_element_map);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5/4.0, 1e-6);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestVolumeDependentAveragedSourcePdeArchiving() throw(Exception)
@@ -414,12 +411,12 @@ public:
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "VolumeDependentAveragedSourcePde.arch";
@@ -435,7 +432,6 @@ public:
             (*p_arch) << p_pde;
 
             // Avoid memory leak
-            delete p_mesh;
             delete p_pde;
         }
 

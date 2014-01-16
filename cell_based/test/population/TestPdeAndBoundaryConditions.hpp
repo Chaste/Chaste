@@ -414,10 +414,10 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_generating_mesh->GetNumNodes());
 
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create a coarse mesh - element 1 contains all the cells,
         // element 0 contains none
@@ -485,9 +485,6 @@ public:
         r_location += shift;
 
         pde_and_bc.SetUpSourceTermsForAveragedSourcePde(&coarse_mesh);
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestArchivingWithoutSolution() throw(Exception)

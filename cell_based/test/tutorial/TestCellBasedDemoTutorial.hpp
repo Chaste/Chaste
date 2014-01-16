@@ -165,23 +165,22 @@ public:
     {
         /* We now need to create a {{{NodesOnlyMesh}}} we do this by first creating a {{{MutableMesh}}}
          * and passing this to a helper method {{{ConstructNodesWithoutMesh}}} along with a interaction cut off length
-         * that defines the connectivity in the mesh. Note that we need to
-         * delete {{{p_mesh}}} at the end of the test, to avoid memory leaks, as we created this pointer.
+         * that defines the connectivity in the mesh.
          */
         HoneycombMeshGenerator generator(2, 2); //**Changed**//
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh(); //**Changed**//
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>; //**Changed**//
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5); //**Changed**//
+        NodesOnlyMesh<2> mesh; //**Changed**//
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5); //**Changed**//
 
         /* We create the cells as before, only this time we need one cell per node.*/
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type); //**Changed**//
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type); //**Changed**//
 
         /* This time we create a {{{NodeBasedCellPopulation}}} as we are using a {{{NodesOnlyMesh}}}.
          * We also set a cut off length to speed up simulations. This defines a radius of interaction for the cells.*/
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);//**Changed**//
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);//**Changed**//
 
         /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory
          * and output results more often as a larger default timestep is used for these simulations. */
@@ -205,9 +204,6 @@ public:
 
         /* Again we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
-
-        /* Before finishing the test we delete the pointer to the mesh to avoid memory leaks */
-        delete p_mesh; //** Changed**// to stop memory leaks
     }
 
     /*

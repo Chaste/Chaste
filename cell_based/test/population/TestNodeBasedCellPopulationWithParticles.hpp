@@ -76,13 +76,13 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
         // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes()-1);
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes()-1);
 
         std::vector<unsigned> cell_location_indices;
         for (unsigned i=0; i<cells.size(); i++)
@@ -94,16 +94,16 @@ public:
         // corresponding to real cells, so cannot work out which nodes are
         // particles
         std::vector<CellPtr> cells_copy(cells);
-        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulationWithParticles<2> dodgy_cell_population(*p_mesh, cells_copy),
+        TS_ASSERT_THROWS_THIS(NodeBasedCellPopulationWithParticles<2> dodgy_cell_population(mesh, cells_copy),
                 "Node 4 does not appear to be a particle or has a cell associated with it");
 
         // Passes as the cell population constructor automatically works out which
         // cells are particles using the mesh and cell_location_indices
-        NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, cell_location_indices);
+        NodeBasedCellPopulationWithParticles<2> cell_population(mesh, cells, cell_location_indices);
 
         // Here we set the particles to what they already are
         std::set<unsigned> particle_indices;
-        particle_indices.insert(p_mesh->GetNumNodes()-1);
+        particle_indices.insert(mesh.GetNumNodes()-1);
         cell_population.SetParticles(particle_indices);
 
         // So validate passes at the moment
@@ -111,16 +111,13 @@ public:
 
         // Test GetCellUsingLocationIndex()
         TS_ASSERT_THROWS_NOTHING(cell_population.GetCellUsingLocationIndex(0)); // real cell
-        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(p_mesh->GetNumNodes()-1u),"Location index input argument does not correspond to a Cell"); // particles
+        TS_ASSERT_THROWS_THIS(cell_population.GetCellUsingLocationIndex(mesh.GetNumNodes()-1u),"Location index input argument does not correspond to a Cell"); // particles
 
         // Now we label a real cell's node as particle
         particle_indices.insert(1);
 
         // Validate detects this inconsistency
         TS_ASSERT_THROWS_THIS(cell_population.SetParticles(particle_indices),"Node 1 is labelled as a particle and has a cell attached");
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     // Test with particles, checking that the Iterator doesn't loop over particles
@@ -134,8 +131,8 @@ public:
         TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -145,16 +142,16 @@ public:
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
-        NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, location_indices);
+        NodeBasedCellPopulationWithParticles<2> cell_population(mesh, cells, location_indices);
 
         // Create a set of node indices corresponding to particles
         std::set<unsigned> node_indices;
         std::set<unsigned> location_indices_set;
         std::set<unsigned> particle_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            node_indices.insert(p_mesh->GetNode(i)->GetIndex());
+            node_indices.insert(mesh.GetNode(i)->GetIndex());
         }
         for (unsigned i=0; i<location_indices.size(); i++)
         {
@@ -165,7 +162,7 @@ public:
                             location_indices_set.begin(), location_indices_set.end(),
                             std::inserter(particle_indices, particle_indices.begin()));
 
-        std::vector<bool> is_particle(p_mesh->GetNumNodes(), false);
+        std::vector<bool> is_particle(mesh.GetNumNodes(), false);
         for (std::set<unsigned>::iterator it=particle_indices.begin();
              it!=particle_indices.end();
              it++)
@@ -191,10 +188,7 @@ public:
         TS_ASSERT_EQUALS(counter, cell_population.GetNumRealCells());
 
         // Check counter = num_nodes - num_particles_nodes
-        TS_ASSERT_EQUALS(counter + particle_indices.size(), p_mesh->GetNumNodes());
-
-        // Avoid memory leak
-        delete p_mesh;
+        TS_ASSERT_EQUALS(counter + particle_indices.size(), mesh.GetNumNodes());
     }
 
     void TestCellPopulationIteratorWithNoCells() throw(Exception)
@@ -210,8 +204,8 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
@@ -224,7 +218,7 @@ public:
         cells[0]->StartApoptosis();
 
         // Create a cell population
-        NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, cell_location_indices);
+        NodeBasedCellPopulationWithParticles<2> cell_population(mesh, cells, cell_location_indices);
 
         // Iterate over cell population and check there is a single cell
         unsigned counter = 0;
@@ -255,9 +249,6 @@ public:
         }
         TS_ASSERT_EQUALS(counter, 0u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().empty(), true);
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestRemoveDeadCellsAndReMeshWithParticles()
@@ -273,12 +264,12 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
         {
             if (i != 80)
             {
@@ -293,9 +284,9 @@ public:
         cells[27]->StartApoptosis();
 
         // Create a cell population, with some random particles
-        NodeBasedCellPopulationWithParticles<2> cell_population_with_particles(*p_mesh, cells, cell_location_indices);
+        NodeBasedCellPopulationWithParticles<2> cell_population_with_particles(mesh, cells, cell_location_indices);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
 
         // Num real cells should be num_nodes (81) - num_particles (11) = 70
         TS_ASSERT_EQUALS(cell_population_with_particles.GetNumRealCells(), 70u);
@@ -305,7 +296,7 @@ public:
         unsigned num_removed_with_particles = cell_population_with_particles.RemoveDeadCells();
 
         TS_ASSERT_EQUALS(num_removed_with_particles, 1u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 80u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 80u);
         TS_ASSERT_DIFFERS(cell_population_with_particles.rGetCells().size(), cells.size()); // CellPopulation now copies cells
 
         // Num real cells should be num_nodes (81) - num_particle (11) - 1 deleted node = 69
@@ -314,18 +305,18 @@ public:
         cell_population_with_particles.Update();
 
         // For coverage
-        NodeMap map(p_mesh->GetNumAllNodes());
+        NodeMap map(mesh.GetNumAllNodes());
         map.ResetToIdentity();
         cell_population_with_particles.UpdateParticlesAfterReMesh(map);
 
         // Num real cells should be new_num_nodes (80) - num_particles (11)
         TS_ASSERT_EQUALS(cell_population_with_particles.GetNumRealCells(), 69u);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh->GetNumAllNodes());
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh.GetNumAllNodes());
 
         // Nodes 0-9 should not been renumbered so are still particles.
         // the particle at node 80 is now at 79 as node 27 was deleted..
-        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-                node_iter != p_mesh->GetNodeIteratorEnd();
+        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
             unsigned index = node_iter->GetIndex();
@@ -358,9 +349,6 @@ public:
         }
 
         TS_ASSERT_EQUALS(node_indices_with_particles, expected_node_indices);
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestAddAndRemoveAndAddWithOutUpdate()
@@ -376,12 +364,12 @@ public:
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-        p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.2);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         // Create vector of cell location indices
         std::vector<unsigned> cell_location_indices;
-        for (unsigned i=10; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=10; i<mesh.GetNumNodes(); i++)
         {
             if (i != 80)
             {
@@ -396,9 +384,9 @@ public:
         cells[27]->StartApoptosis();
 
         // Create a cell population, with some random particles
-        NodeBasedCellPopulationWithParticles<2> cell_population(*p_mesh, cells, cell_location_indices);
+        NodeBasedCellPopulationWithParticles<2> cell_population(mesh, cells, cell_location_indices);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 70u);
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -414,7 +402,7 @@ public:
         new_location[0] = 0.3435346344234;
         cell_population.AddCell(p_new_cell, new_location, cell_population.rGetCells().front() /*random choice of parent*/);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 82u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
 
         p_simulation_time->IncrementTimeOneStep();
@@ -422,7 +410,7 @@ public:
         unsigned num_removed = cell_population.RemoveDeadCells();
         TS_ASSERT_EQUALS(num_removed, 1u);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 70u);
 
         FixedDurationGenerationBasedCellCycleModel* p_model2 = new FixedDurationGenerationBasedCellCycleModel();
@@ -435,11 +423,8 @@ public:
         new_location2[0] = 0.6435346344234;
         cell_population.AddCell(p_new_cell2, new_location2, cell_population.rGetCells().front() /*random choice of parent*/);
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 82u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 82u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 71u);
-
-        // Avoid memory leak
-        delete p_mesh;
     }
 
     void TestUpdateNodeLocations() throw(Exception)
@@ -722,16 +707,16 @@ public:
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
-            NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
-            p_mesh->ConstructNodesWithoutMesh(generating_mesh, 1.5);
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
 
             // Create cells
             std::vector<CellPtr> cells;
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             // Create a cell population
-            NodeBasedCellPopulationWithParticles<2>* const p_cell_population = new NodeBasedCellPopulationWithParticles<2>(*p_mesh, cells);
+            NodeBasedCellPopulationWithParticles<2>* const p_cell_population = new NodeBasedCellPopulationWithParticles<2>(mesh, cells);
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
@@ -751,7 +736,6 @@ public:
             (*p_arch) << p_cell_population;
 
             // Avoid memory leak
-            delete p_mesh;
             SimulationTime::Destroy();
             delete p_cell_population;
         }
