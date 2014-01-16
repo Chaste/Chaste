@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * == Introduction ==
  *
- * This tutroial is designed to give you a quick introduction to running cell-based
+ * This tutorial is designed to give you a quick introduction to running cell-based
  * simulations in Chaste. Full details are postponed until later tutorials.
  *
  * We begin with a simple monolayer simulation and see how to:
