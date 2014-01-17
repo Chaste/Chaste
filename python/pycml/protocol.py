@@ -79,6 +79,7 @@ class Protocol(processors.ModelModifier):
         self._output_specifications = []
         self._vector_outputs = set()
         self._vector_outputs_detail = []
+        self._optional_vars = set()
         warn_only = not model.get_option('fully_automatic') and model.get_option('warn_on_units_errors')
         self.set_units_converter(processors.UnitsConverter(self.model, warn_only))
     
@@ -92,7 +93,10 @@ class Protocol(processors.ModelModifier):
     
     @staticmethod
     def find_required_annotations(proto_file_path):
-        """Parse a protocol XML file and determine what model annotations will be required."""
+        """Parse a protocol XML file and determine what model annotations will be required.
+        
+        Note: this method is obsolete, and doesn't pick up everything!
+        """
         proto_docs = []
         model_nss = {}
         # First load all the XMLs
@@ -200,6 +204,8 @@ class Protocol(processors.ModelModifier):
             else:
                 return None
         if not units_only and hasattr(proto_xml.protocol, u'modelInterface'):
+            for optional in getattr(proto_xml.protocol.modelInterface, u'specifyOptionalVariable', []):
+                self.specify_optional_variable(optional.name)
             for vardecl in getattr(proto_xml.protocol.modelInterface, u'declareNewVariable', []):
                 self.declare_new_variable(vardecl.name, get_units(vardecl), getattr(vardecl, u'initial_value', None))
             for rule in getattr(proto_xml.protocol.modelInterface, u'unitsConversionRule', []):
@@ -215,6 +221,10 @@ class Protocol(processors.ModelModifier):
             for expr in getattr(proto_xml.protocol.modelInterface, u'addOrReplaceEquation', []):
                 self.add_or_replace_equation(expr.xml_element_children().next())
     
+    def specify_optional_variable(self, prefixed_name):
+        """Specify the given variable as being optional, so that the interface copes if it isn't present."""
+        self._optional_vars.add(prefixed_name)
+    
     def specify_output_variable(self, prefixed_name, units=None):
         """Specify the given variable as a protocol output, optionally in the given units.
         
@@ -222,6 +232,8 @@ class Protocol(processors.ModelModifier):
         modified (if needed) and in particular after the input variable declarations have been processed.  This
         ordering is necessary to allow a variable to be both an input and an output.
         """
+        if prefixed_name in self._optional_vars:
+            raise ProtocolError("The protocol output '%s' cannot be specified as an optional variable" % prefixed_name)
         self._output_specifications.append({'prefixed_name': prefixed_name, 'units': units})
 
     def process_output_declarations(self):
@@ -337,7 +349,11 @@ class Protocol(processors.ModelModifier):
             try:
                 var = self._lookup_ontology_term(input['prefixed_name'])
             except ValueError:
-                raise ProtocolError("There is no model variable annotated with the term " + prefixed_name)
+                if input['prefixed_name'] not in self._optional_vars:
+                    raise ProtocolError("There is no model variable annotated with the term " + prefixed_name)
+                else:
+                    print >>sys.stderr, 'Ignoring missing optional input', input['prefixed_name']
+                    continue
             # Check it has the correct type
             deps = var.get_all_expr_dependencies()
             if len(deps) > 1:
@@ -387,32 +403,35 @@ class Protocol(processors.ModelModifier):
         """Set the given variable as a protocol input, optionally in the given units.
         
         At this point we just note that it's going to become an input, and create the variable if
-        it doesn't exist (so that a later add_or_replace_equation call can define it if appropriate).
+        it doesn't exist (so that a later add_or_replace_equation call can define it if appropriate),
+        unless it is also specified as being optional.
+        
         The model definition will only be replaced if specified using add_or_replace_equation.
         After those parts have been processed, we will iterate through all specified inputs and
         process the units and initial_value specifications, using the process_input_declarations
         method.
         
-        The variable will become a constant parameter that can be set from the protocol.  If units
-        are given and differ from its original units, they must be added to the model if they don't
-        exist, and a new version of the variable added to the protocol component, with a suitable
-        assignment.
+        If units are given and differ from its original units, they must be added to the model if they don't
+        exist, and a new version of the variable added to the protocol component, with a suitable assignment.
         
         If the initial_value is given then this will overwrite the original setting if present.
-        Any assignment to the variable will be removed.
         
-        If the variable does not exist, this is only an error if an initial_value or units are not given.
-        Otherwise we just create the variable.
+        If the variable does not exist, this is only an error if an initial_value or units are not given,
+        and the variable is not declared as optional.  Otherwise we just create the variable.
         """
         try:
             var = self._lookup_ontology_term(prefixed_name)
         except ValueError:
-            # Create the variable
-            if units is None:
-                raise ProtocolError("Units must be specified for input variables not appearing in the model; none are given for " + prefixed_name)
-            oxmeta_name = prefixed_name.split(':')[1]
-            var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
-            var.set_oxmeta_name(oxmeta_name)
+            if prefixed_name in self._optional_vars:
+                print >>sys.stderr, 'Ignoring missing optional input', prefixed_name
+                return
+            else:
+                # Create the variable
+                if units is None:
+                    raise ProtocolError("Units must be specified for input variables not appearing in the model; none are given for " + prefixed_name)
+                oxmeta_name = prefixed_name.split(':')[1]
+                var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
+                var.set_oxmeta_name(oxmeta_name)
         # Flag for later processing
         self._input_specifications.append({'prefixed_name': prefixed_name, 'units': units, 'initial_value': initial_value})
         # Record for statistics output
@@ -476,8 +495,8 @@ class Protocol(processors.ModelModifier):
         assert children[0].localName == u'bvar', "A units conversion rule must have a single bound variable: " + conv_expr.xml()
         bvar_name = unicode(children[0].ci).strip()
         body_expr = children[1]
-        # Modify variable references within the body_expr so they use fully qualified names
-        # (compname, varname), except for uses of the bound variable
+        # Modify variable references within the body_expr so they use fully qualified names (compname, varname),
+        # except for uses of the bound variable
         try:
             self._identify_referenced_variables(body_expr, bvar_name)
         except ValueError:
@@ -524,7 +543,8 @@ class Protocol(processors.ModelModifier):
         for input in filter(lambda i: isinstance(i, cellml_variable), self.inputs):
             self._check_input(input)
             self._add_variable_to_model(input)
-        for input in filter(lambda i: isinstance(i, mathml_apply), self.inputs):
+        for input in list(filter(lambda i: isinstance(i, mathml_apply), self.inputs)):
+            # Note that we convert to list this time, because _add_maths_to_model might modify self.inputs
             self._check_input(input)
             self._add_maths_to_model(input)
         self.process_input_declarations()
@@ -550,11 +570,17 @@ class Protocol(processors.ModelModifier):
         num_outputs = len(self.outputs | self._vector_outputs)
         num_equations = len([e for e in self.model._cml_assignments if isinstance(e, mathml_apply)])
         state_vars = self.model.find_state_vars()
+        all_vars = list(self.model.get_all_variables())
         print >>sys.stderr, 'Statistics about the modified model:'
         print >>sys.stderr, '    # inputs:         ', len(inputs)
         print >>sys.stderr, '    # total outputs:  ', num_outputs
         print >>sys.stderr, '    # state variables:', len(state_vars)
         print >>sys.stderr, '    # equations:      ', num_equations
+        print >>sys.stderr, '    # variables:      ', len(all_vars)
+        print >>sys.stderr, '    Missing optional variables:'
+        for prefixed_name in sorted(self._optional_vars):
+            if self._lookup_ontology_term(prefixed_name, check_optional=True) is None:
+                print >>sys.stderr, ' '*7, prefixed_name
     
     def add_alias(self, var, alias):
         """Add an alias name for a variable.
@@ -793,7 +819,7 @@ class Protocol(processors.ModelModifier):
                 for ci_elt in self._find_ci_elts(child):
                     yield ci_elt
     
-    def _identify_referenced_variables(self, expr, special_name=None):
+    def _identify_referenced_variables(self, expr, special_name=None, check_optional=False):
         """Figure out which variables are referenced in the given expression, and update ci elements.
         
         The expression should contain names as used in the protocol, i.e. prefixed names giving an
@@ -802,7 +828,11 @@ class Protocol(processors.ModelModifier):
         A ValueError is raised if any referenced variable doesn't exist.
         However, any reference to special_name is not checked and left as-is.
         Also, names already in fully qualified form are assumed to be ok and left as-is.
+        
+        If check_optional is True, we don't throw on missing ontology-annotated variables if they're
+        in the optional set, but just return False instead.
         """
+        all_vars_found = True
         for ci_elt in self._find_ci_elts(expr):
             vname = unicode(ci_elt)
             if vname == special_name:
@@ -810,7 +840,11 @@ class Protocol(processors.ModelModifier):
             if ',' in vname:
                 continue
             if ':' in vname:
-                var = self._lookup_ontology_term(vname)
+                var = self._lookup_ontology_term(vname, check_optional=check_optional)
+                if var is None:
+                    # It was a missing optional variable
+                    all_vars_found = False
+                    continue
             else:
                 try:
                     var = self._get_protocol_component().get_variable_by_name(vname)
@@ -819,8 +853,9 @@ class Protocol(processors.ModelModifier):
                                      % vname)
             full_name = var.component.name + u',' + var.name
             ci_elt._rename(full_name)
+        return all_vars_found
     
-    def _lookup_ontology_term(self, prefixed_name, enforce_uniqueness=True):
+    def _lookup_ontology_term(self, prefixed_name, enforce_uniqueness=True, check_optional=False):
         """Find the variable annotated with the given term, if it exists.
         
         The term should be given in prefixed form, with the prefix appearing in the protocol's namespace
@@ -830,6 +865,9 @@ class Protocol(processors.ModelModifier):
         
         Will throw ValueError if the variable doesn't exist in the model, or the given term is invalid.
         If enforce_uniqueness is True, also ensures there's only one variable with the annotation.
+        
+        If check_optional is True, we don't throw on missing ontology-annotated variables if they're
+        in the optional set, but just return None instead.
         """
         try:
             prefix, _ = prefixed_name.split(':')
@@ -844,7 +882,10 @@ class Protocol(processors.ModelModifier):
             raise ValueError("We only support 'oxmeta' annotations at present")
         vars = self.model.get_variables_by_ontology_term((prefixed_name, nsuri))
         if len(vars) == 0:
-            raise ValueError("The ontology term '%s' does not match any variables" % prefixed_name)
+            if check_optional and prefixed_name in self._optional_vars:
+                return None
+            else:
+                raise ValueError("The ontology term '%s' does not match any variables" % prefixed_name)
         if enforce_uniqueness:
             if len(vars) > 1:
                 raise ValueError("The ontology term '%s' matches multiple variables" % prefixed_name)
@@ -962,7 +1003,13 @@ class Protocol(processors.ModelModifier):
                         oxmeta_name = vname.split(':')[1]
                         var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
                         var.set_oxmeta_name(oxmeta_name)
-        self._identify_referenced_variables(expr)
+        if not self._identify_referenced_variables(expr, check_optional=True):
+            # Some optional variables weren't present in the model, so we can't use this equation
+            print >>sys.stderr, "Warning: optional model variables missing, so not using model interface equation:"
+            if hasattr(expr, 'loc'):
+                print >>sys.stderr, "  ", expr.loc
+            self.inputs.remove(expr)
+            return
         # Figure out what's on the LHS of the assignment
         if lhs.localName == u'ci':
             # Straight assignment to variable
@@ -1058,7 +1105,7 @@ class Protocol(processors.ModelModifier):
             elif var.get_type() in [VarTypes.Computed, VarTypes.Mapped]:
                 var.set_is_derived_quantity(True)
             else:
-                assert var.get_type() in [VarTypes.State, VarTypes.Free]
+                assert var.get_type() in [VarTypes.State, VarTypes.Free], 'Bad var ' + str(var) + ' of type ' + str(var.get_type())
         for var in self.outputs:
             var.set_is_output_variable(True)
 
