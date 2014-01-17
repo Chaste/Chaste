@@ -51,11 +51,18 @@ import pycml
 # Allowed metadata names, more to come
 # TODO #1209: Use a proper ontology!
 METADATA_NAMES = frozenset(
-    ['state_variable',
+    ['state_variable', 'time', 'temperature', 
      # =====================================================
      # Cardiac-Specific Labels
      # =====================================================
-     'membrane_voltage', 'time', 'membrane_capacitance', 'membrane_E_R',  'temperature', 
+     # VOLTAGES / POTENTIALS
+     'membrane_voltage', 
+     # These are intended to refer to outer cell membrane, new tags should be 
+     # introduced for SR membrane, mitochondrial membranes etc.
+     'sodium_reversal_potential', 'potassium_reversal_potential', 
+     'calcium_reversal_potential', 'chloride_reversal_potential',
+     # Membrane properties
+     'membrane_capacitance', 'membrane_E_R',
      # =====================================================
      # Stimulus Current
      # =====================================================
