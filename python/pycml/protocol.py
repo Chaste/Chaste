@@ -651,9 +651,13 @@ class Protocol(processors.ModelModifier):
         print >>sys.stderr, '    # state variables:', len(state_vars)
         print >>sys.stderr, '    # equations:      ', num_equations
         print >>sys.stderr, '    # variables:      ', len(all_vars)
-        print >>sys.stderr, '    Missing optional variables:'
+        missing_vars = []
         for prefixed_name in sorted(self._optional_vars):
             if self._lookup_ontology_term(prefixed_name, check_optional=True) is None:
+                missing_vars.append(prefixed_name)
+        if missing_vars:
+            print >>sys.stderr, '    Missing optional variables:'
+            for prefixed_name in missing_vars:
                 print >>sys.stderr, ' '*7, prefixed_name
     
     def add_alias(self, var, alias):
