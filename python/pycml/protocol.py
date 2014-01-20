@@ -603,7 +603,7 @@ class Protocol(processors.ModelModifier):
                 var = expr.assigned_variable()
                 if isinstance(var, cellml_variable) and var.get_units() is self.magic_units:
                     defn = expr.eq.rhs
-                    #print 'Magic units for', var, 'defined by', defn, defn.get_units()
+#                     print 'Magic units for', var, 'defined by', defn, defn.get_units()
                     units = self.add_units(defn.get_units().extract())
                     var.units = units.name
     
@@ -627,10 +627,11 @@ class Protocol(processors.ModelModifier):
                 for output_spec in self._output_specifications:
                     if output_spec['prefixed_name'] == vname:
                         var = self._create_annotated_variable(vname, output_spec['units'])
+#                         print 'Created output', vname, '=', var, 'with units', var.units
                         return
                 # Is this an optional variable (with this expression being the default definition)?
                 if vname in self._optional_vars:
-                    #print 'Creating', vname, 'with magic units'
+#                     print 'Creating', vname, 'with magic units'
                     var = self._create_annotated_variable(vname, self.magic_units)
     
     def report_stats(self):
@@ -750,6 +751,7 @@ class Protocol(processors.ModelModifier):
         else:
             new_var = self.add_variable(comp, new_name, units, id=var.cmeta_id)
             self.del_attr(var, u'id', NSS['cmeta'])
+#         print 'Replacing', var, 'by', new_var, 'with id', new_var.cmeta_id
         return new_var
     
     def _check_input(self, input):
@@ -759,13 +761,11 @@ class Protocol(processors.ModelModifier):
         else:
             exists = self.model is getattr(input, 'xml_parent', None)
         if exists and not getattr(input, '_cml_ok_as_input', False):
-            msg = "Inputs must not already exist in the model. (Input %s exists.)" % repr(input)
-            raise ProtocolError(msg)
+            raise ProtocolError("Inputs must not already exist in the model. (Input %s exists.)" % repr(input))
         
     def _error_handler(self, errors):
         """Deal with errors found when re-analysing a modified model."""
-        raise ProtocolError('Applying protocol created an invalid model:\n  '
-                            + '\n  '.join(map(str, errors)))
+        raise ProtocolError('Applying protocol created an invalid model:\n  ' + '\n  '.join(map(str, errors)))
     
     def _check_if_output(self, old_var, new_var):
         """A variable is being replaced.  If the original was an output, make the new one instead."""
@@ -856,7 +856,16 @@ class Protocol(processors.ModelModifier):
                     cname, vname = self._split_name(vname)
                     comp = expr.component
                     if comp.name != cname:
-                        self.connect_variables((cname,vname), (comp.name,vname))
+                        # Check for the special case of the referenced variable having a source in this component already
+                        src_comp = self.model.get_component_by_name(cname)
+                        src_var = src_comp.get_variable_by_name(vname).get_source_variable(recurse=True)
+                        if src_var.component is comp:
+                            # Use the existing var
+#                             print 'Using existing var', src_var, 'for reference', unicode(ci_elt)
+                            vname = src_var.name
+                        else:
+#                             print 'Connecting to reference', unicode(ci_elt), 'from component', comp.name
+                            self.connect_variables(src_var, (comp.name,vname))
                     # Now just rename to be local
                     ci_elt._rename(vname)
     
@@ -969,6 +978,7 @@ class Protocol(processors.ModelModifier):
                 raise ValueError("The ontology term '%s' matches multiple variables" % prefixed_name)
             else:
                 vars = vars[0]
+#         print 'Looked up', prefixed_name, 'as', vars
         return vars
     
     def _apply_conversion_rule(self, assignment, conv_template, placeholder_name):
@@ -1096,8 +1106,10 @@ class Protocol(processors.ModelModifier):
             clamping = isinstance(rhs, mathml_ci) and unicode(rhs) == unicode(lhs)
             self.remove_definition(assigned_var, keep_initial_value=clamping)
             if clamping:
+#                 print 'Clamping', assigned_var
                 self.inputs.remove(expr) # The equation isn't actually used in this case
             else:
+#                 print 'Redefining', assigned_var
                 self.add_expr_to_comp(cname, expr)
                 assigned_var._add_dependency(expr)
         else:
