@@ -205,7 +205,7 @@ class Protocol(processors.ModelModifier):
                 return None
         if not units_only and hasattr(proto_xml.protocol, u'modelInterface'):
             for optional in getattr(proto_xml.protocol.modelInterface, u'specifyOptionalVariable', []):
-                self.specify_optional_variable(optional.name)
+                self.specify_optional_variable(optional.name, optional.xml_children)
             for vardecl in getattr(proto_xml.protocol.modelInterface, u'declareNewVariable', []):
                 self.declare_new_variable(vardecl.name, get_units(vardecl), getattr(vardecl, u'initial_value', None))
             for rule in getattr(proto_xml.protocol.modelInterface, u'unitsConversionRule', []):
@@ -221,9 +221,24 @@ class Protocol(processors.ModelModifier):
             for expr in getattr(proto_xml.protocol.modelInterface, u'addOrReplaceEquation', []):
                 self.add_or_replace_equation(expr.xml_element_children().next())
     
-    def specify_optional_variable(self, prefixed_name):
-        """Specify the given variable as being optional, so that the interface copes if it isn't present."""
+    def specify_optional_variable(self, prefixed_name, children):
+        """Specify the given variable as being optional, so that the interface copes if it isn't present.
+        
+        If a default expression is given, we also need to add this equation to the inputs set iff the LHS
+        variable doesn't exist.  The variable itself will be added in a later processing phase, once we
+        can determine whether its definition can actually be evaluated.  It will be given units even later,
+        once variable connections have been fixed and hence the units of the RHS can be calculated.
+        """
         self._optional_vars.add(prefixed_name)
+        assert len(children) <= 1, 'Malformed specifyOptionalVariable element with %d children' % len(children)
+        if len(children) == 1:
+            # Default given; check if we need it
+            if self._lookup_ontology_term(prefixed_name, check_optional=True) is None:
+                rhs = children[0]
+                rhs.xml_parent.safe_remove_child(rhs)
+                lhs = pycml.mathml_ci.create_new(rhs, prefixed_name)
+                defn = pycml.mathml_apply.create_new(rhs, u'eq', [lhs, rhs])
+                self.add_or_replace_equation(defn)
     
     def specify_output_variable(self, prefixed_name, units=None):
         """Specify the given variable as a protocol output, optionally in the given units.
@@ -232,8 +247,6 @@ class Protocol(processors.ModelModifier):
         modified (if needed) and in particular after the input variable declarations have been processed.  This
         ordering is necessary to allow a variable to be both an input and an output.
         """
-        if prefixed_name in self._optional_vars:
-            raise ProtocolError("The protocol output '%s' cannot be specified as an optional variable" % prefixed_name)
         self._output_specifications.append({'prefixed_name': prefixed_name, 'units': units})
 
     def process_output_declarations(self):
@@ -295,6 +308,13 @@ class Protocol(processors.ModelModifier):
                 # Ensure it gets computed and annotated
                 self._vector_outputs.add(var)
                 var.add_rdf_annotation(('pycml:output-vector', NSS['pycml']), vector_name)
+    
+    def _create_annotated_variable(self, prefixed_name, units):
+        """Create a new variable in the model, annotated with the given term, and in the given units."""
+        oxmeta_name = prefixed_name.split(':')[1]
+        var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
+        var.set_oxmeta_name(oxmeta_name)
+        return var
     
     def _find_state_variables(self):
         """Find all (likely) state variables by examining the model mathematics for ODEs."""
@@ -429,9 +449,7 @@ class Protocol(processors.ModelModifier):
                 # Create the variable
                 if units is None:
                     raise ProtocolError("Units must be specified for input variables not appearing in the model; none are given for " + prefixed_name)
-                oxmeta_name = prefixed_name.split(':')[1]
-                var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
-                var.set_oxmeta_name(oxmeta_name)
+                var = self._create_annotated_variable(prefixed_name, units)
         # Flag for later processing
         self._input_specifications.append({'prefixed_name': prefixed_name, 'units': units, 'initial_value': initial_value})
         # Record for statistics output
@@ -543,6 +561,9 @@ class Protocol(processors.ModelModifier):
         for input in filter(lambda i: isinstance(i, cellml_variable), self.inputs):
             self._check_input(input)
             self._add_variable_to_model(input)
+        for input in filter(lambda i: isinstance(i, mathml_apply), self.inputs):
+            self._check_input(input)
+            self._check_equation_lhs(input) # Create LHS var if needed
         for input in list(filter(lambda i: isinstance(i, mathml_apply), self.inputs)):
             # Note that we convert to list this time, because _add_maths_to_model might modify self.inputs
             self._check_input(input)
@@ -558,6 +579,59 @@ class Protocol(processors.ModelModifier):
         for var, oxmeta_name in self._pending_oxmeta_assignments:
             var.set_oxmeta_name(oxmeta_name)
         self.report_stats()
+    
+    @property
+    def magic_units(self):
+        """Return a fake units object for use when creating variables whose units are not yet known.
+        
+        Also create a member list for recording variables with these units.
+        """
+        try:
+            return self._magic_units
+        except AttributeError:
+            u = self._magic_units = pycml.cellml_units.create_new(self.model, u'**magic**', [])
+            return u
+    
+    def _fix_magic_units(self):
+        """Give real units (calculated from RHS of defining equation) to any variable with 'magic' units.
+        
+        We need to process variables in order sorted by the dependency graph, since some variables with magic units
+        might be defined in terms of other variables with magic units.
+        """
+        for expr in self.model.get_assignments():
+            if isinstance(expr, mathml_apply):
+                var = expr.assigned_variable()
+                if isinstance(var, cellml_variable) and var.get_units() is self.magic_units:
+                    defn = expr.eq.rhs
+                    #print 'Magic units for', var, 'defined by', defn, defn.get_units()
+                    units = self.add_units(defn.get_units().extract())
+                    var.units = units.name
+    
+    def _check_equation_lhs(self, expr):
+        """Check whether the variable on the LHS of a new equation exists, or whether we can create it.
+        
+        There are two cases in which the protocol can create an annotated variable not existing in the model:
+        an optional variable with a default definition, or an output with a separate equation overriding any definition.
+        If the latter there will also be units specified in the output definition, but in the former case we need to use
+        'magic' units until variable connections have been sorted out, and we can calculate the real units.
+        """
+        assert isinstance(expr, mathml_apply)
+        assert expr.operator().localName == u'eq', 'Expression is not an assignment'
+        lhs, rhs = list(expr.operands())
+        if lhs.localName == u'ci' and u':' in unicode(lhs):
+            try:
+                vname = unicode(lhs)
+                var = self._lookup_ontology_term(vname)
+            except ValueError:
+                # Is this declared as an output with units?
+                for output_spec in self._output_specifications:
+                    if output_spec['prefixed_name'] == vname:
+                        var = self._create_annotated_variable(vname, output_spec['units'])
+                        return
+                # Is this an optional variable (with this expression being the default definition)?
+                if vname in self._optional_vars:
+                    #print 'Creating', vname, 'with magic units'
+                    var = self._create_annotated_variable(vname, self.magic_units)
     
     def report_stats(self):
         """Output a short report on what the modified model looks like.
@@ -924,7 +998,10 @@ class Protocol(processors.ModelModifier):
 
     def _add_units_conversions(self):
         """Apply units conversions, in particular 'special' ones, to the protocol component.
-        
+
+        We first check for any variables with 'magic' units and try to give them real units based
+        on their definitions.
+
         Also convert any equations that have been added to the model, even if they don't appear
         in the protocol component, since otherwise we might not do all necessary conversions
         between model & protocol mathematics.
@@ -932,6 +1009,7 @@ class Protocol(processors.ModelModifier):
         converter = self.get_units_converter()
         notifier = NotifyHandler(level=logging.WARNING)
         logging.getLogger('units-converter').addHandler(notifier)
+        self._fix_magic_units()
         proto_comp = self._get_protocol_component()
         converter.add_conversions_for_component(proto_comp)
         converter.convert_assignments(filter(lambda i: isinstance(i, mathml_apply), self.inputs))
@@ -989,25 +1067,20 @@ class Protocol(processors.ModelModifier):
         assert isinstance(expr, mathml_apply)
         assert expr.operator().localName == u'eq', 'Expression is not an assignment'
         lhs, rhs = list(expr.operands())
-        # Check for the case of assigning to a variable declared with an ontology term that isn't in the model,
-        # but is an output
-        if lhs.localName == u'ci' and u':' in unicode(lhs):
-            try:
-                vname = unicode(lhs)
-                var = self._lookup_ontology_term(vname)
-            except ValueError:
-                # Is this declared just as an output with units? In which case, add var to model
-                for output_spec in self._output_specifications:
-                    if output_spec['prefixed_name'] == vname:
-                        units = output_spec['units']
-                        oxmeta_name = vname.split(':')[1]
-                        var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
-                        var.set_oxmeta_name(oxmeta_name)
         if not self._identify_referenced_variables(expr, check_optional=True):
-            # Some optional variables weren't present in the model, so we can't use this equation
+            # Some optional variables weren't present in the model, so we can't use this equation.
             print >>sys.stderr, "Warning: optional model variables missing, so not using model interface equation:"
             if hasattr(expr, 'loc'):
                 print >>sys.stderr, "  ", expr.loc
+            # Check, however, whether it defines an output or the default value for an optional variable, since this is then an error.
+            if lhs.localName == u'ci':
+                vname = unicode(lhs)
+                if u':' in vname:
+                    if vname in self._optional_vars:
+                        raise ProtocolError("Cannot give a value to optional variable '%s' as not all variables used in its default clause are present." % vname)
+                    for output_spec in self._output_specifications:
+                        if output_spec['prefixed_name'] == vname:
+                            raise ProtocolError("At least one optional variable required to override the definition of model output '%s' was not found and has no default value." % vname)
             self.inputs.remove(expr)
             return
         # Figure out what's on the LHS of the assignment
