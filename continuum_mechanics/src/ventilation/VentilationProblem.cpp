@@ -391,7 +391,9 @@ void VentilationProblem::SolveProblemFromFile(const std::string& rInFilePath, co
         }
     }
     Solve();
+#ifdef CHASTE_VTK
     WriteVtk(rOutFileDir, rOutFileName);
+#endif
 }
 
 
