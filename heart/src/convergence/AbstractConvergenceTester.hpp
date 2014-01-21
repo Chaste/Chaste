@@ -62,7 +62,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StimulusBoundaryCondition.hpp"
 
 #include "Warnings.hpp"
-#include "Debug.hpp"
 
 typedef enum StimulusType_
 {
@@ -589,7 +588,8 @@ public:
                     this->Converged = l2_norm_full < this->RelativeConvergenceCriterion;
                     this->LastDifference = l2_norm_full;
 #define COVERAGE_IGNORE
-                    if (time_series.size() == 1u || time_series.back() == 0.0)
+                    assert (time_series.size() != 1u);
+                    if (time_series.back() == 0.0)
                     {
                         std::cout << "Failed after successful convergence - give up this convergence test\n";
                         break;
@@ -598,7 +598,7 @@ public:
 
                 }
 
-                if (/*!this->PopulatedResult &&*/ time_series.size() != 1u && time_series.back() != 0.0)
+                if ( time_series.back() != 0.0)
                 {
                     // Simulation ran to completion
                     this->PopulatedResult=true;
