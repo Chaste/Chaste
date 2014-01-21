@@ -244,9 +244,10 @@ public:
     void TestOdeConvergencein1DWithBackwardN98() throw(Exception)
     {
         OdeConvergenceTester<CellNobleVargheseKohlNoble1998aFromCellMLBackwardEuler,  MonodomainProblem<1>, 1, 1> tester;
+        tester.AbsoluteStimulus = -5e6; // The default of -1e7 causes V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
         TS_ASSERT(tester.Converged);
-        TS_ASSERT_DELTA(tester.OdeTimeStep, 0.005, 1e-10);
+        TS_ASSERT_DELTA(tester.OdeTimeStep, 0.0025, 1e-10);
     }
 
     void TestOdePdeConvergencein1DWithBackwardN98() throw(Exception)

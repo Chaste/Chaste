@@ -86,7 +86,7 @@ public:
         tester.AbsoluteStimulus = -5e8; // We want V to go out of range for lookup tables
         tester.Converge(__FUNCTION__);
 
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 10u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
                          "This run threw an exception.  Check convergence results\n");
         Warnings::Instance()->QuietDestroy();
