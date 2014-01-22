@@ -1065,6 +1065,45 @@ class Protocol(processors.ModelModifier):
             comp._del_variable(orig_var, keep_annotations=(orig_var.cmeta_id == var.cmeta_id))
         var.name = vname
         comp._add_variable(var)
+    
+    def _force_evaluate(self, variable):
+        """Attempt to force the evaluation of variable, even if it isn't static.
+        
+        We do a recursive sweep of the variable's dependencies in order to set each variable as temporarily static,
+        so that we can use var.get_value() to do the evaluation.  Otherwise the first variable lookup with var's
+        definition would give an error if the definition isn't known to be static.
+        """
+        def process_defn(var, set=True):
+            """Set or unset var and its dependencies as static."""
+            if set:
+                var._set_binding_time(BINDING_TIMES.static, temporary=True)
+                # If this is an input with value specified, also set the value temporarily
+#                 print 'Checking', var, var.oxmeta_name
+                for spec in self._input_specifications:
+                    try:
+                        if var is self._lookup_ontology_term(spec['prefixed_name']):
+#                             print var, spec
+                            if spec['initial_value']:
+                                var.set_value(spec['initial_value'], follow_maps=False)
+                            break
+                    except ValueError:
+                        pass
+            else:
+                var._unset_binding_time(only_temporary=True)
+                var.unset_values()
+            defn = var.get_dependencies()
+            if defn:
+                if isinstance(defn[0], mathml_apply):
+                    for ci_elt in self._find_ci_elts(defn[0].eq.rhs):
+                        process_defn(ci_elt.variable)
+                elif isinstance(defn[0], cellml_variable):
+                    process_defn(defn[0])
+        try:
+            process_defn(variable, set=True)
+            value = unicode("%.17g" % variable.get_value())
+        finally:
+            process_defn(variable, set=False)
+        return value
 
     def _add_maths_to_model(self, expr):
         """Add or replace an equation in the model.
@@ -1104,6 +1143,15 @@ class Protocol(processors.ModelModifier):
             assigned_var = self.model.get_variable_by_name(cname, vname)
             # Check for the special case of "var = var" which signifies clamping to initial value
             clamping = isinstance(rhs, mathml_ci) and unicode(rhs) == unicode(lhs)
+            if clamping and not hasattr(assigned_var, u'initial_value'):
+                # Hope it's computed, and try to evaluate the definition
+                try:
+                    assigned_var.initial_value = self._force_evaluate(assigned_var)
+                except:
+                    pass # TODO: Check against optional variables in order to give nicer error message
+#                     import traceback
+#                     traceback.print_exc()
+#                     raise ProtocolError("No suitable value found for clamped variable " + unicode(lhs))
             self.remove_definition(assigned_var, keep_initial_value=clamping)
             if clamping:
 #                 print 'Clamping', assigned_var

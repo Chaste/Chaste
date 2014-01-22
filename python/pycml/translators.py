@@ -5681,8 +5681,8 @@ class ConfigurationStore(object):
         def find_units_match(test_units, units_list, remove_match=False, keep_only_match=False):
             """Look for a units definition dimensionally equivalent to test_units within units_list.
             
-            If remove_match is True, remove any match from the list.
-            If keep_only_match is True, remove any non-matches from the list.
+            If remove_match is True, remove the first match from the list.
+            If keep_only_match is True, remove all entries except the first match from the list.
             Return the matching units, or None if there are no matches.
             """
             for units in units_list:
