@@ -418,6 +418,9 @@ class Protocol(processors.ModelModifier):
             input_var.set_oxmeta_name(oxmeta_name)
             # Add to the old self.inputs collection for statistics calculation
             self.inputs.add(input_var)
+            if var is not input_var:
+#                 print 'Removing old input', var, 'new is', input_var
+                self.inputs.remove(var)
 
     def specify_input_variable(self, prefixed_name, units=None, initial_value=None):
         """Set the given variable as a protocol input, optionally in the given units.
@@ -647,8 +650,8 @@ class Protocol(processors.ModelModifier):
         state_vars = self.model.find_state_vars()
         all_vars = list(self.model.get_all_variables())
         print >>sys.stderr, 'Statistics about the modified model:'
-        print >>sys.stderr, '    # inputs:         ', len(inputs)
-        print >>sys.stderr, '    # total outputs:  ', num_outputs
+        print >>sys.stderr, '    # inputs:         ', len(inputs)#, map(str, inputs)
+        print >>sys.stderr, '    # total outputs:  ', num_outputs#, map(str, self.outputs)
         print >>sys.stderr, '    # state variables:', len(state_vars)
         print >>sys.stderr, '    # equations:      ', num_equations
         print >>sys.stderr, '    # variables:      ', len(all_vars)
@@ -1082,7 +1085,7 @@ class Protocol(processors.ModelModifier):
                 for spec in self._input_specifications:
                     try:
                         if var is self._lookup_ontology_term(spec['prefixed_name']):
-#                             print var, spec
+#                             print 'Set value for', var, 'using', spec
                             if spec['initial_value']:
                                 var.set_value(spec['initial_value'], follow_maps=False)
                             break
@@ -1103,6 +1106,7 @@ class Protocol(processors.ModelModifier):
             value = unicode("%.17g" % variable.get_value())
         finally:
             process_defn(variable, set=False)
+#         print 'Evaluated', variable, 'to', value
         return value
 
     def _add_maths_to_model(self, expr):
@@ -1146,6 +1150,7 @@ class Protocol(processors.ModelModifier):
             if clamping and not hasattr(assigned_var, u'initial_value'):
                 # Hope it's computed, and try to evaluate the definition
                 try:
+#                     print 'Computing initial value for clamped', unicode(lhs), assigned_var
                     assigned_var.initial_value = self._force_evaluate(assigned_var)
                 except:
                     pass # TODO: Check against optional variables in order to give nicer error message
@@ -1203,6 +1208,11 @@ class Protocol(processors.ModelModifier):
                 if node not in needed_nodes:
                     if isinstance(node, cellml_variable):
                         node.component._del_variable(node)
+                        try:
+                            self.inputs.remove(node)
+#                             print 'Removed', node, 'from inputs'
+                        except:
+                            pass
                     elif isinstance(node, mathml_apply):
                         node.xml_parent.xml_remove_child(node)
             # Update connection elements
