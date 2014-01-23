@@ -364,9 +364,12 @@ void ExtendedBidomainProblem<DIM>::DefineWriterColumns(bool extending)
         mVariablesIDs.push_back(mVoltageColumnId_Vm1);
         mVariablesIDs.push_back(mVoltageColumnId_Vm2);
         mVariablesIDs.push_back(mVoltageColumnId_Phie);
-        /**\todo No estimated length given in the line below, which means the writer
-            will not be able to use a higher-performance chunk shape. See #2449. */
-        this->mpWriter->DefineUnlimitedDimension("Time","msecs");
+
+        // Only used to get an estimate of the # of timesteps below (copied from Abstract class)
+        TimeStepper stepper(AbstractCardiacProblem<DIM,DIM,3>::mCurrentTime,
+                            HeartConfig::Instance()->GetSimulationDuration(),
+                            HeartConfig::Instance()->GetPrintingTimeStep());
+        this->mpWriter->DefineUnlimitedDimension("Time", "msecs", stepper.EstimateTimeSteps()+1); // +1 for start and end
     }
     else
     {
