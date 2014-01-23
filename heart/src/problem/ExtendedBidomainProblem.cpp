@@ -364,6 +364,8 @@ void ExtendedBidomainProblem<DIM>::DefineWriterColumns(bool extending)
         mVariablesIDs.push_back(mVoltageColumnId_Vm1);
         mVariablesIDs.push_back(mVoltageColumnId_Vm2);
         mVariablesIDs.push_back(mVoltageColumnId_Phie);
+        /**\todo No estimated length given in the line below, which means the writer
+            will not be able to use a higher-performance chunk shape. See #2449. */
         this->mpWriter->DefineUnlimitedDimension("Time","msecs");
     }
     else

@@ -75,6 +75,8 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
         columns_id.push_back( p_writer->DefineVariable(var_name,"mV") );
     }
 
+    /**\todo No estimated length given in the line below, which means the writer
+       will not be able to use a higher-performance chunk shape. See #2449. */
     p_writer->DefineUnlimitedDimension("Time","msecs");
     p_writer->DefineFixedDimension( rMechanicsMesh.GetNumNodes() );
     p_writer->EndDefineMode();
