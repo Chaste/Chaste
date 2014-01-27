@@ -75,9 +75,7 @@ VentilationProblem::~VentilationProblem()
 
 void VentilationProblem::SetOutflowPressure(double pressure)
 {
-    unsigned pressure_index =  mMesh.GetNumElements() +  mOutletNodeIndex;
-    mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
-    mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
+    SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
 }
 
 void VentilationProblem::SetConstantInflowPressures(double pressure)
@@ -88,10 +86,8 @@ void VentilationProblem::SetConstantInflowPressures(double pressure)
      {
          if ((*iter)->GetIndex() != mOutletNodeIndex)
          {
-             unsigned pressure_index =  mMesh.GetNumElements() +  (*iter)->GetIndex();
              //Boundary conditions at each boundary/leaf node
-             mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
-             mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
+             SetPressureAtBoundaryNode(*(*iter), pressure);
          }
      }
 }
@@ -104,17 +100,38 @@ void VentilationProblem::SetConstantInflowFluxes(double flux)
      {
          if ((*iter)->GetIndex() != mOutletNodeIndex)
          {
-             unsigned pressure_index =  mMesh.GetNumElements() +  (*iter)->GetIndex();
-             unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
-
-             // Boundary conditions at each boundary/leaf edge.  Note that this goes into the
-             // row associated with the leaf node so that the edge's row can still be used
-             // for flux/pressure.
-             mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
-             mpLinearSystem->SetRhsVectorElement(pressure_index, flux);
+             SetFluxAtBoundaryNode(*(*iter), flux);
          }
      }
 }
+
+void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure)
+{
+    ///\todo This should really be an exception.
+    assert(rNode.IsBoundaryNode());
+    unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
+
+    mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
+    mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
+}
+
+void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
+{
+    ///\todo This should really be an exception.
+    assert(rNode.IsBoundaryNode());
+
+    // In a <1,3> mesh a boundary node will be associated with exactly one edge.
+    // Flux boundary conditions are set in the system matrix using
+    // the node index for the row and the edge index for the column.
+    // The row associated with the leaf node is used so that the edge's row
+    // can still be used to solve for flux/pressure.
+    unsigned edge_index = *( rNode.ContainingElementsBegin() );
+    unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
+
+    mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
+    mpLinearSystem->SetRhsVectorElement(pressure_index, flux);
+}
+
 
 void VentilationProblem::Assemble(bool dynamicReassemble)
 {
@@ -317,14 +334,24 @@ void VentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
 
 
 void VentilationProblem::Solve(TimeStepper& rTimeStepper,
-        void (*pBoundaryConditionFunction)(VentilationProblem*, double),
+        void (*pBoundaryConditionFunction)(VentilationProblem*, double, const Node<3>&),
         const std::string& rDirName, const std::string& rFileBaseName)
 {
 #ifdef CHASTE_VTK
     VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
 #endif
 
-    pBoundaryConditionFunction(this, rTimeStepper.GetTime());
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+         iter != mMesh.GetBoundaryNodeIteratorEnd();
+         ++iter )
+    {
+        if ((*iter)->GetIndex() != mOutletNodeIndex)
+        {
+            //Boundary conditions at each boundary/leaf node
+            pBoundaryConditionFunction(this, rTimeStepper.GetTime(), *(*iter));
+        }
+    }
+
     // Do the regular solve
     Solve();
 
@@ -335,8 +362,18 @@ void VentilationProblem::Solve(TimeStepper& rTimeStepper,
     while (!rTimeStepper.IsTimeAtEnd())
     {
         rTimeStepper.AdvanceOneTimeStep();
-        pBoundaryConditionFunction(this, rTimeStepper.GetTime());
+        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+                 iter != mMesh.GetBoundaryNodeIteratorEnd();
+                 ++iter )
+        {
+            if ((*iter)->GetIndex() != mOutletNodeIndex)
+            {
+                //Boundary conditions at each boundary/leaf node
+                pBoundaryConditionFunction(this, rTimeStepper.GetTime(), *(*iter));
+            }
+        }
 
+        ///\todo #2300 This should call regular Solve() (probably!).
         mpLinearSystem->AssembleFinalLinearSystem();
         Vec last_solution = mSolution;
         mSolution = mpLinearSystem->Solve(mSolution);

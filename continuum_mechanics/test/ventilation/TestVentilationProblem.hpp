@@ -56,20 +56,35 @@ std::vector<double> pressureAt5;
 std::vector<double> pressureAt6;
 std::vector<double> pressureAt7;
 
-void LinearTimeBCs(VentilationProblem* pProblem, double time)
+void LinearTimeBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
 {
-    pProblem->SetConstantInflowPressures(15*time);
+    pProblem->SetPressureAtBoundaryNode(rNode, 15*time);
 }
 
-void SineBCs(VentilationProblem* pProblem, double time)
+void SineBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
 {
-    pProblem->SetConstantInflowPressures(15.0*sin(time*5.0/(2.0*M_PI)));
+    pProblem->SetPressureAtBoundaryNode(rNode, 15.0*sin(time*5.0/(2.0*M_PI)));
 }
-void FileBCs(VentilationProblem* pProblem, double time)
+
+void FileBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
 {
     unsigned timestep= (unsigned) floor(time*100.0+0.5);
-    pProblem->SetConstantInflowPressures(pressureAt7[timestep]);
+    pProblem->SetPressureAtBoundaryNode(rNode, pressureAt7[timestep]);
 }
+
+void GravitationalBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
+{
+    double x_max =  6.0;
+    double x_min = -6.0;
+    double delta_p = 0.5;
+
+    double x = rNode.rGetLocation()[0];
+
+    double pressure = delta_p * (x - x_min)/(x_max - x_min);
+
+    pProblem->SetPressureAtBoundaryNode(rNode, pressure);
+}
+
 class TestVentilationProblem : public CxxTest::TestSuite
 {
 private:
@@ -223,10 +238,10 @@ public:
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6666,   1e-4);
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2222, 1e-4);
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-4); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-4); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-4); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-4); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-4);
         TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
         TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-8); // BC (Inflow flux)
         TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-8); // BC (Inflow flux)
@@ -281,6 +296,16 @@ public:
         TimeStepper stepper(0.0, 25.0, 0.1);
         problem.Solve(stepper, &SineBCs, "TestVentilation", "three_bifurcations_sine");
     }
+
+    void TestGravitationalVaryingThreeBifurcations() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        problem.SetRadiusOnEdge();
+        problem.SetOutflowPressure(0.0);
+        TimeStepper stepper(0.0, 1.0, 0.1);
+        problem.Solve(stepper, &GravitationalBCs, "TestVentilation", "three_bifurcations_gravity");
+    }
+
     /*
      * HOW_TO_TAG Continuum mechanics/Ventilation
      * Solve a simple ventilation problem defined in a file.

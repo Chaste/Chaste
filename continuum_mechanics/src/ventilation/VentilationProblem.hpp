@@ -51,8 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Current functionality: pressure boundary conditions are set on each of the boundary nodes
  * Solves for pressure at internal nodes and flux on edges
  */
-class VentilationProblem {
-
+class VentilationProblem
+{
+private:
     TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
     LinearSystem* mpLinearSystem; /**< Linear system for pressure (at nodes) and flux (in edges).  Allocated by constructor */
@@ -135,6 +136,29 @@ public:
      */
     void SetConstantInflowFluxes(double flux);
 
+
+    /**
+     * Sets a Dirichlet pressure boundary condition for a given node.
+     *
+     * The given boundary condition will be applied at the next time step and persist through
+     * time unless overwritten.
+     *
+     * @param rNode The node to set the boundary condition for
+     * @param pressure The pressure boundary condition
+     */
+    void SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure);
+
+    /**
+     * Sets a Dirichlet flux boundary condition for a given node.
+     *
+     * The given boundary condition will be applied at the next time step and persist through
+     * time unless overwritten.
+     *
+     * @param rNode The node to set the boundary condition for
+     * @param flux The flux boundary condition
+     */
+    void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux);
+
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
      *  * Poiseuille flow in the edges
@@ -189,7 +213,7 @@ public:
      *  @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
      *  @param rFileBaseName The base name of the new VTK file.
      */
-    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(VentilationProblem*, double), const std::string& rDirName, const std::string& rFileBaseName);
+    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(VentilationProblem*, double, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
 
     /**
      * Read a problem definition from a file and use then solve that problem
