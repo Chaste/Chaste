@@ -55,9 +55,6 @@ class MonodomainCorrectionTermAssembler
     : public AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,1>
 {
 protected:
-    /** Local cache of the configuration singleton instance */
-    HeartConfig* mpConfig;
-
     /**
      * This method is called by AssembleOnElement and tells the assembler
      * the contribution to add to the element stiffness vector.

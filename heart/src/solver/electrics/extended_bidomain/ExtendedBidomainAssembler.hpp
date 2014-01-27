@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacFeVolumeIntegralAssembler.hpp"
 
 #include "ExtendedBidomainTissue.hpp"
-#include "HeartConfig.hpp"
 #include "Element.hpp"
 #include "BoundaryElement.hpp"
 #include "ChastePoint.hpp"
@@ -76,10 +75,6 @@ protected:
 
     /** The tissue for which we assemble the matrix */
     ExtendedBidomainTissue<SPACE_DIM>* mpExtendedBidomainTissue;
-
-    /** Local cache of the configuration singleton instance*/
-    HeartConfig* mpConfig;
-
 
     /**
      * ComputeMatrixTerm()

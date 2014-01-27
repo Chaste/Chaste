@@ -64,7 +64,6 @@ MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainAssembler(
       mStiffnessMatrixAssembler(pMesh, pTissue)
 {
     assert(pTissue);
-    mpConfig = HeartConfig::Instance();
 }
 
 

@@ -70,9 +70,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class BidomainAssembler : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>
 {
 protected:
-    /** Local cache of the configuration singleton instance*/
-    HeartConfig* mpConfig;
-
     /**
      * ComputeMatrixTerm()
      *

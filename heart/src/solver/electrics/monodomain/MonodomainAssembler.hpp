@@ -65,9 +65,6 @@ class MonodomainAssembler
    : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,CARDIAC>
 {
 protected:
-    /** Local cache of the configuration singleton instance*/
-    HeartConfig* mpConfig;
-
     /** This assembler uses another assembler, though just for calling the
      *  ComputeMatrixTerm() method. */
     MassMatrixAssembler<ELEMENT_DIM, SPACE_DIM> mMassMatrixAssembler;

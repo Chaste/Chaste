@@ -42,8 +42,7 @@ MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::MonodomainCorrectionTermA
         MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue)
     : AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,1>(pMesh,pTissue)
 {
-    mpConfig = HeartConfig::Instance();
-    assert(mpConfig->GetUseStateVariableInterpolation());
+    assert(this->mpConfig->GetUseStateVariableInterpolation());
 }
 
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
@@ -55,7 +54,7 @@ c_vector<double,1*(ELEM_DIM+1)> MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE
     c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
     Element<ELEM_DIM,SPACE_DIM>* pElement)
 {
-    double Am = mpConfig->GetSurfaceAreaToVolumeRatio();
+    double Am = this->mpConfig->GetSurfaceAreaToVolumeRatio();
 
     // compute the ionic current at this quadrature point using the
     // interpolated state variables, and a random choice of cell (all

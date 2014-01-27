@@ -142,15 +142,15 @@ METADATA_NAMES = frozenset(
      # I K1
      'membrane_inward_rectifier_potassium_current',     
         'membrane_inward_rectifier_potassium_current_conductance',
-        'membrane_transient_outward_current_s_gate', 
-        'membrane_transient_outward_current_r_gate',
      # I to, sometimes fast and slow components, sometimes not.
      'membrane_transient_outward_current',
         'membrane_transient_outward_current_conductance',
         'membrane_fast_transient_outward_current',
-           'membrane_fast_transient_outward_current_conductance',
-        'membrane_slow_transient_outward_current',    
-           'membrane_slow_transient_outward_current_conductance',       
+            'membrane_transient_outward_current_r_gate',
+            'membrane_fast_transient_outward_current_conductance',
+        'membrane_slow_transient_outward_current',
+            'membrane_transient_outward_current_s_gate',    
+            'membrane_slow_transient_outward_current_conductance',       
         'membrane_transient_outward_current_time_independent_rectification_gate_constant',
      # I katp
      'membrane_atp_dependent_potassium_current',

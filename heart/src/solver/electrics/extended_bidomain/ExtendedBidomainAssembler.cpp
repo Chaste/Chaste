@@ -138,7 +138,6 @@ ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainAssembler(
               mpExtendedBidomainTissue(pTissue)
 {
     assert(pTissue != NULL);
-    mpConfig = HeartConfig::Instance();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

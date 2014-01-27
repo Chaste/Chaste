@@ -51,8 +51,8 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
             Element<ELEMENT_DIM,SPACE_DIM>* pElement)
 {
     // get bidomain parameters
-    double Am = mpConfig->GetSurfaceAreaToVolumeRatio();
-    double Cm = mpConfig->GetCapacitance();
+    double Am = this->mpConfig->GetSurfaceAreaToVolumeRatio();
+    double Cm = this->mpConfig->GetCapacitance();
 
     const c_matrix<double, SPACE_DIM, SPACE_DIM>& sigma_i = this->mpCardiacTissue->rGetIntracellularConductivityTensor(pElement->GetIndex());
     const c_matrix<double, SPACE_DIM, SPACE_DIM>& sigma_e = this->mpCardiacTissue->rGetExtracellularConductivityTensor(pElement->GetIndex());
@@ -95,9 +95,6 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
     return ret;
 }
 
-
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
@@ -105,7 +102,6 @@ BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
     : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue)
 {
     assert(pTissue != NULL);
-    mpConfig = HeartConfig::Instance();
 }
 
 

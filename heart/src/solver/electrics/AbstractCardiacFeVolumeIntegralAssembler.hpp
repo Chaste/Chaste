@@ -52,6 +52,9 @@ protected:
     /** The Cardiac tissue on which to solve. */
     AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* mpCardiacTissue;
 
+    /** Local cache of the configuration singleton pointer*/
+    HeartConfig* mpConfig;
+
 public:
 
     /**
@@ -62,7 +65,8 @@ public:
     AbstractCardiacFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
                                              AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
         : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>(pMesh),
-          mpCardiacTissue(pTissue)
+          mpCardiacTissue(pTissue),
+          mpConfig(HeartConfig::Instance())
     {
         assert(pTissue);
     }
