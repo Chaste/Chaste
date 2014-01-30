@@ -1567,6 +1567,18 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         {
             rHaloNodesOwned.insert(temp_halo_nodes.begin(), temp_halo_nodes.end());
         }
+        else
+        {
+            /* It may be that this element is in the set of owned nodes erroneously.
+             * The original set of owned elements (from the k-way partition) informed a
+             * node partition.  It may be that an element near the edge of this new node
+             * partition may no longer be needed.
+             *
+             * Note that rather than inserting elements to the original element partition set,
+             * we could instead start the set afresh with:  rElementsOwned.clear();
+             */
+            rElementsOwned.erase(element_number);
+        }
     }
 
     rMeshReader.Reset();
