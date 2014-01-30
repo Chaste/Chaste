@@ -2200,6 +2200,42 @@ public:
             TS_ASSERT_DELTA(edge_len[1], 0.2010, 1e-4);
         }
     }
+
+    void FailingTestPartitionHasNoElementsWithAllHaloNodes() throw (Exception)
+    {
+        /*
+         * For UCSD_heart: proc 0 hits 38 all-halo elements, and proc 1 hits 23 (on 2-way).
+         */
+//        TrianglesMeshReader<3,3> reader("heart/test/data/UCSD_heart");
+
+        /*
+         * For box_shaped_heart: only proc 1 has bad elements, with global indices 77, 114, and 119.
+         */
+        TrianglesMeshReader<3,3> reader("heart/test/data/box_shaped_heart/box_heart");
+        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        mesh.ConstructFromMeshReader(reader);
+
+        // Loop over all nodes in all elements. If any element is made of all-halo-nodes, hit assertion.
+        for (AbstractTetrahedralMesh<3,3>::ElementIterator iter = mesh.GetElementIteratorBegin();
+             iter != mesh.GetElementIteratorEnd();
+             ++iter)
+        {
+            bool any_local = false;
+            for (unsigned node_local_index=0; node_local_index < 4u; node_local_index++)
+            {
+                unsigned node_global_index = iter->GetNodeGlobalIndex(node_local_index);
+                if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(node_global_index))
+                {
+                    any_local = true;
+                }
+            }
+            TS_ASSERT(any_local);
+            /*if(!any_local)
+            {
+                PRINT_VARIABLE(iter->GetIndex());
+            }*/
+        }
+    }
 };
 
 #endif /*TESTDISTRIBUTEDTETRAHEDRALMESH_HPP_*/
