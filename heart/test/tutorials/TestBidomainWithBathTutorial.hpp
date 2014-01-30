@@ -78,8 +78,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 /* This test will show how to load a mesh in the test and pass it into the problem,
  * for which the following includes are needed */
-#include "TetrahedralMesh.hpp"
+#include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
+/* This header is needed for the sqrt function. */
+#include <cmath>
 
 /* Define the test */
 class TestRunningBidomainSimulationsTutorial : public CxxTest::TestSuite
@@ -108,10 +110,11 @@ public: // Tests should be public!
 
         /*
          * Now, we load up a rectangular mesh (in triangle/tetgen format), done as follows,
-         * using {{{TrianglesMeshReader}}}.
+         * using {{{TrianglesMeshReader}}}.  Note that we use a distributed mesh, so the data
+         * is shared among processes if run in parallel.
          */
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        TetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         /*
@@ -147,27 +150,29 @@ public: // Tests should be public!
          * by looping over elements and setting those more than 2mm from the centre
          * as bath elements (by default, the others are cardiac elements).
          */
-        for(unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+             iter != mesh.GetElementIteratorEnd();
+             ++iter)
         {
-            double x = mesh.GetElement(i)->CalculateCentroid()[0];
-            double y = mesh.GetElement(i)->CalculateCentroid()[1];
+            double x = iter->CalculateCentroid()[0];
+            double y = iter->CalculateCentroid()[1];
             if( sqrt((x-0.05)*(x-0.05) + (y-0.05)*(y-0.05)) > 0.02 )
             {
                 if (y<0.05)
                 {
                     //Outside circle on the bottom
-                    mesh.GetElement(i)->SetAttribute(bath_id1);
+                    iter->SetAttribute(bath_id1);
                 }
                 else
                 {
                     //Outside circle on the top
-                    mesh.GetElement(i)->SetAttribute(bath_id2);
+                    iter->SetAttribute(bath_id2);
                 }
             }
             else
             {
                 //IDs default to 0, but we want to be safe
-                mesh.GetElement(i)->SetAttribute(tissue_id);
+                iter->SetAttribute(tissue_id);
             }
         }
 
@@ -246,11 +251,13 @@ public: // Tests should be public!
         ReplicatableVector solution_repl(solution);
 
         bool ap_triggered = false;
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+             iter != mesh.GetNodeIteratorEnd();
+             ++iter)
         {
-            if (HeartRegionCode::IsRegionTissue( mesh.GetNode(i)->GetRegion() ))
+            if (HeartRegionCode::IsRegionTissue( iter->GetRegion() ))
             {
-                if (solution_repl[2*i] > 0.0) // 2*i, ie the voltage for this node (would be 2*i+1 for phi_e for this node)
+                if (solution_repl[2*iter->GetIndex()] > 0.0) // 2*i, ie the voltage for this node (would be 2*i+1 for phi_e for this node)
                 {
                     ap_triggered = true;
                 }
