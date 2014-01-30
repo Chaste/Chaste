@@ -2201,7 +2201,7 @@ public:
         }
     }
 
-    void FailingTestPartitionHasNoElementsWithAllHaloNodes() throw (Exception)
+    void noTestPartitionHasNoElementsWithAllHaloNodes() throw (Exception)
     {
         /*
          * For UCSD_heart: proc 0 hits 38 all-halo elements, and proc 1 hits 23 (on 2-way).
@@ -2211,7 +2211,12 @@ public:
         /*
          * For box_shaped_heart: only proc 1 has bad elements, with global indices 77, 114, and 119.
          */
-        TrianglesMeshReader<3,3> reader("heart/test/data/box_shaped_heart/box_heart");
+//        TrianglesMeshReader<3,3> reader("heart/test/data/box_shaped_heart/box_heart");
+
+        /*
+         * For cube_2mm_152_elements: 1 failure on proc 1 (index 93).
+         */
+        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_152_elements");
         DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         mesh.ConstructFromMeshReader(reader);
 
