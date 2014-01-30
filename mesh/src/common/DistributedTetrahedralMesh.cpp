@@ -1538,9 +1538,16 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      * Refine element distribution. Add extra elements that parMETIS didn't consider initially but
      * include any node owned by the processor. This ensures that all the system matrix rows are
      * assembled locally.
+     * It may be that some of these elements are in the set of owned nodes erroneously.
+     * The original set of owned elements (from the k-way partition) informed a
+     * node partition.  It may be that an element near the edge of this new node
+     * partition may no longer be needed.
+     *
+     * Note that rather than clearing the set we could remove elements to the original element partition set
+     * with erase(), if (!element_owned) below.
      */
+    rElementsOwned.clear();
     rMeshReader.Reset();
-
     for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
     {
         ElementData element_data = rMeshReader.GetNextElementData();
@@ -1566,18 +1573,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         if (element_owned)
         {
             rHaloNodesOwned.insert(temp_halo_nodes.begin(), temp_halo_nodes.end());
-        }
-        else
-        {
-            /* It may be that this element is in the set of owned nodes erroneously.
-             * The original set of owned elements (from the k-way partition) informed a
-             * node partition.  It may be that an element near the edge of this new node
-             * partition may no longer be needed.
-             *
-             * Note that rather than inserting elements to the original element partition set,
-             * we could instead start the set afresh with:  rElementsOwned.clear();
-             */
-            rElementsOwned.erase(element_number);
         }
     }
 
