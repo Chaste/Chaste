@@ -159,7 +159,7 @@ public:
         //These values are equivalent to Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
         TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-8, 1e-12);
         problem.SetViscosity(1.0);
-        TS_ASSERT_DELTA(problem.GetDensity(), 1.511e-9, 1e-12);
+        TS_ASSERT_DELTA(problem.GetDensity(), 1.511e-9, 1e-10);
         problem.SetDensity(1.0);
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(100);
@@ -242,7 +242,7 @@ public:
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-4);
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-4);
         TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 3e-4); // (Outflow flux)
         TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-8); // BC (Inflow flux)
         TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-8); // BC (Inflow flux)
         TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-8); // BC (Inflow flux)

@@ -390,13 +390,13 @@ public:
         TS_ASSERT_EQUALS(param_cvode.size(),param_chaste.size());
         TS_ASSERT_EQUALS(derived_quantity_cvode.size(),derived_quantity_chaste.size());
 
-        double tolerance = 3e-2;
+        double tolerance = 6e-2;
         for (unsigned i=0; i<voltages_cvode.size(); ++i)
         {
             // The tolerances for voltage are adjusted cleverly at upstroke in CompareCellModelResults below...
-            TS_ASSERT_DELTA(voltages_cvode[i],voltages_chaste[i],10*tolerance);
-            TS_ASSERT_DELTA(param_cvode[i], param_chaste[i],1e-9); // These should be very very similar!
-            TS_ASSERT_DELTA(param_cvode[i], 16.0,1e-9);
+            TS_ASSERT_DELTA(voltages_cvode[i],voltages_chaste[i], 10*tolerance);
+            TS_ASSERT_DELTA(param_cvode[i], param_chaste[i], 1e-9); // These should be very very similar!
+            TS_ASSERT_DELTA(param_cvode[i], 16.0, 1e-9);
             TS_ASSERT_DELTA(derived_quantity_chaste[i], derived_quantity_cvode[i], 70*tolerance);
         }
 
@@ -408,7 +408,7 @@ public:
         solution_chaste.WriteToFile("TestCvodeCells","sh04_chaste","ms",1,clean_dir,precision,include_derived_quantities);
 
         bool voltage_only = false;
-        CompareCellModelResults("sh04_cvode", "sh04_chaste",tolerance, voltage_only, "TestCvodeCells");
+        CompareCellModelResults("sh04_cvode", "sh04_chaste", tolerance, voltage_only, "TestCvodeCells");
 
         // Coverage of GetIIonic method.
         TS_ASSERT_DELTA(sh04_ode_system.GetIIonic(), sh04_cvode_system.GetIIonic(), 1e-4);

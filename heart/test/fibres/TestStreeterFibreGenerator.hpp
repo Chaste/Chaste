@@ -57,7 +57,7 @@ private:
         FibreReader<3> fibre_reader1(rGeneratedFile, generatedFileType);
         FibreReader<3> fibre_reader2(rReferenceFile, referenceFileType);
 
-        double tol = 1e-14;
+        double tol = 1e-10;
 
         std::vector< c_vector<double, 3> > fibres1;
         std::vector< c_vector<double, 3> > second1;
