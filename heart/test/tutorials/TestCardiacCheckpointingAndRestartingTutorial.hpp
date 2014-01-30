@@ -129,6 +129,10 @@ public:
  *   written out to disk at each checkpoint. This is to ensure that each checkpoint directory contains everything
  *   needed to resume the simulation. The mesh written out will be in permuted form if it was
  *   partitioned for a parallel simulation.
+ * * To make this process slightly more efficient, Chaste will copy the original mesh files if the mesh was loaded
+ *   from disk and hasn't been modified (e.g. by permuting).  Because of this, if you modify the mesh in memory,
+ *   e.g. by setting element attributes in [UserTutorials/BidomainWithBath bidomain-with-bath simulations], then
+ *   you need to inform Chaste by calling `mesh.SetMeshHasChangedSinceLoading()`, so your modifications aren't lost.
  * * Meshes written in checkpoints use a binary form of the Triangle/Tetgen mesh format. This makes checkpoints
  *   significantly smaller but will cause portability problems if checkpoints are moved between little-endian systems
  *   (e.g. x86) and big-endian systems (e.g. PowerPC).

@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Backward Euler allows much greater ODE timesteps to be used. For cellml models provided with Chaste,
  * using Backward Euler is trivial: just change the .hpp included as follows, and the class name as below.
  *
- * If you want to use Backward Euler your own cellml file, there is an intermediate step - see
+ * If you want to use Backward Euler for your own CellML file, there is an intermediate step - see
  * https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#GeneratingBackwardEulercellmodels
  * (note: requires Maple). (This step creates the .out files that are already present in heart/src/odes/cellml)
  *
@@ -102,7 +102,7 @@ public: // Tests should be public!
 
         /* Use the {{{PlaneStimulusCellFactory}}} to define a set
          * of Luo-Rudy cells. We pass the stimulus magnitude as 0.0
-         * as we don't want any stimulated cells
+         * as we don't want any stimulated cells.
          */
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEuler,2> cell_factory(0.0);
 
@@ -117,12 +117,12 @@ public: // Tests should be public!
         /*
          * In most simulations there is one valid tissue identifier and one valid bath identifier
          * (for elements).
-         * These can be obtained with
+         * One of these can be assigned to an element with
          *  * {{{mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidTissueId());}}}
          *  * {{{mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());}}}
          *
          * If we want heterogeneous conductivities outside the heart (for example for torso and blood)
-         * then we will need different identifiers
+         * then we will need different identifiers:
          */
         std::set<unsigned> tissue_ids;
         static unsigned tissue_id=0;
@@ -142,7 +142,7 @@ public: // Tests should be public!
          * or for example
          * mesh/test/data/1D_0_to_1_10_elements_with_two_attributes.ele,
          * and note that the header in this file has 1 at the end to indicate that
-         * the file defines an attribute for each element. We have read in a mesh
+         * the file defines an attribute for each element). We have read in a mesh
          * without this type of information set up, so we set it up manually,
          * by looping over elements and setting those more than 2mm from the centre
          * as bath elements (by default, the others are cardiac elements).
@@ -169,8 +169,20 @@ public: // Tests should be public!
                 //IDs default to 0, but we want to be safe
                 mesh.GetElement(i)->SetAttribute(tissue_id);
             }
-
         }
+
+        /* HOW_TO_TAG Cardiac/Problem definition Tell Chaste that a mesh has been modified
+         *
+         * Since we have modified the mesh by setting element attributes, we need to inform Chaste of this fact.
+         * If we do not, problems will arise when [UserTutorials/CardiacCheckpointingAndRestartingTutorial checkpointing],
+         * since the code that saves the simulation state will assume that it can just reuse the original mesh files,
+         * and thus won't save the new element attributes.
+         *
+         * (Some mesh modifications, that use methods on the mesh class directly, will automatically record that
+         * the mesh has been modified.  Since we're just modifying elements, this information isn't propagated at
+         * present.)
+         */
+        mesh.SetMeshHasChangedSinceLoading();
 
         /*
          * The external conductivity can set two ways:
@@ -225,8 +237,6 @@ public: // Tests should be public!
          * defined at cardiac nodes (a node contained in ''any'' cardiac element), but
          * for visualisation and computation a 'fake' value of ZERO is given for the
          * voltage at bath nodes.
-         *
-         * EMPTYLINE
          *
          * Finally, we can check that an AP was induced in any of the cardiac
          * cells. We use a `ReplicatableVector` as before, and make sure we

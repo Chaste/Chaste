@@ -157,6 +157,12 @@ public:
 
             setenv("CHASTE_TEST_OUTPUT", test_folder.c_str(), 1/*Overwrite*/);
 
+            // Make a folder using a FileFinder, for coverage of the case where the root output folder doesn't exist
+            FileFinder sub_folder("test_folder", RelativeTo::ChasteTestOutput);
+            TS_ASSERT(!sub_folder.Exists());
+            OutputFileHandler creating_handler(sub_folder);
+            TS_ASSERT(sub_folder.Exists());
+
             // Make a folder
             OutputFileHandler handler5("whatever");
             TS_ASSERT(FileFinder(test_folder, RelativeTo::CWD).Exists());
