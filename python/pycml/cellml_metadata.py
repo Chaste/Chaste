@@ -155,6 +155,9 @@ METADATA_NAMES = frozenset(
      # I katp
      'membrane_atp_dependent_potassium_current',
         'membrane_atp_dependent_potassium_current_conductance',  
+     # I K,b (background current / leak)
+     'membrane_background_potassium_current',
+        'membrane_background_potassium_current_conductance',
      # ========================================================================
      # Mixed Currents
      # ========================================================================   
@@ -167,6 +170,14 @@ METADATA_NAMES = frozenset(
            'membrane_hyperpolarisation_activated_funny_current_potassium_component_conductance',
         'membrane_hyperpolarisation_activated_funny_current_sodium_component', 
            'membrane_hyperpolarisation_activated_funny_current_sodium_component_conductance', 
+     # ICaL conductance of non-calcium ions:
+     # Things here are getting a bit confusing, have to be careful as tags may have different
+     # effects in different models. i.e. does main 'membrane_L_type_calcium_current_conductance'
+     # scale all these as well, or are they treated as completely separate ion currents (as per O'Hara).
+     'membrane_L_type_calcium_channel_sodium_current',
+     'membrane_L_type_calcium_channel_sodium_current_conductance',
+     'membrane_L_type_calcium_channel_potassium_current',
+     'membrane_L_type_calcium_channel_potassium_current_conductance',
      # ========================================================================
      # CALCIUM CURRENTS
      # ========================================================================
@@ -190,7 +201,7 @@ METADATA_NAMES = frozenset(
      'membrane_background_calcium_current',
         'membrane_background_calcium_current_conductance', 
      # ========================================================================
-     # Calcium subsystem parameters
+     # Calcium subsystem parameters - needs tidying up.
      # ========================================================================
      'SR_release_current', 'SR_leak_current_max', 'SR_release_current_max', 
      'SR_release_kmcacyt', 'SR_release_kmcads', 'SR_uptake_current_max', 
@@ -202,6 +213,8 @@ METADATA_NAMES = frozenset(
       # I NCX
       'membrane_sodium_calcium_exchanger_current', 
         'membrane_sodium_calcium_exchanger_current_conductance', # a.k.a. permeability
+      'SR_sodium_calcium_exchanger_current', 
+        'SR_sodium_calcium_exchanger_current_conductance', # a.k.a. permeability
       # INaK
       'membrane_sodium_potassium_pump_current',
           'membrane_sodium_potassium_pump_current_permeability', # often INaK_max
