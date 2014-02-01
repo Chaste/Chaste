@@ -250,7 +250,6 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::AddForceContribution(Abstract
             // This can't happen
             NEVER_REACHED;
     }
-
 }
 
 template<unsigned DIM>
