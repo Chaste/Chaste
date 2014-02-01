@@ -67,10 +67,10 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
             {
                 // Get the element index corresponding to this cell
                 unsigned elem_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
-    
+
                 // Get the set of neighbouring element indices
                 std::set<unsigned> neighbouring_elem_indices = vertex_mesh.GetNeighbouringElementIndices(elem_index);
-    
+
                 // Check if any of the corresponding cells have the CellLabel property...
                 unsigned num_labelled_neighbours = 0;
                 for (std::set<unsigned>::iterator elem_iter = neighbouring_elem_indices.begin();

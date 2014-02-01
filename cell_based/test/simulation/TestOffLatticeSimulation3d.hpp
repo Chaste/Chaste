@@ -51,8 +51,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
+#include "CellVolumesWriter.hpp"
 
-//This test is always run sequentially (never in parallel)
+// Cell population writers
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestOffLatticeSimulation3d : public AbstractCellBasedTestSuite
@@ -196,7 +202,7 @@ public:
         TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 2u);
 
         // Uncommenting this line calls an error in accessing nodes in the vertex elements #
-        //cell_population.SetOutputVoronoiData(true);
+        //cell_population.AddWriter<VoronoiDataWriter>();
 
         simulator.SetEndTime(0.1);
         simulator.Solve();
@@ -271,13 +277,12 @@ public:
         TS_ASSERT_LESS_THAN(location_indices.size(), num_nodes);
         TS_ASSERT_EQUALS(location_indices.size(), 8u);
 
-        // Test Save with a MeshBasedCellPopulationWithGhostNodes
+        // Test Save() with a MeshBasedCellPopulationWithGhostNodes
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(*p_mesh, cells, location_indices);
-
-        cell_population.SetOutputVoronoiData(true);                           // Output Voronoi data
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestGhostNodesSpheroidSimulation3D");
@@ -297,14 +302,12 @@ public:
         SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
 
-        // Test Save with a MeshBasedCellPopulation - one cell born during this
-
+        // Test Save() with a MeshBasedCellPopulation - one cell born during this
         MeshBasedCellPopulationWithGhostNodes<3> cell_population2(*p_mesh, cells2);
-
-        cell_population2.SetOutputVoronoiData(true);                           // Output Voronoi data
-        cell_population2.SetOutputCellProliferativeTypes(true);
-        cell_population2.SetOutputCellMutationStates(true);
-        cell_population2.SetOutputCellVolumes(true);
+        cell_population2.AddWriter<VoronoiDataWriter>();
+        cell_population2.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population2.AddWriter<CellMutationStatesWriter>();
+        cell_population2.AddWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator2(cell_population2);
         simulator2.SetOutputDirectory("TestGhostNodesSpheroidSimulation3DNoGhosts");

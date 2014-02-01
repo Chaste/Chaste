@@ -4,12 +4,3 @@
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
-		<OutputCellIdData>0</OutputCellIdData>
-		<OutputCellMutationStates>0</OutputCellMutationStates>
-		<OutputCellAncestors>0</OutputCellAncestors>
-		<OutputCellProliferativeTypes>0</OutputCellProliferativeTypes>
-		<OutputCellVariables>0</OutputCellVariables>
-		<OutputCellCyclePhases>0</OutputCellCyclePhases>
-		<OutputCellAges>0</OutputCellAges>
-		<OutputCellVolumes>0</OutputCellVolumes>
-		<OutputNodeVelocities>0</OutputNodeVelocities>

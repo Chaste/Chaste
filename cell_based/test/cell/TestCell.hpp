@@ -1188,7 +1188,6 @@ public:
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("something"), 1.0);
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
     }
-
 };
 
 #endif /*TESTCELL_HPP_*/

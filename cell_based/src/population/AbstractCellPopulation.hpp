@@ -46,10 +46,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
+
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
 #include <boost/serialization/shared_ptr.hpp>
+
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 
 #include "Node.hpp"
 #include "CellPropertyRegistry.hpp"
@@ -65,22 +70,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "ApoptoticCellProperty.hpp"
-#include "DefaultCellProliferativeType.hpp"
-#include "StemCellProliferativeType.hpp"
-#include "TransitCellProliferativeType.hpp"
-#include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
 #include "CellData.hpp"
 #include "AbstractMesh.hpp"
+#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellWriter.hpp"
 
+///\todo #2441 remove this
 /** Forward declaration of cell population writers. */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulationWriter;
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellWriter;
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulationWriter;
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellWriter;
+
 /**
  * An abstract facade class encapsulating a cell population.
  *
  * Contains a group of cells and associated methods.
- *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class AbstractCellPopulation : public Identifiable
@@ -105,45 +109,35 @@ private:
         archive & mCellCyclePhaseCount;
         archive & mpCellPropertyRegistry;
         archive & mOutputResultsForChasteVisualizer;
-        archive & mOutputCellIdData;
-        archive & mOutputCellMutationStates;
-        archive & mOutputCellAncestors;
-        archive & mOutputCellProliferativeTypes;
-        archive & mOutputCellVariables;
-        archive & mOutputCellCyclePhases;
-        archive & mOutputCellAges;
-        archive & mOutputCellVolumes;
-        archive & mOutputNodeVelocities;
+        archive & mCellWriters;
+        archive & mCellPopulationWriters;
     }
 
 protected:
 
-    /** Map location (node or VertexElement) indices back to cells */
+    /** Map location (node or VertexElement) indices back to cells. */
     std::map<unsigned, std::set<CellPtr> > mLocationCellMap;
 
-    /** Map cells to location (node or VertexElement) indices */
+    /** Map cells to location (node or VertexElement) indices. */
     std::map<Cell*, unsigned> mCellLocationMap;
 
-    /** Reference to the mesh */
+    /** Reference to the mesh. */
     AbstractMesh<ELEMENT_DIM, SPACE_DIM>& mrMesh;
 
-    /** List of cells */
+    /** List of cells. */
     std::list<CellPtr> mCells;
 
-    /** Current cell cycle phase counts */
+    /** Current cell cycle phase counts. */
     std::vector<unsigned> mCellCyclePhaseCount;
 
-    /** Current cell proliferative types count */
+    /** Current cell proliferative types count. */
     std::vector<unsigned> mCellProliferativeTypesCount;
 
-    /** Current cell mutation states count */
+    /** Current cell mutation states count. */
     std::vector<unsigned> mCellMutationStateCount;
 
-    /** Population centroid */
+    /** Population centroid. */
     c_vector<double, SPACE_DIM> mCentroid;
-
-    /** A cache of where the results are going (used for VTK writer). */
-    std::string mDirPath;
 
     /** Meta results file for VTK. */
     out_stream mpVtkMetaFile;
@@ -154,38 +148,11 @@ protected:
     /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
     bool mOutputResultsForChasteVisualizer;
 
-    /** Whether to write cell ID data to file. */
-    bool mOutputCellIdData;
+    /** A list of cell writers. */
+    std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
 
-    /** Whether to count the number of each cell mutation state and output to file. */
-    bool mOutputCellMutationStates;
-
-    /** Whether to output the ancestor of each cell to a visualizer file. */
-    bool mOutputCellAncestors;
-
-    /** Whether to count the number of each cell type and output to file. */
-    bool mOutputCellProliferativeTypes;
-
-    /** Whether to write the cell variables to a file. */
-    bool mOutputCellVariables;
-
-    /** Whether to write the cell cycle phases to a file. */
-    bool mOutputCellCyclePhases;
-
-    /** Whether to write the cell ages to a file. */
-    bool mOutputCellAges;
-
-    /** Whether to write the cell volumes (in 3D) or areas (in 2D) to a file. */
-    bool mOutputCellVolumes;
-
-    /** Whether to write the node velocities to a file. */
-    bool mOutputNodeVelocities;
-
-    /** A list of cell writers */
-    std::vector<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* > mCellWriters;
-
-    /** A list of cell writers */
-    std::vector<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* > mCellPopulationWriters;
+    /** A list of cell population writers. */
+    std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationWriters;
 
     /**
      * Check consistency of our internal data structures.
@@ -200,8 +167,10 @@ protected:
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile()=0;
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory)=0;
 
     /**
      * Constructor that just takes in a mesh.
@@ -231,11 +200,6 @@ public:
      * Base class with virtual methods needs a virtual destructor.
      */
     virtual ~AbstractCellPopulation();
-
-    /**
-     * Delete the pointers to cell population writers. Used in the destructor.
-     */
-    void DeleteWriters();
 
     /**
      * Initialise each cell's cell-cycle model.
@@ -537,23 +501,18 @@ public:
     virtual void UpdateCellProcessLocation();
 
     /**
-     * Use an output file handler to create output files for visualizer and post-processing.
+     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
+     * 
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     */
+    virtual void OpenWritersFiles(const std::string& rDirectory);
+
+    /**
+     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
-     * @param cleanOutputDirectory  whether to delete the contents of the output directory prior to output file creation
      */
-    virtual void CreateOutputFiles(const std::string& rDirectory,
-                                   bool cleanOutputDirectory);
-
-    /**
-     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending)
-     */
-    void OpenWritersFiles();
-
-    /**
-     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing
-     */
-    void OpenWritersFilesForAppend();
+    void OpenWritersFilesForAppend(const std::string& rDirectory);
 
     /**
      * Clear the counters used for cell population output.
@@ -562,8 +521,10 @@ public:
 
     /**
      * Write results from the current cell population state to output files.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteResultsToFiles();
+    virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -571,7 +532,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pPopulationWriter)=0;
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -580,7 +541,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter, CellPtr pCell)=0;
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
 
     /**
      * Generate results for all cells in the current cell population.
@@ -615,63 +576,68 @@ public:
     bool GetOutputResultsForChasteVisualizer();
 
     /**
-     * @return mOutputCellIdData
+     * Add a cell population writer based on its type. Template parameters are inferred from the population.
+     * The implementation of this function must be available in the header file.
      */
-    bool GetOutputCellIdData();
+    template<template <unsigned, unsigned> class T>
+    typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
+												  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
+    AddWriter()
+    {
+        mCellPopulationWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+    }
+
+	/**
+	 * Add a cell writer based on its type. Template parameters are inferred from the population.
+	 * The implementation of this function must be available in the header file.
+	 */
+    template<template <unsigned, unsigned> class T>
+    typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
+												  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
+    AddWriter()
+    {
+        mCellWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+    }
+
+	/**
+	 * Get whether the population has a writer of the specified type.
+	 * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
+	 */
+    template<template <unsigned, unsigned> class T>
+    bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
+																 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
+    {
+        for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
+             pop_writer_iter != mCellPopulationWriters.end();
+             ++pop_writer_iter)
+        {
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(pop_writer_iter->get()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
-     * @return mOutputCellMutationStates
-     */
-    bool GetOutputCellMutationStates();
-
-    /**
-     * @return mOutputCellAncestors
-     */
-    bool GetOutputCellAncestors();
-
-    /**
-     * @return mOutputCellProliferativeTypes
-     */
-    bool GetOutputCellProliferativeTypes();
-
-    /**
-     * @return mOutputCellVariables
-     */
-    bool GetOutputCellVariables();
-
-    /**
-     * @return mOutputCellCyclePhases
-     */
-    bool GetOutputCellCyclePhases();
-
-    /**
-     * @return mOutputCellAges
-     */
-    bool GetOutputCellAges();
-
-    /**
-     * @return mOutputCellVolumes
-     */
-    bool GetOutputCellVolumes();
-
-    /**
-     * @return mOutputNodeVelocities
-     */
-    bool GetOutputNodeVelocities();
-
-    /**
-     * Add a cell population writer to the population
-     *
-     * @param pWriter a boost_shared_ptr to the writer to add.
-     */
-    void AddPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pWriter);
-
-    /**
-     * Add a cell writer to the population
-     *
-     * @param pWriter a boost_shared_ptr to the writer to add.
-     */
-    void AddCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pWriter);
+	 * Get whether the population has a writer of the specified type.
+	 * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
+	 */
+    template<template <unsigned, unsigned> class T>
+    bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
+																 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
+    {
+        for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer = mCellWriters.begin();
+             cell_writer != mCellWriters.end();
+             ++cell_writer)
+        {
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(cell_writer->get()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Set mOutputResultsForChasteVisualizer.
@@ -679,69 +645,6 @@ public:
      * @param outputResultsForChasteVisualizer the new value of mOutputResultsForChasteVisualizer
      */
     void SetOutputResultsForChasteVisualizer(bool outputResultsForChasteVisualizer);
-
-    /**
-     * Set mOutputCellIdData.
-     *
-     * @param outputCellIdData the new value of mOutputCellIdData
-     */
-    void SetOutputCellIdData(bool outputCellIdData);
-
-    /**
-     * Set mOutputCellMutationStates.
-     *
-     * @param outputCellMutationStates the new value of mOutputCellMutationStates
-     */
-    void SetOutputCellMutationStates(bool outputCellMutationStates);
-
-    /**
-     * Set mOutputCellAncestors.
-     *
-     * @param outputCellAncestors the new value of mOutputCellAncestors
-     */
-    void SetOutputCellAncestors(bool outputCellAncestors);
-
-    /**
-     * Set mOutputCellProliferativeTypes.
-     *
-     * @param outputCellProliferativeTypes the new value of mOutputCellProliferativeTypes
-     */
-    void SetOutputCellProliferativeTypes(bool outputCellProliferativeTypes);
-
-    /**
-     * Set mOutputCellVariables.
-     *
-     * @param outputCellVariables the new value of mOutputCellVariables
-     */
-    void SetOutputCellVariables(bool outputCellVariables);
-
-    /**
-     * Set mOutputCellCyclePhases.
-     *
-     * @param outputCellCyclePhases the new value of mOutputCellCyclePhases
-     */
-    void SetOutputCellCyclePhases(bool outputCellCyclePhases);
-
-    /**
-     * Set mOutputCellAges.
-     *
-     * @param outputCellAges the new value of mOutputCellAges
-     */
-    void SetOutputCellAges(bool outputCellAges);
-
-    /**
-     * Set mOutputCellVolumes.
-     *
-     * @param outputCellVolumes the new value of mOutputCellVolumes
-     */
-    void SetOutputCellVolumes(bool outputCellVolumes);
-
-    /**
-     * Set mOutputNodeVelocities.
-     *
-     * @param outputNodeVelocities the new value of mOutputNodeVelocities
-     */
-    void SetOutputNodeVelocities(bool outputNodeVelocities);
 
     /**
      * @return The width (maximum distance to centroid) of the cell population
@@ -850,18 +753,6 @@ public:
      * @return iterator pointing to one past the last cell in the cell population
      */
     Iterator End();
-};
-
-enum cell_colours
-{
-    STEM_COLOUR, // 0
-    TRANSIT_COLOUR, // 1
-    DIFFERENTIATED_COLOUR, // 2
-    EARLY_CANCER_COLOUR, // 3
-    LATE_CANCER_COLOUR, // 4
-    LABELLED_COLOUR, // 5
-    APOPTOSIS_COLOUR, // 6
-    INVISIBLE_COLOUR // visualizer treats '7' as invisible
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellPopulation)

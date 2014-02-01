@@ -36,8 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "VtkMeshWriter.hpp"
-#include "AbstractCellPopulationWriter.hpp"
-#include "AbstractCellWriter.hpp"
+
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -286,13 +294,13 @@ void NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rP
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+void NodeBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
+void NodeBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -488,12 +496,12 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
-void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
+void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
-    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     // Make sure the nodes are ordered contiguously in memory.
     NodeMap map(1 + this->mpNodesOnlyMesh->GetMaximumNodeIndex());
@@ -539,17 +547,17 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
-        if (this->mOutputCellAncestors)
+        if (this-> template HasWriter<CellAncestorWriter>())
         {
             double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
             cell_ancestors[node_index] = ancestor_index;
         }
-        if (this->mOutputCellProliferativeTypes)
+        if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
             cell_types[node_index] = cell_type;
         }
-        if (this->mOutputCellMutationStates)
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             double mutation_state = cell_iter->GetMutationState()->GetColour();
 
@@ -564,17 +572,17 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
             cell_mutation_states[node_index] = mutation_state;
         }
-        if (this->mOutputCellAges)
+        if (this-> template HasWriter<CellAgesWriter>())
         {
             double age = cell_iter->GetAge();
             cell_ages[node_index] = age;
         }
-        if (this->mOutputCellCyclePhases)
+        if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             double cycle_phase = cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase();
             cell_cycle_phases[node_index] = cycle_phase;
         }
-        if (this->mOutputCellVolumes)
+        if (this-> template HasWriter<CellVolumesWriter>())
         {
             double cell_radius = p_node->GetRadius();
             cell_radii[node_index] = cell_radius;
@@ -590,27 +598,27 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     mesh_writer.AddPointData("Process rank", rank);
 
-    if (this->mOutputCellProliferativeTypes)
+    if (this-> template HasWriter<CellProliferativeTypesWriter>())
     {
         mesh_writer.AddPointData("Cell types", cell_types);
     }
-    if (this->mOutputCellAncestors)
+    if (this-> template HasWriter<CellAncestorWriter>())
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);
     }
-    if (this->mOutputCellMutationStates)
+    if (this-> template HasWriter<CellMutationStatesWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
     }
-    if (this->mOutputCellAges)
+    if (this-> template HasWriter<CellAgesWriter>())
     {
         mesh_writer.AddPointData("Ages", cell_ages);
     }
-    if (this->mOutputCellCyclePhases)
+    if (this-> template HasWriter<CellProliferativePhasesWriter>())
     {
         mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
     }
-    if (this->mOutputCellVolumes)
+    if (this-> template HasWriter<CellVolumesWriter>())
     {
         mesh_writer.AddPointData("Cell radii", cell_radii);
     }

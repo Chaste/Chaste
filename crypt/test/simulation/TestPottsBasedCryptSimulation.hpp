@@ -67,7 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
-
+#include "CellVolumesWriter.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestPottsBasedCryptSimulation : public AbstractCellBasedTestSuite
@@ -108,7 +108,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // Create an instance of a Wnt concentration
         WntConcentration<2>::Instance()->SetType(LINEAR);
@@ -161,7 +161,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -191,7 +191,6 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 35u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 20u);
     }
-
 };
 
 #endif /*TESTPOTTSBASEDCRYPTSIMULATION_HPP_*/

@@ -91,15 +91,17 @@ protected:
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile()=0;
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory)=0;
 
 public:
 
     /**
      * Default constructor.
      *
-     * @param rMesh a refernce to the mesh underlying the cell population
+     * @param rMesh a reference to the mesh underlying the cell population
      * @param rCells a vector of cells
      * @param locationIndices an optional vector of location indices that correspond to real cells
      */

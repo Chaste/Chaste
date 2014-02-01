@@ -163,9 +163,11 @@ public:
     CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
 
     /**
-     * Overridden WriteVtkResultsToFile method.
+     * Overridden WriteVtkResultsToFile() method.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    void WriteVtkResultsToFile();
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
     /**
      * Outputs CellPopulation parameters to file

@@ -36,8 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(std::string directory)
-    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter()
+    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>()
 {
 }
 

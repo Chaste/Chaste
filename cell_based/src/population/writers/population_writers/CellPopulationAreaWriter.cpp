@@ -32,12 +32,18 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "CellPopulationAreaWriter.hpp"
-#include "VertexMesh.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "cellpopulationareas.dat";
 }
@@ -111,3 +117,7 @@ template class CellPopulationAreaWriter<2,2>;
 template class CellPopulationAreaWriter<1,3>;
 template class CellPopulationAreaWriter<2,3>;
 template class CellPopulationAreaWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellPopulationAreaWriter)

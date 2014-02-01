@@ -32,11 +32,18 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "VoronoiDataWriter.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "voronoi.dat";
 }
@@ -99,3 +106,7 @@ template class VoronoiDataWriter<2,2>;
 template class VoronoiDataWriter<1,3>;
 template class VoronoiDataWriter<2,3>;
 template class VoronoiDataWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(VoronoiDataWriter)

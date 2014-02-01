@@ -10,8 +10,6 @@
 	<MeshBasedCellPopulation-2-2>
 		<UseAreaBasedDampingConstant>0</UseAreaBasedDampingConstant>
 		<AreaBasedDampingConstantParameter>0.1</AreaBasedDampingConstantParameter>
-		<OutputVoronoiData>0</OutputVoronoiData>
-		<OutputCellPopulationVolumes>0</OutputCellPopulationVolumes>
 		<WriteVtkAsPoints>0</WriteVtkAsPoints>
 		<OutputMeshInVtk>0</OutputMeshInVtk>
 		<HasVariableRestLength>0</HasVariableRestLength>
@@ -19,15 +17,6 @@
 		<DampingConstantNormal>1</DampingConstantNormal>
 		<DampingConstantMutant>1</DampingConstantMutant>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>
-		<OutputCellIdData>0</OutputCellIdData>
-		<OutputCellMutationStates>0</OutputCellMutationStates>
-		<OutputCellAncestors>0</OutputCellAncestors>
-		<OutputCellProliferativeTypes>0</OutputCellProliferativeTypes>
-		<OutputCellVariables>0</OutputCellVariables>
-		<OutputCellCyclePhases>0</OutputCellCyclePhases>
-		<OutputCellAges>0</OutputCellAges>
-		<OutputCellVolumes>0</OutputCellVolumes>
-		<OutputNodeVelocities>0</OutputNodeVelocities>
 	</MeshBasedCellPopulation-2-2>
 
 	<CellCycleModels>

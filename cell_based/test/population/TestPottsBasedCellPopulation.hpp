@@ -55,6 +55,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "FileComparison.hpp"
 
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVariablesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestPottsBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -427,14 +439,14 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.SetOutputCellIdData(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAncestors(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellVariables(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellVariablesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
         cell_population.SetNumSweepsPerTimestep(5);
 
         TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 5u);
@@ -442,10 +454,8 @@ public:
         // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
-        cell_population.OpenWritersFiles();
-
-        cell_population.WriteResultsToFiles();
+        cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
 
@@ -495,7 +505,7 @@ public:
             c_vector<double, 2> expected;
             expected(0) = (double)(index%4);
             expected(1) = (double)(index>3) + (double)(index>7) + (double)(index>11);
-            
+
             double drift = norm_2(node_location-expected);
             TS_ASSERT_LESS_THAN(drift, 1e-6);
         }
@@ -548,7 +558,7 @@ public:
             c_vector<double, 2> expected;
             expected(0) = 0.5 + 2*(i%2 != 0);
             expected(1) = 0.5 + 2*(i > 1);
-            
+
             double drift = norm_2(cell_location-expected);
             TS_ASSERT_LESS_THAN(drift, 1e-6);
 

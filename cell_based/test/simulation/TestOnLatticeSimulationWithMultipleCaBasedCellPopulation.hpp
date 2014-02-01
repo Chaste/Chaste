@@ -148,7 +148,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // timestep and size of domain to let us calculate the probabilities of movement.
+        // Specify the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
         double diffusion_parameter = 0.1;
         unsigned num_runs = 2000;
@@ -178,7 +178,7 @@ public:
         simulator.SetDt(delta_t);
         simulator.SetEndTime(delta_t);
 
-        // Adding update rule
+        // Add update rule
         MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
         simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
@@ -199,7 +199,7 @@ public:
             location_of_cell[cell_location]++;
 
             // Reset the position of the cell
-            simulator.rGetCellPopulation().MoveCellInLocationMap(*cell_iter,cell_location,4u);
+            simulator.rGetCellPopulation().MoveCellInLocationMap(*cell_iter, cell_location, 4u);
 
             TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 4u);
         }
@@ -217,15 +217,15 @@ public:
         }
 
         // Note that these simulations are stochastic and so the tolerances are relatively loose
-        TS_ASSERT_DELTA(probability_of_occupation[0],diffusion_parameter*delta_t/4.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[1],diffusion_parameter*delta_t/2.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[2],diffusion_parameter*delta_t/4.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[3],diffusion_parameter*delta_t/2.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[4],1.0 - 3.0 * diffusion_parameter*delta_t, 2e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[5],diffusion_parameter*delta_t/2.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[6],diffusion_parameter*delta_t/4.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[7],diffusion_parameter*delta_t/2.0, 1e-2);
-        TS_ASSERT_DELTA(probability_of_occupation[8],diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[0], diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[1], diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[2], diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[3], diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[4], 1.0 - 3.0*diffusion_parameter*delta_t, 2e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[5], diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[6], diffusion_parameter*delta_t/4.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[7], diffusion_parameter*delta_t/2.0, 1e-2);
+        TS_ASSERT_DELTA(probability_of_occupation[8], diffusion_parameter*delta_t/4.0, 1e-2);
 
         // For coverage
         simulator.RemoveAllMultipleCaUpdateRules();

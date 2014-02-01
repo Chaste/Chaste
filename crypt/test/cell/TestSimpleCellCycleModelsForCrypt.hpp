@@ -558,15 +558,13 @@ public:
         std::string simple_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( simple_wnt_results_dir + "simple_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/simple_wnt_results.parameters").CompareFiles();
     }
-
 };
 
-//member initialisation
-    const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 0.721992;  // 3.11227;
-    const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 1.59526;  // 1.65468;
-    const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 1.58154;   // 2.60806;
-    const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 0.117421; // 2.64101;
-    const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 0.422089;  // 1.28792;
-
+// Member initialisation
+const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 0.721992;  // 3.11227;
+const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 1.59526;  // 1.65468;
+const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 1.58154;   // 2.60806;
+const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 0.117421; // 2.64101;
+const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 0.422089;  // 1.28792;
 
 #endif /*TESTSIMPLECELLCYCLEMODELSFORCRYPT_HPP_*/

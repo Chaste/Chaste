@@ -36,32 +36,42 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef NODELOCATIONWRITER_HPP_
 #define NODELOCATIONWRITER_HPP_
 
-#include "OutputFileHandler.hpp"
-#include "AbstractCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-
 #include "AbstractCellPopulationWriter.hpp"
-
-#include <string>
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /** A class written using the visitor pattern for writing node location from a cell population to file.*/
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class NodeLocationWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+    }
+
 public:
 
     /**
      * Default constructor
-     * @param directory the path to the directory in to which this class should write.
      */
-    NodeLocationWriter(std::string directory);
+    NodeLocationWriter();
 
     /**
      * Visit any population and write the data. This is the same structure for any population.
      *
      * @param pCellPopulation a pointer to the population to visit.
      */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
@@ -98,5 +108,9 @@ public:
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
+
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(NodeLocationWriter)
 
 #endif /* NODELOCATIONWRITER_HPP_ */

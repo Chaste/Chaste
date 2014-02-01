@@ -56,6 +56,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "FileComparison.hpp"
 
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVariablesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestMultipleCaBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -330,20 +342,20 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MultipleCaBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.SetOutputCellIdData(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAncestors(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellVariables(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellVariablesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-        TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
-        cell_population.OpenWritersFiles();
-        cell_population.WriteResultsToFiles();
+
+        cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
         TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
 
         // Compare output with saved files of what they should look like

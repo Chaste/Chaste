@@ -43,10 +43,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed to convert mesh in order to write nodes to VTK (visualize as glyphs)
 #include "VtkMeshWriter.hpp"
 
-// Needed to write population data to file.
-#include "AbstractCellPopulationWriter.hpp"
-#include "AbstractCellWriter.hpp"
-#include "CellWriters.hpp"
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellLocationWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
 
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
@@ -419,23 +424,29 @@ void MultipleCaBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 }
 
 template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+void MultipleCaBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
+void MultipleCaBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
+void MultipleCaBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
 {
-    AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
+    if (this->mOutputResultsForChasteVisualizer)
+    {
+        if (!this-> template HasWriter<CellLocationWriter>())
+        {
+            this-> template AddWriter<CellLocationWriter>();
+        }
+    }
 
-    this->AddCellWriter(new CellLocationWriter<DIM, DIM>(rDirectory));
+    AbstractCellPopulation<DIM>::OpenWritersFiles(rDirectory);
 }
 
 template<unsigned DIM>
@@ -486,13 +497,13 @@ std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetNeighbouringNodeIndice
 }
 
 template<unsigned DIM>
-void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
+void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     ///\todo #2032 Compare with MeshBasedCellPopulation::WriteVtkResultsToFile etc.
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
-    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     unsigned num_cells = this->GetNumRealCells();
     std::vector<double> cell_types(num_cells, -1.0);
@@ -518,7 +529,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         std::vector<double> cellwise_data_var(num_cells);
         cellwise_data.push_back(cellwise_data_var);
     }
-
 
     unsigned cell = 0;
 
@@ -576,24 +586,24 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
         nodes.push_back(new Node<DIM>(cell, coords, false));
 
-        if (this->mOutputCellAncestors)
+        if (this-> template HasWriter<CellAncestorWriter>())
         {
             double ancestor_index = (cell_ptr->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_ptr->GetAncestor();
             cell_ancestors[cell] = ancestor_index;
         }
-        if (this->mOutputCellProliferativeTypes)
+        if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             cell_types[cell] = cell_ptr->GetCellProliferativeType()->GetColour();
         }
-        if (this->mOutputCellMutationStates)
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
         }
-        if (this->mOutputCellAges)
+        if (this-> template HasWriter<CellAgesWriter>())
         {
             cell_ages[cell] = cell_ptr->GetAge();
         }
-        if (this->mOutputCellCyclePhases)
+        if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             cell_cycle_phases[cell] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
         }
@@ -609,27 +619,27 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     // Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)
     mesh_writer.AddPointData("Cell ids", cell_ids);
 
-    if (this->mOutputCellProliferativeTypes)
+    if (this-> template HasWriter<CellProliferativeTypesWriter>())
     {
         mesh_writer.AddPointData("Cell types", cell_types);
     }
-    if (this->mOutputCellAncestors)
+    if (this-> template HasWriter<CellAncestorWriter>())
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);
     }
-    if (this->mOutputCellMutationStates)
+    if (this-> template HasWriter<CellMutationStatesWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
     }
-    if (this->mOutputCellAges)
+    if (this-> template HasWriter<CellAgesWriter>())
     {
         mesh_writer.AddPointData("Ages", cell_ages);
     }
-    if (this->mOutputCellCyclePhases)
+    if (this-> template HasWriter<CellProliferativePhasesWriter>())
     {
         mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
     }
-    if (this->mOutputCellMutationStates)
+    if (this-> template HasWriter<CellMutationStatesWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
         mesh_writer.AddPointData("Cell labels", cell_labels);

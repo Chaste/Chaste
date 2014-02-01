@@ -77,14 +77,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractSimpleCellCycleModel}}}.
  * The duration of the G1 phase depends on the deviation from a 'target' volume (or area/length in 2D/1D): if a cell's volume is
- * lower than a given fraction of its target volume, the G1 phase continues. 
+ * lower than a given fraction of its target volume, the G1 phase continues.
  * This model of cell-cycle progression allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
  * in this cell cycle model, quiescence is implemented only by extending the G1 phase. Therefore, if a cell
  * is compressed during G2 or S phases then it will still divide, and thus cells whose volumes are smaller
- * than the given threshold may still divide. 
- * 
- * The target volume and the critical fraction are specified using the methods {{{SetEquilibriumVolume()}}} and {{{SetQuiescentVolumeFraction()}}} respectively. 
- * Within the {{{ContactInhibitionCellCycleModel}}}'s {{{UpdateCellCyclePhase()}}} method these parameters are compared to the actual cell volumes, which are stored 
+ * than the given threshold may still divide.
+ *
+ * The target volume and the critical fraction are specified using the methods {{{SetEquilibriumVolume()}}} and {{{SetQuiescentVolumeFraction()}}} respectively.
+ * Within the {{{ContactInhibitionCellCycleModel}}}'s {{{UpdateCellCyclePhase()}}} method these parameters are compared to the actual cell volumes, which are stored
  * using the cell property {{{CellData}}}.
  */
 #include "ContactInhibitionCellCycleModel.hpp"
@@ -98,6 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The remaining header files define classes that will be also be used and are presented in other tutorials. */
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "CellMutationStatesWriter.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -161,7 +162,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells (i.e. those that are inhibited from division) you need to use the following command.*/
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);
@@ -180,9 +181,9 @@ public:
         simulator.AddForce(p_force);
 
         /*
-         * To study the behaviour of the cells with varying volume, we trap them in the square domain [0,2.5]x[0,2.5]. 
-         * This is implemented using four {{{PlaneBoundaryCondition}}} objects. 
-         * These planes are indicated by a point and a normal and then passed to the {{{VolumeTrackedOffLatticeSimulation}}}. 
+         * To study the behaviour of the cells with varying volume, we trap them in the square domain [0,2.5]x[0,2.5].
+         * This is implemented using four {{{PlaneBoundaryCondition}}} objects.
+         * These planes are indicated by a point and a normal and then passed to the {{{VolumeTrackedOffLatticeSimulation}}}.
          * The domain is chosen to be quite small so as to make the test run in a short amount of time.
          */
 
@@ -275,7 +276,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);
@@ -366,7 +367,7 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);

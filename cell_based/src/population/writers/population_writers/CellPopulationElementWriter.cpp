@@ -32,11 +32,18 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "CellPopulationElementWriter.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "results.vizelements";
 }
@@ -92,38 +99,37 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPop
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-	// Loop over cells and find associated elements so in the same order as the cells in output files
-	for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
-		 cell_iter != pCellPopulation->End();
-		 ++cell_iter)
-	{
-		unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+    // Loop over cells and find associated elements so in the same order as the cells in output files
+    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+         cell_iter != pCellPopulation->End();
+         ++cell_iter)
+    {
+        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
 
-		// Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
-		bool elem_corresponds_to_dead_cell = false;
+        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
+        bool elem_corresponds_to_dead_cell = false;
 
-		if (pCellPopulation->IsCellAttachedToLocationIndex(elem_index))
-		{
-			elem_corresponds_to_dead_cell = pCellPopulation->GetCellUsingLocationIndex(elem_index)->IsDead();
-		}
+        if (pCellPopulation->IsCellAttachedToLocationIndex(elem_index))
+        {
+            elem_corresponds_to_dead_cell = pCellPopulation->GetCellUsingLocationIndex(elem_index)->IsDead();
+        }
 
-		// Write element data to file
-		if (!(pCellPopulation->GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
-		{
-			PottsElement<SPACE_DIM>* p_element = pCellPopulation->rGetMesh().GetElement(elem_index);
-			unsigned num_nodes_in_element = p_element->GetNumNodes();
+        // Write element data to file
+        if (!(pCellPopulation->GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+        {
+            PottsElement<SPACE_DIM>* p_element = pCellPopulation->rGetMesh().GetElement(elem_index);
+            unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-			// First write the number of Nodes belonging to this VertexElement
-			*this->mpOutStream << num_nodes_in_element << " ";
+            // First write the number of Nodes belonging to this VertexElement
+            *this->mpOutStream << num_nodes_in_element << " ";
 
-			// Then write the global index of each Node in this element
-			for (unsigned i=0; i<num_nodes_in_element; i++)
-			{
-				*this->mpOutStream << p_element->GetNodeGlobalIndex(i) << " ";
-			}
-		}
-	}
-
+            // Then write the global index of each Node in this element
+            for (unsigned i=0; i<num_nodes_in_element; i++)
+            {
+                *this->mpOutStream << p_element->GetNodeGlobalIndex(i) << " ";
+            }
+        }
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -169,3 +175,7 @@ template class CellPopulationElementWriter<2,2>;
 template class CellPopulationElementWriter<1,3>;
 template class CellPopulationElementWriter<2,3>;
 template class CellPopulationElementWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellPopulationElementWriter)

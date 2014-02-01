@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellDivisionRule.hpp"
 
-
 template<unsigned SPACE_DIM>
 AbstractCellDivisionRule<SPACE_DIM>::AbstractCellDivisionRule()
 {
@@ -59,17 +58,9 @@ void AbstractCellDivisionRule<SPACE_DIM>::OutputCellDivisionRuleInfo(out_stream&
 template<unsigned SPACE_DIM>
 void AbstractCellDivisionRule<SPACE_DIM>::OutputCellDivisionRuleParameters(out_stream& rParamsFile)
 {
-    //put any member variables here.
 }
 
-
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
 template class AbstractCellDivisionRule<1>;
 template class AbstractCellDivisionRule<2>;
 template class AbstractCellDivisionRule<3>;
-
-// Serialization for Boost >= 1.36
-/*#include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(AbstractCellDivisionRule)*/

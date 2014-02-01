@@ -32,21 +32,28 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "BoundaryNodeWriter.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "results.vizboundarynodes";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
-            node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         if (!node_iter->IsDeleted())
         {
@@ -100,3 +107,7 @@ template class BoundaryNodeWriter<2,2>;
 template class BoundaryNodeWriter<1,3>;
 template class BoundaryNodeWriter<2,3>;
 template class BoundaryNodeWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(BoundaryNodeWriter)

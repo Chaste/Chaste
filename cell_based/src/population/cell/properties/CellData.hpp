@@ -55,7 +55,7 @@ class CellData;
  * This cell property allows each cell to store one or more 'named' variables associated with it,
  * for example corresponding to the intracellular oxygen concentration. Other classes may interrogate
  * or modify the values stored in this class.
- * 
+ *
  * Each Cell owns a CellData property.
  */
 class CellData : public AbstractCellProperty
@@ -112,7 +112,7 @@ public:
 
     /**
      * @return all keys.
-     * 
+     *
      * These are sorted in lexicographical/alphabetic order (so that the order is independent of any map iteration method).
      */
     std::vector<std::string> GetKeys() const;

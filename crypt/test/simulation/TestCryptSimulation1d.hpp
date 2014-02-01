@@ -55,7 +55,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
-//This test is always run sequentially (never in parallel)
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestCryptSimulation1d : public AbstractCellBasedTestSuite
@@ -602,7 +607,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<1> crypt(mesh, cells);
-        crypt.SetOutputCellProliferativeTypes(true);
+        crypt.AddWriter<CellProliferativeTypesCountWriter>();
 
         // Set up crypt simulation
         CryptSimulation1d simulator(crypt);
@@ -693,9 +698,8 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<1> crypt(mesh, cells);
-
-        crypt.SetOutputCellMutationStates(true);
-        crypt.SetOutputCellProliferativeTypes(true);
+        crypt.AddWriter<CellMutationStatesWriter>();
+        crypt.AddWriter<CellProliferativeTypesCountWriter>();
 
         AbstractCellPopulation<1>::Iterator cell_iterator = crypt.Begin();
         cell_iterator->SetBirthTime(-1.0);   // Make cell-cycle models do minimum work

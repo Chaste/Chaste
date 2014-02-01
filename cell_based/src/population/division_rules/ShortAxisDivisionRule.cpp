@@ -36,16 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisDivisionRule.hpp"
 
 template <unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> ShortAxisDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell,
-                                                                               VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+c_vector<double, SPACE_DIM> ShortAxisDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
+    CellPtr pParentCell,
+    VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
     VertexElement<SPACE_DIM, SPACE_DIM>* p_element = rCellPopulation.GetElementCorrespondingToCell(pParentCell);
     return rCellPopulation.rGetMesh().GetShortAxisOfElement(p_element->GetIndex());
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
 template class ShortAxisDivisionRule<1>;
 template class ShortAxisDivisionRule<2>;
 template class ShortAxisDivisionRule<3>;

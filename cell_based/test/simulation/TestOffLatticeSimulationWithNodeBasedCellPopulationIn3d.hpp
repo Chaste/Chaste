@@ -54,6 +54,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBasedCellKiller.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 
+// Cell population writers
+#include "NodeVelocityWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractCellBasedTestSuite
@@ -94,8 +98,8 @@ public:
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
 
         // Set output options
-        node_based_cell_population.SetOutputCellProliferativeTypes(true);
-        node_based_cell_population.SetOutputNodeVelocities(true);
+        node_based_cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        node_based_cell_population.AddWriter<NodeVelocityWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(node_based_cell_population);
@@ -157,7 +161,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
-        node_based_cell_population.SetOutputCellProliferativeTypes(true);
+        node_based_cell_population.AddWriter<CellProliferativeTypesCountWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(node_based_cell_population);
@@ -207,7 +211,6 @@ public:
             delete nodes[i];
         }
     }
-
 };
 
 #endif /*TESTOFFLATTICESIMULATIONWITHNODEBASEDCELLPOPULATIONIN3D_HPP_*/

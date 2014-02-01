@@ -493,7 +493,6 @@ public:
         TS_ASSERT_DELTA(p_wnt2->GetCryptProjectionParameterA(), 0.8, 1e-12);
         TS_ASSERT_DELTA(p_wnt2->GetCryptProjectionParameterB(), 1.3, 1e-12);
     }
-
 };
 
 #endif /*TESTWNTCONCENTRATION_HPP_*/

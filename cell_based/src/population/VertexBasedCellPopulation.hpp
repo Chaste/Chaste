@@ -88,8 +88,10 @@ private:
 
     /**
      * Overridden WriteVtkResultsToFile() method.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    void WriteVtkResultsToFile();
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
     friend class boost::serialization::access;
     /**
@@ -291,12 +293,13 @@ public:
     void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
-     * Overridden CreateOutputFiles() method.
+     * Overridden OpenWritersFiles() method.
+     *
+     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
-     * @param cleanOutputDirectory  whether to delete the contents of the output directory prior to output file creation
      */
-    void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
+    virtual void OpenWritersFiles(const std::string& rDirectory);
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -304,7 +307,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -313,7 +316,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.

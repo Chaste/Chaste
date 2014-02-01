@@ -47,13 +47,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
-
 /**
- * A facade class encapsulating a mesh-based 'cell population'
+ * A facade class encapsulating a mesh-based 'cell population'.
  *
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh.
- *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>
@@ -88,12 +86,9 @@ private:
         archive & mSpringRestLengths;
         archive & mUseAreaBasedDampingConstant;
         archive & mAreaBasedDampingConstantParameter;
-        archive & mOutputVoronoiData;
-        archive & mOutputCellPopulationVolumes;
         archive & mWriteVtkAsPoints;
         archive & mOutputMeshInVtk;
         archive & mHasVariableRestLength;
-
 
         this->Validate();
     }
@@ -137,12 +132,6 @@ protected:
 
     /** Non-dimensional parameter d0 for use in area-based damping constant calculations. */
     double mAreaBasedDampingConstantParameter;
-
-    /** Whether to write cell volume and surface area (in 3D) or area and perimeter (in 2D) information to file. */
-    bool mOutputVoronoiData;
-
-    /** Whether to write the cell population volumes (in 3D) or areas (in 2D)  to file. */
-    bool mOutputCellPopulationVolumes;
 
     /** Whether to write cells as points in VTK. */
     bool mWriteVtkAsPoints;
@@ -217,13 +206,6 @@ public:
     bool UseAreaBasedDampingConstant();
 
     /**
-     * Set method for mOutputVoronoiData.
-     *
-     * @param outputVoronoiData whether to output cell area and perimeter information
-     */
-    void SetOutputVoronoiData(bool outputVoronoiData);
-
-    /**
      * Overridden AddNode() method.
      *
      * Add a new node to the cell population.
@@ -260,6 +242,15 @@ public:
     void SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant);
 
     /**
+     * Overridden OpenWritersFiles() method.
+     *
+     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     */
+    virtual void OpenWritersFiles(const std::string& rDirectory);
+
+    /**
      * Remove all cells that are labelled as dead.
      *
      * Note that this now calls MutableMesh::DeleteNodePriorToReMesh()
@@ -288,17 +279,11 @@ public:
     virtual CellPtr AddCell(CellPtr pNewCell, const c_vector<double,SPACE_DIM>& rCellDivisionVector, CellPtr pParentCell);
 
     /**
-     * Overridden CreateOutputFiles() method.
+     * Overridden WriteResultsToFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
-     * @param cleanOutputDirectory  whether to delete the contents of the output directory prior to output file creation
      */
-    void CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory);
-
-    /**
-     * Overridden WriteResultsToFiles() method.
-     */
-    virtual void WriteResultsToFiles();
+    virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -306,7 +291,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pPopulationWriter);
+    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter);
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -315,7 +300,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data is being written.
      */
-    virtual void AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell);
 
     /**
      * Overridden Update(bool hasHadBirthsOrDeaths) method.
@@ -327,9 +312,10 @@ public:
     virtual void Update(bool hasHadBirthsOrDeaths=true);
 
     /**
-     *  Tessellates when required
-     *  If areas or volumes are needed for mUseAreaBasedDampingConstant or mOutputCellPopulationVolumes or mOutputCellVolumes
-     *  If Voronoi data is to be output
+     *  Tessellates when required: if areas or volumes are needed for
+     *  mUseAreaBasedDampingConstant; if a CellPopulationAreaWriter or
+     *  CellVolumesWriter has been added to the population; or if
+     *  Voronoi data are to be output.
      */
     void TessellateIfNeeded();
 
@@ -358,8 +344,10 @@ public:
 
     /**
      * Overridden WriteVtkResultsToFile() method.
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile();
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -518,23 +506,6 @@ public:
      * @param areaBasedDampingConstantParameter the new value of mAreaBasedDampingConstantParameter
      */
     void SetAreaBasedDampingConstantParameter(double areaBasedDampingConstantParameter);
-
-    /**
-     * @return mOutputVoronoiData
-     */
-    bool GetOutputVoronoiData();
-
-    /**
-     * @return mOutputCellPopulationVolumes
-     */
-    bool GetOutputCellPopulationVolumes();
-
-    /**
-     * Set mOutputCellPopulationVolumes.
-     *
-     * @param outputCellPopulationVolumes the new value of mOutputCellPopulationVolumes
-     */
-    void SetOutputCellPopulationVolumes(bool outputCellPopulationVolumes);
 
     /**
      * Overridden rGetNodePairs method which uses the Delaunay triangulatiuon

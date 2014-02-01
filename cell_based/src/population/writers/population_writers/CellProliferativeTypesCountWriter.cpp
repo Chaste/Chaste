@@ -32,17 +32,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "CellProliferativeTypesCountWriter.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesCountWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesCountWriter()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "celltypes.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
 
@@ -100,3 +107,7 @@ template class CellProliferativeTypesCountWriter<2,2>;
 template class CellProliferativeTypesCountWriter<1,3>;
 template class CellProliferativeTypesCountWriter<2,3>;
 template class CellProliferativeTypesCountWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellProliferativeTypesCountWriter)

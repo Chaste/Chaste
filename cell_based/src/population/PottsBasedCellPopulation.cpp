@@ -42,9 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
-#include "AbstractCellPopulationWriter.hpp"
-#include "AbstractCellWriter.hpp"
+// Cell population writers
 #include "CellPopulationElementWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -331,30 +331,37 @@ void PottsBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
 }
 
-template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
-{
-    AbstractCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
 
-    this->AddPopulationWriter(new CellPopulationElementWriter<DIM,DIM>(rDirectory));
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
+{
+    if (this->mOutputResultsForChasteVisualizer)
+    {
+        if (!this-> template HasWriter<CellPopulationElementWriter>())
+        {
+            this-> template AddWriter<CellPopulationElementWriter>();
+        }
+    }
+
+    AbstractCellPopulation<DIM>::OpenWritersFiles(rDirectory);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::WriteResultsToFiles()
+void PottsBasedCellPopulation<DIM>::WriteResultsToFiles(const std::string& rDirectory)
 {
     CreateElementTessellation(); // To be used to output to the visualizer
 
-    AbstractCellPopulation<DIM>::WriteResultsToFiles();
+    AbstractCellPopulation<DIM>::WriteResultsToFiles(rDirectory);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+void PottsBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
+void PottsBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -489,12 +496,12 @@ unsigned PottsBasedCellPopulation<DIM>::GetNumSweepsPerTimestep()
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
+void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();
-    VtkMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results_"+time.str(), false);
+    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     unsigned num_nodes = GetNumNodes();
     std::vector<double> cell_types;
@@ -509,7 +516,8 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 
     unsigned num_cell_data_items = 0;
     std::vector<std::string> cell_data_names;
-    //We assume that the first cell is representative of all cells
+
+    // We assume that the first cell is representative of all cells
     num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
@@ -529,7 +537,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             // No elements associated with this gridpoint
             cell_types.push_back(-1.0);
             elem_ids.push_back(-1.0);
-            if (this->mOutputCellMutationStates)
+            if (this-> template HasWriter<CellMutationStatesWriter>())
             {
                 cell_mutation_states.push_back(-1.0);
                 cell_labels.push_back(-1.0);
@@ -547,7 +555,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
             double cell_type = p_cell->GetCellProliferativeType()->GetColour();
             cell_types.push_back(cell_type);
 
-            if (this->mOutputCellMutationStates)
+            if (this-> template HasWriter<CellMutationStatesWriter>())
             {
                 double cell_mutation_state = p_cell->GetMutationState()->GetColour();
                 cell_mutation_states.push_back(cell_mutation_state);
@@ -574,7 +582,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     mesh_writer.AddPointData("Element index", elem_ids);
     mesh_writer.AddPointData("Cell types", cell_types);
 
-    if (this->mOutputCellMutationStates)
+    if (this-> template HasWriter<CellMutationStatesWriter>())
     {
         assert(cell_mutation_states.size() == num_nodes);
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);

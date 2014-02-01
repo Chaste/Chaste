@@ -37,32 +37,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CELLMUTATIONSTATESWRITER_HPP_
 
 #include "AbstractCellPopulationWriter.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /** A class written using the visitor pattern for writing cell mutations states from a cell population to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellMutationStatesWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+    }
+
 public:
 
     /**
-     * Default constructor
-     * @param directory the path to the directory in to which this class should write.
+     * Default constructor.
      */
-    CellMutationStatesWriter(std::string directory);
+    CellMutationStatesWriter();
 
     /**
-     * Write the header to file
-     * @param pCellPopulation a pointer to the population to be written.
+     * Write the header to file.
      *
+     * @param pCellPopulation a pointer to the population to be written.
      */
     virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * A general method for writing to any population
+     * A general method for writing to any population.
      *
-     * @param pCellPopulation the population to write.
+     * @param pCellPopulation the population to write
      */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
@@ -99,5 +115,9 @@ public:
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
+
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMutationStatesWriter)
 
 #endif /*CELLMUTATIONSTATESWRITER_HPP_*/

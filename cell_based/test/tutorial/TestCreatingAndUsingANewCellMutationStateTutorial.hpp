@@ -82,6 +82,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "CellMutationStatesWriter.hpp"
 #include "CellsGenerator.hpp"
 #include "SmartPointers.hpp"
 #include "FakePetscSetup.hpp"
@@ -260,7 +261,7 @@ public:
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
-        /* We now asign the mutation to the 11th and 51st cell.*/
+        /* We now assign the mutation to the 11th and 51st cells.*/
         cells[10]->SetMutationState(p_state);
         cells[50]->SetMutationState(p_state);
 
@@ -269,7 +270,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple, and end time. */

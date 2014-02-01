@@ -39,9 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
 #include "Identifiable.hpp"
-
 #include "VertexBasedCellPopulation.hpp"
 
+// Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 
 /**
@@ -57,46 +57,6 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM>
 class AbstractCellDivisionRule : public Identifiable
 {
-public:
-    /**
-     * Default Constructor.
-     */
-    AbstractCellDivisionRule();
-
-    /**
-     * Empty destructor.
-     */
-    virtual ~AbstractCellDivisionRule();
-
-    /**
-     * Calculate the vector that will divide the two halves of the existing Vertex cell
-     * to form the boundary between parent and daughter cell.
-     *
-     * @param pParentCell  The existing vertex cell
-     * @param rCellPopulation  The Vertex cell population
-     * @return the division vector.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-                                                            VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
-
-    /**
-     * Output the name of the concrete class and call OutputCellDivisionRuleInfo
-     *
-     * @param rParamsFile  The stream of the parameter file
-     */
-    void OutputCellDivisionRuleInfo(out_stream& rParamsFile);
-
-protected:
-    /**
-     * Output any parameters associated with the division rule.
-     * Currently empty since this class has no member variables. Should
-     * be overridden by any child classes that have parameters.
-     *
-     * @param rParamsFile  The stream of the parameter file
-     */
-    virtual void OutputCellDivisionRuleParameters(out_stream& rParamsFile);
-
-
 private:
     friend class boost::serialization::access;
     /**
@@ -108,9 +68,46 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // When this is in an inheritance tree it will want to call a method like this:
-        //archive & boost::serialization::base_object<AbstractCellDivisionRule<SPACE_DIM> >(*this);
     }
+
+protected:
+    /**
+     * Output any parameters associated with the division rule.
+     * Currently empty since this class has no member variables. Should
+     * be overridden by any child classes that have parameters.
+     *
+     * @param rParamsFile  The stream of the parameter file
+     */
+    virtual void OutputCellDivisionRuleParameters(out_stream& rParamsFile);
+
+public:
+    /**
+     * Default constructor.
+     */
+    AbstractCellDivisionRule();
+
+    /**
+     * Empty destructor.
+     */
+    virtual ~AbstractCellDivisionRule();
+
+    /**
+     * Return the vector that will divide the two halves of the existing cell
+     * to form the boundary between parent and daughter cell.
+     *
+     * @param pParentCell  The existing cell
+     * @param rCellPopulation  The vertex-based cell population
+     * @return the division vector.
+     */
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+                                                            VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
+
+    /**
+     * Output the name of the concrete class and call OutputCellDivisionRuleParameters().
+     *
+     * @param rParamsFile  The stream of the parameter file
+     */
+    void OutputCellDivisionRuleInfo(out_stream& rParamsFile);
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellDivisionRule)

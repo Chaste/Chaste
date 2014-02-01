@@ -59,6 +59,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellPopulationAreaWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "NodeVelocityWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestMeshBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -494,9 +509,13 @@ public:
 
         // Create a cell population without ghost nodes
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
 
         // Specify node velocities to be output, and set non-zero applied forces on some nodes
-        cell_population.SetOutputNodeVelocities(true);
+        cell_population.AddWriter<NodeVelocityWriter>();
 
         c_vector<double, 2> applied_force_on_node_0;
         applied_force_on_node_0[0] = 4.5;
@@ -768,12 +787,13 @@ public:
 
     void TestCellPopulationWritersIn2d()
     {
-        EXIT_IF_PARALLEL;    // Cannot write cell populations in parallel.
+        // Cannot write cell populations in parallel
+        EXIT_IF_PARALLEL;
 
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        // Resetting the Maximum cell Id to zero (to account for previous tests)
+        // Resetting the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
         // Create a simple mesh
@@ -805,17 +825,13 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-2-2");
 
         // Test set/get methods
-        TS_ASSERT_EQUALS(cell_population.GetOutputVoronoiData(), false);
-        TS_ASSERT_EQUALS(cell_population.GetOutputCellIdData(), false);
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
 
-        cell_population.SetOutputVoronoiData(true);
-        cell_population.SetOutputCellIdData(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
         cell_population.SetOutputMeshInVtk(true);
 
-        TS_ASSERT_EQUALS(cell_population.GetOutputVoronoiData(), true);
-        TS_ASSERT_EQUALS(cell_population.GetOutputCellIdData(), true);
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
         TS_ASSERT_EQUALS(cell_population.GetOutputMeshInVtk(), true);
 
@@ -830,14 +846,17 @@ public:
 
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
-        cell_population.SetOutputCellPopulationVolumes(true);
-        cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellCyclePhases(true);
+
+        cell_population.AddWriter<CellPopulationAreaWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.SetOutputCellAncestors(true);
+        cell_population.AddWriter<CellAncestorWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -845,9 +864,8 @@ public:
         std::string output_directory = "TestCellPopulationWritersIn2d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        cell_population.CreateOutputFiles(output_directory, false);
-        cell_population.OpenWritersFiles();
-        cell_population.WriteResultsToFiles();
+        cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
         cell_population.CloseOutputFiles();
 
         // Test the GetCellMutationStateCount function
@@ -896,7 +914,8 @@ public:
 
     void TestCellPopulationWritersIn3d()
     {
-        EXIT_IF_PARALLEL;    // Cannot write cell populations in parallel.
+        // Cannot write cell populations in parallel
+        EXIT_IF_PARALLEL;
 
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -938,16 +957,17 @@ public:
         }
 
         // Test set methods
-        cell_population.SetOutputVoronoiData(true);
-        cell_population.SetOutputCellPopulationVolumes(true);
-        cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellCyclePhases(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddWriter<CellPopulationAreaWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.SetOutputCellAncestors(true);
+        cell_population.AddWriter<CellAncestorWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -955,9 +975,8 @@ public:
         std::string output_directory = "TestCellPopulationWritersIn3d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        cell_population.CreateOutputFiles(output_directory, false);
-        cell_population.OpenWritersFiles();
-        cell_population.WriteResultsToFiles();
+        cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
         cell_population.CloseOutputFiles();
 
         // Test the GetCellMutationStateCount function

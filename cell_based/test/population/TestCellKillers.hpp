@@ -719,7 +719,7 @@ public:
         {
             HoneycombVertexMeshGenerator generator(4,4);
             MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
-        
+
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;

@@ -54,7 +54,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "CellId.hpp"
 #include "FileComparison.hpp"
-//This test is always run sequentially (never in parallel)
+
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellPopulationAreaWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestMeshBasedCellPopulationWithGhostNodes : public AbstractCellBasedTestSuite
@@ -815,25 +829,26 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulationWithGhostNodes-3");
 
         // Test set methods
-        cell_population.SetOutputVoronoiData(true);
-        cell_population.SetOutputCellPopulationVolumes(true);
-        cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellCyclePhases(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddWriter<CellPopulationAreaWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.SetOutputCellAncestors(true);
+        cell_population.AddWriter<CellAncestorWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
 
         std::string output_directory = "TestCellPopulationWritersIn3dWithGhostNodes";
         OutputFileHandler output_file_handler(output_directory, false);
-        cell_population.CreateOutputFiles(output_directory, false);
-        cell_population.OpenWritersFiles();
-        cell_population.WriteResultsToFiles();
+
+        cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
         cell_population.CloseOutputFiles();
 
         // Compare output with saved files of what they should look like
@@ -946,7 +961,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(mesh, cells, location_indices);
-        cell_population.SetOutputVoronoiData(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
 
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();
@@ -1007,7 +1022,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(mesh, cells, location_indices);
-        cell_population.SetOutputVoronoiData(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
 
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();
@@ -1072,7 +1087,6 @@ public:
         TS_ASSERT_EQUALS(keys[0], "added variable");
         TS_ASSERT_EQUALS(keys[1], "variable");
     }
-
 };
 
 #endif /*TESTMESHBASEDCELLPOPULATIONWITHGHOSTNODES_HPP_*/

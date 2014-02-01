@@ -38,21 +38,29 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
+#include "ArchiveOpener.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 
-// Writers
+// Cell writers
+#include "CellIdWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+
+// Cell population writers
 #include "NodeLocationWriter.hpp"
 #include "BoundaryNodeWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
-#include "VoronoiDataWriter.hpp"
-#include "VertexSwapWriters.hpp"
-#include "CellPopulationAreaWriter.hpp"
-#include "CellWriters.hpp"
 #include "NodeVelocityWriter.hpp"
+#include "VertexT1SwapLocationsWriter.hpp"
+#include "VertexT3SwapLocationsWriter.hpp"
+#include "VoronoiDataWriter.hpp"
 
 // Files to create populations
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -99,8 +107,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeLocationWriter and test that the correct output is generated
-        NodeLocationWriter<3,3> location_writer(output_directory);
-        location_writer.OpenOutputFile();
+        NodeLocationWriter<3,3> location_writer;
+        location_writer.OpenOutputFile(output_directory);
         location_writer.WriteTimeStamp();
         location_writer.Visit(&cell_population);
         location_writer.WriteNewline();
@@ -109,7 +117,7 @@ public:
         FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeLocationWriter/results.viznodes").CompareFiles();
 
         // Test that we can append to files
-        location_writer.OpenOutputFileForAppend();
+        location_writer.OpenOutputFileForAppend(output_directory);
         location_writer.WriteTimeStamp();
         location_writer.Visit(&cell_population);
         location_writer.WriteNewline();
@@ -147,8 +155,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a BoundaryNodeWriter and test that the correct output is generated
-        BoundaryNodeWriter<3,3> boundary_writer(output_directory);
-        boundary_writer.OpenOutputFile();
+        BoundaryNodeWriter<3,3> boundary_writer;
+        boundary_writer.OpenOutputFile(output_directory);
         boundary_writer.WriteTimeStamp();
         boundary_writer.Visit(&cell_population);
         boundary_writer.WriteNewline();
@@ -157,7 +165,7 @@ public:
         FileComparison(results_dir + "results.vizboundarynodes", "cell_based/test/data/TestBoundaryNodeWriter/results.vizboundarynodes").CompareFiles();
 
         // Test that we can append to files
-        boundary_writer.OpenOutputFileForAppend();
+        boundary_writer.OpenOutputFileForAppend(output_directory);
         boundary_writer.WriteTimeStamp();
         boundary_writer.Visit(&cell_population);
         boundary_writer.WriteNewline();
@@ -188,8 +196,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellPopulationElementWriter and test that the correct output is generated
-        CellPopulationElementWriter<2,2> element_writer(output_directory);
-        element_writer.OpenOutputFile();
+        CellPopulationElementWriter<2,2> element_writer;
+        element_writer.OpenOutputFile(output_directory);
         element_writer.WriteTimeStamp();
         element_writer.Visit(&cell_population);
         element_writer.WriteNewline();
@@ -198,7 +206,7 @@ public:
         FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationElementWriter/results.vizelements").CompareFiles();
 
         // Test that we can append to files
-        element_writer.OpenOutputFileForAppend();
+        element_writer.OpenOutputFileForAppend(output_directory);
         element_writer.WriteTimeStamp();
         element_writer.Visit(&cell_population);
         element_writer.WriteNewline();
@@ -227,7 +235,7 @@ public:
         location_indices.push_back(17);
 
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
         cell_population.GenerateCellResults();
 
         // Create an output directory for the writer
@@ -236,8 +244,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellMutationStatesWriter and test that the correct output is generated
-        CellMutationStatesWriter<2,2> mutation_states_writer(output_directory);
-        mutation_states_writer.OpenOutputFile();
+        CellMutationStatesWriter<2,2> mutation_states_writer;
+        mutation_states_writer.OpenOutputFile(output_directory);
         mutation_states_writer.WriteHeader(&cell_population);
         mutation_states_writer.WriteTimeStamp();
         mutation_states_writer.Visit(&cell_population);
@@ -247,13 +255,40 @@ public:
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesWriter/cellmutationstates.dat").CompareFiles();
 
         // Test that we can append to files
-        mutation_states_writer.OpenOutputFileForAppend();
+        mutation_states_writer.OpenOutputFileForAppend(output_directory);
         mutation_states_writer.WriteTimeStamp();
         mutation_states_writer.Visit(&cell_population);
         mutation_states_writer.WriteNewline();
         mutation_states_writer.CloseFile();
 
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesWriter/cellmutationstates_twice.dat").CompareFiles();
+    }
+
+    void TestArchivingOfCellMutationStatesWriter() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellMutationStatesWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+       }
     }
 
     void TestCellProliferativeTypesAndPhasesCountWriters() throw (Exception)
@@ -274,8 +309,11 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellCyclePhases(true);
+
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+
         cell_population.GenerateCellResults();
 
         // Create an output directory for the writer
@@ -284,8 +322,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellProliferativeTypesCountWriter and test that the correct output is generated
-        CellProliferativeTypesCountWriter<3,3> types_count_writer(output_directory);
-        types_count_writer.OpenOutputFile();
+        CellProliferativeTypesCountWriter<3,3> types_count_writer;
+        types_count_writer.OpenOutputFile(output_directory);
         types_count_writer.WriteTimeStamp();
         types_count_writer.Visit(&cell_population);
         types_count_writer.WriteNewline();
@@ -294,7 +332,7 @@ public:
         FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/celltypes.dat").CompareFiles();
 
         // Test that we can append to files
-        types_count_writer.OpenOutputFileForAppend();
+        types_count_writer.OpenOutputFileForAppend(output_directory);
         types_count_writer.WriteTimeStamp();
         types_count_writer.Visit(&cell_population);
         types_count_writer.WriteNewline();
@@ -303,8 +341,8 @@ public:
         FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/celltypes_twice.dat").CompareFiles();
 
         // Create a CellProliferativePhasesCountWriter and test that the correct output is generated
-        CellProliferativePhasesCountWriter<3,3> phases_count_writer(output_directory);
-        phases_count_writer.OpenOutputFile();
+        CellProliferativePhasesCountWriter<3,3> phases_count_writer;
+        phases_count_writer.OpenOutputFile(output_directory);
         phases_count_writer.WriteTimeStamp();
         phases_count_writer.Visit(&cell_population);
         phases_count_writer.WriteNewline();
@@ -313,7 +351,7 @@ public:
         FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/cellcyclephases.dat").CompareFiles();
 
         // Test that we can append to files
-        phases_count_writer.OpenOutputFileForAppend();
+        phases_count_writer.OpenOutputFileForAppend(output_directory);
         phases_count_writer.WriteTimeStamp();
         phases_count_writer.Visit(&cell_population);
         phases_count_writer.WriteNewline();
@@ -348,8 +386,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VoronoiDataWriter and test that the correct output is generated
-        VoronoiDataWriter<3,3> voronoi_writer(output_directory);
-        voronoi_writer.OpenOutputFile();
+        VoronoiDataWriter<3,3> voronoi_writer;
+        voronoi_writer.OpenOutputFile(output_directory);
         voronoi_writer.WriteTimeStamp();
         voronoi_writer.Visit(&cell_population);
         voronoi_writer.WriteNewline();
@@ -358,7 +396,7 @@ public:
         FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestVoronoiDataWriter/voronoi.dat").CompareFiles();
 
         // Test that we can append to files
-        voronoi_writer.OpenOutputFileForAppend();
+        voronoi_writer.OpenOutputFileForAppend(output_directory);
         voronoi_writer.WriteTimeStamp();
         voronoi_writer.Visit(&cell_population);
         voronoi_writer.WriteNewline();
@@ -388,8 +426,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
-        VertexT1SwapLocationsWriter<2,2> t1_swaps_writer(output_directory);
-        t1_swaps_writer.OpenOutputFile();
+        VertexT1SwapLocationsWriter<2,2> t1_swaps_writer;
+        t1_swaps_writer.OpenOutputFile(output_directory);
         t1_swaps_writer.WriteTimeStamp();
         t1_swaps_writer.Visit(&cell_population);
         t1_swaps_writer.WriteNewline();
@@ -398,7 +436,7 @@ public:
         FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T1SwapLocations.dat").CompareFiles();
 
         // Test that we can append to files
-        t1_swaps_writer.OpenOutputFileForAppend();
+        t1_swaps_writer.OpenOutputFileForAppend(output_directory);
         t1_swaps_writer.WriteTimeStamp();
         t1_swaps_writer.Visit(&cell_population);
         t1_swaps_writer.WriteNewline();
@@ -407,8 +445,8 @@ public:
         FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T1SwapLocations_twice.dat").CompareFiles();
 
         // Create a VertexT3SwapLocationsWriter and test that the correct output is generated
-        VertexT3SwapLocationsWriter<2,2> t3_swaps_writer(output_directory);
-        t3_swaps_writer.OpenOutputFile();
+        VertexT3SwapLocationsWriter<2,2> t3_swaps_writer;
+        t3_swaps_writer.OpenOutputFile(output_directory);
         t3_swaps_writer.WriteTimeStamp();
         t3_swaps_writer.Visit(&cell_population);
         t3_swaps_writer.WriteNewline();
@@ -417,7 +455,7 @@ public:
         FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T3SwapLocations.dat").CompareFiles();
 
         // Test that we can append to files
-        t3_swaps_writer.OpenOutputFileForAppend();
+        t3_swaps_writer.OpenOutputFileForAppend(output_directory);
         t3_swaps_writer.WriteTimeStamp();
         t3_swaps_writer.Visit(&cell_population);
         t3_swaps_writer.WriteNewline();
@@ -452,8 +490,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellMutationStatesWriter and test that the correct output is generated
-        CellPopulationAreaWriter<3,3> area_writer(output_directory);
-        area_writer.OpenOutputFile();
+        CellPopulationAreaWriter<3,3> area_writer;
+        area_writer.OpenOutputFile(output_directory);
         area_writer.WriteTimeStamp();
         area_writer.Visit(&cell_population);
         area_writer.WriteNewline();
@@ -462,7 +500,7 @@ public:
         FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationAreaWriter/cellpopulationareas.dat").CompareFiles();
 
         // Test that we can append to files
-        area_writer.OpenOutputFileForAppend();
+        area_writer.OpenOutputFileForAppend(output_directory);
         area_writer.WriteTimeStamp();
         area_writer.Visit(&cell_population);
         area_writer.WriteNewline();
@@ -519,8 +557,8 @@ public:
         std::string mesh_based_results_dir = mesh_based_output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeNelocityWriter and test that the correct output is generated
-        NodeVelocityWriter<3,3> mesh_based_writer(mesh_based_output_directory);
-        mesh_based_writer.OpenOutputFile();
+        NodeVelocityWriter<3,3> mesh_based_writer;
+        mesh_based_writer.OpenOutputFile(mesh_based_output_directory);
         mesh_based_writer.WriteTimeStamp();
         mesh_based_writer.Visit(&mesh_based_cell_population);
         mesh_based_writer.WriteNewline();
@@ -561,8 +599,8 @@ public:
         std::string node_based_results_dir = node_based_output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeNelocityWriter and test that the correct output is generated
-        NodeVelocityWriter<3,3> node_based_writer(node_based_output_directory);
-        node_based_writer.OpenOutputFile();
+        NodeVelocityWriter<3,3> node_based_writer;
+        node_based_writer.OpenOutputFile(node_based_output_directory);
         node_based_writer.WriteTimeStamp();
         node_based_writer.Visit(&node_based_cell_population);
         node_based_writer.WriteNewline();
@@ -587,7 +625,7 @@ public:
         node_based_cell_population.GetNode(1)->AddAppliedForceContribution(force_on_node_1);
 
         // Test that we can append to files
-        node_based_writer.OpenOutputFileForAppend();
+        node_based_writer.OpenOutputFileForAppend(node_based_output_directory);
         node_based_writer.WriteTimeStamp();
         node_based_writer.Visit(&node_based_cell_population);
         node_based_writer.WriteNewline();
@@ -642,8 +680,8 @@ public:
         std::string vertex_based_results_dir = vertex_based_output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeNelocityWriter and test that the correct output is generated
-        NodeVelocityWriter<2,2> vertex_based_writer(vertex_based_output_directory);
-        vertex_based_writer.OpenOutputFile();
+        NodeVelocityWriter<2,2> vertex_based_writer;
+        vertex_based_writer.OpenOutputFile(vertex_based_output_directory);
         vertex_based_writer.WriteTimeStamp();
         vertex_based_writer.Visit(&vertex_based_cell_population);
         vertex_based_writer.WriteNewline();
@@ -671,16 +709,14 @@ public:
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
         // Create a writer and test that it is correctly added to the cell population
-        CellPopulationElementWriter<3,3>* p_elem_writer = new CellPopulationElementWriter<3,3>("output");
-        cell_population.AddPopulationWriter(p_elem_writer);
+        cell_population.AddWriter<CellPopulationElementWriter>();
 
-        ///\todo test something here (#2404)
+        ///\todo test something here (#2404, #2441)
 
         // Create another writer and test that it is correctly added to the cell population
-        CellIdWriter<3,3>* p_cell_writer = new CellIdWriter<3,3>("output_directory");
-        cell_population.AddCellWriter(p_cell_writer);
+        cell_population.AddWriter<CellIdWriter>();
 
-        ///\todo test something here (#2404)
+        ///\todo test something here (#2404, #2441)
 
         // Avoid memory leaks (note that the writers are deleted by the population destructor)
         for (unsigned i=0; i<nodes.size(); i++)

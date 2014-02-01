@@ -41,11 +41,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "IsNan.hpp"
 #include "ShortAxisDivisionRule.hpp"
 
-// Cell writer definitions
-#include "AbstractCellPopulationWriter.hpp"
-#include "AbstractCellWriter.hpp"
-#include "VertexSwapWriters.hpp"
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
+#include "VertexT1SwapLocationsWriter.hpp"
+#include "VertexT3SwapLocationsWriter.hpp"
 
 template<unsigned DIM>
 VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
@@ -353,13 +360,13 @@ void VertexBasedCellPopulation<DIM>::Validate()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<DIM, DIM>* pPopulationWriter)
+void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::AcceptCellWriter(AbstractCellWriter<DIM, DIM>* pCellWriter, CellPtr pCell)
+void VertexBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -377,12 +384,12 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
+void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     SimulationTime* p_time = SimulationTime::Instance();
 
-    VertexMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results", false);
+    VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
     std::stringstream time;
     time << p_time->GetTimeStepsElapsed();
 
@@ -430,32 +437,32 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
         }
         cell_labels[elem_index] = cell_label;
 
-        if (this->mOutputCellAncestors)
+        if (this-> template HasWriter<CellAncestorWriter>())
         {
             double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
             cell_ancestors[elem_index] = ancestor_index;
         }
-        if (this->mOutputCellProliferativeTypes)
+        if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             double cell_type = p_cell->GetCellProliferativeType()->GetColour();
             cell_types[elem_index] = cell_type;
         }
-        if (this->mOutputCellMutationStates)
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             double mutation_state = p_cell->GetMutationState()->GetColour();
             cell_mutation_states[elem_index] = mutation_state;
         }
-        if (this->mOutputCellAges)
+        if (this-> template HasWriter<CellAgesWriter>())
         {
             double age = p_cell->GetAge();
             cell_ages[elem_index] = age;
         }
-        if (this->mOutputCellCyclePhases)
+        if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
             cell_cycle_phases[elem_index] = cycle_phase;
         }
-        if (this->mOutputCellVolumes)
+        if (this-> template HasWriter<CellVolumesWriter>())
         {
             double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(elem_index);
             cell_volumes[elem_index] = cell_volume;
@@ -467,27 +474,27 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
     }
 
     mesh_writer.AddCellData("Cell labels", cell_labels);
-    if (this->mOutputCellProliferativeTypes)
+    if (this-> template HasWriter<CellProliferativeTypesWriter>())
     {
         mesh_writer.AddCellData("Cell types", cell_types);
     }
-    if (this->mOutputCellAncestors)
+    if (this-> template HasWriter<CellAncestorWriter>())
     {
         mesh_writer.AddCellData("Ancestors", cell_ancestors);
     }
-    if (this->mOutputCellMutationStates)
+    if (this-> template HasWriter<CellMutationStatesWriter>())
     {
         mesh_writer.AddCellData("Mutation states", cell_mutation_states);
     }
-    if (this->mOutputCellAges)
+    if (this-> template HasWriter<CellAgesWriter>())
     {
         mesh_writer.AddCellData("Ages", cell_ages);
     }
-    if (this->mOutputCellCyclePhases)
+    if (this-> template HasWriter<CellProliferativePhasesWriter>())
     {
         mesh_writer.AddCellData("Cycle phases", cell_cycle_phases);
     }
-    if (this->mOutputCellVolumes)
+    if (this-> template HasWriter<CellVolumesWriter>())
     {
         mesh_writer.AddCellData("Cell volumes", cell_volumes);
     }
@@ -509,19 +516,29 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile()
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
+void VertexBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
 {
-    AbstractOffLatticeCellPopulation<DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
-
     if (this->mOutputResultsForChasteVisualizer)
     {
-        this->AddPopulationWriter(new CellPopulationElementWriter<DIM, DIM>(rDirectory));
+        if (!this-> template HasWriter<CellPopulationElementWriter>())
+        {
+            this-> template AddWriter<CellPopulationElementWriter>();
+        }
     }
+
     if (mOutputCellRearrangementLocations)
     {
-        this->AddPopulationWriter(new VertexT1SwapLocationsWriter<DIM, DIM>(rDirectory));
-        this->AddPopulationWriter(new VertexT3SwapLocationsWriter<DIM, DIM>(rDirectory));
+        if (!this-> template HasWriter<VertexT1SwapLocationsWriter>())
+        {
+            this-> template AddWriter<VertexT1SwapLocationsWriter>();
+        }
+        if (!this-> template HasWriter<VertexT3SwapLocationsWriter>())
+        {
+            this-> template AddWriter<VertexT3SwapLocationsWriter>();
+        }
     }
+
+    AbstractCellPopulation<DIM>::OpenWritersFiles(rDirectory);
 }
 
 template<unsigned DIM>

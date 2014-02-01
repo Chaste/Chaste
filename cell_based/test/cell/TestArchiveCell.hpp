@@ -203,7 +203,6 @@ public:
             }
         }
     }
-
 };
 
 #endif /*TESTARCHIVECELL_HPP_*/

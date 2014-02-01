@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "Version.hpp"
-
+#include "CellProliferativeTypesCountWriter.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
@@ -223,7 +223,7 @@ public:
     */
     void TestResultsFileForLongerCryptSimulation() throw(Exception)
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
         // Set output directory
         std::string output_directory = "TestResultsFileForLongerCryptSimulation";
@@ -259,7 +259,7 @@ public:
         MeshBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set cell population to output cell types
-        crypt.SetOutputCellProliferativeTypes(true);
+        crypt.AddWriter<CellProliferativeTypesCountWriter>();
 
         // Set up instance of WntConcentration singleton and associate it with crypt
         WntConcentration<2>::Instance()->SetType(LINEAR);

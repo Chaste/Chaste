@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
-
+#include "CellMutationStatesWriter.hpp"
 #include "FakePetscSetup.hpp"
 
 class TestOffLatticeSimulationWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -454,7 +454,7 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -508,7 +508,7 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);

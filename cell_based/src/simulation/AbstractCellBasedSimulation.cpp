@@ -130,6 +130,22 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                     c_vector<double, SPACE_DIM> new_location = CalculateCellDivisionVector(*cell_iter);
 
                     // If required, output this location to file
+                    /**
+                     * \todo (#2441)
+                     *
+                     * For consistency with the rest of the output code, consider removing the
+                     * AbstractCellBasedSimulation member mOutputDivisionLocations, adding a new
+                     * member mAgesAndLocationsOfDividingCells to AbstractCellPopulation, adding
+                     * a new class CellDivisionLocationsWriter to the CellPopulationWriter hierarchy
+                     * to output the content of mAgesAndLocationsOfDividingCells to file (remembering
+                     * to clear mAgesAndLocationsOfDividingCells at each timestep), and replacing the
+                     * following conditional statement with something like
+                     *
+                     * if (mrCellPopulation.HasWriter<CellDivisionLocationsWriter>())
+                     * {
+                     *     mCellDivisionLocations.push_back(new_location);
+                     * }
+                     */
                     if (mOutputDivisionLocations)
                     {
                         *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
@@ -342,8 +358,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     // Create output files for the visualizer
     OutputFileHandler output_file_handler(results_directory+"/", true);
 
-    mrCellPopulation.CreateOutputFiles(results_directory+"/", false);
-    mrCellPopulation.OpenWritersFiles();
+    mrCellPopulation.OpenWritersFiles(results_directory+"/");
 
     if (mOutputDivisionLocations)
     {
@@ -409,7 +424,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         *mpVizSetupFile << std::flush;
     }
 
-    mrCellPopulation.WriteResultsToFiles();
+    mrCellPopulation.WriteResultsToFiles(results_directory+"/");
 
     OutputSimulationSetup();
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::SETUP);
@@ -456,7 +471,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
         if (p_simulation_time->GetTimeStepsElapsed()%mSamplingTimestepMultiple == 0)
         {
-            mrCellPopulation.WriteResultsToFiles();
+            mrCellPopulation.WriteResultsToFiles(results_directory+"/");
 
             // Call UpdateAtEndOfOutputTimeStep() on each modifier
             for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();

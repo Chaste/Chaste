@@ -63,6 +63,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "NodeVelocityWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -99,9 +104,9 @@ public:
         }
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputNodeVelocities(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddWriter<NodeVelocityWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -179,8 +184,8 @@ public:
         }
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -252,8 +257,8 @@ public:
         }
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells,location_indices);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -325,8 +330,8 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // Create a simulation
         OffLatticeSimulation<2> simulator(cell_population);

@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
-
+#include "CellMutationStatesWriter.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOnLatticeSimulationWithPottsBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -328,7 +328,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
+        cell_population.AddWriter<CellMutationStatesWriter>(); // So outputs the labelled cells
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -522,7 +522,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true); // So outputs the labelled cells
+        cell_population.AddWriter<CellMutationStatesWriter>(); // So outputs the labelled cells
 
         // Set up cell-based simulation
         OnLatticeSimulation<3> simulator(cell_population);

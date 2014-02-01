@@ -64,6 +64,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "NodeVelocityWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
 
 class TestOffLatticeSimulation : public AbstractCellBasedTestSuite
@@ -102,7 +108,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Output Voronoi data
-        cell_population.SetOutputVoronoiData(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
 
         // Set up simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -115,8 +121,7 @@ public:
         simulator.AddForce(p_force);
 
         // Record node velocities
-        TS_ASSERT_EQUALS(cell_population.GetOutputNodeVelocities(), false);
-        cell_population.SetOutputNodeVelocities(true);
+        cell_population.AddWriter<NodeVelocityWriter>();
 
         // Record division locations
         TS_ASSERT_EQUALS(simulator.GetOutputDivisionLocations(), false);
@@ -177,10 +182,10 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Output Voronoi data
-        cell_population.SetOutputVoronoiData(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
 
         // Record node velocities
-        cell_population.SetOutputNodeVelocities(true);
+        cell_population.AddWriter<NodeVelocityWriter>();
 
         // Set up simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -500,7 +505,7 @@ public:
         MutableMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-          // Create cells
+        // Create cells
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
@@ -514,9 +519,9 @@ public:
         simulator.SetOutputDirectory("TestOffLatticeSimulationWith2dMeshIn3d");
         simulator.SetEndTime(1.0);
 
-         // Create a force law and pass it to the simulation
-        //MAKE_PTR(GeneralisedLinearSpringForce<2,3>, p_force); THe MAKE_PTR macro doesnt recognise this due to extra comma
-        boost::shared_ptr<GeneralisedLinearSpringForce<2,3> > p_force(new GeneralisedLinearSpringForce<2,3>());
+        // Create a force law and pass it to the simulation
+        typedef GeneralisedLinearSpringForce<2,3> Force;
+        MAKE_PTR(Force, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -916,9 +921,6 @@ public:
 
         MeshBasedCellPopulation<1> cell_population(mesh, cells);
 
-        // Coverage
-        cell_population.SetOutputCellIdData(true);
-
         // Set up cell-based simulation
         OffLatticeSimulation<1> simulator(cell_population);
         simulator.SetOutputDirectory("Test1DOffLatticeSimulation");
@@ -981,8 +983,8 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
         cell_population.GenerateCellResults();
 
         // Test we have the correct cell mutation state counts

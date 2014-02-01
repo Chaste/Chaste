@@ -42,11 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
-#include "AbstractCellPopulationWriter.hpp"
-#include "AbstractCellWriter.hpp"
-#include "CellWriters.hpp"
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VoronoiDataWriter.hpp"
+#include "NodeVelocityWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -60,8 +67,6 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
       mDeleteMesh(deleteMesh),
       mUseAreaBasedDampingConstant(false),
       mAreaBasedDampingConstantParameter(0.1),
-      mOutputVoronoiData(false),
-      mOutputCellPopulationVolumes(false),
       mWriteVtkAsPoints(false),
       mOutputMeshInVtk(false),
       mHasVariableRestLength(false)
@@ -269,7 +274,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
     ///\todo check if there is a more efficient way of keeping track of node velocity information (#2404)
     std::map<unsigned, c_vector<double, SPACE_DIM> > old_node_applied_force_map;
     old_node_applied_force_map.clear();
-    if (this->mOutputNodeVelocities)
+    if (this-> template HasWriter<NodeVelocityWriter>())
     {
         /*
          * If outputting node velocities, we must keep a record of the applied force at each
@@ -309,7 +314,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
             unsigned new_node_index = node_map.GetNewIndex(old_node_index);
             this->SetCellUsingLocationIndex(new_node_index,*it);
 
-            if (this->mOutputNodeVelocities)
+            if (this-> template HasWriter<NodeVelocityWriter>())
             {
                 this->GetNode(new_node_index)->AddAppliedForceContribution(old_node_applied_force_map[old_node_index]);
             }
@@ -317,7 +322,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
 
         this->Validate();
     }
-    else if (this->mOutputNodeVelocities)
+    else if (this-> template HasWriter<NodeVelocityWriter>())
     {
         for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
         {
@@ -379,7 +384,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
      if ((SPACE_DIM==2 || SPACE_DIM==3)&&(ELEMENT_DIM==SPACE_DIM))
     {
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::TESSELLATION);
-        if (mUseAreaBasedDampingConstant || mOutputVoronoiData || mOutputCellPopulationVolumes || this->mOutputCellVolumes)
+        if (mUseAreaBasedDampingConstant ||
+            this-> template HasWriter<VoronoiDataWriter>() ||
+            this-> template HasWriter<CellPopulationAreaWriter>() ||
+            this-> template HasWriter<CellVolumesWriter>())
         {
             CreateVoronoiTessellation();
         }
@@ -493,47 +501,44 @@ CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell
 //////////////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOutputFiles(const std::string& rDirectory, bool cleanOutputDirectory)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std::string& rDirectory)
 {
-    AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CreateOutputFiles(rDirectory, cleanOutputDirectory);
-
-    this->AddPopulationWriter(new CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
-
-    if (mOutputVoronoiData)
+    if (this->mOutputResultsForChasteVisualizer)
     {
-        this->AddPopulationWriter(new VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
+        if (!this-> template HasWriter<CellPopulationElementWriter>())
+        {
+            this-> template AddWriter<CellPopulationElementWriter>();
+        }
     }
-    if (mOutputCellPopulationVolumes)
-    {
-        this->AddPopulationWriter(new CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory));
-    }
+
+    AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(rDirectory);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles()
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
 {
     if (SimulationTime::Instance()->GetTimeStepsElapsed() == 0 && this->mpVoronoiTessellation == NULL)
     {
-        TessellateIfNeeded(); //Update isn't run on time-step zero
+        TessellateIfNeeded(); // Update isn't run on time-step zero
     }
 
-    AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles();
+    AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteResultsToFiles(rDirectory);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationWriter(AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>* pPopulationWriter)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>* pCellWriter, CellPtr pCell)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     // Write time to file
@@ -555,7 +560,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
     unsigned num_cell_data_items = 0;
     std::vector<std::string> cell_data_names;
-    //We assume that the first cell is representative of all cells
+    // We assume that the first cell is representative of all cells
     num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
@@ -567,13 +572,13 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
     if (mOutputMeshInVtk)
     {
-        VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "mesh_"+time.str(), false);
+        VtkMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "mesh_"+time.str(), false);
         mesh_writer.WriteFilesUsingMesh(rGetMesh());
     }
 
     if (mWriteVtkAsPoints)
     {
-        VtkMeshWriter<SPACE_DIM,SPACE_DIM> cells_writer(this->mDirPath, "results_"+time.str(), false);
+        VtkMeshWriter<SPACE_DIM, SPACE_DIM> cells_writer(rDirectory, "results_"+time.str(), false);
 
         // Loop over cells
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
@@ -586,16 +591,16 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             // Get this cell-cycle model
             AbstractCellCycleModel* p_model = cell_iter->GetCellCycleModel();
 
-            if (this->mOutputCellAncestors)
+            if (this-> template HasWriter<CellAncestorWriter>())
             {
                 double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
                 cell_ancestors[node_index] = ancestor_index;
             }
-            if (this->mOutputCellProliferativeTypes)
+            if (this-> template HasWriter<CellProliferativeTypesWriter>())
             {
                 cell_types[node_index] = cell_iter->GetCellProliferativeType()->GetColour();
             }
-            if (this->mOutputCellMutationStates)
+            if (this-> template HasWriter<CellMutationStatesWriter>())
             {
                 double mutation_state = cell_iter->GetMutationState()->GetColour();
 
@@ -610,11 +615,11 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
 
                 cell_mutation_states[node_index] = mutation_state;
             }
-            if (this->mOutputCellAges)
+            if (this-> template HasWriter<CellAgesWriter>())
             {
                 cell_ages[node_index] = cell_iter->GetAge();
             }
-            if (this->mOutputCellCyclePhases)
+            if (this-> template HasWriter<CellProliferativePhasesWriter>())
             {
                 cell_cycle_phases[node_index] = p_model->GetCurrentCellCyclePhase();
             }
@@ -624,23 +629,23 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             }
         }
 
-        if (this->mOutputCellProliferativeTypes)
+        if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             cells_writer.AddPointData("Cell types", cell_types);
         }
-        if (this->mOutputCellAncestors)
+        if (this-> template HasWriter<CellAncestorWriter>())
         {
             cells_writer.AddPointData("Ancestors", cell_ancestors);
         }
-        if (this->mOutputCellMutationStates)
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             cells_writer.AddPointData("Mutation states", cell_mutation_states);
         }
-        if (this->mOutputCellAges)
+        if (this-> template HasWriter<CellAgesWriter>())
         {
             cells_writer.AddPointData("Ages", cell_ages);
         }
-        if (this->mOutputCellCyclePhases)
+        if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             cells_writer.AddPointData("Cycle phases", cell_cycle_phases);
         }
@@ -674,7 +679,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
     }
     else if (mpVoronoiTessellation != NULL)
     {
-        VertexMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(this->mDirPath, "results", false);
+        VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
         std::vector<double> cell_volumes(num_points);
 
         // Loop over elements of mpVoronoiTessellation
@@ -697,28 +702,28 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             // Get this cell-cycle model
             AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
 
-            if (this->mOutputCellAncestors)
+            if (this-> template HasWriter<CellAncestorWriter>())
             {
                 double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
                 cell_ancestors[elem_index] = ancestor_index;
             }
-            if (this->mOutputCellProliferativeTypes)
+            if (this-> template HasWriter<CellProliferativeTypesWriter>())
             {
                 cell_types[elem_index] = p_cell->GetCellProliferativeType()->GetColour();
             }
-            if (this->mOutputCellMutationStates)
+            if (this-> template HasWriter<CellMutationStatesWriter>())
             {
                 cell_mutation_states[elem_index] = p_cell->GetMutationState()->GetColour();
             }
-            if (this->mOutputCellAges)
+            if (this-> template HasWriter<CellAgesWriter>())
             {
                 cell_ages[elem_index] = p_cell->GetAge();
             }
-            if (this->mOutputCellCyclePhases)
+            if (this-> template HasWriter<CellProliferativePhasesWriter>())
             {
                 cell_cycle_phases[elem_index] = p_model->GetCurrentCellCyclePhase();
             }
-            if (this->mOutputCellVolumes)
+            if (this-> template HasWriter<CellVolumesWriter>())
             {
                 cell_volumes[elem_index] = mpVoronoiTessellation->GetVolumeOfElement(elem_index);
             }
@@ -728,27 +733,27 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile()
             }
         }
 
-        if (this->mOutputCellProliferativeTypes)
+        if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             mesh_writer.AddCellData("Cell types", cell_types);
         }
-        if (this->mOutputCellAncestors)
+        if (this-> template HasWriter<CellAncestorWriter>())
         {
             mesh_writer.AddCellData("Ancestors", cell_ancestors);
         }
-        if (this->mOutputCellMutationStates)
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             mesh_writer.AddCellData("Mutation states", cell_mutation_states);
         }
-        if (this->mOutputCellAges)
+        if (this-> template HasWriter<CellAgesWriter>())
         {
             mesh_writer.AddCellData("Ages", cell_ages);
         }
-        if (this->mOutputCellCyclePhases)
+        if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             mesh_writer.AddCellData("Cycle phases", cell_cycle_phases);
         }
-        if (this->mOutputCellVolumes)
+        if (this-> template HasWriter<CellVolumesWriter>())
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }
@@ -787,18 +792,18 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
         unsigned node_index = this->GetLocationIndexUsingCell(pCell);
 
         // Try to get the element index of the Voronoi tessellation corresponding to this node index
-    	try
-    	{
-   	    	unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
+        try
+        {
+               unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
 
-   	    	// Get the cell's volume from the Voronoi tessellation
-   	     	cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
-  	  	}
-  	  	catch (Exception&)
-  	  	{
-     		// If it doesn't exist this must be a boundary cell, so return infinite volume.
-     	    cell_volume = DBL_MAX;
-    	}
+               // Get the cell's volume from the Voronoi tessellation
+                cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
+            }
+            catch (Exception&)
+            {
+             // If it doesn't exist this must be a boundary cell, so return infinite volume.
+             cell_volume = DBL_MAX;
+        }
     }
     else if (SPACE_DIM==3 && ELEMENT_DIM==2)
     {
@@ -1153,30 +1158,6 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputVoronoiData()
-{
-    return mOutputVoronoiData;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputVoronoiData(bool outputVoronoiData)
-{
-    mOutputVoronoiData = outputVoronoiData;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOutputCellPopulationVolumes()
-{
-    return mOutputCellPopulationVolumes;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOutputCellPopulationVolumes(bool outputCellPopulationVolumes)
-{
-    mOutputCellPopulationVolumes = outputCellPopulationVolumes;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
 {
     //mNodePairs.Clear();
@@ -1189,8 +1170,6 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParamet
 {
     *rParamsFile << "\t\t<UseAreaBasedDampingConstant>" << mUseAreaBasedDampingConstant << "</UseAreaBasedDampingConstant>\n";
     *rParamsFile << "\t\t<AreaBasedDampingConstantParameter>" <<  mAreaBasedDampingConstantParameter << "</AreaBasedDampingConstantParameter>\n";
-    *rParamsFile << "\t\t<OutputVoronoiData>" <<  mOutputVoronoiData << "</OutputVoronoiData>\n";
-    *rParamsFile << "\t\t<OutputCellPopulationVolumes>" << mOutputCellPopulationVolumes << "</OutputCellPopulationVolumes>\n";
     *rParamsFile << "\t\t<WriteVtkAsPoints>" << mWriteVtkAsPoints << "</WriteVtkAsPoints>\n";
     *rParamsFile << "\t\t<OutputMeshInVtk>" << mOutputMeshInVtk << "</OutputMeshInVtk>\n";
     *rParamsFile << "\t\t<HasVariableRestLength>" << mHasVariableRestLength << "</HasVariableRestLength>\n";
@@ -1308,7 +1287,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetRestLength(unsigned inde
     }
     else
     {
-    	EXCEPTION("Tried to set a rest length in a simulation with fixed rest length. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
+        EXCEPTION("Tried to set a rest length in a simulation with fixed rest length. You can only use variable rest lengths if SetUpdateCellPopulationRule is set on the simulation.");
     }
 }
 

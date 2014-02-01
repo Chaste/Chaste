@@ -37,15 +37,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTCELLPOPULATIONWRITER_HPP_
 
 #include "AbstractCellBasedWriter.hpp"
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
-// All cell populations
-#include "MeshBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-
-#include <string>
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class MeshBasedCellPopulation;
+template<unsigned SPACE_DIM> class MultipleCaBasedCellPopulation;
+template<unsigned SPACE_DIM> class NodeBasedCellPopulation;
+template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
+template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 
 /**
  * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
@@ -53,16 +54,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellPopulationWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
 {
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+    }
+
 public:
 
     /**
-     * Default constructor
-     * @param directory the path to the directory in to which this class should write.
+     * Default constructor.
+     *
+     * @param  the path to the  in to which this class should write.
      */
-    AbstractCellPopulationWriter(std::string directory);
+    AbstractCellPopulationWriter();
 
     /**
-     * Write the header to file
+     * Write the header to file.
+     *
      * @param pCellPopulation a pointer to the population to be written.
      */
     virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);

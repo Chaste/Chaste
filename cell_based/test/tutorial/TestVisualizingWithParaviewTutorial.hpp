@@ -93,6 +93,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FakePetscSetup.hpp"
+#include "VoronoiDataWriter.hpp"
 
 /* Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods.
@@ -139,7 +140,7 @@ public:
         /* In order to output the .vtu files required for Paraview, we explicitly
          * instruct the simulation to output the data we need.
          */
-        cell_population.SetOutputVoronoiData(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory and end time. */

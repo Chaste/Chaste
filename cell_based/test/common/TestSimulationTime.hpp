@@ -203,7 +203,7 @@ public:
     void TestArchiveSimulationTime()
     {
         EXIT_IF_PARALLEL;
-        
+
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "time.arch";
 

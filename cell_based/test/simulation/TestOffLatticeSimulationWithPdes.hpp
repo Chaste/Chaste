@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VolumeDependentAveragedSourcePde.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-
+#include "CellPopulationAreaWriter.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
@@ -254,7 +254,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
+        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -314,7 +314,7 @@ public:
         NumericFileComparison comp_celltypes(results_dir + "/results.vizcelltypes", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizcelltypes");
         TS_ASSERT(comp_celltypes.CompareFiles(1e-15));
 
-        FileComparison( results_dir + "/results.vizsetup", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizsetup").CompareFiles();
+        FileComparison(results_dir + "/results.vizsetup", "cell_based/test/data/OffLatticeSimulationWithOxygen/results.vizsetup").CompareFiles();
     }
 
     void TestWithPointwiseSource() throw(Exception)
@@ -360,7 +360,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
+        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -441,7 +441,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
+        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -527,7 +527,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellPopulationVolumes(true); // record the spheroid radius and apoptotic radius
+        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);

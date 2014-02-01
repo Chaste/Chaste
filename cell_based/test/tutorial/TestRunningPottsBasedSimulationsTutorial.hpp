@@ -81,13 +81,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 /* The next header file defines the class that simulates the evolution of an on lattice {{{CellPopulation}}}. */
 #include "OnLatticeSimulation.hpp"
-/* The next header file defines a potts-based {{{CellPopulation}}} class.*/
+/* The next header file defines a{{{CellPopulation}}} class for implementing a cellular Potts model.*/
 #include "PottsBasedCellPopulation.hpp"
-/* The next header file defines some update rules for describing the Hamiltonain used to define the Potts simulations. */
+/* The next header file defines some update rules for describing the Hamiltonian used to define the Potts simulations. */
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "TransitCellProliferativeType.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
@@ -254,7 +255,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},
          * and set the output directory and end time. */
@@ -348,7 +349,7 @@ public:
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},
          * and set the output directory and end time. */

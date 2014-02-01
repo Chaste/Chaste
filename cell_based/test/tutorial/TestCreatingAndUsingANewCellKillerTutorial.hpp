@@ -142,7 +142,6 @@ public:
     {
         AbstractCellKiller<2>::OutputCellKillerParameters(rParamsFile);
     }
-
 };
 
 /* As mentioned in [wiki:UserTutorials/CreatingAndUsingANewCellCycleModel], we need to include the next block

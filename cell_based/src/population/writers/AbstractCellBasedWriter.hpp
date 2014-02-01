@@ -36,65 +36,83 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLBASEDWRITER_HPP_
 #define ABSTRACTCELLBASEDWRITER_HPP_
 
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
 #include "OutputFileHandler.hpp"
-#include <string>
 
 /**
  * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractCellBasedWriter
+class AbstractCellBasedWriter : public Identifiable
 {
 private:
 
-    /** The directory in which to write the file. */
-    std::string mDirectory;
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+    	archive & mFileName;
+    }
 
 protected:
 
-    /** The name of node location files */
+    /** The name of node location files. */
     std::string mFileName;
 
-    /** An output stream for writing data */
+    /** An output stream for writing data. */
     out_stream mpOutStream;
 
 public:
 
     /**
-     * Default constructor
-     * @param directory the path to the directory in to which this class should write.
+     * Default constructor.
      */
-    AbstractCellBasedWriter(std::string directory);
+    AbstractCellBasedWriter();
 
     /**
-     * A virtual destructor
+     * Virtual destructor.
      */
     virtual ~AbstractCellBasedWriter();
 
     /**
-     * Close the stream file
+     * Close mpOutStream.
      */
     void CloseFile();
 
     /**
-     * Open the out stream for writing
+     * Open mpOutStream for writing.
+     *
+     * @param directory the directory in which to open this file.
      */
-    virtual void OpenOutputFile();
+    virtual void OpenOutputFile(const std::string directory);
 
     /**
-     * Open the out stream for appending.
+     * Open mpOutStream for appending.
+     *
+     * @param directory the directory in which to open this file.
      */
-    void OpenOutputFileForAppend();
+    void OpenOutputFileForAppend(const std::string directory);
 
     /**
-     * Write the current time stamp to the file.
+     * Write the current time stamp to mpOutStream.
      */
     virtual void WriteTimeStamp();
 
     /**
-     * Add a newline character to the stream.
+     * Add a newline character to mpOutStream.
      */
     virtual void WriteNewline();
 };
+
+TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellBasedWriter)
 
 #endif /*ABSTRACTCELLBASEDWRITER_HPP_*/

@@ -81,8 +81,8 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellBetaCateninWriter and test that the correct output is generated
-        CellBetaCateninWriter<2,2> beta_catenin_writer(output_directory);
-        beta_catenin_writer.OpenOutputFile();
+        CellBetaCateninWriter<2,2> beta_catenin_writer;
+        beta_catenin_writer.OpenOutputFile(output_directory);
         beta_catenin_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

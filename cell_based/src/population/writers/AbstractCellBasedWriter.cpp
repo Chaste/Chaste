@@ -36,8 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter(std::string directory)
-    : mDirectory(directory)
+AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter()
 {
 }
 
@@ -53,16 +52,16 @@ void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::CloseFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile()
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile(const std::string directory)
 {
-    OutputFileHandler output_file_handler(mDirectory, false);
+    OutputFileHandler output_file_handler(directory, false);
     mpOutStream = output_file_handler.OpenOutputFile(mFileName);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend()
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend(const std::string directory)
 {
-    OutputFileHandler output_file_handler(mDirectory, false);
+    OutputFileHandler output_file_handler(directory, false);
     mpOutStream = output_file_handler.OpenOutputFile(mFileName, std::ios::app);
 }
 

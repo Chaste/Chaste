@@ -55,7 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-//This test is always run sequentially (never in parallel)
+#include "CellAncestorWriter.hpp"
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestCryptSimulation2dWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -819,7 +821,7 @@ public:
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set crypt to output cell types and cell ancestors
-        crypt.SetOutputCellAncestors(true);
+        crypt.AddWriter<CellAncestorWriter>();
 
         // Create an instance of a Wnt concentration
         WntConcentration<2>::Instance()->SetType(LINEAR);

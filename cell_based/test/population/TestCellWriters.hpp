@@ -37,10 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCELLWRITERS_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include "ArchiveOpener.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
-#include "CellWriters.hpp"
-
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
@@ -57,6 +58,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestor.hpp"
 #include "SimulationTime.hpp"
 
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellLocationWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVariablesWriter.hpp"
+#include "CellVolumesWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -97,25 +107,20 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellAncestorWriter<2,2> ancestor_writer(output_directory);
-
-        ancestor_writer.OpenOutputFile();
-
+        CellAncestorWriter<2,2> ancestor_writer;
+        ancestor_writer.OpenOutputFile(output_directory);
         ancestor_writer.WriteTimeStamp();
-
         ancestor_writer.VisitCell(p_cell, p_cell_population);
-
         ancestor_writer.CloseFile();
 
         FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestCellAncestorWriter/results.vizancestors").CompareFiles();
 
-        ancestor_writer.OpenOutputFileForAppend();
-
+        ancestor_writer.OpenOutputFileForAppend(output_directory);
         ancestor_writer.CloseFile();
 
+        // Tidy up
         delete p_cell_population;
         delete nodes[0];
-
     }
 
     void TestWriteCellProliferativeTypesAndPhases() throw (Exception)
@@ -148,30 +153,23 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellProliferativeTypesWriter<2,2> types_writer(output_directory);
-
-        types_writer.OpenOutputFile();
-
+        CellProliferativeTypesWriter<2,2> types_writer;
+        types_writer.OpenOutputFile(output_directory);
         types_writer.WriteTimeStamp();
-
         types_writer.VisitCell(p_cell, p_cell_population);
-
         types_writer.CloseFile();
 
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellProliferativeTypesWriter/results.vizcelltypes").CompareFiles();
 
-        CellProliferativePhasesWriter<2,2> phases_writer(output_directory);
-
-        phases_writer.OpenOutputFile();
-
+        CellProliferativePhasesWriter<2,2> phases_writer;
+        phases_writer.OpenOutputFile(output_directory);
         phases_writer.WriteTimeStamp();
-
         phases_writer.VisitCell(p_cell, p_cell_population);
-
         phases_writer.CloseFile();
 
         FileComparison(results_dir + "results.vizcellphases", "cell_based/test/data/TestCellProliferativeTypesWriter/results.vizcellphases").CompareFiles();
 
+        // Tidy up
         delete p_cell_population;
         delete nodes[0];
     }
@@ -212,18 +210,15 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellVariablesWriter<2,2> variables_writer(output_directory);
-
-        variables_writer.OpenOutputFile();
-
+        CellVariablesWriter<2,2> variables_writer;
+        variables_writer.OpenOutputFile(output_directory);
         variables_writer.WriteTimeStamp();
-
         variables_writer.VisitCell(p_cell, p_cell_population);
-
         variables_writer.CloseFile();
 
         FileComparison(results_dir + "cellvariables.dat", "cell_based/test/data/TestCellVariablesWriter/cellvariables.dat").CompareFiles();
 
+        // Tidy up
         delete p_cell_population;
         delete nodes[0];
     }
@@ -258,18 +253,15 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellAgesWriter<2,2> ages_writer(output_directory);
-
-        ages_writer.OpenOutputFile();
-
+        CellAgesWriter<2,2> ages_writer;
+        ages_writer.OpenOutputFile(output_directory);
         ages_writer.WriteTimeStamp();
-
         ages_writer.VisitCell(p_cell, p_cell_population);
-
         ages_writer.CloseFile();
 
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestCellAgesWriter/cellages.dat").CompareFiles();
 
+        // Tidy up
         delete p_cell_population;
         delete nodes[0];
     }
@@ -304,18 +296,15 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellIdWriter<2,2> id_writer(output_directory);
-
-        id_writer.OpenOutputFile();
-
+        CellIdWriter<2,2> id_writer;
+        id_writer.OpenOutputFile(output_directory);
         id_writer.WriteTimeStamp();
-
         id_writer.VisitCell(p_cell, p_cell_population);
-
         id_writer.CloseFile();
 
         FileComparison(results_dir + "loggedcell.dat", "cell_based/test/data/TestCellIdWriter/loggedcell.dat").CompareFiles();
 
+        // Tidy up
         delete nodes[0];
         delete p_cell_population;
     }
@@ -342,17 +331,15 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellVolumesWriter<2,2> volumes_writer(output_directory);
-
-        volumes_writer.OpenOutputFile();
-
+        CellVolumesWriter<2,2> volumes_writer;
+        volumes_writer.OpenOutputFile(output_directory);
         volumes_writer.WriteTimeStamp();
 
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
-                        cell_iter != cell_population.End();
-                        ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-                volumes_writer.VisitCell(*cell_iter, &cell_population);
+            volumes_writer.VisitCell(*cell_iter, &cell_population);
         }
 
         volumes_writer.CloseFile();
@@ -388,22 +375,47 @@ public:
 
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        CellLocationWriter<2,2> location_writer(output_directory);
-
-        location_writer.OpenOutputFile();
-
+        CellLocationWriter<2,2> location_writer;
+        location_writer.OpenOutputFile(output_directory);
         location_writer.WriteTimeStamp();
 
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
-                        cell_iter != cell_population.End();
-                        ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
-                location_writer.VisitCell(*cell_iter, &cell_population);
+            location_writer.VisitCell(*cell_iter, &cell_population);
         }
 
         location_writer.CloseFile();
 
         FileComparison(results_dir + "results.vizlocations", "cell_based/test/data/TestCellLocationsWriter/results.vizlocations").CompareFiles();
+    }
+
+    void TestArchivingOfCellAgesWriter() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellAgesWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAgesWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+       }
     }
 };
 

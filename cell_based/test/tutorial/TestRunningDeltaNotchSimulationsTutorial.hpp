@@ -86,6 +86,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
+#include "CellAgesWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+#include "CellVariablesWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
 /*
@@ -155,12 +163,13 @@ public:
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellVolumes(true);
-        cell_population.SetOutputCellVariables(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddWriter<CellVariablesWriter>();
 
         /* As we are using the {{{CellData}}} class to store the information about each cell required to
          * solve the Delta/Notch ODE system, we must first instantiate this singleton and associate it with the
@@ -248,12 +257,11 @@ public:
         }
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellIdData(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAges(true);
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellIdWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
 
         /* We choose to initialise the concentrations to random levels in each cell. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

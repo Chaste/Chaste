@@ -58,7 +58,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "ShortAxisDivisionRule.hpp"
 
-//This test is always run sequentially (never in parallel)
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "VertexT1SwapLocationsWriter.hpp"
+#include "VertexT3SwapLocationsWriter.hpp"
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestVertexBasedCellPopulation : public AbstractCellBasedTestSuite
@@ -805,13 +818,16 @@ public:
             }
         }
 
-        cell_population.SetOutputCellRearrangementLocations(true);
-        cell_population.SetOutputCellMutationStates(true);
-        cell_population.SetOutputCellProliferativeTypes(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAncestors(true);
-        cell_population.SetOutputCellAges(true);
-        cell_population.SetOutputCellVolumes(true);
+        cell_population.AddWriter<VertexT1SwapLocationsWriter>();
+        cell_population.AddWriter<VertexT3SwapLocationsWriter>();
+        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddWriter<CellVolumesWriter>();
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -825,9 +841,8 @@ public:
         std::string output_directory = "TestVertexBasedCellPopulationOutputWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        TS_ASSERT_THROWS_NOTHING(cell_population.CreateOutputFiles(output_directory, false));
-        cell_population.OpenWritersFiles();
-        cell_population.WriteResultsToFiles();
+        cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
 
         TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
 
@@ -861,8 +876,8 @@ public:
         TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // For coverage
-        cell_population.OpenWritersFiles();
-        TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles());
+        cell_population.OpenWritersFiles(output_directory);
+        TS_ASSERT_THROWS_NOTHING(cell_population.WriteResultsToFiles(output_directory));
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");

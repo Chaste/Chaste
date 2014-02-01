@@ -55,6 +55,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
 
+// Cell population writers
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
@@ -111,7 +115,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.SetOutputCellProliferativeTypes(true);
+        crypt.AddWriter<CellProliferativeTypesCountWriter>();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
@@ -181,8 +185,8 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.SetOutputVoronoiData(true);
-        crypt.SetOutputCellProliferativeTypes(true);
+        crypt.AddWriter<VoronoiDataWriter>();
+        crypt.AddWriter<CellProliferativeTypesCountWriter>();
 
         // Set the first cell to be logged
         crypt.Begin()->SetLogged();

@@ -64,4 +64,3 @@ template class AbstractCellBasedSimulationModifier<2,2>;
 template class AbstractCellBasedSimulationModifier<1,3>;
 template class AbstractCellBasedSimulationModifier<2,3>;
 template class AbstractCellBasedSimulationModifier<3,3>;
-

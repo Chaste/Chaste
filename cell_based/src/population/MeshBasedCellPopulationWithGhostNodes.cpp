@@ -35,6 +35,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+
 template<unsigned DIM>
 MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNodes(
      MutableMesh<DIM, DIM>& rMesh,
@@ -279,12 +289,12 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
 }
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
+void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     if (this->mpVoronoiTessellation != NULL)
     {
-        VertexMeshWriter<DIM, DIM> mesh_writer(this->mDirPath, "results", false);
+        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
         std::stringstream time;
         time << SimulationTime::Instance()->GetTimeStepsElapsed();
 
@@ -327,32 +337,32 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
                 // Get the cell corresponding to this element
                 CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
-                if (this->mOutputCellAncestors)
+                if (this-> template HasWriter<CellAncestorWriter>())
                 {
                     double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
                     cell_ancestors[elem_index] = ancestor_index;
                 }
-                if (this->mOutputCellProliferativeTypes)
+                if (this-> template HasWriter<CellProliferativeTypesWriter>())
                 {
                     double cell_type = p_cell->GetCellProliferativeType()->GetColour();
                     cell_types[elem_index] = cell_type;
                 }
-                if (this->mOutputCellMutationStates)
+                if (this-> template HasWriter<CellMutationStatesWriter>())
                 {
                     double mutation_state = p_cell->GetMutationState()->GetColour();
                     cell_mutation_states[elem_index] = mutation_state;
                 }
-                if (this->mOutputCellAges)
+                if (this-> template HasWriter<CellAgesWriter>())
                 {
                     double age = p_cell->GetAge();
                     cell_ages[elem_index] = age;
                 }
-                if (this->mOutputCellCyclePhases)
+                if (this-> template HasWriter<CellProliferativePhasesWriter>())
                 {
                     double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
                     cell_cycle_phases[elem_index] = cycle_phase;
                 }
-                if (this->mOutputCellVolumes)
+                if (this-> template HasWriter<CellVolumesWriter>())
                 {
                     double cell_volume = this->mpVoronoiTessellation->GetVolumeOfElement(elem_index);
                     cell_volumes[elem_index] = cell_volume;
@@ -366,27 +376,27 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
             }
             else
             {
-                if (this->mOutputCellAncestors)
+                if (this-> template HasWriter<CellAncestorWriter>())
                 {
                     cell_ancestors[elem_index] = -1.0;
                 }
-                if (this->mOutputCellProliferativeTypes)
+                if (this-> template HasWriter<CellProliferativeTypesWriter>())
                 {
                     cell_types[elem_index] = -1.0;
                 }
-                if (this->mOutputCellMutationStates)
+                if (this-> template HasWriter<CellMutationStatesWriter>())
                 {
                     cell_mutation_states[elem_index] = -1.0;
                 }
-                if (this->mOutputCellAges)
+                if (this-> template HasWriter<CellAgesWriter>())
                 {
                     cell_ages[elem_index] = -1.0;
                 }
-                if (this->mOutputCellCyclePhases)
+                if (this-> template HasWriter<CellProliferativePhasesWriter>())
                 {
                     cell_cycle_phases[elem_index] = -1.0;
                 }
-                if (this->mOutputCellVolumes)
+                if (this-> template HasWriter<CellVolumesWriter>())
                 {
                     cell_volumes[elem_index] = -1.0;
                 }
@@ -394,27 +404,27 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile()
         }
 
         mesh_writer.AddCellData("Non-ghosts", ghosts);
-        if (this->mOutputCellProliferativeTypes)
+        if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             mesh_writer.AddCellData("Cell types", cell_types);
         }
-        if (this->mOutputCellAncestors)
+        if (this-> template HasWriter<CellAncestorWriter>())
         {
             mesh_writer.AddCellData("Ancestors", cell_ancestors);
         }
-        if (this->mOutputCellMutationStates)
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             mesh_writer.AddCellData("Mutation states", cell_mutation_states);
         }
-        if (this->mOutputCellAges)
+        if (this-> template HasWriter<CellAgesWriter>())
         {
             mesh_writer.AddCellData("Ages", cell_ages);
         }
-        if (this->mOutputCellCyclePhases)
+        if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             mesh_writer.AddCellData("Cycle phases", cell_cycle_phases);
         }
-        if (this->mOutputCellVolumes)
+        if (this-> template HasWriter<CellVolumesWriter>())
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }

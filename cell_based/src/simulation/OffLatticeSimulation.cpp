@@ -170,8 +170,8 @@ c_vector<double, SPACE_DIM> OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::Calcula
             {
                 /*
                  * Note that to pick a random point on the surface of a sphere, it is incorrect
-                 * to select spherical coordinates from uniform distributions on [0, 2*pi) and 
-                 * [0, pi) respectively, since points picked in this way will be 'bunched' near 
+                 * to select spherical coordinates from uniform distributions on [0, 2*pi) and
+                 * [0, pi) respectively, since points picked in this way will be 'bunched' near
                  * the poles. See #2230.
                  */
                 double u = RandomNumberGenerator::Instance()->ranf();

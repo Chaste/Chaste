@@ -32,21 +32,28 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #include "NodeLocationWriter.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter(std::string directory)
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "results.viznodes";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM>* pCellPopulation)
+void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
-            node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
         if (!node_iter->IsDeleted())
         {
@@ -110,3 +117,7 @@ template class NodeLocationWriter<2,2>;
 template class NodeLocationWriter<1,3>;
 template class NodeLocationWriter<2,3>;
 template class NodeLocationWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(NodeLocationWriter)

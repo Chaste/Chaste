@@ -51,7 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
-
+#include "CellAncestorWriter.hpp"
+#include "VoronoiDataWriter.hpp"
 #include "FakePetscSetup.hpp"
 
 /**
@@ -201,8 +202,8 @@ public:
         TS_ASSERT_EQUALS(real_node_indices.size(), cells.size());
 
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(mesh, cells, real_node_indices);
-        cell_population.SetOutputVoronoiData(true);
-        cell_population.SetOutputCellAncestors(true);
+        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddWriter<CellAncestorWriter>();
 
         TS_ASSERT_EQUALS(ghost_node_indices.size(), cell_population.GetGhostNodeIndices().size());
 

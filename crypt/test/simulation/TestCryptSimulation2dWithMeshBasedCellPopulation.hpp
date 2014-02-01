@@ -67,6 +67,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
 
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellAncestorWriter.hpp"
+#include "CellIdWriter.hpp"
+#include "CellVolumesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "VoronoiDataWriter.hpp"
+
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
@@ -421,7 +435,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.SetOutputCellMutationStates(true);
+        crypt.AddWriter<CellMutationStatesWriter>();
 
         // Create crypt simulation from cell population and force law
         CryptSimulation2d simulator(crypt);
@@ -707,7 +721,7 @@ public:
     // A check that save and load works when a Voronoi tessellation is involved
     void TestMeshSurvivesSaveLoadWithVoronoiTessellation() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
         // Create mesh
         double crypt_length = 22.0;
@@ -787,9 +801,10 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.SetOutputCellCyclePhases(true); // for coverage
+        crypt.AddWriter<CellProliferativePhasesCountWriter>();
+        crypt.AddWriter<CellProliferativePhasesWriter>();
 
-        // We have a Wnt Gradient - but not Wnt dependent cells
+        // We have a Wnt Gradient - but not Wnt-dependent cells
         // so that the test runs quickly, but we test archiving of it!
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
@@ -989,11 +1004,11 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Cover the write Voronoi data method
-        crypt.SetOutputVoronoiData(true);
-        crypt.SetOutputCellPopulationVolumes(true);
-        crypt.SetOutputCellVolumes(true);
-        crypt.SetOutputCellAncestors(true);
-        crypt.SetOutputCellAges(true);
+        crypt.AddWriter<VoronoiDataWriter>();
+        crypt.AddWriter<CellPopulationAreaWriter>();
+        crypt.AddWriter<CellVolumesWriter>();
+        crypt.AddWriter<CellAncestorWriter>();
+        crypt.AddWriter<CellAgesWriter>();
 
         AbstractCellPopulation<2>::Iterator cell_iterator = crypt.Begin();
         cell_iterator->SetBirthTime(-1.0);   // Make cell-cycle models do minimum work
@@ -1031,16 +1046,17 @@ public:
 
         // Cover exceptions
         TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellMutationStateCount(),
-                              "Call SetOutputCellMutationStates(true) before using this function");
-        simulator.rGetCellPopulation().SetOutputCellMutationStates(true);
+                              "Call AddWriter<CellMutationStatesWriter>() before using this function");
+        simulator.rGetCellPopulation().AddWriter<CellMutationStatesWriter>();
 
         TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellProliferativeTypeCount(),
-                              "Call SetOutputCellProliferativeTypes(true) before using this function");
-        simulator.rGetCellPopulation().SetOutputCellProliferativeTypes(true);
+                              "Call AddWriter<CellProliferativeTypesCountWriter>() before using this function");
+        simulator.rGetCellPopulation().AddWriter<CellProliferativeTypesCountWriter>();
 
         TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().rGetCellCyclePhaseCount(),
-                              "Call SetOutputCellCyclePhases(true) before using this function");
-        simulator.rGetCellPopulation().SetOutputCellCyclePhases(true);
+                              "Call AddWriter<CellProliferativePhasesCountWriter>() before using this function");
+        simulator.rGetCellPopulation().AddWriter<CellProliferativePhasesCountWriter>();
+        simulator.rGetCellPopulation().AddWriter<CellProliferativePhasesWriter>();
 
         // Run simulation
         simulator.Solve();
@@ -1112,7 +1128,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Cover writing logged cell
-        crypt.SetOutputCellIdData(true);
+        crypt.AddWriter<CellIdWriter>();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
@@ -1188,7 +1204,7 @@ public:
         simulator.rGetCellPopulation().GetCellUsingLocationIndex(56)->SetMutationState(p_apc1);
         simulator.rGetCellPopulation().GetCellUsingLocationIndex(51)->SetMutationState(p_apc2);
         simulator.rGetCellPopulation().GetCellUsingLocationIndex(63)->SetMutationState(p_bcat1);
-        simulator.rGetCellPopulation().SetOutputCellMutationStates(true);
+        simulator.rGetCellPopulation().AddWriter<CellMutationStatesWriter>();
 
         // Run simulation
         simulator.Solve();
@@ -1545,7 +1561,7 @@ public:
      */
     void TestCellCountInitialization()
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+        EXIT_IF_PARALLEL; // HoneycombMeshGenerator doesn't work in parallel
 
         // Create mesh
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
@@ -1571,10 +1587,10 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-
-        crypt.SetOutputCellMutationStates(true);
-        crypt.SetOutputCellProliferativeTypes(true);
-        crypt.SetOutputCellCyclePhases(true);
+        crypt.AddWriter<CellMutationStatesWriter>();
+        crypt.AddWriter<CellProliferativeTypesCountWriter>();
+        crypt.AddWriter<CellProliferativePhasesCountWriter>();
+        crypt.AddWriter<CellProliferativePhasesWriter>();
         crypt.GenerateCellResults();
 
         // Each cell count has been initialized to the correct size and computed
@@ -1829,7 +1845,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.SetOutputCellMutationStates(true);
+        crypt.AddWriter<CellMutationStatesWriter>();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
@@ -1887,8 +1903,8 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2>* p_crypt = new MeshBasedCellPopulationWithGhostNodes<2>(*p_mesh, cells, location_indices, false, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
 
         // Set simulation to output cell types and cell ancestors
-        p_crypt->SetOutputCellMutationStates(true);
-        p_crypt->SetOutputCellAncestors(true);
+        p_crypt->AddWriter<CellMutationStatesWriter>();
+        p_crypt->AddWriter<CellAncestorWriter>();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(*p_crypt, false, false);

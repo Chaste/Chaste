@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *   1. that has the CellLabel property;
  *   2. is not the only cell to have the CellLabel property;
  *   3. shares no edges with any other cell with the CellLabel property.
- * 
+ *
  * Works for a VertexBasedCellPopulation only.
  */
 template<unsigned DIM>

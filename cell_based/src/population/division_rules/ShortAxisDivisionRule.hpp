@@ -39,46 +39,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellDivisionRule.hpp"
-
 #include "VertexBasedCellPopulation.hpp"
 
+// Forward declaration prevents circular include chain
+///\todo unnecessary?
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractCellDivisionRule;
 
 /**
  * A class to generate the short axis of a cell for Vertex-based cell
  * populations, to be used in cell division. This is the default rule that
- * is used in most of the vertex simulations.
+ * is used in most of the vertex-based simulations.
  *
  * The short axis is the eigenvector associated with the largest eigenvalue
  * of the moment of inertia of the cell's polygon.
- *
- * */
+ */
 template <unsigned SPACE_DIM>
 class ShortAxisDivisionRule  : public AbstractCellDivisionRule<SPACE_DIM>
 {
-public:
-    /**
-     * Default Constructor.
-     */
-    ShortAxisDivisionRule(){};
-
-    /**
-     * Empty destructor.
-     */
-    virtual ~ShortAxisDivisionRule(){};
-
-    /**
-     * Calculate the vector that will divide the two halves of the existing Vertex cell
-     * to form the boundary between the daughter cells.
-     *
-     * @param pParentCell  The existing vertex cell
-     * @param rCellPopulation  The Vertex cell population
-     * @return the division vector.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-                                                            VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
-
 private:
     friend class boost::serialization::access;
     /**
@@ -92,6 +70,34 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellDivisionRule<SPACE_DIM> >(*this);
     }
+
+public:
+    /**
+     * Default constructor.
+     */
+    ShortAxisDivisionRule()
+    {
+    }
+
+    /**
+     * Empty destructor.
+     */
+    virtual ~ShortAxisDivisionRule()
+    {
+    }
+
+    /**
+     * Overridden CalculateCellDivisionVector() method.
+     *
+     * Return the short axis of the existing cell, which will be used to
+     * form the boundary between the daughter cells.
+     *
+     * @param pParentCell  The existing cell
+     * @param rCellPopulation  The vertex-based cell population
+     * @return the division vector.
+     */
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+                                  VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

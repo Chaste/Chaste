@@ -85,6 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "CellMutationStatesWriter.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -351,11 +352,11 @@ public:
         HoneycombMeshGenerator generator(10, 10);
         MutableMesh<2,2>* p_generating_mesh = generator.GetCircularMesh(5);
 
-        NodesOnlyMesh<2>* p_mesh = new(NodesOnlyMesh<2>);
+        NodesOnlyMesh<2> mesh;
         /* We construct the mesh using the generating mesh and a cut-off 1.5 which defines the
          * connectivity in the mesh.
          */
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
         /* We now create a shared pointer to our new property, as follows. */
         MAKE_PTR(MotileCellProperty, p_motile);
@@ -370,7 +371,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             /* For each node we create a cell with our cell-cycle model and the wild-type cell mutation state.
              * We then add the property {{{MotileCellProperty}}} to a random selection of the cells, as follows. */
@@ -401,10 +402,10 @@ public:
 
         /* Now that we have defined the mesh and cells, we can define the cell population. The constructor
          * takes in the mesh and the cells vector. */
-        NodeBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.SetOutputCellMutationStates(true);
+        cell_population.AddWriter<CellMutationStatesWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple, and end time. */
@@ -424,9 +425,6 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
-        /* We conclude by deleting any pointers that we created in the test to avoid memory leaks.*/
-        delete p_mesh;
     }
     /*
      * When you visualize the results with

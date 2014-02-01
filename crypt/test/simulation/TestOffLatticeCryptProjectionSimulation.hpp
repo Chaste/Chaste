@@ -60,7 +60,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "StochasticWntCellCycleModel.hpp"
 #include "SmartPointers.hpp"
-//This test is always run sequentially (never in parallel)
+
+// Cell writers
+#include "CellAgesWriter.hpp"
+#include "CellProliferativePhasesWriter.hpp"
+#include "CellVariablesWriter.hpp"
+
+// Cell population writers
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
+
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestOffLatticeCryptProjectionSimulation : public AbstractCellBasedTestSuite
@@ -104,10 +114,11 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetOutputCellPopulationVolumes(true);
-        cell_population.SetOutputCellVariables(true);
-        cell_population.SetOutputCellCyclePhases(true);
-        cell_population.SetOutputCellAges(true);
+        cell_population.AddWriter<CellPopulationAreaWriter>();
+        cell_population.AddWriter<CellVariablesWriter>();
+        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddWriter<CellAgesWriter>();
 
         // Set up Wnt Gradient
         WntConcentration<2>::Instance()->SetType(LINEAR);

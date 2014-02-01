@@ -33,10 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 #include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "MultipleCaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationWriter(std::string directory)
-    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationWriter()
+    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>()
 {
 }
 

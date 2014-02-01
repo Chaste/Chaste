@@ -54,6 +54,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "SmartPointers.hpp"
+#include "CellVolumesWriter.hpp"
+
+// Cell population writers
+#include "CellMutationStatesWriter.hpp"
+#include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellPopulationAreaWriter.hpp"
+#include "NodeVelocityWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -163,7 +171,7 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
-        node_based_cell_population.SetOutputCellVolumes(true);
+        node_based_cell_population.AddWriter<CellVolumesWriter>();
         node_based_cell_population.Update();
 
         // Set up cell-based simulation
@@ -232,7 +240,7 @@ public:
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetUseVariableRadii(true);
-        node_based_cell_population.SetOutputCellVolumes(true);
+        node_based_cell_population.AddWriter<CellVolumesWriter>();
         node_based_cell_population.Update();
 
         // Set up cell-based simulation
@@ -460,7 +468,7 @@ public:
     // Testing Save
     void TestSave() throw (Exception)
     {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
+        EXIT_IF_PARALLEL; // HoneycombMeshGenereator does not work in parallel
 
         // Create a simple mesh
         int num_cells_depth = 5;

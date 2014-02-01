@@ -43,15 +43,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellBetaCateninWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Serialize the object and its member variables.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+    }
+
 public:
 
     /**
      * Default constructor.
-     *
-     * @param directory the path to the directory in to which this class should write.
      */
-    CellBetaCateninWriter(std::string directory)
-        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>(directory)
+    CellBetaCateninWriter()
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
     {
         this->mFileName = "results.vizbetacatenin";
     }
