@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSingleCellTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestLuoRudySimulation() throw(Exception)
+    void TestShannonSimulation() throw(Exception)
     {
 /* Make sure this code is only run if CVODE is installed/enabled on the computer */
 #ifdef CHASTE_CVODE
@@ -122,6 +122,22 @@ public:
          *
          * Cardiac cell models can be pretty tricky to deal with, as they are very stiff and sometimes full
          * of singularities.
+         *
+         * One of the first things you want to ensure is that the maximum timestep CVODE can take is less
+         * than or equal to the duration of the stimulus. Otherwise CVODE could evaluate the right-hand side
+         * before and after the stimulus, and never see it (giving you a cell that never does anything).
+         * This can be done using something like:
+         *
+         * {{{double max_timestep = p_regular_stim->GetDuration();}}}
+         *
+         * instead of the declaration of `max_timestep` below. In this tutorial we want an answer that is
+         * refined in time to give an accurate upstroke velocity. So we make the maximum timestep even
+         * smaller, to match the printing timestep. A rough rule of thumb would be to use the smaller of
+         * stimulus duration and printing time step as your CVODE maximum timestep. But note CVODE will still
+         * give sensible answers if printing timestep is less than maximum timestep, it might just decide
+         * to interpolate the output instead of evaluate it directly, if it thinks it will be
+         * accurate enough to meet your tolerances.
+         *
          *
          * A common error from CVODE is '''TOO_MUCH_WORK''', this means CVODE tried to exceed the maximum number of
          * internal time steps it is allowed to do. You can try using the method `SetMaxSteps` to change
@@ -248,13 +264,13 @@ public:
         double apd = cell_props.GetLastActionPotentialDuration(90);
         double upstroke_velocity = cell_props.GetLastMaxUpstrokeVelocity();
         /*
-         * Here we just check that the values are equal to the ones we expect with appropriate precision.
+         * Here we just check that the values are equal to the ones we expect, with appropriate precision to pass on different versions of CVODE.
          */
         TS_ASSERT_DELTA(apd, 212.41, 1e-2);
         TS_ASSERT_DELTA(upstroke_velocity, 339.8, 1.0);
 
 #else
-        /* CVODE is not enable or installed*/
+        /* CVODE is not enabled or installed.*/
         std::cout << "Cvode is not enabled.\n";
 #endif
     }
