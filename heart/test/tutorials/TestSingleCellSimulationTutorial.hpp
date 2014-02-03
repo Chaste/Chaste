@@ -91,9 +91,9 @@ public:
          *
          * If you want to define your own stimulus without using the default one,
          * you can define it here instead of giving it an empty stimulus:
-         * EMPTYLINE
-         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500);}}}
-         * EMPTYLINE
+         *
+         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500);}}
+         *
          * the parameters are magnitude, duration, start time, and period of stimulus.
          */
         boost::shared_ptr<RegularStimulus> p_stimulus;
@@ -105,7 +105,7 @@ public:
          * (if one has been labelled, you get an exception if not), and return it.
          *
          * NB. You could automatically check whether one is available with:
-         * EMPTYLINE
+         *
          * {{{p_model->HasCellMLDefaultStimulus()}}}
          *
          */
@@ -162,8 +162,6 @@ public:
          * tolerances of the CVODE solver, the default being (1e-5,1e-7), although it isn't clear whether
          * refining sometimes makes things worse, as CVODE goes to look for trouble in areas with steep gradients.
          *
-         * EMPTYLINE
-         *
          * {{{p_model->SetTolerances(1e-6,1e-8);}}}
          *
          * By default we use an analytic Jacobian for CVODE cells (where available - see [wiki:ChasteGuides/CodeGenerationFromCellML]
@@ -172,8 +170,6 @@ public:
          * CVODE errors when trying to run simulations, it can be worth switching off the analytic Jacobian and resorting
          * to a numerical approximation (as happens by default if no analytic Jacobian is available). This can be done with the
          * following command:
-         *
-         * EMPTYLINE
          *
          * {{{p_model->ForceUseOfNumericalJacobian();}}}
          *
@@ -199,8 +195,6 @@ public:
          * You can detect for steady state alternans by giving it true as a second parameter
          * {{{SteadyStateRunner steady_runner(p_model, true);}}}
          *
-         * EMPTYLINE
-         *
          * You may change the number of maximum paces the runner takes. The default is 1e5.
          */
         SteadyStateRunner steady_runner(p_model);
@@ -220,29 +214,26 @@ public:
          *
          * Now we solve for the number of paces we are interested in
          * max_timestep and sampling time step should generally be the same for CVODE cells.
-         * EMPTYLINE
+         *
          * The absolute values of start time and end time are typically only relevant for the stimulus, in general
          * nothing else on the right-hand side of the equations uses time directly.
          *
-         * EMPTYLINE
          * i.e. if you have a `RegularStimulus` of period 1000ms then you would get exactly the same results
          * calling Solve(0,1000,...) twice, as you would calling Solve(0,1000,...) and Solve(1000,2000,...).
          *
-         * EMPTYLINE
-         *
          * Single cell results can be very sensitive to the sampling time step, because of the steepness of the upstroke.
-         *
-         * EMPTYLINE
          *
          * For example, try changing the line below to 1 ms. The upstroke velocity that is detected will change
          * from 339 mV/ms to around 95 mV/ms. APD calculations will only ever be accurate to sampling timestep
          * for the same reason.
          */
         double max_timestep = 0.1;
+        p_model->SetMaxTimestep(max_timestep);
+
         double sampling_timestep = max_timestep;
         double start_time = 0.0;
         double end_time = 1000.0;
-        OdeSolution solution = p_model->Solve(start_time, end_time, max_timestep, sampling_timestep);
+        OdeSolution solution = p_model->Compute(start_time, end_time, sampling_timestep);
 
         /*
          * `p_model` retains the state variables at the end of `Solve`, if you call `Solve` again the state

@@ -74,6 +74,11 @@ void AbstractCvodeCell::SetVoltage(double voltage)
 }
 
 
+void AbstractCvodeCell::SetMaxTimestep(double maxDt)
+{
+    SetTimestep(maxDt); // Note: SetTimestep() sets the maximum timestep.
+}
+
 void AbstractCvodeCell::SetTimestep(double maxDt)
 {
     mMaxDt = maxDt;
