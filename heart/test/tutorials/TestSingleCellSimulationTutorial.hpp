@@ -92,7 +92,7 @@ public:
          * If you want to define your own stimulus without using the default one,
          * you can define it here instead of giving it an empty stimulus:
          *
-         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500);}}
+         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500));}}}
          *
          * the parameters are magnitude, duration, start time, and period of stimulus.
          */

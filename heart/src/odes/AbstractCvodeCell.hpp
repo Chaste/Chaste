@@ -171,12 +171,12 @@ public:
      * and return state variable values.
      *
      * The maximum time step to use will be taken as #mMaxDt.  If this is unset
-     * it is the same as the sampling interval, which defaults to
+     * it is the same as tSamp, which defaults to
      * HeartConfig::Instance()->GetPrintingTimeStep().
      *
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
-     * @param tSamp  sampling interval for returned results (defaults to dt)
+     * @param tSamp  sampling interval for returned results (defaults to HeartConfig printing time step)
      * @return solution object
      */
     OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0);
