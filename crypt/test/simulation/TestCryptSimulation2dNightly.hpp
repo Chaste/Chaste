@@ -446,18 +446,18 @@ public:
         /*
          * HOW_TO_TAG Cell Based/Simulation
          * Time various aspects of a cell-based simulation using `CellBasedEventHandler`.
-           
-           Do not forget 
-            #include "CellBasedEventHandler.hpp" 
-           and to call 
-            CellBasedEventHandler::Enable(); 
+
+           Do not forget
+            #include "CellBasedEventHandler.hpp"
+           and to call
+            CellBasedEventHandler::Enable();
            at the top of the test.
 
            If you are running multiple simulations then either
            place a CellBasedEventHandler::Reset(); before or after each solve
            or add the reset to the tearDown() method as above
          */
-                                
+
         CellBasedEventHandler::Headings();
         CellBasedEventHandler::Report();
     }
