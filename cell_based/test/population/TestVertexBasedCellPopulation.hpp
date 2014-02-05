@@ -927,6 +927,9 @@ public:
                 cell_iter->ReadyToDivide();
             }
 
+            // Coverage
+            p_cell_population->SetOutputCellRearrangementLocations(false);
+
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -1018,6 +1021,8 @@ public:
                     TS_ASSERT_EQUALS(this_index, loaded_index);
                 }
             }
+
+            TS_ASSERT_EQUALS(p_cell_population->GetOutputCellRearrangementLocations(), false);
 
             // Tidy up
             delete p_cell_population;
