@@ -271,23 +271,25 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellMutationStatesWriter<2,2>();
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellMutationStatesWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            output_arch << p_cell_writer;
+            output_arch << p_population_writer;
+
+            delete p_population_writer;
         }
 
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> p_cell_writer_2;
+            input_arch >> p_population_writer_2;
 
-            delete p_cell_writer_2;
+            delete p_population_writer_2;
        }
     }
 

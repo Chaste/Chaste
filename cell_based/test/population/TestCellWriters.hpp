@@ -404,6 +404,8 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             output_arch << p_cell_writer;
+
+            delete p_cell_writer;
         }
 
         {
