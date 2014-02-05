@@ -502,7 +502,7 @@ public:
 
     /**
      * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
-     * 
+     *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void OpenWritersFiles(const std::string& rDirectory);
@@ -583,7 +583,7 @@ public:
      */
     template<template <unsigned, unsigned> class T>
     typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
-												  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
+                                                  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
     AddWriter()
     {
         mCellPopulationWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
@@ -597,7 +597,7 @@ public:
      */
     template<template <unsigned, unsigned> class T>
     typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
-												  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
+                                                  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
     AddWriter()
     {
         mCellWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
@@ -611,7 +611,7 @@ public:
      */
     template<template <unsigned, unsigned> class T>
     bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
-																 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
+                                                                 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
     {
         for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
              pop_writer_iter != mCellPopulationWriters.end();
@@ -633,7 +633,7 @@ public:
      */
     template<template <unsigned, unsigned> class T>
     bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
-																 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
+                                                                 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
     {
         for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer = mCellWriters.begin();
              cell_writer != mCellWriters.end();

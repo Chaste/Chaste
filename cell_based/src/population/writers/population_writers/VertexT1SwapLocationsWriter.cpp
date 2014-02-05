@@ -52,18 +52,18 @@ VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexT1SwapLocationsWriter
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-	std::vector< c_vector<double, SPACE_DIM> > t1_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT1Swaps();
+    std::vector< c_vector<double, SPACE_DIM> > t1_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT1Swaps();
 
-	*this->mpOutStream << t1_swap_locations.size() << "\t";
-	for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
-	{
-		for (unsigned i=0; i<SPACE_DIM; i++)
-		{
-			*this->mpOutStream << t1_swap_locations[index][i] << "\t";
-		}
-	}
+    *this->mpOutStream << t1_swap_locations.size() << "\t";
+    for (unsigned index = 0;  index < t1_swap_locations.size(); index++)
+    {
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            *this->mpOutStream << t1_swap_locations[index][i] << "\t";
+        }
+    }
 
-	pCellPopulation->rGetMesh().ClearLocationsOfT1Swaps();
+    pCellPopulation->rGetMesh().ClearLocationsOfT1Swaps();
 }
 
 // Explicit instantiation

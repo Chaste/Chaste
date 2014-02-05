@@ -595,7 +595,7 @@ boost::shared_ptr<AbstractCellDivisionRule<DIM> > VertexBasedCellPopulation<DIM>
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::SetDivisionRule(boost::shared_ptr<AbstractCellDivisionRule<DIM> > pDivisionRule)
 {
-	mpDivisionRule = pDivisionRule;
+    mpDivisionRule = pDivisionRule;
 }
 
 template<unsigned DIM>

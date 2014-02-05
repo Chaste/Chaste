@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::CellVariablesWriter()
-	: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "cellvariables.dat";
 }
@@ -47,18 +47,18 @@ CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::CellVariablesWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-	if (dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))
-	{
-		// Write location index corresponding to cell
-		*this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
+    if (dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))
+    {
+        // Write location index corresponding to cell
+        *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
 
-		// Write cell variables
-		std::vector<double> proteins = (static_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))->GetProteinConcentrations();
-		for (unsigned i=0; i<proteins.size(); i++)
-		{
-			*this->mpOutStream << proteins[i] << " ";
-		}
-	}
+        // Write cell variables
+        std::vector<double> proteins = (static_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel()))->GetProteinConcentrations();
+        for (unsigned i=0; i<proteins.size(); i++)
+        {
+            *this->mpOutStream << proteins[i] << " ";
+        }
+    }
 }
 
 // Explicit instantiation

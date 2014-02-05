@@ -187,7 +187,7 @@ double PottsElement<DIM>::GetAspectRatio()
 //        break;
 //    }
     default:
-    	NEVER_REACHED;
+        NEVER_REACHED;
     }
 
     // As matrix is symmetric positive semidefinite

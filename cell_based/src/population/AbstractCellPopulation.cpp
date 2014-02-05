@@ -468,24 +468,24 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             }
 
             ///\todo (#2441) Make the writers accept shared_ptr instead of references
-			///\todo (#2441) employ std::for_each here
-			for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
-				 pop_writer_iter != mCellPopulationWriters.end();
-				 ++pop_writer_iter)
-			{
-				AcceptPopulationWriter(*pop_writer_iter);
-			}
+            ///\todo (#2441) employ std::for_each here
+            for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
+                 pop_writer_iter != mCellPopulationWriters.end();
+                 ++pop_writer_iter)
+            {
+                AcceptPopulationWriter(*pop_writer_iter);
+            }
 
             for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
                  cell_iter != this->End();
                  ++cell_iter)
             {
-				for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
-					 cell_writer_iter != mCellWriters.end();
-					 ++cell_writer_iter)
-				{
-					AcceptCellWriter(*cell_writer_iter, *cell_iter);
-				}
+                for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
+                     cell_writer_iter != mCellWriters.end();
+                     ++cell_writer_iter)
+                {
+                    AcceptCellWriter(*cell_writer_iter, *cell_iter);
+                }
             }
 
 //            std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), &(this->AcceptPopulationWriter));

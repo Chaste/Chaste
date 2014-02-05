@@ -38,26 +38,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::CellAgesWriter()
-	: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
 {
-	this->mFileName = "cellages.dat";
+    this->mFileName = "cellages.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-	// Write location index corresponding to cell
-	*this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
+    // Write location index corresponding to cell
+    *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
 
-	// Write cell location
-	c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-	for (unsigned i=0; i<SPACE_DIM; i++)
-	{
-		*this->mpOutStream << cell_location[i] << " ";
-	}
+    // Write cell location
+    c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        *this->mpOutStream << cell_location[i] << " ";
+    }
 
-	// Write cell age
-	*this->mpOutStream << pCell->GetAge() << " ";
+    // Write cell age
+    *this->mpOutStream << pCell->GetAge() << " ";
 }
 
 // Explicit instantiation

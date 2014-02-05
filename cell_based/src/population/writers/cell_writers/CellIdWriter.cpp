@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellIdWriter<ELEMENT_DIM, SPACE_DIM>::CellIdWriter()
-	: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "loggedcell.dat";
 }
@@ -47,14 +47,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellIdWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned cell_id = pCell->GetCellId();
-	unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
-	*this->mpOutStream << " " << cell_id << " " << location_index;
+    unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+    *this->mpOutStream << " " << cell_id << " " << location_index;
 
-	c_vector<double, SPACE_DIM> coords = pCellPopulation->GetLocationOfCellCentre(pCell);
-	for (unsigned i=0; i<SPACE_DIM; i++)
-	{
-		*this->mpOutStream << " " << coords[i];
-	}
+    c_vector<double, SPACE_DIM> coords = pCellPopulation->GetLocationOfCellCentre(pCell);
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        *this->mpOutStream << " " << coords[i];
+    }
 }
 
 // Explicit instantiation

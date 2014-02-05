@@ -60,7 +60,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-    	archive & mFileName;
+        archive & mFileName;
     }
 
 protected:

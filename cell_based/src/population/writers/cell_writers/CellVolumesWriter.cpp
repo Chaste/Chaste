@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellVolumesWriter<ELEMENT_DIM, SPACE_DIM>::CellVolumesWriter()
-	: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
 {
     this->mFileName = "cellareas.dat";
 }
@@ -46,21 +46,21 @@ CellVolumesWriter<ELEMENT_DIM, SPACE_DIM>::CellVolumesWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellVolumesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-	unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
-	unsigned cell_id = pCell->GetCellId();
-	c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-	double volume = pCellPopulation->GetVolumeOfCell(pCell);
+    unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+    unsigned cell_id = pCell->GetCellId();
+    c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(pCell);
+    double volume = pCellPopulation->GetVolumeOfCell(pCell);
 
-	if (volume < DBL_MAX)   // Only write cells with finite volume (avoids a case for boundary cells in MeshBasedCellPopulation)
-	{
-		*this->mpOutStream << location_index << " " << cell_id << " ";
-		for (unsigned i=0; i<SPACE_DIM; i++)
-		{
-			*this->mpOutStream << centre_location[i] << " ";
-		}
+    if (volume < DBL_MAX)   // Only write cells with finite volume (avoids a case for boundary cells in MeshBasedCellPopulation)
+    {
+        *this->mpOutStream << location_index << " " << cell_id << " ";
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            *this->mpOutStream << centre_location[i] << " ";
+        }
 
-		*this->mpOutStream << volume << " ";
-	}
+        *this->mpOutStream << volume << " ";
+    }
 }
 
 // Explicit instantiation

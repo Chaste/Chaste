@@ -38,16 +38,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::CellLocationWriter()
-	: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
 {
-	this->mFileName = "results.vizlocations";
+    this->mFileName = "results.vizlocations";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-	unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
-	*this->mpOutStream << location_index << " ";
+    unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+    *this->mpOutStream << location_index << " ";
 }
 
 // Explicit instantiation

@@ -148,22 +148,22 @@ public:
 
     CellMotilityWriter()
         : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
-	{
-		this->mFileName = "cellmotilityresults.dat";
-	}
+    {
+        this->mFileName = "cellmotilityresults.dat";
+    }
 
-	void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
-	{
-		*this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
+    void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+    {
+        *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
 
         c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
-		for (unsigned i=0; i<SPACE_DIM; i++)
-		{
-			*this->mpOutStream << cell_location[i] << " ";
-		}
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            *this->mpOutStream << cell_location[i] << " ";
+        }
 
-		*this->mpOutStream << pCell->HasCellProperty<MotileCellProperty>() << " ";
-	}
+        *this->mpOutStream << pCell->HasCellProperty<MotileCellProperty>() << " ";
+    }
 };
 
 /* TODO: sort out comments

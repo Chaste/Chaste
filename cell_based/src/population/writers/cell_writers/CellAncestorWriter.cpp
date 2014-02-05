@@ -38,22 +38,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::CellAncestorWriter()
-	: AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
 {
-	this->mFileName = "results.vizancestors";
+    this->mFileName = "results.vizancestors";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned ancestor = pCell->GetAncestor();
-	if (ancestor == UNSIGNED_UNSET)
-	{
-		// Set the file to -1 to mark this case.
-		ancestor = 1;
-		*this->mpOutStream << "-";
-	}
-	*this->mpOutStream << ancestor << " ";
+    if (ancestor == UNSIGNED_UNSET)
+    {
+        // Set the file to -1 to mark this case.
+        ancestor = 1;
+        *this->mpOutStream << "-";
+    }
+    *this->mpOutStream << ancestor << " ";
 }
 
 // Explicit instantiation
