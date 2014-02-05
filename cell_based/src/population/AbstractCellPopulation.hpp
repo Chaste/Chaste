@@ -578,6 +578,8 @@ public:
     /**
      * Add a cell population writer based on its type. Template parameters are inferred from the population.
      * The implementation of this function must be available in the header file.
+     *
+     * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
     typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
@@ -587,10 +589,12 @@ public:
         mCellPopulationWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
-	/**
-	 * Add a cell writer based on its type. Template parameters are inferred from the population.
-	 * The implementation of this function must be available in the header file.
-	 */
+    /**
+     * Add a cell writer based on its type. Template parameters are inferred from the population.
+     * The implementation of this function must be available in the header file.
+     *
+     * @return This method returns void
+     */
     template<template <unsigned, unsigned> class T>
     typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
 												  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
@@ -599,10 +603,12 @@ public:
         mCellWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
-	/**
-	 * Get whether the population has a writer of the specified type.
-	 * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
-	 */
+    /**
+     * Get whether the population has a writer of the specified type.
+     *
+     * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
+     * @return whether the population has this writer
+     */
     template<template <unsigned, unsigned> class T>
     bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
 																 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
@@ -620,9 +626,11 @@ public:
     }
 
     /**
-	 * Get whether the population has a writer of the specified type.
-	 * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
-	 */
+     * Get whether the population has a writer of the specified type.
+     *
+     * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
+     * @return whether the population has this writer
+     */
     template<template <unsigned, unsigned> class T>
     bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
 																 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const

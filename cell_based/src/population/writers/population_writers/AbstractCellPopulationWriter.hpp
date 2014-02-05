@@ -73,8 +73,6 @@ public:
 
     /**
      * Default constructor.
-     *
-     * @param  the path to the  in to which this class should write.
      */
     AbstractCellPopulationWriter();
 
