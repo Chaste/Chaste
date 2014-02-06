@@ -876,7 +876,7 @@ public:
         // Currently, NagaiHonda force only works if used together with a target area growth modifier
         // This tests that a meaningful error appears if we don't use a growth modifier
         TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
-        		"You need to add a TargetAreaGrowthModifier to the simulation in order to use NagaiHondaForce.");
+                "You need to add a TargetAreaGrowthModifier to the simulation in order to use NagaiHondaForce.");
 
         // create our modifier, which sets the target areas for the cell population
         // this is a workaround to make the test work

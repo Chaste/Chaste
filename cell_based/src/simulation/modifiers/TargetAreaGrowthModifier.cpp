@@ -39,7 +39,7 @@ template<unsigned DIM>
 TargetAreaGrowthModifier<DIM>::TargetAreaGrowthModifier()
     : AbstractCellBasedSimulationModifier<DIM>()
 {
-	mMatureCellTargetArea = 1.0;
+    mMatureCellTargetArea = 1.0;
 }
 
 template<unsigned DIM>
@@ -68,7 +68,7 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM
 
 {
     // Make sure the cell population is updated
-	///\todo: double check that this update call doesn't break anything (i.e. counting of swaps etc.)
+    ///\todo #2488: double check that this update call doesn't break anything (i.e. counting of swaps etc.)
     rCellPopulation.Update();
 
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
@@ -81,10 +81,10 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
              elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
              ++elem_iter)
-	{
-    	unsigned elem_index = elem_iter->GetIndex();
+    {
+        unsigned elem_index = elem_iter->GetIndex();
         UpdateTargetAreaOfCell( p_cell_population->GetCellUsingLocationIndex(elem_index) );
-	}
+    }
 }
 
 template<unsigned DIM>
@@ -129,13 +129,13 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
         }
         else
         {
-        	// At division, daughter cells inherit the cell data array from the mother cell. Here, we assign the target area
-        	// that we want daughter cells to have to cells that we know to divide in this time step. This is a little hack
-        	// that we might want to clean up in the future.
-        	if (pCell->ReadyToDivide())
-        	{
-        		cell_target_area = 0.5*mMatureCellTargetArea;
-        	}
+            // At division, daughter cells inherit the cell data array from the mother cell. Here, we assign the target area
+            // that we want daughter cells to have to cells that we know to divide in this time step. This is a little hack
+            // that we might want to clean up in the future.
+            if (pCell->ReadyToDivide())
+            {
+                cell_target_area = 0.5*mMatureCellTargetArea;
+            }
         }
     }
 

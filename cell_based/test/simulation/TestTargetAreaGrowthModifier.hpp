@@ -188,90 +188,90 @@ public:
 
     void TestTargetAreaOfDaughterCells()
     {
-    	// Plan: initialise a cell and have it divide at a fixed time. If cell divides at t, check that:
-    	// target area of mother cell at t - dt = mature target area
-    	// target area of daughter cells at t = half of that
-    	// target area of daughter cells at t + dt = half of mature target area + little increment
+        // Plan: initialise a cell and have it divide at a fixed time. If cell divides at t, check that:
+        // target area of mother cell at t - dt = mature target area
+        // target area of daughter cells at t = half of that
+        // target area of daughter cells at t + dt = half of mature target area + little increment
 
-    	// Create a simple 2D MutableVertexMesh with only one cell
-    	HoneycombVertexMeshGenerator generator(1, 1);
-    	MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        // Create a simple 2D MutableVertexMesh with only one cell
+        HoneycombVertexMeshGenerator generator(1, 1);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-    	// Set up cell.
-    	std::vector<CellPtr> cells;
-    	MAKE_PTR(WildTypeCellMutationState, p_state);
-    	MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        // Set up cell.
+        std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-    	FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+        FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
-    	CellPtr p_cell(new Cell(p_state, p_model));
-    	p_cell->SetCellProliferativeType(p_transit_type);
-    	double birth_time = -11.0; // The cell cycle duration is 12
-    	p_cell->SetBirthTime(birth_time);
-    	cells.push_back(p_cell);
+        CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(p_transit_type);
+        double birth_time = -11.0; // The cell cycle duration is 12
+        p_cell->SetBirthTime(birth_time);
+        cells.push_back(p_cell);
 
-    	// Create cell population
-    	VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-    	// Set up cell-based simulation
-    	OffLatticeSimulation<2> simulator(cell_population);
-    	simulator.SetOutputDirectory("TestTargetAreaOfDaughterCells");
-    	simulator.SetEndTime(0.997);
-    	//dt=0.002
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestTargetAreaOfDaughterCells");
+        simulator.SetEndTime(0.997);
+        //dt=0.002
 
-    	// Create a force law and pass it to the simulation
-    	MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-    	simulator.AddForce(p_nagai_honda_force);
+        // Create a force law and pass it to the simulation
+        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+        simulator.AddForce(p_nagai_honda_force);
 
-    	// The TargetAreaGrowthModifier
-    	MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
-    	simulator.AddSimulationModifier(p_growth_modifier);
+        // The TargetAreaGrowthModifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
-    	// Run simulation
-    	simulator.Solve();
+        // Run simulation
+        simulator.Solve();
 
-    	unsigned num_cells_before_division = simulator.rGetCellPopulation().GetNumRealCells();
+        unsigned num_cells_before_division = simulator.rGetCellPopulation().GetNumRealCells();
         // we should only have one cell now
-    	TS_ASSERT_EQUALS(num_cells_before_division,1u);
+        TS_ASSERT_EQUALS(num_cells_before_division,1u);
 
         // this is the cell from before, let's see what its target area is
         double target_area_before_division = p_cell->GetCellData()->GetItem("target area");
         TS_ASSERT_DELTA(target_area_before_division,1.0,1e-9);
 
         //so now we adjust the end time and run the simulation a bit further
-    	simulator.SetEndTime(1.001);
-    	simulator.Solve();
+        simulator.SetEndTime(1.001);
+        simulator.Solve();
 
-    	unsigned num_cells_at_division = simulator.rGetCellPopulation().GetNumRealCells();
+        unsigned num_cells_at_division = simulator.rGetCellPopulation().GetNumRealCells();
         // we should have two cells now
-    	TS_ASSERT_EQUALS(num_cells_at_division,2u);
+        TS_ASSERT_EQUALS(num_cells_at_division,2u);
 
-    	// Iterate over the cells, checking their target areas
-  	    for (typename VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-    	         cell_iter != cell_population.End();
-    	         ++cell_iter)
-  	    {
-  	    	double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
+        // Iterate over the cells, checking their target areas
+          for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+          {
+              double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
             TS_ASSERT_DELTA(target_area_at_division,0.5,1e-9);
-  	    }
+          }
 
         //so now the same thing again
-    	simulator.SetEndTime(1.003);
-    	simulator.Solve();
+        simulator.SetEndTime(1.003);
+        simulator.Solve();
 
-    	unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
+        unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
         // we should still have two cells
-    	TS_ASSERT_EQUALS(num_cells_after_division,2u);
+        TS_ASSERT_EQUALS(num_cells_after_division,2u);
 
-  	    for (typename VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-    	         cell_iter != cell_population.End();
-    	         ++cell_iter)
-  	    {
-  	    	double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
-  	        // line to verify: cell_target_area *= 0.5*(1 + cell_age/g1_duration)
-  	    	double supposed_target_area_after_division = 0.5*(1+0.002/2.);
+          for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+          {
+              double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
+              // line to verify: cell_target_area *= 0.5*(1 + cell_age/g1_duration)
+              double supposed_target_area_after_division = 0.5*(1+0.002/2.);
             TS_ASSERT_DELTA(target_area_after_division,supposed_target_area_after_division,1e-9);
-  	    }
+          }
     }
 
 
