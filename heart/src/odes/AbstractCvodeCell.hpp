@@ -140,10 +140,11 @@ public:
     void SetMaxTimestep(double maxDt);
 
     /**
-     * Set the maximum timestep to use for simulating this cell.
-     * As CVODE adaptively alters the timestep used, this method just sets the
-     * maximum timestep allowed (despite its name). User should call SetMaxTimestep() instead
-     * of this method, for clearer code.
+     * Set the \b maximum timestep to use for simulating this cell.
+     *
+     * As CVODE adaptively alters the timestep used, this method just sets the maximum timestep allowed (despite its name).
+     * It is required as our base class AbstractCardiacCellInterface declares it as a pure virtual method.
+     * Users using this class directly should call SetMaxTimestep instead of this method, for clearer code.
      *
      * @param maxDt  the maximum timestep
      */

@@ -200,7 +200,7 @@ public:
 
         lr91_cvode_system.ResetToInitialConditions();
         TS_ASSERT_EQUALS(lr91_cvode_system.GetMaxSteps(), 10000);
-        lr91_cvode_system.SetTimestep(DOUBLE_UNSET); // Use default (set from HeartConfig)
+        lr91_cvode_system.SetMaxTimestep(DOUBLE_UNSET); // Use default (set from HeartConfig)
         lr91_cvode_system.SolveAndUpdateState(start_time, end_time);
         // The max time step, which was unset, should now be set to printing time step.
         TS_ASSERT_DELTA(lr91_cvode_system.GetTimestep(), HeartConfig::Instance()->GetPrintingTimeStep(), 1e-9);

@@ -82,7 +82,7 @@ public:
     virtual ~AbstractCardiacCellInterface();
 
     /**
-     * Set the timestep (or maximum timestep) to use for simulating this cell.
+     * Set the timestep (or maximum timestep when using CVODE) to use for simulating this cell.
      *
      * @param dt  the timestep
      */

@@ -174,7 +174,7 @@ public:
 
             // A standard native CVODE solve
             p_cell_cvode->SetMaxSteps(0xffffffff);
-            p_cell_cvode->SetTimestep(max_time_step);
+            p_cell_cvode->SetMaxTimestep(max_time_step);
             p_cell_cvode->ForceUseOfNumericalJacobian(true);
             TS_ASSERT(!p_cell_cvode->GetUseAnalyticJacobian());
 
