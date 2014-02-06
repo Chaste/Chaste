@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SloughingCellKiller.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "StochasticWntCellCycleModel.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -98,6 +99,7 @@ public:
             StochasticWntCellCycleModel ccm;
             SloughingCellKiller<2> killer(&crypt, 1.0);
             GeneralisedLinearSpringForce<2> force;
+            crypt.AddWriter<CellMutationStatesWriter>();
         }
 
         // Directory in which the stored results were archived
