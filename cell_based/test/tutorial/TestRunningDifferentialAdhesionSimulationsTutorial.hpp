@@ -97,6 +97,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 
+/*
+ * Similar to the {{{NagaiHondaForce}}}, this force law requires a {{{TargetAreaGrowthModifier}}} which
+ * assigns target areas to each cell and updates this information in each time step.
+ */
+#include "TargetAreaGrowthModifier.hpp"
+
 /* Having included all the necessary header files, we proceed by defining the test class. */
 class TestRunningDifferentialAdhesionSimulationsTutorial : public AbstractCellBasedTestSuite
 {
@@ -177,6 +183,12 @@ public:
         p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(12.0);
         p_force->SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(40.0);
         simulator.AddForce(p_force);
+
+        /* A {{{NagaiHondaForceDifferentialAdhesionForce}}} assumes that each cell has been assigned a target area.
+         * The {{{TargetAreaGrowthModifier}}} will assign and update the target areas of all cells.
+         */
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         /* Finally, we run the simulation. */
         simulator.Solve();

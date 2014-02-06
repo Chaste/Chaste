@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation2d.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
 #include "NagaiHondaForce.hpp"
+#include "TargetAreaGrowthModifier.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "CryptCellsGenerator.hpp"
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisOne.hpp"
@@ -211,6 +212,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Move the first node (which should be on y=0) down a bit
         TS_ASSERT_DELTA(crypt.GetNode(0)->rGetLocation()[1], 0.0, 1e-6);
 
@@ -264,6 +269,9 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
         // No cell killer
 
         // Run simulation
@@ -313,6 +321,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Make crypt shorter for sloughing
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -357,6 +369,10 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
+
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Make crypt shorter for sloughing
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
@@ -409,6 +425,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Make crypt shorter for sloughing
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -460,6 +480,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Make crypt shorter for sloughing
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -508,6 +532,10 @@ public:
         MAKE_PTR_ARGS(VertexCryptBoundaryForce<2>, p_boundary_force_law, (150));
         simulator.AddForce(p_boundary_force_law);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Make crypt shorter for sloughing
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -554,6 +582,10 @@ public:
         // Create a force laws and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
+
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         /*
          * Memory leak (unconditional jump) without the following line. The
@@ -618,6 +650,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Create cell killer and pass in to crypt simulation
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -674,6 +710,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
+
         // Create cell killer and pass in to crypt simulation
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -724,6 +764,10 @@ public:
         // Create a force laws and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
+
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Create cell killer and pass in to crypt simulation
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
@@ -837,6 +881,10 @@ public:
         // Create a force laws and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
+
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Create cell killer and pass in to crypt simulation
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));

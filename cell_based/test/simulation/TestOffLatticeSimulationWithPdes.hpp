@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FunctionalBoundaryCondition.hpp"
 #include "AveragedSourcePde.hpp"
 #include "VolumeDependentAveragedSourcePde.hpp"
+#include "TargetAreaGrowthModifier.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "CellPopulationAreaWriter.hpp"
@@ -1381,6 +1382,10 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
+
+        // A Nagai Honda Force has to be used together with a TargetAreaGrowthModifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Find centre of coarse PDE mesh
         c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);

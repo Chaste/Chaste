@@ -2,4 +2,3 @@
 			<NagaiHondaMembraneSurfaceEnergyParameter>10</NagaiHondaMembraneSurfaceEnergyParameter>
 			<NagaiHondaCellCellAdhesionEnergyParameter>1</NagaiHondaCellCellAdhesionEnergyParameter>
 			<NagaiHondaCellBoundaryAdhesionEnergyParameter>1</NagaiHondaCellBoundaryAdhesionEnergyParameter>
-			<MatureCellTargetArea>1</MatureCellTargetArea>

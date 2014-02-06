@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "Exception.hpp"
 
 #include "AbstractForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -76,7 +77,7 @@ private:
         archive & mNagaiHondaMembraneSurfaceEnergyParameter;
         archive & mNagaiHondaCellCellAdhesionEnergyParameter;
         archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
-        archive & mMatureCellTargetArea;
+
     }
 
 protected:
@@ -101,10 +102,6 @@ protected:
      */
     double mNagaiHondaCellBoundaryAdhesionEnergyParameter;
 
-    /**
-     * Non-dimensional target area of a mature (fully-grown) Cell.
-     */
-    double mMatureCellTargetArea;
 
 public:
 
@@ -187,28 +184,6 @@ public:
      */
     void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double nagaiHondaCellBoundaryAdhesionEnergyParameter);
 
-    /**
-     * Get the target area of a given cell. This grows linearly from
-     * 0.5*A to A during the G1 phase of the cell cycle, then remains
-     * at A for the rest of the cell cycle, where A denotes the
-     * member variable mMatureCellTargetArea.
-     *
-     * @param pCell the cell
-     * @return the cell's target area
-     */
-    virtual double GetTargetAreaOfCell(const CellPtr pCell) const;
-
-    /**
-     * @return mMatureCellTargetArea
-     */
-    double GetMatureCellTargetArea() const;
-
-    /**
-     * Set mMatureCellTargetArea.
-     *
-     * @param matureCellTargetArea the new value of mMatureCellTargetArea
-     */
-    void SetMatureCellTargetArea(double matureCellTargetArea);
 
     /**
      * Overridden OutputForceParameters() method.

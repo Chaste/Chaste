@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation2d.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "NagaiHondaForce.hpp"
+#include "TargetAreaGrowthModifier.hpp"
 #include "VertexCryptBoundaryForce.hpp"
 #include "SimpleWntCellCycleModel.hpp"
 #include "SloughingCellKiller.hpp"
@@ -113,6 +114,10 @@ public:
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
+
+        // ...and with that the target area growth modifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         // Add a cell killer
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));

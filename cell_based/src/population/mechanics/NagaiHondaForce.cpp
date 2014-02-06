@@ -39,10 +39,9 @@ template<unsigned DIM>
 NagaiHondaForce<DIM>::NagaiHondaForce()
    : AbstractForce<DIM>(),
      mNagaiHondaDeformationEnergyParameter(100.0), // This is 1.0 in the Nagai & Honda paper
-     mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 the Nagai & Honda paper
-     mNagaiHondaCellCellAdhesionEnergyParameter(1.0), // This is 0.01 the Nagai & Honda paper
-     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0), // This is 0.01 the Nagai & Honda paper
-     mMatureCellTargetArea(1.0)
+     mNagaiHondaMembraneSurfaceEnergyParameter(10.0), // This is 0.1 in the Nagai & Honda paper
+     mNagaiHondaCellCellAdhesionEnergyParameter(1.0), // This is 0.01 in the Nagai & Honda paper
+     mNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0) // This is 0.01 in the Nagai & Honda paper
 {
 }
 
@@ -76,7 +75,18 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         unsigned elem_index = elem_iter->GetIndex();
         element_areas[elem_index] = p_cell_population->rGetMesh().GetVolumeOfElement(elem_index);
         element_perimeters[elem_index] = p_cell_population->rGetMesh().GetSurfaceAreaOfElement(elem_index);
-        target_areas[elem_index] = GetTargetAreaOfCell(p_cell_population->GetCellUsingLocationIndex(elem_index));
+        try
+        {
+            // If we haven't specified a growth modifier, there won't be any target areas in the CellData array and CellData
+            // will throw an exception that it doesn't have "target area" entries.  We add this piece of code to give a more
+            // understandable message. There is a slight chance that the exception is thrown although the error is not about the
+            // target areas.
+            target_areas[elem_index] = p_cell_population->GetCellUsingLocationIndex(elem_index)->GetCellData()->GetItem("target area");
+        }
+        catch (Exception& e)
+        {
+            EXCEPTION("You need to add a TargetAreaGrowthModifier to the simulation in order to use NagaiHondaForce.");
+        }
     }
 
     // Iterate over vertices in the cell population
@@ -226,63 +236,6 @@ void NagaiHondaForce<DIM>::SetNagaiHondaCellBoundaryAdhesionEnergyParameter(doub
     mNagaiHondaCellBoundaryAdhesionEnergyParameter = cellBoundaryAdhesionEnergyParameter;
 }
 
-template<unsigned DIM>
-double NagaiHondaForce<DIM>::GetTargetAreaOfCell(const CellPtr pCell) const
-{
-    // Get target area A of a healthy cell in S, G2 or M phase
-    double cell_target_area = mMatureCellTargetArea;
-
-    double cell_age = pCell->GetAge();
-    double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
-
-    // If the cell is differentiated then its G1 duration is infinite
-    if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
-    {
-        // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
-        g1_duration = pCell->GetCellCycleModel()->GetTransitCellG1Duration();
-    }
-
-    if (pCell->HasCellProperty<ApoptoticCellProperty>())
-    {
-        // Age of cell when apoptosis begins
-        if (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime() < g1_duration)
-        {
-            cell_target_area *= 0.5*(1 + (pCell->GetStartOfApoptosisTime() - pCell->GetBirthTime())/g1_duration);
-        }
-
-        // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-        cell_target_area = cell_target_area - 0.5*cell_target_area/(pCell->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
-
-        // Don't allow a negative target area
-        if (cell_target_area < 0)
-        {
-            cell_target_area = 0;
-        }
-    }
-    else
-    {
-        // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
-        if (cell_age < g1_duration)
-        {
-            cell_target_area *= 0.5*(1 + cell_age/g1_duration);
-        }
-    }
-
-    return cell_target_area;
-}
-
-template<unsigned DIM>
-double NagaiHondaForce<DIM>::GetMatureCellTargetArea() const
-{
-    return mMatureCellTargetArea;
-}
-
-template<unsigned DIM>
-void NagaiHondaForce<DIM>::SetMatureCellTargetArea(double matureCellTargetArea)
-{
-    assert(matureCellTargetArea >= 0.0);
-    mMatureCellTargetArea = matureCellTargetArea;
-}
 
 template<unsigned DIM>
 void NagaiHondaForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
@@ -291,7 +244,6 @@ void NagaiHondaForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     *rParamsFile << "\t\t\t<NagaiHondaMembraneSurfaceEnergyParameter>" << mNagaiHondaMembraneSurfaceEnergyParameter << "</NagaiHondaMembraneSurfaceEnergyParameter>\n";
     *rParamsFile << "\t\t\t<NagaiHondaCellCellAdhesionEnergyParameter>" << mNagaiHondaCellCellAdhesionEnergyParameter << "</NagaiHondaCellCellAdhesionEnergyParameter>\n";
     *rParamsFile << "\t\t\t<NagaiHondaCellBoundaryAdhesionEnergyParameter>" << mNagaiHondaCellBoundaryAdhesionEnergyParameter << "</NagaiHondaCellBoundaryAdhesionEnergyParameter>\n";
-    *rParamsFile << "\t\t\t<MatureCellTargetArea>" << mMatureCellTargetArea << "</MatureCellTargetArea>\n";
 
     // Call method on direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
