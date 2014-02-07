@@ -77,6 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NagaiHondaForce.hpp"
+#include "TargetAreaGrowthModifier.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "OnLatticeSimulation.hpp"
@@ -144,6 +145,13 @@ public:
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
+
+        /* A Nagai Honda Force has to be used together with a {{{TargetAreaGrowthModifier}}}.
+         * This modifies the target area of individual cells and thus alters the relative forces
+         * between neighbouring cells.
+         */
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        simulator.AddSimulationModifier(p_growth_modifier);
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
