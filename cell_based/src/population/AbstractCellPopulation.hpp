@@ -610,8 +610,7 @@ public:
      * @return whether the population has this writer
      */
     template<template <unsigned, unsigned> class T>
-    bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
-                                                                 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
+    bool HasWriter() const
     {
         for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
              pop_writer_iter != mCellPopulationWriters.end();
@@ -622,19 +621,6 @@ public:
                 return true;
             }
         }
-        return false;
-    }
-
-    /**
-     * Get whether the population has a writer of the specified type.
-     *
-     * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
-     * @return whether the population has this writer
-     */
-    template<template <unsigned, unsigned> class T>
-    bool HasWriter(typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
-                                                                 T<ELEMENT_DIM, SPACE_DIM> >::value >::type* dummy = 0) const
-    {
         for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer = mCellWriters.begin();
              cell_writer != mCellWriters.end();
              ++cell_writer)
