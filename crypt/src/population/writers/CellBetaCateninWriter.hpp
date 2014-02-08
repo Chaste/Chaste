@@ -64,9 +64,8 @@ public:
      * Default constructor.
      */
     CellBetaCateninWriter()
-        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizbetacatenin")
     {
-        this->mFileName = "results.vizbetacatenin";
     }
 
     /**
