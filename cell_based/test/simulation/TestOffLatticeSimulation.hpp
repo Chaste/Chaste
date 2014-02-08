@@ -108,7 +108,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Output Voronoi data
-        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         // Set up simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -121,7 +121,7 @@ public:
         simulator.AddForce(p_force);
 
         // Record node velocities
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Record division locations
         TS_ASSERT_EQUALS(simulator.GetOutputDivisionLocations(), false);
@@ -182,10 +182,10 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Output Voronoi data
-        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         // Record node velocities
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Set up simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -983,8 +983,8 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         cell_population.GenerateCellResults();
 
         // Test we have the correct cell mutation state counts

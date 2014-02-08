@@ -202,7 +202,7 @@ public:
         TS_ASSERT_EQUALS(simulator.mSamplingTimestepMultiple, 2u);
 
         // Uncommenting this line calls an error in accessing nodes in the vertex elements #
-        //cell_population.AddWriter<VoronoiDataWriter>();
+        //cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         simulator.SetEndTime(0.1);
         simulator.Solve();
@@ -279,10 +279,10 @@ public:
 
         // Test Save() with a MeshBasedCellPopulationWithGhostNodes
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(*p_mesh, cells, location_indices);
-        cell_population.AddWriter<VoronoiDataWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("TestGhostNodesSpheroidSimulation3D");
@@ -304,10 +304,10 @@ public:
 
         // Test Save() with a MeshBasedCellPopulation - one cell born during this
         MeshBasedCellPopulationWithGhostNodes<3> cell_population2(*p_mesh, cells2);
-        cell_population2.AddWriter<VoronoiDataWriter>();
-        cell_population2.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population2.AddWriter<CellMutationStatesWriter>();
-        cell_population2.AddWriter<CellVolumesWriter>();
+        cell_population2.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population2.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population2.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population2.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator2(cell_population2);
         simulator2.SetOutputDirectory("TestGhostNodesSpheroidSimulation3DNoGhosts");

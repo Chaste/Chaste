@@ -235,7 +235,7 @@ public:
         location_indices.push_back(17);
 
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
-        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
         cell_population.GenerateCellResults();
 
         // Create an output directory for the writer
@@ -312,9 +312,9 @@ public:
 
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         cell_population.GenerateCellResults();
 
@@ -711,12 +711,12 @@ public:
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
         // Create a writer and test that it is correctly added to the cell population
-        cell_population.AddWriter<CellPopulationElementWriter>();
+        cell_population.AddPopulationWriter<CellPopulationElementWriter>();
 
         ///\todo test something here (#2404, #2441)
 
         // Create another writer and test that it is correctly added to the cell population
-        cell_population.AddWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellIdWriter>();
 
         ///\todo test something here (#2404, #2441)
 

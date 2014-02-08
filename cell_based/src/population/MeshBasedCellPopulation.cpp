@@ -507,7 +507,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std
     {
         if (!this-> template HasWriter<CellPopulationElementWriter>())
         {
-            this-> template AddWriter<CellPopulationElementWriter>();
+            this-> template AddPopulationWriter<CellPopulationElementWriter>();
         }
     }
 

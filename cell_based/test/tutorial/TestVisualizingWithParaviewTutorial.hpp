@@ -141,7 +141,7 @@ public:
         /* In order to output the .vtu files required for Paraview, we explicitly
          * instruct the simulation to output the data we need.
          */
-        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory and end time. */

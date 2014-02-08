@@ -115,7 +115,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.AddWriter<CellProliferativeTypesCountWriter>();
+        crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
@@ -185,8 +185,8 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.AddWriter<VoronoiDataWriter>();
-        crypt.AddWriter<CellProliferativeTypesCountWriter>();
+        crypt.AddPopulationWriter<VoronoiDataWriter>();
+        crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
 
         // Set the first cell to be logged
         crypt.Begin()->SetLogged();

@@ -818,16 +818,16 @@ public:
             }
         }
 
-        cell_population.AddWriter<VertexT1SwapLocationsWriter>();
-        cell_population.AddWriter<VertexT3SwapLocationsWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddPopulationWriter<VertexT1SwapLocationsWriter>();
+        cell_population.AddPopulationWriter<VertexT3SwapLocationsWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
 
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
-        cell_population.AddWriter<CellAncestorWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();

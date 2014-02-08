@@ -405,7 +405,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple, and end time. */

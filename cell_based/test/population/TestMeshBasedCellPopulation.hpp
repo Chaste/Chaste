@@ -515,7 +515,7 @@ public:
         }
 
         // Specify node velocities to be output, and set non-zero applied forces on some nodes
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         c_vector<double, 2> applied_force_on_node_0;
         applied_force_on_node_0[0] = 4.5;
@@ -827,8 +827,8 @@ public:
         // Test set/get methods
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
 
-        cell_population.AddWriter<VoronoiDataWriter>();
-        cell_population.AddWriter<CellIdWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
         cell_population.SetOutputMeshInVtk(true);
 
@@ -847,16 +847,16 @@ public:
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
 
-        cell_population.AddWriter<CellPopulationAreaWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -957,17 +957,17 @@ public:
         }
 
         // Test set methods
-        cell_population.AddWriter<VoronoiDataWriter>();
-        cell_population.AddWriter<CellPopulationAreaWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();

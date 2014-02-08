@@ -913,35 +913,35 @@ public:
         node_based_cell_population.Update(); // so cell neighbours are calculated
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellMutationStatesWriter>());
-        node_based_cell_population.AddWriter<CellMutationStatesWriter>();
+        node_based_cell_population.AddPopulationWriter<CellMutationStatesWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellMutationStatesWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellIdWriter>());
-        node_based_cell_population.AddWriter<CellIdWriter>();
+        node_based_cell_population.AddCellWriter<CellIdWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellIdWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativeTypesCountWriter>());
-        node_based_cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativeTypesCountWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativePhasesCountWriter>());
-        node_based_cell_population.AddWriter<CellProliferativePhasesCountWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativePhasesCountWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativePhasesWriter>());
-        node_based_cell_population.AddWriter<CellProliferativePhasesWriter>();
+        node_based_cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativePhasesWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellAgesWriter>());
-        node_based_cell_population.AddWriter<CellAgesWriter>();
+        node_based_cell_population.AddCellWriter<CellAgesWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellAgesWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellVolumesWriter>());
-        node_based_cell_population.AddWriter<CellVolumesWriter>();
+        node_based_cell_population.AddCellWriter<CellVolumesWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellVolumesWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellAncestorWriter>());
-        node_based_cell_population.AddWriter<CellAncestorWriter>();
+        node_based_cell_population.AddCellWriter<CellAncestorWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellAncestorWriter>());
 
 
@@ -1026,7 +1026,7 @@ public:
         node_based_cell_population.rGetMesh().GetNode(0)->SetRadius(0.6); // Default is 0.5
         node_based_cell_population.Update(); // To recalculate cell neighbours
 
-        node_based_cell_population.AddWriter<CellIdWriter>();
+        node_based_cell_population.AddCellWriter<CellIdWriter>();
 
         // Coverage of writing CellData to VTK
         for (AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
@@ -1041,13 +1041,13 @@ public:
         std::string output_directory = "TestNodeBasedCellPopulationWriters2d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        node_based_cell_population.AddWriter<CellMutationStatesWriter>();
-        node_based_cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        node_based_cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        node_based_cell_population.AddWriter<CellProliferativePhasesWriter>();
-        node_based_cell_population.AddWriter<CellAgesWriter>();
-        node_based_cell_population.AddWriter<CellVolumesWriter>();
-        node_based_cell_population.AddWriter<CellAncestorWriter>();
+        node_based_cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        node_based_cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        node_based_cell_population.AddCellWriter<CellAgesWriter>();
+        node_based_cell_population.AddCellWriter<CellVolumesWriter>();
+        node_based_cell_population.AddCellWriter<CellAncestorWriter>();
 
         node_based_cell_population.SetCellAncestorsToLocationIndices();
 
@@ -1130,15 +1130,15 @@ public:
         std::string output_directory = "TestNodeBasedCellPopulationWriters3d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        cell_population.AddWriter<CellVolumesWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
 
         cell_population.OpenWritersFiles(output_directory);
         cell_population.WriteResultsToFiles(output_directory);
@@ -1201,8 +1201,8 @@ public:
         std::string output_directory = "TestWritingCellCyclePhases";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        node_based_cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        node_based_cell_population.AddWriter<CellProliferativePhasesWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        node_based_cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         node_based_cell_population.OpenWritersFiles(output_directory);
         node_based_cell_population.WriteResultsToFiles(output_directory);

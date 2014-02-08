@@ -439,14 +439,14 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
-        cell_population.AddWriter<CellAncestorWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellVariablesWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddCellWriter<CellVariablesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
         cell_population.SetNumSweepsPerTimestep(5);
 
         TS_ASSERT_EQUALS(cell_population.GetNumSweepsPerTimestep(), 5u);

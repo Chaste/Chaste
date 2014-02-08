@@ -135,13 +135,13 @@ public:
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
-        cell_population.AddWriter<CellVariablesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddCellWriter<CellVariablesWriter>();
 
         /* We randomly label some cells using the cell property {{{CellLabel}}}. We begin by creating a shared pointer to
          * this cell property using the helper singleton {{{CellPropertyRegistry}}}. We then loop over the cells and label

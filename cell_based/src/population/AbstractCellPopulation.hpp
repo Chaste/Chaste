@@ -582,9 +582,7 @@ public:
      * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
-    typename boost::enable_if_c<boost::is_base_of<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>,
-                                                  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
-    AddWriter()
+    void AddPopulationWriter()
     {
         mCellPopulationWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
@@ -596,9 +594,7 @@ public:
      * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
-    typename boost::enable_if_c<boost::is_base_of<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>,
-                                                  T<ELEMENT_DIM, SPACE_DIM> >::value>::type
-    AddWriter()
+    void AddCellWriter()
     {
         mCellWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }

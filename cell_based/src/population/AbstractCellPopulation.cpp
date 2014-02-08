@@ -49,9 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
 
+#include <boost/bind.hpp>
+#include <boost/mem_fn.hpp>
+
 #include <algorithm>
 #include <functional>
-#include <boost/bind.hpp>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -180,7 +182,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMut
 {
     if (!HasWriter<CellMutationStatesWriter>())
     {
-        EXCEPTION("Call AddWriter<CellMutationStatesWriter>() before using this function");
+        EXCEPTION("Call AddPopulationWriter<CellMutationStatesWriter>() before using this function");
     }
     return mCellMutationStateCount;
 }
@@ -190,7 +192,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
 {
     if (!HasWriter<CellProliferativeTypesCountWriter>())
     {
-        EXCEPTION("Call AddWriter<CellProliferativeTypesCountWriter>() before using this function");
+        EXCEPTION("Call AddPopulationWriter<CellProliferativeTypesCountWriter>() before using this function");
     }
     return mCellProliferativeTypesCount;
 }
@@ -200,7 +202,7 @@ const std::vector<unsigned>& AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGe
 {
     if (!HasWriter<CellProliferativePhasesCountWriter>())
     {
-        EXCEPTION("Call AddWriter<CellProliferativePhasesCountWriter>() before using this function");
+        EXCEPTION("Call AddPopulationWriter<CellProliferativePhasesCountWriter>() before using this function");
     }
     return mCellCyclePhaseCount;
 }
@@ -358,20 +360,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 {
-    ///\todo (#2441) employ std::for_each here
-    for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
-         pop_writer_iter != mCellPopulationWriters.end();
-         ++pop_writer_iter)
-    {
-        (*pop_writer_iter)->CloseFile();
-    }
+    typedef AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> writer_t;
 
-    for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
-         cell_writer_iter != mCellWriters.end();
-         ++cell_writer_iter)
-    {
-        (*cell_writer_iter)->CloseFile();
-    }
+    std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::CloseFile, _1));
+    std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::CloseFile, _1));
 
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
@@ -395,15 +387,15 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std:
     {
         if (!HasWriter<NodeLocationWriter>())
         {
-            AddWriter<NodeLocationWriter>();
+            AddPopulationWriter<NodeLocationWriter>();
         }
         if (!HasWriter<BoundaryNodeWriter>())
         {
-            AddWriter<BoundaryNodeWriter>();
+            AddPopulationWriter<BoundaryNodeWriter>();
         }
         if (!HasWriter<CellProliferativeTypesWriter>())
         {
-            AddWriter<CellProliferativeTypesWriter>();
+            AddCellWriter<CellProliferativeTypesWriter>();
         }
     }
 
@@ -427,7 +419,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std:
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFilesForAppend(const std::string& rDirectory)
 {
-    ///\todo (#2441) employ std::for_each here
     for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
          pop_writer_iter != mCellPopulationWriters.end();
          ++pop_writer_iter)
@@ -435,7 +426,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFilesForAppend(c
         (*pop_writer_iter)->OpenOutputFileForAppend(rDirectory);
     }
 
-    ///\todo (#2441) employ std::for_each here
     for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
          cell_writer_iter != mCellWriters.end();
          ++cell_writer_iter)
@@ -467,8 +457,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
               std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
             }
 
-            ///\todo (#2441) Make the writers accept shared_ptr instead of references
-            ///\todo (#2441) employ std::for_each here
             for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
                  pop_writer_iter != mCellPopulationWriters.end();
                  ++pop_writer_iter)
@@ -488,17 +476,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                 }
             }
 
-//            std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), &(this->AcceptPopulationWriter));
-//            std::for_each(mCellWriters.begin(), mCellWriters.end(), &AcceptCellWriter);
-
             // The top-most process adds a newline
             if (PetscTools::AmTopMost())
             {
               std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
               std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
             }
-//            std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::Close, _1));
-//            std::for_each(mCellPopulationWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::Close, _1));
         }
         PetscTools::EndRoundRobin();
     }

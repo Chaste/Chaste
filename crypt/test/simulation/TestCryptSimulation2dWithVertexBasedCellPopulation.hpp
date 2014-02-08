@@ -865,7 +865,7 @@ public:
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set crypt to output cell types and cell ancestors
-        crypt.AddWriter<CellAncestorWriter>();
+        crypt.AddCellWriter<CellAncestorWriter>();
 
         // Create an instance of a Wnt concentration
         WntConcentration<2>::Instance()->SetType(LINEAR);

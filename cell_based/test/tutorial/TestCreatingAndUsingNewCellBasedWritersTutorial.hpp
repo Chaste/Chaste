@@ -289,8 +289,8 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         /* In order to write cell motility data using our writer, we must add it to the list of writers
-         * used by the population, which is done using the templated `AddWriter` method.*/
-        cell_population.AddWriter<CellMotilityWriter>();
+         * used by the population, which is done using the templated `AddCellWriter` method.*/
+        cell_population.AddCellWriter<CellMotilityWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple, and end time. */

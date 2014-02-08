@@ -442,7 +442,7 @@ void MultipleCaBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDi
     {
         if (!this-> template HasWriter<CellLocationWriter>())
         {
-            this-> template AddWriter<CellLocationWriter>();
+            this-> template AddCellWriter<CellLocationWriter>();
         }
     }
 

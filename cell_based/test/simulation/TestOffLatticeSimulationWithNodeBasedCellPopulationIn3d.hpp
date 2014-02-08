@@ -98,8 +98,8 @@ public:
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
 
         // Set output options
-        node_based_cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        node_based_cell_population.AddWriter<NodeVelocityWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        node_based_cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(node_based_cell_population);
@@ -161,7 +161,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
         NodeBasedCellPopulation<3> node_based_cell_population(mesh, cells);
-        node_based_cell_population.AddWriter<CellProliferativeTypesCountWriter>();
+        node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(node_based_cell_population);

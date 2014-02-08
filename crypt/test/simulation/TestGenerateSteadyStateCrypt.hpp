@@ -98,7 +98,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices, false, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
 
         // Set cell population to output cell types
-        crypt.AddWriter<CellMutationStatesWriter>();
+        crypt.AddPopulationWriter<CellMutationStatesWriter>();
 
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetWntConcentrationParameter(1.0/3.0);

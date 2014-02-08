@@ -644,16 +644,16 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithParticles-3");
 
         // Test writer methods
-        cell_population.AddWriter<CellVolumesWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
 
-        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
 
         std::string output_directory = "TestCellPopulationWritersIn3dWithParticles";
         OutputFileHandler output_file_handler(output_directory, false);

@@ -475,7 +475,7 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -533,7 +533,7 @@ public:
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);

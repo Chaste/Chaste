@@ -202,8 +202,8 @@ public:
         TS_ASSERT_EQUALS(real_node_indices.size(), cells.size());
 
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(mesh, cells, real_node_indices);
-        cell_population.AddWriter<VoronoiDataWriter>();
-        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
 
         TS_ASSERT_EQUALS(ghost_node_indices.size(), cell_population.GetGhostNodeIndices().size());
 

@@ -522,7 +522,7 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirect
     {
         if (!this-> template HasWriter<CellPopulationElementWriter>())
         {
-            this-> template AddWriter<CellPopulationElementWriter>();
+            this-> template AddPopulationWriter<CellPopulationElementWriter>();
         }
     }
 
@@ -530,11 +530,11 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirect
     {
         if (!this-> template HasWriter<VertexT1SwapLocationsWriter>())
         {
-            this-> template AddWriter<VertexT1SwapLocationsWriter>();
+            this-> template AddPopulationWriter<VertexT1SwapLocationsWriter>();
         }
         if (!this-> template HasWriter<VertexT3SwapLocationsWriter>())
         {
-            this-> template AddWriter<VertexT3SwapLocationsWriter>();
+            this-> template AddPopulationWriter<VertexT3SwapLocationsWriter>();
         }
     }
 

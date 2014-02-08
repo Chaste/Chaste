@@ -171,7 +171,7 @@ public:
 
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
-        node_based_cell_population.AddWriter<CellVolumesWriter>();
+        node_based_cell_population.AddCellWriter<CellVolumesWriter>();
         node_based_cell_population.Update();
 
         // Set up cell-based simulation
@@ -240,7 +240,7 @@ public:
         // Create a node-based cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
         node_based_cell_population.SetUseVariableRadii(true);
-        node_based_cell_population.AddWriter<CellVolumesWriter>();
+        node_based_cell_population.AddCellWriter<CellVolumesWriter>();
         node_based_cell_population.Update();
 
         // Set up cell-based simulation

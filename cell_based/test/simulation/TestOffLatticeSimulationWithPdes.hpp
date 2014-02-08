@@ -255,7 +255,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -361,7 +361,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -442,7 +442,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -528,7 +528,7 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);

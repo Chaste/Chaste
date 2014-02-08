@@ -99,7 +99,7 @@ public:
             StochasticWntCellCycleModel ccm;
             SloughingCellKiller<2> killer(&crypt, 1.0);
             GeneralisedLinearSpringForce<2> force;
-            crypt.AddWriter<CellMutationStatesWriter>();
+            crypt.AddPopulationWriter<CellMutationStatesWriter>();
         }
 
         // Directory in which the stored results were archived

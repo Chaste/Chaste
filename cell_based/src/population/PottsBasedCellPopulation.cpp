@@ -339,7 +339,7 @@ void PottsBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirecto
     {
         if (!this-> template HasWriter<CellPopulationElementWriter>())
         {
-            this-> template AddWriter<CellPopulationElementWriter>();
+            this-> template AddPopulationWriter<CellPopulationElementWriter>();
         }
     }
 

@@ -108,7 +108,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create an instance of a Wnt concentration
         WntConcentration<2>::Instance()->SetType(LINEAR);
@@ -161,7 +161,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellVolumesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);

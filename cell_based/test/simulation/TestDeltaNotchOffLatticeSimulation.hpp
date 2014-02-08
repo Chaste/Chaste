@@ -114,7 +114,7 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -207,7 +207,7 @@ public:
 
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Set up the simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -306,7 +306,7 @@ public:
 
         // Create the cell population
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Set up the simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -371,7 +371,7 @@ public:
 
         // Create cell-based population object
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -427,7 +427,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -487,7 +487,7 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<NodeVelocityWriter>();
+        cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);

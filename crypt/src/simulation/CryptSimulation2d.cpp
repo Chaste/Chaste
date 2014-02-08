@@ -174,7 +174,7 @@ void CryptSimulation2d::SetupSolve()
      */
     if (dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(this->mrCellPopulation.Begin()->GetCellCycleModel()))
     {
-        mrCellPopulation.AddWriter<CellBetaCateninWriter>();
+        mrCellPopulation.AddCellWriter<CellBetaCateninWriter>();
     }
 
     if (dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(mrCellPopulation.Begin()->GetCellCycleModel()))

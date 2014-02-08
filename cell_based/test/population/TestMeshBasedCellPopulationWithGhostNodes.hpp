@@ -829,17 +829,17 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulationWithGhostNodes-3");
 
         // Test set methods
-        cell_population.AddWriter<VoronoiDataWriter>();
-        cell_population.AddWriter<CellPopulationAreaWriter>();
-        cell_population.AddWriter<CellVolumesWriter>();
-        cell_population.AddWriter<CellMutationStatesWriter>();
-        cell_population.AddWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellAncestorWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
@@ -961,7 +961,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(mesh, cells, location_indices);
-        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();
@@ -1022,7 +1022,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(mesh, cells, location_indices);
-        cell_population.AddWriter<VoronoiDataWriter>();
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         // Create Voronoi tessellation
         cell_population.CreateVoronoiTessellation();

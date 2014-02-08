@@ -114,11 +114,11 @@ public:
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddWriter<CellPopulationAreaWriter>();
-        cell_population.AddWriter<CellVariablesWriter>();
-        cell_population.AddWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddWriter<CellProliferativePhasesWriter>();
-        cell_population.AddWriter<CellAgesWriter>();
+        cell_population.AddPopulationWriter<CellPopulationAreaWriter>();
+        cell_population.AddCellWriter<CellVariablesWriter>();
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellAgesWriter>();
 
         // Set up Wnt Gradient
         WntConcentration<2>::Instance()->SetType(LINEAR);
