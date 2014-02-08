@@ -73,10 +73,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-/* TODO The next header defines a base class for cell properties. Our new
+/* The next header defines a base class for cell properties. Our new
  * cell property will inherit from this abstract class. */
 #include "AbstractCellProperty.hpp"
-/* TODO The remaining header files define classes that will be used in the cell-based
+/* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based
  * Chaste tutorials. */
 #include "AbstractForce.hpp"
@@ -126,7 +126,10 @@ public:
  *
  * == Defining a cell writer class ==
  *
- * TODO: document class and methods
+ * We define a class that writes information about each cell in the population, using
+ * the public methods of the population class. We inherit from the base class, {{{AbstractCellWriter}}},
+ * which encapsulates how files are written. To specify how this writer should act on each cell we implement
+ * the `VisitCell` method.
  *
  * Note that usually this code would be separated out into a declaration in a .hpp file and
  * definition in a .cpp file.
@@ -137,6 +140,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellMotilityWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+    /*
+     * The serialize method defines how a cell writer object itself can be written to file.
+     * In almost all cases it should just call the base class serializer, using the code below.
+     * If the new cell writer class has any data members, they should be serialized in this method.
+     */
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -146,11 +154,24 @@ private:
 
 public:
 
+    /*
+     * The constructor method calls the base class constructor, with the name of the output file as
+     * a parameter. In this case the filename written to will be "cellmotilityresults.dat".
+     */
     CellMotilityWriter()
         : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellmotilityresults.dat")
     {
     }
 
+    /*
+     * The implmenetation of the VisitCell method defines what data this writer commits to the file.
+     * Data can be streamed into the member variable mpOutputStream using the << operator.
+     * In this example, for each cell `pCell` in the population `pCellPopulation`, we first write its
+     * location index, followed by a space, followed by its location co-ordinated (space separated)
+     * followed by a 0 or 1 indicating whether the cell has the motile property.
+     * The base class handles writing the timestamp and newline for each simulation timestep, so we 
+     * don't need to worry about that.
+     */
     void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
     {
         *this->mpOutStream << pCellPopulation->GetLocationIndexUsingCell(pCell) << " ";
@@ -165,10 +186,9 @@ public:
     }
 };
 
-/* TODO: sort out comments
- *
+/* 
  * As mentioned in previous cell-based Chaste tutorials, we need to include the next block
- * of code to be able to archive the cell property and force objects in a cell-based simulation,
+ * of code to be able to archive the cell property and writer objects in a cell-based simulation,
  * and to obtain a unique identifier for our new classes for when writing results to file.
  *
  * Identifiers for both classes are defined together here, since we can only have each #include once
@@ -183,9 +203,9 @@ CHASTE_CLASS_EXPORT(MotileCellProperty)
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMotilityWriter)
 
 /*
- * TODO: This completes the code for {{{CellMotilityWriter}}}. Note that usually this code
- * would be separated out into a separate declaration in a .hpp file and definition
- * in a .cpp file.
+ * TODO: This completes the code for {{{MotileCellProperty and  {{{CellMotilityWriter}}}. 
+ * Note that usually this code would be separated out into a separate declaration in a .hpp 
+ * file and definition in a .cpp file.
  *
  * EMPTYLINE
  *
@@ -200,8 +220,8 @@ public:
     /*
      * === Using the cell-based writers in a cell-based simulation ===
      *
-     * We conclude with a brief test demonstrating how {{{MotileCellProperty}}} can be used
-     * in a cell-based simulation.
+     * We conclude with a brief test demonstrating how {{{MotileCellProperty}}} and {{{CellMotilityWriter}}}
+     * can be used in a cell-based simulation.
      */
     void TestOffLatticeSimulationWithMotileCellPropertyAndWriters() throw(Exception)
     {
@@ -267,7 +287,8 @@ public:
          * takes in the mesh and the cells vector. */
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        /* TODO: update comments...In order to visualize labelled cells we need to use the following command.*/
+        /* In order to write cell motility data using our writer, we must add it to the list of writers
+         * used by the population, which is done using the templated `AddWriter` method.*/
         cell_population.AddWriter<CellMotilityWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
