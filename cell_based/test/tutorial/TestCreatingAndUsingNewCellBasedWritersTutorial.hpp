@@ -164,10 +164,11 @@ public:
     }
 
     /*
-     * The implmenetation of the VisitCell method defines what data this writer commits to the file.
-     * Data can be streamed into the member variable mpOutputStream using the << operator.
+     * The implmenetation of the `VisitCell` method defines the data this writer commits to the file.
+     * Data can be streamed into the member variable mpOutputStream using the << operator. This data is
+     * the written to file.
      * In this example, for each cell `pCell` in the population `pCellPopulation`, we first write its
-     * location index, followed by a space, followed by its location co-ordinated (space separated)
+     * location index, followed by a space, followed by its location co-ordinates (space separated)
      * followed by a 0 or 1 indicating whether the cell has the motile property.
      * The base class handles writing the timestamp and newline for each simulation timestep, so we 
      * don't need to worry about that.
