@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter()
+AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellBasedWriter(const std::string &rFileName)
+    : mFileName(rFileName)
 {
 }
 

@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::NodeLocationWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("results.viznodes")
 {
-    this->mFileName = "results.viznodes";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

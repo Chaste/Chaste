@@ -38,9 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::CellAgesWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellages.dat")
 {
-    this->mFileName = "cellages.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

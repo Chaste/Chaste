@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesCountWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("cellcyclephases.dat")
 {
-    this->mFileName = "cellcyclephases.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -44,9 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexT1SwapLocationsWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("T1SwapLocations.dat")
 {
-    this->mFileName = "T1SwapLocations.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::BoundaryNodeWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("results.vizboundarynodes")
 {
-    this->mFileName = "results.vizboundarynodes";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

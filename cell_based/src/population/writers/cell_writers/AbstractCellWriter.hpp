@@ -69,8 +69,9 @@ public:
 
     /**
      * Default constructor.
+     * @param rFileName the name of the file to write to.
      */
-    AbstractCellWriter();
+    AbstractCellWriter(const std::string &rFileName);
 
     /**
      * Visit a cell and write its data.

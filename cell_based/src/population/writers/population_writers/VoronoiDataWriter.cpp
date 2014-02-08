@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("voronoi.dat")
 {
-    this->mFileName = "voronoi.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

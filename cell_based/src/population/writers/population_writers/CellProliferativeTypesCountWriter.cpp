@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesCountWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("celltypes.dat")
 {
-    this->mFileName = "celltypes.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

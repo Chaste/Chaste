@@ -38,9 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::CellLocationWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizlocations")
 {
-    this->mFileName = "results.vizlocations";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

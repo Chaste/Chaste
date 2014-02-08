@@ -147,9 +147,8 @@ private:
 public:
 
     CellMotilityWriter()
-        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+        : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellmotilityresults.dat")
     {
-        this->mFileName = "cellmotilityresults.dat";
     }
 
     void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)

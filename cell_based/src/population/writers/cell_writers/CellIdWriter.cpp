@@ -38,9 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellIdWriter<ELEMENT_DIM, SPACE_DIM>::CellIdWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("loggedcell.dat")
 {
-    this->mFileName = "loggedcell.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

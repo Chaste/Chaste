@@ -74,9 +74,10 @@ protected:
 public:
 
     /**
-     * Default constructor.
+     * Constructor.
+     * @param rFileName the name of the file to write to.
      */
-    AbstractCellBasedWriter();
+    AbstractCellBasedWriter(const std::string &rFileName);
 
     /**
      * Virtual destructor.

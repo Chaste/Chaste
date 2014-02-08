@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPopulationAreaWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationAreaWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("cellpopulationareas.dat")
 {
-    this->mFileName = "cellpopulationareas.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

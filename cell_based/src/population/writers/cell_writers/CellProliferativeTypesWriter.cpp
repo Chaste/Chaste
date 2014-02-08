@@ -38,9 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativeTypesWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizcelltypes")
 {
-    this->mFileName = "results.vizcelltypes";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

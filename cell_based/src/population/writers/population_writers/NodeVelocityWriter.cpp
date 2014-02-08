@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::NodeVelocityWriter()
-    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>()
+    : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("nodevelocities.dat")
 {
-    this->mFileName = "nodevelocities.dat";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
