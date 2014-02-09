@@ -115,7 +115,7 @@ public:
 
     /**
      * Write one timestep of output data to the primary results file.
-     * Adds the extracellular potential to the results.
+     * Adds the voltage to the results.
      *
      * @param time  the current time
      * @param voltageVec  the solution vector to write

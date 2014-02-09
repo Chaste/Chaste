@@ -125,7 +125,8 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     }
     catch (const Exception& e)
     {
-        // This catch statement is quite tricky to cover, but it is actually done in TestCardiacSimulation::TestMono1dSodiumBlockBySettingNamedParameter
+        // This catch statement is quite tricky to cover, but it is actually done
+        // in TestCardiacSimulation::TestMono1dSodiumBlockBySettingNamedParameter()
 
         // Errors thrown creating cells will often be process-specific
         PetscTools::ReplicateException(true);
