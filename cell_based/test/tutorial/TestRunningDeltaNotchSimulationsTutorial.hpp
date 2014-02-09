@@ -135,7 +135,7 @@ public:
      */
     void TestVertexBasedMonolayerWithDeltaNotch() throw (Exception)
     {
-        /** We include the next line because Vertex simulations cannot be run in parallel */
+        /* We include the next line because Vertex simulations cannot be run in parallel */
         EXIT_IF_PARALLEL;
 
         /* First we create a regular vertex mesh. */
@@ -230,7 +230,7 @@ public:
      */
     void TestNodeBasedMonolayerWithDeltaNotch() throw (Exception)
     {
-        /** We include the next line because HoneycombMeshGenerator, used in this test, is not
+        /* We include the next line because HoneycombMeshGenerator, used in this test, is not
          *  yet implemented in parallel. */
         EXIT_IF_PARALLEL;
 

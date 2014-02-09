@@ -342,7 +342,7 @@ public:
      */
     void TestOffLatticeSimulationWithMotileCellProperty() throw(Exception)
     {
-        /** We include the next line because HoneycombMeshGenerator, used in this test, is not
+        /* We include the next line because HoneycombMeshGenerator, used in this test, is not
          *  yet implemented in parallel. */
         EXIT_IF_PARALLEL;
 
@@ -426,13 +426,13 @@ public:
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0}}}
-     *
-     * you should see a collection of cells with the cell property (labelled dark blue) moving towards the origin.     *
-     */
 };
+/*
+ * When you visualize the results with
+ *
+ * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0}}}
+ *
+ * you should see a collection of cells with the {{{MotileCellProperty}}} (labelled dark blue) moving towards the origin.
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLPROPERTYTUTORIAL_HPP_*/

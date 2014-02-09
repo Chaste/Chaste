@@ -146,7 +146,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* A Nagai Honda Force has to be used together with a {{{TargetAreaGrowthModifier}}}.
+        /* A {{{NagaiHondaForce}}} has to be used together with a {{{TargetAreaGrowthModifier}}}.
          * This modifies the target area of individual cells and thus alters the relative forces
          * between neighbouring cells.
          */

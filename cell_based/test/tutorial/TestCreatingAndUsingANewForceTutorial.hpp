@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * In previous cell-based Chaste tutorial, we used existing force classes to define
+ * In previous cell-based Chaste tutorials, we used existing force classes to define
  * how cells interact mechanically. In this tutorial we show
  * how to create a new force class, and how this can be used in a cell-based
  * simulation.
