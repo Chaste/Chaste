@@ -83,7 +83,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             // target areas.
             target_areas[elem_index] = p_cell_population->GetCellUsingLocationIndex(elem_index)->GetCellData()->GetItem("target area");
         }
-        catch (Exception& e)
+        catch (Exception&)
         {
             EXCEPTION("You need to add a TargetAreaGrowthModifier to the simulation in order to use NagaiHondaForce.");
         }
