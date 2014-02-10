@@ -81,7 +81,9 @@ class TestSingleCellTutorial : public CxxTest::TestSuite
 public:
     void TestShannonSimulation() throw(Exception)
     {
-/* Make sure this code is only run if CVODE is installed/enabled on the computer */
+/* CVODE is still an optional Chaste dependency, but it is highly recommended for
+ * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled
+ * (see InstallCvode and ChasteGuides/HostconfigSystem). */
 #ifdef CHASTE_CVODE
         /*
          * == Defining a CVODE model ==
@@ -212,8 +214,7 @@ public:
         /*
          * == Getting detail for paces of interest ==
          *
-         * Now we solve for the number of paces we are interested in
-         * max_timestep and sampling time step should generally be the same for CVODE cells.
+         * Now we solve for the number of paces we are interested in.
          *
          * The absolute values of start time and end time are typically only relevant for the stimulus, in general
          * nothing else on the right-hand side of the equations uses time directly.
@@ -260,8 +261,10 @@ public:
         TS_ASSERT_DELTA(apd, 212.41, 1e-2);
         TS_ASSERT_DELTA(upstroke_velocity, 339.8, 1.0);
 
+        /* CVODE is still an optional dependency for Chaste.
+         * If CVODE is not installed this tutorial will
+         * not do anything, but we can at least alert the user to this.*/
 #else
-        /* CVODE is not enabled or installed.*/
         std::cout << "Cvode is not enabled.\n";
 #endif
     }
