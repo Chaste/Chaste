@@ -53,6 +53,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "NagaiHondaForce.hpp"
+//This test is only run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestTargetAreaGrowthModifier : public AbstractCellBasedTestSuite
 {
