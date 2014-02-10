@@ -1167,64 +1167,75 @@ void Hdf5DataWriter::SetFixedChunkSize(const unsigned& rTimestepsPerChunk,
     mFixedChunkSize[2] = rVariablesPerChunk;
 }
 
+hsize_t Hdf5DataWriter::CalculateNumberOfChunks()
+{
+    // Number of chunks for istore_k optimisation
+    hsize_t num_chunks = 1;
+    for (unsigned i=0; i<DATASET_DIMS; ++i)
+    {
+        num_chunks *= ceil( static_cast<double>(mDatasetDims[i]) / mChunkSize[i] );
+    }
+    return num_chunks;
+}
+
 void Hdf5DataWriter::SetChunkSize()
 {
     /*
      * The size in each dimension is increased in step until the size of
      * the chunk exceeds a limit, or we end up with one big chunk...
+     *
+     * Also make sure we don't have too many chunks. Over 75 K makes the
+     * H5Pset_istore_k optimisation above very detrimental to performance
+     * according to "Notes from 31 July 2013" at:
+     * http://confluence.diamond.ac.uk/display/Europroj/Ulrik+Pederson+-+Excalibur+Notes
      */
-    const unsigned recommended_max_number_chunks = 75000; // See note below and link to confluence website
+    const unsigned recommended_max_number_chunks = 75000;
     if (mUseOptimalChunkSizeAlgorithm)
     {
-        // The line below initially shoots for > 128 K chunks, which seems
-        // to be a good compromise. For large problems, performance usually
-        // improves with increased chunk size, so the user may wish to
-        // increase this to 1 M (or more) chunks. The chunk cache is set to
-        // 128 M by default which should be plenty.
-        unsigned target_size_bytes = 1024*1024/8;
-        // Also make sure we don't have too many chunks. Over 75 K makes the
-        // H5Pset_istore_k optimisation above very detrimental to performance
-        // according to "Notes from 31 July 2013" at:
-        // http://confluence.diamond.ac.uk/display/Europroj/Ulrik+Pederson+-+Excalibur+Notes
-        mNumberOfChunks = UINT_MAX;
-        while ( mNumberOfChunks > recommended_max_number_chunks )
-        {
-            unsigned target_size = 0;
-            long unsigned divisors[DATASET_DIMS];
-            unsigned chunk_size_bytes = 0;
+        /*
+         * The line below initially shoots for (at least) 128 K chunks, which
+         * seems to be a good compromise. For large problems, performance usually
+         * improves with increased chunk size, so the user may wish to
+         * increase this to 1 M (or more) chunks. The chunk cache is set to
+         * 128 M by default which should be plenty.
+         */
+        unsigned target_size_bytes = 1024*1024/8; // 128 K
+        hsize_t target_size = 1; // Size of chunk (in entries) for all dims
+        hsize_t divisors[DATASET_DIMS];
+        hsize_t chunk_size_in_bytes;
 
-            while ( chunk_size_bytes < target_size_bytes )
+        // While we have too many chunks, make target_size_bytes larger
+        do
+        {
+            // While the chunks are too small, make mChunkSize[i]s larger
+            do
             {
-                target_size++;
-                chunk_size_bytes = 8u;
-                bool all_ones = true;
+                chunk_size_in_bytes = 8u; // 8 bytes/double
+                bool all_one_chunk = true;
                 for (unsigned i=0; i<DATASET_DIMS; ++i)
                 {
-                    divisors[i] = ceil(double(mDatasetDims[i])/target_size);
-                    mChunkSize[i] = ceil(double(mDatasetDims[i])/divisors[i]);
-                    chunk_size_bytes *= mChunkSize[i];
-                    all_ones = all_ones && divisors[i]==1u;
+                    divisors[i] = ceil( static_cast<double>(mDatasetDims[i]) / target_size );
+                    mChunkSize[i] = ceil( static_cast<double>(mDatasetDims[i]) / divisors[i] );
+                    chunk_size_in_bytes *= mChunkSize[i];
+                    all_one_chunk = all_one_chunk && divisors[i]==1u;
                 }
                 // Check if all divisors==1, which means we have one big chunk
-                if (all_ones)
+                if (all_one_chunk)
                 {
                     break;
                 }
+                target_size++; // Increase target size for next iteration
+            } while ( chunk_size_in_bytes < target_size_bytes );
 
-            }
-            // Number of chunks for istore_k optimsation
-            mNumberOfChunks = 1;
-            for (unsigned i=0; i<DATASET_DIMS; ++i)
-            {
-                mNumberOfChunks *= ceil(double(mDatasetDims[i])/mChunkSize[i]);
-            }
+            mNumberOfChunks = CalculateNumberOfChunks();
+
             target_size_bytes *= 2; // Increase target size for next iteration
-        }
+
+        } while ( mNumberOfChunks > recommended_max_number_chunks );
     }
     /*
-     * ... unless the user has set chunk dimensions explicitly, in which
-     * case use those.  The user is given a warning if the number of chunks
-     * is likely to cause a problem.
+     * ... unless the user has set chunk dimensions explicitly, in which case
+     * use those. The program will exit if the size results in too many chunks.
      */
     else
     {
@@ -1232,12 +1243,9 @@ void Hdf5DataWriter::SetChunkSize()
         {
             mChunkSize[i] = mFixedChunkSize[i];
         }
-        // Number of chunks for istore_k optimisation
-        mNumberOfChunks = 1;
-        for (unsigned i=0; i<DATASET_DIMS; ++i)
-        {
-            mNumberOfChunks *= ceil(double(mDatasetDims[i])/mChunkSize[i]);
-        }
+
+        mNumberOfChunks = CalculateNumberOfChunks();
+
         if ( mNumberOfChunks > recommended_max_number_chunks)
         {
             /*

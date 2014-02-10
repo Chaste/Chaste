@@ -87,7 +87,7 @@ private:
 
     bool mUseOptimalChunkSizeAlgorithm;             /**< Whether to use the built-in algorithm for optimal chunk size */
     hsize_t mChunkSize[DATASET_DIMS];               /**< Stores chunk dimensions */
-    long unsigned mNumberOfChunks;                  /**< The total number of chunks in the dataset */
+    hsize_t mNumberOfChunks;                  /**< The total number of chunks in the dataset */
     hsize_t mFixedChunkSize[DATASET_DIMS];          /**< User-provided chunk size */
 
 
@@ -116,6 +116,20 @@ private:
      * This method sets #mFileId.
      */
     void OpenFile();
+
+    /**
+     * Little method to calculate the number of chunks resulting from given chunk dimensions.
+     */
+    hsize_t CalculateNumberOfChunks();
+
+    /**
+     * This method sets the member variables which record the chunk dimensions to use in the main dataset.
+     * If the user has specified a chunk size using #SetFixedChunkSize then these are used, otherwise an
+     * algorithm sets the chunk dimensions by increasing each dimension in step until a threshold size
+     * (in bytes) is exceeded. By default, this threshold is 128 K, which seems to be a good compromise
+     * size. We found "squarish" shaped chunks in general perform better than other shapes.
+     */
+    void SetChunkSize();
 
 public:
 
@@ -268,16 +282,6 @@ public:
     void SetFixedChunkSize(const unsigned& rTimestepsPerChunk,
                            const unsigned& rNodesPerChunk,
                            const unsigned& rVariablesPerChunk);
-
-    /**
-     * This method sets the member variables which record the chunk dimensions to use in the main dataset.
-     * If the user has specified a chunk size using #SetFixedChunkSize then these are used, otherwise an
-     * algorithm sets the chunk dimensions by increasing each dimension in step until a threshold size
-     * (in bytes) is exceeded. By default, this threshold is 128 K, which seems to be a good compromise
-     * size. We found "squarish" shaped chunks in general perform better than other shapes.
-     */
-    void SetChunkSize();
-
 
 };
 
