@@ -832,10 +832,10 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
     }
     else
     {
-        //Not implemented for other dimensions
+        // Not implemented for other dimensions
         NEVER_REACHED;
-
     }
+
     return cell_volume;
 }
 

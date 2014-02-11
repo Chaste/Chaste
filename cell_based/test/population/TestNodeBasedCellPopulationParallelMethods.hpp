@@ -123,7 +123,6 @@ public:
 
         unsigned node_left_index = (*mpNodeBasedCellPopulation->mCellsToSendLeft.begin()).second->GetIndex();
         TS_ASSERT_EQUALS(node_left_index, index_of_node_to_send);
-
     }
 
     void TestSendAndRecieveCells() throw (Exception)

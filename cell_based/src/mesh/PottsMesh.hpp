@@ -131,7 +131,6 @@ protected:
                                          ArchiveLocationInfo::GetMeshFilename(),
                                          false);
         mesh_writer.WriteFilesUsingMesh(*(const_cast<PottsMesh<DIM>*>(this)));
-
     }
 
     /**

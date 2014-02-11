@@ -77,7 +77,6 @@ private:
         archive & mNagaiHondaMembraneSurfaceEnergyParameter;
         archive & mNagaiHondaCellCellAdhesionEnergyParameter;
         archive & mNagaiHondaCellBoundaryAdhesionEnergyParameter;
-
     }
 
 protected:

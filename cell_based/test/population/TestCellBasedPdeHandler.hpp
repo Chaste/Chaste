@@ -878,7 +878,6 @@ public:
         point(1) = 0.0;
 
         TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(point,"variable"), 1.0, 1e-6);
-
     }
 
     void TestSolvePdeAndWriteResultsToFileWithoutCoarsePdeMeshNeumann() throw(Exception)

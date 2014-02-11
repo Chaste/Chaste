@@ -613,7 +613,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
         }
 
         cell ++;
-
     }
 
     // Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)

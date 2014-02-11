@@ -75,6 +75,7 @@ public:
 
     /**
      * Constructor.
+     *
      * @param rFileName the name of the file to write to.
      */
     AbstractCellBasedWriter(const std::string &rFileName);

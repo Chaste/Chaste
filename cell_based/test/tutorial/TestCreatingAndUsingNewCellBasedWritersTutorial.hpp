@@ -168,7 +168,7 @@ public:
      * In this example, for each cell {{{pCell}}} in {{{pCellPopulation}}}, we write its
      * location index, followed by a space, followed by its location coordinates (space separated)
      * followed by a 0 or 1 indicating whether the cell has the motile property.
-     * The base class handles writing the timestamp and newline for each simulation timestep, so we 
+     * The base class handles writing the timestamp and newline for each simulation timestep, so we
      * don't need to worry about that.
      */
     void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
@@ -185,7 +185,7 @@ public:
     }
 };
 
-/* 
+/*
  * As mentioned in previous cell-based Chaste tutorials, we need to include the next block
  * of code to be able to archive the cell property and writer objects in a cell-based simulation,
  * and to obtain a unique identifier for our new classes for when writing results to file.
