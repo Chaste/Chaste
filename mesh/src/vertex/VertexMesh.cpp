@@ -1528,9 +1528,13 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
     }
 
     // Select the largest absolute coordinate to ignore for planar projection
-    double abs_x = unit_normal[0]>0 ? unit_normal[0]>0 : -unit_normal[0];
-    double abs_y = unit_normal[1]>0 ? unit_normal[1]>0 : -unit_normal[1];
-    double abs_z = unit_normal[2]>0 ? unit_normal[2]>0 : -unit_normal[2];
+    double abs_x = (unit_normal[0]>0) ? unit_normal[0] : -unit_normal[0];
+    double abs_y = (unit_normal[1]>0) ? unit_normal[1] : -unit_normal[1];
+    double abs_z = (unit_normal[2]>0) ? unit_normal[2] : -unit_normal[2];
+
+    // How about
+    abs_x = fabs(unit_normal[0]);
+    // which is far more intuitive than the ternary conditional operator?
 
     unsigned dim_to_ignore = 2; // ignore z coordinate
     double abs = abs_z;
