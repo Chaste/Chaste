@@ -134,6 +134,19 @@ bool Divides(double smallerNumber, double largerNumber)
     return false;
 }
 
+hsize_t CeilDivide(hsize_t numerator, hsize_t denominator)
+{
+    if( numerator==0 )
+    {
+        return 0;
+    }
+    else
+    {
+        // Overflow-safe for large numbers, but not valid for numerator==0.
+        return ((numerator - 1) / denominator) + 1;
+    }
+}
+
 double Signum(double value)
 {
     return (0.0 < value) - (value < 0.0);

@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
 #include "Version.hpp"
+#include "MathsCustomFunctions.hpp"
 
 Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
                                const std::string& rDirectory,
@@ -1173,7 +1174,7 @@ hsize_t Hdf5DataWriter::CalculateNumberOfChunks()
     hsize_t num_chunks = 1;
     for (unsigned i=0; i<DATASET_DIMS; ++i)
     {
-        num_chunks *= ceil( static_cast<double>(mDatasetDims[i]) / mChunkSize[i] );
+        num_chunks *= CeilDivide(mDatasetDims[i], mChunkSize[i]);
     }
     return num_chunks;
 }
@@ -1214,8 +1215,8 @@ void Hdf5DataWriter::SetChunkSize()
                 bool all_one_chunk = true;
                 for (unsigned i=0; i<DATASET_DIMS; ++i)
                 {
-                    divisors[i] = ceil( static_cast<double>(mDatasetDims[i]) / target_size );
-                    mChunkSize[i] = ceil( static_cast<double>(mDatasetDims[i]) / divisors[i] );
+                    divisors[i] = CeilDivide(mDatasetDims[i], target_size);
+                    mChunkSize[i] = CeilDivide(mDatasetDims[i], divisors[i]);
                     chunk_size_in_bytes *= mChunkSize[i];
                     all_one_chunk = all_one_chunk && divisors[i]==1u;
                 }

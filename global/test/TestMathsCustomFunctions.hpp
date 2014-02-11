@@ -78,6 +78,12 @@ public:
         TS_ASSERT_EQUALS(Divides(0.01, 0.00),  false);
     }
 
+    void TestCeilDivide() throw(Exception)
+    {
+        TS_ASSERT_EQUALS(CeilDivide(5u,3u), 2u);
+        TS_ASSERT_EQUALS(CeilDivide(0,3u), 0u);
+    }
+
     void TestSignum() throw(Exception)
     {
         TS_ASSERT_EQUALS(Signum(0.0), 0.0);

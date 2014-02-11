@@ -119,6 +119,7 @@ private:
 
     /**
      * Little method to calculate the number of chunks resulting from given chunk dimensions.
+     * @return The number of chunks resulting from chunk dimensions (stored in member variable).
      */
     hsize_t CalculateNumberOfChunks();
 
