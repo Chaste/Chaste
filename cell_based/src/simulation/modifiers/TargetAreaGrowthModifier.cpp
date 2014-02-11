@@ -37,9 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 TargetAreaGrowthModifier<DIM>::TargetAreaGrowthModifier()
-    : AbstractCellBasedSimulationModifier<DIM>()
+    : AbstractCellBasedSimulationModifier<DIM>(),
+      mMatureCellTargetArea(1.0)
 {
-    mMatureCellTargetArea = 1.0;
 }
 
 template<unsigned DIM>
@@ -65,7 +65,6 @@ void TargetAreaGrowthModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& 
 
 template<unsigned DIM>
 void TargetAreaGrowthModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-
 {
     // Make sure the cell population is updated
     ///\todo #2488: double check that this update call doesn't break anything (i.e. counting of swaps etc.)
@@ -73,14 +72,14 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM
 
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
     {
-    EXCEPTION("TargetAreaGrowthModifier is to be used with a VertexBasedCellPopulation only");
+        EXCEPTION("TargetAreaGrowthModifier is to be used with a VertexBasedCellPopulation only");
     }
 
     VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
 
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-             elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
-             ++elem_iter)
+         elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
+         ++elem_iter)
     {
         unsigned elem_index = elem_iter->GetIndex();
         UpdateTargetAreaOfCell( p_cell_population->GetCellUsingLocationIndex(elem_index) );
@@ -129,9 +128,13 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
         }
         else
         {
-            // At division, daughter cells inherit the cell data array from the mother cell. Here, we assign the target area
-            // that we want daughter cells to have to cells that we know to divide in this time step. This is a little hack
-            // that we might want to clean up in the future.
+            /**
+             * At division, daughter cells inherit the cell data array from the mother cell.
+             * Here, we assign the target area that we want daughter cells to have to cells
+             * that we know to divide in this time step.
+             *
+             * \todo This is a little hack that we might want to clean up in the future.
+             */
             if (pCell->ReadyToDivide())
             {
                 cell_target_area = 0.5*mMatureCellTargetArea;
@@ -139,9 +142,8 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
         }
     }
 
-    // set cell data here
+    // Set cell data
     pCell->GetCellData()->SetItem("target area", cell_target_area);
-
 }
 
 template<unsigned DIM>
@@ -156,10 +158,8 @@ void TargetAreaGrowthModifier<DIM>::SetMatureCellTargetArea(double matureCellTar
     assert(matureCellTargetArea >= 0.0);
     mMatureCellTargetArea = matureCellTargetArea;
 }
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
 
+// Explicit instantiation
 template class TargetAreaGrowthModifier<1>;
 template class TargetAreaGrowthModifier<2>;
 template class TargetAreaGrowthModifier<3>;

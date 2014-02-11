@@ -48,26 +48,52 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TargetAreaGrowthModifier.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "NagaiHondaForce.hpp"
-//This test is only run sequentially (never in parallel)
+
+// This test is only run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestTargetAreaGrowthModifier : public AbstractCellBasedTestSuite
 {
 public:
 
+    void TestUpdateTargetAreasException() throw (Exception)
+    {
+        // First set up SimulationTime (this is usually handled by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a TargetAreaGrowthModifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_modifier);
+
+        // Create a cell population whose type should not be used with a TargetAreaGrowthModifier
+        HoneycombMeshGenerator generator(4, 4, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        MeshBasedCellPopulation<2> population(*p_mesh, cells);
+
+        // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
+        TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreas(population),
+            "TargetAreaGrowthModifier is to be used with a VertexBasedCellPopulation only");
+    }
+
     void TestTargetAreaGrowthModifierMethods() throw (Exception)
     {
-
-        // create our modifier
-        MAKE_PTR(TargetAreaGrowthModifier<2>,p_growth_modifier);
-
+        // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(3*0.25, 3);
+
+        // Create a TargetAreaGrowthModifier
+        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
 
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
@@ -89,25 +115,26 @@ public:
         }
 
         // Create a cell population
-
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.InitialiseCells(); // this method must be called explicitly as there is no simulation
+
+        // This method must be called explicitly as there is no simulation
+        cell_population.InitialiseCells();
 
         // Check UpdateTargetAreaOfCell() method
         for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
-                iter != p_mesh->GetElementIteratorEnd();
-                ++iter)
+             iter != p_mesh->GetElementIteratorEnd();
+             ++iter)
         {
             unsigned elem_index = iter->GetIndex();
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
 
-            // get the mature cell target area
+            // Get the mature cell target area
             double expected_area = p_growth_modifier->GetMatureCellTargetArea();
 
-            // have the growth modifier update the cell target area
+            // Have the growth modifier update the cell target area
             p_growth_modifier->UpdateTargetAreaOfCell(p_cell);
 
-            if (elem_index!=4 && elem_index<=7)
+            if ((elem_index != 4) && (elem_index <= 7))
             {
                 expected_area *= 0.5*(1 + ((double)elem_index)/7.0);
             }
@@ -117,18 +144,16 @@ public:
             TS_ASSERT_DELTA(actual_area, expected_area, 1e-12);
         }
 
-        // check that the growth rule for individual cells works together
-        // with the UpdateTargetAreas method
-
+        // Check that the growth rule for individual cells works together with the UpdateTargetAreas() method
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
         CellPtr p_cell_1 = cell_population.GetCellUsingLocationIndex(1);
         CellPtr p_cell_4 = cell_population.GetCellUsingLocationIndex(4);
 
-        // Make cell 1 and 4 undergo apoptosis
+        // Make cells 1 and 4 undergo apoptosis
         p_cell_1->StartApoptosis();
         p_cell_4->StartApoptosis();
 
-        // update the target areas
+        // Update the target areas
         p_growth_modifier->UpdateTargetAreas(cell_population);
 
         double actual_area_0 = p_cell_0->GetCellData()->GetItem("target area");
@@ -199,7 +224,7 @@ public:
         HoneycombVertexMeshGenerator generator(1, 1);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Set up cell.
+        // Set up cell
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -219,73 +244,71 @@ public:
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestTargetAreaOfDaughterCells");
         simulator.SetEndTime(0.997);
-        //dt=0.002
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // The TargetAreaGrowthModifier
+        // Create a TargetAreaGrowthModifier
         MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
         simulator.Solve();
 
+        // We should only have one cell now
         unsigned num_cells_before_division = simulator.rGetCellPopulation().GetNumRealCells();
-        // we should only have one cell now
-        TS_ASSERT_EQUALS(num_cells_before_division,1u);
+        TS_ASSERT_EQUALS(num_cells_before_division, 1u);
 
-        // this is the cell from before, let's see what its target area is
+        // This is the cell from before; let's see what its target area is
         double target_area_before_division = p_cell->GetCellData()->GetItem("target area");
         TS_ASSERT_DELTA(target_area_before_division,1.0,1e-9);
 
-        //so now we adjust the end time and run the simulation a bit further
+        // We now adjust the end time and run the simulation a bit further
         simulator.SetEndTime(1.001);
         simulator.Solve();
 
+        // We should now have two cells
         unsigned num_cells_at_division = simulator.rGetCellPopulation().GetNumRealCells();
-        // we should have two cells now
-        TS_ASSERT_EQUALS(num_cells_at_division,2u);
+        TS_ASSERT_EQUALS(num_cells_at_division, 2u);
 
         // Iterate over the cells, checking their target areas
-          for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
-          {
-              double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
+        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
             TS_ASSERT_DELTA(target_area_at_division,0.5,1e-9);
-          }
+        }
 
-        //so now the same thing again
+        // We now do the same thing again
         simulator.SetEndTime(1.003);
         simulator.Solve();
 
+        // We should still have two cells
         unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
-        // we should still have two cells
-        TS_ASSERT_EQUALS(num_cells_after_division,2u);
+        TS_ASSERT_EQUALS(num_cells_after_division, 2u);
 
-          for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
-          {
-              double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
-              // line to verify: cell_target_area *= 0.5*(1 + cell_age/g1_duration)
-              double supposed_target_area_after_division = 0.5*(1+0.002/2.);
+        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
+            // line to verify: cell_target_area *= 0.5*(1 + cell_age/g1_duration)
+            double supposed_target_area_after_division = 0.5*(1+0.002/2.);
             TS_ASSERT_DELTA(target_area_after_division,supposed_target_area_after_division,1e-9);
-          }
+        }
     }
-
 
     void TestTargetAreaGrowthModifierArchiving()
     {
-        //create a file for archiving
+        // Create a file for archiving
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "growth_modifier.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "TargetAreaGrowthModifier.arch";
 
-        // separate scope to write the archive
+        // Separate scope to write the archive
         {
-            // initialise a growth modifier and set a non-standard mature target area
+            // Initialise a growth modifier and set a non-standard mature target area
             MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
             p_growth_modifier->SetMatureCellTargetArea(14.3);
 
@@ -298,22 +321,22 @@ public:
             output_arch << p_abstract_simulation_modifier;
         }
 
-        // separate scope to read the archive
+        // Separate scope to read the archive
         {
-            //MAKE_PTR((AbstractCellBasedSimulationModifier<2,2>) , p_growth_modifier);
             boost::shared_ptr<AbstractCellBasedSimulationModifier<2,2> > p_growth_modifier(new AbstractCellBasedSimulationModifier<2,2>);
+
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
             input_arch >> p_growth_modifier;
 
-            // get a pointer of type growth modifier
+            // Get a pointer of type growth modifier
             boost::shared_ptr<TargetAreaGrowthModifier<2> > p_real_growth_modifier =
                     boost::dynamic_pointer_cast<TargetAreaGrowthModifier<2> >(p_growth_modifier);
             TS_ASSERT(p_real_growth_modifier != NULL);
 
-            // see whether we read out the correct target area
+            // See whether we read out the correct target area
             double mature_target_area = p_real_growth_modifier->GetMatureCellTargetArea();
             TS_ASSERT_DELTA(mature_target_area, 14.3, 1e-9);
         }

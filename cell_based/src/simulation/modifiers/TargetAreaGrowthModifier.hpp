@@ -68,7 +68,7 @@ class TargetAreaGrowthModifier : public AbstractCellBasedSimulationModifier<DIM,
 protected:
 
     /**
-     * The target area of mature cells.  Each cell has their own target area stored in CellData which grows
+     * The target area of mature cells. Each cell has their own target area stored in CellData which grows
      * towards the #mMatureCellTargetArea during G1-phase.
      */
     double mMatureCellTargetArea;
@@ -112,9 +112,9 @@ public:
     double GetMatureCellTargetArea();
 
     /**
-     * Set the target area of mature cells in the growth rule
+     * Set the target area of mature cells in the growth rule.
      *
-     * @param matureCellTargetArea
+     * @param matureCellTargetArea the new value of #mMatureCellTargetArea
      */
     void SetMatureCellTargetArea(double matureCellTargetArea);
 
