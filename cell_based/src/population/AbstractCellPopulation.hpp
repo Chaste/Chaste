@@ -602,7 +602,6 @@ public:
     /**
      * Get whether the population has a writer of the specified type.
      *
-     * @param dummy a dummy parameter to make sure the correct function gets called using SFINAE.
      * @return whether the population has this writer
      */
     template<template <unsigned, unsigned> class T>
