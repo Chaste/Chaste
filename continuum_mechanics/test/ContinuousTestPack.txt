@@ -9,4 +9,5 @@ TestProblemDefinitions.hpp
 TestStokesFlowAssembler.hpp
 TestStokesFlowSolver.hpp
 TestVtkNonlinearElasticitySolutionWriter.hpp
+ventilation/TestAcinarUnitModels.hpp
 ventilation/TestVentilationProblem.hpp

@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
+#include "Swan2012AcinarUnit.hpp"
 
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
@@ -64,7 +65,7 @@ private:
      * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
      *  mu = 1.92e-5 Pa*s
            = 1.92e-5 kg/(m*s)
-           = 1.92e-8 kg/(mm*s)
+           = 1.92e-8 kg/(mm*s) or kPa.s
      * Consider http://en.wikipedia.org/wiki/Viscosity#Air which gives
      * mu = 1.81x10^(-5) kg/(m*s) -- 1.86x10^(-5) kg/(m*s)
      */
@@ -80,6 +81,8 @@ private:
     double mDensity;
 
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
+
+    std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
 
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes

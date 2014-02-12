@@ -59,6 +59,49 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
     // preallocating 5 non-zeros allows for 4-way branching
     mpLinearSystem = new LinearSystem(mMesh.GetNumNodes()+mMesh.GetNumElements(), 5u);
+
+    /*
+     * Set up the Acinar units at the terminals
+     *
+     * \todo Currently this is hard coded using a Swan acinar unit
+     * (with functional residual capacity appropriate initial values). Long term this
+     * should be factored out into a factory to allow setup of other acinar units and
+     * other initial conditions
+     */
+    unsigned num_acinar = mesh.GetNumBoundaryNodes() - 1;
+    double acinus_volume = 1.2e9/num_acinar; //Assumes a residual capacity of 1.2l (x10^9 in mm^3)
+
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+          iter != mMesh.GetBoundaryNodeIteratorEnd();
+          ++iter)
+     {
+         if ((*iter)->GetIndex() != mOutletNodeIndex)
+         {
+             ///\todo We need to do some parallel here in order to load balance
+             Swan2012AcinarUnit* p_acinus = new Swan2012AcinarUnit;
+
+             p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
+             p_acinus->SetUndeformedVolume(acinus_volume);
+             p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
+             p_acinus->SetAirwayPressure(-0.49);
+
+             //Calculates the resistance of the terminal bronchiole feeding the acinus.
+             //This should be updated dynamically during the simulation
+             c_vector<double, 3> dummy;
+             double length;
+             unsigned edge_index = *( rNode.ContainingElementsBegin() );
+             mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
+
+             double radius = (*iter)->rGetNodeAttributes()[0];
+
+             double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
+             p_acinus->SetTerminalBronchioleResistance(resistance);
+
+             mAcinarUnits.push_back(p_acinus);
+             ///\todo make a map for node->acinar (rather than a vector)?
+         }
+     }
+
 }
 
 VentilationProblem::~VentilationProblem()
@@ -70,6 +113,10 @@ VentilationProblem::~VentilationProblem()
     if (mSolution)
     {
         PetscTools::Destroy(mSolution);
+    }
+    for (unsigned i=0; i<mAcinarUnits.size(); i++)
+    {
+        delete mAcinarUnits[i];
     }
 }
 
