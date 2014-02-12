@@ -68,7 +68,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
      * should be factored out into a factory to allow setup of other acinar units and
      * other initial conditions
      */
-    unsigned num_acinar = mesh.GetNumBoundaryNodes() - 1;
+    unsigned num_acinar = mMesh.GetNumBoundaryNodes() - 1;
     double acinus_volume = 1.2e9/num_acinar; //Assumes a residual capacity of 1.2l (x10^9 in mm^3)
 
     for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
@@ -89,7 +89,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
              //This should be updated dynamically during the simulation
              c_vector<double, 3> dummy;
              double length;
-             unsigned edge_index = *( rNode.ContainingElementsBegin() );
+             unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
              mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
 
              double radius = (*iter)->rGetNodeAttributes()[0];
