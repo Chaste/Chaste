@@ -1577,37 +1577,35 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
 
     // Scale to get area before projection
     face_area /= abs;
-    bool double_check=false;
-    if (double_check)
-    {
-        ///\todo #2391 recalculate both the area and the normal in the same framework
-
-        c_vector<double, SPACE_DIM> weighted_normal = zero_vector<double>(SPACE_DIM);
-        c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
-
-        for (unsigned local_index=1; local_index<num_nodes_in_face; local_index++)
-        {
-            c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
-            weighted_normal += VectorProduct(v_minus_v0, vnext_minus_v0);
-        }
-        double area = norm_2(weighted_normal);
-        weighted_normal /= area;
-        area /= 2.0;
-        if (std::isnan(face_area) || abs == 0.0)
-        {
-            // Not always true, only sometimes! assert(area == 0.0);
-            if (area != 0.0)
-            {
-                //TRACE("Mismatch between methods");
-            }
-        }
-        else
-        {
-            assert( fabs(area - fabs(face_area)) < DBL_EPSILON);
-            c_vector<double, SPACE_DIM> diff_normals = unit_normal - weighted_normal;
-            assert(norm_1(diff_normals) < DBL_EPSILON);
-        }
-    }
+//    {
+//        ///\todo #2391 recalculate both the area and the normal in the same framework
+//
+//        c_vector<double, SPACE_DIM> weighted_normal = zero_vector<double>(SPACE_DIM);
+//        c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
+//
+//        for (unsigned local_index=1; local_index<num_nodes_in_face; local_index++)
+//        {
+//            c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
+//            weighted_normal += VectorProduct(v_minus_v0, vnext_minus_v0);
+//        }
+//        double area = norm_2(weighted_normal);
+//        weighted_normal /= area;
+//        area /= 2.0;
+//        if (std::isnan(face_area) || abs == 0.0)
+//        {
+//            // Not always true, only sometimes! assert(area == 0.0);
+//            if (area != 0.0)
+//            {
+//                //TRACE("Mismatch between methods");
+//            }
+//        }
+//        else
+//        {
+//            assert( fabs(area - fabs(face_area)) < DBL_EPSILON);
+//            c_vector<double, SPACE_DIM> diff_normals = unit_normal - weighted_normal;
+//            assert(norm_1(diff_normals) < DBL_EPSILON);
+//        }
+//    }
     return fabs(face_area);
 }
 /// Specialization to avoid compiler error about zero-sized arrays
