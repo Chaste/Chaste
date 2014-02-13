@@ -640,7 +640,9 @@ public:
     bool InitialiseWriter();
 
     /**
-     * Specifies which nodes in the mesh to output.
+     * Specifies which nodes in the mesh to output. This method must be called before InitialiseWriter,
+     * otherwise all nodes will still be output. If this method is called when extending an existing
+     * HDF5 file, it will be ignored.
      *
      * @param rNodesToOutput is a reference to a vector with the indexes of the nodes
      * where the output is desired.
