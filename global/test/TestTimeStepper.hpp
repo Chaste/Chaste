@@ -113,9 +113,14 @@ public:
                 real_time_step = end_time - current_time;
                 // std::cout<<"InternalSolve "<<timestep<<" "<<real_time_step<<"\n";
                 to_time = end_time;
+
+                TS_ASSERT_EQUALS(stepper.GetNextTimeStep(), real_time_step);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(stepper.GetNextTimeStep(), real_time_step, 1e-12);
             }
 
-            TS_ASSERT_EQUALS(stepper.GetNextTimeStep(), real_time_step);
             TS_ASSERT_EQUALS(stepper.GetIdealTimeStep(), timestep);
             TS_ASSERT_EQUALS(stepper.GetTime(), current_time);
             TS_ASSERT_EQUALS(stepper.GetNextTime(), to_time);
