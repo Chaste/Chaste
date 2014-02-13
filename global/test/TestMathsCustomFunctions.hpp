@@ -80,8 +80,13 @@ public:
 
     void TestCeilDivide() throw(Exception)
     {
-        TS_ASSERT_EQUALS(CeilDivide(5u,3u), 2u);
-        TS_ASSERT_EQUALS(CeilDivide(0,3u), 0u);
+        TS_ASSERT_EQUALS(CeilDivide(28u, 7u), 4u);
+        TS_ASSERT_EQUALS(CeilDivide(27u, 7u), 4u);
+        TS_ASSERT_EQUALS(CeilDivide(29u, 7u), 5u);
+        TS_ASSERT_EQUALS(CeilDivide(6u, 3u), 2u);
+        TS_ASSERT_EQUALS(CeilDivide(5u, 3u), 2u);
+        TS_ASSERT_EQUALS(CeilDivide(0u, 3u), 0u);
+        TS_ASSERT_EQUALS(CeilDivide(2342368901u, UINT_MAX), 1u);
     }
 
     void TestSignum() throw(Exception)

@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MATHSCUSTOMFUNCTIONS_HPP_
 
 #include <cfloat>
-#include <H5public.h> // For definition of hsize_t
 
 /**
  * @file
@@ -76,12 +75,12 @@ bool Divides(double smallerNumber, double largerNumber);
 
 /**
  * @return the result of dividing (unsigned) numerator by denominator, 
- * rounded up (away from 0), and overflow-safe for large (HDF5-style) integers.
+ * rounded up (away from 0), and overflow-safe for large integers up to UINT_MAX.
  *
  * @param numerator the numerator
  * @param denominator the denominator
  */
-hsize_t CeilDivide(hsize_t numerator, hsize_t denominator);
+unsigned CeilDivide(unsigned numerator, unsigned denominator);
 
 /**
  * @return the sign of the argument, i.e. -1 if value<0, 0 if value=0, or +1 if value>0.

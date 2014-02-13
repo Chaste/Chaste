@@ -134,16 +134,16 @@ bool Divides(double smallerNumber, double largerNumber)
     return false;
 }
 
-hsize_t CeilDivide(hsize_t numerator, hsize_t denominator)
+unsigned CeilDivide(unsigned numerator, unsigned denominator)
 {
-    if( numerator==0 )
+    if( numerator==0u )
     {
-        return 0;
+        return 0u;
     }
     else
     {
         // Overflow-safe for large numbers, but not valid for numerator==0.
-        return ((numerator - 1) / denominator) + 1;
+        return ((numerator - 1u) / denominator) + 1u;
     }
 }
 

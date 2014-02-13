@@ -1201,9 +1201,9 @@ void Hdf5DataWriter::SetChunkSize()
          * 128 M by default which should be plenty.
          */
         unsigned target_size_bytes = 1024*1024/8; // 128 K
-        hsize_t target_size = 1; // Size of chunk (in entries) for all dims
-        hsize_t divisors[DATASET_DIMS];
-        hsize_t chunk_size_in_bytes;
+        unsigned target_size = 1; // Size of chunk (in entries) for all dims
+        unsigned divisors[DATASET_DIMS];
+        unsigned chunk_size_in_bytes;
 
         // While we have too many chunks, make target_size_bytes larger
         do
@@ -1226,13 +1226,15 @@ void Hdf5DataWriter::SetChunkSize()
                     break;
                 }
                 target_size++; // Increase target size for next iteration
-            } while ( chunk_size_in_bytes < target_size_bytes );
+            }
+            while ( chunk_size_in_bytes < target_size_bytes );
 
             mNumberOfChunks = CalculateNumberOfChunks();
 
             target_size_bytes *= 2; // Increase target size for next iteration
 
-        } while ( mNumberOfChunks > recommended_max_number_chunks );
+        }
+        while ( mNumberOfChunks > recommended_max_number_chunks );
     }
     /*
      * ... unless the user has set chunk dimensions explicitly, in which case
