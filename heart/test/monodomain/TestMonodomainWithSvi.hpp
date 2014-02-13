@@ -91,6 +91,44 @@ public:
     }
 };
 
+// DO NOT COPY.  A version of the factory, written without GetNodeOrHaloNode(),
+// which was intended to stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
+template<unsigned DIM>
+class BlockCellFactoryWithGetNode : public AbstractCardiacCellFactory<DIM>
+{
+private:
+    boost::shared_ptr<SimpleStimulus> mpStimulus;
+
+public:
+    BlockCellFactoryWithGetNode()
+        : AbstractCardiacCellFactory<DIM>(),
+          mpStimulus(new SimpleStimulus(-1000000.0, 0.5))
+    {
+        assert(DIM<3);
+    }
+
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    {
+        // This line will throw in parallel with SVI
+        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+        double y;
+        if(DIM==2)
+        {
+            y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
+        }
+
+        if (    (DIM==1 && fabs(x)<0.02+1e-6)
+             || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6) )
+        {
+            return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
+        }
+        else
+        {
+            return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpZeroStimulus);
+        }
+    }
+};
+
 // stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
 #ifdef CHASTE_CVODE
 template<unsigned DIM>
@@ -519,6 +557,30 @@ public:
 
             delete p_monodomain_problem;
         }
+    }
+
+    // This test is fine sequentially but should always fail in parallel.
+    void TestGetNodeThrowsInParallel() throw (Exception)
+    {
+        EXIT_IF_SEQUENTIAL;
+        DistributedTetrahedralMesh<1,1> mesh;
+
+        mesh.ConstructRegularSlabMesh(0.02, 1.0);
+
+        HeartConfig::Instance()->SetOutputDirectory("MonodomainSviGetNode");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+        HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
+
+        HeartConfig::Instance()->SetUseStateVariableInterpolation();
+
+        // This is the wrong factory
+        BlockCellFactoryWithGetNode<1> cell_factory;
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetMesh(&mesh);
+
+        TS_ASSERT_THROWS_THIS(monodomain_problem.Initialise(), "Failed to make a cardiac cell for a halo node. Hint: in "
+                              "your cell factory method CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
     }
 };
 

@@ -444,7 +444,17 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
             for (unsigned local_index = 0; local_index < num_halo_nodes; local_index++)
             {
                 unsigned global_index = mHaloNodes[local_index];
-                mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(global_index);
+                try
+                {
+                    mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(global_index);
+                }
+                catch (Exception& e)
+                {
+                    // If CreateCardiacCellForNode throws immediately, then it's probable that the
+                    // user has a cell factory that isn't expecting to make cells at halo nodes.
+                    EXCEPTION("Failed to make a cardiac cell for a halo node. Hint: in your cell factory method "
+                              "CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
+                }
                 mHaloCellsDistributed[local_index]->SetUsedInTissueSimulation();
                 mHaloGlobalToLocalIndexMap[global_index] = local_index;
             }
