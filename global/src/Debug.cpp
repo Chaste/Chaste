@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Debug.hpp"
+#include <execinfo.h> //For backtrace
+//#include <cxxabi.h> // For demangling C++ C-style names
 
 std::string FormDebugHead()
 {
@@ -44,4 +46,25 @@ std::string FormDebugHead()
         header << "proc " << PetscTools::GetMyRank() << ": ";
     }
     return header.str();
+}
+
+
+void PrintTheStack()
+{
+    // storage array for stack trace address data
+    void* address_list[20u]; //20 is about the number of stack symbols we are going to print
+
+    // retrieve current stack addresses
+    unsigned num_addresses = backtrace(address_list, sizeof(address_list) / sizeof(void*));
+
+    char** symbol_list = backtrace_symbols(address_list, num_addresses);
+
+    // iterate over the returned symbol lines.
+    for (unsigned i = 0; i < num_addresses; i++)
+    {
+        // We could demangle, but this may not be portable on GNU Linux versus Mac OSX
+        // char* ret = abi::__cxa_demangle(begin_name, funcname, &funcnamesize, &status);
+        TRACE("Level " << i << ": " << symbol_list[i]);
+    }
+    free(symbol_list);
 }

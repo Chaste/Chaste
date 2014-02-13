@@ -53,6 +53,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @return a 'header' which can be printed in each debug output line */
 std::string FormDebugHead();
+/**
+ * In extremis, print enough of the stack to see how we got to this point (e.g. at EXCEPTION time).
+ * This is used with the macro STACK
+ */
+void PrintTheStack();
 
 /**
  * Print a debug message.
@@ -61,7 +66,7 @@ std::string FormDebugHead();
 #define TRACE(stuff) std::cout << FormDebugHead() << stuff << std::endl << std::flush;
 
 /** Print some trace containing the file name and line number. */
-#define MARK std::cout << FormDebugHead() <<  __FILE__ << " at line " <<__LINE__ << std::endl << std::flush;
+#define MARK std::cout << FormDebugHead() <<  __FILE__ << " at line " << __LINE__ << std::endl << std::flush;
 
 /** Print the name and value of the given variable.
  * @param var */
@@ -139,4 +144,10 @@ std::string FormDebugHead();
  * the round-robin will cause deadlock.
  */
 #define MARK_IN_ORDER PetscTools::BeginRoundRobin(); MARK; PetscTools::EndRoundRobin();
+
+/**
+ * In extremis, print enough of the stack to see how we got to this point (e.g. at EXCEPTION time)
+ */
+#define STACK PrintTheStack();
+
 #endif /*DEBUG_HPP_*/

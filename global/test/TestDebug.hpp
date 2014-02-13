@@ -44,6 +44,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestDebug : public CxxTest::TestSuite
 {
+private:
+    void AnotherFunctionOnTheStack()
+    {
+        STACK;
+    }
+
 public:
 
     // Can't really test these other than that they compile and visually looking at output
@@ -109,6 +115,8 @@ public:
         PetscTools::IsolateProcesses();
         TRACE("Processes are isolated.");
         PetscTools::IsolateProcesses(false);
+
+        AnotherFunctionOnTheStack();
     }
 };
 
