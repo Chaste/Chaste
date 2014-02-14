@@ -876,12 +876,11 @@ public:
         // Currently, NagaiHonda force only works if used together with a target area growth modifier
         // This tests that a meaningful error appears if we don't use a growth modifier
         TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
-                "You need to add a AbstractTargetAreaModifier to the simulation in order to use NagaiHondaForce.");
+                "You need to add an AbstractTargetAreaModifier to the simulation in order to use NagaiHondaForce");
 
         // create our modifier, which sets the target areas for the cell population
         // this is a workaround to make the test work
         // #2488
-
         MAKE_PTR(SimpleTargetAreaModifier<2>,p_growth_modifier);
         p_growth_modifier->UpdateTargetAreas(cell_population);
 
@@ -896,7 +895,6 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -force_magnitude*sin(angles[i]), 1e-4);
         }
-
 
         // Set up simulation time
         SimulationTime* p_simulation_time = SimulationTime::Instance();

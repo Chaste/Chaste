@@ -76,11 +76,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
 
-///\todo #2441 remove this
-/** Forward declaration of cell population writers. */
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulationWriter;
-//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellWriter;
-
 /**
  * An abstract facade class encapsulating a cell population.
  *

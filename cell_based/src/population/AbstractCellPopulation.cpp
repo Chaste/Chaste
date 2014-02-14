@@ -360,6 +360,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 {
+    // Save some typing
     typedef AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> writer_t;
 
     std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::CloseFile, _1));
@@ -453,8 +454,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             // The master process writes time stamps
             if (PetscTools::AmMaster())
             {
-              std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
-              std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
+                std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
+                std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
             }
 
             for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
@@ -509,8 +510,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
 {
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-            cell_iter != this->End();
-            ++cell_iter)
+         cell_iter != this->End();
+         ++cell_iter)
     {
         if (HasWriter<CellProliferativePhasesCountWriter>())
         {

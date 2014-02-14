@@ -1383,7 +1383,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A Nagai Honda Force has to be used together with a AbstractTargetAreaModifier
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
