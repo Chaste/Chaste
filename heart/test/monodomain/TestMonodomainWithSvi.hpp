@@ -559,10 +559,10 @@ public:
         }
     }
 
-    // This test is fine sequentially but should always fail in parallel.
+    // This initialisation is fine sequentially but should always fail in parallel.
+    // Note - this is a higher-level version of an equivalent test of the tissue class in TestMonodomainTissue
     void TestGetNodeThrowsInParallel() throw (Exception)
     {
-        EXIT_IF_SEQUENTIAL;
         DistributedTetrahedralMesh<1,1> mesh;
 
         mesh.ConstructRegularSlabMesh(0.02, 1.0);
@@ -579,8 +579,15 @@ public:
         MonodomainProblem<1> monodomain_problem( &cell_factory );
         monodomain_problem.SetMesh(&mesh);
 
-        TS_ASSERT_THROWS_THIS(monodomain_problem.Initialise(), "Failed to make a cardiac cell for a halo node. Hint: in "
-                              "your cell factory method CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
+        if (PetscTools::IsParallel())
+        {
+            TS_ASSERT_THROWS_THIS(monodomain_problem.Initialise(), "Failed to make a cardiac cell for a halo node. Hint: in "
+                                  "your cell factory method CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
+        }
+        else
+        {
+            monodomain_problem.Initialise();
+        }
     }
 };
 

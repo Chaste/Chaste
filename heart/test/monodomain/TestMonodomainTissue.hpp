@@ -98,14 +98,14 @@ public:
  *  to use halo exchange but the cardiac cell factory is not aware that it may be asked to
  *  create cells at halo nodes (i.e. using GetNode() instead of GetNodeOrHaloNode())
  */
-class MyWrongCardiacCellFactory : public AbstractCardiacCellFactory<1>
+class WrongCardiacCellFactoryUsesGetNode : public AbstractCardiacCellFactory<1>
 {
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
 
-    MyWrongCardiacCellFactory()
+    WrongCardiacCellFactoryUsesGetNode()
         : AbstractCardiacCellFactory<1>(),
           mpStimulus(new SimpleStimulus(-80.0, 0.5))
     {
@@ -435,13 +435,13 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=0.1, ie 11 node mesh
 
-        MyWrongCardiacCellFactory cell_factory;
+        WrongCardiacCellFactoryUsesGetNode cell_factory;
         cell_factory.SetMesh(&mesh);
 
         if ( ! PetscTools::IsSequential() )
         {
-            TS_ASSERT_THROWS_CONTAINS( MonodomainTissue<1> monodomain_tissue( &cell_factory, true ),
-                                       "does not belong to processor" );
+            TS_ASSERT_THROWS_THIS(MonodomainTissue<1> monodomain_tissue( &cell_factory, true), "Failed to make a cardiac cell for a halo node. Hint: in "
+                                  "your cell factory method CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
         }
     }
 
