@@ -464,6 +464,64 @@ public:
         t3_swaps_writer.CloseFile();
 
         FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T3SwapLocations_twice.dat").CompareFiles();
+
+        // Coverage of the Visit() method when called on a MeshBasedCellPopulation
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true,  1.0, 1.0));
+        nodes.push_back(new Node<2>(2, true,  1.0, 0.0));
+        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
+        MutableMesh<2,2> mesh(nodes);
+        std::vector<CellPtr> mesh_based_cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+        mesh_based_cells_generator.GenerateBasic(mesh_based_cells, mesh.GetNumNodes());
+        MeshBasedCellPopulation<2> mesh_based_cell_population(mesh, cells);
+
+        TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&mesh_based_cell_population));
+        TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&mesh_based_cell_population));
+
+        // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+        PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+        std::vector<CellPtr> ca_based_cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+        ca_based_cells_generator.GenerateBasic(cells, 5);
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(7);
+        location_indices.push_back(11);
+        location_indices.push_back(12);
+        location_indices.push_back(13);
+        location_indices.push_back(17);
+        MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+        TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&ca_based_cell_population));
+        TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&ca_based_cell_population));
+
+        // Coverage of the Visit() method when called on a NodeBasedCellPopulation
+        std::vector<Node<2>* > node_based_nodes;
+        node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+        NodesOnlyMesh<2> node_based_mesh;
+        node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
+        std::vector<CellPtr> node_based_cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+        node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
+        NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
+
+        TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&node_based_cell_population));
+        TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&node_based_cell_population));
+
+        // Coverage of the Visit() method when called on a PottsBasedCellPopulation
+        PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
+        PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+        std::vector<CellPtr> potts_based_cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+        potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
+        PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
+
+        TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&potts_based_cell_population));
+        TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&potts_based_cell_population));
     }
 
     void TestCellPopulationAreaWriter() throw (Exception)
