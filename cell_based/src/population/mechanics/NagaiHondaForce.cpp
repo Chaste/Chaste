@@ -85,7 +85,7 @@ void NagaiHondaForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
         }
         catch (Exception&)
         {
-            EXCEPTION("You need to add a TargetAreaGrowthModifier to the simulation in order to use NagaiHondaForce.");
+            EXCEPTION("You need to add a AbstractTargetAreaModifier to the simulation in order to use NagaiHondaForce.");
         }
     }
 

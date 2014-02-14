@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellLabel.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
@@ -125,8 +125,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -226,8 +226,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -287,8 +287,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -346,8 +346,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier#2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         ////////////////////////////////////////////
@@ -414,8 +414,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Add cell killers to simulation (note we must account for element index changes following each kill)
@@ -486,8 +486,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -551,8 +551,8 @@ public:
         p_force->SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(40.0);
         simulator.AddForce(p_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -608,8 +608,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -670,8 +670,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation
@@ -730,8 +730,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run and save simulation

@@ -87,11 +87,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between neighbouring cells in the cell population, subject to each vertex.
  */
 #include "NagaiHondaForce.hpp"
-/* This force law assumes that cells have possess a "target area" property which determines the size of each
+/* This force law assumes that cells possess a "target area" property which determines the size of each
  * cell in the simulation. In order to assign target areas to cells and update them in each time step, we need
  * the next header file.
  */
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 /* The next header file defines a boundary condition for the cells.*/
 #include "PlaneBoundaryCondition.hpp"
 /* The next header file defines a cell killer, which specifies how cells are removed from the simulation.*/
@@ -173,9 +173,10 @@ public:
 
         /* A {{{NagaiHondaForce}}} assumes that each cell has a target area. The target areas of cells are used to determine pressure
          * forces on each vertex and eventually determine the size of each cell in the simulation. In order to assign target areas to cells
-         * and update them in each time step we add a {{{TargetAreaGrowthModifier}}} to the simulation.
+         * and update them in each time step we add a {{{SimpleTargetAreaModifier}}} to the simulation, which inherits from
+         *  {{{AbstractTargetAreaModifier}}}.
          */
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         /* To run the simulation, we call {{{Solve()}}}. */
@@ -237,9 +238,9 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* We also make a pointer to the growth modifier and add it to the simulator.
+        /* We also make a pointer to the target area modifier and add it to the simulator.
          */
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         /* We now create one or more {{{CellPopulationBoundaryCondition}}}s, which determine

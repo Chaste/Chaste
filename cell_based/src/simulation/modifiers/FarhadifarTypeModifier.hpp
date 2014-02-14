@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TARGETAREAGROWTHMODIFIER_HPP_
-#define TARGETAREAGROWTHMODIFIER_HPP_
+#ifndef FARHADIFARTYPEMODIFIER_HPP_
+#define FARHADIFARTYPEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractCellBasedSimulationModifier.hpp"
+#include "AbstractTargetAreaModifier.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
 /**
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * It is used to implement growth in vertex-based simulations.
  */
 template<unsigned DIM>
-class TargetAreaGrowthModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class FarhadifarTypeModifier : public AbstractTargetAreaModifier<DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -61,69 +61,20 @@ class TargetAreaGrowthModifier : public AbstractCellBasedSimulationModifier<DIM,
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
-        archive & mMatureCellTargetArea;
+        archive & boost::serialization::base_object<AbstractTargetAreaModifier<DIM> >(*this);
     }
-
-protected:
-
-    /**
-     * The target area of mature cells. Each cell has their own target area stored in CellData which grows
-     * towards the #mMatureCellTargetArea during G1-phase.
-     */
-    double mMatureCellTargetArea;
 
 public:
 
     /**
      * Default constructor.
      */
-    TargetAreaGrowthModifier();
+    FarhadifarTypeModifier();
 
     /**
      * Destructor.
      */
-    virtual ~TargetAreaGrowthModifier();
-
-    /**
-     * Overridden UpdateAtEndOfTimeStep() method.
-     *
-     * Specifies what to do in the simulation at the end of each time step.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
-
-    /**
-     * Overridden SetupSolve() method.
-     *
-     * Specifies what to do in the simulation before the start of the time loop.
-     *
-     * @param rCellPopulation reference to the cell population
-     * @param outputDirectory the output directory, relative to where Chaste output is stored
-     */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
-
-    /**
-     * Get the target area of mature cells in the growth rules. The standard value is 1.0.
-     *
-     * @return the target area of mature cells.
-     */
-    double GetMatureCellTargetArea();
-
-    /**
-     * Set the target area of mature cells in the growth rule.
-     *
-     * @param matureCellTargetArea the new value of #mMatureCellTargetArea
-     */
-    void SetMatureCellTargetArea(double matureCellTargetArea);
-
-    /**
-     * Helper method to update the target area property of all cells in the population.
-     *
-     * @param rCellPopulation reference to the cell population
-     */
-    void UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual ~FarhadifarTypeModifier();
 
     /**
      * Helper method to update the target area property of an individual cell.
@@ -134,6 +85,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(TargetAreaGrowthModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(FarhadifarTypeModifier)
 
-#endif /*TARGETAREAGROWTHMODIFIER_HPP_*/
+#endif /*FARHADIFARTYPEMODIFIER_HPP_*/

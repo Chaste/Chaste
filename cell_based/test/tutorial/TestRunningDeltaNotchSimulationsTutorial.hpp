@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NagaiHondaForce.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "CellAgesWriter.hpp"
@@ -115,7 +115,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta-Notch signalling.
  */
 #include "DeltaNotchTrackingModifier.hpp"
-
 
 /* Having included all the necessary header files, we proceed by defining the test class.
  */
@@ -207,7 +206,7 @@ public:
 
         /* This modifier assigns target areas to each cell, which are required by the {{{NagaiHondaForce}}}.
          */
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
         simulator.Solve();
     }

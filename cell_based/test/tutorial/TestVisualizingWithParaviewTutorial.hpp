@@ -89,7 +89,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
@@ -265,10 +265,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* We also make a pointer to the growth modifier and add it to the simulator.
-         * The growth modifier assigns target areas to cells throughout the simulation.
+        /* We also make a pointer to target area modifier and add it to the simulator.
+         * The target area modifier assigns target areas to cells throughout the simulation.
          */
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         /* To run the simulation, we call {{{Solve()}}}. */

@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 #include "CellVolumesWriter.hpp"
@@ -347,8 +347,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with a TargetAreaGrowthModifier #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run simulation

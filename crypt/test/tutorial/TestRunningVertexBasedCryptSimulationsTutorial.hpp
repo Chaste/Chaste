@@ -99,9 +99,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between neighbouring cells in the cell population, subject to each vertex.
  */
 #include "NagaiHondaForce.hpp"
-/* In conjunction with the {{{NagaiHondaForce}}}, we always have to use a {{{TargetAreaGrowthModifier}}} as well.
+/* In conjunction with the {{{NagaiHondaForce}}}, we always have to use a child class of {{{AbstractTargetAreaModifier}}} as well.
+ * Here, we use the {{{SimpleTargetAreaModifier}}}.
  */
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 
 /* Next, we define the test class. */
 class TestRunningVertexBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
@@ -158,11 +159,11 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* The {{{NagaiHondaForce}}} requires us to add a {{{TargetAreaGrowthModifier}}} to the simulation.
+        /* The {{{NagaiHondaForce}}} requires us to add a child class of {{{AbstractTargetAreaModifier}}} to the simulation.
          * This modifier assigns and updates target areas to each cell throughout the simulation. The target
          * areas are in turn used by the force law to determine the pressure forces on each vertex.
          */
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         /* Before running the simulation, we add a cell killer. This object
@@ -228,7 +229,7 @@ public:
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
 
-        /* Create a simulator as before, and add a force law, the growth modifier and a sloughing cell killer to it. */
+        /* Create a simulator as before, and add a force law, the target area modifier and a sloughing cell killer to it. */
         CryptSimulation2d simulator(crypt);
         simulator.SetOutputDirectory("VertexCryptWithSimpleWntCellCycleModel");
         simulator.SetEndTime(0.1);
@@ -236,7 +237,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));

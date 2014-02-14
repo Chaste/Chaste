@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "NodeVelocityWriter.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
@@ -380,7 +380,7 @@ public:
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -504,7 +504,7 @@ public:
         simulator.AddForce(p_nagai_honda_force);
 
         // NagaiHondaForce requires a growth modifier
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Run and save simulation

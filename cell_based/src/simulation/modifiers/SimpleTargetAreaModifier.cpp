@@ -33,64 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 
 template<unsigned DIM>
-TargetAreaGrowthModifier<DIM>::TargetAreaGrowthModifier()
-    : AbstractCellBasedSimulationModifier<DIM>(),
-      mMatureCellTargetArea(1.0)
+SimpleTargetAreaModifier<DIM>::SimpleTargetAreaModifier()
+    : AbstractTargetAreaModifier<DIM>()
 {
 }
 
 template<unsigned DIM>
-TargetAreaGrowthModifier<DIM>::~TargetAreaGrowthModifier()
+SimpleTargetAreaModifier<DIM>::~SimpleTargetAreaModifier()
 {
 }
 
 template<unsigned DIM>
-void TargetAreaGrowthModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    UpdateTargetAreas(rCellPopulation);
-}
-
-template<unsigned DIM>
-void TargetAreaGrowthModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
-{
-    /*
-     * We must update CellData in SetupSolve(), otherwise it will not have been
-     * fully initialised by the time we enter the main time loop.
-     */
-    UpdateTargetAreas(rCellPopulation);
-}
-
-template<unsigned DIM>
-void TargetAreaGrowthModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
-{
-    // Make sure the cell population is updated
-    ///\todo #2488: double check that this update call doesn't break anything (i.e. counting of swaps etc.)
-    rCellPopulation.Update();
-
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
-    {
-        EXCEPTION("TargetAreaGrowthModifier is to be used with a VertexBasedCellPopulation only");
-    }
-
-    VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
-
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-         elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
-         ++elem_iter)
-    {
-        unsigned elem_index = elem_iter->GetIndex();
-        UpdateTargetAreaOfCell( p_cell_population->GetCellUsingLocationIndex(elem_index) );
-    }
-}
-
-template<unsigned DIM>
-void TargetAreaGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
+void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
 {
     // Get target area A of a healthy cell in S, G2 or M phase
-    double cell_target_area = mMatureCellTargetArea;
+    double cell_target_area = this->mReferenceTargetArea;
 
     double cell_age = pCell->GetAge();
     double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
@@ -137,7 +97,7 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
              */
             if (pCell->ReadyToDivide())
             {
-                cell_target_area = 0.5*mMatureCellTargetArea;
+                cell_target_area = 0.5*this->mReferenceTargetArea;
             }
         }
     }
@@ -146,24 +106,11 @@ void TargetAreaGrowthModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     pCell->GetCellData()->SetItem("target area", cell_target_area);
 }
 
-template<unsigned DIM>
-double TargetAreaGrowthModifier<DIM>::GetMatureCellTargetArea()
-{
-    return mMatureCellTargetArea;
-}
-
-template<unsigned DIM>
-void TargetAreaGrowthModifier<DIM>::SetMatureCellTargetArea(double matureCellTargetArea)
-{
-    assert(matureCellTargetArea >= 0.0);
-    mMatureCellTargetArea = matureCellTargetArea;
-}
-
 // Explicit instantiation
-template class TargetAreaGrowthModifier<1>;
-template class TargetAreaGrowthModifier<2>;
-template class TargetAreaGrowthModifier<3>;
+template class SimpleTargetAreaModifier<1>;
+template class SimpleTargetAreaModifier<2>;
+template class SimpleTargetAreaModifier<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(TargetAreaGrowthModifier)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SimpleTargetAreaModifier)

@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -876,13 +876,13 @@ public:
         // Currently, NagaiHonda force only works if used together with a target area growth modifier
         // This tests that a meaningful error appears if we don't use a growth modifier
         TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
-                "You need to add a TargetAreaGrowthModifier to the simulation in order to use NagaiHondaForce.");
+                "You need to add a AbstractTargetAreaModifier to the simulation in order to use NagaiHondaForce.");
 
         // create our modifier, which sets the target areas for the cell population
         // this is a workaround to make the test work
         // #2488
 
-        MAKE_PTR(TargetAreaGrowthModifier<2>,p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>,p_growth_modifier);
         p_growth_modifier->UpdateTargetAreas(cell_population);
 
         force.AddForceContribution(cell_population);
@@ -1026,7 +1026,7 @@ public:
 
         // now we add the the growth modifier and go on
         // #2488
-        MAKE_PTR(TargetAreaGrowthModifier<2>,p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>,p_growth_modifier);
         p_growth_modifier->UpdateTargetAreas(cell_population);
 
         force.AddForceContribution(cell_population);

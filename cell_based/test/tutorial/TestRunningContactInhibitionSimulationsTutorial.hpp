@@ -107,7 +107,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
-#include "TargetAreaGrowthModifier.hpp"
+#include "SimpleTargetAreaModifier.hpp"
 #include "SimulationTime.hpp"
 #include "CellLabel.hpp"
 #include "MutableMesh.hpp"
@@ -386,10 +386,10 @@ public:
         simulator.AddForce(p_nagai_honda_force);
 
         /* A {{{NagaiHondaForce}}} assumes that each cell has a target area assigned to it. In order to
-         * assign target areas to each cell and define how they grow, we add a {{{TargetAreaGrowthModifier}}}
+         * assign target areas to each cell and define how they grow, we add a {{{SimpleTargetAreaModifier}}}
          * to the simulator.
          */
-        MAKE_PTR(TargetAreaGrowthModifier<2>, p_growth_modifier);
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         /* To run the simulation, we call {{{Solve()}}}. */
