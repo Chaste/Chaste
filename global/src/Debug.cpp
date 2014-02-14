@@ -34,7 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Debug.hpp"
+// If you ever need backtrace in Windows then the RTFM begins at "CaptureStackBackTrace"
+#ifndef _MSC_VER
 #include <execinfo.h> //For backtrace
+#endif//_MSC_VER
 //#include <cxxabi.h> // For demangling C++ C-style names
 
 std::string FormDebugHead()
@@ -51,6 +54,9 @@ std::string FormDebugHead()
 
 void PrintTheStack()
 {
+    // If you ever need backtrace in Windows then the RTFM begins at "CaptureStackBackTrace"
+    TRACE("Stack information");
+#ifndef _MSC_VER
     // storage array for stack trace address data
     void* address_list[20u]; //20 is about the number of stack symbols we are going to print
 
@@ -67,4 +73,5 @@ void PrintTheStack()
         TRACE("Level " << i << ": " << symbol_list[i]);
     }
     free(symbol_list);
+#endif //_MSC_VER
 }

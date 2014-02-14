@@ -528,7 +528,7 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
     for (unsigned i=0; i<num_nodes; i++)
     {
         node_data = rMeshReader.GetNextNode();
-        unsigned is_boundary_node = (unsigned) node_data[DIM];
+        unsigned is_boundary_node = (bool) node_data[DIM];
         node_data.pop_back();
         this->mNodes.push_back(new Node<DIM>(i, node_data, is_boundary_node));
     }

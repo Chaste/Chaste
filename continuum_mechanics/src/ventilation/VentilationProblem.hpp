@@ -262,7 +262,7 @@ public:
     /**
      * @param dynamicResistance
      **/
-    void SetDynamicResistance(double dynamicResistance = true)
+    void SetDynamicResistance(bool dynamicResistance = true)
     {
         mDynamicResistance = dynamicResistance;
     }

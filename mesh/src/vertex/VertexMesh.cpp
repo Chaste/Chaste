@@ -854,7 +854,7 @@ void VertexMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshRead
     for (unsigned i=0; i<num_nodes; i++)
     {
         node_data = rMeshReader.GetNextNode();
-        unsigned is_boundary_node = (unsigned) node_data[2];
+        unsigned is_boundary_node = (bool) node_data[2];
         node_data.pop_back();
         this->mNodes.push_back(new Node<2>(i, node_data, is_boundary_node));
     }
@@ -913,7 +913,7 @@ void VertexMesh<3,3>::ConstructFromMeshReader(AbstractMeshReader<3,3>& rMeshRead
     for (unsigned i=0; i<num_nodes; i++)
     {
         node_data = rMeshReader.GetNextNode();
-        unsigned is_boundary_node = (unsigned) node_data[3];
+        unsigned is_boundary_node = (bool) node_data[3];
         node_data.pop_back();
         this->mNodes.push_back(new Node<3>(i, node_data, is_boundary_node));
     }
