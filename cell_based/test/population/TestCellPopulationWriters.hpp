@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Files to create populations
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -466,17 +467,12 @@ public:
         FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T3SwapLocations_twice.dat").CompareFiles();
 
         // Coverage of the Visit() method when called on a MeshBasedCellPopulation
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 1.0));
-        nodes.push_back(new Node<2>(2, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
-        nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
-        MutableMesh<2,2> mesh(nodes);
+        HoneycombMeshGenerator tet_generator(5, 5, 0);
+        MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
         std::vector<CellPtr> mesh_based_cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
-        mesh_based_cells_generator.GenerateBasic(mesh_based_cells, mesh.GetNumNodes());
-        MeshBasedCellPopulation<2> mesh_based_cell_population(mesh, cells);
+        mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
+        MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
         TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&mesh_based_cell_population));
         TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&mesh_based_cell_population));
@@ -486,7 +482,7 @@ public:
         PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
         std::vector<CellPtr> ca_based_cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
-        ca_based_cells_generator.GenerateBasic(cells, 5);
+        ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
         std::vector<unsigned> location_indices;
         location_indices.push_back(7);
         location_indices.push_back(11);
