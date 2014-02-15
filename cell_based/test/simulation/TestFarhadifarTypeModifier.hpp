@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctime>
 #include "SmartPointers.hpp"
 
-#include "Debug.hpp"
 #include "FarhadifarTypeModifier.hpp"
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -58,33 +57,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "CellBasedEventHandler.hpp"
 
+// This test is only run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
+
 class TestFarhadifarTypeModifier : public AbstractCellBasedTestSuite
 {
 public:
-	void TestUpdateTargetAreasException() throw (Exception)
-	{
-		// First set up SimulationTime (this is usually handled by a simulation object)
-		SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+    void TestUpdateTargetAreasException() throw (Exception)
+    {
+        // First set up SimulationTime (this is usually handled by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-		// Create a FarhadifarTypeModifier
-		MAKE_PTR(FarhadifarTypeModifier<2>, p_modifier);
+        // Create a FarhadifarTypeModifier
+        MAKE_PTR(FarhadifarTypeModifier<2>, p_modifier);
 
-		// Create a cell population whose type should not be used with a FarhadifarTypeModifier
-		HoneycombMeshGenerator generator(4, 4, 0);
-		MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        // Create a cell population whose type should not be used with a FarhadifarTypeModifier
+        HoneycombMeshGenerator generator(4, 4, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
 
-		MeshBasedCellPopulation<2> population(*p_mesh, cells);
+        MeshBasedCellPopulation<2> population(*p_mesh, cells);
 
-		// Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
-		TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreas(population),
-				"AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
+        // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
+        TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreas(population),
+                "AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
 
-	}
+    }
 
    void TestFarhadifarTypeModifierMethods() throw (Exception)
     {
@@ -111,16 +113,16 @@ public:
         // the cells have varying ages
         for (unsigned i=0; i<cells.size(); i++)
         {
-        	double birth_time;
-        	if (i > 3)
-        	{
-        		birth_time = 0 - (20. + 0.8*(i-4.));
-        	}
-        	else
-        	{
-        		birth_time = 0.0 - 2*i;
-        	}
-        	cells[i]->SetBirthTime(birth_time);
+            double birth_time;
+            if (i > 3)
+            {
+                birth_time = 0 - (20. + 0.8*(i-4.));
+            }
+            else
+            {
+                birth_time = 0.0 - 2*i;
+            }
+            cells[i]->SetBirthTime(birth_time);
         }
 
         // Create a cell population
@@ -274,7 +276,7 @@ public:
         // This is the cell from before, let's see what its target area is
         double target_area_before_division = p_cell->GetCellData()->GetItem("target area");
         double expected_area = p_growth_modifier->GetReferenceTargetArea() +
-        		                  (p_cell->GetAge() - 8.0)/(p_cell->GetCellCycleModel()->GetG2Duration());
+                                  (p_cell->GetAge() - 8.0)/(p_cell->GetCellCycleModel()->GetG2Duration());
         TS_ASSERT_DELTA(target_area_before_division,expected_area,1e-9);
 
         // Now we adjust the end time and run the simulation a bit further
@@ -287,11 +289,11 @@ public:
 
         // Iterate over the cells, checking their target areas
         for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-        		cell_iter != cell_population.End();
-        		++cell_iter)
+                cell_iter != cell_population.End();
+                ++cell_iter)
         {
-        	double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
-        	TS_ASSERT_DELTA(target_area_at_division,1.0,1e-9);
+            double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
+            TS_ASSERT_DELTA(target_area_at_division,1.0,1e-9);
         }
 
         // Now we do the same thing again
@@ -304,12 +306,12 @@ public:
         TS_ASSERT_EQUALS(num_cells_after_division,2u);
 
         for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-        		cell_iter != cell_population.End();
-        		++cell_iter)
+                cell_iter != cell_population.End();
+                ++cell_iter)
         {
-        	double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
+            double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
 
-        	TS_ASSERT_DELTA(target_area_after_division,1.0,1e-9);
+            TS_ASSERT_DELTA(target_area_after_division,1.0,1e-9);
         }
     }
 

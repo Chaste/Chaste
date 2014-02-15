@@ -70,7 +70,7 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {
         // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-    	/// todo: which cells are apoptotic? if they get apoptotic during G2-phase then this line has to be changed
+        /// todo: which cells are apoptotic? if they get apoptotic during G2-phase then this line has to be changed
         cell_target_area = cell_target_area - 0.5*cell_target_area/(pCell->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
 
         // Don't allow a negative target area
@@ -96,7 +96,7 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
          */
         if (pCell->ReadyToDivide())
         {
-        	cell_target_area = this->mReferenceTargetArea;
+            cell_target_area = this->mReferenceTargetArea;
         }
     }
 
