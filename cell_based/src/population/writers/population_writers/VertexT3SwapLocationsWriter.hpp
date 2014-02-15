@@ -71,32 +71,28 @@ public:
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
-    {}
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the MultipleCaBasedCellPopulation to visit.
      */
-    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-    {}
+    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-    {}
+    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
-    {}
+    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.

@@ -49,6 +49,26 @@ VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexT1SwapLocationsWriter
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     std::vector< c_vector<double, SPACE_DIM> > t1_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT1Swaps();
