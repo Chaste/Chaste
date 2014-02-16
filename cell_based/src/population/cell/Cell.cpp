@@ -427,7 +427,7 @@ CellPtr Cell::Divide()
     // Create copy of cell property collection to modify for daughter cell
     CellPropertyCollection daughter_property_collection = mCellPropertyCollection;
 
-    // Remove the CellId from the daughter cell a new one will be assigned in the constructor
+    // Remove the CellId from the daughter cell, as a new one will be assigned in the constructor
     daughter_property_collection.RemoveProperty<CellId>();
 
     // Copy all cell data (note we create a new object not just copying the pointer)
@@ -446,6 +446,9 @@ CellPtr Cell::Divide()
 
     // Initialise properties of daughter cell
     p_new_cell->GetCellCycleModel()->InitialiseDaughterCell();
+
+    // Set the daughter cell to inherit the apoptosis time of the parent cell
+    p_new_cell->SetApoptosisTime(mApoptosisTime);
 
     return p_new_cell;
 }

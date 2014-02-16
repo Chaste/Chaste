@@ -352,7 +352,7 @@ public:
 
         // Test that the stem cell's progeny has correctly inherited the apoptosis time member variable
         TS_ASSERT_DELTA(p_stem_cell->GetApoptosisTime(), 15.78, 1e-6);
-///\todo #2495        TS_ASSERT_DELTA(p_daughter_cell->GetApoptosisTime(), 15.78, 1e-6);
+        TS_ASSERT_DELTA(p_daughter_cell->GetApoptosisTime(), 15.78, 1e-6);
 
         p_simulation_time->IncrementTimeOneStep(); //t=36
 
