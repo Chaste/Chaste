@@ -296,7 +296,6 @@ public:
         p_simulation_time->IncrementTimeOneStep(); //t=6
 
         // Cover bad cell-cycle model
-
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_type_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
@@ -307,6 +306,10 @@ public:
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_model));
         p_stem_cell->SetCellProliferativeType(p_type);
         p_stem_cell->InitialiseCellCycleModel();
+
+        // Set the time over which the cell would undergo apoptosis, if it were told to
+        p_stem_cell->SetApoptosisTime(15.78);
+        TS_ASSERT_DELTA(p_stem_cell->GetApoptosisTime(), 15.78, 1e-6);
 
         // This test needs particular cell cycle times
         TS_ASSERT_DELTA(p_model->GetStemCellG1Duration(), 14.0, 1e-12);
@@ -346,6 +349,10 @@ public:
         TS_ASSERT_EQUALS(static_cast<FixedDurationGenerationBasedCellCycleModel*>(p_daughter_cell->GetCellCycleModel())->GetGeneration(), 1u);
         TS_ASSERT_EQUALS(p_daughter_cell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
         TS_ASSERT_DELTA(p_daughter_cell->GetAge(), 0, 1e-9);
+
+        // Test that the stem cell's progeny has correctly inherited the apoptosis time member variable
+        TS_ASSERT_DELTA(p_stem_cell->GetApoptosisTime(), 15.78, 1e-6);
+///\todo #2495        TS_ASSERT_DELTA(p_daughter_cell->GetApoptosisTime(), 15.78, 1e-6);
 
         p_simulation_time->IncrementTimeOneStep(); //t=36
 
@@ -901,7 +908,6 @@ public:
 
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_transit_type(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-
 
         FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
 
