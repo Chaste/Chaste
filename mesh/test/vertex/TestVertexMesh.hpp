@@ -2023,6 +2023,55 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 1.125, 1e-4);
         TS_ASSERT_DELTA(voronoi_mesh.GetSurfaceAreaOfElement(0), 9.0*sqrt(3.0)/2.0, 1e-4);
     }
+
+
+    void TestTessellationConstructor3dWithRepeatedCircumcentres() throw (Exception)
+    {
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0,  false,  1.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(1,  false,  1.5, 1.5, 1.5));
+        nodes.push_back(new Node<3>(2,  true, 0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(3,  true,  2.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(4,  true,  2.0,  2.0, 0.0));
+        nodes.push_back(new Node<3>(5,  true, 0.0,  2.0, 0.0));
+        nodes.push_back(new Node<3>(6,  true, 0.0, 0.0,  2.0));
+        nodes.push_back(new Node<3>(7, true,  2.0, 0.0,  2.0));
+        nodes.push_back(new Node<3>(8, true,  2.0,  2.0,  2.0));
+        nodes.push_back(new Node<3>(9, true, 0.0,  2.0,  2.0));
+        MutableMesh<3,3> delaunay_mesh(nodes);
+
+        TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 18u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 10u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumBoundaryNodes(), 8u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes() - delaunay_mesh.GetNumBoundaryNodes(), 2u);
+
+        VertexMesh<3,3> voronoi_mesh(delaunay_mesh);
+
+        // Check there are as many nodes in the Voronoi mesh as there are elements in the Delaunay mesh
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 18u);
+        // Note that some Voronoi nodes are repeated - most of the points above are co-spherical
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5u)->rGetLocation()[0],   1.0, 1e-8);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5u)->rGetLocation()[1],   1.0, 1e-8);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5u)->rGetLocation()[2],   3.25, 1e-8);
+        TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(5u)->rGetLocation() - voronoi_mesh.GetNode(12u)->rGetLocation()),   0.0, DBL_EPSILON);
+
+
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 2u);
+        //\todo TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 0., 1e-4);
+        //\todo TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1u), 0., 1e-4);
+
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumFaces(), 15u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(0u)), 0.3064, 1e-4); //Degenerate triangle
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(1u)), 1.8267, 1e-4); //Quad
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(2u)), 2.6792, 1e-4); //Six-sided
+
+//        VertexMeshWriter<3,3> vertex_mesh_writer("TestVertexMeshWriter", "vertex_mesh");
+//        vertex_mesh_writer.WriteFilesUsingMesh(voronoi_mesh);
+//        vertex_mesh_writer.WriteVtkUsingMesh(voronoi_mesh);
+    }
+
+
 };
 
 #endif /*TESTVERTEXMESH_HPP_*/

@@ -1495,6 +1495,24 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetUnitNormalToF
     c_vector<double, SPACE_DIM> v1_minus_v0 = this->GetVectorFromAtoB(v0, v1);
     c_vector<double, SPACE_DIM> v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
 
+    if( norm_1(v1_minus_v0) == 0.0 && ( pFace->GetNumNodes() >= 4u ))
+    {
+        ///\todo #2391 Remove temporary hack
+        v2 = pFace->GetNode(3)->rGetLocation();
+        v1_minus_v0 = v2_minus_v0;
+        v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
+
+    }
+    if(( pFace->GetNumNodes() >= 4u ) &&( norm_1(this->GetVectorFromAtoB(v1, v2)) == 0.0 || norm_1(v2_minus_v0) == 0.0) )
+    {
+        ///\todo #2391 Remove temporary hack
+        assert( pFace->GetNumNodes() >= 4u );
+        v2 = pFace->GetNode(3)->rGetLocation();
+        v2_minus_v0 = this->GetVectorFromAtoB(v0, v2);
+    }
+
+
+
     c_vector<double, SPACE_DIM> unit_normal = VectorProduct(v1_minus_v0, v2_minus_v0);
 
     double magnitude = norm_2(unit_normal);
@@ -1524,6 +1542,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
     if (norm_inf(unit_normal)==0.0)
     {
         ///\todo #2391 We have already warned the user that the face is degenerate and this should not happen
+        //NEVER_REACHED;
         return 0.0;
     }
 
@@ -1577,35 +1596,34 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
 
     // Scale to get area before projection
     face_area /= abs;
-//    {
-//        ///\todo #2391 recalculate both the area and the normal in the same framework
-//
-//        c_vector<double, SPACE_DIM> weighted_normal = zero_vector<double>(SPACE_DIM);
-//        c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
-//
-//        for (unsigned local_index=1; local_index<num_nodes_in_face; local_index++)
-//        {
-//            c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
-//            weighted_normal += VectorProduct(v_minus_v0, vnext_minus_v0);
-//        }
-//        double area = norm_2(weighted_normal);
-//        weighted_normal /= area;
-//        area /= 2.0;
-//        if (std::isnan(face_area) || abs == 0.0)
-//        {
-//            // Not always true, only sometimes! assert(area == 0.0);
-//            if (area != 0.0)
-//            {
-//                //TRACE("Mismatch between methods");
-//            }
-//        }
-//        else
-//        {
-//            assert( fabs(area - fabs(face_area)) < DBL_EPSILON);
-//            c_vector<double, SPACE_DIM> diff_normals = unit_normal - weighted_normal;
-//            assert(norm_1(diff_normals) < DBL_EPSILON);
-//        }
-//    }
+    {
+        ///\todo #2391 recalculate both the area and the normal in the same framework
+
+        c_vector<double, SPACE_DIM> weighted_normal = zero_vector<double>(SPACE_DIM);
+        c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
+
+        for (unsigned local_index=2; local_index<num_nodes_in_face; local_index++)
+        {
+
+            c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
+            weighted_normal += VectorProduct(v_minus_v0, vnext_minus_v0);
+            v_minus_v0 = vnext_minus_v0;
+        }
+        double area = norm_2(weighted_normal);
+        weighted_normal /= area;
+        area /= 2.0;
+        if (std::isnan(face_area) || face_area == 0.0)
+        {
+            //assert(area == 0.0);
+
+        }
+        else
+        {
+            assert( fabs(area - fabs(face_area)) < 1e8);//Vacuous #2391
+            c_vector<double, SPACE_DIM> diff_normals = unit_normal - weighted_normal;
+            assert(norm_1(diff_normals) < 1e8);  //Vacuous #2391
+        }
+    }
     return fabs(face_area);
 }
 /// Specialization to avoid compiler error about zero-sized arrays
