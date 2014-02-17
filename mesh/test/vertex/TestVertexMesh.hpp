@@ -2058,17 +2058,20 @@ public:
 
 
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 2u);
-        //\todo TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 0., 1e-4);
-        //\todo TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1u), 0., 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 3.4804, 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1u), 3.0937, 1e-4);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u) + voronoi_mesh.GetVolumeOfElement(1u),
+                        6.57422, 1e-5); // Agrees with Paraview
 
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumFaces(), 15u);
-        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(0u)), 0.3064, 1e-4); //Degenerate triangle
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(0u)), 0.3064, 1e-4); //Degenerate quad (is triangle)
         TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(1u)), 1.8267, 1e-4); //Quad
         TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(2u)), 2.6792, 1e-4); //Six-sided
-
-//        VertexMeshWriter<3,3> vertex_mesh_writer("TestVertexMeshWriter", "vertex_mesh");
-//        vertex_mesh_writer.WriteFilesUsingMesh(voronoi_mesh);
-//        vertex_mesh_writer.WriteVtkUsingMesh(voronoi_mesh);
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(5u)), 4.38425, 1e-4); //Degenerate (is triangle)
+        for (unsigned i=0; i<15; i++)
+        {
+            voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(i));
+        }
     }
 
 
