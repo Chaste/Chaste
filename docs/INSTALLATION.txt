@@ -1,11 +1,14 @@
 CHASTE DEVELOPER INSTALLATION GUIDE (for SOURCE-CODE users only, NOT STANDALONE EXECUTABLE users)
 
+************************************************************************************************************************
+*                                                                                                                      *
+* NB: This guide is currently out of date!  It will be updated for the next release, but see our wiki in the meantime! *
+*                                                                                                                      *
+************************************************************************************************************************
 
 This guide walks you through a "standard" installation of Chaste and all its
-dependencies.  Other guides can be found on the developer wiki at
-https://chaste.cs.ox.ac.uk/trac/wiki/DeveloperInstallGuide
-For a guest login, use the username "anonymous", and your email address as
-the password.
+dependencies.  Other guides can be found on the Chaste wiki at
+https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/InstallGuide
 Anyone can register an account with the Chaste wiki to view and comment on public tickets.
 
 There are many dependencies, so if you are running the Ubuntu Linux
@@ -38,12 +41,12 @@ libraries might need updating). Please install them as described below.
 Use your package manager to install Scons or
 
 cd $CHASTE_LIBS
-wget http://mesh.dl.sourceforge.net/sourceforge/scons/scons-1.2.0.tar.gz
-tar zxf scons-1.2.0.tar.gz
-cd scons-1.2.0
+wget http://downloads.sourceforge.net/project/scons/scons/2.2.0/scons-2.2.0.tar.gz
+tar zxf scons-2.2.0.tar.gz
+cd scons-2.2.0
 python setup.py install --prefix=$CHASTE_LIBS
 cd ..
-rm -rf scons-1.2.0.tar.gz scons-1.2.0
+rm -rf scons-2.2.0.tar.gz scons-2.2.0
 
 On a 64-bit machine you may find that an invocation of Scons
 ($CHASTE_LIBS/bin/scons) produces the error "ImportError: No module named
@@ -56,11 +59,8 @@ ln -s lib64 lib
 
 ========PETSC:=======
 
-Note that the version of HDF5 installed by PETSc (HDF5 v 1.6.6) has a known bug when extending large files in 
-parallel.  If you wish to avoid this bug then you will need to leave out the "--download-hdf5=yes".  Then follow the
-install HDF5 instructions from INSTALLATION_OLD.txt.  The configure line will look like:
-export PATH=$CHASTE_LIBS/petsc-3.0.0-p8/linux-gnu/bin/:${PATH}
-CC=mpicc ./configure --enable-parallel --prefix=$CHASTE_LIBS/hdf5
+Note that the version of HDF5 installed by PETSc (HDF5 v 1.6.6) has a known bug when extending large files in
+parallel.  If you wish to avoid this bug then see alternative installation guides on our website.
 
 PETSc 3.0 and later versions can install some of our dependencies for us (OpenMPI, HDF5,
 ParMETIS, hypre):
@@ -70,7 +70,7 @@ ParMETIS, hypre):
 
 cd $CHASTE_LIBS
 wget http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.0.0-p8.tar.gz
-tar xzvf petsc-3.0.0-p8.tar.gz 
+tar xzvf petsc-3.0.0-p8.tar.gz
 rm -f petsc-3.0.0-p8.tar.gz
 cd petsc-3.0.0-p8/
 export PETSC_DIR=`pwd`
@@ -93,6 +93,8 @@ ls /usr/include/boost/serialization/
 
 Please don't use Boost versions 1.35, 1.36, or 1.41 as serialization in these versions is broken.
 Note that archives created by a newer version of Boost may be unreadable by older versions.
+
+NB: Boost 1.34 probably won't compile on most current Linux distribution releases!
 
 cd $CHASTE_LIBS
 wget http://fastbull.dl.sourceforge.net/sourceforge/boost/boost-jam-3.1.17-1-linuxx86.tgz
@@ -173,14 +175,14 @@ If you are installing in userspace there are 3 steps:
 
 1. (CMAKE -- First check to see if you have this on your system)
 cd $CHASTE_LIBS 
-wget http://www.cmake.org/files/v2.6/cmake-2.6.2-Linux-i386.tar.gz 
+wget http://www.cmake.org/files/v2.6/cmake-2.6.2-Linux-i386.tar.gz
 tar xvfz cmake-2.6.2-Linux-i386.tar.gz 
 export PATH=${CHASTE_LIBS}/cmake-2.6.2-Linux-i386/bin/:${PATH}
 
 2. (VTK) 
 cd $CHASTE_LIBS 
 #Note that we currently test with VTK-5.0.4 and VTK-5.2.1
-#However, 5.0.4 won't compile with recent versions of gcc! 
+#However, 5.0.4 won't compile with recent versions of gcc!
 wget http://www.vtk.org/files/release/5.2/vtk-5.2.1.tar.gz
 tar xvfz vtk-5.2.1.tar.gz 
 cd VTK
@@ -310,9 +312,9 @@ Similarly if PYTHONPATH is already set in your .bashrc, use
 
 export PYTHONPATH=$PYTHONPATH:$CHASTE_LIBS/python:$CHASTE_LIBS/lib/python
 
-Note that test output will be put in the folder given by the environment variable CHASTE_TEST_OUTPUT. 
-If this has not been assigned to anything, it will be (temporarily) set to be the directory 
-"/tmp/<USER_NAME>/testoutput/" whenever scons is run. If you would prefer output in a different 
+Note that test output will be put in the folder given by the environment variable CHASTE_TEST_OUTPUT.
+If this has not been assigned to anything, it will be (temporarily) set to be the directory
+"/tmp/<USER_NAME>/testoutput/" whenever scons is run. If you would prefer output in a different
 directory also add the following to the .bashrc file.
 
 export CHASTE_TEST_OUTPUT=<YOUR CHOICE OF DIRECTORY>
@@ -334,20 +336,20 @@ NB. You will need to logout and in again for the above to take effect (or instea
 
 First, return to the main Chaste directory (the folder with the code and this README file)
 
-You will need to edit the python/hostconfig/default.py to give the correct paths to each 
+You will need to edit the python/hostconfig/default.py to give the correct paths to each
 of the libraries.  Note that if you followed these instructions (placing all dependencies below
 a ${CHASTE_LIBS} directory) then this should be a matter of editing the line that sets chaste_libs_path.
 
 If you've used a variation on these instructions then you may need to make other alterations.  For
 example, the name of the Boost serialization library may differ in the 'other_libraries' field.
-The location and names of the Blas and Lapack libraries are also included in the default.py file 
+The location and names of the Blas and Lapack libraries are also included in the default.py file
 and should be changed to the correct paths and names for your installation.  The correct names
 for MKL Blas/Lapack libraries are
 blas_lapack = ['mkl_lapack', 'mkl', 'svml']
 
-Note that if you have the Intel compiler available, you may want to enable Chaste compilation 
-with Intel.  We've found that on some tests the build-type for optimised Intel 
-"build=IntelProduction" (see below) provides an executable that is up to 60% faster than 
+Note that if you have the Intel compiler available, you may want to enable Chaste compilation
+with Intel.  We've found that on some tests the build-type for optimised Intel
+"build=IntelProduction" (see below) provides an executable that is up to 60% faster than
 optimised Gnu "build=GccOpt".
 
 
@@ -423,7 +425,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:[*PATH_TO_CHASTE*]/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CHASTE_LIBS/boost/lib:$CHASTE_LIBS/xerces/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CHASTE_LIBS/hdf/lib:$CHASTE_LIBS/rdf/lib
 
-In order to run a simulation edit the ChasteParameters.xml file according to your needs and, 
+In order to run a simulation edit the ChasteParameters.xml file according to your needs and,
 from the Chaste directory, type
 
 apps/src/Chaste ChasteParameters.xml
