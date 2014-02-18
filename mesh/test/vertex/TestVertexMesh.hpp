@@ -1162,7 +1162,8 @@ public:
         // Face 0 has four vertices, is perpendicular to the y axis, and has area 1*3 = 3
         VertexElement<2,3>* p_face_0 = p_mesh->GetFace(0);
         TS_ASSERT_EQUALS(p_face_0->GetNumNodes(), 4u);
-        c_vector<double, 3> unit_normal_0 = p_mesh->GetUnitNormalToFace(p_face_0);
+        c_vector<double, 3> unit_normal_0;
+        p_mesh->CalculateUnitNormalToFaceWithArea(p_face_0, unit_normal_0);
         TS_ASSERT_DELTA(unit_normal_0[0], 0.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_0[1], 1.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_0[2], 0.0, 1e-6);
@@ -1171,7 +1172,8 @@ public:
         // Face 1 has three vertices, is perpendicular to the x axis, and has area 0.5*2*3 = 3
         VertexElement<2,3>* p_face_1 = p_mesh->GetFace(1);
         TS_ASSERT_EQUALS(p_face_1->GetNumNodes(), 3u);
-        c_vector<double, 3> unit_normal_1 = p_mesh->GetUnitNormalToFace(p_face_1);
+        c_vector<double, 3> unit_normal_1;
+        p_mesh->CalculateUnitNormalToFaceWithArea(p_face_1, unit_normal_1);
         TS_ASSERT_DELTA(unit_normal_1[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_1[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_1[2], 0.0, 1e-6);
@@ -1181,7 +1183,8 @@ public:
         // and has area 1*sqrt(2^2 + 3^2) = sqrt(13.0)
         VertexElement<2,3>* p_face_2 = p_mesh->GetFace(2);
         TS_ASSERT_EQUALS(p_face_2->GetNumNodes(), 4u);
-        c_vector<double, 3> unit_normal_2 = p_mesh->GetUnitNormalToFace(p_face_2);
+        c_vector<double, 3> unit_normal_2;
+        p_mesh->CalculateUnitNormalToFaceWithArea(p_face_2, unit_normal_2);
         TS_ASSERT_DELTA(unit_normal_2[0], 0.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_2[1], -sin(atan2(3.0,2.0)), 1e-6);
         TS_ASSERT_DELTA(unit_normal_2[2], -cos(atan2(3.0,2.0)), 1e-6);
@@ -1190,7 +1193,8 @@ public:
         // Face 1 has three vertices, is perpendicular to the x axis, and has area 0.5*2*3 = 3
         VertexElement<2,3>* p_face_3 = p_mesh->GetFace(3);
         TS_ASSERT_EQUALS(p_face_3->GetNumNodes(), 3u);
-        c_vector<double, 3> unit_normal_3 = p_mesh->GetUnitNormalToFace(p_face_3);
+        c_vector<double, 3> unit_normal_3;
+        p_mesh->CalculateUnitNormalToFaceWithArea(p_face_3, unit_normal_3);
         TS_ASSERT_DELTA(unit_normal_3[0], -1.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_3[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_3[2], 0.0, 1e-6);
@@ -1199,7 +1203,8 @@ public:
         // Face 4 has four vertices, is perpendicular to the z axis, and has area 1*2 = 2
         VertexElement<2,3>* p_face_4 = p_mesh->GetFace(4);
         TS_ASSERT_EQUALS(p_face_4->GetNumNodes(), 4u);
-        c_vector<double, 3> unit_normal_4 = p_mesh->GetUnitNormalToFace(p_face_4);
+        c_vector<double, 3> unit_normal_4;
+        p_mesh->CalculateUnitNormalToFaceWithArea(p_face_4, unit_normal_4);
         TS_ASSERT_DELTA(unit_normal_4[0], 0.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_4[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(unit_normal_4[2], -1.0, 1e-6);
@@ -2028,50 +2033,60 @@ public:
     void TestTessellationConstructor3dWithRepeatedCircumcentres() throw (Exception)
     {
         std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0,  false,  1.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(1,  false,  1.5, 1.5, 1.5));
-        nodes.push_back(new Node<3>(2,  true, 0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(3,  true,  2.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(4,  true,  2.0,  2.0, 0.0));
-        nodes.push_back(new Node<3>(5,  true, 0.0,  2.0, 0.0));
-        nodes.push_back(new Node<3>(6,  true, 0.0, 0.0,  2.0));
-        nodes.push_back(new Node<3>(7, true,  2.0, 0.0,  2.0));
-        nodes.push_back(new Node<3>(8, true,  2.0,  2.0,  2.0));
-        nodes.push_back(new Node<3>(9, true, 0.0,  2.0,  2.0));
+        nodes.push_back(new Node<3>(0,  false,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1,  false,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2,  false,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3,  false,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4,  false,  0.5, 0.5, 0.5));
+        nodes.push_back(new Node<3>(5,  true,  -1.0, -1.0, -1.0));
+        nodes.push_back(new Node<3>(6,  true,   2.0, -1.0, -1.0));
+        nodes.push_back(new Node<3>(7,  true,   2.0,  2.0, -1.0));
+        nodes.push_back(new Node<3>(8,  true,  -1.0,  2.0, -1.0));
+        nodes.push_back(new Node<3>(9,  true,  -1.0, -1.0,  2.0));
+        nodes.push_back(new Node<3>(10, true,   2.0, -1.0,  2.0));
+        nodes.push_back(new Node<3>(11, true,   2.0,  2.0,  2.0));
+        nodes.push_back(new Node<3>(12, true,  -1.0,  2.0,  2.0));
         MutableMesh<3,3> delaunay_mesh(nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
-        TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 18u);
-        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 10u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 32u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 13u);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumBoundaryNodes(), 8u);
-        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes() - delaunay_mesh.GetNumBoundaryNodes(), 2u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes() - delaunay_mesh.GetNumBoundaryNodes(), 5u);
 
         VertexMesh<3,3> voronoi_mesh(delaunay_mesh);
 
         // Check there are as many nodes in the Voronoi mesh as there are elements in the Delaunay mesh
-        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 18u);
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 32u);
+
         // Note that some Voronoi nodes are repeated - most of the points above are co-spherical
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5u)->rGetLocation()[0],   1.0, 1e-8);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5u)->rGetLocation()[1],   1.0, 1e-8);
-        TS_ASSERT_DELTA(voronoi_mesh.GetNode(5u)->rGetLocation()[2],   3.25, 1e-8);
-        TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(5u)->rGetLocation() - voronoi_mesh.GetNode(12u)->rGetLocation()),   0.0, DBL_EPSILON);
+        // In particular, nodes 0, 11 and 14 are all at (0.5, 0.5, -2.5)
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0u)->rGetLocation()[0],   0.5, 1e-8);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0u)->rGetLocation()[1],   0.5, 1e-8);
+        TS_ASSERT_DELTA(voronoi_mesh.GetNode(0u)->rGetLocation()[2],   -2.5, 1e-8);
+        TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(0u)->rGetLocation() - voronoi_mesh.GetNode(11u)->rGetLocation()),   0.0, DBL_EPSILON);
+        TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(0u)->rGetLocation() - voronoi_mesh.GetNode(14u)->rGetLocation()),   0.0, DBL_EPSILON);
 
 
-        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 2u);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 3.4804, 1e-4);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1u), 3.0937, 1e-4);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u) + voronoi_mesh.GetVolumeOfElement(1u),
-                        6.57422, 1e-5); // Agrees with Paraview
 
-        TS_ASSERT_EQUALS(voronoi_mesh.GetNumFaces(), 15u);
-        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(0u)), 0.3064, 1e-4); //Degenerate quad (is triangle)
-        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(1u)), 1.8267, 1e-4); //Quad
-        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(2u)), 2.6792, 1e-4); //Six-sided
-        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(5u)), 4.38425, 1e-4); //Degenerate (is triangle)
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumFaces(), 32u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(0u)), 2.7556, 1e-4); //Degenerate quad (is triangle)
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(1u)), 2.7556, 1e-4); //Five point, but is triangle
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(2u)), 2.3864, 1e-4); //Six point, but is triangle
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(4u)), 0.0000, 1e-12); //Degenerate triangle
+        TS_ASSERT_DELTA(voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(5u)), 2.7556, 1e-4); //Triangle
         for (unsigned i=0; i<15; i++)
         {
             voronoi_mesh.GetAreaOfFace(voronoi_mesh.GetFace(i));
         }
+        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 7.5937, 1e-4);
+        double volume=0.0;
+        for (unsigned i=0; i< voronoi_mesh.GetNumElements(); i++)
+        {
+            volume += voronoi_mesh.GetVolumeOfElement(i);
+        }
+        TS_ASSERT_DELTA(volume, 31.5, 1e-4); // Agrees with Paraview
     }
 
 

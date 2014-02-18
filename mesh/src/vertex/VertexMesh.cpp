@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
-#include "IsNan.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Warnings.hpp"
 
@@ -1067,15 +1066,15 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
             // Get pointer to face
             VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = p_element->GetFace(face_index);
 
-            // Get unit normal to this face
-            c_vector<double, SPACE_DIM> unit_normal = GetUnitNormalToFace(p_face);
+
+            // Calculate the area of the face and get unit normal to this face
+            c_vector<double, SPACE_DIM> unit_normal;
+            double face_area = CalculateUnitNormalToFaceWithArea(p_face, unit_normal);
 
             // Calculate the perpendicular distance from the plane of the face to the chosen apex
             c_vector<double, SPACE_DIM> base_to_apex = GetVectorFromAtoB(p_face->GetNodeLocation(0), pyramid_apex);
             double perpendicular_distance = fabs(inner_prod(base_to_apex, unit_normal));
 
-            // Calculate the area of the face
-            double face_area = GetAreaOfFace(p_face);
 
             // Use these to calculate the volume of the pyramid formed by the face and the point pyramid_apex
             element_volume += face_area * perpendicular_distance / 3;
@@ -1484,35 +1483,36 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGrad
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetUnitNormalToFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal)
 {
     assert(SPACE_DIM == 3);
-    // As we are in 3D, the face must have at least three vertices, so use its first three vertices
+    // As we are in 3D, the face must have at least three vertices,
     assert( pFace->GetNumNodes() >= 3u );
-    c_vector<double, SPACE_DIM> weighted_normal = zero_vector<double>(SPACE_DIM);
-    c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
 
+    // Reset the answer
+    rNormal = zero_vector<double>(SPACE_DIM);
+
+    c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
     for (unsigned local_index=2; local_index<pFace->GetNumNodes(); local_index++)
     {
 
         c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
-        weighted_normal += VectorProduct(v_minus_v0, vnext_minus_v0);
+        rNormal += VectorProduct(v_minus_v0, vnext_minus_v0);
         v_minus_v0 = vnext_minus_v0;
     }
-    double magnitude = norm_2(weighted_normal);
-    if ( magnitude == 0.0 )
+    double magnitude = norm_2(rNormal);
+    if ( magnitude != 0.0 )
     {
-        ///\todo #2391 There is potential for a floating point exception here, so we'll bail out
-        // Either v1_minus_v0 is zero (co-located points), or v2_minus_v0 is zero (co-located points), or
-        // the two vectors are parallel (collinear points).
-        WARNING("Found a face which is degenerate or has repeated points.  We shouldn't let this happen.  Meanwhile, the code will ignore it and carry on.");
-        return weighted_normal; //Which is still zero
+        // Normalize the normal vector
+        rNormal /= magnitude;
     }
-
-    // Normalize the normal vector
-    weighted_normal /= magnitude;
-
-    return weighted_normal;
+    else
+    {
+        // There is potential for a floating point exception here if we divide by zero, so we'll move on.
+        // All points are colocated.
+        WARNING("Found a face which is degenerate or has repeated points.  We shouldn't let this happen.  Meanwhile, the code will ignore it and carry on.");
+    }
+    return magnitude/2.0;
 }
 
 
@@ -1522,92 +1522,8 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
     assert(SPACE_DIM == 3);
 
     // Get the unit normal to the plane of this face
-    c_vector<double, SPACE_DIM> unit_normal = GetUnitNormalToFace(pFace);
-    if (norm_inf(unit_normal)==0.0)
-    {
-        ///\todo #2391 We have already warned the user that the face is degenerate and this should not happen
-        return 0.0;
-    }
-
-    // Select the largest absolute coordinate to ignore for planar projection
-    double abs_x = (unit_normal[0]>0) ? unit_normal[0] : -unit_normal[0];
-    double abs_y = (unit_normal[1]>0) ? unit_normal[1] : -unit_normal[1];
-    double abs_z = (unit_normal[2]>0) ? unit_normal[2] : -unit_normal[2];
-
-    // How about
-    abs_x = fabs(unit_normal[0]);
-    // which is far more intuitive than the ternary conditional operator?
-
-    unsigned dim_to_ignore = 2; // ignore z coordinate
-    double abs = abs_z;
-
-    if (abs_x > abs_y)
-    {
-        if (abs_x > abs_z)
-        {
-            dim_to_ignore = 0; // ignore x coordinate
-            abs = abs_x;
-        }
-    }
-    else if (abs_y > abs_z)
-    {
-        dim_to_ignore = 1; // ignore y coordinate
-        abs = abs_y;
-    }
-
-    // Compute area of the 2D projection
-    c_vector<double, SPACE_DIM-1> this_vertex;
-    c_vector<double, SPACE_DIM-1> next_vertex;
-
-    unsigned num_nodes_in_face = pFace->GetNumNodes();
-
-    unsigned dim1 = dim_to_ignore==0 ? 1 : 0;
-    unsigned dim2 = dim_to_ignore==2 ? 1 : 2;
-
-    double face_area = 0.0;
-    for (unsigned local_index=0; local_index<num_nodes_in_face; local_index++)
-    {
-        // Find locations of current vertex and anticlockwise vertex
-        this_vertex[0] = pFace->GetNodeLocation(local_index, dim1);
-        this_vertex[1] = pFace->GetNodeLocation(local_index, dim2);
-        next_vertex[0] = pFace->GetNodeLocation((local_index+1)%num_nodes_in_face, dim1);
-        next_vertex[1] = pFace->GetNodeLocation((local_index+1)%num_nodes_in_face, dim2);
-
-        // It doesn't matter if the face is oriented clockwise or not, since we are only interested in the area
-        face_area += 0.5*(this_vertex[0]*next_vertex[1] - next_vertex[0]*this_vertex[1]);
-    }
-
-    // Scale to get area before projection
-    face_area /= abs;
-    {
-        ///\todo #2391 recalculate both the area and the normal in the same framework
-
-        c_vector<double, SPACE_DIM> weighted_normal = zero_vector<double>(SPACE_DIM);
-        c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
-
-        for (unsigned local_index=2; local_index<num_nodes_in_face; local_index++)
-        {
-
-            c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
-            weighted_normal += VectorProduct(v_minus_v0, vnext_minus_v0);
-            v_minus_v0 = vnext_minus_v0;
-        }
-        double area = norm_2(weighted_normal);
-        weighted_normal /= area;
-        area /= 2.0;
-        if (std::isnan(face_area) || face_area == 0.0)
-        {
-            assert(fabs(area) < 1e-14);
-
-        }
-        else
-        {
-            assert( fabs(area - fabs(face_area)) < 1e8);//Vacuous #2391
-            c_vector<double, SPACE_DIM> diff_normals = unit_normal - weighted_normal;
-            assert(norm_1(diff_normals) < 1e8);  //Vacuous #2391
-        }
-    }
-    return fabs(face_area);
+    c_vector<double, SPACE_DIM> unit_normal;
+    return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
 }
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)

@@ -493,20 +493,18 @@ public:
     double GetElongationShapeFactorOfElement(unsigned elementIndex);
 
     /**
-     * Compute the unit normal vector to a given face in 3D. This is achieved from a triangle
-     * of vertices of the face. Note: this may return the outward or inward normal, depending
-     * on your point of view.
+     * Compute the unit normal vector to a given face in 3D. This is achieved by calculating scaled normal,
+     * which is the effective sum of signed areas of triangle forming the face.
+     * Note: this may return the outward or inward normal, depending
+     * on the face chirality.
      *
      * @param pFace a face in the mesh
-     *
-     * @return the unit normal
+     * @param rNormal vector in which to return the unit normal
      */
-    c_vector<double, SPACE_DIM> GetUnitNormalToFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
+    double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal);
 
     /**
-     * Get the area of a given face in 3D. This is achieved by projecting the face onto a 2D plane.
-     * To avoid degeneracy and optimize robustness, we choose to ignore the dimension of the component
-     * of the unit normal to the plane with the greatest absolute value.
+     * Get the area of a given face in 3D.  Uses CalculateUnitNormalToFaceWithArea
      *
      * This needs to be overridden in daughter classes for non-Euclidean metrics.
      *

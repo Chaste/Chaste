@@ -782,10 +782,6 @@ public:
 
     void TestCellPopulationWritersIn3dWithGhostNodes()
     {
-        ///\todo
-        // Warning - this test is broken.  The test that the Voronoi data is unchanged
-        // merely tests that there were Floating Point problems in the code
-        // trunk/cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat
 
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -795,19 +791,19 @@ public:
 
         // Create a simple 3D mesh with some ghost nodes
         std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0,  true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1,  true,  1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2,  true,  1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(3,  true,  0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(4,  false, 0.5, 0.5, 0.5));
-        nodes.push_back(new Node<3>(5,  false, -1.0, -1.0, -1.0));
-        nodes.push_back(new Node<3>(6,  false,  2.0, -1.0, -1.0));
-        nodes.push_back(new Node<3>(7,  false,  2.0,  2.0, -1.0));
-        nodes.push_back(new Node<3>(8,  false, -1.0,  2.0, -1.0));
-        nodes.push_back(new Node<3>(9,  false, -1.0, -1.0,  2.0));
-        nodes.push_back(new Node<3>(10, false,  2.0, -1.0,  2.0));
-        nodes.push_back(new Node<3>(11, false,  2.0,  2.0,  2.0));
-        nodes.push_back(new Node<3>(12, false, -1.0,  2.0,  2.0));
+        nodes.push_back(new Node<3>(0,  false,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1,  false,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2,  false,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3,  false,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4,  false,  0.5, 0.5, 0.5));
+        nodes.push_back(new Node<3>(5,  true,  -1.0, -1.0, -1.0));
+        nodes.push_back(new Node<3>(6,  true,   2.0, -1.0, -1.0));
+        nodes.push_back(new Node<3>(7,  true,   2.0,  2.0, -1.0));
+        nodes.push_back(new Node<3>(8,  true,  -1.0,  2.0, -1.0));
+        nodes.push_back(new Node<3>(9,  true,  -1.0, -1.0,  2.0));
+        nodes.push_back(new Node<3>(10, true,   2.0, -1.0,  2.0));
+        nodes.push_back(new Node<3>(11, true,   2.0,  2.0,  2.0));
+        nodes.push_back(new Node<3>(12, true,  -1.0,  2.0,  2.0));
         MutableMesh<3,3> mesh(nodes);
 
         std::vector<unsigned> location_indices;
