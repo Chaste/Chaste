@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
-#include "Warnings.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
@@ -1112,7 +1111,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
         // Loop over faces and add up areas
         for (unsigned face_index=0; face_index<p_element->GetNumFaces(); face_index++)
         {
-            surface_area += GetAreaOfFace(p_element->GetFace(face_index));
+            surface_area += CalculateAreaOfFace(p_element->GetFace(face_index));
         }
     }
     return surface_area;
@@ -1505,19 +1504,15 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(Ver
     {
         // Normalize the normal vector
         rNormal /= magnitude;
-    }
-    else
-    {
-        // There is potential for a floating point exception here if we divide by zero, so we'll move on.
-        // All points are colocated.
-        WARNING("Found a face which is degenerate or has repeated points.  We shouldn't let this happen.  Meanwhile, the code will ignore it and carry on.");
+        // If all points are co-located, then magnitude==0.0 and there is potential for a floating point exception
+        // here if we divide by zero, so we'll move on.
     }
     return magnitude/2.0;
 }
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
 {
     assert(SPACE_DIM == 3);
 
@@ -1528,7 +1523,7 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaOfFace(VertexElement<ELEMENT_D
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)
 template<>
-double VertexMesh<1,1>::GetAreaOfFace(VertexElement<0,1>* pFace)
+double VertexMesh<1,1>::CalculateAreaOfFace(VertexElement<0,1>* pFace)
 {
     NEVER_REACHED;
 }

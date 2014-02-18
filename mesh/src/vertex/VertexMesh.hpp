@@ -500,6 +500,8 @@ public:
      *
      * @param pFace a face in the mesh
      * @param rNormal vector in which to return the unit normal
+     *
+     * @return the area
      */
     double CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal);
 
@@ -512,7 +514,7 @@ public:
      *
      * @return the area
      */
-    virtual double GetAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
+    virtual double CalculateAreaOfFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace);
 
     /**
      * Compute the direction of the shortest principal axis passing through the centroid,

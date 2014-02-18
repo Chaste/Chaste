@@ -752,11 +752,11 @@ public:
 
             if (face_index == 1)
             {
-                TS_ASSERT_DELTA(cell_population3d.GetVoronoiTessellation()->GetAreaOfFace(p_face), 1.9485, 1e-4);
+                TS_ASSERT_DELTA(cell_population3d.GetVoronoiTessellation()->CalculateAreaOfFace(p_face), 1.9485, 1e-4);
             }
             else
             {
-                TS_ASSERT_DELTA(cell_population3d.GetVoronoiTessellation()->GetAreaOfFace(p_face), 1.125, 1e-4);
+                TS_ASSERT_DELTA(cell_population3d.GetVoronoiTessellation()->CalculateAreaOfFace(p_face), 1.125, 1e-4);
             }
         }
 
