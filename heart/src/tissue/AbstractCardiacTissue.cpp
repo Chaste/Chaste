@@ -448,7 +448,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
                 {
                     mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(global_index);
                 }
-                catch (Exception& e)
+                catch (Exception&)
                 {
                     // If CreateCardiacCellForNode throws immediately, then it's probable that the
                     // user has a cell factory that isn't expecting to make cells at halo nodes.
