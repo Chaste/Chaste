@@ -65,7 +65,7 @@ private:
 
 protected:
 
-    /** The name of node location files. */
+    /** The name of the output file. */
     std::string mFileName;
 
     /** An output stream for writing data. */
