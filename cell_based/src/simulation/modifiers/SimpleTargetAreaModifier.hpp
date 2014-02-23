@@ -37,15 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SIMPLETARGETAREAMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
-
 #include "AbstractTargetAreaModifier.hpp"
-
-// Forward declaration prevents circular include chain
-//template<unsigned DIM> class AbstractTargetAreaModifier;
 
 /**
  * A modifier class in which the target area property of each cell is updated.
  * It is used to implement growth in vertex-based simulations.
+ *
+ * \todo Improve class documentation by describing precisely how the target
+ * area depends on the cell's status
  */
 template<unsigned DIM>
 class SimpleTargetAreaModifier : public AbstractTargetAreaModifier<DIM>
@@ -77,6 +76,11 @@ public:
      */
     virtual ~SimpleTargetAreaModifier();
 
+    /**
+     * Overridden UpdateTargetAreaOfCell() method.
+     *
+     * @param pCell pointer to the cell
+     */
     virtual void UpdateTargetAreaOfCell(const CellPtr pCell);
 };
 
