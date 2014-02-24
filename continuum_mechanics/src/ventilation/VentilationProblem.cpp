@@ -154,8 +154,10 @@ void VentilationProblem::SetConstantInflowFluxes(double flux)
 
 void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure)
 {
-    ///\todo This should really be an exception.
-    assert(rNode.IsBoundaryNode());
+    if (rNode.IsBoundaryNode() == false)
+    {
+        EXCEPTION("Boundary conditions cannot be set at internal nodes");
+    }
     unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
 
     mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
@@ -164,8 +166,10 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
 
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
 {
-    ///\todo This should really be an exception.
-    assert(rNode.IsBoundaryNode());
+    if (rNode.IsBoundaryNode() == false)
+    {
+        EXCEPTION("Boundary conditions cannot be set at internal nodes");
+    }
 
     // In a <1,3> mesh a boundary node will be associated with exactly one edge.
     // Flux boundary conditions are set in the system matrix using
@@ -304,7 +308,8 @@ void VentilationProblem::Solve()
 {
     Assemble();
     mpLinearSystem->AssembleFinalLinearSystem();
-    mSolution = mpLinearSystem->Solve();
+    //This call assumes that the solution vector may have been used before (at the previous timestep for example)
+    mSolution = mpLinearSystem->Solve(mSolution);
     if (mDynamicResistance)
     {
         double relative_diff = DBL_MAX;
@@ -315,7 +320,7 @@ void VentilationProblem::Solve()
             Assemble(true);
             mpLinearSystem->AssembleFinalLinearSystem();
             Vec old_solution = mSolution;
-            mSolution = mpLinearSystem->Solve();
+            mSolution = mpLinearSystem->Solve(old_solution); // However, seeding with the old solution doesn't appear to change the convergence of the KSP solver
             PetscVecTools::WAXPY(difference, -1.0, mSolution, old_solution);
             double l_inf_diff;
             VecNorm(difference, NORM_INFINITY, &l_inf_diff);
