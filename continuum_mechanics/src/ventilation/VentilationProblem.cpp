@@ -308,8 +308,18 @@ void VentilationProblem::Solve()
 {
     Assemble();
     mpLinearSystem->AssembleFinalLinearSystem();
-    //This call assumes that the solution vector may have been used before (at the previous timestep for example)
-    mSolution = mpLinearSystem->Solve(mSolution);
+    if (mSolution==NULL)
+    {
+        // First solve
+        mSolution = mpLinearSystem->Solve();
+    }
+    else
+    {
+        //This call is when the solution vector may have been used before (at the previous timestep for example)
+        Vec last_solution = mSolution;
+        mSolution = mpLinearSystem->Solve(last_solution);
+        PetscTools::Destroy(last_solution);
+    }
     if (mDynamicResistance)
     {
         double relative_diff = DBL_MAX;
@@ -393,27 +403,18 @@ void VentilationProblem::Solve(TimeStepper& rTimeStepper,
     VtkMeshWriter<1, 3> vtk_writer(rDirName, rFileBaseName, false);
 #endif
 
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
-         iter != mMesh.GetBoundaryNodeIteratorEnd();
-         ++iter )
-    {
-        if ((*iter)->GetIndex() != mOutletNodeIndex)
-        {
-            //Boundary conditions at each boundary/leaf node
-            pBoundaryConditionFunction(this, rTimeStepper.GetTime(), *(*iter));
-        }
-    }
-
-    // Do the regular solve
-    Solve();
-
-#ifdef CHASTE_VTK
-    AddDataToVtk(vtk_writer, "_000000");
-#endif
-
+    bool first_step=true;
     while (!rTimeStepper.IsTimeAtEnd())
     {
-        rTimeStepper.AdvanceOneTimeStep();
+        if (first_step)
+        {
+            // Do a solve at t=0 before advancing time.
+            first_step = false;
+        }
+        else
+        {
+            rTimeStepper.AdvanceOneTimeStep();
+        }
         for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
                  iter != mMesh.GetBoundaryNodeIteratorEnd();
                  ++iter )
@@ -425,11 +426,9 @@ void VentilationProblem::Solve(TimeStepper& rTimeStepper,
             }
         }
 
-        ///\todo #2300 This should call regular Solve() (probably!).
-        mpLinearSystem->AssembleFinalLinearSystem();
-        Vec last_solution = mSolution;
-        mSolution = mpLinearSystem->Solve(mSolution);
-        PetscTools::Destroy(last_solution);
+        // Regular solve
+        Solve();
+
         std::ostringstream suffix_name;
         suffix_name <<  "_" << std::setw(6) << std::setfill('0') << rTimeStepper.GetTotalTimeStepsTaken();
 #ifdef CHASTE_VTK
