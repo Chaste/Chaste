@@ -262,7 +262,8 @@ def get_build_function(build, run_time_flags='', test_time_limit=0):
     def build_function(target, source, env):
         # Set up the environment from env['ENV'], env['ENV']['PYTHONPATH'] and env['PYINCPATH']
         orig_python_path = copy.copy(env['ENV']['PYTHONPATH'])
-        env.PrependENVPath('PYTHONPATH', env.get('PYINCPATH', ''))
+        new_paths = env.Flatten(env.subst(env.get('PYINCPATH', ''), conv=lambda n: n))
+        env.PrependENVPath('PYTHONPATH', new_paths)
         test_env = copy.copy(env['ENV'])
         env['ENV']['PYTHONPATH'] = orig_python_path
         # Run the test

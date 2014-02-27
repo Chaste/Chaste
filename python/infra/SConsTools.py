@@ -299,6 +299,8 @@ def CloneEnv(env):
     newenv['CHASTE_LIBRARIES'] = env['CHASTE_LIBRARIES']
     newenv['CHASTE_CPP_PATH'] = env['CHASTE_CPP_PATH']
     newenv['CHASTE_CPP_PATHS'] = env['CHASTE_CPP_PATHS']
+    newenv['CHASTE_PYINCPATH'] = env['CHASTE_PYINCPATH']
+    newenv['CHASTE_PYINCPATHS'] = env['CHASTE_PYINCPATHS']
     return newenv
 
 
@@ -374,12 +376,13 @@ def DetermineLibraryDependencies(env, partialGraph):
                     deps = map(get_lib, full_graph[comp])
                     if deps:
                         env.Depends(comp_lib, deps)
-    # Set up construction variables that can be used in CPPPATH
+    # Set up construction variables that can be used in CPPPATH and PYINCPATH
     for comp in full_graph:
         comp_name = comp
         if comp_name.startswith(PROJECT_PREFIX):
             comp_name = comp_name[len(PROJECT_PREFIX):]
         env['CHASTE_CPP_PATH'][comp_name] = env.Flatten([env['CHASTE_CPP_PATHS'][c] for c in full_graph[comp]])
+        env['CHASTE_PYINCPATH'][comp_name] = env.Flatten([env['CHASTE_PYINCPATHS'][c] for c in full_graph[comp]])
     # Early versions of SCons aren't as nice
     scons_ver = env._get_major_minor_revision(SCons.__version__)
     if scons_ver < (1,0,0):
@@ -396,9 +399,9 @@ def DetermineLibraryDependencies(env, partialGraph):
 
 def CompleteFolderPaths(folders):
     """
-    Given a list of folders with the current, return a list suitable for use in the CPPPATH
+    Given a list of folders in the current component, return a list suitable for use in the CPPPATH
     for other components.  It must therefore contain full path information, and include the
-    copies with the build folder.  Using SCons' Dir objects makes this easier.
+    copies within the build folder.  Using SCons' Dir objects makes this easier.
     """
     paths = []
     for f in folders:
@@ -1053,8 +1056,8 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     if all_cpppath:
         env.Prepend(CPPPATH=all_cpppath)
     env.Append(CPPPATH="${CHASTE_CPP_PATH['%s']}" % projectName)
-    # Python search path just considers this project at present
-    AddPyDirs(env, project_path, pydirs)
+    # Python search path is handled similarly
+    AddPyDirs(env, project_path, pydirs, projectName)
 
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(env, otherVars)
@@ -1155,11 +1158,18 @@ def FindPyDirs(env):
                 env.Execute(Delete(pyc))
     return pydirs
 
-def AddPyDirs(env, basePath, pydirs):
-    """Add folders containing Python sources, if any, to the module search path."""
+def AddPyDirs(env, basePath, pydirs, componentName):
+    """Add folders containing Python sources, if any, to the module search path.
+    
+    Also sets up build data structures so other components can use them.
+    """
+    pydir_paths = map(lambda d: os.path.join('#', basePath, d), pydirs)
     if pydirs:
-        pydir_paths = map(lambda d: os.path.join('#', basePath, d), pydirs)
         env.Append(PYINCPATH=pydir_paths)
+    # Set the paths so other components/projects can use our Python code
+    env['CHASTE_PYINCPATHS'][componentName] = pydir_paths
+    env.Append(PYINCPATH='${CHASTE_PYINCPATH["%s"]}' % componentName)
+
 
 def DoComponentSConscript(component, otherVars):
     """Main logic for a Chaste component's SConscript file.
@@ -1206,8 +1216,8 @@ def DoComponentSConscript(component, otherVars):
     if all_cpppath:
         env.Prepend(CPPPATH=all_cpppath)
     env.Append(CPPPATH='${CHASTE_CPP_PATH["%s"]}' % component)
-    # Python search path just considers this component at present
-    AddPyDirs(env, component, pydirs)
+    # Python search path is handled similarly
+    AddPyDirs(env, component, pydirs, component)
 
     # Build any dynamically loadable modules
     dyn_libs = DoDynamicallyLoadableModules(env, otherVars)

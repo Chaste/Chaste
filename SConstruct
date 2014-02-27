@@ -289,7 +289,7 @@ env.Append(BOPT = 'g_c++') # Needed for some versions of PETSc?
 env.Replace(CXX = build.tools['mpicxx'])
 env.Replace(AR = build.tools['ar'])
 env.Replace(CXXFILESUFFIX = '.cpp')
-env.Append(PYINCPATH='#/python/pycml') # Ensure Python tests can use PyCml easily
+env.Append(PYINCPATH=['#/python/pycml']) # Ensure Python tests can use PyCml easily
 env['INSTALL_PREFIX'] = install_prefix
 env['INSTALL_FILES'] = install_files
 
@@ -321,6 +321,8 @@ env['CHASTE_OBJECTS'] = {}
 env['UPDATE_CHASTE_PROVENANCE'] = update_provenance
 env['CHASTE_CPP_PATHS'] = {}
 env['CHASTE_CPP_PATH'] = {}
+env['CHASTE_PYINCPATHS'] = {}
+env['CHASTE_PYINCPATH'] = {}
 
 if not requested_tests:
     # Default is to build all components, but not user projects
