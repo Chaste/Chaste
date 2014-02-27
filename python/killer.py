@@ -76,7 +76,7 @@ def check_pid(pid):
     return result
 
 def try_kill(pid, sig):
-    """Try to kill a process, but ignore errors."""
+    """Try to kill a process, but ignore errors (e.g. because a process is already dead)."""
     try:
         os.kill(int(pid), sig)
     except OSError:
@@ -96,6 +96,21 @@ for pid in test_pids:
                 # Now sleep for a bit to let it die
                 time.sleep(10) # seconds
                 # Then re-check running processes
+                test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
+                break
+
+# Next, try to make the builder script save any results folders to the right place
+for pid in test_pids:
+    cmdline = check_pid(pid)
+    if cmdline is not None:
+        if len(cmdline) > 2 and 'builder' in cmdline[1] and 'no-lock' in cmdline[2]:
+            print "Builder is running as PID", pid
+            if not sim:
+                try_kill(pid, signal.SIGUSR1)
+                print "  ** Poking (sent SIGUSR1)"
+                # Now sleep for a bit to let it move files
+                time.sleep(5) # seconds
+                # Re-check running processes, just in case
                 test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
                 break
 
