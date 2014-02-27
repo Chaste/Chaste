@@ -75,6 +75,13 @@ def check_pid(pid):
         pass
     return result
 
+def try_kill(pid, sig):
+    """Try to kill a process, but ignore errors."""
+    try:
+        os.kill(int(pid), sig)
+    except OSError:
+        pass
+
 test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
 
 # First, try killing off scons
@@ -84,13 +91,12 @@ for pid in test_pids:
         if len(cmdline) > 1 and 'scons' in cmdline[1]:
             print "SCons is running as PID", pid
             if not sim:
-                os.kill(int(pid), signal.SIGTERM)
+                try_kill(pid, signal.SIGTERM)
                 print "  ** Killing (sent SIGTERM)"
                 # Now sleep for a bit to let it die
                 time.sleep(10) # seconds
-                # Then re-check running proceses
-                test_pids = filter(lambda pid: pid[0] in "0123456789",
-                                   os.listdir('/proc'))
+                # Then re-check running processes
+                test_pids = filter(lambda pid: pid[0] in "0123456789", os.listdir('/proc'))
                 break
 
 # Next, try killing everything still running
@@ -99,5 +105,5 @@ for pid in test_pids:
     if cmdline is not None:
         print pid, "is running from our dir as", cmdline[0:3]
         if not sim:
-            os.kill(int(pid), signal.SIGKILL)
+            try_kill(pid, signal.SIGKILL)
             print "  ** Killing (sent SIGKILL)"
