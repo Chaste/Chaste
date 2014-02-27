@@ -156,12 +156,12 @@ public:
 
         mProbeNode = 15u;//for comparing node traces
 
-        //Run 3 ms and save
+        // Run 3 ms and save
         Run2DSimulationSaveAfterThreemilliSecondsIntraStim(archive_dir, archive_file);
-        //resume and run remaining 2 ms
+        // Resume and run remaining 2 ms
         LoadAndRunRemainingTwoMilliSecondsIntraStim(archive_dir, archive_file);
 
-        //Now run, from scratch the same full extended bidomain simulation (5 ms)
+        // Now run, from scratch the same full extended bidomain simulation (5 ms)
         RunFull2DSimulationIntraStim();
 
         // check that full and checkpointed simulations generate the same hdf5 result
@@ -182,12 +182,12 @@ public:
 
         mProbeNode = 15u;//for comparing node traces
 
-        //Run 3 ms and save
+        // Run 3 ms and save
         Run2DSimulationSaveAfterThreemilliSecondsExtraStim(archive_dir, archive_file);
-        //resume and run remaining 2 ms
+        // Resume and run remaining 2 ms
         LoadAndRunRemainingTwoMilliSecondsExtraStim(archive_dir, archive_file);
 
-        //Now run, from scratch the same full extended bidomain simulation (5 ms)
+        // Now run, from scratch the same full extended bidomain simulation (5 ms)
         RunFull2DSimulationExtraStim();
 
         // check that full and checkpointed simulations generate the same hdf5 result
