@@ -84,6 +84,11 @@ public:
         TS_ASSERT_THROWS_THIS(TimeStepper(end_time, start_time, timestep),
                               "The simulation duration must be positive, not -2");
 
+        // Note that the timestep in this test does not divide whole time interval nicely, therefore we can't enforce a constant timestep.
+        bool enforce_constant_timestep = true;
+        TS_ASSERT_THROWS_CONTAINS(TimeStepper(start_time, end_time, timestep, enforce_constant_timestep),
+                                      "TimeStepper estimates non-constant timesteps will need to be used");
+
         TimeStepper stepper(start_time, end_time, timestep);
 
         TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), (unsigned) floor((end_time - start_time)/timestep) );
@@ -111,11 +116,19 @@ public:
             if (to_time >= close_to_end_time)
             {
                 real_time_step = end_time - current_time;
-                // std::cout<<"InternalSolve "<<timestep<<" "<<real_time_step<<"\n";
+                //std::cout<<"TImes: " << timestep << " " << stepper.GetNextTimeStep() <<", difference = " << timestep - stepper.GetNextTimeStep()  << "\n";
                 to_time = end_time;
-            }
 
-            TS_ASSERT_EQUALS(stepper.GetNextTimeStep(), real_time_step);
+                // Note that with non-constant timesteps, the final timestep can vary a lot (but not more than a normal sized timestep!).
+                TS_ASSERT_DELTA(stepper.GetNextTimeStep(), timestep, timestep);
+            }
+            else
+            {
+                // Otherwise the GetNextTimeStep() doesn't return the stored timestep,
+                // it returns the difference between current and next, which can vary by machine precision.
+                TS_ASSERT_DELTA(stepper.GetNextTimeStep(), timestep, DBL_EPSILON);
+            }
+            TS_ASSERT_DELTA(stepper.GetNextTimeStep(), real_time_step, DBL_EPSILON);
             TS_ASSERT_EQUALS(stepper.GetIdealTimeStep(), timestep);
             TS_ASSERT_EQUALS(stepper.GetTime(), current_time);
             TS_ASSERT_EQUALS(stepper.GetNextTime(), to_time);

@@ -96,6 +96,9 @@ public:
     /**
      * @return Get the size of the next time step which will be taken.
      * GetNextTimeStep() == GetNextTime() - GetTime()
+     *
+     * Note that even when the next time step will be the ideal timestep,
+     * this may report something different (by a machine epsilon!).
      */
     double GetNextTimeStep();
 

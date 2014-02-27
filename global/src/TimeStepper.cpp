@@ -159,29 +159,12 @@ double TimeStepper::GetNextTime() const
 
 double TimeStepper::GetNextTimeStep()
 {
-    double dt = mDt;
-
-    if (mNextTime >= mEnd)
-    {
-        dt = mEnd - mTime;
-    }
-
-    // If the next time or the current time is one of the additional times, the timestep will not be mDt
-    if (mAdditionalTimesReached > 0)
-    {
-        if (fabs(mNextTime - mAdditionalTimes[mAdditionalTimesReached-1]) < mEpsilon ||
-            fabs(mTime - mAdditionalTimes[mAdditionalTimesReached-1]) < mEpsilon)
-        {
-            dt = mNextTime - mTime;
-            assert(dt > 0);
-        }
-    }
-
-    return dt;
+    return mNextTime - mTime;
 }
+
 double TimeStepper::GetIdealTimeStep()
 {
-    return(mDt);
+    return mDt;
 }
 
 bool TimeStepper::IsTimeAtEnd() const

@@ -167,7 +167,7 @@ public:
         // check that full and checkpointed simulations generate the same hdf5 result
         TS_ASSERT(CompareFilesViaHdf5DataReader("Extended2DFull", "extended2d", true,
                                                 "Extended2DArchived", "extended2d", true,
-                                                1e-9));
+                                                5e-9));
     }
 
 
@@ -193,7 +193,7 @@ public:
         // check that full and checkpointed simulations generate the same hdf5 result
         TS_ASSERT(CompareFilesViaHdf5DataReader("Extended2DFullExtraStim", "extended2d", true,
                                                 "Extended2DArchivedExtraStim", "extended2d", true,
-                                                1e-9));
+                                                5e-9));
     }
 private:
 
