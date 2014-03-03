@@ -210,6 +210,15 @@ public:
     CellPtr AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell);
 
     /**
+     * Overridden OpenWritersFiles() method.
+     *
+     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
+     *
+     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     */
+    virtual void OpenWritersFiles(const std::string& rDirectory);
+
+    /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored

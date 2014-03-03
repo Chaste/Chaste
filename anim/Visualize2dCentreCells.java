@@ -79,6 +79,8 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
     public static boolean betaCateninFilePresent = false;
     public static boolean stressFilePresent = false;
     public static boolean elementFilePresent = true;
+    public static boolean locationFilePresent = true;
+    
     public static boolean isSparseMesh = false;
     public static boolean drawOrientations = false;
     // by default the last timestep isn't read or visualised; this
@@ -96,6 +98,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
     public static int[][] ancestor_values;
     public static int[][] element_nodes;
     public static int[][] cell_type;
+    public static int[][] locations;
     public static int[][] image_cells;
 
     public static double max_x = -1e12;
@@ -135,6 +138,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
 
     public static File node_file;
     public static File cell_type_file;
+    public static File location_file;
     public static File element_file;
     public static File pde_solution_file;
     public static File beta_catenin_file;
@@ -599,6 +603,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
 
         node_file = new File(args[0]+"/results.viznodes");
         cell_type_file = new File(args[0]+"/results.vizcelltypes");
+        location_file = new File(args[0]+"/results.vizlocations");
         element_file = new File(args[0]+"/results.vizelements");
         pde_solution_file = new File(args[0]+"/results.vizpdesolution");
         beta_catenin_file = new File(args[0]+"/results.vizbetacatenin");
@@ -615,6 +620,13 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
         {
             System.out.println("The file "+args[0]+"/results.vizcelltypes doesn't exist");
             return;
+        }
+        if (!location_file.isFile())
+        {
+            // If the results.vizlocations does not exist, then assume the results
+            // were generated using a NodeBasedCellPopulation or MeshBasedCellPopulations
+            // i.e. no ghost nodes
+            locationFilePresent = false;
         }
         if (!element_file.isFile())
         {
@@ -791,6 +803,12 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
             numCells = new int[num_lines];
             image_cells = new int[num_lines][];
 
+            
+            if (locationFilePresent)
+            {
+                // One location per cell
+                locations = new int[num_lines][];
+            }
             if (elementFilePresent)
             {
                 numElements = new int[num_lines];
@@ -868,6 +886,14 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
             BufferedReader in_cell_type_file = new BufferedReader(new FileReader(cell_type_file));
             String line_cell_type = in_cell_type_file.readLine(); // from console input example
 
+            BufferedReader in_location_file = null;
+            String line_location = null;
+            if (locationFilePresent)
+            {
+                in_location_file = new BufferedReader(new FileReader(location_file));
+                line_location = in_location_file.readLine();   // above
+            }
+
             BufferedReader in_element_file = null;
             String line_element = null;
             if (elementFilePresent)
@@ -888,6 +914,11 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 // Create a StringTokenizer with a colon sign as a delimiter
                 StringTokenizer st_node = new StringTokenizer(line_node);
                 StringTokenizer st_cell_type = new StringTokenizer(line_cell_type);
+                StringTokenizer st_location = null;
+                if (locationFilePresent)
+                {
+                    st_location = new StringTokenizer(line_location);
+                }
                 StringTokenizer st_element = null;
                 if (elementFilePresent)
                 {
@@ -959,6 +990,16 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     has_stress_line_been_read = true;
                 }
 
+                if (locationFilePresent)
+                {
+                    double location_time = Double.valueOf(st_location.nextToken()).doubleValue();
+                    
+                    if (Math.abs(time.doubleValue() - location_time) > 1e-6)
+                    {
+                        throw new Exception("Error: The time corresponding to each line of the location file must match that of the node file");
+                    }
+                }
+                
                 if (elementFilePresent)
                 {
                     double element_time = Double.valueOf(st_element.nextToken()).doubleValue();
@@ -969,6 +1010,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     }
                 }
 
+                
                 times[row] = time.doubleValue();
 
                 // Count the number of entries in the node file and check correct
@@ -982,12 +1024,20 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 numCells[row] = entries/2;
 
                 int entries_from_cell_type_file = st_cell_type.countTokens();
-                if (numCells[row] != entries_from_cell_type_file)
+                
+                
+                if ( (( numCells[row] != entries_from_cell_type_file) && !locationFilePresent) ||
+                    (locationFilePresent && (numCells[row] < entries_from_cell_type_file)) )
                 {
                     System.out.println("Warning: At time "+time.doubleValue()+", node file gives "+numCells[row]+" cells, but cell type file gives "+entries_from_cell_type_file+" cells");
                     break;
                 }
-
+    
+                if (locationFilePresent)
+                {
+                    locations[row] = new int[memory_factor*numCells[row]];
+                }
+                
                 if (elementFilePresent)
                 {
 
@@ -1015,7 +1065,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                         element_nodes[row] = new int[memory_factor*3*numElements[row]];
                     }
                 }
-
+                
                 positions[row] = new RealPoint[memory_factor*numCells[row]];
 
                 if (orientationFilePresent)
@@ -1038,9 +1088,33 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 {
                     stress_values[row] = new double[memory_factor*numCells[row]][2];
                 }
-
+                
                 cell_type[row] = new int[memory_factor*numCells[row]];
-
+                
+                
+                if (locationFilePresent)
+                {
+                    // Adjust the cell types vector to account for ghost nodes
+                    
+                    // Count the number of entries in the location file and check correct
+                    int num_location_entries = st_location.countTokens();
+                    int num_cell_type_entries = st_cell_type.countTokens();
+                    // Assert(num_location_entries == num_cell_type_entries);
+                    
+                    // Populate a vector of ghosts then ad in normal cells at the relvent places
+                    for (int i=0; i<numCells[row]; i++)
+                    {
+                        cell_type[row][i] = canvas.INVISIBLE_COLOUR;
+                    }
+                    
+                    for (int i=0; i<num_location_entries; i++)
+                    {
+                        locations[row][i] = Integer.parseInt(st_location.nextToken());
+                        cell_type[row][locations[row][i]] = Integer.parseInt(st_cell_type.nextToken());
+                    }
+                }
+                
+                
                 for (int i=0; i<numCells[row]; i++)
                 {
                     double d1 = Double.valueOf(st_node.nextToken()).doubleValue();
@@ -1053,8 +1127,12 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                         orientations[row][i] = new RealPoint(o1,o2);
                     }
 
-                    cell_type[row][i] = Integer.parseInt(st_cell_type.nextToken());
-
+                    
+                    if (!locationFilePresent)
+                    {
+                        cell_type[row][i] = Integer.parseInt(st_cell_type.nextToken());
+                    }
+                    
                     if ( cell_type[row][i] < 0 )
                     {
                         System.out.println("Error: Cell type must be a non-negative integer");
@@ -1163,6 +1241,10 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 if (drawAncestors)
                 {
                     line_ancestors = in_ancestors_file.readLine();
+                }
+                if (locationFilePresent)
+                {
+                    line_location = in_location_file.readLine();
                 }
                 if (elementFilePresent)
                 {

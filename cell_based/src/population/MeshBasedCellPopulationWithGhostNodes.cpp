@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellLocationWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesWriter.hpp"
@@ -286,6 +287,21 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
 
     // Then call the base class method
     AbstractCentreBasedCellPopulation<DIM,DIM>::UpdateNodeLocations(dt);
+}
+
+
+template<unsigned DIM>
+void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(const std::string& rDirectory)
+{
+    if (this->mOutputResultsForChasteVisualizer)
+    {
+        if (!this-> template HasWriter<CellLocationWriter>())
+        {
+            this-> template AddCellWriter<CellLocationWriter>();
+        }
+    }
+
+    MeshBasedCellPopulation<DIM, DIM>::OpenWritersFiles(rDirectory);
 }
 
 template<unsigned DIM>
