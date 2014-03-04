@@ -185,11 +185,13 @@ public:
      * @param pottsElements vector of pointers to PottsElements
      * @param vonNeumannNeighbouringNodeIndices vector of set of Moore neighbours for each node
      * @param mooreNeighbouringNodeIndices vector of set of Von Neumann neighbours for each node
+     * @param deleteNodes whether to delete the nodes when deleting the mesh.
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
               std::vector<PottsElement<DIM>*> pottsElements,
               std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
-              std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices);
+              std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices,
+              bool deleteMesh=true);
 
 
     /**
