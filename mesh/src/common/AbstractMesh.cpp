@@ -35,18 +35,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractMesh.hpp"
 #include "Exception.hpp"
-#include "Debug.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractMesh<ELEMENT_DIM, SPACE_DIM>::AbstractMesh(bool deleteNodes)
+AbstractMesh<ELEMENT_DIM, SPACE_DIM>::AbstractMesh()
     : mpDistributedVectorFactory(NULL),
       mMeshFileBaseName(""),
-      mMeshChangesDuringSimulation(false),
-      mDeleteNodes(deleteNodes)
+      mMeshChangesDuringSimulation(false)
 {
 }
 
@@ -54,12 +52,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
 {
     // Iterate over nodes and free the memory
-    if (mDeleteNodes)
+    for (unsigned i=0; i<mNodes.size(); i++)
     {
-		for (unsigned i=0; i<mNodes.size(); i++)
-		{
-			delete mNodes[i];
-		}
+        delete mNodes[i];
     }
     if (mpDistributedVectorFactory)
     {

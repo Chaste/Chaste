@@ -43,9 +43,7 @@ template<unsigned DIM>
 PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
                           std::vector<PottsElement<DIM>*> pottsElements,
                           std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
-                          std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices,
-                          bool deleteNodes)
-                         : AbstractMesh<DIM,DIM>(deleteNodes)
+                          std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices)
 {
     // Reset member variables and clear mNodes, mElements.
     Clear();
@@ -131,14 +129,11 @@ void PottsMesh<DIM>::Clear()
     mElements.clear();
 
     // Delete nodes
-    if (this->mDeleteNodes)
+    for (unsigned i=0; i<this->mNodes.size(); i++)
     {
-		for (unsigned i=0; i<this->mNodes.size(); i++)
-		{
-			delete this->mNodes[i];
-		}
-		this->mNodes.clear();
+        delete this->mNodes[i];
     }
+    this->mNodes.clear();
 
     mDeletedElementIndices.clear();
 

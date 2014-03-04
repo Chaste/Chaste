@@ -87,7 +87,6 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & mMeshChangesDuringSimulation;
-        archive & mDeleteNodes;
         (*ProcessSpecificArchive<Archive>::Get()) & mpDistributedVectorFactory;
     }
 
@@ -119,12 +118,6 @@ protected:  // Give access of these variables to subclasses
      * Whether this mesh changes during simulation (used to know whether to write a new one to file)
      */
     bool mMeshChangesDuringSimulation;
-
-    /**
-     * Whether to delete the nodes when deleting the mesh
-     * defaults to true
-     */
-    bool mDeleteNodes;
 
     /**
      * Does nothing.  Used in derived classes which have elements
@@ -170,10 +163,8 @@ public:
 
     /**
      * Constructor.
-     *
-     * @param  deleteNodes whether to delete the nodes when deleting the mesh.
      */
-    AbstractMesh(bool deleteNodes=true);
+    AbstractMesh();
 
     /**
      * Virtual destructor, since this class has virtual methods.
