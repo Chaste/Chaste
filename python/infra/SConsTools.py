@@ -72,7 +72,7 @@ _lock = threading.Lock()
 chaste_source_exts = ['.cpp', '.xsd', '.cellml']
 
 def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=False,
-                    sourceExts=None, checkSourcesExist=False):
+                    sourceExts=None, checkSourcesExist=False, otherVars={}):
     """Look for source files under rootDir.
     
     Returns 2 lists: the first of source (.cpp, .xsd, .cellml) files, and the second
@@ -110,13 +110,21 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
                         if not parent_dir in source_dirs:
                             source_dirs.append(parent_dir)
                         break
-        if source_exts == ['.py'] and 'setup.py' in filenames:
+        if source_exts == ['.py'] and 'setup.py' in filenames and not otherVars.get('dyn_libs_only', False):
             # Special case hack for building Python package extension modules
-            # TODO: Set environment variables so libraries like SUNDIALS can be found if not in standard locations
-            # TODO: Don't run when building dynamic libs only
+            # We set environment variables (CFLAGS & LDFLAGS) so libraries like SUNDIALS can be found if not in standard locations
             setup_py_path = os.path.join(os.getcwd(), dirpath, 'setup.py')
-            env.Execute(SCons.Action.Action('python %s build_ext --inplace' % setup_py_path,
-                                            chdir=os.path.dirname(setup_py_path)))
+            e = env.Clone(LIBPATH=otherVars['other_libpaths'])
+            cflags = e.Split(e['CCFLAGS'])
+            incflags = []
+            for i, f in enumerate(cflags):
+                if f == otherVars['build'].IncludeFlag():
+                    incflags.append(f)
+                    incflags.append(cflags[i+1])
+            e.Replace(CCFLAGS=incflags)
+            e.Execute(SCons.Action.Action('CFLAGS="$_CPPINCFLAGS $CCFLAGS" LDFLAGS="$_LIBDIRFLAGS $LINKFLAGS"'
+                                          ' python %s build_ext --inplace' % setup_py_path,
+                                          chdir=os.path.dirname(setup_py_path)))
         if has_sources and (includeRoot or dirpath != rootDir):
             source_dirs.append(dirpath)
     if dirsOnly:
@@ -992,7 +1000,7 @@ def DoDynamicallyLoadableModules(baseEnv, otherVars):
     # Find any source files that should get made into dynamically loadable modules.
     curdir = os.getcwd()
     os.chdir('../..')
-    dyn_source, dyn_cpppath = FindSourceFiles(dyn_env, 'dynamic', includeRoot=True)
+    dyn_source, dyn_cpppath = FindSourceFiles(dyn_env, 'dynamic', includeRoot=True, otherVars=otherVars)
     os.chdir(curdir)
     dyn_env.Prepend(CPPPATH=dyn_cpppath)
     # Try to avoid likely conflicts
@@ -1043,10 +1051,10 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     curdir = os.getcwd()
     # Look for .cpp files within the project's src folder
     os.chdir('../..') # This is so .o files are built in <project>/build/<something>/
-    files, cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
-    pydirs = FindPyDirs(env)
+    files, cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True, otherVars=otherVars)
+    pydirs = FindPyDirs(env, otherVars)
     # Look for source files that tests depend on under <project>/test/.
-    testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'])
+    testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'], otherVars=otherVars)
     # Move back to the build dir
     os.chdir(curdir)
 
@@ -1148,9 +1156,9 @@ def CheckForSpecialFiles(env, component, files, otherVars):
                 special_objs.extend(objs)
     return special_objs
 
-def FindPyDirs(env):
+def FindPyDirs(env, otherVars):
     """Find folders containing Python sources in this component/project."""
-    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True)
+    pydirs = FindSourceFiles(env, 'src', sourceExts=['.py'], includeRoot=True, checkSourcesExist=True, dirsOnly=True, otherVars=otherVars)
     # Clear out any stale .pyc files (i.e. those without associated .py sources)
     for pydir in pydirs:
         for pyc in glob.glob(os.path.join(pydir, '*.pyc')):
@@ -1194,17 +1202,15 @@ def DoComponentSConscript(component, otherVars):
     curdir = os.getcwd()
     # Look for source files within the <component>/src folder
     os.chdir('../..') # This is so .o files are built in <component>/build/<something>/
-    files, cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True)
-    pydirs = FindPyDirs(env)
+    files, cpppath = FindSourceFiles(env, 'src', ignoreDirs=['broken'], includeRoot=True, otherVars=otherVars)
+    pydirs = FindPyDirs(env, otherVars)
     # Look for source files that tests depend on under test/.
     # We also need to add any subfolders to the CPPPATH, so they are searched
     # for #includes.
-    testsource, test_cpppath = FindSourceFiles(env, 'test',
-                                               ignoreDirs=['data'],
-                                               includeRoot=True)
+    testsource, test_cpppath = FindSourceFiles(env, 'test', ignoreDirs=['data'], includeRoot=True, otherVars=otherVars)
     # Install headers?
     if env['INSTALL_FILES']:
-        headers, _ = FindSourceFiles(env, 'src', sourceExts=['.hpp'])
+        headers, _ = FindSourceFiles(env, 'src', sourceExts=['.hpp'], otherVars=otherVars)
         t = env.Install(os.path.join(otherVars['install_prefix'], 'include'), headers)
         env.Alias('install', t)
     # Move back to the buid dir
