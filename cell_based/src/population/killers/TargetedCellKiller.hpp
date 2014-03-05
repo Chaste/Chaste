@@ -120,7 +120,7 @@ namespace boost
 namespace serialization
 {
 /**
- * Serialize information required to construct a RandomCellKiller.
+ * Serialize information required to construct a TargetedCellKiller.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
@@ -136,7 +136,7 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a RandomCellKiller.
+ * De-serialize constructor parameters and initialise a TargetedCellKiller.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
