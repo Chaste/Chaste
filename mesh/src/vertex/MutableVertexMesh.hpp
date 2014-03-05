@@ -137,20 +137,6 @@ protected:
     /**
      * Helper method for ReMesh().
      *
-     * Check for any triangular element whose area is smaller than mT2Threshold
-     * and call PerformT2Swap() on any such element.
-     *
-     * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
-     *                   with indices of VertexElements in the new mesh.  This should be created
-     *                   with the correct size, GetNumElements()
-     *
-     * @return whether we need to check for, and implement, any further local remeshing operations
-     */
-    bool CheckForT2Swaps(VertexElementMap& rElementMap);
-
-    /**
-     * Helper method for ReMesh().
-     *
      * Check if any elements have become intersected and correct this by implementing the appropriate
      * local remeshing operation (a T3 swap or node merge).
      *
@@ -450,6 +436,20 @@ public:
      * @return the index of the new element in the mesh
      */
     unsigned AddElement(VertexElement<ELEMENT_DIM, SPACE_DIM>* pNewElement);
+
+    /**
+     * Helper method for ReMesh().
+     *
+     * Check for any triangular element whose area is smaller than mT2Threshold
+     * and call PerformT2Swap() on any such element.
+     *
+     * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
+     *                   with indices of VertexElements in the new mesh.  This should be created
+     *                   with the correct size, GetNumElements()
+     *
+     * @return whether we need to check for, and implement, any further local remeshing operations
+     */
+    bool CheckForT2Swaps(VertexElementMap& rElementMap);
 
     /**
      * Delete mNodes and mElements.

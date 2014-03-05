@@ -510,7 +510,7 @@ public:
 
             TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&node_based_cell_population));
             TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&node_based_cell_population));
-        
+
             // Tidy up
             delete node_based_nodes[0];
             delete node_based_nodes[1];

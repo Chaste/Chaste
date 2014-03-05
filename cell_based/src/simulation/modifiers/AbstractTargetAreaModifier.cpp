@@ -70,6 +70,7 @@ void AbstractTargetAreaModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<D
     ///\todo #2488: double check that this update call doesn't break anything (i.e. counting of swaps etc.)
     rCellPopulation.Update();
 
+    ///\todo (#2489) maybe move this to SetupSolve() to avoid repeated dynamic casting
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
     {
         EXCEPTION("AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");

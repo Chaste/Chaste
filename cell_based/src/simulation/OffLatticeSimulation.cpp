@@ -36,11 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "T2SwapCellKiller.hpp"
 #include "AbstractCellDivisionRule.hpp"
-
 #include "Cylindrical2dMesh.hpp"
 #include "Cylindrical2dVertexMesh.hpp"
-
 #include "AbstractTwoBodyInteractionForce.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
@@ -65,8 +64,14 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     }
     else
     {
-        assert (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation));
+        assert(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation));
         this->mDt = 0.002; // smaller time step required for convergence/stability
+
+        // For VertexBasedCellPopulations we automatically add a T2SwapCellKiller. In order to inhibit T2 swaps
+        // the user needs to set the threshold for T2 swaps in the mesh to 0.
+        VertexBasedCellPopulation<SPACE_DIM>* p_vertex_based_cell_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation);
+        MAKE_PTR_ARGS(T2SwapCellKiller<SPACE_DIM>, T2_swap_cell_killer, (p_vertex_based_cell_population));
+        AddCellKiller(T2_swap_cell_killer);
     }
 }
 

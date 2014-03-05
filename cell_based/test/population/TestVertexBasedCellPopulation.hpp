@@ -71,6 +71,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
 
+// Test warnings
+#include "Warnings.hpp"
+
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -759,6 +762,12 @@ public:
         }
 
         TS_ASSERT_EQUALS(element_indices, expected_elem_indices);
+
+        // Test Warnings
+        // The case where the warning doesn't occur is tested in TestT2SwapCellKiller
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
+        Warnings::QuietDestroy();
     }
 
     void TestVertexBasedCellPopulationOutputWriters() throw (Exception)

@@ -430,7 +430,7 @@ public:
         // Run simulation
         simulator.Solve();
 
-        // Check that cells 6 and 14 have now been removed.
+        // Check that cells 6 and 14 have now been removed
         unsigned new_num_nodes = simulator.rGetCellPopulation().GetNumNodes();
         unsigned new_num_elements = (static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements();
         unsigned new_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
@@ -441,9 +441,12 @@ public:
         TS_ASSERT_EQUALS(new_num_cells, new_num_elements);
 
         // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 5u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Cell removed due to a T2 swap; this is not counted in the dead cells counter");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
         Warnings::QuietDestroy();
     }
 

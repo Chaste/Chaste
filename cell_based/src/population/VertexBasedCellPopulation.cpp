@@ -223,9 +223,20 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
     {
         if ((*it)->IsDead())
         {
-            // Remove the element from the mesh
+            // Count the cell as dead
             num_removed++;
-            mpMutableVertexMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
+
+            // Remove the element from the mesh if it is not deleted yet
+            ///\todo (#2489) this should cause an error - we should fix this!
+            if (!(this->GetElement(this->GetLocationIndexUsingCell((*it)))->IsDeleted()))
+            {
+                // This warning relies on the fact that there is only one other possibility for
+                // vertex elements to be marked as deleted: a T2 swap
+                WARNING("A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
+                mpMutableVertexMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
+            }
+
+            // Delete the cell
             it = this->mCells.erase(it);
         }
         else

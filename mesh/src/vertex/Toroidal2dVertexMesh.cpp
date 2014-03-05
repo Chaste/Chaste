@@ -218,7 +218,7 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
                     this_node_index += num_nodes;
                 }
             }
-                
+
             // If the element straddles the top/bottom periodic boundary...
             if (element_straddles_top_bottom_boundary)
             {

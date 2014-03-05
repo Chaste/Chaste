@@ -779,24 +779,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
          * mesh. Instead, we just remove any deleted elements and nodes.
          */
         RemoveDeletedNodesAndElements(rElementMap);
-
-        // We must check for, and implement, any T2 swaps prior to checking for T1 swaps
         bool recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            // Note that whenever we call CheckForT2Swaps(), the element indices must run from zero up to mElements.size()-1
-            recheck_mesh = CheckForT2Swaps(rElementMap);
-
-            // If a T2 swap occurred...
-            if (recheck_mesh == true)
-            {
-                // ...then remove any deleted elements and nodes
-                RemoveDeletedNodesAndElements(rElementMap);
-            }
-            else
-            {
-                recheck_mesh = CheckForT1Swaps(rElementMap);
-            }
+            recheck_mesh = CheckForT1Swaps(rElementMap);
         }
 
         // Check for element intersections
@@ -811,9 +797,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
     }
     else // 3D
     {
-        #define COVERAGE_IGNORE
+#define COVERAGE_IGNORE
         EXCEPTION("Remeshing has not been implemented in 3D (see #827 and #860)\n");
-        #undef COVERAGE_IGNORE
+#undef COVERAGE_IGNORE
         ///\todo Implement ReMesh() in 3D (see #1422)
     }
 }
@@ -904,6 +890,8 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
             {
                 // ...then perform a T2 swap and break out of the loop
                 PerformT2Swap(*elem_iter);
+                // todo: cover this line in a test
+                rElementMap.SetDeleted(elem_iter->GetIndex());
                 return true;
             }
         }

@@ -268,50 +268,50 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
             neighbour_location_index = *neighbour_iter;
 
-			std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
-			std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
-			// Only calculate Hamiltonian and update elements if the nodes are from different elements, or one is from the medium
-			if (    ( !containing_elements.empty() && neighbour_containing_elements.empty() )
-				 || ( containing_elements.empty() && !neighbour_containing_elements.empty() )
-				 || ( !containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin() ) )
-			{
-				double delta_H = 0.0; // This is H_1-H_0.
+            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+            std::set<unsigned> neighbour_containing_elements = GetNode(neighbour_location_index)->rGetContainingElementIndices();
+            // Only calculate Hamiltonian and update elements if the nodes are from different elements, or one is from the medium
+            if (    ( !containing_elements.empty() && neighbour_containing_elements.empty() )
+                 || ( containing_elements.empty() && !neighbour_containing_elements.empty() )
+                 || ( !containing_elements.empty() && !neighbour_containing_elements.empty() && *containing_elements.begin() != *neighbour_containing_elements.begin() ) )
+            {
+                double delta_H = 0.0; // This is H_1-H_0.
 
-				// Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
-				for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
-					 iter != mUpdateRuleCollection.end();
-					 ++iter)
-				{
-					delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
-				}
+                // Now add contributions to the Hamiltonian from each AbstractPottsUpdateRule
+                for (typename std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > >::iterator iter = mUpdateRuleCollection.begin();
+                     iter != mUpdateRuleCollection.end();
+                     ++iter)
+                {
+                    delta_H += (*iter)->EvaluateHamiltonianContribution(neighbour_location_index, p_node->GetIndex(), *this);
+                }
 
-				// Generate a uniform random number to do the random motion
-				double random_number = p_gen->ranf();
+                // Generate a uniform random number to do the random motion
+                double random_number = p_gen->ranf();
 
-				double p = exp(-delta_H/mTemperature);
-				if (delta_H <= 0 || random_number < p)
-				{
-					// Do swap
+                double p = exp(-delta_H/mTemperature);
+                if (delta_H <= 0 || random_number < p)
+                {
+                    // Do swap
 
-					// Remove the current node from any elements containing it (there should be at most one such element)
-					for (std::set<unsigned>::iterator iter = containing_elements.begin();
-						 iter != containing_elements.end();
-						 ++iter)
-					{
-						GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(node_index));
+                    // Remove the current node from any elements containing it (there should be at most one such element)
+                    for (std::set<unsigned>::iterator iter = containing_elements.begin();
+                         iter != containing_elements.end();
+                         ++iter)
+                    {
+                        GetElement(*iter)->DeleteNode(GetElement(*iter)->GetNodeLocalIndex(node_index));
 
-						///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
-					}
+                        ///\todo If this causes the element to have no nodes then flag the element and cell to be deleted
+                    }
 
-					// Next add the current node to any elements containing the neighbouring node (there should be at most one such element)
-					for (std::set<unsigned>::iterator iter = neighbour_containing_elements.begin();
-						 iter != neighbour_containing_elements.end();
-						 ++iter)
-					{
-						GetElement(*iter)->AddNode(this->mrMesh.GetNode(node_index));
-					}
-				}
-        	}
+                    // Next add the current node to any elements containing the neighbouring node (there should be at most one such element)
+                    for (std::set<unsigned>::iterator iter = neighbour_containing_elements.begin();
+                         iter != neighbour_containing_elements.end();
+                         ++iter)
+                    {
+                        GetElement(*iter)->AddNode(this->mrMesh.GetNode(node_index));
+                    }
+                }
+            }
         }
     }
 }
