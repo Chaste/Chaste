@@ -43,7 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "LinearSystem.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "ReplicatableVector.hpp"
 #include "VentilationProblem.hpp"
 
 // Pressures read from file.  Pressures labelled P10, P20, P21, P30, P31, P32, P33 map to the mesh
@@ -140,15 +139,15 @@ public:
         problem.SetConstantInflowPressures(0.0);
         problem.Solve();
 
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[0], 92813610, 1);
-        TS_ASSERT_DELTA(solution_vector_repl[1], 46406805, 1);
-        TS_ASSERT_DELTA(solution_vector_repl[2], 46406805, 1);
-        TS_ASSERT_DELTA(solution_vector_repl[3], 100.0, 1e-6); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[4], 84.5107, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[5], 0.0, 1e-6); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[6], 0.0, 1e-6); //BC
-
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(flux[0], 92813610, 1);
+        TS_ASSERT_DELTA(flux[1], 46406805, 1);
+        TS_ASSERT_DELTA(flux[2], 46406805, 1);
+        TS_ASSERT_DELTA(pressure[0], 100.0, 1e-6); //BC
+        TS_ASSERT_DELTA(pressure[1], 84.5107, 1e-4);
+        TS_ASSERT_DELTA(pressure[2], 0.0, 1e-6); //BC
+        TS_ASSERT_DELTA(pressure[3], 0.0, 1e-6); //BC
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "small_conical");
 #endif
@@ -166,14 +165,15 @@ public:
         problem.SetConstantInflowPressures(0.0);
         problem.Solve();
 
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[0], 19932007, 1);
-        TS_ASSERT_DELTA(solution_vector_repl[1], 9966003, 1);
-        TS_ASSERT_DELTA(solution_vector_repl[2], 9966003, 1);
-        TS_ASSERT_DELTA(solution_vector_repl[3], 100.0, 1e-6); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[4], 91.8789, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[5], 0.0, 1e-6); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[6], 0.0, 1e-6); //BC
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(flux[0], 19932007, 1);
+        TS_ASSERT_DELTA(flux[1], 9966003, 1);
+        TS_ASSERT_DELTA(flux[2], 9966003, 1);
+        TS_ASSERT_DELTA(pressure[0], 100.0, 1e-6); //BC
+        TS_ASSERT_DELTA(pressure[1], 91.8789, 1e-4);
+        TS_ASSERT_DELTA(pressure[2], 0.0, 1e-6); //BC
+        TS_ASSERT_DELTA(pressure[3], 0.0, 1e-6); //BC
 
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "small_cylindrical");
@@ -191,16 +191,16 @@ public:
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations");
 #endif
-        const unsigned num_edge = problem.rGetMesh().GetNumElements();
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 0.0006,   1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 0.001274, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 0.001274, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 0.00148608, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 0.00148608, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 0.00148608, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 0.00148608, 1e-8); //BC
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 0.0006,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 0.001274, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 0.001274, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 0.00148608, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 0.00148608, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 0.00148608, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 0.00148608, 1e-8); //BC
     }
 
     void TestThreeBifurcationsWithRadiusOnNodeFile() throw (Exception)
@@ -209,21 +209,21 @@ public:
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15);
         problem.Solve();
-        const unsigned num_edge = problem.rGetMesh().GetNumElements();
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6666,   1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-4); // (Inflow flux)
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[0], -284.0705, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -71.0176, 1e-4); // (Inflow flux)
     }
 
     void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
@@ -232,24 +232,25 @@ public:
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15);
         problem.Solve();
-        const unsigned num_edge = problem.rGetMesh().GetNumElements();
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6666,   1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-4); // (Inflow flux)
 
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[0], -284.0705, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -71.0176, 1e-4); // (Inflow flux)
         //This is the extra node at the Trachea
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+8], 2.2222, 1e-4); //Between root and first bifurcation
+        TS_ASSERT_DELTA(pressure[8], 2.2222, 1e-4); //Between root and first bifurcation
+
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");
 #endif
@@ -261,21 +262,22 @@ public:
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowFluxes(-71.0176);
         problem.Solve();
-        const unsigned num_edge = problem.rGetMesh().GetNumElements();
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6666,   1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 3e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-8); // BC (Inflow flux)
+
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15, 1e-4);
+        TS_ASSERT_DELTA(pressure[5], 15, 1e-4);
+        TS_ASSERT_DELTA(pressure[6], 15, 1e-4);
+        TS_ASSERT_DELTA(pressure[7], 15, 1e-4);
+        TS_ASSERT_DELTA(flux[0], -284.0705, 3e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -71.0176, 1e-8); // BC (Inflow flux)
     }
 
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
@@ -293,16 +295,16 @@ public:
         problem.SetConstantInflowPressures(15);
         problem.SetDynamicResistance();
         problem.Solve();
-        const unsigned num_edge = problem.rGetMesh().GetNumElements();
-        ReplicatableVector solution_vector_repl( problem.GetSolution());
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6878,   1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2292, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2292, 1e-4);
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-8); //BC
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.6878,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.2292, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.2292, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
@@ -371,17 +373,17 @@ public:
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 25.0, 0.01);
         problem.Solve(stepper, &FileBCs, "TestVentilation", "three_bifurcations_normal");
-        const unsigned num_edge = problem.rGetMesh().GetNumElements();
-        ReplicatableVector solution_vector_repl( problem.GetSolution());//check pressure at time @ 25
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
         //Note: the two implementations are using different resistance models, so are not yet the same
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], pressureAt1[2500], 0.2); ///\todo #2300
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], pressureAt2[2500], 0.1); ///\todo #2300
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], pressureAt3[2500], 0.1); ///\todo #2300
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], pressureAt4[2500], 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], pressureAt5[2500], 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], pressureAt6[2500], 1e-8); //BC
-        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], pressureAt7[2500], 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], pressureAt1[2500], 0.2); ///\todo #2300
+        TS_ASSERT_DELTA(pressure[2], pressureAt2[2500], 0.1); ///\todo #2300
+        TS_ASSERT_DELTA(pressure[3], pressureAt3[2500], 0.1); ///\todo #2300
+        TS_ASSERT_DELTA(pressure[4], pressureAt4[2500], 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], pressureAt5[2500], 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], pressureAt6[2500], 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], pressureAt7[2500], 1e-8); //BC
     }
 //    void TestAnnotateGenerations() throw (Exception)
 //    {

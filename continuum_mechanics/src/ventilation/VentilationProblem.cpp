@@ -354,6 +354,25 @@ Vec VentilationProblem::GetSolution()
     return mSolution;
 }
 
+void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges,
+                                                         std::vector<double>& rPressuresOnNodes)
+{
+    ReplicatableVector solution_vector_repl( mSolution );
+    unsigned num_elem = mMesh.GetNumElements();
+
+    rFluxesOnEdges.resize(num_elem);
+    for (unsigned i=0; i<num_elem; i++)
+    {
+        rFluxesOnEdges[i] = solution_vector_repl[i];
+    }
+
+    rPressuresOnNodes.resize(mMesh.GetNumNodes());
+    for (unsigned i=0; i<mMesh.GetNumNodes(); i++)
+    {
+        rPressuresOnNodes[i] = solution_vector_repl[i+num_elem];
+    }
+}
+
 
 void VentilationProblem::SetRadiusOnEdge(bool isOnEdges)
 {
@@ -379,20 +398,10 @@ void VentilationProblem::WriteVtk(const std::string& rDirName, const std::string
 void VentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
         const std::string& rSuffix)
 {
-    ///\todo This is clunky
-    ReplicatableVector solution_vector_repl( mSolution );
-    std::vector<double> fluxes(mMesh.GetNumElements());
-    for (unsigned i=0; i<mMesh.GetNumElements(); i++)
-    {
-        fluxes[i] = solution_vector_repl[i];
-    }
+    std::vector<double> pressures;
+    std::vector<double> fluxes;
+    GetSolutionAsFluxesAndPressures(fluxes, pressures);
     rVtkWriter.AddCellData("Flux"+rSuffix, fluxes);
-    std::vector<double> pressures(mMesh.GetNumNodes());
-    unsigned num_elem = mMesh.GetNumElements();
-    for (unsigned i=0; i<mMesh.GetNumNodes(); i++)
-    {
-        pressures[i] = solution_vector_repl[i+num_elem];
-    }
     rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
 }
 

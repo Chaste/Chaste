@@ -175,6 +175,17 @@ public:
      */
     Vec GetSolution();
 
+    /**
+     * The mSolution Vec is a mixture of flux and pressure solutions and, in parallel, it is distributed across
+     * processors.  This method replicates the solution across all processors and then splits it into its flux
+     * and pressure components.  Because of the replication it makes sense to get both solutions in a single call.
+     *
+     * \todo Make a scaling of fluxes and reverse the scale here.
+     * @param rFluxesOnEdges The component of the mSolution Vec which represents fluxes (this vector is resized)
+     * @param rPressuresOnNodes The component of the mSolution Vec which represents pressures (this vector is resized)
+     */
+    void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes);
+
 #ifdef CHASTE_VTK
 
     /**
