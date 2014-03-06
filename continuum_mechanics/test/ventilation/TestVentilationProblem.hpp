@@ -226,6 +226,35 @@ public:
         TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-4); // (Inflow flux)
     }
 
+    void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations_extra_links", 0u);
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(15);
+        problem.Solve();
+        const unsigned num_edge = problem.rGetMesh().GetNumElements();
+        ReplicatableVector solution_vector_repl( problem.GetSolution());
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+1], 6.6666,   1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+2], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+4], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+5], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+6], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+7], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(solution_vector_repl[0], -284.0705, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[3],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[4],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[5],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(solution_vector_repl[6],  -71.0176, 1e-4); // (Inflow flux)
+
+        //This is the extra node at the Trachea
+        TS_ASSERT_DELTA(solution_vector_repl[num_edge+8], 2.2222, 1e-4); //Between root and first bifurcation
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");
+#endif
+    }
+
     void TestThreeBifurcationsWithRadiusOnNodeFileFluxBoundaries() throw (Exception)
     {
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
@@ -371,6 +400,20 @@ public:
 //            dfs_queue.pop();
 //        }
 //    }
+
+    void TestTopOfAirwaysPatientDataVeryNearFailer() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
+        PetscOptionsSetValue("-ksp_monitor", "");
+
+        problem.SetViscosity(3e-2); //Even six orders of magnitude don't fix stability issues
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(50.0);
+        TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
+        std::vector<double> boundary(r_mesh.GetNumNodes(), 0.0);
+        problem.Solve();
+    }
+
     void TestExceptions() throw(Exception)
     {
         TS_ASSERT_THROWS_THIS(VentilationProblem bad_problem("mesh/test/data/y_branch_3d_mesh", 1u),
@@ -383,6 +426,7 @@ public:
         TS_ASSERT_THROWS_THIS(problem.SetFluxAtBoundaryNode(3u, 0.0), "Boundary conditions cannot be set at internal nodes");
 
     }
+
 
 };
 

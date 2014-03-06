@@ -59,6 +59,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
     // preallocating 5 non-zeros allows for 4-way branching
     mpLinearSystem = new LinearSystem(mMesh.GetNumNodes()+mMesh.GetNumElements(), 5u);
+    // Possibly more robust... mpLinearSystem->SetKspType("gmres");
 
     /*
      * Set up the Acinar units at the terminals
@@ -308,6 +309,9 @@ void VentilationProblem::Solve()
 {
     Assemble();
     mpLinearSystem->AssembleFinalLinearSystem();
+    // mpLinearSystem->DisplayMatrix();
+    // mpLinearSystem->DisplayRhs();
+
     if (mSolution==NULL)
     {
         // First solve
