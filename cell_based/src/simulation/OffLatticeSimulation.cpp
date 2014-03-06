@@ -71,7 +71,7 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
         // the user needs to set the threshold for T2 swaps in the mesh to 0.
         VertexBasedCellPopulation<SPACE_DIM>* p_vertex_based_cell_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation);
         MAKE_PTR_ARGS(T2SwapCellKiller<SPACE_DIM>, T2_swap_cell_killer, (p_vertex_based_cell_population));
-        AddCellKiller(T2_swap_cell_killer);
+        this->AddCellKiller(T2_swap_cell_killer);
     }
 }
 
