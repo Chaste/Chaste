@@ -316,23 +316,22 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         {
             // This shouldn't ever happen, as the cell vector only contains living cells
             unsigned old_elem_index = old_map[(*cell_iter).get()];
-
-            if (element_map.IsDeleted(old_elem_index))
-            {
-                /**
-                 * \todo this is a kludge to remove the cell once a T2 swap occurs; this is not included
-                 * in the dead cells counter at present. This should be included in the RemoveDeadCells()
-                 * method so that the death is correctly counted.
-                 */
-                WARNING("Cell removed due to a T2 swap; this is not counted in the dead cells counter");
-                cell_iter = this->mCells.erase(cell_iter);
-                --cell_iter;
-            }
-            else
-            {
+assert(!element_map.IsDeleted(old_elem_index));
+//            if (element_map.IsDeleted(old_elem_index))
+//            {
+//                /**
+//                 * A vertex element got deleted without the cell being deleted first, this should
+//                 * never happen.
+//                 */
+//                WARNING("Cell removed due to a T2 swap; this is not counted in the dead cells counter");
+//                cell_iter = this->mCells.erase(cell_iter);
+//                --cell_iter;
+//            }
+//            else
+//            {
                 unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
                 this->SetCellUsingLocationIndex(new_elem_index, *cell_iter);
-            }
+//            }
         }
 
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
@@ -364,7 +363,7 @@ void VertexBasedCellPopulation<DIM>::Validate()
 
         if (validated_element[i] > 1)
         {
-            // This should never be reached as you can only set one cell per element index.
+            // This should never be reached as you can only set one cell per element index
             EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
