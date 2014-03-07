@@ -260,12 +260,16 @@ def get_build_function(build, run_time_flags='', test_time_limit=0):
     """Return a function that can be used as a Builder by SCons."""
     
     def build_function(target, source, env):
-        # Set up the environment from env['ENV'], env['ENV']['PYTHONPATH'] and env['PYINCPATH']
+        # Set up the environment from env['ENV']
+        # Python tests need PYTHONPATH set from env['ENV']['PYTHONPATH'] and env['PYINCPATH']
         orig_python_path = copy.copy(env['ENV']['PYTHONPATH'])
         new_paths = env.Flatten(env.subst(env.get('PYINCPATH', ''), conv=lambda n: n))
         env.PrependENVPath('PYTHONPATH', new_paths)
         test_env = copy.copy(env['ENV'])
         env['ENV']['PYTHONPATH'] = orig_python_path
+        # Functional curation also needs CFLAGS & LDFLAGS for Cython compilation
+        test_env['CFLAGS'] = os.environ.get('CHASTE_CYTHON_CFLAGS', '')
+        test_env['LDFLAGS'] = os.environ.get('CHASTE_CYTHON_LDFLAGS', '')
         # Run the test
         log = run_test(str(source[0]), str(target[0]), build, run_time_flags, time_limit=test_time_limit, env=test_env)
         # Note the extra dependency of the copied log file

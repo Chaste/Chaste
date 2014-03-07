@@ -122,6 +122,8 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
                     incflags.append(f)
                     incflags.append(cflags[i+1])
             e.Replace(CCFLAGS=incflags)
+            os.environ['CHASTE_CYTHON_CFLAGS'] = e.subst("$_CPPINCFLAGS $CCFLAGS")
+            os.environ['CHASTE_CYTHON_LDFLAGS'] = e.subst("$_LIBDIRFLAGS $LINKFLAGS")
             e.Execute(SCons.Action.Action('CFLAGS="$_CPPINCFLAGS $CCFLAGS" LDFLAGS="$_LIBDIRFLAGS $LINKFLAGS"'
                                           ' python %s build_ext --inplace' % setup_py_path,
                                           chdir=os.path.dirname(setup_py_path)))
