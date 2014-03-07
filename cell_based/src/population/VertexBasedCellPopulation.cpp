@@ -314,24 +314,12 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
              cell_iter != this->mCells.end();
              ++cell_iter)
         {
-            // This shouldn't ever happen, as the cell vector only contains living cells
+            // The cell vector should only ever contain living cells
             unsigned old_elem_index = old_map[(*cell_iter).get()];
-assert(!element_map.IsDeleted(old_elem_index));
-//            if (element_map.IsDeleted(old_elem_index))
-//            {
-//                /**
-//                 * A vertex element got deleted without the cell being deleted first, this should
-//                 * never happen.
-//                 */
-//                WARNING("Cell removed due to a T2 swap; this is not counted in the dead cells counter");
-//                cell_iter = this->mCells.erase(cell_iter);
-//                --cell_iter;
-//            }
-//            else
-//            {
-                unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
-                this->SetCellUsingLocationIndex(new_elem_index, *cell_iter);
-//            }
+            assert(!element_map.IsDeleted(old_elem_index));
+
+            unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
+            this->SetCellUsingLocationIndex(new_elem_index, *cell_iter);
         }
 
         // Check that each VertexElement has only one CellPtr associated with it in the updated cell population
