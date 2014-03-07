@@ -71,10 +71,10 @@ protected:
     /**
      * @return a newly created purkinje cells for the given node.
      * Must be overridden by subclasses to return a Purkinje cell object for the given node.
-     * @param nodeIndex  global node index.
+     * @param pNode  pointer to node object
      * @param pCardiacCell  the cardiac cell that has already been created at this node
      */
-    virtual AbstractCardiacCellInterface* CreatePurkinjeCellForTissueNode(unsigned nodeIndex,
+    virtual AbstractCardiacCellInterface* CreatePurkinjeCellForTissueNode(Node<SPACE_DIM>* pNode,
                                                                           AbstractCardiacCellInterface* pCardiacCell)=0;
 
     /**
@@ -122,10 +122,10 @@ public:
      * case it calls CreatePurkinjeCellForTissueNode (which must be defined by subclasses),
      * otherwise it returns a pointer to a (unique) fake cell
      *
-     * @param nodeIndex  global node index.
+     * @param pNode  pointer to node
      * @param pCardiacCell  the cardiac cell that has already been created at this node
      */
-    AbstractCardiacCellInterface* CreatePurkinjeCellForNode(unsigned nodeIndex,
+    AbstractCardiacCellInterface* CreatePurkinjeCellForNode(Node<SPACE_DIM>* pNode,
                                                             AbstractCardiacCellInterface* pCardiacCell);
 
     /**

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A factory to ease creating cardiac cell objects for use in a mono/bidomain simulation.
  *
  * The user should implement their own concrete class, in particular implementing
- * CreateCardiacCellForTissueNode(unsigned), which should return the cell corresponding to a
+ * CreateCardiacCellForTissueNode(Node*), which should return the cell corresponding to a
  * given node. The user should also implement GetNumberOfCells() if this isn't equal
  * to the number of nodes. FinaliseCellCreation() can be used to (eg) add stimuli to
  * certain cells after they have been created.
@@ -88,17 +88,17 @@ public:
      * case a pointer to a (unique) fake cell is returned) and if not, calls
      * CreateCardiacCellForTissueNode (which must be defined by subclasses).
      *
-     * @param nodeIndex  Global node index.
+     * @param node  Pointer to node object.
      */
-    virtual AbstractCardiacCellInterface* CreateCardiacCellForNode(unsigned nodeIndex);
+    virtual AbstractCardiacCellInterface* CreateCardiacCellForNode(Node<SPACE_DIM>* pNode);
 
     /**
      * Must be overridden by subclasses to return a cell object for the given node.
      *
-     * @param nodeIndex  Global node index.
+     * @param node  Pointer to node object.
      * @return a newly created cell object for the given tissue node.
      */
-    virtual AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned nodeIndex)=0;
+    virtual AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)=0;
 
     /**
      * May be overridden by subclasses to perform any necessary work after all cells

@@ -70,7 +70,8 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
         for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
         {
             unsigned global_index = ownership_range_low + local_index;
-            mCellsDistributedSecondCell[local_index] = pCellFactorySecondCell->CreateCardiacCellForNode(global_index);
+            Node<SPACE_DIM>* node = AbstractCardiacTissue<SPACE_DIM>::mpMesh->GetNode(global_index);
+            mCellsDistributedSecondCell[local_index] = pCellFactorySecondCell->CreateCardiacCellForNode(node);
             mCellsDistributedSecondCell[local_index]->SetUsedInTissueSimulation();
             mGgapDistributed[local_index] = 0.0;//default. It will be changed by specific method later when user input will be obtained
             mExtracellularStimuliDistributed[local_index] = pExtracellularStimulusFactory->CreateStimulusForNode(global_index);

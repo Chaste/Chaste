@@ -65,13 +65,13 @@ public:
         assert(DIM<3);
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
-        double x = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
         double y;
         if(DIM==2)
         {
-            y = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[1];
+            y = pNode->rGetLocation()[1];
         }
 
         if (    (DIM==1 && fabs(x)<0.02+1e-6)

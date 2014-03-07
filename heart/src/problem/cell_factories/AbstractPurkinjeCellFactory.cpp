@@ -166,7 +166,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
 {
     mpMixedDimensionMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>*>(pMesh);
-    if (mpMixedDimensionMesh ==NULL)
+    if (mpMixedDimensionMesh == NULL)
     {
         EXCEPTION("AbstractPurkinjeCellFactory must take a MixedDimensionMesh");
     }
@@ -186,12 +186,13 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreatePurkinjeCellForNode(
-        unsigned nodeIndex,
+        Node<SPACE_DIM>* pNode,
         AbstractCardiacCellInterface* pCardiacCell)
 {
-    if (mLocalPurkinjeNodes.count(nodeIndex)>0)
+    unsigned node_index = pNode->GetIndex();
+    if (mLocalPurkinjeNodes.count(node_index)>0)
     {
-        return CreatePurkinjeCellForTissueNode(nodeIndex, pCardiacCell);
+        return CreatePurkinjeCellForTissueNode(pNode, pCardiacCell);
     }
     else
     {

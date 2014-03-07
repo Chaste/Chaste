@@ -183,9 +183,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
-        c_vector<double,DIM> x = this->GetMesh()->GetNode(node)->rGetLocation();
+        c_vector<double,DIM> x = pNode->rGetLocation();
 
         boost::shared_ptr<PositionDependentStimulus<DIM> >
             p_stimulus(new PositionDependentStimulus<DIM>(x));

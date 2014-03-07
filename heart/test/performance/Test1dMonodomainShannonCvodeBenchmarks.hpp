@@ -72,11 +72,11 @@ public:
       {
       }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         CELL_MODEL *p_cell;
 
-        if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        if (pNode->GetPoint()[0] == 0.0)
         {
             p_cell = new CELL_MODEL(this->mpSolver,
                                     mpStimulus);
@@ -113,7 +113,7 @@ public:
       {
       }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         AbstractCardiacCell* p_cell;
 
@@ -126,7 +126,7 @@ public:
         boost::shared_ptr<CvodeAdaptor> p_cvode_solver(new CvodeAdaptor());
         p_cvode_solver->SetMinimalReset(true);
         p_cvode_solver->SetTolerances(1e-4,1e-6);// NB These defaulted to different values in AbstractCvodeSystem.
-        if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        if (pNode->GetPoint()[0] == 0.0)
         {
             p_cell = new CellShannon2004FromCellML(p_cvode_solver,
                                                    mpStimulus);
@@ -160,7 +160,7 @@ public:
       {
       }
 
-    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         AbstractCvodeCell* p_cell;
 
@@ -172,7 +172,7 @@ public:
         // Here we add a native Cvode cell (which includes its own solver) at every node.
         boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
 
-        if (this->GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        if (pNode->GetPoint()[0] == 0.0)
         {
             p_cell = new CellShannon2004FromCellMLCvode(p_empty_solver,
                                                         mpStimulus);

@@ -102,13 +102,14 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
         for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
         {
             unsigned global_index = ownership_range_low + local_index;
-            mCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(global_index);
+            Node<SPACE_DIM>* p_node = mpMesh->GetNode(global_index);
+            mCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
             mCellsDistributed[local_index]->SetUsedInTissueSimulation();
 
             if (mHasPurkinje)
             {
                 mPurkinjeCellsDistributed[local_index]
-                    = p_purkinje_cell_factory->CreatePurkinjeCellForNode(global_index, mCellsDistributed[local_index]);
+                    = p_purkinje_cell_factory->CreatePurkinjeCellForNode(p_node, mCellsDistributed[local_index]);
                 mPurkinjeCellsDistributed[local_index]->SetUsedInTissueSimulation();
             }
         }
@@ -444,9 +445,10 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
             for (unsigned local_index = 0; local_index < num_halo_nodes; local_index++)
             {
                 unsigned global_index = mHaloNodes[local_index];
+                Node<SPACE_DIM>* p_node = mpMesh->GetNode(global_index);
                 try
                 {
-                    mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(global_index);
+                    mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
                 }
                 catch (Exception&)
                 {

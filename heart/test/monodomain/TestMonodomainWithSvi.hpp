@@ -70,13 +70,13 @@ public:
         assert(DIM<3);
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
-        double x = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
         double y;
         if(DIM==2)
         {
-            y = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[1];
+            y = pNode->rGetLocation()[1];
         }
 
         if (    (DIM==1 && fabs(x)<0.02+1e-6)
@@ -107,14 +107,14 @@ public:
         assert(DIM<3);
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
         // This line will throw in parallel with SVI
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
         double y;
         if(DIM==2)
         {
-            y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
+            y = pNode->rGetLocation()[1];
         }
 
         if (    (DIM==1 && fabs(x)<0.02+1e-6)
@@ -145,13 +145,13 @@ public:
         assert(DIM<3);
     }
 
-    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
-        double x = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
         double y;
         if(DIM==2)
         {
-            y = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[1];
+            y = pNode->rGetLocation()[1];
         }
 
         AbstractCvodeCell* p_cell;
@@ -184,9 +184,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
-        double x = this->GetMesh()->GetNodeOrHaloNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
         if ( x<0.15 )
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);

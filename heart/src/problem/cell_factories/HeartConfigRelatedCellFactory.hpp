@@ -171,9 +171,9 @@ public:
      * The stimulus is determined in this method (using the list of stimulation regions).
      * The cardiac cell type (and parameters) are
      * determined in the CreateCellWithIntracellularStimulus method
-     * @param nodeIndex is the global index within the mesh
+     * @param pNode pointer to the node.
      */
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned nodeIndex);
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode);
 
     /**
      * Helper method to calculate and fill in the heterogeneities areas (mCellHeterogeneityAreas)

@@ -67,12 +67,12 @@ public:
     }
 
     /**
-     * @param node  The global index of a node
+     * @param pNode  Pointer to the node.
      * @return  A cardiac cell which corresponds to this node.
      */
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)
     {
-        double x = this->GetMesh()->GetNode(node)->GetPoint()[0];
+        double x = pNode->GetPoint()[0];
 
         ///\todo remove magic number? (#1884)
         if (x*x<=1e-10)

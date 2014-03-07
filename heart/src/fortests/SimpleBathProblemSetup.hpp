@@ -75,30 +75,30 @@ public:
 
     /**
      * @return a newly created new cell.
-     * @param node  where to put the cell
+     * @param pNode  pointer to Node object for cell.
      */
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
         // paranoia - check this is really a tissue node
-        assert(HeartRegionCode::IsRegionTissue( this->GetMesh()->GetNode(node)->GetRegion() ));
+        assert(HeartRegionCode::IsRegionTissue( pNode->GetRegion() ));
 
         // stimulate centre node normally..
         bool is_centre;
 
         if (DIM==1)
         {
-            is_centre = (fabs(this->GetMesh()->GetNode(node)->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6);
+            is_centre = (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6);
         }
         else if (DIM==2)
         {
-            is_centre = (    (fabs(this->GetMesh()->GetNode(node)->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6)
-                          && (fabs(this->GetMesh()->GetNode(node)->GetPoint()[1]-mStimulatedPoint(1)) < 1e-6) );
+            is_centre = (    (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6)
+                          && (fabs(pNode->GetPoint()[1]-mStimulatedPoint(1)) < 1e-6) );
         }
         else
         {
-            is_centre = (    (fabs(this->GetMesh()->GetNode(node)->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6)
-                          && (fabs(this->GetMesh()->GetNode(node)->GetPoint()[1]-mStimulatedPoint(1)) < 1e-6)
-                          && (fabs(this->GetMesh()->GetNode(node)->GetPoint()[2]-mStimulatedPoint(2)) < 1e-6) );
+            is_centre = (    (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6)
+                          && (fabs(pNode->GetPoint()[1]-mStimulatedPoint(1)) < 1e-6)
+                          && (fabs(pNode->GetPoint()[2]-mStimulatedPoint(2)) < 1e-6) );
         }
 
         if (is_centre)

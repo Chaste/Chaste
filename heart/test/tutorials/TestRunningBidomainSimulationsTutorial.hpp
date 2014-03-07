@@ -97,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
  * which tells the problem class what type of cardiac cells to create. The cell-factory
  * class has to inherit from {{{AbstractCardiacCellFactory<DIM>}}}, which means it must
- * implement the method {{{CreateCardiacCellForTissueNode(unsigned nodeNum)}}}, which returns
+ * implement the method {{{CreateCardiacCellForTissueNode(Node<DIM>*)}}}, which returns
  * a pointer to an {{{AbstractCardiacCell}}}. Note, some concrete cell factories have
  * been defined, such as the {{{PlaneStimulusCellFactory}}} (see later tutorials), which
  * could be used in the simulation, but for completeness we create our own cell factory in
@@ -136,10 +136,10 @@ public:
      * {{{mTimestep}}}, {{{mpZeroStimulus}}} and {{{mpSolver}}} which are all
      * members of the base class. The timestep and solver are defined in the base
      * class just so that the user doesn't have to create them here. */
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
         if (x<0.02+1e-6 && y<0.02+1e-6) // ie if x<=0.02 and y<=0.02 (and we are assuming here x,y>=0).
         {
             /* Create a LR91 cell with the non-zero stimulus. This is a volume stimulus, ie

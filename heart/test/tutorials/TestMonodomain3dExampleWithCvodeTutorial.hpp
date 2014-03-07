@@ -108,7 +108,7 @@ public:
      * The following method definition changes to return an `AbstractCvodeCell`
      * instead of an `AbstractCardiacCell`.
      */
-    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
         AbstractCvodeCell* p_cell;
         /*
@@ -119,9 +119,9 @@ public:
          */
         boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
 
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
-        double z = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[2];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
+        double z = pNode->rGetLocation()[2];
 
         /*
          * We then create a 'native' CVODE cell - each cell has its own solver embedded within it.

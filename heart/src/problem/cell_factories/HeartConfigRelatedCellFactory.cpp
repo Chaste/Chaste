@@ -334,7 +334,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellIntracellularStimulus(Abst
 
 
 template<unsigned SPACE_DIM>
-AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCardiacCellForTissueNode(unsigned nodeIndex)
+AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)
 {
     boost::shared_ptr<MultiStimulus> node_specific_stimulus(new MultiStimulus());
 
@@ -343,13 +343,14 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCa
          stimulus_index < mStimuliApplied.size();
          ++stimulus_index)
     {
-        if ( mStimulatedAreas[stimulus_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()) )
+        if ( mStimulatedAreas[stimulus_index]->DoesContain(pNode->GetPoint()) )
         {
             node_specific_stimulus->AddStimulus(mStimuliApplied[stimulus_index]);
         }
     }
 
-    return CreateCellWithIntracellularStimulus(node_specific_stimulus, nodeIndex);
+    unsigned node_index = pNode->GetIndex();
+    return CreateCellWithIntracellularStimulus(node_specific_stimulus, node_index);
 }
 
 template<unsigned SPACE_DIM>

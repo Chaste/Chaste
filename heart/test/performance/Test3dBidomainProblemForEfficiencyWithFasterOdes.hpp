@@ -70,10 +70,10 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-        if (GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        if (pNode->GetPoint()[0] == 0.0)
         {
             //std::cout << node+1 << "\n";
             return new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpRegStimulus);

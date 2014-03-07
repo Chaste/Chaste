@@ -77,9 +77,10 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<PROBLEM_DIM>* pNode)
     {
-        if (node==0)
+        unsigned node_index = pNode->GetIndex();
+        if (node_index==0)
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, mpStimulus);
         }

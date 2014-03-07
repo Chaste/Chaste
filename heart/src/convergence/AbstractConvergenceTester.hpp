@@ -116,11 +116,11 @@ public:
     /**
      * @return a newly createdcell model
      *
-     * @param node Global node index
+     * @param pNode  Pointer to node object
      */
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
-        double x = this->GetMesh()->GetNode(node)->GetPoint()[0];
+        double x = pNode->GetPoint()[0];
         double d_level = x/mStepSize;
         unsigned level = (unsigned) d_level;
         assert(fabs(level-d_level) < DBL_MAX); //x ought to really be a multiple of the step size

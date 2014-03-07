@@ -68,12 +68,12 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         CorriasBuistICCModified *cell;
         cell = new CorriasBuistICCModified(mpSolver, mpZeroStimulus);
 
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
         double IP3_initial = 0.00067;
         double IP3_final = 0.00065;
         double cable_length = 10.0;
@@ -95,7 +95,7 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         CorriasBuistSMCModified *cell;
         cell = new CorriasBuistSMCModified(mpSolver, mpZeroStimulus);

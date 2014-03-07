@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A factory to ease creating contraction cell models for use in a electro-mechanics simulations.
  *
  * The user should implement their own concrete class, in particular implementing
- * CreateContractionCellForElement(unsigned), which should return the contraction model corresponding to a
+ * CreateContractionCellForElement(Element*), which should return the contraction model corresponding to a
  * given element. The user should also implement GetNumberOfCells() if this isn't equal
  * to the number of nodes. FinaliseCellCreation() can be used to (eg) add stimuli to
  * certain cells after they have been created.
@@ -72,12 +72,12 @@ public:
      * the quad point index is the index that would be obtained by looping over
      * elements and then looping over quad points.
      *
-     * @param elemIndex  Global element index.
+     * @param pElement  Pointer to element.
      * It is assumed that all the quad points in a given element will be assigned the same kind
      * of contraction cell.
      *
      */
-    virtual AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex) = 0;
+    virtual AbstractContractionModel* CreateContractionCellForElement(Element<DIM, DIM>* pElement) = 0;
 
     /**
      * Set the mechanics mesh to be used by this cell factory.

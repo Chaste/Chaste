@@ -57,11 +57,11 @@ public:
      : AbstractContractionCellFactory<DIM>()
     {};
 
-    AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex)
+    AbstractContractionModel* CreateContractionCellForElement(Element<DIM, DIM>* pElement)
     {
         AbstractContractionModel* p_model;
 
-        c_vector<double, 2> centroid = this->mpMesh->GetElement(elemIndex)->CalculateCentroid();
+        c_vector<double, 2> centroid = pElement->CalculateCentroid();
 
         if (centroid[0] >= 0.07)
         {

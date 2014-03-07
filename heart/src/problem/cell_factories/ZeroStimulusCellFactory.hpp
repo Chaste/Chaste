@@ -51,7 +51,7 @@ public:
     {
     }
 
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
         return new CELL(this->mpSolver, this->mpZeroStimulus);
     }

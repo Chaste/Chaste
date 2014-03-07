@@ -58,9 +58,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
-        if (GetMesh()->GetNode(node)->GetPoint()[0] == 0.0)
+        if (pNode->GetPoint()[0] == 0.0)
         {
             return new FitzHughNagumo1961OdeSystem(mpSolver, mpStimulus);
         }

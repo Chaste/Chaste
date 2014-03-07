@@ -71,10 +71,10 @@ public:
     /**
      * Main method that is called by the solver to assign a model to each quadrature point.
      *
-     * @param elemIndex  The index of the element in the mechanics mesh
+     * @param pElement  Pointer to the element in the mechanics mesh
      * @return  A contraction model for this element.
      */
-    AbstractContractionModel* CreateContractionCellForElement(unsigned elemIndex)
+    AbstractContractionModel* CreateContractionCellForElement(Element<DIM, DIM>* pElement)
     {
         switch(mContractionModelName)
         {

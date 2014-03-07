@@ -71,10 +71,10 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
         if (fabs(x)<0.02+1e-6 && y<-0.4+1e-6) // stimulating small region
         {
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);

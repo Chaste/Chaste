@@ -60,10 +60,10 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
         // Stimulate the apex
-        if (GetMesh()->GetNode(node)->rGetLocation()[2] < mZvalueToStimulateBelow)
+        if (pNode->rGetLocation()[2] < mZvalueToStimulateBelow)
         {
             return new CellLuoRudy1991FromCellML(mpSolver,mpStimulus);
         }

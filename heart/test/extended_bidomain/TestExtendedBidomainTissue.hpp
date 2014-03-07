@@ -73,12 +73,12 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
         CellLuoRudy1991FromCellML* first_cell;
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
-        double z = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[2];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
+        double z = pNode->rGetLocation()[2];
 
         if ((x < 0.005) && (y < 0.005) && (z < 0.005))
         {
@@ -101,7 +101,7 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
         CellLuoRudy1991FromCellML* second_cell = new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         return second_cell;

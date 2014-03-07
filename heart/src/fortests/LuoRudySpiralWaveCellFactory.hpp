@@ -83,13 +83,13 @@ public:
      * some with S1 and some with S2, to initiate a spiral wave. We also alter one of the
      * conductances in the model to make the wave easier to initiate on this small domain.
      *
-     * @param nodeIndex  the global node index we would like an action potential model for
+     * @param pNode  the pointer to Node object we would like an action potential model for
      * @return a cardiac cell for this node
      */
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
 
         double x_threshold_for_S1 = 0.1 + 1e-6;
         double x_threshold_for_S2 = mXExtent*0.6;
@@ -120,7 +120,8 @@ public:
         // Qu et al. Origins of Spiral Wave Meander and Breakup... Annals of Biomedical Eng. 28:755-771 (2000).
         p_cell->SetParameter("membrane_L_type_calcium_current_conductance",0); // slow inward current in original model.
 
-        if (nodeIndex==0)
+        unsigned node_index = pNode->GetIndex();
+        if (node_index==0)
         {
 //            std::cout << "[K_o] = " << p_cell->GetAnyVariable("extracellular_potassium_concentration") << "mM \n";
 //            std::cout << "[K_i] = " << p_cell->GetAnyVariable("cytosolic_potassium_concentration") << "mM \n";

@@ -142,7 +142,7 @@ public:
      * @param node  The global index of a node
      * @return  A cardiac cell which corresponds to this node.
      */
-    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)
     {
         return new CELL(this->mpSolver, mpStimulus);
     }
@@ -161,7 +161,7 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         return new CellLuoRudy1991FromCellML(mpSolver, mpIntraStimulus);
     }

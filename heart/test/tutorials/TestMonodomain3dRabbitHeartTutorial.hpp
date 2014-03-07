@@ -76,9 +76,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
-        double z = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[2];
+        double z = pNode->rGetLocation()[2];
 
         if (z <= 0.04248)
         {

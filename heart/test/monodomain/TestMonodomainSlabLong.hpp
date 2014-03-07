@@ -59,7 +59,7 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<3>* pNode)
     {
         return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
     }

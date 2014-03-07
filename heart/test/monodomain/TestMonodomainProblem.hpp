@@ -83,9 +83,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
-        ChastePoint<2> location = GetMesh()->GetNode(node)->GetPoint();
+        ChastePoint<2> location = pNode->GetPoint();
 
         if (fabs(location[0]-0.05)<1e-6 && fabs(location[1]-0.05)<1e-6)
         {
@@ -121,32 +121,12 @@ public:
         {
         }
 
-//    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
-//    {
-//        AbstractCardiacCell* p_cell;
-//        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
-//
-//        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-//
-//        if (x<0.3)
-//        {
-//            p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpStimulus);
-//        }
-//        else
-//        {
-//            p_cell = new CellLuoRudy1991FromCellMLBackwardEuler(p_solver, mpZeroStimulus);
-//        }
-//
-//
-//        return p_cell;
-//    }
-
-    AbstractCvodeCell* CreateCardiacCellForTissueNode(unsigned nodeIndex)
+    AbstractCvodeCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         AbstractCvodeCell* p_cell;
         boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
 
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
 
         if (x<0.3)
         {

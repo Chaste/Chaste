@@ -55,7 +55,7 @@ public:
     ZeroStimulusCellFactory() : AbstractCardiacCellFactory<1>()
     {}
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
         return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
 

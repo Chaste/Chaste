@@ -75,9 +75,10 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
-        if (node==0)
+        unsigned node_index = pNode->GetIndex();
+        if (node_index==0)
         {
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
         }
@@ -111,9 +112,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
     {
-        if (GetMesh()->GetNode(node)->rGetLocation()[0] < 0.5)
+        if (pNode->rGetLocation()[0] < 0.5)
         {
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
         }
@@ -142,9 +143,9 @@ public:
     {
     }
 
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(unsigned node)
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
-        ChastePoint<2> location = GetMesh()->GetNode(node)->GetPoint();
+        ChastePoint<2> location = pNode->GetPoint();
 
         if (fabs(location[0])<1e-6)
         {
@@ -156,7 +157,7 @@ public:
         }
     }
 
-    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(unsigned node,
+    AbstractCardiacCell* CreatePurkinjeCellForTissueNode(Node<2>* pNode,
                                                          AbstractCardiacCellInterface* pCardiacCell)
     {
         return new CellDiFrancescoNoble1985FromCellML(mpSolver, mpZeroStimulus);

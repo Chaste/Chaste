@@ -93,7 +93,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
                 else
                 {
                     // Tissue
-                    data_at_quad_point.ContractionModel = p_factory->CreateContractionCellForElement(element.GetIndex());
+                    data_at_quad_point.ContractionModel = p_factory->CreateContractionCellForElement( &element );
                 }
                 mQuadPointToDataAtQuadPointMap[quad_pt_global_index] = data_at_quad_point;
             }
