@@ -102,7 +102,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
         for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
         {
             unsigned global_index = ownership_range_low + local_index;
-            Node<SPACE_DIM>* p_node = mpMesh->GetNodeOrHaloNode(global_index);
+            Node<SPACE_DIM>* p_node = mpMesh->GetNode(global_index);
             mCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
             mCellsDistributed[local_index]->SetUsedInTissueSimulation();
 
@@ -445,18 +445,9 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
             for (unsigned local_index = 0; local_index < num_halo_nodes; local_index++)
             {
                 unsigned global_index = mHaloNodes[local_index];
+                // These are all halo nodes, so we use the "GetNodeOrHaloNode" variety of GetNode
                 Node<SPACE_DIM>* p_node = mpMesh->GetNodeOrHaloNode(global_index);
-                try
-                {
-                    mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
-                }
-                catch (Exception&)
-                {
-                    // If CreateCardiacCellForNode throws immediately, then it's probable that the
-                    // user has a cell factory that isn't expecting to make cells at halo nodes.
-                    EXCEPTION("Failed to make a cardiac cell for a halo node. Hint: in your cell factory method "
-                              "CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
-                }
+                mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
                 mHaloCellsDistributed[local_index]->SetUsedInTissueSimulation();
                 mHaloGlobalToLocalIndexMap[global_index] = local_index;
             }

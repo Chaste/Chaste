@@ -94,43 +94,6 @@ public:
     }
 };
 
-/*
- *  With this cardiac cell factory we cover the case where one tells Mono/BidomainProblem
- *  to use halo exchange but the cardiac cell factory is not aware that it may be asked to
- *  create cells at halo nodes (i.e. using GetNode() instead of GetNodeOrHaloNode())
- */
-class WrongCardiacCellFactoryUsesGetNode : public AbstractCardiacCellFactory<1>
-{
-private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
-
-public:
-
-    WrongCardiacCellFactoryUsesGetNode()
-        : AbstractCardiacCellFactory<1>(),
-          mpStimulus(new SimpleStimulus(-80.0, 0.5))
-    {
-    }
-
-    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<1>* pNode)
-    {
-        if (pNode->rGetLocation()[0] < 0.5)
-        {
-            return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
-        }
-        else
-        {
-            return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
-        }
-    }
-
-    boost::shared_ptr<SimpleStimulus> GetStimulus()
-    {
-        return mpStimulus;
-    }
-};
-
-
 class PurkinjeCellFactory : public AbstractPurkinjeCellFactory<2>
 {
 private:
@@ -427,22 +390,6 @@ public:
             // Zero is not halo owned by any process (unless we have a lot of them).
             TS_ASSERT_THROWS_CONTAINS(monodomain_tissue.GetCardiacCellOrHaloCell(0),
                                       "Requested node/halo 0 does not belong to processor ");
-        }
-    }
-
-    void TestNodeExchangeExceptions() throw(Exception)
-    {
-        HeartConfig::Instance()->Reset();
-        DistributedTetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=0.1, ie 11 node mesh
-
-        WrongCardiacCellFactoryUsesGetNode cell_factory;
-        cell_factory.SetMesh(&mesh);
-
-        if ( ! PetscTools::IsSequential() )
-        {
-            TS_ASSERT_THROWS_THIS(MonodomainTissue<1> monodomain_tissue( &cell_factory, true), "Failed to make a cardiac cell for a halo node. Hint: in "
-                                  "your cell factory method CreateCardiacCellForTissueNode() replace GetNode() with GetNodeOrHaloNode()?");
         }
     }
 
