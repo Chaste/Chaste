@@ -101,7 +101,6 @@ private:
         archive & mCells;
         archive & mLocationCellMap;
         archive & mCellLocationMap;
-        archive & mCellCyclePhaseCount;
         archive & mpCellPropertyRegistry;
         archive & mOutputResultsForChasteVisualizer;
         archive & mCellWriters;
@@ -121,15 +120,6 @@ protected:
 
     /** List of cells. */
     std::list<CellPtr> mCells;
-
-    /** Current cell cycle phase counts. */
-    std::vector<unsigned> mCellCyclePhaseCount;
-
-    /** Current cell proliferative types count. */
-    std::vector<unsigned> mCellProliferativeTypesCount;
-
-    /** Current cell mutation states count. */
-    std::vector<unsigned> mCellMutationStateCount;
 
     /** Population centroid. */
     c_vector<double, SPACE_DIM> mCentroid;
@@ -342,7 +332,7 @@ public:
      * [3] = G_TWO_PHASE
      * [4] = M_PHASE
      */
-    const std::vector<unsigned>& rGetCellCyclePhaseCount() const;
+    std::vector<unsigned> GetCellCyclePhaseCount();
 
     /**
      * @return the number of real cells.
@@ -377,8 +367,7 @@ public:
 
     /**
      * Get the set of cells corresponding to a given location index.
-     *
-     * Note the set may be empty.
+     * Note that the set may be empty.
      *
      * @param index the location index
      *
@@ -510,11 +499,6 @@ public:
     void OpenWritersFilesForAppend(const std::string& rDirectory);
 
     /**
-     * Clear the counters used for cell population output.
-     */
-    void ResetCellCounters();
-
-    /**
      * Write results from the current cell population state to output files.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
@@ -537,11 +521,6 @@ public:
      * @param pCell the cell whose data is being written.
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
-
-    /**
-     * Generate results for all cells in the current cell population.
-     */
-    virtual void GenerateCellResults();
 
     /**
      * Close any output files.

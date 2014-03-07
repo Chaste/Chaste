@@ -52,8 +52,6 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellP
 {
     if (PetscTools::AmMaster())
     {
-        pCellPopulation->SetDefaultCellMutationStateAndProliferativeTypeOrdering();
-
         *this->mpOutStream << "Time\t ";
 
         const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties =
@@ -75,6 +73,25 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abstra
 {
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
+    // Reduce results onto all processes
+    if (PetscTools::IsParallel())
+    {
+        // Make sure the vector on each process has the same size
+        unsigned local_size = mutation_state_count.size();
+        unsigned global_size;
+
+        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
+        mutation_state_count.resize(global_size, 0u);
+
+        std::vector<unsigned> mutation_counts(mutation_state_count.size(), 0u);
+        for (unsigned i=0; i<mutation_counts.size(); i++)
+        {
+            MPI_Allreduce(&mutation_state_count[i], &mutation_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        }
+
+        mutation_state_count = mutation_counts;
+    }
+
     if (PetscTools::AmMaster())
     {
         for (unsigned i=0; i<mutation_state_count.size(); i++)
@@ -88,6 +105,25 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
+
+    // Reduce results onto all processes
+    if (PetscTools::IsParallel())
+    {
+        // Make sure the vector on each process has the same size
+        unsigned local_size = mutation_state_count.size();
+        unsigned global_size;
+
+        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
+        mutation_state_count.resize(global_size, 0u);
+
+        std::vector<unsigned> mutation_counts(mutation_state_count.size(), 0u);
+        for (unsigned i=0; i<mutation_counts.size(); i++)
+        {
+            MPI_Allreduce(&mutation_state_count[i], &mutation_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
+        }
+
+        mutation_state_count = mutation_counts;
+    }
 
     if (PetscTools::AmMaster())
     {
