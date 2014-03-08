@@ -88,14 +88,14 @@ public:
      * case a pointer to a (unique) fake cell is returned) and if not, calls
      * CreateCardiacCellForTissueNode (which must be defined by subclasses).
      *
-     * @param node  Pointer to node object.
+     * @param pNode  Pointer to node object.
      */
     virtual AbstractCardiacCellInterface* CreateCardiacCellForNode(Node<SPACE_DIM>* pNode);
 
     /**
      * Must be overridden by subclasses to return a cell object for the given node.
      *
-     * @param node  Pointer to node object.
+     * @param pNode  Pointer to node object.
      * @return a newly created cell object for the given tissue node.
      */
     virtual AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<SPACE_DIM>* pNode)=0;
