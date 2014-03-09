@@ -310,9 +310,10 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 #ifdef CHASTE_VTK
     if (this->mpVoronoiTessellation != NULL)
     {
-        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
-        std::stringstream time;
-        time << SimulationTime::Instance()->GetTimeStepsElapsed();
+		// Write time to file
+		unsigned time_step = SimulationTime::Instance()->GetTimeStepsElapsed();
+		std::stringstream time;
+		time << time_step;
 
         unsigned num_elements = this->mpVoronoiTessellation->GetNumElements();
         std::vector<double> ghosts(num_elements);
@@ -322,19 +323,6 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         std::vector<double> cell_ages(num_elements);
         std::vector<double> cell_cycle_phases(num_elements);
         std::vector<double> cell_volumes(num_elements);
-        std::vector<std::vector<double> > cellwise_data;
-
-        unsigned num_cell_data_items = 0;
-        // This code is commented  because CellData can't deal with ghost nodes see #1975
-//        //We assume that the first cell is representative of all cells
-//            num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-
-        for (unsigned var=0; var<num_cell_data_items; var++)
-        {
-            // This code is commented code is because CellData can't deal with ghost nodes see #1975
-            //std::vector<double> cellwise_data_var(num_elements);
-            //cellwise_data.push_back(cellwise_data_var);
-        }
 
         // Loop over Voronoi elements
         for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
@@ -342,11 +330,11 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
              ++elem_iter)
         {
             // Get index of this element in the Voronoi tessellation mesh
-            unsigned elem_index = elem_iter->GetIndex();
+            unsigned location_index = elem_iter->GetIndex();
 
-            unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+            unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(location_index);
 
-            ghosts[elem_index] = (double)(this->IsGhostNode(node_index));
+            ghosts[location_index] = (double)(this->IsGhostNode(node_index));
 
             if (!this->IsGhostNode(node_index))
             {
@@ -356,69 +344,64 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
                 if (this-> template HasWriter<CellAncestorWriter>())
                 {
                     double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
-                    cell_ancestors[elem_index] = ancestor_index;
+                    cell_ancestors[location_index] = ancestor_index;
                 }
                 if (this-> template HasWriter<CellProliferativeTypesWriter>())
                 {
                     double cell_type = p_cell->GetCellProliferativeType()->GetColour();
-                    cell_types[elem_index] = cell_type;
+                    cell_types[location_index] = cell_type;
                 }
                 if (this-> template HasWriter<CellMutationStatesWriter>())
                 {
                     double mutation_state = p_cell->GetMutationState()->GetColour();
-                    cell_mutation_states[elem_index] = mutation_state;
+                    cell_mutation_states[location_index] = mutation_state;
                 }
                 if (this-> template HasWriter<CellAgesWriter>())
                 {
                     double age = p_cell->GetAge();
-                    cell_ages[elem_index] = age;
+                    cell_ages[location_index] = age;
                 }
                 if (this-> template HasWriter<CellProliferativePhasesWriter>())
                 {
                     double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
-                    cell_cycle_phases[elem_index] = cycle_phase;
+                    cell_cycle_phases[location_index] = cycle_phase;
                 }
                 if (this-> template HasWriter<CellVolumesWriter>())
                 {
-                    double cell_volume = this->mpVoronoiTessellation->GetVolumeOfElement(elem_index);
-                    cell_volumes[elem_index] = cell_volume;
-                }
-
-                for (unsigned var=0; var<num_cell_data_items; var++)
-                {
-                    // This code is commented  because CellData can't deal with ghost nodes see #1975
-                    //cellwise_data[var][elem_index] =  cell_iter->GetCellData()->GetItem(var);
+                    double cell_volume = this->mpVoronoiTessellation->GetVolumeOfElement(location_index);
+                    cell_volumes[location_index] = cell_volume;
                 }
             }
             else
             {
                 if (this-> template HasWriter<CellAncestorWriter>())
                 {
-                    cell_ancestors[elem_index] = -1.0;
+                    cell_ancestors[location_index] = -1.0;
                 }
                 if (this-> template HasWriter<CellProliferativeTypesWriter>())
                 {
-                    cell_types[elem_index] = -1.0;
+                    cell_types[location_index] = -1.0;
                 }
                 if (this-> template HasWriter<CellMutationStatesWriter>())
                 {
-                    cell_mutation_states[elem_index] = -1.0;
+                    cell_mutation_states[location_index] = -1.0;
                 }
                 if (this-> template HasWriter<CellAgesWriter>())
                 {
-                    cell_ages[elem_index] = -1.0;
+                    cell_ages[location_index] = -1.0;
                 }
                 if (this-> template HasWriter<CellProliferativePhasesWriter>())
                 {
-                    cell_cycle_phases[elem_index] = -1.0;
+                    cell_cycle_phases[location_index] = -1.0;
                 }
                 if (this-> template HasWriter<CellVolumesWriter>())
                 {
-                    cell_volumes[elem_index] = -1.0;
+                    cell_volumes[location_index] = -1.0;
                 }
             }
         }
 
+        VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
         mesh_writer.AddCellData("Non-ghosts", ghosts);
         if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
@@ -444,24 +427,12 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }
-        ///\todo #1975
-        // This code is commented code is because Cellwise Data can't deal with ghost nodes see #1975
-        if (num_cell_data_items > 0)
-        {
-//            for (unsigned var=0; var<cellwise_data.size(); var++)
-//            {
-//                // This code is commented  because Cellwise Data can't deal with ghost nodes see #1975
-//                std::stringstream data_name;
-//                data_name << "Cellwise data " << var;
-//                std::vector<double> cellwise_data_var = cellwise_data[var];
-//                mesh_writer.AddCellData(data_name.str(), cellwise_data_var);
-//            }
-        }
+
         mesh_writer.WriteVtkUsingMesh(*(this->mpVoronoiTessellation), time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << time_step;
         *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << time_step;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
 #endif //CHASTE_VTK
@@ -476,10 +447,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::OutputCellPopulationParameters(
     MeshBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class MeshBasedCellPopulationWithGhostNodes<1>;
 template class MeshBasedCellPopulationWithGhostNodes<2>;
 template class MeshBasedCellPopulationWithGhostNodes<3>;
