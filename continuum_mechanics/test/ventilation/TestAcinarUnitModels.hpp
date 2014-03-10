@@ -74,7 +74,7 @@ public:
         double gamma = (3.0/4.0)*(3*0.433 + 0.611)*(lambda*lambda - 1)*(lambda*lambda - 1);
         TS_ASSERT_DELTA(acinus.CalculateGamma(), gamma, 1e-6);
 
-        double xi = 2500;
+        double xi = 2.5;
         double dPedLambda = (3.0*xi/2.0)*(3*0.433 + 0.611)*(3*0.433 + 0.611)*(lambda*lambda - 1)*(lambda*lambda - 1)*std::exp(gamma) +
                              (xi/2.0)*(3*0.433 + 0.611)*(lambda*lambda + 1)*std::exp(gamma)/(lambda*lambda);
 
@@ -85,49 +85,63 @@ public:
 
     void TestSwan2012AcinarUnitInspiration() throw(Exception)
     {
+        double viscosity = 1.92e-8;
+        double terminal_airway_radius = 0.25; //mm
+        double terminal_airway_length = 1.0;  //mm
+        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(terminal_airway_radius*terminal_airway_radius*terminal_airway_radius*terminal_airway_radius);
+        double airway_pressure = 0.0;
+
         Swan2012AcinarUnit acinus;
 
         acinus.SetAirwayPressure(0.0);
         acinus.SetAirwayPressure(0.0);
-        acinus.SetPleuralPressure(-490);
-        acinus.SetPleuralPressure(-490);
+        acinus.SetPleuralPressure(-0.49);
+        acinus.SetPleuralPressure(-0.49);
         acinus.SetFlow(0.0);
-        acinus.SetStretchRatio(1.0);
-        acinus.SetUndeformedVolume(1.0);
-        acinus.SetTerminalBronchioleResistance(0.0005); //Determine appropriate values
+        acinus.SetStretchRatio(1.259921049894873);                          //cube root(2) (corresponds to 2x volume), standard for FRC
+        acinus.SetUndeformedVolume(0.5);                                    //Arbitrary
+        acinus.SetTerminalBronchioleResistance(terminal_airway_resistance); //Determine appropriate values
 
         acinus.SolveAndUpdateState(0.0, 0.2);
         TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6); //With no pressure change we expect no flow
-        TS_ASSERT_DELTA(acinus.GetVolume(), 1.0, 1e-6); //With no pressure change we expect no volume change
+        TS_ASSERT_DELTA(acinus.GetVolume(), 1.0, 1e-2); //With no pressure change we expect no volume change
 
         //Sinussoidal inspiration followed by fixed pleural pressure
-        TimeStepper time_stepper(0.0, 2.0, 0.01);
-        double old_compliance = -1;
+        TimeStepper time_stepper(0.0, 2.0, 0.005);
+        double old_compliance = DBL_MAX;
         double old_flow = DBL_MAX;
+        double flow_integral = 0.0;
         while (!time_stepper.IsTimeAtEnd())
         {
             if(time_stepper.GetNextTime() <= 1.0) //breath in
             {
-                double pleural_pressure = -490 - 300*(1 + sin((M_PI/2)*(time_stepper.GetNextTime() - 1)));
+                double pleural_pressure = -0.49 - 3.0*(1 + sin((M_PI/2)*(time_stepper.GetNextTime() - 1)));
                 acinus.SetPleuralPressure(pleural_pressure);
+                acinus.SetAirwayPressure(airway_pressure);
+
+                TS_ASSERT_DELTA(flow_integral, acinus.GetVolume() - 1.0, 1e-2); //Check for conservation of volume
+
                 acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
 
-                TS_ASSERT_LESS_THAN(old_compliance, acinus.CalculateAcinarTissueCompliance()); //Check compliance monotonicity
+                airway_pressure = acinus.GetFlow()*terminal_airway_resistance;
+                flow_integral += acinus.GetFlow()*(time_stepper.GetNextTime() - time_stepper.GetTime());
+
+                TS_ASSERT_LESS_THAN(acinus.CalculateAcinarTissueCompliance(), old_compliance); //Check compliance monotonicity
                 old_compliance = acinus.CalculateAcinarTissueCompliance();
             }
             else //constant pleural pressure
             {
+                acinus.SetAirwayPressure(airway_pressure);
                 acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
+                airway_pressure = acinus.GetFlow()/terminal_airway_resistance;
 
-                if(time_stepper.GetNextTime() > 1.1) //Check flow decreases monotonically after the initial inspiration
-                {
-                    TS_ASSERT_LESS_THAN(acinus.GetFlow(), old_flow);
-                    old_flow = acinus.GetFlow();
-                }
+                TS_ASSERT_LESS_THAN_EQUALS(acinus.GetFlow(), old_flow);
+                old_flow = acinus.GetFlow();
             }
-
             time_stepper.AdvanceOneTimeStep();
         }
+
+        TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);
     }
 };
 #endif /*_TESTACINARUNITMODELS_HPP_*/
