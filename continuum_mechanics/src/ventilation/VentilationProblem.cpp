@@ -43,8 +43,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mpLinearSystem(NULL),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
-      mViscosity(1.92e-8),
-      mDensity(1.51e-9),
+      mViscosity(1.92e-5),
+      mDensity(1.51e-6),
       mSolution(NULL)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);

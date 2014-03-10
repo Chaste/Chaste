@@ -63,7 +63,7 @@ private:
 
     /** (Dynamic) viscosity in kg/(mm*second).
      * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
-     *  mu = 1.92e-5 Pa*s
+     *  mu = 1.92e-5 Pa*s <-- USED HERE
            = 1.92e-5 kg/(m*s)
            = 1.92e-8 kg/(mm*s) or kPa.s
      * Consider http://en.wikipedia.org/wiki/Viscosity#Air which gives
@@ -74,8 +74,10 @@ private:
     /** Density in kg/(mm^3).
      *  rho (for dry air) ~ 1.2041 kg/m^3 = 1.2e-9 kg/mm^3
      *  Default to Swan (page 224)
-     *  rho = 1.51e-6 g/mm^3
+     *  rho = 1.51e-6 g/mm^3 <-- USED HERE
      *      = 1.51e-9 kg/mm^3
+     *      = 1.51e-6 kg/(m s^2) * s^2 / (mm)^2
+     *      - 1.51e-6 Pa s^2 /mm^2
      *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;
@@ -125,17 +127,19 @@ public:
     ~VentilationProblem();
 
     /** Sets the pressure at the outflow/root of the tree
-     * @param pressure  The pressure value
+     *
+     * @param pressure  The pressure value in Pascals
      */
     void SetOutflowPressure(double pressure);
 
     /** Sets the pressure at each inflow/leaf of the tree
-     * @param pressure  The pressure value
+     * @param pressure  The pressure value in Pascals
      */
     void SetConstantInflowPressures(double pressure);
 
     /** Sets the flux at each inflow/leaf-edge of the tree
-     * @param flux  The flux value
+     * Flux is "volumetric flow rate"
+     * @param flux  The flux value in (mm^3)/s
      */
     void SetConstantInflowFluxes(double flux);
 
@@ -147,7 +151,7 @@ public:
      * time unless overwritten.
      *
      * @param rNode The node to set the boundary condition for
-     * @param pressure The pressure boundary condition
+     * @param pressure The pressure boundary condition in Pascals
      */
     void SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure);
 
@@ -158,7 +162,7 @@ public:
      * time unless overwritten.
      *
      * @param rNode The node to set the boundary condition for
-     * @param flux The flux boundary condition
+     * @param flux The flux boundary condition in (mm^3)/s
      */
     void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux);
 

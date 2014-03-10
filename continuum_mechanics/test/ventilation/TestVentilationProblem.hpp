@@ -133,7 +133,7 @@ public:
     void TestVentilationProblemOnBranch() throw(Exception)
     {
         VentilationProblem problem("mesh/test/data/y_branch_3d_mesh", 0u);
-        TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-8, 1e-12);
+        TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-5, 1e-12);
         problem.SetViscosity(1.0);
         problem.SetOutflowPressure(100);
         problem.SetConstantInflowPressures(0.0);
@@ -156,9 +156,9 @@ public:
     {
         VentilationProblem problem("mesh/test/data/y_branch_3d_mesh");
         //These values are equivalent to Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
-        TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-8, 1e-12);
+        TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-5, 1e-12);
         problem.SetViscosity(1.0);
-        TS_ASSERT_DELTA(problem.GetDensity(), 1.511e-9, 1e-10);
+        TS_ASSERT_DELTA(problem.GetDensity(), 1.51e-6, 1e-10);
         problem.SetDensity(1.0);
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(100);
@@ -219,11 +219,11 @@ public:
         TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(flux[0], -284.0705, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[3],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[4],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[5],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[6],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -0.0710, 1e-4); // (Inflow flux)
     }
 
     void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
@@ -243,11 +243,12 @@ public:
         TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(flux[0], -284.0705, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[3],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[4],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[5],  -71.0176, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[6],  -71.0176, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -0.0710, 1e-4); // (Inflow flux)
+        std::cout<<flux[6];
         //This is the extra node at the Trachea
         TS_ASSERT_DELTA(pressure[8], 2.2222, 1e-4); //Between root and first bifurcation
 
@@ -260,7 +261,7 @@ public:
     {
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowFluxes(-71.0176);
+        problem.SetConstantInflowFluxes(-7.10176e-2);
         problem.Solve();
 
         std::vector<double> flux, pressure;
@@ -273,11 +274,11 @@ public:
         TS_ASSERT_DELTA(pressure[5], 15, 1e-4);
         TS_ASSERT_DELTA(pressure[6], 15, 1e-4);
         TS_ASSERT_DELTA(pressure[7], 15, 1e-4);
-        TS_ASSERT_DELTA(flux[0], -284.0705, 3e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[3],  -71.0176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[4],  -71.0176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[5],  -71.0176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[6],  -71.0176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -0.0710176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -0.0710176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -0.0710176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -0.0710176, 1e-8); // BC (Inflow flux)
     }
 
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
@@ -292,19 +293,19 @@ public:
          */
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowPressures(15);
+        problem.SetConstantInflowPressures(15000); //Needed to increase the resistance in these artificial airways
         problem.SetDynamicResistance();
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6.6878,   1e-4);
-        TS_ASSERT_DELTA(pressure[2], 12.2292, 1e-4);
-        TS_ASSERT_DELTA(pressure[3], 12.2292, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6687.89,   1e-2);
+        TS_ASSERT_DELTA(pressure[2], 12229.3, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 12229.3, 1e-2);
+        TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-8); //BC
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
@@ -352,7 +353,7 @@ public:
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations");
         problem.SolveProblemFromFile("continuum_mechanics/test/data/ChasteVentilationInput.txt", "VentilationOutput", "3_bifurcations");
     }
-    void TestReadFile()  throw (Exception)
+    void joeTestReadFile()  throw (Exception)
     {
         ReadDataFromFile("continuum_mechanics/test/data/Pdata-Normal.txt");
         TS_ASSERT_EQUALS(pressureAt1.size(), 2501u);
@@ -411,8 +412,10 @@ public:
         problem.SetViscosity(3e-2); //Even six orders of magnitude don't fix stability issues
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
+//        problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
-        std::vector<double> boundary(r_mesh.GetNumNodes(), 0.0);
+        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
     }
 
@@ -428,8 +431,6 @@ public:
         TS_ASSERT_THROWS_THIS(problem.SetFluxAtBoundaryNode(3u, 0.0), "Boundary conditions cannot be set at internal nodes");
 
     }
-
-
 };
 
 #endif /*_TESTVENTILATIONPROBLEM_HPP_*/
