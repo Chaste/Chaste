@@ -48,7 +48,7 @@ Swan2012AcinarUnit::Swan2012AcinarUnit() : mQ(0.0),
                                            mRaw(0.0),
                                            mA(0.433),
                                            mB(0.611),
-                                           mXi(2500),
+                                           mXi(2.5),
                                            mV0(1.0)
 {
 
