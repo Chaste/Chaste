@@ -59,7 +59,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
     // preallocating 5 non-zeros allows for 4-way branching
     mpLinearSystem = new LinearSystem(mMesh.GetNumNodes()+mMesh.GetNumElements(), 5u);
-    // Possibly more robust... mpLinearSystem->SetKspType("gmres");
+    mpLinearSystem->SetAbsoluteTolerance(1e-10);
+    mpLinearSystem->SetKspType("gmres");
 
     /*
      * Set up the Acinar units at the terminals
@@ -148,7 +149,7 @@ void VentilationProblem::SetConstantInflowFluxes(double flux)
      {
          if ((*iter)->GetIndex() != mOutletNodeIndex)
          {
-             SetFluxAtBoundaryNode(*(*iter), flux);
+             SetFluxAtBoundaryNode(*(*iter), flux*mFluxScaling);
          }
      }
 }
@@ -249,7 +250,7 @@ void VentilationProblem::Assemble(bool dynamicReassemble)
                  * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
                  */
                 // Note that we can only do this if mSolution is valid AND we own the local part
-                double flux = PetscVecTools::GetElement(mSolution, element_index);
+                double flux = PetscVecTools::GetElement(mSolution, element_index)/mFluxScaling;
                 double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
                 double c = 1.85;
                 double z = (c/4.0) * sqrt(reynolds_number * radius / length);
@@ -263,7 +264,7 @@ void VentilationProblem::Assemble(bool dynamicReassemble)
             unsigned pressure_index_0 =  mMesh.GetNumElements() +  iter->GetNodeGlobalIndex(0);
             unsigned pressure_index_1 =  mMesh.GetNumElements() +  iter->GetNodeGlobalIndex(1);
 
-            mpLinearSystem->SetMatrixElement(element_index, element_index, -resistance);
+            mpLinearSystem->SetMatrixElement(element_index, element_index, -resistance/mFluxScaling);
             mpLinearSystem->SetMatrixElement(element_index, pressure_index_0,  1.0);
             mpLinearSystem->SetMatrixElement(element_index, pressure_index_1, -1.0);
         }
@@ -309,8 +310,8 @@ void VentilationProblem::Solve()
 {
     Assemble();
     mpLinearSystem->AssembleFinalLinearSystem();
-    // mpLinearSystem->DisplayMatrix();
-    // mpLinearSystem->DisplayRhs();
+//     mpLinearSystem->DisplayMatrix();
+//     mpLinearSystem->DisplayRhs();
 
     if (mSolution==NULL)
     {
@@ -363,7 +364,7 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
     rFluxesOnEdges.resize(num_elem);
     for (unsigned i=0; i<num_elem; i++)
     {
-        rFluxesOnEdges[i] = solution_vector_repl[i];
+        rFluxesOnEdges[i] = solution_vector_repl[i]/mFluxScaling;
     }
 
     rPressuresOnNodes.resize(mMesh.GetNumNodes());

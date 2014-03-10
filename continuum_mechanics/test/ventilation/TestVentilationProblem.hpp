@@ -248,7 +248,6 @@ public:
         TS_ASSERT_DELTA(flux[4],  -0.0710, 1e-4); // (Inflow flux)
         TS_ASSERT_DELTA(flux[5],  -0.0710, 1e-4); // (Inflow flux)
         TS_ASSERT_DELTA(flux[6],  -0.0710, 1e-4); // (Inflow flux)
-        std::cout<<flux[6];
         //This is the extra node at the Trachea
         TS_ASSERT_DELTA(pressure[8], 2.2222, 1e-4); //Between root and first bifurcation
 
@@ -353,7 +352,7 @@ public:
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations");
         problem.SolveProblemFromFile("continuum_mechanics/test/data/ChasteVentilationInput.txt", "VentilationOutput", "3_bifurcations");
     }
-    void joeTestReadFile()  throw (Exception)
+    void TestReadFile()  throw (Exception)
     {
         ReadDataFromFile("continuum_mechanics/test/data/Pdata-Normal.txt");
         TS_ASSERT_EQUALS(pressureAt1.size(), 2501u);
@@ -409,7 +408,7 @@ public:
         VentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
 
-        problem.SetViscosity(3e-2); //Even six orders of magnitude don't fix stability issues
+        //problem.SetViscosity(3e-2); //Even six orders of magnitude don't fix stability issues
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
 //        problem.SetConstantInflowFluxes(100.0);

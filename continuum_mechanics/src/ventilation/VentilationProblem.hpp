@@ -81,7 +81,7 @@ private:
      *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;
-
+    static const double mFluxScaling = 2e-5; /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux */
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
 
     std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
@@ -184,7 +184,6 @@ public:
      * processors.  This method replicates the solution across all processors and then splits it into its flux
      * and pressure components.  Because of the replication it makes sense to get both solutions in a single call.
      *
-     * \todo Make a scaling of fluxes and reverse the scale here.
      * @param rFluxesOnEdges The component of the mSolution Vec which represents fluxes (this vector is resized)
      * @param rPressuresOnNodes The component of the mSolution Vec which represents pressures (this vector is resized)
      */
