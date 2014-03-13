@@ -439,42 +439,18 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
         CalculateHaloNodesFromNodeExchange();
         unsigned num_halo_nodes = mHaloNodes.size();
         mHaloCellsDistributed.resize( num_halo_nodes );
-
-        try
+        for (unsigned local_index = 0; local_index < num_halo_nodes; local_index++)
         {
-            for (unsigned local_index = 0; local_index < num_halo_nodes; local_index++)
-            {
-                unsigned global_index = mHaloNodes[local_index];
-                // These are all halo nodes, so we use the "GetNodeOrHaloNode" variety of GetNode
-                Node<SPACE_DIM>* p_node = mpMesh->GetNodeOrHaloNode(global_index);
-                mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
-                mHaloCellsDistributed[local_index]->SetUsedInTissueSimulation();
-                mHaloGlobalToLocalIndexMap[global_index] = local_index;
-            }
-
-            // No need to call FinaliseCellCreation() as halo node cardiac cells will
-            // never be stimulated (their values are communicated from the process that
-            // owns them.
+            unsigned global_index = mHaloNodes[local_index];
+            // These are all halo nodes, so we use the "GetNodeOrHaloNode" variety of GetNode
+            Node<SPACE_DIM>* p_node = mpMesh->GetNodeOrHaloNode(global_index);
+            mHaloCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
+            mHaloCellsDistributed[local_index]->SetUsedInTissueSimulation();
+            mHaloGlobalToLocalIndexMap[global_index] = local_index;
         }
-        catch (const Exception& e)
-        {
-            // Errors thrown creating cells will often be process-specific
-            PetscTools::ReplicateException(true);
-
-            // Delete cells
-            // Should really do this for other processes too, but this is all we need
-            // to get memory testing to pass, and leaking when we're about to die isn't
-            // that bad!
-            for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mHaloCellsDistributed.begin();
-                 cell_iterator != mHaloCellsDistributed.end();
-                 ++cell_iterator)
-            {
-                delete (*cell_iterator);
-            }
-
-            throw e;
-        }
-        PetscTools::ReplicateException(false);
+        // No need to call FinaliseCellCreation() as halo node cardiac cells will
+        // never be stimulated (their values are communicated from the process that
+        // owns them.
     }
 }
 

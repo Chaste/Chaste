@@ -51,6 +51,10 @@ public:
     {
     }
 
+    /**
+     * @param pNode  Pointer to the node.
+     * @return  A cardiac cell which corresponds to this node.
+     */
     AbstractCardiacCellInterface* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
         return new CELL(this->mpSolver, this->mpZeroStimulus);
