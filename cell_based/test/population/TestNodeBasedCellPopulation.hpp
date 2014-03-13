@@ -1208,8 +1208,8 @@ public:
         node_based_cell_population.WriteResultsToFiles(output_directory);
         node_based_cell_population.CloseOutputFiles();
 
-        // Test the GetCellCyclePhaseCount() function
-        std::vector<unsigned> cell_cycle_phases = node_based_cell_population.GetCellCyclePhaseCount();
+        // Test the rGetCellCyclePhaseCount() function
+        std::vector<unsigned> cell_cycle_phases = node_based_cell_population.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phases[0], 1u);
         TS_ASSERT_EQUALS(cell_cycle_phases[1], 3u);
         TS_ASSERT_EQUALS(cell_cycle_phases[2], 0u);

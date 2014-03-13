@@ -50,48 +50,22 @@ CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePha
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> cell_cycle_phases_count = pCellPopulation->GetCellCyclePhaseCount();
+    std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
 
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
+    for (unsigned i=0; i < phases_count.size(); i++)
     {
-        std::vector<unsigned> phase_counts(cell_cycle_phases_count.size(), 0u);
-
-        for (unsigned i=0; i<phase_counts.size(); i++)
-        {
-            MPI_Allreduce(&cell_cycle_phases_count[i], &phase_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-        }
-
-        cell_cycle_phases_count = phase_counts;
-    }
-
-    for (unsigned i=0; i < cell_cycle_phases_count.size(); i++)
-    {
-        *this->mpOutStream << cell_cycle_phases_count[i] << "\t";
+        *this->mpOutStream << phases_count[i] << "\t";
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> cell_cycle_phases_count = pCellPopulation->GetCellCyclePhaseCount();
+    std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
 
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
+    for (unsigned i=0; i < phases_count.size(); i++)
     {
-        std::vector<unsigned> phase_counts(cell_cycle_phases_count.size(), 0u);
-
-        for (unsigned i=0; i<phase_counts.size(); i++)
-        {
-            MPI_Allreduce(&cell_cycle_phases_count[i], &phase_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-        }
-
-        cell_cycle_phases_count = phase_counts;
-    }
-
-    for (unsigned i=0; i < cell_cycle_phases_count.size(); i++)
-    {
-        *this->mpOutStream << cell_cycle_phases_count[i] << "\t";
+        *this->mpOutStream << phases_count[i] << "\t";
     }
 }
 

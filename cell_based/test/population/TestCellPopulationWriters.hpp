@@ -237,6 +237,7 @@ public:
 
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
         cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.GenerateCellResults();
 
         // Create an output directory for the writer
         std::string output_directory = "TestCellMutationStatesWriter";
@@ -311,11 +312,12 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
-        cell_population.InitialiseCells();
 
         cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+
+        cell_population.GenerateCellResults();
 
         // Create an output directory for the writer
         std::string output_directory = "TestCellProliferativeTypesAndPhasesCountWriters";
@@ -325,7 +327,6 @@ public:
         // Create a CellProliferativeTypesCountWriter and test that the correct output is generated
         CellProliferativeTypesCountWriter<3,3> types_count_writer;
         types_count_writer.OpenOutputFile(output_directory);
-        types_count_writer.WriteHeader(&cell_population);
         types_count_writer.WriteTimeStamp();
         types_count_writer.Visit(&cell_population);
         types_count_writer.WriteNewline();

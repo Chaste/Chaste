@@ -52,25 +52,6 @@ void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulati
 {
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
 
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
-    {
-        // Make sure the vector on each process has the same size
-        unsigned local_size = proliferative_type_count.size();
-        unsigned global_size;
-
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
-        proliferative_type_count.resize(global_size, 0u);
-
-        std::vector<unsigned> types_counts(proliferative_type_count.size(), 0u);
-        for (unsigned i=0; i<types_counts.size(); i++)
-        {
-            MPI_Allreduce(&proliferative_type_count[i], &types_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-        }
-
-        proliferative_type_count = types_counts;
-    }
-
     if (PetscTools::AmMaster())
     {
         for (unsigned i=0; i<proliferative_type_count.size(); i++)
@@ -84,25 +65,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> proliferative_type_count = pCellPopulation->GetCellProliferativeTypeCount();
-
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
-    {
-        // Make sure the vector on each process has the same size
-        unsigned local_size = proliferative_type_count.size();
-        unsigned global_size;
-
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
-        proliferative_type_count.resize(global_size, 0u);
-
-        std::vector<unsigned> types_counts(proliferative_type_count.size(), 0u);
-        for (unsigned i=0; i<types_counts.size(); i++)
-        {
-            MPI_Allreduce(&proliferative_type_count[i], &types_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-        }
-
-        proliferative_type_count = types_counts;
-    }
 
     if (PetscTools::AmMaster())
     {

@@ -985,6 +985,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddPopulationWriter<CellMutationStatesWriter>();
         cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.GenerateCellResults();
 
         // Test we have the correct cell mutation state counts
         CellPropertyRegistry* p_registry_before_solve = cell_population.Begin()->rGetCellPropertyCollection().GetCellPropertyRegistry();

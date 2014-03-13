@@ -1044,6 +1044,20 @@ public:
         // If you want to visualize this use the 'notcylindrical' option
         // (it is too small for it to figure out what's happening on its own)
 
+        // Cover exceptions
+        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellMutationStateCount(),
+                              "Call AddPopulationWriter<CellMutationStatesWriter>() before using this function");
+        simulator.rGetCellPopulation().AddPopulationWriter<CellMutationStatesWriter>();
+
+        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellProliferativeTypeCount(),
+                              "Call AddPopulationWriter<CellProliferativeTypesCountWriter>() before using this function");
+        simulator.rGetCellPopulation().AddPopulationWriter<CellProliferativeTypesCountWriter>();
+
+        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().rGetCellCyclePhaseCount(),
+                              "Call AddPopulationWriter<CellProliferativePhasesCountWriter>() before using this function");
+        simulator.rGetCellPopulation().AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        simulator.rGetCellPopulation().AddCellWriter<CellProliferativePhasesWriter>();
+
         // Run simulation
         simulator.Solve();
 
@@ -1577,6 +1591,7 @@ public:
         crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         crypt.AddPopulationWriter<CellProliferativePhasesCountWriter>();
         crypt.AddCellWriter<CellProliferativePhasesWriter>();
+        crypt.GenerateCellResults();
 
         // Each cell count has been initialized to the correct size and computed
         std::vector<unsigned> cell_mutation_state_count1 = crypt.GetCellMutationStateCount();
@@ -1601,7 +1616,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count1[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count1[3], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count1 = crypt.GetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count1 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count1.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[1], 0u);
@@ -1646,7 +1661,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count3[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count3[3], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count3 = crypt.GetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count3 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count3.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count3[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count3[1], 2u);
@@ -1681,6 +1696,7 @@ public:
 
         // In the loaded simulation, we want the various cell counts to be saved
         // (so that simulations which quit when a certain population is removed don't stop too soon)
+        p_simulator->rGetCellPopulation().GenerateCellResults();
         std::vector<unsigned> cell_mutation_state_count4 = p_simulator->rGetCellPopulation().GetCellMutationStateCount();
         TS_ASSERT_EQUALS(cell_mutation_state_count4.size(), 4u);
         TS_ASSERT_EQUALS(cell_mutation_state_count4[0], 13u);
@@ -1703,7 +1719,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count4[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count4[3], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count4 = crypt.GetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count4 = crypt.rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count4.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count4[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count4[1], 2u);
@@ -1738,7 +1754,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count5 = p_simulator->rGetCellPopulation().GetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count5 = p_simulator->rGetCellPopulation().rGetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count5.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count5[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count5[1], 1u);
