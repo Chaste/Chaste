@@ -81,7 +81,7 @@ private:
      *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;
-    static const double mFluxScaling = 2e-5; /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux */
+    double mFluxScaling;  /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux.  This should be the same scale as Poiseuille resistance (comparable to viscosity).*/
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
 
     std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
