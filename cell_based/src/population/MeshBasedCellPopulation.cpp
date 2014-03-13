@@ -546,30 +546,31 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 {
 #ifdef CHASTE_VTK
     // Write time to file
-    unsigned time_step = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << time_step;
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
 
-    unsigned num_cells = GetNumNodes();
+    unsigned num_points = GetNumNodes();
     if (!mWriteVtkAsPoints && (mpVoronoiTessellation != NULL))
     {
-        num_cells = mpVoronoiTessellation->GetNumElements();
+        num_points = mpVoronoiTessellation->GetNumElements();
     }
 
-    std::vector<double> cell_types(num_cells);
-    std::vector<double> cell_ancestors(num_cells);
-    std::vector<double> cell_mutation_states(num_cells);
-    std::vector<double> cell_ages(num_cells);
-    std::vector<double> cell_cycle_phases(num_cells);
-
-    // We assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
-
+    std::vector<double> cell_types(num_points);
+    std::vector<double> cell_ancestors(num_points);
+    std::vector<double> cell_mutation_states(num_points);
+    std::vector<double> cell_ages(num_points);
+    std::vector<double> cell_cycle_phases(num_points);
     std::vector<std::vector<double> > cellwise_data;
+
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
+    // We assume that the first cell is representative of all cells
+    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    cell_data_names = this->Begin()->GetCellData()->GetKeys();
+
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cellwise_data_var(num_cells);
+        std::vector<double> cellwise_data_var(num_points);
         cellwise_data.push_back(cellwise_data_var);
     }
 
@@ -583,22 +584,25 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
     {
         VtkMeshWriter<SPACE_DIM, SPACE_DIM> cells_writer(rDirectory, "results_"+time.str(), false);
 
-        // Iterate over cells
+        // Loop over cells
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {
-            // Get the location index corresponding to this cell
-            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+            // Get the node index corresponding to this cell
+            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+            // Get this cell-cycle model
+            AbstractCellCycleModel* p_model = cell_iter->GetCellCycleModel();
 
             if (this-> template HasWriter<CellAncestorWriter>())
             {
                 double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
-                cell_ancestors[location_index] = ancestor_index;
+                cell_ancestors[node_index] = ancestor_index;
             }
             if (this-> template HasWriter<CellProliferativeTypesWriter>())
             {
-                cell_types[location_index] = cell_iter->GetCellProliferativeType()->GetColour();
+                cell_types[node_index] = cell_iter->GetCellProliferativeType()->GetColour();
             }
             if (this-> template HasWriter<CellMutationStatesWriter>())
             {
@@ -613,21 +617,19 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
                     mutation_state = p_label->GetColour();
                 }
 
-                cell_mutation_states[location_index] = mutation_state;
+                cell_mutation_states[node_index] = mutation_state;
             }
             if (this-> template HasWriter<CellAgesWriter>())
             {
-                double age = cell_iter->GetAge();
-                cell_ages[location_index] = age;
+                cell_ages[node_index] = cell_iter->GetAge();
             }
             if (this-> template HasWriter<CellProliferativePhasesWriter>())
             {
-                AbstractCellCycleModel* p_model = cell_iter->GetCellCycleModel();
-                cell_cycle_phases[location_index] = p_model->GetCurrentCellCyclePhase();
+                cell_cycle_phases[node_index] = p_model->GetCurrentCellCyclePhase();
             }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cellwise_data[var][location_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+                cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
 
@@ -674,15 +676,15 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         }
 
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-        *(this->mpVtkMetaFile) << time_step;
+        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
         *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-        *(this->mpVtkMetaFile) << time_step;
+        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
     else if (mpVoronoiTessellation != NULL)
     {
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
-        std::vector<double> cell_volumes(num_cells);
+        std::vector<double> cell_volumes(num_points);
 
         // Loop over elements of mpVoronoiTessellation
         for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
@@ -690,10 +692,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
              ++elem_iter)
         {
             // Get index of this element in mpVoronoiTessellation
-            unsigned location_index = elem_iter->GetIndex();
+            unsigned elem_index = elem_iter->GetIndex();
 
             // Get the index of the corresponding node in mrMesh
-            unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(location_index);
+            unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
 
             // There should be no ghost nodes
             assert(!this->IsGhostNode(node_index));
@@ -701,48 +703,37 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             // Get the cell corresponding to this element
             CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
+            // Get this cell-cycle model
+            AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
+
             if (this-> template HasWriter<CellAncestorWriter>())
             {
                 double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
-                cell_ancestors[location_index] = ancestor_index;
+                cell_ancestors[elem_index] = ancestor_index;
             }
             if (this-> template HasWriter<CellProliferativeTypesWriter>())
             {
-                double cell_type = p_cell->GetCellProliferativeType()->GetColour();
-                cell_types[location_index] = cell_type;
+                cell_types[elem_index] = p_cell->GetCellProliferativeType()->GetColour();
             }
             if (this-> template HasWriter<CellMutationStatesWriter>())
             {
-                double mutation_state = p_cell->GetMutationState()->GetColour();
-
-				CellPropertyCollection collection = p_cell->rGetCellPropertyCollection();
-				CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-				if (label_collection.GetSize() == 1)
-				{
-					boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-					mutation_state = p_label->GetColour();
-				}
-
-			    cell_mutation_states[location_index] = mutation_state;
+                cell_mutation_states[elem_index] = p_cell->GetMutationState()->GetColour();
             }
             if (this-> template HasWriter<CellAgesWriter>())
             {
-                double age = p_cell->GetAge();
-                cell_ages[location_index] = age;
+                cell_ages[elem_index] = p_cell->GetAge();
             }
             if (this-> template HasWriter<CellProliferativePhasesWriter>())
             {
-                AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
-                cell_cycle_phases[location_index] = p_model->GetCurrentCellCyclePhase();
+                cell_cycle_phases[elem_index] = p_model->GetCurrentCellCyclePhase();
             }
             if (this-> template HasWriter<CellVolumesWriter>())
             {
-                cell_volumes[location_index] = mpVoronoiTessellation->GetVolumeOfElement(location_index);
+                cell_volumes[elem_index] = mpVoronoiTessellation->GetVolumeOfElement(elem_index);
             }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cellwise_data[var][location_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
 
@@ -780,9 +771,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
         mesh_writer.WriteVtkUsingMesh(*mpVoronoiTessellation, time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-        *(this->mpVtkMetaFile) << time_step;
+        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
         *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-        *(this->mpVtkMetaFile) << time_step;
+        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
 #endif //CHASTE_VTK
@@ -1304,7 +1295,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetRestLength(unsigned inde
     }
 }
 
+/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////
+
 template class MeshBasedCellPopulation<1,1>;
 template class MeshBasedCellPopulation<1,2>;
 template class MeshBasedCellPopulation<2,2>;

@@ -385,95 +385,92 @@ template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    // Write time to file
-    unsigned time_step = SimulationTime::Instance()->GetTimeStepsElapsed();
-    std::stringstream time;
-    time << time_step;
+    SimulationTime* p_time = SimulationTime::Instance();
 
-    unsigned num_cells = mpMutableVertexMesh->GetNumElements();
-    std::vector<double> cell_types(num_cells);
-    std::vector<double> cell_labels(num_cells);
-    std::vector<double> cell_ancestors(num_cells);
-    std::vector<double> cell_mutation_states(num_cells);
-    std::vector<double> cell_ages(num_cells);
-    std::vector<double> cell_cycle_phases(num_cells);
-    std::vector<double> cell_volumes(num_cells);
+    VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
+    std::stringstream time;
+    time << p_time->GetTimeStepsElapsed();
+
+    unsigned num_elements = mpMutableVertexMesh->GetNumElements();
+    std::vector<double> cell_types(num_elements);
+    std::vector<double> cell_labels(num_elements);
+    std::vector<double> cell_ancestors(num_elements);
+    std::vector<double> cell_mutation_states(num_elements);
+    std::vector<double> cell_ages(num_elements);
+    std::vector<double> cell_cycle_phases(num_elements);
+    std::vector<double> cell_volumes(num_elements);
+    std::vector<std::vector<double> > cellwise_data;
+
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
 
     // We assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    std::vector<std::vector<double> > cellwise_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cellwise_data_var(num_cells);
+        std::vector<double> cellwise_data_var(num_elements);
         cellwise_data.push_back(cellwise_data_var);
     }
 
-    // Iterate over cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    // Loop over vertex elements
+    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
+         elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
+         ++elem_iter)
     {
         // Get index of this element in the vertex mesh
-        unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = elem_iter->GetIndex();
+
+        // Get the cell corresponding to this element
+        CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+        assert(p_cell);
 
         double cell_label = 0.0;
-        if (cell_iter->template HasCellProperty<CellLabel>())
+        if (p_cell->HasCellProperty<CellLabel>())
         {
-            CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection().template GetProperties<CellLabel>();
+            CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
             boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
             cell_label = p_label->GetColour();
         }
-        cell_labels[location_index] = cell_label;
+        cell_labels[elem_index] = cell_label;
 
         if (this-> template HasWriter<CellAncestorWriter>())
         {
-            double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
-            cell_ancestors[location_index] = ancestor_index;
+            double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
+            cell_ancestors[elem_index] = ancestor_index;
         }
         if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
-            double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
-            cell_types[location_index] = cell_type;
+            double cell_type = p_cell->GetCellProliferativeType()->GetColour();
+            cell_types[elem_index] = cell_type;
         }
         if (this-> template HasWriter<CellMutationStatesWriter>())
         {
-			double mutation_state = cell_iter->GetMutationState()->GetColour();
-
-			CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
-			CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-			if (label_collection.GetSize() == 1)
-			{
-				boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-				mutation_state = p_label->GetColour();
-			}
-
-			cell_mutation_states[location_index] = mutation_state;
+            double mutation_state = p_cell->GetMutationState()->GetColour();
+            cell_mutation_states[elem_index] = mutation_state;
         }
         if (this-> template HasWriter<CellAgesWriter>())
         {
-            double age = cell_iter->GetAge();
-            cell_ages[location_index] = age;
+            double age = p_cell->GetAge();
+            cell_ages[elem_index] = age;
         }
         if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
-            double cycle_phase = cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase();
-            cell_cycle_phases[location_index] = cycle_phase;
+            double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
+            cell_cycle_phases[elem_index] = cycle_phase;
         }
         if (this-> template HasWriter<CellVolumesWriter>())
         {
-            double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(location_index);
-            cell_volumes[location_index] = cell_volume;
+            double cell_volume = mpMutableVertexMesh->GetVolumeOfElement(elem_index);
+            cell_volumes[elem_index] = cell_volume;
         }
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cellwise_data[var][location_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+            cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
         }
     }
 
-    VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
     mesh_writer.AddCellData("Cell labels", cell_labels);
     if (this-> template HasWriter<CellProliferativeTypesWriter>())
     {
@@ -509,9 +506,9 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 
     mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << time_step;
+    *(this->mpVtkMetaFile) << p_time->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << time_step;
+    *(this->mpVtkMetaFile) << p_time->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }
@@ -727,7 +724,10 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     return p_mesh;
 }
 
+/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////
+
 template class VertexBasedCellPopulation<1>;
 template class VertexBasedCellPopulation<2>;
 template class VertexBasedCellPopulation<3>;

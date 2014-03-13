@@ -509,8 +509,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             // The top-most process adds a newline
             if (PetscTools::AmTopMost())
             {
-                std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
-                std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
+              std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
+              std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
             }
             CloseOutputFiles();
         }

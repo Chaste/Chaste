@@ -499,39 +499,43 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    // Write time to file
-    unsigned time_step = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << time_step;
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
-    // Make sure the nodes are ordered contiguously in memory
+    // Make sure the nodes are ordered contiguously in memory.
     NodeMap map(1 + this->mpNodesOnlyMesh->GetMaximumNodeIndex());
     this->mpNodesOnlyMesh->ReMesh(map);
 
-    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
-    unsigned num_cells = GetNumNodes();
-    std::vector<double> cell_types(num_cells);
-    std::vector<double> cell_ancestors(num_cells);
-    std::vector<double> cell_mutation_states(num_cells);
-    std::vector<double> cell_ages(num_cells);
-    std::vector<double> cell_cycle_phases(num_cells);
-    std::vector<double> cell_radii(num_cells);
-    std::vector<double> rank(num_cells);
+    unsigned num_nodes = GetNumNodes();
+    std::vector<double> cell_types(num_nodes);
+    std::vector<double> cell_ancestors(num_nodes);
+    std::vector<double> cell_mutation_states(num_nodes);
+    std::vector<double> cell_ages(num_nodes);
+    std::vector<double> cell_cycle_phases(num_nodes);
+    std::vector<double> cell_radii(num_nodes);
+    std::vector<std::vector<double> > cellwise_data;
+    std::vector<double> rank(num_nodes);
+
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
 
     // We assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    if (num_nodes > 0)
+    {
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    }
 
-    std::vector<std::vector<double> > cellwise_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cellwise_data_var(num_cells);
+        std::vector<double> cellwise_data_var(num_nodes);
         cellwise_data.push_back(cellwise_data_var);
     }
 
-    // Iterate over cells
+    // Loop over cells
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
@@ -541,17 +545,17 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
         Node<DIM>* p_node = this->GetNode(global_index);
 
-        unsigned location_index = this->rGetMesh().SolveNodeMapping(global_index);
+        unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
         if (this-> template HasWriter<CellAncestorWriter>())
         {
             double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
-            cell_ancestors[location_index] = ancestor_index;
+            cell_ancestors[node_index] = ancestor_index;
         }
         if (this-> template HasWriter<CellProliferativeTypesWriter>())
         {
             double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
-            cell_types[location_index] = cell_type;
+            cell_types[node_index] = cell_type;
         }
         if (this-> template HasWriter<CellMutationStatesWriter>())
         {
@@ -566,30 +570,30 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
                 mutation_state = p_label->GetColour();
             }
 
-            cell_mutation_states[location_index] = mutation_state;
+            cell_mutation_states[node_index] = mutation_state;
         }
         if (this-> template HasWriter<CellAgesWriter>())
         {
             double age = cell_iter->GetAge();
-            cell_ages[location_index] = age;
+            cell_ages[node_index] = age;
         }
         if (this-> template HasWriter<CellProliferativePhasesWriter>())
         {
             double cycle_phase = cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase();
-            cell_cycle_phases[location_index] = cycle_phase;
+            cell_cycle_phases[node_index] = cycle_phase;
         }
         if (this-> template HasWriter<CellVolumesWriter>())
         {
             double cell_radius = p_node->GetRadius();
-            cell_radii[location_index] = cell_radius;
+            cell_radii[node_index] = cell_radius;
         }
 
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cellwise_data[var][location_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+            cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
 
-        rank[location_index] = (PetscTools::GetMyRank());
+        rank[node_index] = (PetscTools::GetMyRank());
     }
 
     mesh_writer.AddPointData("Process rank", rank);
@@ -629,9 +633,9 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     mesh_writer.WriteFilesUsingMesh(*mpNodesOnlyMesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << time_step;
+    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << time_step;
+    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }
@@ -955,7 +959,10 @@ void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, boost::shared_ptr<
     mLocationHaloCellMap[pNode->GetIndex()] = pCell;
 }
 
+/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////
+
 template class NodeBasedCellPopulation<1>;
 template class NodeBasedCellPopulation<2>;
 template class NodeBasedCellPopulation<3>;

@@ -495,10 +495,9 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    // Write time to file
-    SimulationTime* p_time = SimulationTime::Instance();
     std::stringstream time;
-    time << p_time->GetTimeStepsElapsed();
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     unsigned num_nodes = GetNumNodes();
     std::vector<double> cell_types;
@@ -509,18 +508,20 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     cell_mutation_states.reserve(num_nodes);
     cell_labels.reserve(num_nodes);
     elem_ids.reserve(num_nodes);
+    std::vector<std::vector<double> > cellwise_data;
+
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
 
     // We assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    std::vector<std::vector<double> > cellwise_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
         std::vector<double> cellwise_data_var(num_nodes);
         cellwise_data.push_back(cellwise_data_var);
     }
-
     for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
          iter != mpPottsMesh->GetNodeIteratorEnd();
          ++iter)
@@ -574,7 +575,6 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     assert(cell_types.size() == num_nodes);
     assert(elem_ids.size() == num_nodes);
 
-    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
     mesh_writer.AddPointData("Element index", elem_ids);
     mesh_writer.AddPointData("Cell types", cell_types);
 
@@ -610,7 +610,10 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 #endif //CHASTE_VTK
 }
 
+/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
+/////////////////////////////////////////////////////////////////////////////
+
 template class PottsBasedCellPopulation<1>;
 template class PottsBasedCellPopulation<2>;
 template class PottsBasedCellPopulation<3>;
