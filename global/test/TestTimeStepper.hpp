@@ -189,67 +189,41 @@ public:
 
     void TestAdditionalSteppingPoints() throw(Exception)
     {
-        std::vector<double> additional_times_bad_order;
-        additional_times_bad_order.push_back(0.75);
-        additional_times_bad_order.push_back(0.25);
+        {
+            std::vector<double> additional_times_bad_order;
 
-        TS_ASSERT_THROWS_THIS(TimeStepper stepper(0.0, 1.0, 0.1, false, additional_times_bad_order),
-                              "The additional times vector should be in ascending numerical order; "
-                              "entry 1 is less than or equal to entry 0.");
+            additional_times_bad_order.push_back(0.7);
+            additional_times_bad_order.push_back(0.2);
 
-        std::vector<double> additional_times;
-        additional_times.push_back(0.03);
-        additional_times.push_back(0.25);
-        additional_times.push_back(0.5);
-        additional_times.push_back(0.75);
+            TS_ASSERT_THROWS_THIS(TimeStepper stepper(0.0, 1.0, 0.1, false, additional_times_bad_order),
+                                  "The additional times vector should be in ascending numerical order; "
+                                  "entry 1 is less than or equal to entry 0.");
+        }
+        {
+            std::vector<double> additional_times;
+            additional_times.push_back(0.03);
+            additional_times.push_back(0.25);
+            additional_times.push_back(0.5);
+            additional_times.push_back(0.75);
 
-        TimeStepper stepper(0.0, 1.0, 0.1, false, additional_times);
+            TS_ASSERT_THROWS_THIS(TimeStepper stepper(0.0, 1.0, 0.1, false, additional_times),
+                                  "Additional times are now deprecated.  Use only to check whether the given times are met: "
+                                  "e.g. Electrode events should only happen on printing steps.");
+      }
 
-        TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(),13u);
-
-        std::vector<double> expected_times_reverse_order;
-        expected_times_reverse_order.push_back(1.0);
-        expected_times_reverse_order.push_back(0.9);
-        expected_times_reverse_order.push_back(0.8);
-        expected_times_reverse_order.push_back(0.75);
-        expected_times_reverse_order.push_back(0.7);
-        expected_times_reverse_order.push_back(0.6);
-        expected_times_reverse_order.push_back(0.5);
-        expected_times_reverse_order.push_back(0.4);
-        expected_times_reverse_order.push_back(0.3);
-        expected_times_reverse_order.push_back(0.25);
-        expected_times_reverse_order.push_back(0.2);
-        expected_times_reverse_order.push_back(0.1);
-        expected_times_reverse_order.push_back(0.03);
-        expected_times_reverse_order.push_back(0.0);
-
-        std::vector<double> expected_timesteps_reverse_order;
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.05);
-        expected_timesteps_reverse_order.push_back(0.05);
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.05);
-        expected_timesteps_reverse_order.push_back(0.05);
-        expected_timesteps_reverse_order.push_back(0.1);
-        expected_timesteps_reverse_order.push_back(0.07);
-        expected_timesteps_reverse_order.push_back(0.03);
-
+        std::vector<double> check_additional_times;
+        check_additional_times.push_back(0.0);
+        check_additional_times.push_back(0.2);
+        check_additional_times.push_back(0.5);
+        check_additional_times.push_back(0.7);
+        TimeStepper stepper(0.0, 1.0, 0.1, false, check_additional_times);
+        TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(),10u);
         while (!stepper.IsTimeAtEnd())
         {
-            TS_ASSERT_DELTA(stepper.GetTime(),expected_times_reverse_order.back(),1e-12);
-            expected_times_reverse_order.pop_back();
-
-            TS_ASSERT_DELTA(stepper.GetNextTimeStep(),expected_timesteps_reverse_order.back(),1e-12);
-            expected_timesteps_reverse_order.pop_back();
-
             stepper.AdvanceOneTimeStep();
         }
 
-        TS_ASSERT_EQUALS(stepper.GetTotalTimeStepsTaken(),13u);
+        TS_ASSERT_EQUALS(stepper.GetTotalTimeStepsTaken(),10u);
     }
 
     void TestResetTimeStep() throw(Exception)
@@ -288,40 +262,6 @@ public:
         TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), 1u);
 
         stepper.AdvanceOneTimeStep();
-        TS_ASSERT_EQUALS(stepper.IsTimeAtEnd(), true);
-    }
-
-    void TestResetTimeStepWithAdditionalSteppingPoints() throw(Exception)
-    {
-        double timestep = 0.1;
-        std::vector<double> additional_times;
-        additional_times.push_back(0.33);
-
-        TimeStepper stepper(0.0, 0.5, timestep, false, additional_times);
-
-        stepper.AdvanceOneTimeStep();
-        TS_ASSERT_EQUALS(stepper.GetTime(), 0.1);
-
-        timestep = 0.25;
-        stepper.ResetTimeStep(timestep);
-        TS_ASSERT_DELTA(stepper.GetNextTimeStep(), 0.23, 1e-12);
-        TS_ASSERT_DELTA(stepper.GetNextTime(), 0.33, 1e-12);
-
-        stepper.AdvanceOneTimeStep();
-        TS_ASSERT_EQUALS(stepper.GetTime(), 0.33);
-
-        TS_ASSERT_DELTA(stepper.GetNextTimeStep(), 0.02, 1e-12);
-        TS_ASSERT_DELTA(stepper.GetNextTime(), 0.35, 1e-12);
-
-        stepper.AdvanceOneTimeStep();
-        TS_ASSERT_EQUALS(stepper.GetTime(), 0.35);
-
-        TS_ASSERT_DELTA(stepper.GetNextTimeStep(), 0.15, 1e-12);
-        TS_ASSERT_DELTA(stepper.GetNextTime(), 0.5, 1e-12);
-
-        stepper.AdvanceOneTimeStep();
-        TS_ASSERT_EQUALS(stepper.GetTime(), 0.5);
-
         TS_ASSERT_EQUALS(stepper.IsTimeAtEnd(), true);
     }
 
@@ -398,9 +338,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            std::vector<double> additional_times;
-            additional_times.push_back(0.55);
-            TimeStepper stepper(0.0, 1.0, 0.1, false, additional_times);
+            TimeStepper stepper(0.0, 1.0, 0.1, false);
 
             //Run for 5 steps
             for (int i=0; i<5; i++)
@@ -409,7 +347,7 @@ public:
             }
 
             TS_ASSERT_DELTA(stepper.GetTime(), 0.5, 1e-10);
-            TS_ASSERT_DELTA(stepper.GetNextTime(), 0.55, 1e-10);
+            TS_ASSERT_DELTA(stepper.GetNextTime(), 0.6, 1e-10);
 
             TimeStepper* const p_stepper_for_archiving = &stepper;
             output_arch << p_stepper_for_archiving;
@@ -417,11 +355,11 @@ public:
 
             //Exhibit normal behaviour after archive snapshot
             stepper.AdvanceOneTimeStep();
-            TS_ASSERT_DELTA(stepper.GetTime(), 0.55, 1e-10);
-            TS_ASSERT_DELTA(stepper.GetNextTime(), 0.6, 1e-10);
-            stepper.AdvanceOneTimeStep();
             TS_ASSERT_DELTA(stepper.GetTime(), 0.6, 1e-10);
             TS_ASSERT_DELTA(stepper.GetNextTime(), 0.7, 1e-10);
+            stepper.AdvanceOneTimeStep();
+            TS_ASSERT_DELTA(stepper.GetTime(), 0.7, 1e-10);
+            TS_ASSERT_DELTA(stepper.GetNextTime(), 0.8, 1e-10);
 
         }
 
@@ -434,15 +372,15 @@ public:
             input_arch >> p_stepper;
 
             TS_ASSERT_DELTA(p_stepper->GetTime(), 0.5, 1e-10);
-            TS_ASSERT_DELTA(p_stepper->GetNextTime(), 0.55, 1e-10);
-
-            p_stepper->AdvanceOneTimeStep();
-            TS_ASSERT_DELTA(p_stepper->GetTime(), 0.55, 1e-10);
             TS_ASSERT_DELTA(p_stepper->GetNextTime(), 0.6, 1e-10);
 
             p_stepper->AdvanceOneTimeStep();
             TS_ASSERT_DELTA(p_stepper->GetTime(), 0.6, 1e-10);
             TS_ASSERT_DELTA(p_stepper->GetNextTime(), 0.7, 1e-10);
+
+            p_stepper->AdvanceOneTimeStep();
+            TS_ASSERT_DELTA(p_stepper->GetTime(), 0.7, 1e-10);
+            TS_ASSERT_DELTA(p_stepper->GetNextTime(), 0.8, 1e-10);
 
             delete p_stepper;
         }

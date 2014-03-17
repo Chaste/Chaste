@@ -45,7 +45,7 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
       mEnd(endTime),
       mDt(dt),
       mTotalTimeStepsTaken(0),
-      mAdditionalTimesReached(0),
+      mAdditionalTimesReachedDeprecated(0),
       mTime(startTime),
       mEpsilon(DBL_EPSILON)
 {
@@ -71,7 +71,8 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
         // When mDt divides this interval (and the interval is positive) then we are going there anyway
         if (!Divides(mDt, time_interval) && (time_interval > DBL_EPSILON))
         {
-            mAdditionalTimes.push_back(additionalTimes[i]);
+            //mAdditionalTimes.push_back(additionalTimes[i]);
+            EXCEPTION("Additional times are now deprecated.  Use only to check whether the given times are met: e.g. Electrode events should only happen on printing steps.");
         }
     }
 
@@ -104,7 +105,7 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
 
 double TimeStepper::CalculateNextTime()
 {
-    double next_time = mStart + (mTotalTimeStepsTaken - mAdditionalTimesReached + 1)*mDt;
+    double next_time = mStart + (mTotalTimeStepsTaken + 1)*mDt;
 
     // Does the next time bring us very close to the end time?
     // Note that the inequality in this guard matches the inversion of the guard in the enforceConstantTimeStep
@@ -114,20 +115,8 @@ double TimeStepper::CalculateNextTime()
         next_time = mEnd;
     }
 
-    if (!mAdditionalTimes.empty())
-    {
-        if (mAdditionalTimesReached < mAdditionalTimes.size())
-        {
-            // Does this next step take us very close to, or over, an additional time?
-            double next_additional_time = mAdditionalTimes[mAdditionalTimesReached];
-            double epsilon = next_additional_time > 1 ? next_additional_time*DBL_EPSILON : DBL_EPSILON;
-            if (next_additional_time - next_time <= epsilon)
-            {
-                next_time = next_additional_time;
-                mAdditionalTimesReached++;
-            }
-        }
-    }
+    assert(mAdditionalTimesDeprecated.empty());
+
     return next_time;
 }
 
@@ -165,18 +154,7 @@ double TimeStepper::GetNextTimeStep()
     {
         dt = mEnd - mTime;
     }
-
-    // If the next time or the current time is one of the additional times, the timestep will not be mDt
-    if (mAdditionalTimesReached > 0)
-    {
-        if (fabs(mNextTime - mAdditionalTimes[mAdditionalTimesReached-1]) < mEpsilon ||
-            fabs(mTime - mAdditionalTimes[mAdditionalTimesReached-1]) < mEpsilon)
-        {
-            dt = mNextTime - mTime;
-            assert(dt > 0);
-        }
-    }
-
+    assert(mAdditionalTimesDeprecated.empty());
     return dt;
 }
 double TimeStepper::GetIdealTimeStep()
@@ -191,7 +169,7 @@ bool TimeStepper::IsTimeAtEnd() const
 
 unsigned TimeStepper::EstimateTimeSteps() const
 {
-    return (unsigned) floor((mEnd - mStart)/mDt + 0.5) + mAdditionalTimes.size();
+    return (unsigned) floor((mEnd - mStart)/mDt + 0.5);
 }
 
 unsigned TimeStepper::GetTotalTimeStepsTaken() const

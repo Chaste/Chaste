@@ -70,8 +70,10 @@ public:
      * @param enforceConstantTimeStep If this is true the stepper estimates whether non-constant
      *  timesteps will be used and quits if so.
      * @param additionalTimes If the timestepper needs to stop at certain additional times, they can be passed in in this std::vector.
-     *  Defaults to empty. These times must be in ascending order. Note that if, for example, start=0, end=0.5, dt=0.1, and the additional
-     *  stopping time is 0.33, the times used will be 0,0.1,0.2,0.3,0.33,0.4,0.5  NOT  ..,0.33,0.43,0.5
+     *  Defaults to empty. These times must be in ascending order.
+     *  DEPRECATION: Note that these additional times are checked in order to ensure that the stepper will
+     *  stop at these times anyway.  (For example we want to check that new events such as electrodes switching on will be detected
+     *  in a regular time loop.) New additional times are not added but instead throw an exception.
      */
     TimeStepper(double startTime, double endTime, double dt, bool enforceConstantTimeStep=false, std::vector<double> additionalTimes=std::vector<double> ());
 
@@ -154,11 +156,11 @@ private:
     /** The size of time step. */
     double mDt;
 
-    /** The total number of time steps taken, including those to get one of the 'additional times'. */
+    /** The total number of time steps taken. */
     unsigned mTotalTimeStepsTaken;
 
-    /** The number of times one of the 'additional times' has been passed. */
-    unsigned mAdditionalTimesReached;
+    /** DEPRECATED: The number of times one of the 'additional times' has been passed. */
+    unsigned mAdditionalTimesReachedDeprecated;
 
     /** The current time. */
     double mTime;
@@ -176,8 +178,8 @@ private:
     /** @return Compute what the time will be at the next time step. */
     double CalculateNextTime();
 
-    /** Vector to store the additional times the stepper must stop at. */
-    std::vector<double> mAdditionalTimes;
+    /** DEPRECATED Vector to store the additional times the stepper must stop at. */
+    std::vector<double> mAdditionalTimesDeprecated;
 
         /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -197,8 +199,8 @@ private:
         archive & mTime;
         archive & mNextTime;
         archive & mEpsilon;
-        archive & mAdditionalTimesReached;
-        archive & mAdditionalTimes;
+        archive & mAdditionalTimesReachedDeprecated;
+        archive & mAdditionalTimesDeprecated;
     }
 
 };
