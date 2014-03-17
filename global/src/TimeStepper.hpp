@@ -95,10 +95,18 @@ public:
 
     /**
      * @return Get the size of the next time step which will be taken.
-     * GetNextTimeStep() == GetNextTime() - GetTime()
      *
-     * Note that even when the next time step will be the ideal timestep,
-     * this may report something different (by a machine epsilon!).
+     * Note that this is often reported as the ideal timestep.
+     *
+     * The actual time step is mNextTime - mTime which could be evaluated as
+     *  GetNextTime() - GetTime() = mNextTime - mTime
+     *  ~= mStart + (mTotalTimeStepsTaken  + 1)*mDt - mTime
+     *  ~= mStart + (mTotalTimeStepsTaken  + 1)*mDt - (mStart + mTotalTimeStepsTaken*mDt)
+     *  ~= mDt
+     *  This wouldn't evaluate to mDt in general but to within 2*mEpsilon <= 2*DBL_EPSILON*mEnd*mDt
+     *  When mEnd and/or mStart are a long way from zero then the value reported
+     *   mNextTime - mTime
+     *  will differ from mDt, even when the actual step is mDt
      */
     double GetNextTimeStep();
 

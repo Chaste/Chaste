@@ -124,9 +124,9 @@ public:
             }
             else
             {
-                // Otherwise the GetNextTimeStep() doesn't return the stored timestep,
-                // it returns the difference between current and next, which can vary by machine precision.
-                TS_ASSERT_DELTA(stepper.GetNextTimeStep(), timestep, DBL_EPSILON);
+                // Otherwise the GetNextTimeStep() returns the stored timestep,
+                TS_ASSERT_EQUALS(stepper.GetNextTimeStep(),  timestep);
+
             }
             TS_ASSERT_DELTA(stepper.GetNextTimeStep(), real_time_step, DBL_EPSILON);
             TS_ASSERT_EQUALS(stepper.GetIdealTimeStep(), timestep);
