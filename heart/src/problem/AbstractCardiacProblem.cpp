@@ -399,7 +399,9 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
                         HeartConfig::Instance()->GetPrintingTimeStep(),
                         false,
                         additional_stopping_times);
-
+    // Note that SetUpAdditionalStoppingTimes is a method from the BidomainWithBath class it adds
+    // electrode events into the regular time-stepping
+    //    EXCEPTION("Electrode switch on/off events should coincide with printing time steps.");
     std::string progress_reporter_dir;
 
     if (mPrintOutput)
