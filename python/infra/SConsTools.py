@@ -60,10 +60,14 @@ def pns(nodes):
     """Pretty-print nodes for debugging."""
     return map(str, nodes)
 
+#fp = open('tsp.txt', 'w')
 def tsp(*args):
     """Thread-safer print, for debugging."""
     msg = ' '.join(map(str, args)) + '\n'
-    print msg,
+    try:
+        print >>fp, msg,
+    except:
+        print msg,
 
 # Should provide a whole-build global lock, if needed
 _lock = threading.Lock()
@@ -231,11 +235,13 @@ def BuildTest(target, source, env):
     objects = []
     #import thread
     #tid = thread.get_ident()
-    #tsp(tid, source[0], sorted(env['CHASTE_OBJECTS'].keys()))
+    #tsp("\n", tid, source[0], 'BuildTest', sorted(env['CHASTE_OBJECTS'].keys()))
     #tsp(tid, source[0], sorted(env['CHASTE_COMPONENTS']))
+    #from SCons.Node import StateString as S
 
     def process(o):
         """Process an object file as described in BuildTest.__doc__"""
+        #tsp(tid, source[0], "process", o, S[o.state])
         # Ensure scons' dependencies are set up, in a thread-safe fashion
         _lock.acquire()
         o._chaste_lock = getattr(o, '_chaste_lock', threading.Lock())
@@ -247,7 +253,7 @@ def BuildTest(target, source, env):
         for d in o.implicit:
             hdr = str(d)
             if hdr not in header_files:
-                #tsp(tid, source[0], str(o), hdr, o.state)
+                #tsp(tid, source[0], 'a dep of', o, 'is', hdr, S[o.state])
                 header_files.add(hdr)
                 # Is this a Chaste header?
                 parts = hdr.split(os.path.sep)
@@ -265,21 +271,20 @@ def BuildTest(target, source, env):
                             has_source = source_filename in env['CHASTE_OBJECTS']
                             if has_source:
                                 break
-                    #tsp(tid, source[0], base, has_source)
+                    #tsp(tid, source[0], 'has chaste dep', source_filename if has_source else base, has_source)
                     if has_source:
                         # Find the object file(s) and analyse it/them
                         objs = env['CHASTE_OBJECTS'][source_filename]
+                        #tsp(tid, source[0], 'src objs', map(str, objs))
                         objects.extend(objs)
                         for obj in objs:
-                            #tsp(tid, str(obj), obj.state)
                             process(obj)
 
     for o in source:
-        #tsp(tid, str(o), o.state)
         process(o)
     # Build the test itself
     runner = env['RUNNER_EXE']
-    #tsp("Building", runner, "from", pns(source+objects), "by", tid)
+    #tsp("Building", runner, "from", pns(source+objects), "by", tid, "\n")
     actual_runner = env['TestBuilder'](target=runner, source=source+objects)
     env.Alias('test_exes', actual_runner)
     assert actual_runner[0] is runner # Just in case
