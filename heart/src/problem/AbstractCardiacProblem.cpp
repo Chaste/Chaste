@@ -366,6 +366,18 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
 {
     PreSolveChecks();
 
+    std::vector<double> additional_stopping_times;
+    SetUpAdditionalStoppingTimes(additional_stopping_times);
+
+    TimeStepper stepper(mCurrentTime,
+                        HeartConfig::Instance()->GetSimulationDuration(),
+                        HeartConfig::Instance()->GetPrintingTimeStep(),
+                        false,
+                        additional_stopping_times);
+    // Note that SetUpAdditionalStoppingTimes is a method from the BidomainWithBath class it adds
+    // electrode events into the regular time-stepping
+    //    EXCEPTION("Electrode switch on/off events should coincide with printing time steps.");
+
     if (!mpBoundaryConditionsContainer) // the user didn't supply a bcc
     {
         // Set up the default bcc
@@ -391,17 +403,6 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
         initial_condition = CreateInitialCondition();
     }
 
-    std::vector<double> additional_stopping_times;
-    SetUpAdditionalStoppingTimes(additional_stopping_times);
-
-    TimeStepper stepper(mCurrentTime,
-                        HeartConfig::Instance()->GetSimulationDuration(),
-                        HeartConfig::Instance()->GetPrintingTimeStep(),
-                        false,
-                        additional_stopping_times);
-    // Note that SetUpAdditionalStoppingTimes is a method from the BidomainWithBath class it adds
-    // electrode events into the regular time-stepping
-    //    EXCEPTION("Electrode switch on/off events should coincide with printing time steps.");
     std::string progress_reporter_dir;
 
     if (mPrintOutput)

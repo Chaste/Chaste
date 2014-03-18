@@ -997,6 +997,7 @@ public:
 
         TS_ASSERT_THROWS_THIS(bidomain_problem1.Solve(), "Additional times are now deprecated.  Use only to check whether the given times are met: "
                                                           "e.g. Electrode events should only happen on printing steps.");
+        delete p_mesh1;
     }
 
     void TestBidomainWithBathCanOutputVariables() throw(Exception)
