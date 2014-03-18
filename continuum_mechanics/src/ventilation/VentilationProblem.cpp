@@ -59,7 +59,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // We solve for flux at every edge and for pressure at each node/bifurcation
     // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
     // preallocating 5 non-zeros allows for 4-way branching
-    mpLinearSystem = new LinearSystem(mMesh.GetNumNodes()+mMesh.GetNumElements(), 5u);
+    mSolution = PetscTools::CreateVec(mMesh.GetNumNodes()+mMesh.GetNumElements());
+    mpLinearSystem = new LinearSystem(mSolution, 5u);
     mpLinearSystem->SetAbsoluteTolerance(1e-10);
     mpLinearSystem->SetKspType("gmres");
 
@@ -150,7 +151,7 @@ void VentilationProblem::SetConstantInflowFluxes(double flux)
      {
          if ((*iter)->GetIndex() != mOutletNodeIndex)
          {
-             SetFluxAtBoundaryNode(*(*iter), flux*mFluxScaling);
+             SetFluxAtBoundaryNode(*(*iter), flux);
          }
      }
 }
@@ -165,6 +166,7 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
 
     mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
+    PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
 }
 
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
@@ -183,7 +185,8 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
 
     mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
-    mpLinearSystem->SetRhsVectorElement(pressure_index, flux);
+    mpLinearSystem->SetRhsVectorElement(pressure_index, flux*mFluxScaling);
+    PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
 }
 
 
@@ -311,21 +314,14 @@ void VentilationProblem::Solve()
 {
     Assemble();
     mpLinearSystem->AssembleFinalLinearSystem();
+    PetscVecTools::Finalise(mSolution);
 //     mpLinearSystem->DisplayMatrix();
 //     mpLinearSystem->DisplayRhs();
 
-    if (mSolution==NULL)
-    {
-        // First solve
-        mSolution = mpLinearSystem->Solve();
-    }
-    else
-    {
-        //This call is when the solution vector may have been used before (at the previous timestep for example)
-        Vec last_solution = mSolution;
-        mSolution = mpLinearSystem->Solve(last_solution);
-        PetscTools::Destroy(last_solution);
-    }
+    //This call is when the solution vector may have been used before (at the previous timestep for example)
+    Vec last_solution = mSolution;
+    mSolution = mpLinearSystem->Solve(last_solution);
+    PetscTools::Destroy(last_solution);
     if (mDynamicResistance)
     {
         double relative_diff = DBL_MAX;

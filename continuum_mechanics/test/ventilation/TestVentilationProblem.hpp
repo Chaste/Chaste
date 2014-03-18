@@ -269,15 +269,15 @@ public:
         TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
         TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
         TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15, 1e-4);
-        TS_ASSERT_DELTA(pressure[5], 15, 1e-4);
-        TS_ASSERT_DELTA(pressure[6], 15, 1e-4);
-        TS_ASSERT_DELTA(pressure[7], 15, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15, 2e-4);
+        TS_ASSERT_DELTA(pressure[5], 15, 2e-4);
+        TS_ASSERT_DELTA(pressure[6], 15, 2e-4);
+        TS_ASSERT_DELTA(pressure[7], 15, 2e-4);
         TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[3],  -0.0710176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[4],  -0.0710176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[5],  -0.0710176, 1e-8); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[6],  -0.0710176, 1e-8); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[3],  -0.0710176, 1e-6); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -0.0710176, 1e-6); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -0.0710176, 1e-6); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -0.0710176, 1e-6); // BC (Inflow flux)
     }
 
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
@@ -403,18 +403,18 @@ public:
 //        }
 //    }
 
-    void TestTopOfAirwaysPatientDataVeryNearFailer() throw (Exception)
+    void TestTopOfAirwaysPatientDataVeryNearFailure() throw (Exception)
     {
         VentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
 
-        //problem.SetViscosity(3e-2); //Even six orders of magnitude don't fix stability issues
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
 //        problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
+        problem.Solve();
         problem.Solve();
     }
 
