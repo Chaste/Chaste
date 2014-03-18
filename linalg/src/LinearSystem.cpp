@@ -792,12 +792,6 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             PETSCEXCEPT( KSPSetNullSpace(mKspSolver, mMatNullSpace) );
         }
 
-        if (lhsGuess)
-        {
-            // Assume that the user of this method will always be kind enough to give us a reasonable guess.
-            KSPSetInitialGuessNonzero(mKspSolver,PETSC_TRUE);
-        }
-
         KSPSetFromOptions(mKspSolver);
 
         /*
@@ -940,6 +934,8 @@ Vec LinearSystem::Solve(Vec lhsGuess)
     if (lhsGuess)
     {
         VecCopy(lhsGuess, lhs_vector);
+        // Assume that the user of this method will always be kind enough to give us a reasonable guess.
+        KSPSetInitialGuessNonzero(mKspSolver, PETSC_TRUE);
     }
 
     // Check if the right hand side is small (but non-zero), PETSc can diverge immediately
