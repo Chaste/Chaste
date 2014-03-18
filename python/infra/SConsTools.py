@@ -45,6 +45,7 @@ import threading
 from SCons.Script import Command, Dir, Value, Copy, Delete
 import SCons
 import SCons.Action
+import SCons.Node
 import SCons.Tool
 import SCons.Script
 import SCons.Scanner
@@ -235,13 +236,16 @@ def BuildTest(target, source, env):
     objects = []
     #import thread
     #tid = thread.get_ident()
-    #tsp("\n", tid, source[0], 'BuildTest', sorted(env['CHASTE_OBJECTS'].keys()))
+    #tsp("\n", tid, source[0], 'BuildTest')#, sorted(env['CHASTE_OBJECTS'].keys()))
     #tsp(tid, source[0], sorted(env['CHASTE_COMPONENTS']))
-    #from SCons.Node import StateString as S
+    #S = SCons.Node.StateString
 
     def process(o):
         """Process an object file as described in BuildTest.__doc__"""
-        #tsp(tid, source[0], "process", o, S[o.state])
+        #tsp(tid, source[0], "process", o, S[o.state], os.path.exists(str(o)), map(str, o.sources), map(str, o.depends), o.implicit is None, S[o.sources[0].state])
+        while o.sources[0].state is SCons.Node.executing:
+            # Wait for the sources to be generated, so scanning the object does something useful!
+            time.sleep(0.01) # 10 ms
         # Ensure scons' dependencies are set up, in a thread-safe fashion
         _lock.acquire()
         o._chaste_lock = getattr(o, '_chaste_lock', threading.Lock())
@@ -249,6 +253,7 @@ def BuildTest(target, source, env):
         o._chaste_lock.acquire()
         o.scan()
         o._chaste_lock.release()
+        #tsp(tid, source[0], "state post scan", o, S[o.state], os.path.exists(str(o)), map(str, o.sources), map(str, o.depends), map(str, o.implicit))
         # Now process the dependencies
         for d in o.implicit:
             hdr = str(d)
@@ -298,6 +303,7 @@ def RegisterObjects(env, key, objs):
     for obj in objs:
         src = obj.sources[0]
         if src.is_derived():
+            #tsp('RegisterObjects', key, map(str, objs), obj, src, src.path)
             env['CHASTE_OBJECTS'][src.path] = [obj]
 
 
