@@ -266,9 +266,9 @@ public:
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
-        TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[1], 6.6666,   2e-3);
+        TS_ASSERT_DELTA(pressure[2], 12.2222, 2e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.2222, 2e-4);
         TS_ASSERT_DELTA(pressure[4], 15, 2e-4);
         TS_ASSERT_DELTA(pressure[5], 15, 2e-4);
         TS_ASSERT_DELTA(pressure[6], 15, 2e-4);

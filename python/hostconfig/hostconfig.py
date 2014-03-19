@@ -91,9 +91,12 @@ except ImportError:
     except ImportError:
         # How about distro-specific config?
         try:
-            fp = open('/etc/issue')
-            distro = fp.read().split()[0].lower()
-            fp.close()
+            if sys.platform == 'darwin':
+                distro = 'macosx'
+            else:
+                fp = open('/etc/issue')
+                distro = fp.read().split()[0].lower()
+                fp.close()
             (file, pathname, desc) = imp.find_module(distro, ['python/hostconfig'])
             try:
                 conf = imp.load_module(distro, file, pathname, desc)
