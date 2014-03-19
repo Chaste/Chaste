@@ -621,14 +621,18 @@ public:
         ls.SetRhsVectorElement(2, 50.0);
         ls.AssembleFinalLinearSystem();
 
-        ls.Solve();
+	Vec sol1 = ls.Solve();
+	PetscTools::Destroy(sol1);
         unsigned num_iters_from_default = ls.GetNumIterations();
         Vec zero_guess=PetscTools::CreateVec(3);
         PetscVecTools::SetElement(zero_guess, 0, 0.0);
         PetscVecTools::SetElement(zero_guess, 1, 0.0);
         PetscVecTools::SetElement(zero_guess, 2, 0.0);
         PetscVecTools::Finalise(zero_guess);
-        ls.Solve(zero_guess);
+        Vec sol2 = ls.Solve(zero_guess);
+        PetscTools::Destroy(zero_guess);
+        PetscTools::Destroy(sol2);
+      
         unsigned num_iters_from_zero = ls.GetNumIterations();
         TS_ASSERT_EQUALS(num_iters_from_default, num_iters_from_zero);
 
@@ -645,7 +649,7 @@ public:
         unsigned num_iters_from_perfect = ls.GetNumIterations();
         TS_ASSERT_EQUALS(num_iters_from_perfect, 0u);
         TS_ASSERT_LESS_THAN(num_iters_from_perfect, num_iters_from_zero);
-
+        
         int lo, hi;
         VecGetOwnershipRange(solution_vector,&lo,&hi);
         PetscScalar* p_solution_elements_array;
