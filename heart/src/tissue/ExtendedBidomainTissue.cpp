@@ -67,12 +67,10 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
 
     try
     {
-        for (typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator node_iter=this->mpMesh->GetNodeIteratorBegin();
-             node_iter != this->mpMesh->GetNodeIteratorEnd();
-             ++node_iter)
+        for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
         {
-            Node<SPACE_DIM>* p_node = &(*node_iter);
-            unsigned local_index = p_node->GetIndex() - ownership_range_low;
+            unsigned global_index = local_index + ownership_range_low;
+            Node<SPACE_DIM>* p_node = this->mpMesh->GetNode(global_index);
             mCellsDistributedSecondCell[local_index] = pCellFactorySecondCell->CreateCardiacCellForNode(p_node);
             mCellsDistributedSecondCell[local_index]->SetUsedInTissueSimulation();
             mGgapDistributed[local_index] = 0.0;//default. It will be changed by specific method later when user input will be obtained
@@ -160,15 +158,14 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
     assert(this->mpMesh != NULL);
 
     unsigned ownership_range_low = this->mpDistributedVectorFactory->GetLow();
-    assert(mGgapDistributed.size() == this->mpDistributedVectorFactory->GetLocalOwnership());//the constructor should have allocated memory.
+    unsigned num_local_nodes = this->mpDistributedVectorFactory->GetLocalOwnership();
+    assert(mGgapDistributed.size() == num_local_nodes);//the constructor should have allocated memory.
     try
     {
-        for (typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator node_iter=this->mpMesh->GetNodeIteratorBegin();
-             node_iter != this->mpMesh->GetNodeIteratorEnd();
-             ++node_iter)
+        for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
         {
-            Node<SPACE_DIM>* p_node = &(*node_iter);
-            unsigned local_index = p_node->GetIndex() - ownership_range_low;
+            unsigned global_index = ownership_range_low + local_index;
+            Node<SPACE_DIM>* p_node = this->mpMesh->GetNode(global_index);
             mGgapDistributed[local_index] = mGGap;//assign default uniform value everywhere first
 
             //then change where and if necessary
