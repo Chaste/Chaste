@@ -134,6 +134,8 @@ private:
     {
         c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> ret = zero_matrix<double>(ELEMENT_DIM+1,ELEMENT_DIM+1);
 
+        double dt = PdeSimulationTime::GetPdeTimeStep();
+
         for(unsigned i=0; i<ELEMENT_DIM+1; i++) // essentially a loop over the basis functions
         {
             for(unsigned j=0; j<ELEMENT_DIM+1; j++) // essentially a loop over the basis functions
@@ -143,7 +145,7 @@ private:
                 // -dt * stiffness matrix
                 for(unsigned dim=0; dim<SPACE_DIM; dim++)
                 {
-                    ret(i,j) -= PdeSimulationTime::GetPdeTimeStep() * rGradPhi(dim,i)*rGradPhi(dim,j);
+                    ret(i,j) -= dt * rGradPhi(dim,i)*rGradPhi(dim,j);
                 }
             }
         }

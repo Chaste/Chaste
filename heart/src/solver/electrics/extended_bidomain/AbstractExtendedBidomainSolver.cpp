@@ -82,9 +82,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(V
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec existingSolution)
 {
-    double time = PdeSimulationTime::GetTime();
-    double delta_t = PdeSimulationTime::GetPdeTimeStep();
-    mpExtendedBidomainTissue->SolveCellSystems(existingSolution, time, time + delta_t);
+    mpExtendedBidomainTissue->SolveCellSystems(existingSolution, PdeSimulationTime::GetTime(), PdeSimulationTime::GetNextTime());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

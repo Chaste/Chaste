@@ -120,7 +120,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::FollowingSolveLin
     // solve cell models for second half timestep
     double time = PdeSimulationTime::GetTime();
     double dt = PdeSimulationTime::GetPdeTimeStep();
-    mpMonodomainTissue->SolveCellSystems(currentSolution, time + dt/2, time+dt, true);
+    mpMonodomainTissue->SolveCellSystems(currentSolution, time + dt/2, PdeSimulationTime::GetNextTime(), true);
 }
 
 

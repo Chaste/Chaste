@@ -115,10 +115,9 @@ public :
     ///////////////////////
     double GetIIonic(const std::vector<double>* pStateVariables=NULL)
     {
-        // NOTE: the +0.01 (pde_timestep) is so the source function is evaluated at the
-        // next timestep to be consistent with how GetStimulus(time) is called.
+        // We use the next timestep to be consistent with how GetStimulus(time) is called.
 
-        double t = PdeSimulationTime::GetTime()  +  0.01;
+        double t = PdeSimulationTime::GetNextTime();
         if(DIM==1)
         {
             return (-0.5*M_PI*M_PI + 1.5)*exp(-t)*cos(M_PI*mX[0]);

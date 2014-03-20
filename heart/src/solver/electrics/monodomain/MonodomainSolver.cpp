@@ -176,9 +176,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
 {
     // solve cell models
-    double time = PdeSimulationTime::GetTime();
-    double dt = PdeSimulationTime::GetPdeTimeStep();
-    mpMonodomainTissue->SolveCellSystems(currentSolution, time, time+dt);
+    mpMonodomainTissue->SolveCellSystems(currentSolution, PdeSimulationTime::GetTime(), PdeSimulationTime::GetNextTime());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

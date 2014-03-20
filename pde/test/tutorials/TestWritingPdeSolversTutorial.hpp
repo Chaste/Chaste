@@ -367,15 +367,16 @@ private:
         double v = rU(1);
         double w = rU(2);
 
-        // this is how to get the current time and timestep
+        // this is how to get the current time, timestep and inverse of the timestep
         double t = PdeSimulationTime::GetTime();
         double dt = PdeSimulationTime::GetPdeTimeStep();
+        double inverse_dt = PdeSimulationTime::GetPdeTimeStepInverse();
 
         for (unsigned i=0; i<3; i++)
         {
-            ret(3*i)   =  (u/dt) * rPhi(i);
-            ret(3*i+1) =  (v/dt) * rPhi(i);
-            ret(3*i+2) =  (w/dt + g(t+dt,rX)) * rPhi(i);
+            ret(3*i)   =  u* inverse_dt * rPhi(i);
+            ret(3*i+1) =  v* inverse_dt * rPhi(i);
+            ret(3*i+2) =  (w * inverse_dt + g(t+dt,rX)) * rPhi(i);
         }
         return ret;
     }

@@ -428,6 +428,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     if (mOdeSystemsPresent)
     {
         double time = PdeSimulationTime::GetTime();
+        double next_time = PdeSimulationTime::GetNextTime();
         double dt = PdeSimulationTime::GetPdeTimeStep();
 
         ReplicatableVector soln_repl(currentPdeSolution);
@@ -447,7 +448,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
             mOdeSystemsAtNodes[node_index]->SetPdeSolution(current_soln_this_node);
 
             // Solve ODE system at this node
-            mpOdeSolver->SolveAndUpdateStateVariable(mOdeSystemsAtNodes[node_index], time, time+dt, dt);
+            mpOdeSolver->SolveAndUpdateStateVariable(mOdeSystemsAtNodes[node_index], time, next_time, dt);
         }
     }
 }
