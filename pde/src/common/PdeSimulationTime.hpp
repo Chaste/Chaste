@@ -61,12 +61,17 @@ public:
     /**
      * Set the current PDE timestep.
      *
+     * The method checks that next_time ~= mTime + timestep
      * @param timestep  the current timestep
+     * @param next_time  the next time (as given by the PDE time stepper).
      */
-    static void SetPdeTimeStep(double timestep);
+    static void SetPdeTimeStepAndNextTime(double timestep, double next_time);
 
     /** @return the current PDE timestep. */
     static double GetPdeTimeStep();
+
+    /** @return the next time (time after time-step has been made).*/
+    static double GetNextTime();
 
     /** @return 1/dt. */
     static double GetPdeTimeStepInverse();
@@ -78,6 +83,13 @@ private:
 
     /** The timestep used in the PDE solve. */
     static double mPdeTimeStep;
+
+    /** The next time (from the original PDE time-stepper).
+     * mNextTime ~= mTime + mPdeTimeStep.
+     * Note that this is stored explicitly because if we do the addition
+     * then the answer will be off by mTime*DBL_EPSILON.
+     */
+    static double mNextTime;
 
     /** 1/dt. */
     static double mPdeTimeStepInverse;

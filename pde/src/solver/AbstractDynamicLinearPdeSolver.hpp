@@ -408,7 +408,7 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
         // Save the timestep as the last one use, and also put it in PdeSimulationTime
         // so everyone can see it
         mLastWorkingTimeStep = new_dt;
-        PdeSimulationTime::SetPdeTimeStep(new_dt);
+        PdeSimulationTime::SetPdeTimeStepAndNextTime(new_dt, stepper.GetNextTime());
 
         // Solve
         try

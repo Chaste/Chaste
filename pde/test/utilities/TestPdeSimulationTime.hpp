@@ -48,9 +48,11 @@ public:
         PdeSimulationTime::SetTime(1.0453346);
         TS_ASSERT_EQUALS(PdeSimulationTime::GetTime(), 1.0453346);
 
-        PdeSimulationTime::SetPdeTimeStep(0.025);
+        PdeSimulationTime::SetPdeTimeStepAndNextTime(0.025, 1.0453346+0.025);
         TS_ASSERT_EQUALS(PdeSimulationTime::GetPdeTimeStep(), 0.025);
         TS_ASSERT_EQUALS(PdeSimulationTime::GetPdeTimeStepInverse(), 1.0/0.025);
+
+        TS_ASSERT_EQUALS(PdeSimulationTime::GetNextTime(), 1.0453346+0.025);
     }
 };
 

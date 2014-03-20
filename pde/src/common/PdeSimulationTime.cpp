@@ -33,11 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <cassert>
+#include <cmath>
 #include "PdeSimulationTime.hpp"
+#include "MathsCustomFunctions.hpp"
 
 double PdeSimulationTime::mTime;
 double PdeSimulationTime::mPdeTimeStep;
 double PdeSimulationTime::mPdeTimeStepInverse;
+double PdeSimulationTime::mNextTime;
 
 void PdeSimulationTime::SetTime(double time)
 {
@@ -49,10 +53,12 @@ double PdeSimulationTime::GetTime()
     return mTime;
 }
 
-void PdeSimulationTime::SetPdeTimeStep(double timestep)
+void PdeSimulationTime::SetPdeTimeStepAndNextTime(double timestep, double next_time)
 {
+    assert( fabs(next_time - timestep - mTime) < DBL_EPSILON*next_time);
     mPdeTimeStep = timestep;
     mPdeTimeStepInverse = 1.0/timestep;
+    mNextTime = next_time;
 }
 
 double PdeSimulationTime::GetPdeTimeStep()
@@ -63,4 +69,9 @@ double PdeSimulationTime::GetPdeTimeStep()
 double PdeSimulationTime::GetPdeTimeStepInverse()
 {
     return mPdeTimeStepInverse;
+}
+
+double PdeSimulationTime::GetNextTime()
+{
+    return mNextTime;
 }
