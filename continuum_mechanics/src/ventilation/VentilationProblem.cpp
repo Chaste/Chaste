@@ -166,7 +166,7 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
 
     mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
-    PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
+    //PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
 }
 
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
@@ -186,7 +186,7 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
 
     mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, flux*mFluxScaling);
-    PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
+    //PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
 }
 
 
