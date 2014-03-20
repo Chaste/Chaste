@@ -72,14 +72,14 @@ protected:
 public:
 
     /**
-     * @return Create a stimulus object for the given node.
+     * @return a stimulus object for the given node.
      * Default implementation here returns a zero stimulus.
      *
      *  May be overridden by child classes.
      *
-     * @param nodeIndex  Global node index.
+     * @param pNode  pointer to the node object
      */
-    virtual boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(unsigned nodeIndex);
+    virtual boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<SPACE_DIM>* pNode);
 
     /**
      * @return  The number of cells

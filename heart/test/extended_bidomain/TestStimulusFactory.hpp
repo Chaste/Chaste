@@ -69,11 +69,11 @@ public:
     {
     }
 
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(unsigned nodeIndex)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<3>* pNode)
     {
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
-        double z = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[2];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
+        double z = pNode->rGetLocation()[2];
 
         boost::shared_ptr<SimpleStimulus> p_stimulus;
         if ((x < 0.0005) && (y < 0.0005) && (z < 0.0005))
@@ -103,18 +103,19 @@ public:
         AbstractStimulusFactory<3> my_factory;
         my_factory.SetMesh(&mesh);
 
-        //ZeroStimulus *stimulus;
-        for (unsigned i = 0; i < my_factory.GetNumberOfCells(); i++)
+        for (AbstractMesh<3,3>::NodeIterator iter=mesh.GetNodeIteratorBegin();
+             iter != mesh.GetNodeIteratorEnd();
+             ++iter)
         {
-            boost::shared_ptr<AbstractStimulusFunction> stimulus (my_factory.CreateStimulusForNode(i));
+            boost::shared_ptr<AbstractStimulusFunction> stimulus = my_factory.CreateStimulusForNode(&(*iter));
 
             TS_ASSERT_EQUALS(stimulus->GetStimulus(0), 0);
             TS_ASSERT_EQUALS(stimulus->GetStimulus(1), 0);
             TS_ASSERT_EQUALS(stimulus->GetStimulus(2), 0);
             TS_ASSERT_EQUALS(stimulus->GetStimulus(258), 0);
         }
-
     }
+
     void TestOneFactory() throw (Exception)
     {
         HeartConfig::Instance()->Reset();
@@ -132,19 +133,18 @@ public:
         TS_ASSERT_EQUALS(my_factory.GetNumberOfCells(), 27u);
 
         //probe node 0 (in the stimulated corner)
-        boost::shared_ptr<AbstractStimulusFunction> stimulus (my_factory.CreateStimulusForNode(0));
+        boost::shared_ptr<AbstractStimulusFunction> stimulus = my_factory.CreateStimulusForNode(mesh.GetNode(0));
 
         TS_ASSERT_EQUALS(stimulus->GetStimulus(0), 0);//before it starts
         TS_ASSERT_EQUALS(stimulus->GetStimulus(1.01), -428000);//during the stimulus
         TS_ASSERT_EQUALS(stimulus->GetStimulus(2), 0);//after it finished
 
-        //probe node 16 (not in the stimulated corner)
-        boost::shared_ptr<AbstractStimulusFunction> stimulus_zero (my_factory.CreateStimulusForNode(15));
+        //probe node 15 (not in the stimulated corner)
+        boost::shared_ptr<AbstractStimulusFunction> stimulus_zero = my_factory.CreateStimulusForNode(mesh.GetNode(15));
 
         TS_ASSERT_EQUALS(stimulus_zero->GetStimulus(0), 0);
         TS_ASSERT_EQUALS(stimulus_zero->GetStimulus(1.01), 0);
         TS_ASSERT_EQUALS(stimulus_zero->GetStimulus(2), 0);
-
     }
 
     void TestComputeContributiontoRHS() throw (Exception)

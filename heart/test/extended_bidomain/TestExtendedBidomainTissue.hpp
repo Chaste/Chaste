@@ -116,11 +116,11 @@ public:
     {
     }
 
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(unsigned nodeIndex)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<3>* pNode)
     {
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
-        double y = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[1];
-        double z = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[2];
+        double x = pNode->rGetLocation()[0];
+        double y = pNode->rGetLocation()[1];
+        double z = pNode->rGetLocation()[2];
 
         boost::shared_ptr<SimpleStimulus> p_stimulus;
         if ((x < 0.005) && (y < 0.005) && (z < 0.005))
@@ -141,7 +141,7 @@ class StimulusFactory2D: public AbstractStimulusFactory<2>
 public:
     StimulusFactory2D() : AbstractStimulusFactory<2>()
     {}
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(unsigned nodeIndex)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<2>* pNode)
     {
         boost::shared_ptr<SimpleStimulus> p_stimulus ( new SimpleStimulus(-428000, 1.0, 0.1) );
         return p_stimulus;

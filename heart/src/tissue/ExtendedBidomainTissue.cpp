@@ -67,19 +67,21 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
 
     try
     {
-        for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
+        for (typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator node_iter=this->mpMesh->GetNodeIteratorBegin();
+             node_iter != this->mpMesh->GetNodeIteratorEnd();
+             ++node_iter)
         {
-            unsigned global_index = ownership_range_low + local_index;
-            Node<SPACE_DIM>* node = AbstractCardiacTissue<SPACE_DIM>::mpMesh->GetNode(global_index);
-            mCellsDistributedSecondCell[local_index] = pCellFactorySecondCell->CreateCardiacCellForNode(node);
+            Node<SPACE_DIM>* p_node = &(*node_iter);
+            unsigned local_index = p_node->GetIndex() - ownership_range_low;
+            mCellsDistributedSecondCell[local_index] = pCellFactorySecondCell->CreateCardiacCellForNode(p_node);
             mCellsDistributedSecondCell[local_index]->SetUsedInTissueSimulation();
             mGgapDistributed[local_index] = 0.0;//default. It will be changed by specific method later when user input will be obtained
-            mExtracellularStimuliDistributed[local_index] = pExtracellularStimulusFactory->CreateStimulusForNode(global_index);
+            mExtracellularStimuliDistributed[local_index] = pExtracellularStimulusFactory->CreateStimulusForNode(p_node);
         }
 
         pCellFactorySecondCell->FinaliseCellCreation(&mCellsDistributedSecondCell,
-                                           this->mpDistributedVectorFactory->GetLow(),
-                                           this->mpDistributedVectorFactory->GetHigh());
+                                                     this->mpDistributedVectorFactory->GetLow(),
+                                                     this->mpDistributedVectorFactory->GetHigh());
     }
     catch (const Exception& e)
     {
@@ -107,7 +109,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
     mExtracellularStimulusCacheReplicated.Resize(pExtracellularStimulusFactory->GetNumberOfCells());
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 
-    //Creat the extracellular conductivity tensor
+    //Create the extracellular conductivity tensor
     CreateExtracellularConductivityTensors();
 }
 
@@ -157,20 +159,22 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
     assert(mGgapHeterogeneityRegions.size() == mGgapValues.size());
     assert(this->mpMesh != NULL);
 
-    unsigned num_local_nodes = this->mpDistributedVectorFactory->GetLocalOwnership();
     unsigned ownership_range_low = this->mpDistributedVectorFactory->GetLow();
-    assert(mGgapDistributed.size() == num_local_nodes);//the constructor should have allocated memory.
+    assert(mGgapDistributed.size() == this->mpDistributedVectorFactory->GetLocalOwnership());//the constructor should have allocated memory.
     try
     {
-        for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
+        for (typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator node_iter=this->mpMesh->GetNodeIteratorBegin();
+             node_iter != this->mpMesh->GetNodeIteratorEnd();
+             ++node_iter)
         {
+            Node<SPACE_DIM>* p_node = &(*node_iter);
+            unsigned local_index = p_node->GetIndex() - ownership_range_low;
             mGgapDistributed[local_index] = mGGap;//assign default uniform value everywhere first
 
             //then change where and if necessary
-            unsigned global_index = ownership_range_low + local_index;
             for (unsigned het_index = 0; het_index < mGgapHeterogeneityRegions.size(); het_index++)
             {
-                if ( mGgapHeterogeneityRegions[het_index]->DoesContain ( this->mpMesh->GetNode(global_index)->GetPoint() ) )
+                if ( mGgapHeterogeneityRegions[het_index]->DoesContain ( p_node->GetPoint() ) )
                 {
                     mGgapDistributed[local_index] = mGgapValues[het_index];
                 }

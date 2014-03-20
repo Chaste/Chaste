@@ -99,10 +99,12 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     /////////////////////////////////////////////////////
     try
     {
-        for (unsigned local_index = 0; local_index < num_local_nodes; local_index++)
+        for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter=mpMesh->GetNodeIteratorBegin();
+             node_iter != mpMesh->GetNodeIteratorEnd();
+             ++node_iter)
         {
-            unsigned global_index = ownership_range_low + local_index;
-            Node<SPACE_DIM>* p_node = mpMesh->GetNode(global_index);
+            Node<SPACE_DIM>* p_node = &(*node_iter);
+            unsigned local_index = p_node->GetIndex() - ownership_range_low;
             mCellsDistributed[local_index] = pCellFactory->CreateCardiacCellForNode(p_node);
             mCellsDistributed[local_index]->SetUsedInTissueSimulation();
 
@@ -361,7 +363,7 @@ template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetIntracellularConductivityTensor(unsigned elementIndex)
 {
     assert( mpIntracellularConductivityTensors);
-    if(mpConductivityModifier==NULL)
+    if (mpConductivityModifier==NULL)
     {
         return (*mpIntracellularConductivityTensors)[elementIndex];
     }

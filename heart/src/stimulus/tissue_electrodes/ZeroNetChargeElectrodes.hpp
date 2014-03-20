@@ -82,9 +82,9 @@ public:
     /**
      * @return Creates an appropriate stimulus for each node as to abide compatibility conditions.
      *
-     * @param nodeIndex the node index for which to create the stimulus
+     * @param pNode the node for which to create the stimulus
      */
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(unsigned nodeIndex);
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<DIM>* pNode);
 
     /**
      * Destructor

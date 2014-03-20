@@ -158,17 +158,17 @@ void ElectrodesStimulusFactory<DIM>::SetCompatibleExtracellularStimulus()
 }
 
 template<unsigned DIM>
-boost::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::CreateStimulusForNode(unsigned nodeIndex)
+boost::shared_ptr<AbstractStimulusFunction> ElectrodesStimulusFactory<DIM>::CreateStimulusForNode(Node<DIM>* pNode)
 {
     boost::shared_ptr<RegularStimulus> p_stimulus;
     for (unsigned pair_index = 0; pair_index < mrElectrodePairs.size(); pair_index++)
     {
-        if (mrElectrodePairs[pair_index].first->DoesContain(this->mpMesh->GetNode(nodeIndex)->GetPoint()) )
+        if (mrElectrodePairs[pair_index].first->DoesContain(pNode->GetPoint()) )
         {
             p_stimulus.reset( new RegularStimulus(mMagnitudesElectrode1[pair_index], mrDurations[pair_index], mrPeriods[pair_index], mrStarts[pair_index], mrEnds[pair_index]));
 
         }
-        else if (mrElectrodePairs[pair_index].second->DoesContain(this->mpMesh->GetNode(nodeIndex)->GetPoint()) )
+        else if (mrElectrodePairs[pair_index].second->DoesContain(pNode->GetPoint()) )
         {
             p_stimulus.reset ( new RegularStimulus(mMagnitudesElectrode2[pair_index], mrDurations[pair_index], mrPeriods[pair_index], mrStarts[pair_index], mrEnds[pair_index]));
 

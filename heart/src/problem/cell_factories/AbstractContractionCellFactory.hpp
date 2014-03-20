@@ -90,7 +90,7 @@ public:
     }
 
     //
-    // \todo 2370 The methods below are likely to be required for the final version of this class.
+    // \todo #2370 The methods below are likely to be required for the final version of this class.
     // Thus the definitions have been left in place commented out
     // You'll also need to re-doxygen the comments!
     //

@@ -112,9 +112,9 @@ public:
     {
     }
 
-    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(unsigned nodeIndex)
+    boost::shared_ptr<AbstractStimulusFunction> CreateStimulusForNode(Node<2>* pNode)
     {
-        double x = this->GetMesh()->GetNode(nodeIndex)->rGetLocation()[0];
+        double x = pNode->rGetLocation()[0];
 
         boost::shared_ptr<SimpleStimulus> p_stimulus;
         if ((x <= 0.01))
