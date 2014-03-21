@@ -404,14 +404,27 @@ public:
 //        }
 //    }
 
-    void TestTopOfAirwaysPatientDataVeryNearFailure() throw (Exception)
+    void TestTopOfAirwaysPatientData() throw (Exception)
     {
         VentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
-
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowPressures(50.0);
-//        problem.SetConstantInflowFluxes(100.0);
+//        problem.SetConstantInflowPressures(50.0);
+        problem.SetConstantInflowFluxes(100.0);
+        TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
+        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
+        problem.Solve();
+        problem.Solve();
+    }
+
+    void failingTestPatientData() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
+        PetscOptionsSetValue("-ksp_monitor", "");
+        problem.SetOutflowPressure(0.0);
+//        problem.SetConstantInflowPressures(50.0);
+        problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);

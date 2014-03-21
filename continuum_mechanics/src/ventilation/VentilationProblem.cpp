@@ -61,8 +61,12 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // preallocating 5 non-zeros allows for 4-way branching
     mSolution = PetscTools::CreateVec(mMesh.GetNumNodes()+mMesh.GetNumElements());
     mpLinearSystem = new LinearSystem(mSolution, 5u);
-    mpLinearSystem->SetAbsoluteTolerance(1e-10);
-    mpLinearSystem->SetKspType("gmres");
+    mpLinearSystem->SetAbsoluteTolerance(1e-11);
+    mpLinearSystem->SetPcType("sor");
+    PetscOptionsSetValue("-ksp_diagonal_scale","");
+    PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
+
+    //mpLinearSystem->SetKspType("gmres");
 
     /*
      * Set up the Acinar units at the terminals
@@ -166,7 +170,7 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
 
     mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
-    //PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
+    PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
 }
 
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
