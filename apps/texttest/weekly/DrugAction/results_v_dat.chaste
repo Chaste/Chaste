@@ -93426,7 +93426,7 @@
 -0.0199842
 -0.0127137
 -0.00633573
--0.000931362
+-0.000931363
 0.00341388
 0.00661169
 0.00857642
@@ -200899,4 +200899,4 @@
 -83.1809
 -83.1807
 -83.1806
-# Created by Chaste version 2.2.12762 on Wed, 25 May 2011 10:25:38 +0000.  Chaste was built on Wed, 25 May 2011 09:31:41 +0000 by machine (uname) 'Linux userpc44.comlab.ox.ac.uk 2.6.24-29-generic #1 SMP Wed Mar 16 18:58:12 UTC 2011 x86_64' using settings: GccOptNative, shared libraries.
+# Created by Chaste version 3.1.20098 (with uncommitted modifications) on Fri, 21 Mar 2014 09:58:46 +0000.  Chaste was built on Fri, 06 Sep 2013 16:14:50 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOpt_8, no Chaste libraries.  Checked-out project versions: Eikonal=66M; papers=18344M.
