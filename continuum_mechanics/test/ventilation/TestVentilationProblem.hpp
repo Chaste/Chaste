@@ -290,6 +290,7 @@ public:
          * Dynamic (Pedley) resistance is used at higher Reynolds numbers.
          * There is no coupled acinus compliance model in this version.
          */
+        EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15000); //Needed to increase the resistance in these artificial airways
