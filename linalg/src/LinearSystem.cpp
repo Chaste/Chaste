@@ -793,7 +793,11 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         }
 
         KSPSetFromOptions(mKspSolver);
-
+        if (lhsGuess)
+        {
+            // Assume that the user of this method will always be kind enough to give us a reasonable guess.
+            KSPSetInitialGuessNonzero(mKspSolver,PETSC_TRUE);
+        }
         /*
          * Non-adaptive Chebyshev: the required spectrum approximation is computed just once
          * at the beginning of the simulation. This is done with two extra CG solves.
@@ -934,8 +938,9 @@ Vec LinearSystem::Solve(Vec lhsGuess)
     if (lhsGuess)
     {
         VecCopy(lhsGuess, lhs_vector);
-        // Assume that the user of this method will always be kind enough to give us a reasonable guess.
-        KSPSetInitialGuessNonzero(mKspSolver, PETSC_TRUE);
+        // If this wasn't done at construction time then it may be too late for this:
+        // KSPSetInitialGuessNonzero(mKspSolver, PETSC_TRUE);
+        // Is it possible to warn the user?
     }
 
     // Check if the right hand side is small (but non-zero), PETSc can diverge immediately

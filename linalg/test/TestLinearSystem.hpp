@@ -620,10 +620,11 @@ public:
         ls.SetRhsVectorElement(1, 32.0);
         ls.SetRhsVectorElement(2, 50.0);
         ls.AssembleFinalLinearSystem();
+//      /* This will mess up the following because the *first call* to Solve has to contain an initial guess. */
+//        Vec sol1 = ls.Solve();
+//        PetscTools::Destroy(sol1);
+//        unsigned num_iters_from_default = ls.GetNumIterations();
 
-	Vec sol1 = ls.Solve();
-	PetscTools::Destroy(sol1);
-        unsigned num_iters_from_default = ls.GetNumIterations();
         Vec zero_guess=PetscTools::CreateVec(3);
         PetscVecTools::SetElement(zero_guess, 0, 0.0);
         PetscVecTools::SetElement(zero_guess, 1, 0.0);
@@ -632,9 +633,8 @@ public:
         Vec sol2 = ls.Solve(zero_guess);
         PetscTools::Destroy(zero_guess);
         PetscTools::Destroy(sol2);
-      
+
         unsigned num_iters_from_zero = ls.GetNumIterations();
-        TS_ASSERT_EQUALS(num_iters_from_default, num_iters_from_zero);
 
         // Set the correct answer for the intial guess
         Vec good_guess=PetscTools::CreateVec(3);
