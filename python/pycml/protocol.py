@@ -385,8 +385,8 @@ class Protocol(processors.ModelModifier):
                 lhs, rhs = list(deps[0].operands())
                 if lhs.localName == u'ci':
                     if not (isinstance(rhs, mathml_cn) or
-                            (hasattr(rhs, 'apply') and hasattr(rhs.apply, 'minus') and len(rhs.apply.xml_children) == 2
-                             and isinstance(rhs.apply.xml_children[1], mathml_cn))):
+                            (isinstance(rhs, mathml_apply) and hasattr(rhs, u'minus') and len(rhs.xml_children) == 2
+                             and isinstance(rhs.xml_children[1], mathml_cn))):
                         raise ProtocolError("The computed variable " + str(var) + " may not be specified as an input.")
                     # It's the special Computed case - convert to a constant
                     var.initial_value = unicode(rhs.evaluate())
