@@ -771,7 +771,7 @@ def CreatePyCmlBuilder(build, buildenv):
     def RunPyCml(target, source, env):
         args = GetArgs(target, source, env)
         command = [script] + args + [str(source[0])]
-        print "Running", ' '.join(command)
+        print "Running", command
         rc = subprocess.call(command)
         return rc
     PyCmlAction = buildenv.Action(RunPyCml)
