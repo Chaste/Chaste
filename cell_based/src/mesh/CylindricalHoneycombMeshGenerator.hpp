@@ -56,7 +56,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param numNodesAlongWidth  The number of cells you want alopng the bottom of the domain
+     * @param numNodesAlongWidth  The number of cells you want along the bottom of the domain
      * @param numNodesAlongLength  The number of cells you want sides of the domain
      * @param ghosts  The thickness of ghost nodes to put around the edge (defaults to 3)
      * @param scaleFactor  The scale factor for the width (circumference) of the cells (defaults to 1.0)
