@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "ReplicatableVector.hpp"
 #include "Warnings.hpp"
+//#include "Debug.hpp"
 
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
@@ -45,7 +46,6 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
       mDensity(1.51e-6),
-      mFluxScaling(mViscosity),
       mSolution(NULL)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
@@ -61,12 +61,12 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // preallocating 5 non-zeros allows for 4-way branching
     mSolution = PetscTools::CreateVec(mMesh.GetNumNodes()+mMesh.GetNumElements());
     mpLinearSystem = new LinearSystem(mSolution, 5u);
-    mpLinearSystem->SetAbsoluteTolerance(1e-10);
-    //mpLinearSystem->SetPcType("sor");
+    mpLinearSystem->SetAbsoluteTolerance(1e-5);
+    mpLinearSystem->SetPcType("jacobi");
     PetscOptionsSetValue("-ksp_diagonal_scale","");
     PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
 
-    mpLinearSystem->SetKspType("gmres");
+    mpLinearSystem->SetKspType("fgmres");
 
     /*
      * Set up the Acinar units at the terminals
@@ -79,37 +79,41 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     unsigned num_acinar = mMesh.GetNumBoundaryNodes() - 1;
     double acinus_volume = 1.2e9/num_acinar; //Assumes a residual capacity of 1.2l (x10^9 in mm^3)
 
+    mFluxScaling = DBL_MAX;  // Adjusted to the least resistant of the terminal branches
     for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
           iter != mMesh.GetBoundaryNodeIteratorEnd();
           ++iter)
-     {
-         if ((*iter)->GetIndex() != mOutletNodeIndex)
-         {
-             ///\todo We need to do some parallel here in order to load balance
-             Swan2012AcinarUnit* p_acinus = new Swan2012AcinarUnit;
+    {
+        //Calculates the resistance of the terminal bronchiole.
+        //This should be updated dynamically during the simulation
+        c_vector<double, 3> dummy;
+        double length;
+        unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
+        mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
 
-             p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
-             p_acinus->SetUndeformedVolume(acinus_volume);
-             p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
-             p_acinus->SetAirwayPressure(-0.49);
+        double radius = (*iter)->rGetNodeAttributes()[0];
 
-             //Calculates the resistance of the terminal bronchiole feeding the acinus.
-             //This should be updated dynamically during the simulation
-             c_vector<double, 3> dummy;
-             double length;
-             unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
-             mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
+        double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
+        if ((*iter)->GetIndex() == mOutletNodeIndex)
+        {
+            // Use the top of the tree to get an indication of resistances
+            mFluxScaling = resistance;
+        }
+        else
+        {
+            ///\todo We need to do some parallel here in order to load balance
+            Swan2012AcinarUnit* p_acinus = new Swan2012AcinarUnit;
 
-             double radius = (*iter)->rGetNodeAttributes()[0];
+            p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
+            p_acinus->SetUndeformedVolume(acinus_volume);
+            p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
+            p_acinus->SetAirwayPressure(-0.49);
+            p_acinus->SetTerminalBronchioleResistance(resistance);
 
-             double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-             p_acinus->SetTerminalBronchioleResistance(resistance);
-
-             mAcinarUnits.push_back(p_acinus);
-             ///\todo make a map for node->acinar (rather than a vector)?
-         }
-     }
-
+            mAcinarUnits.push_back(p_acinus);
+            ///\todo make a map for node->acinar (rather than a vector)?
+        }
+    }
 }
 
 VentilationProblem::~VentilationProblem()
@@ -190,7 +194,7 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
 
     mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, flux*mFluxScaling);
-    //PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
+    PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
 }
 
 
@@ -235,7 +239,6 @@ void VentilationProblem::Assemble(bool dynamicReassemble)
             mMesh.GetWeightedDirectionForElement(element_index, dummy, length);
 
             double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-
             if ( dynamicReassemble )
             {
                 /* Pedley et al. 1970
@@ -361,18 +364,33 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
 {
     ReplicatableVector solution_vector_repl( mSolution );
     unsigned num_elem = mMesh.GetNumElements();
+//    double max_flux = 0.0;
+//    double max_scaled_flux = 0.0;
+//    double max_pressure = 0.0;
 
     rFluxesOnEdges.resize(num_elem);
     for (unsigned i=0; i<num_elem; i++)
     {
         rFluxesOnEdges[i] = solution_vector_repl[i]/mFluxScaling;
+//        if (fabs(solution_vector_repl[i]) > max_scaled_flux)
+//        {
+//            max_scaled_flux = fabs(solution_vector_repl[i]);
+//            max_flux = rFluxesOnEdges[i];
+//        }
+
     }
 
     rPressuresOnNodes.resize(mMesh.GetNumNodes());
     for (unsigned i=0; i<mMesh.GetNumNodes(); i++)
     {
         rPressuresOnNodes[i] = solution_vector_repl[i+num_elem];
+//        if (fabs(rPressuresOnNodes[i])>max_pressure)
+//        {
+//            max_pressure = fabs(rPressuresOnNodes[i]);
+//        }
+
     }
+//    PRINT_5_VARIABLES(max_flux, max_scaled_flux, max_pressure, max_scaled_flux/max_pressure, max_flux/max_pressure);
 }
 
 

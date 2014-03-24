@@ -409,13 +409,16 @@ public:
         VentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
-//        problem.SetConstantInflowPressures(50.0);
-        problem.SetConstantInflowFluxes(100.0);
+        problem.SetConstantInflowPressures(50.0);
+        //problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
         problem.Solve();
+        // For debugging...
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
     }
 
     void failingTestPatientData() throw (Exception)
@@ -430,8 +433,10 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
         problem.Solve();
-    }
 
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25
+    }
     void TestExceptions() throw(Exception)
     {
         TS_ASSERT_THROWS_THIS(VentilationProblem bad_problem("mesh/test/data/y_branch_3d_mesh", 1u),
