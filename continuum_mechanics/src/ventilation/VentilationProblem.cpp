@@ -61,12 +61,12 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // preallocating 5 non-zeros allows for 4-way branching
     mSolution = PetscTools::CreateVec(mMesh.GetNumNodes()+mMesh.GetNumElements());
     mpLinearSystem = new LinearSystem(mSolution, 5u);
-    mpLinearSystem->SetAbsoluteTolerance(1e-11);
-    mpLinearSystem->SetPcType("sor");
+    mpLinearSystem->SetAbsoluteTolerance(1e-10);
+    //mpLinearSystem->SetPcType("sor");
     PetscOptionsSetValue("-ksp_diagonal_scale","");
     PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
 
-    //mpLinearSystem->SetKspType("gmres");
+    mpLinearSystem->SetKspType("gmres");
 
     /*
      * Set up the Acinar units at the terminals
