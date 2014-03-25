@@ -203,7 +203,9 @@ METADATA_NAMES = frozenset(
      # ========================================================================
      # Calcium subsystem parameters - needs tidying up.
      # ========================================================================
-     'SR_release_current', 'SR_uptake_current', 'SR_leak_current', 
+     'SR_release_current', # a.k.a. Jrel or RyR channel current 
+     'SR_uptake_current',# a.k.a. Jup or SERCA current
+     'SR_leak_current', 
      'SR_leak_current_max', 'SR_release_current_max', 'SR_uptake_current_max', 
      'SR_release_kmcacyt', 'SR_release_kmcads', 
      'calcium_dynamics_release_current_maximum', 'calcium_dynamics_leak_current_maximum', 
