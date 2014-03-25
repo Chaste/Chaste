@@ -265,7 +265,7 @@ def get_build_function(build, run_time_flags='', test_time_limit=0):
         orig_python_path = copy.copy(env['ENV']['PYTHONPATH'])
         new_paths = env.Flatten(env.subst(env.get('PYINCPATH', ''), conv=lambda n: n))
         env.PrependENVPath('PYTHONPATH', new_paths)
-        test_env = copy.copy(env['ENV'])
+        test_env = copy.deepcopy(env['ENV'])
         env['ENV']['PYTHONPATH'] = orig_python_path
         # Functional curation also needs CFLAGS & LDFLAGS for Cython compilation
         test_env['CFLAGS'] = os.environ.get('CHASTE_CYTHON_CFLAGS', '')
