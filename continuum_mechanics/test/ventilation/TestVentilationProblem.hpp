@@ -306,6 +306,32 @@ public:
         TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-8); //BC
+
+        TS_ASSERT_DELTA(flux[6], -70.8367, 1e-4);
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
+#endif
+    }
+    void TestThreeBifurcationsWithDynamicResistanceFluxCondition() throw (Exception)
+    {
+        EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
+        VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowFluxes(-70.8367); //Needed to increase the resistance in these artificial airways
+        problem.SetDynamicResistance();
+        problem.Solve();
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6687.89,   1e-2);
+        TS_ASSERT_DELTA(pressure[2], 12229.3, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 12229.3, 1e-2);
+        TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-2);
+        TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-2);
+        TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-2);
+        TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-2);
+
+        TS_ASSERT_DELTA(flux[6], -70.8367, 1e-4); //BC
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
@@ -429,10 +455,10 @@ public:
 //        problem.SetConstantInflowPressures(50.0);
         problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
-        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
-        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 56379u);
+        TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 56378u);
         problem.Solve();
-        problem.Solve();
+//        problem.Solve();
 
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25
