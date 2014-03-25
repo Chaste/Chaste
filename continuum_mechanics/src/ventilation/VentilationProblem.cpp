@@ -46,7 +46,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
       mDensity(1.51e-6),
-      mSolution(NULL)
+      mSolution(NULL),
+      mFluxGivenAtInflow(false)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
@@ -61,7 +62,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     // preallocating 5 non-zeros allows for 4-way branching
     mSolution = PetscTools::CreateVec(mMesh.GetNumNodes()+mMesh.GetNumElements());
     mpLinearSystem = new LinearSystem(mSolution, 5u);
-    mpLinearSystem->SetAbsoluteTolerance(1e-5);
+    mpLinearSystem->SetAbsoluteTolerance(1e-11);
     mpLinearSystem->SetPcType("jacobi");
     PetscOptionsSetValue("-ksp_diagonal_scale","");
     PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
@@ -114,6 +115,9 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
             ///\todo make a map for node->acinar (rather than a vector)?
         }
     }
+
+    mFlux.resize(mMesh.GetNumElements());
+    mPressure.resize(mMesh.GetNumNodes());
 }
 
 VentilationProblem::~VentilationProblem()
@@ -131,7 +135,93 @@ VentilationProblem::~VentilationProblem()
         delete mAcinarUnits[i];
     }
 }
+void VentilationProblem::SolveDirectFromFlux()
+{
+    /* Work back through the node iterator looking for internal nodes: bifurcations or joints
+     *
+     * Each parent flux is equal to the sum of it's children
+     * Note that we can't iterate all the way back to the root node, but that's okay
+     * because the root is not a bifurcation.  Also note that we can't use a NodeIterator
+     * because it does not have operator--
+     */
+    for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
+    {
+        Node<3>* p_node = mMesh.GetNode(node_index);
+        if (p_node->IsBoundaryNode() == false)
+        {
+            Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
+            unsigned parent_index = *element_iterator;
+            ++element_iterator;
 
+            for (mFlux[parent_index]=0.0; element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+            {
+                mFlux[parent_index] += mFlux[*element_iterator];
+            }
+        }
+    }
+    // Poiseuille flow at each edge
+    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+         iter != mMesh.GetElementIteratorEnd();
+         ++iter)
+    {
+        unsigned element_index = iter->GetIndex();
+        /* Poiseuille flow gives:
+         *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
+         */
+        //Resistance is based on radius, length and viscosity
+        double radius = 0.0;
+        if (mRadiusOnEdge)
+        {
+            radius = iter->GetAttribute();
+        }
+        else
+        {
+            radius = ( iter->GetNode(0)->rGetNodeAttributes()[0] + iter->GetNode(1)->rGetNodeAttributes()[0]) / 2.0;
+        }
+
+        c_vector<double, 3> dummy;
+        double length;
+        mMesh.GetWeightedDirectionForElement(element_index, dummy, length);
+
+        double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
+        double flux = mFlux[element_index];
+        if ( mDynamicResistance )
+        {
+            /* Pedley et al. 1970
+             * http://dx.doi.org/10.1016/0034-5687(70)90094-0
+             * also Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
+             * Standard Poiseuille equation is similar to Pedley's modified Eq1. and matches Swan Eq5.
+             * R_p = 128*mu*L/(pi*d^4) = 8*mu*L/(pi*r^4)
+             *
+             * Pedley Eq 2 and Swan Eq4:
+             *  Z = C/(4*sqrt(2)) * sqrt(Re*d/l) = (C/4)*sqrt(Re*r/l)
+             * Pedley suggests that C = 1.85
+             * R_r = Z*R_p
+             *
+             * Reynold's number in a pipe is
+             * Re = rho*v*d/mu (where d is a characteristic length scale - diameter of pipe)
+             * since flux = v*area
+             * Re = Q * d/(mu*area) = 2*rho*Q/(mu*pi*r) ... (see Swan p 224)
+             *
+             *
+             * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
+             */
+            double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
+            double c = 1.85;
+            double z = (c/4.0) * sqrt(reynolds_number * radius / length);
+            // Pedley's method will only increase the resistance
+            if (z > 1.0)
+            {
+                resistance *= z;
+            }
+        }
+        unsigned pressure_index_parent =  iter->GetNodeGlobalIndex(0);
+        unsigned pressure_index_child  =  iter->GetNodeGlobalIndex(1);
+        mPressure[pressure_index_child] = mPressure[pressure_index_parent] - resistance*flux;
+    }
+
+
+}
 void VentilationProblem::SetOutflowPressure(double pressure)
 {
     SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
@@ -170,6 +260,7 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
     {
         EXCEPTION("Boundary conditions cannot be set at internal nodes");
     }
+    assert(mFluxGivenAtInflow == false);
     unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
 
     mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
@@ -183,6 +274,7 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     {
         EXCEPTION("Boundary conditions cannot be set at internal nodes");
     }
+    mFluxGivenAtInflow = true;
 
     // In a <1,3> mesh a boundary node will be associated with exactly one edge.
     // Flux boundary conditions are set in the system matrix using
@@ -195,6 +287,9 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, flux*mFluxScaling);
     PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
+
+    // Seed the information for a direct solver
+    mFlux[edge_index] = flux;
 }
 
 
@@ -313,7 +408,10 @@ void VentilationProblem::Assemble(bool dynamicReassemble)
             }
         }
     }
-
+    if (mFluxGivenAtInflow)
+    {
+        SolveDirectFromFlux();
+    }
 
 }
 
@@ -377,6 +475,12 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
 //            max_scaled_flux = fabs(solution_vector_repl[i]);
 //            max_flux = rFluxesOnEdges[i];
 //        }
+        if (mFluxGivenAtInflow)
+        {
+            // Direct solution (mFlux) should be given to machine precision.  The PETSc solve
+            // is given to some KSP tolerance.
+            assert( fabs( (rFluxesOnEdges[i] - mFlux[i])/(rFluxesOnEdges[i] + mFlux[i]) ) < 1e-7);
+        }
 
     }
 
@@ -388,6 +492,12 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
 //        {
 //            max_pressure = fabs(rPressuresOnNodes[i]);
 //        }
+        if (mFluxGivenAtInflow && i!=0)
+        {
+            // Direct solution (mPressure) should be given to machine precision.  The PETSc solve
+            // is given to some KSP tolerance.
+            assert( fabs( (rPressuresOnNodes[i] - mPressure[i])/(rPressuresOnNodes[i] + mPressure[i]) ) < 1e-7);
+        }
 
     }
 //    PRINT_5_VARIABLES(max_flux, max_scaled_flux, max_pressure, max_scaled_flux/max_pressure, max_flux/max_pressure);

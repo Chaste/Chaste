@@ -85,7 +85,9 @@ private:
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
 
     std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
-
+    std::vector<double> mFlux; /**< Used in direct solver */
+    std::vector<double> mPressure; /**< Used in direct solver */
+    bool mFluxGivenAtInflow; /**< Used in direct solver */
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
      *  * Poiseuille flow in the edges
@@ -97,6 +99,15 @@ private:
      * (assuming that the system has been solved once already).
      */
     void Assemble(bool dynamicReassemble=false);
+
+    /**
+     * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.
+     * This involves
+     *  * solving directly for parent flux up the tree (using flux balance at each node)
+     *  * solving for child pressure (using Pouiseille or Pedley resistance) down the tree
+     */
+    void SolveDirectFromFlux();
+
 
 public:
     /** Default constructor
