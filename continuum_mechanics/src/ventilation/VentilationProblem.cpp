@@ -164,64 +164,68 @@ void VentilationProblem::SolveDirectFromFlux()
          iter != mMesh.GetElementIteratorEnd();
          ++iter)
     {
-        unsigned element_index = iter->GetIndex();
         /* Poiseuille flow gives:
          *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
          */
-        //Resistance is based on radius, length and viscosity
-        double radius = 0.0;
-        if (mRadiusOnEdge)
-        {
-            radius = iter->GetAttribute();
-        }
-        else
-        {
-            radius = ( iter->GetNode(0)->rGetNodeAttributes()[0] + iter->GetNode(1)->rGetNodeAttributes()[0]) / 2.0;
-        }
-
-        c_vector<double, 3> dummy;
-        double length;
-        mMesh.GetWeightedDirectionForElement(element_index, dummy, length);
-
-        double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-        double flux = mFlux[element_index];
-        if ( mDynamicResistance )
-        {
-            /* Pedley et al. 1970
-             * http://dx.doi.org/10.1016/0034-5687(70)90094-0
-             * also Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
-             * Standard Poiseuille equation is similar to Pedley's modified Eq1. and matches Swan Eq5.
-             * R_p = 128*mu*L/(pi*d^4) = 8*mu*L/(pi*r^4)
-             *
-             * Pedley Eq 2 and Swan Eq4:
-             *  Z = C/(4*sqrt(2)) * sqrt(Re*d/l) = (C/4)*sqrt(Re*r/l)
-             * Pedley suggests that C = 1.85
-             * R_r = Z*R_p
-             *
-             * Reynold's number in a pipe is
-             * Re = rho*v*d/mu (where d is a characteristic length scale - diameter of pipe)
-             * since flux = v*area
-             * Re = Q * d/(mu*area) = 2*rho*Q/(mu*pi*r) ... (see Swan p 224)
-             *
-             *
-             * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
-             */
-            double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
-            double c = 1.85;
-            double z = (c/4.0) * sqrt(reynolds_number * radius / length);
-            // Pedley's method will only increase the resistance
-            if (z > 1.0)
-            {
-                resistance *= z;
-            }
-        }
+        double flux = mFlux[iter->GetIndex()];
+        double resistance = CalculateResistance(*iter, mDynamicResistance, flux);
         unsigned pressure_index_parent =  iter->GetNodeGlobalIndex(0);
         unsigned pressure_index_child  =  iter->GetNodeGlobalIndex(1);
         mPressure[pressure_index_child] = mPressure[pressure_index_parent] - resistance*flux;
     }
-
-
 }
+
+double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool usePedley, double flux)
+{
+    //Resistance is based on radius, length and viscosity
+    double radius = 0.0;
+    if (mRadiusOnEdge)
+    {
+        radius = rElement.GetAttribute();
+    }
+    else
+    {
+        radius = ( rElement.GetNode(0)->rGetNodeAttributes()[0] + rElement.GetNode(1)->rGetNodeAttributes()[0]) / 2.0;
+    }
+
+    c_vector<double, 3> dummy;
+    double length;
+    mMesh.GetWeightedDirectionForElement(rElement.GetIndex(), dummy, length);
+
+    double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
+    if ( usePedley )
+    {
+        /* Pedley et al. 1970
+         * http://dx.doi.org/10.1016/0034-5687(70)90094-0
+         * also Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
+         * Standard Poiseuille equation is similar to Pedley's modified Eq1. and matches Swan Eq5.
+         * R_p = 128*mu*L/(pi*d^4) = 8*mu*L/(pi*r^4)
+         *
+         * Pedley Eq 2 and Swan Eq4:
+         *  Z = C/(4*sqrt(2)) * sqrt(Re*d/l) = (C/4)*sqrt(Re*r/l)
+         * Pedley suggests that C = 1.85
+         * R_r = Z*R_p
+         *
+         * Reynold's number in a pipe is
+         * Re = rho*v*d/mu (where d is a characteristic length scale - diameter of pipe)
+         * since flux = v*area
+         * Re = Q * d/(mu*area) = 2*rho*Q/(mu*pi*r) ... (see Swan p 224)
+         *
+         *
+         * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
+         */
+        double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
+        double c = 1.85;
+        double z = (c/4.0) * sqrt(reynolds_number * radius / length);
+        // Pedley's method will only increase the resistance
+        if (z > 1.0)
+        {
+            resistance *= z;
+        }
+    }
+    return resistance;
+}
+
 void VentilationProblem::SetOutflowPressure(double pressure)
 {
     SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
@@ -319,53 +323,10 @@ void VentilationProblem::Assemble(bool dynamicReassemble)
              *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
              */
             //Resistance is based on radius, length and viscosity
-            double radius = 0.0;
-            if (mRadiusOnEdge)
-            {
-                radius = iter->GetAttribute();
-            }
-            else
-            {
-                radius = ( iter->GetNode(0)->rGetNodeAttributes()[0] + iter->GetNode(1)->rGetNodeAttributes()[0]) / 2.0;
-            }
 
-            c_vector<double, 3> dummy;
-            double length;
-            mMesh.GetWeightedDirectionForElement(element_index, dummy, length);
-
-            double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-            if ( dynamicReassemble )
-            {
-                /* Pedley et al. 1970
-                 * http://dx.doi.org/10.1016/0034-5687(70)90094-0
-                 * also Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
-                 * Standard Poiseuille equation is similar to Pedley's modified Eq1. and matches Swan Eq5.
-                 * R_p = 128*mu*L/(pi*d^4) = 8*mu*L/(pi*r^4)
-                 *
-                 * Pedley Eq 2 and Swan Eq4:
-                 *  Z = C/(4*sqrt(2)) * sqrt(Re*d/l) = (C/4)*sqrt(Re*r/l)
-                 * Pedley suggests that C = 1.85
-                 * R_r = Z*R_p
-                 *
-                 * Reynold's number in a pipe is
-                 * Re = rho*v*d/mu (where d is a characteristic length scale - diameter of pipe)
-                 * since flux = v*area
-                 * Re = Q * d/(mu*area) = 2*rho*Q/(mu*pi*r) ... (see Swan p 224)
-                 *
-                 *
-                 * The upshot of this calculation is that the resistance is scaled with sqrt(Q)
-                 */
-                // Note that we can only do this if mSolution is valid AND we own the local part
-                double flux = PetscVecTools::GetElement(mSolution, element_index)/mFluxScaling;
-                double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
-                double c = 1.85;
-                double z = (c/4.0) * sqrt(reynolds_number * radius / length);
-                // Pedley's method will only increase the resistance
-                if (z > 1.0)
-                {
-                    resistance *= z;
-                }
-            }
+            // Note that we can only get a flux if mSolution is valid AND we own the local part
+            double flux = PetscVecTools::GetElement(mSolution, element_index)/mFluxScaling;
+            double resistance = CalculateResistance(*iter, dynamicReassemble, flux);
             // The solution vector has flux on elements first, then pressure at nodes.
             unsigned pressure_index_0 =  mMesh.GetNumElements() +  iter->GetNodeGlobalIndex(0);
             unsigned pressure_index_1 =  mMesh.GetNumElements() +  iter->GetNodeGlobalIndex(1);
