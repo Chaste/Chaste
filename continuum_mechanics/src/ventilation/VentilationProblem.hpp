@@ -119,7 +119,9 @@ private:
      * with SolveDirectFromFlux().  Note that pressure to flux conversion requires accumulation of the
      * resistance down the tree since weighted_sum(resistance)*flux = delta pressure.
      *
-     * \todo Do dynamic resistance
+     * Note in the mDynamicResistance case we ignore dynamic resistance when setting up the weighted sum
+     * of resistances.  However, since we use dynamic resistance in SolveDirectFromFlux() the solution will
+     * converge to the one which uses dynamic resistance, despite the flux corrections being slightly off.
      */
     void SolveIterativelyFromPressure();
 

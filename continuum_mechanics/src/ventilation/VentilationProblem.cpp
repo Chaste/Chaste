@@ -205,7 +205,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
      */
     assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
     unsigned max_iterations=500;
-    double relative_tolerance = 1e-8;
+    double relative_tolerance = 1e-9;
     double max_relative_boundary_flux_change;
     //double max_delta_pressure;
     //double big_flux_change;
@@ -528,12 +528,18 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
 //            max_scaled_flux = fabs(solution_vector_repl[i]);
 //            max_flux = rFluxesOnEdges[i];
 //        }
-        if (mFluxGivenAtInflow)
+        // Direct solution (mFlux) should be given to machine precision.  The PETSc solve
+        // is given to some KSP tolerance.
+        //PRINT_2_VARIABLES(mFlux[i], rFluxesOnEdges[i]);
+        if (mFlux[i]+rFluxesOnEdges[i]!=0.0)
         {
-            // Direct solution (mFlux) should be given to machine precision.  The PETSc solve
-            // is given to some KSP tolerance.
             assert( fabs( (rFluxesOnEdges[i] - mFlux[i])/(rFluxesOnEdges[i] + mFlux[i]) ) < 1e-7);
         }
+        else
+        {
+            assert( fabs( (rFluxesOnEdges[i] - mFlux[i]) ) < 1e-7);
+        }
+
 
     }
 
@@ -545,11 +551,17 @@ void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rF
 //        {
 //            max_pressure = fabs(rPressuresOnNodes[i]);
 //        }
-        if (mFluxGivenAtInflow && i!=0)
+        if (rPressuresOnNodes[i] > 1e-5)
         {
             // Direct solution (mPressure) should be given to machine precision.  The PETSc solve
             // is given to some KSP tolerance.
             assert( fabs( (rPressuresOnNodes[i] - mPressure[i])/(rPressuresOnNodes[i] + mPressure[i]) ) < 1e-7);
+        }
+        else
+        {
+            // Direct solution (mPressure) should be given to machine precision.  The PETSc solve
+            // is given to some KSP tolerance.
+            assert( fabs( (rPressuresOnNodes[i] - mPressure[i]) ) < 1e-7);
         }
 
     }
