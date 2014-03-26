@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VENTILATIONPROBLEM_HPP_
 #define VENTILATIONPROBLEM_HPP_
 
+#include <map>
 #include "TetrahedralMesh.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
@@ -87,7 +88,10 @@ private:
     std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
     std::vector<double> mFlux; /**< Used in direct solver */
     std::vector<double> mPressure; /**< Used in direct solver */
+    std::map<unsigned, double> mPressureCondition; /**< Used in direct solver */
     bool mFluxGivenAtInflow; /**< Used in direct solver */
+    std::vector<double> mAccumulatedResistance; /**< Used in direct solver */
+
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
      *  * Poiseuille flow in the edges
@@ -107,6 +111,17 @@ private:
      *  * solving for child pressure (using Poiseuille or Pedley resistance) down the tree
      */
     void SolveDirectFromFlux();
+
+
+    /**
+     * Use pressure boundary conditions at leaves (and pressure condition at root) to perform
+     * convert to flux boundary conditions (assuming Poiseuille flow) and then perform a direct solve
+     * with SolveDirectFromFlux().  Note that pressure to flux conversion requires accumulation of the
+     * resistance down the tree since weighted_sum(resistance)*flux = delta pressure.
+     *
+     * \todo Do dynamic resistance
+     */
+    void SolveIterativelyFromPressure();
 
     /**
      * Get the resistance of an edge.  This defaults to Poiseuille resistance (in which only the geometry is used.

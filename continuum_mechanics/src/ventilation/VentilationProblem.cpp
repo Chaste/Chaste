@@ -118,6 +118,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
 
     mFlux.resize(mMesh.GetNumElements());
     mPressure.resize(mMesh.GetNumNodes());
+    mAccumulatedResistance.resize(mMesh.GetNumElements());
 }
 
 VentilationProblem::~VentilationProblem()
@@ -172,6 +173,88 @@ void VentilationProblem::SolveDirectFromFlux()
         unsigned pressure_index_parent =  iter->GetNodeGlobalIndex(0);
         unsigned pressure_index_child  =  iter->GetNodeGlobalIndex(1);
         mPressure[pressure_index_child] = mPressure[pressure_index_parent] - resistance*flux;
+    }
+}
+void VentilationProblem::SolveIterativelyFromPressure()
+{
+    // The first step is to accumulate the resistances all the way down the tree
+    // This could use a tree walker - it's dangerous to assume that the edges are in topological
+    // sort order.
+    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+         iter != mMesh.GetElementIteratorEnd();
+         ++iter)
+    {
+        //Poiseuille resistance for this edge
+        double resistance = CalculateResistance(*iter);
+        unsigned edge_index = iter->GetIndex();
+        if (edge_index == 0)
+        {
+            mAccumulatedResistance[edge_index] = resistance;
+        }
+        else
+        {
+            unsigned parent_index = *(iter->GetNode(0)->ContainingElementsBegin());
+            assert(parent_index<edge_index);
+            // This is based on a symmetric solution
+            mAccumulatedResistance[edge_index] = 2.0*mAccumulatedResistance[parent_index] + resistance;
+        }
+    }
+
+    /* Now use the pressure boundary conditions to determine suitable flux boundary conditions
+     * and iteratively update them until we are done
+     */
+    assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
+    unsigned max_iterations=500;
+    double relative_tolerance = 1e-8;
+    double max_relative_boundary_flux_change;
+    //double max_delta_pressure;
+    //double big_flux_change;
+    //std::map<unsigned, double> last_flux_change;
+    bool converged=false;
+    for (unsigned iteration = 0; iteration < max_iterations && converged==false; iteration++)
+    {
+        max_relative_boundary_flux_change = 0.0;
+        //max_delta_pressure = 0.0;
+        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
+                iter != mMesh.GetBoundaryNodeIteratorEnd();
+                ++iter)
+        {
+            unsigned node_index = (*iter)->GetIndex();
+            unsigned edge_index = *((*iter)->ContainingElementsBegin());
+            if (node_index != mOutletNodeIndex)
+            {
+                // How far we are away from matching this boundary condition.
+                double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
+//                if (fabs(delta_pressure) > max_delta_pressure)
+//                {
+//                    max_delta_pressure = fabs(delta_pressure);
+//                }
+
+                // Offset the first iteration
+                if (iteration == 0)
+                {
+                    delta_pressure += mPressureCondition[mOutletNodeIndex];
+                }
+                // Estimate the flux based on there being a symmetric path to this terminus
+                double estimated_flux_change =  delta_pressure/mAccumulatedResistance[edge_index];
+//                if (edge_index ==9) PRINT_2_VARIABLES(iteration, mFlux[edge_index]);
+////                PRINT_3_VARIABLES(last_flux_change[edge_index], mFlux[edge_index], mFlux[edge_index] + estimated_flux_change);
+//                last_flux_change[edge_index] = mFlux[edge_index];
+                mFlux[edge_index] += estimated_flux_change;
+                double relative_boundary_flux_change = fabs( estimated_flux_change/mFlux[edge_index]);
+                if (relative_boundary_flux_change > max_relative_boundary_flux_change)
+                {
+                    max_relative_boundary_flux_change = relative_boundary_flux_change;
+                    //big_flux_change = estimated_flux_change;
+                }
+            }
+        }
+        if (max_relative_boundary_flux_change <= relative_tolerance)
+        {
+            converged = true;
+        }
+//        PRINT_4_VARIABLES(iteration, max_relative_boundary_flux_change, max_delta_pressure, big_flux_change);
+        SolveDirectFromFlux();
     }
 }
 
@@ -229,6 +312,7 @@ double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool useP
 void VentilationProblem::SetOutflowPressure(double pressure)
 {
     SetPressureAtBoundaryNode(*(mMesh.GetNode(mOutletNodeIndex)), pressure);
+    mPressure[mOutletNodeIndex] = pressure;
 }
 
 void VentilationProblem::SetConstantInflowPressures(double pressure)
@@ -270,6 +354,9 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
     mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
     mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
     PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
+
+    // Store the requirement in a map for the direct solver
+    mPressureCondition[rNode.GetIndex()] = pressure;
 }
 
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
@@ -369,10 +456,6 @@ void VentilationProblem::Assemble(bool dynamicReassemble)
             }
         }
     }
-    if (mFluxGivenAtInflow)
-    {
-        SolveDirectFromFlux();
-    }
 
 }
 
@@ -411,6 +494,15 @@ void VentilationProblem::Solve()
         while (relative_diff > DBL_EPSILON);
         PetscTools::Destroy(difference);
     }
+    if (mFluxGivenAtInflow)
+    {
+        SolveDirectFromFlux();
+    }
+    else
+    {
+        SolveIterativelyFromPressure();
+    }
+
 }
 
 Vec VentilationProblem::GetSolution()
