@@ -823,6 +823,7 @@ public:
         CellPtr p_tn_cell(new Cell(p_healthy_state, p_cell_model));
         p_tn_cell->SetCellProliferativeType(p_transit_type);
         p_tn_cell->InitialiseCellCycleModel();
+        p_cell_model->SetDt(0.1/60.0);
 
         for (unsigned i=0; i<num_steps/2; i++)
         {

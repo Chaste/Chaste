@@ -93,6 +93,7 @@ public:
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_stem_type);
         p_cell->InitialiseCellCycleModel();
+        p_cell_model->SetDt(0.1/60.0);
 
         /*
          * For coverage, we create another cell-cycle model that is identical except that we
