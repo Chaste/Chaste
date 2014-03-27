@@ -386,48 +386,43 @@ public:
 #ifdef CHASTE_CVODE
         ParameterisedCvode ode;
 
-        // First solve with an automatic reset at each Solve call
+        // First solve with a forced reset at each Solve call
+        ode.SetForceReset(true);
         for (unsigned i=0; i<10; i++)
         {
-            ode.SetParameter("a", i); // dy/dx = i
+            ode.SetParameter("a", i); // dy/dt = a
             ode.Solve(i, i+1.0, 1.0);
         }
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 45.0, 1e-12);
 
-        // Now don't reset unless state or time change
-        ode.SetStateVariable(0u, 0.0);
-        ode.SetAutoReset(false);
-        for (unsigned i=0; i<10; i++)
-        {
-            ode.SetParameter("a", i); // dy/dx = i
-            ode.Solve(i, i+1.0, 1.0);
-        }
-        TS_ASSERT_DELTA(ode.GetStateVariable(0u), 40.9074, 1e-1); // Note: wrong answer!
-
-        // Explicit reset when parameter changes
+        // We'll now turn off resetting (back to default behaviour)
+        ode.SetForceReset(false);
+        // But we alter time which will trigger a reset to get the right answer.
         ode.SetStateVariable(0u, 0.0);
         for (unsigned i=0; i<10; i++)
         {
-            ode.SetParameter("a", i); // dy/dx = i
-            ode.ResetSolver();
+            ode.SetParameter("a", i); // dy/dt = a
             ode.Solve(i, i+1.0, 1.0);
         }
-
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 45.0, 1e-12);
-        // Auto reset when state changes
+
+        // Now we change a state variable to trigger a reset (but carry on in time).
         ode.SetStateVariable(0u, 0.0);
         ode.SetParameter("a", 1.0);
         ode.Solve(10.0, 15.0, 1.0);
         TS_ASSERT_DELTA(ode.GetStateVariable(0u), 5.0, 1e-12);
 
-        // Explicit reset when parameter changes
+        // Now we show how you can get befuddled in MinimalReset mode.
+        // carrying on in time, but not resetting the solver.
+        ode.SetMinimalReset(true);
         ode.SetStateVariable(0u, 0.0);
         for (unsigned i=0; i<10; i++)
         {
-            ode.SetParameter("a", i); // dy/dx = i
-            ode.SetAutoReset(true);
-            ode.Solve(i, i+1.0, 1.0);
+            ode.SetParameter("a", i); // dy/dt = a
+            ode.Solve(15.0 + i, i + 16.0, 1.0);
         }
+        TS_ASSERT_DELTA(ode.GetStateVariable(0u), 50.0, 1e-12); // N.B. This is wrong!
+        // (We tricked ODE system by resetting a state variable in minimal reset mode).
 #else
         std::cout << "Cvode is not enabled.\n";
 #endif // CHASTE_CVODE

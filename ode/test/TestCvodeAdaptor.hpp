@@ -227,6 +227,7 @@ public:
         double global_error = 1e-3;
 
         {   // Solve in two steps with reset
+            solver.SetForceReset(true);
             solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
             solutions = solver.Solve(&ode_system, state_variables, 1.0, 2.0, h_value, 0.1);
             int last = solutions.GetNumberOfTimeSteps();
@@ -240,7 +241,6 @@ public:
 
         {   // Solve in two steps without reset
             solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
-            solver.SetAutoReset(false);
             solutions = solver.Solve(&ode_system, state_variables, 1.0, 2.0, h_value, 0.1);
             int last = solutions.GetNumberOfTimeSteps();
             double testvalue = solutions.rGetSolutions()[last][0];
@@ -263,7 +263,7 @@ public:
         }
 
         state_variables = ode_system.GetInitialConditions();
-        solver.SetAutoReset(true);
+        solver.SetForceReset(true);
 
         {   // Solve in two steps with reset again
             solver.Solve(&ode_system, state_variables, 0.0, 1.0, h_value, 0.1);
@@ -320,7 +320,8 @@ public:
 
         solver.CheckForStoppingEvents();
         std::vector<double> state_variables = ode_system.GetInitialConditions();
-        solutions = solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1, 0.01);
+        const double sampling_time = 0.01;
+        solutions = solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1, sampling_time);
         int num_timesteps = solutions.GetNumberOfTimeSteps();
 
         // Final time should be about pi/2
@@ -338,7 +339,7 @@ public:
         // and final y0 should be less than zero
         TS_ASSERT_LESS_THAN( solutions.rGetSolutions()[num_timesteps][0], 0);
 
-        TS_ASSERT_DELTA(solver.GetLastStepSize(), 0.1, 1e-6);
+        TS_ASSERT_DELTA(solver.GetLastStepSize(), sampling_time, 1e-6);
         std::cout << "1st with Exception\n"<< std::flush;
         // If we try to continue, the stopping event is still true, which is an error
         TS_ASSERT_THROWS_THIS(solutions = solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1, 0.01),
@@ -348,7 +349,7 @@ public:
         state_variables = ode_system.GetInitialConditions();
 
         std::cout << "2nd Solve\n"<< std::flush;
-        solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.01);
+        solver.Solve(&ode_system, state_variables, 0.0, 2.0, sampling_time);
         TS_ASSERT_EQUALS(solver.StoppingEventOccurred(), true);
         TS_ASSERT_DELTA(solver.GetStoppingTime(), M_PI_2, 0.01);
         std::cout << "2nd with Exception\n"<< std::flush;
@@ -370,7 +371,9 @@ public:
 
         solver.CheckForStoppingEvents();
         std::vector<double> state_variables = ode_system.GetInitialConditions();
-        solutions = solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1, 0.01);
+
+        const double sampling_time = 0.01;
+        solutions = solver.Solve(&ode_system, state_variables, 0.0, 2.0, 0.1, sampling_time);
         int num_timesteps = solutions.GetNumberOfTimeSteps();
 
         // Final time should be about pi/2
@@ -388,7 +391,7 @@ public:
         // and final y0 should be less than zero
         TS_ASSERT_LESS_THAN( solutions.rGetSolutions()[num_timesteps][0], 0);
 
-        TS_ASSERT_DELTA(solver.GetLastStepSize(), 0.1, 1e-6);
+        TS_ASSERT_DELTA(solver.GetLastStepSize(), sampling_time, 1e-6);
 
         // Alternative Solve method
         state_variables = ode_system.GetInitialConditions();

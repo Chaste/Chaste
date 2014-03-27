@@ -195,7 +195,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
 //    std::cout << " Start: " << startTime << " max dt=" << maxStep << std::endl << std::flush;
 
     // Find out if we need to (re-)initialise
-    bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(startTime, mLastSolutionTime);
+    bool reinit = !mpCvodeMem || mForceReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(startTime, mLastSolutionTime);
     if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetVectorSize(rInitialY);
@@ -289,10 +289,10 @@ void CvodeAdaptor::FreeCvodeMemory()
 }
 
 
-void CvodeAdaptor::SetAutoReset(bool autoReset)
+void CvodeAdaptor::SetForceReset(bool autoReset)
 {
-    mAutoReset = autoReset;
-    if (mAutoReset)
+    mForceReset = autoReset;
+    if (mForceReset)
     {
         SetMinimalReset(false);
         ResetSolver();
@@ -304,7 +304,7 @@ void CvodeAdaptor::SetMinimalReset(bool minimalReset)
     mForceMinimalReset = minimalReset;
     if (mForceMinimalReset)
     {
-        SetAutoReset(false);
+        SetForceReset(false);
     }
 }
 
@@ -356,8 +356,12 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     // Main time sampling loop
     while (!stepper.IsTimeAtEnd() && !mStoppingEventOccurred)
     {
+        // This should stop CVODE going past the end of where we wanted and interpolating back.
+        int ierr = CVodeSetStopTime(mpCvodeMem, stepper.GetNextTime());
+        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+
         double tend;
-        int ierr = CVode(mpCvodeMem, stepper.GetNextTime(), yout, &tend, CV_NORMAL);
+        ierr = CVode(mpCvodeMem, stepper.GetNextTime(), yout, &tend, CV_NORMAL);
         if (ierr<0)
         {
             FreeCvodeMemory();
@@ -405,8 +409,13 @@ void CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
     SetupCvode(pOdeSystem, rYValues, startTime, maxStep);
 
     N_Vector yout = N_VMake_Serial(rYValues.size(), &(rYValues[0]));
+
+    // This should stop CVODE going past the end of where we wanted and interpolating back.
+    int ierr = CVodeSetStopTime(mpCvodeMem, endTime);
+    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+
     double tend;
-    int ierr = CVode(mpCvodeMem, endTime, yout, &tend, CV_NORMAL);
+    ierr = CVode(mpCvodeMem, endTime, yout, &tend, CV_NORMAL);
     if (ierr<0)
     {
         FreeCvodeMemory();
@@ -442,7 +451,7 @@ CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
       mCheckForRoots(false),
       mLastSolutionState(NULL),
       mLastSolutionTime(0.0),
-      mAutoReset(true),
+      mForceReset(false),
       mForceMinimalReset(false)
 {
 }
@@ -455,7 +464,7 @@ CvodeAdaptor::~CvodeAdaptor()
 
 void CvodeAdaptor::RecordStoppingPoint(double stopTime, N_Vector yEnd)
 {
-    if (!mAutoReset)
+    if (!mForceReset)
     {
         const unsigned size = GetVectorSize(yEnd);
         CreateVectorIfEmpty(mLastSolutionState, size);

@@ -138,7 +138,6 @@ public:
         }
 
         // Beefed-up CVODE tolerances.
-        p_cell->SetMinimalReset(true);
         p_cell->SetTolerances(1e-7, 1e-9);
 
         return p_cell;
@@ -1367,7 +1366,7 @@ public:
 
         // Test two values of print timestep
         const unsigned num_print_steps_to_test = 2u;
-        c_vector<double,num_print_steps_to_test> print_steps = Create_c_vector(1, 0.01);
+        c_vector<double,num_print_steps_to_test> print_steps = Create_c_vector(0.1, 0.01);
 
         // Always use the same ODE and PDE timestep of 0.01.
         const double ode_and_pde_steps = 0.01; //ms
@@ -1413,7 +1412,7 @@ public:
 
         // N.B. This tolerance can be reduced to less than 1e-6 if you reduce the ODE+PDE time step to 0.001 instead of 0.01ms.
         // This would be unfeasibly small for 'proper' simulations though, so not sure how to proceed with this!
-        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 2e-2);
+        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 2e-3);
 #else
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE

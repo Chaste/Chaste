@@ -61,7 +61,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     //mpModel->SetTolerances(1e-4,1e-6);
 
     // Use optimisations from #1912 - since we don't interfere with the model between Solve() calls don't reset.
-    mpModel->SetAutoReset(false);
+    mpModel->SetMinimalReset(true);
 
     const unsigned num_paces_to_analyse = (mTwoPaceScan) ? 2u : 1u;
     const unsigned max_evaluations = (unsigned)(mMaxNumPaces/num_paces_to_analyse); // Only allow 10000 paces at the moment.
@@ -94,7 +94,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     }
 
     // Since we don't know what we are going to do with it next re-set it on every solve call.
-    mpModel->SetAutoReset(true);
+    mpModel->SetMinimalReset(false);
 }
 
 #endif // CHASTE_CVODE

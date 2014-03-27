@@ -122,7 +122,7 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
     : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
       mLastSolutionState(NULL),
       mLastSolutionTime(0.0),
-      mAutoReset(true),
+      mForceReset(false),
       mForceMinimalReset(false),
       mUseAnalyticJacobian(false),
       mpCvodeMem(NULL),
@@ -188,8 +188,12 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
     // Main time sampling loop
     while (!stepper.IsTimeAtEnd())
     {
+        // This should stop CVODE going past the end of where we wanted and interpolating back.
+        int ierr = CVodeSetStopTime(mpCvodeMem, stepper.GetNextTime());
+        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+
         double cvode_stopped_at;
-        int ierr = CVode(mpCvodeMem, stepper.GetNextTime(), mStateVariables,
+        ierr = CVode(mpCvodeMem, stepper.GetNextTime(), mStateVariables,
                          &cvode_stopped_at, CV_NORMAL);
         if (ierr<0)
         {
@@ -226,8 +230,12 @@ void AbstractCvodeSystem::Solve(realtype tStart,
 
     SetupCvode(mStateVariables, tStart, maxDt);
 
+    // This should stop CVODE going past the end of where we wanted and interpolating back.
+    int ierr = CVodeSetStopTime(mpCvodeMem, tEnd);
+    assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+
     double cvode_stopped_at;
-    int ierr = CVode(mpCvodeMem, tEnd, mStateVariables, &cvode_stopped_at, CV_NORMAL);
+    ierr = CVode(mpCvodeMem, tEnd, mStateVariables, &cvode_stopped_at, CV_NORMAL);
     if (ierr<0)
     {
 //        DebugSteps(mpCvodeMem, this);
@@ -299,10 +307,10 @@ double AbstractCvodeSystem::GetLastStepSize()
     return mLastInternalStepSize;
 }
 
-void AbstractCvodeSystem::SetAutoReset(bool autoReset)
+void AbstractCvodeSystem::SetForceReset(bool autoReset)
 {
-    mAutoReset = autoReset;
-    if (mAutoReset)
+    mForceReset = autoReset;
+    if (mForceReset)
     {
         ResetSolver();
     }
@@ -313,7 +321,7 @@ void AbstractCvodeSystem::SetMinimalReset(bool minimalReset)
     mForceMinimalReset = minimalReset;
     if (mForceMinimalReset)
     {
-        SetAutoReset(false);
+        SetForceReset(false);
     }
 }
 
@@ -332,8 +340,8 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     assert(maxDt >= 0.0);
 
     // Find out if we need to (re-)initialise
-    //std::cout << "!mpCvodeMem = " << !mpCvodeMem << ", mAutoReset = " << mAutoReset << ", !mLastSolutionState = " << !mLastSolutionState << ", comp doubles = " << !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime) << "\n";
-    bool reinit = !mpCvodeMem || mAutoReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime);
+    //std::cout << "!mpCvodeMem = " << !mpCvodeMem << ", mForceReset = " << mForceReset << ", !mLastSolutionState = " << !mLastSolutionState << ", comp doubles = " << !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime) << "\n";
+    bool reinit = !mpCvodeMem || mForceReset || !mLastSolutionState || !CompareDoubles::WithinAnyTolerance(tStart, mLastSolutionTime);
     if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetNumberOfStateVariables();
@@ -349,6 +357,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 
     if (!mpCvodeMem)
     {
+        //std::cout << "New CVODE solver\n";
         mpCvodeMem = CVodeCreate(CV_BDF, CV_NEWTON);
         if (mpCvodeMem == NULL) EXCEPTION("Failed to SetupCvode CVODE"); // in one line to avoid coverage problem!
 
@@ -382,6 +391,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     }
     else if (reinit)
     {
+        //std::cout << "Resetting CVODE solver\n";
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeReInit(mpCvodeMem, tStart, initialConditions);
         CVodeSStolerances(mpCvodeMem, mRelTol, mAbsTol);
@@ -404,7 +414,8 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 void AbstractCvodeSystem::RecordStoppingPoint(double stopTime)
 {
 //    DebugSteps(mpCvodeMem, this);
-    if (!mAutoReset)
+    // If we're forcing a reset there's no point recording last stopping point?
+    if (!mForceReset)
     {
         const unsigned size = GetNumberOfStateVariables();
         CreateVectorIfEmpty(mLastSolutionState, size);

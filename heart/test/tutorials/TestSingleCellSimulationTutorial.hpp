@@ -256,7 +256,8 @@ public:
         double apd = cell_props.GetLastActionPotentialDuration(90);
         double upstroke_velocity = cell_props.GetLastMaxUpstrokeVelocity();
         /*
-         * Here we just check that the values are equal to the ones we expect, with appropriate precision to pass on different versions of CVODE.
+         * Here we just check that the values are equal to the ones we expect,
+         * with appropriate precision to pass on different versions of CVODE.
          */
         TS_ASSERT_DELTA(apd, 212.41, 1e-2);
         TS_ASSERT_DELTA(upstroke_velocity, 339.8, 1.0);

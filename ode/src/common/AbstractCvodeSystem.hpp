@@ -143,7 +143,7 @@ private:
         archive & rGetParameterNames();
 
         archive & mLastSolutionTime;
-        archive & mAutoReset;
+        archive & mForceReset;
         archive & mForceMinimalReset;
         archive & mRelTol;
         archive & mAbsTol;
@@ -180,7 +180,7 @@ private:
         std::vector<std::string> param_names;
         archive & param_names;
         archive & mLastSolutionTime;
-        archive & mAutoReset;
+        archive & mForceReset;
         archive & mForceMinimalReset;
         archive & mRelTol;
         archive & mAbsTol;
@@ -230,7 +230,7 @@ private:
     double mLastSolutionTime;
 
     /** Whether to automatically reset CVODE on each Solve call. */
-    bool mAutoReset;
+    bool mForceReset;
 
     /** Whether to ignore changes in the state variables when deciding whether to reset. */
     bool mForceMinimalReset;
@@ -317,17 +317,19 @@ public:
      * Set whether to automatically re-initialise CVODE on every call to Solve, or
      * whether to attempt to guess when re-initialisation is needed. For example
      * it will re-initialise if the time changes, or any state variables change.
+     * You can safely change parameters between solve calls with or without resets.
      *
      * See also ResetSolver and SetMinimalReset
      *
      * @param autoReset  whether to reset on every Solve
      */
-    void SetAutoReset(bool autoReset);
+    void SetForceReset(bool autoReset);
 
     /**
      * Set whether to reduce the checking done when guessing when re-initialisation
      * is needed, so it ignores changes in the state variables.  If call with true
      * argument, will call SetAutoReset(false).
+     * You can safely change parameters between solve calls with or without resets.
      *
      * @param minimalReset  whether to avoid checking for changes in state variables
      */
