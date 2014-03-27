@@ -137,8 +137,9 @@ public:
             p_cell = new CellLuoRudy1991FromCellMLCvode(p_empty_solver, mpZeroStimulus);
         }
 
+        // Beefed-up CVODE tolerances.
         p_cell->SetMinimalReset(true);
-        p_cell->SetTolerances(1e-5,1e-7);
+        p_cell->SetTolerances(1e-7, 1e-9);
 
         return p_cell;
     }
@@ -1349,11 +1350,15 @@ public:
     {
 #ifdef CHASTE_CVODE
 
-        PetscOptionsSetValue("-ksp_monitor", "");
+        // Switch this back on to watch linear solver converge on each step.
+        //PetscOptionsSetValue("-ksp_monitor", "");
+
+        // Make sure that this test isn't having problems because of PDE tolerances.
+        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
 
         const double mesh_spacing = 0.01;
         const double x_size = 1.0;
-        TetrahedralMesh<1,1> mesh;
+        DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructRegularSlabMesh(mesh_spacing, x_size);
         const unsigned max_node_index = mesh.GetNumNodes() - 1;
         Cvode1dCellFactory cell_factory;
@@ -1362,7 +1367,7 @@ public:
 
         // Test two values of print timestep
         const unsigned num_print_steps_to_test = 2u;
-        c_vector<double,num_print_steps_to_test> print_steps = Create_c_vector(0.1, 0.01);
+        c_vector<double,num_print_steps_to_test> print_steps = Create_c_vector(1, 0.01);
 
         // Always use the same ODE and PDE timestep of 0.01.
         const double ode_and_pde_steps = 0.01; //ms
@@ -1381,9 +1386,11 @@ public:
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
 
-            for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+            for (AbstractTetrahedralMesh<1,1>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                 node_iter != mesh.GetNodeIteratorEnd();
+                 ++node_iter)
             {
-                AbstractCardiacCellInterface* p_cell = monodomain_problem.GetTissue()->GetCardiacCell(node_index);
+                AbstractCardiacCellInterface* p_cell = monodomain_problem.GetTissue()->GetCardiacCell(node_iter->GetIndex());
 
                 // This checks the maximum timestep in each Cvode cell has been set correctly.
                 TS_ASSERT_EQUALS(static_cast<AbstractCvodeCell*>(p_cell)->GetTimestep(),
@@ -1402,7 +1409,11 @@ public:
             std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index);
             V_to_compare.push_back(V_over_time.back()); // Voltage at final time.
         }
-        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-4);
+        std::cout << "Difference in printing time steps of " << print_steps[0] << " and " << print_steps[1] << " = " << V_to_compare[0] - V_to_compare[1] << " mV" << std::endl;
+
+        // N.B. This tolerance can be reduced to less than 1e-6 if you reduce the ODE+PDE time step to 0.001 instead of 0.01ms.
+        // This would be unfeasibly small for 'proper' simulations though, so not sure how to proceed with this!
+        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 2e-2);
 #else
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE
