@@ -1345,7 +1345,7 @@ public:
     }
 
 
-    void DontTestOutputDoesNotDependOnPrintTimestep() throw(Exception)
+    void TestOutputDoesNotDependOnPrintTimestep() throw(Exception)
     {
 #ifdef CHASTE_CVODE
 
@@ -1402,7 +1402,7 @@ public:
             std::vector<double> V_over_time = simulation_data.GetVariableOverTime("V", max_node_index);
             V_to_compare.push_back(V_over_time.back()); // Voltage at final time.
         }
-        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-12);
+        TS_ASSERT_DELTA(V_to_compare[0], V_to_compare[1], 1e-4);
 #else
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE

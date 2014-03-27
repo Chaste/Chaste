@@ -869,7 +869,6 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
 {
-
     c_vector<double, 2> min_max;
     min_max[0] = DBL_MAX;
     min_max[1] = 0.0;
