@@ -1070,6 +1070,7 @@ int Hdf5DataWriter::GetVariableByName(const std::string& rVariableName)
 
 bool Hdf5DataWriter::ApplyPermutation(const std::vector<unsigned>& rPermutation)
 {
+    ///\todo #1369 - make an "unsafe" version of this method for HDF5 extension
     if (!mIsInDefineMode)
     {
         EXCEPTION("Cannot define permutation when not in Define mode");

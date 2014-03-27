@@ -140,9 +140,6 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             writer.DefineFixedDimension(this->mpMesh->GetDistributedVectorFactory()->GetProblemSize());
             writer.DefineUnlimitedDimension("Time", "msec", 1);
 
-            ///\todo #1369
-            assert(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() == false );
-
             int V = writer.DefineVariable("V","mV");
             int V_2 = writer.DefineVariable("V_2","mV");
             int phie = writer.DefineVariable("Phi_e","mV");

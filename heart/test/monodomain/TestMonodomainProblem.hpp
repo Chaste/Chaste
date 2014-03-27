@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
 #include "ChasteSyscalls.hpp"
+#include "CardiacSimulationArchiver.hpp"
 
 /*
  *  This cell factory introduces a stimulus in the very centre of mesh/test/data/2D_0_to_1mm_400_elements.
@@ -1417,8 +1418,102 @@ public:
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE
     }
+    void inprogessTestMonodomainProblem2DWithArchiving() throw(Exception)
+    {
+        // Names of output and archive directories
+        std::string output_dir = "MonodomainProblem2DWithArchiving_Parallel";
+        std::string archive_location_1 = output_dir+"/"+"monodomain_2d_archive_1";
+        std::string archive_location_2 = output_dir+"/"+"monodomain_2d_archive_2";
+        std::string archive_location_3 = output_dir+"/"+"monodomain_2d_archive_3";
+
+        // Do first stage of simulation
+        {
+
+            // Standard HeartConfig set-up
+            HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
+            HeartConfig::Instance()->SetSimulationDuration(2); //ms
+            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
+            HeartConfig::Instance()->SetOutputDirectory(output_dir);
+            HeartConfig::Instance()->SetOutputFilenamePrefix(output_dir);
+            HeartConfig::Instance()->SetVisualizeWithVtk();
+            HeartConfig::Instance()->SetVisualizeWithParallelVtk();
+
+            HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
 
 
+            // Use cell factory to create monodomain problem
+            PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
+            MonodomainProblem<2> monodomain_problem( &cell_factory );
+            monodomain_problem.Initialise();
+
+
+            HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
+            HeartConfig::Instance()->SetCapacitance(1.0);
+
+
+            // Solve and save
+            monodomain_problem.Solve();
+
+
+            // Check whether the mesh has been permuted
+            std::vector<unsigned> node_permutation = monodomain_problem.rGetMesh().rGetNodePermutation();
+            if (node_permutation.size() == 0)
+            {
+                std::cout << "Mesh has not been permuted\n";
+            }
+            else
+            {
+                // Not writing permutation out as it will be rather long
+                // But could do with checking whether the permutation changes the position of
+                // several nodes to a noticeable extent
+                std::cout << "Mesh has been permuted\n";
+            }
+
+
+            // Save
+            CardiacSimulationArchiver<MonodomainProblem<2> >::Save(monodomain_problem, archive_location_1);
+        }
+
+//        HeartConfig::Instance()->Reset();
+
+        // Second stage - load from archive and run for an extra 2ms before saving again
+        { // Load and run - first go
+            MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_1);
+            HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
+            p_monodomain_problem->Solve();
+            CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_2);
+            delete p_monodomain_problem;
+        }
+
+        // Third stage - repeat procedure from second
+        { // Load and run - second go
+            MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_2);
+            HeartConfig::Instance()->SetSimulationDuration(6.0); //ms
+            p_monodomain_problem->Solve();
+            CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_3);
+            delete p_monodomain_problem;
+        }
+        ///\todo #1369 Read back Meshalyzer .dat file?
+
+        // Locate file
+        FileFinder meshalyzer_dat(output_dir+"/output/"+output_dir+"_V.dat", RelativeTo::ChasteTestOutput);
+        std::ifstream dat_file(meshalyzer_dat.GetAbsolutePath().c_str());
+        std::vector<double> meshalyzer_contents;
+
+        // Make a vector containing the meshalyzer contents (perhaps not the best way of doing it, but it works for now...)
+        // Perhaps do a compare to another version?
+        if (dat_file)
+        {
+            double current_value;
+            while (dat_file >> current_value)
+            {
+                meshalyzer_contents.push_back(current_value);
+            }
+        }
+
+
+
+    }
 };
 
 #endif //_TESTMONODOMAINPROBLEM_HPP_

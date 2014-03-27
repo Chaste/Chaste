@@ -176,7 +176,7 @@ private:
             int vm_col = writer.DefineVariable("Vm","mV");
 
             ///\todo #1369
-            assert(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() == false );
+            //assert(HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering() == false );
 
             if (PROBLEM_DIM==1)
             {
