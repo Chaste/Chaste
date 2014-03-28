@@ -244,10 +244,10 @@ public:
         TS_ASSERT_DELTA(pressure[1], 6.6666 + 1.0,   1e-4);
         TS_ASSERT_DELTA(pressure[2], 12.2222 + 1.0, 1e-4);
         TS_ASSERT_DELTA(pressure[3], 12.2222 + 1.0, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-7); //BC
         TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
         TS_ASSERT_DELTA(flux[10],  -0.0710, 1e-4); // (Inflow flux)
         TS_ASSERT_DELTA(flux[11],  -0.0710, 1e-4); // (Inflow flux)

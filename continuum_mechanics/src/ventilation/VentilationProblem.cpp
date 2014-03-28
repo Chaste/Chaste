@@ -214,7 +214,11 @@ void VentilationProblem::SolveIterativelyFromPressure()
 ////                PRINT_3_VARIABLES(last_flux_change[edge_index], mFlux[edge_index], mFlux[edge_index] + estimated_flux_change);
 //                last_flux_change[edge_index] = mFlux[edge_index];
                 mFlux[edge_index] += estimated_flux_change;
-                double relative_boundary_flux_change = fabs( estimated_flux_change/mFlux[edge_index]);
+                double relative_boundary_flux_change = fabs( estimated_flux_change );
+                if (mFlux[edge_index] != 0.0)
+                {
+                    estimated_flux_change /= fabs(mFlux[edge_index]);
+                }
                 if (relative_boundary_flux_change > max_relative_boundary_flux_change)
                 {
                     max_relative_boundary_flux_change = relative_boundary_flux_change;
