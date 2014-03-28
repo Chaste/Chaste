@@ -210,14 +210,17 @@ void VentilationProblem::SolveIterativelyFromPressure()
                 }
                 // Estimate the flux based on there being a symmetric path to this terminus
                 double estimated_flux_change =  delta_pressure/mAccumulatedResistance[edge_index];
-//                if (edge_index ==9) PRINT_2_VARIABLES(iteration, mFlux[edge_index]);
+                if (edge_index ==9)
+                {
+                    //PRINT_3_VARIABLES(iteration, delta_pressure, mFlux[edge_index]);
+                }
 ////                PRINT_3_VARIABLES(last_flux_change[edge_index], mFlux[edge_index], mFlux[edge_index] + estimated_flux_change);
 //                last_flux_change[edge_index] = mFlux[edge_index];
                 mFlux[edge_index] += estimated_flux_change;
                 double relative_boundary_flux_change = fabs( estimated_flux_change );
                 if (mFlux[edge_index] != 0.0)
                 {
-                    estimated_flux_change /= fabs(mFlux[edge_index]);
+                    relative_boundary_flux_change /= fabs(mFlux[edge_index]);
                 }
                 if (relative_boundary_flux_change > max_relative_boundary_flux_change)
                 {
