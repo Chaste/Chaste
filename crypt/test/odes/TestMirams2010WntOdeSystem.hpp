@@ -126,8 +126,8 @@ public:
         TS_ASSERT_DELTA(solutions.rGetTimes()[end], 100, 1e-2);
 
         // Check results are correct
-        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 433.1134, 1e-4);
-        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 433.1134, 1e-4);
+        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][0], 433.114, 2e-3); // Tolerances relaxed for
+        TS_ASSERT_DELTA(solutions.rGetSolutions()[end][1], 433.114, 2e-3); // different CVODE versions.
         TS_ASSERT_DELTA(solutions.rGetSolutions()[end][2], wnt_level, 1e-4);
 #else
         std::cout << "CVODE is not enabled. " << std::endl;
