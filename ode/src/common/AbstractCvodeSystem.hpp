@@ -106,12 +106,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * SetTolerances(), these can make quite a difference to the time it takes
  * to solve the ODE system.
  *
- * Repeated calls to Solve will set up and delete CVODE memory, unless
- * the following methods are called:
+ * Repeated calls to Solve will no longer set up and delete CVODE memory, unless
+ * the following method is called:
  *
- * SetAutoReset(false) - try not to reset unless time or state variables change
+ * SetForceReset(true) - reset each time Solve() is called
  *
- * SetMinimalReset(true) - calls SetAutoReset(false) and also ignores changes in state vars.
+ * default - reset if state variables change, or we ask to solve from a different time than the last solve call finished.
+ *
+ * SetMinimalReset(true) - ignore changes in state vars and just reset if the time is inconsistent.
  *
  */
 class AbstractCvodeSystem : public AbstractParameterisedSystem<N_Vector>
@@ -328,7 +330,7 @@ public:
     /**
      * Set whether to reduce the checking done when guessing when re-initialisation
      * is needed, so it ignores changes in the state variables.  If call with true
-     * argument, will call SetAutoReset(false).
+     * argument, will call SetForceReset(false).
      * You can safely change parameters between solve calls with or without resets.
      *
      * @param minimalReset  whether to avoid checking for changes in state variables

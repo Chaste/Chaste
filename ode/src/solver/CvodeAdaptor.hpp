@@ -80,11 +80,14 @@ typedef struct CvodeData_ {
  * The timeStep parameters of the abstract class are here used to specify
  * *maximum* steps, since the solver is adaptive.
  *
- * Note that a call to Solve will initialise the CVODE solver, and free its
- * working memory when done.  There is thus a non-trivial overhead involved.
+ * Repeated calls to Solve will no longer set up and delete CVODE memory, unless
+ * the following method is called:
  *
- * \todo Add an option to just initialise once, and assume subsequent Solve
- *   calls are continuing from where we left off.
+ * SetForceReset(true) - reset each time Solve() is called
+ *
+ * default behaviour - reset if state variables change, or we ask to solve from a different time than the last solve call finished.
+ *
+ * SetMinimalReset(true) - ignore changes in state vars and just reset if the time is inconsistent.
  */
 class CvodeAdaptor : public AbstractIvpOdeSolver
 {
@@ -235,7 +238,7 @@ public:
     /**
      * Set whether to reduce the checking done when guessing when re-initialisation
      * is needed, so it ignores changes in the state variables.  If call with true
-     * argument, will call SetAutoReset(false).
+     * argument, will call SetForceReset(false).
      *
      * @param minimalReset  whether to avoid checking for changes in state variables
      */
