@@ -307,10 +307,10 @@ public:
         TS_ASSERT_DELTA(pressure[1], 6687.89,   1e-2);
         TS_ASSERT_DELTA(pressure[2], 12229.3, 1e-2);
         TS_ASSERT_DELTA(pressure[3], 12229.3, 1e-2);
-        TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-4); //BC
+        TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-4); //BC
+        TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-4); //BC
+        TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-4); //BC
 
         TS_ASSERT_DELTA(flux[6], -70.8367, 1e-4);
 #ifdef CHASTE_VTK
@@ -436,12 +436,12 @@ public:
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
     }
 
-    void failingTestPatientData() throw (Exception)
+    void TestPatientData() throw (Exception)
     {
         VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
         PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
-//        problem.SetConstantInflowPressures(50.0);
+        //problem.SetConstantInflowPressures(50.0);
         problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 56379u);
@@ -451,6 +451,9 @@ public:
 
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25
+#ifdef CHASTE_VTK
+        problem.WriteVtk("TestVentilation", "patient_data");
+#endif
     }
     void TestExceptions() throw(Exception)
     {

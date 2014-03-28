@@ -37,16 +37,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "ReplicatableVector.hpp"
 #include "Warnings.hpp"
-//#include "Debug.hpp"
+#include "Debug.hpp"
 
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
-      mpLinearSystem(NULL),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
       mDensity(1.51e-6),
-      mSolution(NULL),
       mFluxGivenAtInflow(false)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
@@ -56,18 +54,6 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     {
         EXCEPTION("Outlet node is not a boundary node");
     }
-
-    // We solve for flux at every edge and for pressure at each node/bifurcation
-    // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)
-    // preallocating 5 non-zeros allows for 4-way branching
-    mSolution = PetscTools::CreateVec(mMesh.GetNumNodes()+mMesh.GetNumElements());
-    mpLinearSystem = new LinearSystem(mSolution, 5u);
-    mpLinearSystem->SetAbsoluteTolerance(1e-11);
-    mpLinearSystem->SetPcType("jacobi");
-    PetscOptionsSetValue("-ksp_diagonal_scale","");
-    PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
-
-    mpLinearSystem->SetKspType("fgmres");
 
     /*
      * Set up the Acinar units at the terminals
@@ -80,27 +66,11 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     unsigned num_acinar = mMesh.GetNumBoundaryNodes() - 1;
     double acinus_volume = 1.2e9/num_acinar; //Assumes a residual capacity of 1.2l (x10^9 in mm^3)
 
-    mFluxScaling = DBL_MAX;  // Adjusted to the least resistant of the terminal branches
     for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
           iter != mMesh.GetBoundaryNodeIteratorEnd();
           ++iter)
     {
-        //Calculates the resistance of the terminal bronchiole.
-        //This should be updated dynamically during the simulation
-        c_vector<double, 3> dummy;
-        double length;
-        unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
-        mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
-
-        double radius = (*iter)->rGetNodeAttributes()[0];
-
-        double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-        if ((*iter)->GetIndex() == mOutletNodeIndex)
-        {
-            // Use the top of the tree to get an indication of resistances
-            mFluxScaling = resistance;
-        }
-        else
+        if ((*iter)->GetIndex() != mOutletNodeIndex)
         {
             ///\todo We need to do some parallel here in order to load balance
             Swan2012AcinarUnit* p_acinus = new Swan2012AcinarUnit;
@@ -109,6 +79,17 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
             p_acinus->SetUndeformedVolume(acinus_volume);
             p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
             p_acinus->SetAirwayPressure(-0.49);
+
+            //Calculates the resistance of the terminal bronchiole.
+            //This should be updated dynamically during the simulation
+            c_vector<double, 3> dummy;
+            double length;
+            unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
+            mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
+
+            double radius = (*iter)->rGetNodeAttributes()[0];
+
+            double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
             p_acinus->SetTerminalBronchioleResistance(resistance);
 
             mAcinarUnits.push_back(p_acinus);
@@ -123,14 +104,6 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
 
 VentilationProblem::~VentilationProblem()
 {
-    if (mpLinearSystem)
-    {
-        delete mpLinearSystem;
-    }
-    if (mSolution)
-    {
-        PetscTools::Destroy(mSolution);
-    }
     for (unsigned i=0; i<mAcinarUnits.size(); i++)
     {
         delete mAcinarUnits[i];
@@ -205,7 +178,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
      */
     assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
     unsigned max_iterations=500;
-    double relative_tolerance = 1e-9;
+    double relative_tolerance = 1e-10;
     double max_relative_boundary_flux_change;
     //double max_delta_pressure;
     //double big_flux_change;
@@ -253,8 +226,15 @@ void VentilationProblem::SolveIterativelyFromPressure()
         {
             converged = true;
         }
-//        PRINT_4_VARIABLES(iteration, max_relative_boundary_flux_change, max_delta_pressure, big_flux_change);
-        SolveDirectFromFlux();
+        else
+        {
+            //        PRINT_4_VARIABLES(iteration, max_relative_boundary_flux_change, max_delta_pressure, big_flux_change);
+            SolveDirectFromFlux();
+        }
+    }
+    if(!converged)
+    {
+        //std::cout<<max_relative_boundary_flux_change<<"\n";
     }
 }
 
@@ -349,11 +329,6 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
         EXCEPTION("Boundary conditions cannot be set at internal nodes");
     }
     assert(mFluxGivenAtInflow == false);
-    unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
-
-    mpLinearSystem->SetMatrixElement(pressure_index, pressure_index,  1.0);
-    mpLinearSystem->SetRhsVectorElement(pressure_index, pressure);
-    PetscVecTools::SetElement(mSolution, pressure_index, pressure); // Make a good guess
 
     // Store the requirement in a map for the direct solver
     mPressureCondition[rNode.GetIndex()] = pressure;
@@ -368,132 +343,16 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     mFluxGivenAtInflow = true;
 
     // In a <1,3> mesh a boundary node will be associated with exactly one edge.
-    // Flux boundary conditions are set in the system matrix using
-    // the node index for the row and the edge index for the column.
-    // The row associated with the leaf node is used so that the edge's row
-    // can still be used to solve for flux/pressure.
     unsigned edge_index = *( rNode.ContainingElementsBegin() );
-    unsigned pressure_index =  mMesh.GetNumElements() +  rNode.GetIndex();
-
-    mpLinearSystem->SetMatrixElement(pressure_index, edge_index,  1.0);
-    mpLinearSystem->SetRhsVectorElement(pressure_index, flux*mFluxScaling);
-    PetscVecTools::SetElement(mSolution, edge_index, flux*mFluxScaling); // Make a good guess
 
     // Seed the information for a direct solver
     mFlux[edge_index] = flux;
 }
 
 
-void VentilationProblem::Assemble(bool dynamicReassemble)
-{
-    PetscInt lo, hi;
-    mpLinearSystem->GetOwnershipRange(lo, hi);
-
-    if (dynamicReassemble)
-    {
-        // Sanity checks
-        assert(mDynamicResistance);
-        // Check that mSolution is valid?
-    }
-
-    // Assemble the Poiseuille flow pipe equations
-    // Poiseuille flow at each edge
-    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
-         iter != mMesh.GetElementIteratorEnd();
-         ++iter)
-    {
-        unsigned element_index = iter->GetIndex();
-        //Only assemble if the row for this element is locally owned
-        if ( (unsigned) lo <=  element_index && element_index < (unsigned) hi )
-        {
-            /* Poiseuille flow gives:
-             *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
-             */
-            //Resistance is based on radius, length and viscosity
-
-            // Note that we can only get a flux if mSolution is valid AND we own the local part
-            double flux = PetscVecTools::GetElement(mSolution, element_index)/mFluxScaling;
-            double resistance = CalculateResistance(*iter, dynamicReassemble, flux);
-            // The solution vector has flux on elements first, then pressure at nodes.
-            unsigned pressure_index_0 =  mMesh.GetNumElements() +  iter->GetNodeGlobalIndex(0);
-            unsigned pressure_index_1 =  mMesh.GetNumElements() +  iter->GetNodeGlobalIndex(1);
-
-            mpLinearSystem->SetMatrixElement(element_index, element_index, -resistance/mFluxScaling);
-            mpLinearSystem->SetMatrixElement(element_index, pressure_index_0,  1.0);
-            mpLinearSystem->SetMatrixElement(element_index, pressure_index_1, -1.0);
-        }
-    }
-
-    if (dynamicReassemble)
-    {
-        // In the reassemble case, we don't have to repeat the flux balance equations
-        // because the matrix components will be the same.
-        return;
-    }
-    // Assemble the flux-balance equations
-    for (AbstractTetrahedralMesh<1,3>::NodeIterator iter =mMesh.GetNodeIteratorBegin();
-          iter != mMesh.GetNodeIteratorEnd();
-          ++iter)
-    {
-        if (!(iter->IsBoundaryNode()) )
-        {
-            unsigned pressure_index =  mMesh.GetNumElements() +  iter->GetIndex();
-            /* Flux balance at each internal node (only one internal node in our case)
-            * flux_in - flux_out_left - flux_out_right = 0
-            */
-            for (Node<3>::ContainingElementIterator element_iterator = iter->ContainingElementsBegin();
-                    element_iterator != iter->ContainingElementsEnd();
-                    ++element_iterator)
-            {
-                unsigned el_index = *element_iterator;
-                //We regard flux as coming in if this node is listed second.
-                double flux_out = 1.0;
-                if (mMesh.GetElement(el_index)->GetNodeGlobalIndex(1) == iter->GetIndex())
-                {
-                    flux_out = -1.0;
-                }
-                mpLinearSystem->SetMatrixElement(pressure_index, el_index, flux_out);
-            }
-        }
-    }
-
-}
 
 void VentilationProblem::Solve()
 {
-    Assemble();
-    mpLinearSystem->AssembleFinalLinearSystem();
-    PetscVecTools::Finalise(mSolution);
-//     mpLinearSystem->DisplayMatrix();
-//     mpLinearSystem->DisplayRhs();
-
-    //This call is when the solution vector may have been used before (at the previous timestep for example)
-    Vec last_solution = mSolution;
-    mSolution = mpLinearSystem->Solve(last_solution);
-    PetscTools::Destroy(last_solution);
-    if (mDynamicResistance)
-    {
-        double relative_diff = DBL_MAX;
-        Vec difference;
-        VecDuplicate(mSolution, &difference);
-        do
-        {
-            Assemble(true);
-            mpLinearSystem->AssembleFinalLinearSystem();
-            Vec old_solution = mSolution;
-            mSolution = mpLinearSystem->Solve(old_solution); // However, seeding with the old solution doesn't appear to change the convergence of the KSP solver
-            PetscVecTools::WAXPY(difference, -1.0, mSolution, old_solution);
-            double l_inf_diff;
-            VecNorm(difference, NORM_INFINITY, &l_inf_diff);
-            PetscTools::Destroy(old_solution);
-
-            double l_inf_soln;
-            VecNorm(mSolution, NORM_INFINITY, &l_inf_soln);
-            relative_diff = l_inf_diff/l_inf_soln;
-        }
-        while (relative_diff > DBL_EPSILON);
-        PetscTools::Destroy(difference);
-    }
     if (mFluxGivenAtInflow)
     {
         SolveDirectFromFlux();
@@ -505,67 +364,12 @@ void VentilationProblem::Solve()
 
 }
 
-Vec VentilationProblem::GetSolution()
-{
-    return mSolution;
-}
 
 void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges,
                                                          std::vector<double>& rPressuresOnNodes)
 {
-    ReplicatableVector solution_vector_repl( mSolution );
-    unsigned num_elem = mMesh.GetNumElements();
-//    double max_flux = 0.0;
-//    double max_scaled_flux = 0.0;
-//    double max_pressure = 0.0;
-
-    rFluxesOnEdges.resize(num_elem);
-    for (unsigned i=0; i<num_elem; i++)
-    {
-        rFluxesOnEdges[i] = solution_vector_repl[i]/mFluxScaling;
-//        if (fabs(solution_vector_repl[i]) > max_scaled_flux)
-//        {
-//            max_scaled_flux = fabs(solution_vector_repl[i]);
-//            max_flux = rFluxesOnEdges[i];
-//        }
-        // Direct solution (mFlux) should be given to machine precision.  The PETSc solve
-        // is given to some KSP tolerance.
-        //PRINT_2_VARIABLES(mFlux[i], rFluxesOnEdges[i]);
-        if (mFlux[i]+rFluxesOnEdges[i]!=0.0)
-        {
-            assert( fabs( (rFluxesOnEdges[i] - mFlux[i])/(rFluxesOnEdges[i] + mFlux[i]) ) < 1e-7);
-        }
-        else
-        {
-            assert( fabs( (rFluxesOnEdges[i] - mFlux[i]) ) < 1e-7);
-        }
-
-
-    }
-
-    rPressuresOnNodes.resize(mMesh.GetNumNodes());
-    for (unsigned i=0; i<mMesh.GetNumNodes(); i++)
-    {
-        rPressuresOnNodes[i] = solution_vector_repl[i+num_elem];
-//        if (fabs(rPressuresOnNodes[i])>max_pressure)
-//        {
-//            max_pressure = fabs(rPressuresOnNodes[i]);
-//        }
-        if (rPressuresOnNodes[i] > 1e-5)
-        {
-            // Direct solution (mPressure) should be given to machine precision.  The PETSc solve
-            // is given to some KSP tolerance.
-            assert( fabs( (rPressuresOnNodes[i] - mPressure[i])/(rPressuresOnNodes[i] + mPressure[i]) ) < 1e-7);
-        }
-        else
-        {
-            // Direct solution (mPressure) should be given to machine precision.  The PETSc solve
-            // is given to some KSP tolerance.
-            assert( fabs( (rPressuresOnNodes[i] - mPressure[i]) ) < 1e-7);
-        }
-
-    }
-//    PRINT_5_VARIABLES(max_flux, max_scaled_flux, max_pressure, max_scaled_flux/max_pressure, max_flux/max_pressure);
+    rFluxesOnEdges = mFlux;
+    rPressuresOnNodes = mPressure;
 }
 
 

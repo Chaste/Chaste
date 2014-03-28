@@ -58,7 +58,6 @@ class VentilationProblem
 private:
     TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
-    LinearSystem* mpLinearSystem; /**< Linear system for pressure (at nodes) and flux (in edges).  Allocated by constructor */
     bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
     bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
 
@@ -82,27 +81,14 @@ private:
      *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;
-    double mFluxScaling;  /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux.  This should be the same scale as Poiseuille resistance (comparable to viscosity).*/
-    Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
 
     std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
-    std::vector<double> mFlux; /**< Used in direct solver */
-    std::vector<double> mPressure; /**< Used in direct solver */
-    std::map<unsigned, double> mPressureCondition; /**< Used in direct solver */
-    bool mFluxGivenAtInflow; /**< Used in direct solver */
-    std::vector<double> mAccumulatedResistance; /**< Used in direct solver */
+    std::vector<double> mFlux; /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
+    std::vector<double> mPressure; /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
+    std::map<unsigned, double> mPressureCondition; /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
+    bool mFluxGivenAtInflow; /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
+    std::vector<double> mAccumulatedResistance; /**< Used in pressure boundary solver.  This holds the approximate combined resistance at each edge from the root of the tree, based on a symmetric solution.*/
 
-    /** Assemble the linear system by writing in
-     *  * flux balance at the nodes
-     *  * Poiseuille flow in the edges
-     *
-     * Does not set any boundary conditions - these are assumed to be set elsewhere
-     * Used by solvers
-     *
-     * @param dynamicReassemble  reassemble the Poiseuille component of the system using dynamic resistance
-     * (assuming that the system has been solved once already).
-     */
-    void Assemble(bool dynamicReassemble=false);
 
     /**
      * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.
@@ -133,6 +119,7 @@ private:
      * @param usePedley  Whether to add Pedley's increasing correction term.  Here the resistance increases
      * which the sqrt of Reynold's number (dependent on flux).
      * @param flux  The flux in the edge (used for Pedley correction).
+     * @return the resistance of this element/edge
      */
     double CalculateResistance(Element<1,3>& rElement, bool usePedley=false, double flux=DBL_MAX);
 
@@ -205,26 +192,17 @@ public:
      */
     void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux);
 
-    /** Assemble the linear system by writing in
-     *  * flux balance at the nodes
-     *  * Poiseuille flow in the edges
-     *
-     *  Solve the linear system
+    /**
+     *  Solve the linear system either
+     *   * directly from fluxes
+     *   * iteratively from pressures
      */
     void Solve();
 
-    /**
-     * @return the PETSc solution vector (for both node pressures and edge fluxes)
-     */
-    Vec GetSolution();
 
     /**
-     * The mSolution Vec is a mixture of flux and pressure solutions and, in parallel, it is distributed across
-     * processors.  This method replicates the solution across all processors and then splits it into its flux
-     * and pressure components.  Because of the replication it makes sense to get both solutions in a single call.
-     *
-     * @param rFluxesOnEdges The component of the mSolution Vec which represents fluxes (this vector is resized)
-     * @param rPressuresOnNodes The component of the mSolution Vec which represents pressures (this vector is resized)
+     * @param rFluxesOnEdges The fluxes ordered by edge index (this vector is resized)
+     * @param rPressuresOnNodes The pressures ordered by node index  (this vector is resized)
      */
     void GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges, std::vector<double>& rPressuresOnNodes);
 
