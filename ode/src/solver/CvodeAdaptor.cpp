@@ -377,6 +377,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
             mStoppingEventOccurred = true;
             mStoppingTime = tend;
         }
+        mLastSolutionTime = tend;
         stepper.AdvanceOneTimeStep();
     }
 
@@ -385,7 +386,7 @@ OdeSolution CvodeAdaptor::Solve(AbstractOdeSystem* pOdeSystem,
 
     int ierr = CVodeGetLastStep(mpCvodeMem, &mLastInternalStepSize);
     assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
-    RecordStoppingPoint(endTime, yout);
+    RecordStoppingPoint(mLastSolutionTime, yout);
     DeleteVector(yout);
 
     return solutions;

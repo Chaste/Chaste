@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellCycleModelOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
+#include "CvodeAdaptor.hpp"
 
 /**
  * A concrete implementation of AbstractCellCycleModelOdeSolver, that uses templates
@@ -136,6 +137,15 @@ template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
 void CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::Initialise()
 {
     mpOdeSolver.reset(new ODE_SOLVER);
+    // If this is a CVODE solver we need to tell it to reset. Otherwise
+    // the fact this is a singleton will lead to all sorts of problems
+    // as CVODE will have the internal state for the wrong ODE system!
+#ifdef CHASTE_CVODE
+    if (boost::dynamic_pointer_cast<CvodeAdaptor>(mpOdeSolver))
+    {
+        (boost::static_pointer_cast<CvodeAdaptor>(mpOdeSolver))->SetForceReset(true);
+    }
+#endif //CHASTE_CVODE
 }
 
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>

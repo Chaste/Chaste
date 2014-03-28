@@ -107,7 +107,11 @@ public:
 
         double steady_beta_cat_at_wnt_equals_1 = p_cycle_model->GetBetaCateninConcentration();
 
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.451, 1e-3);
+#ifdef CHASTE_CVODE
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4362, 1e-4);
+#else
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4511, 1e-4);
+#endif
 
         // Divide the cell
         TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);

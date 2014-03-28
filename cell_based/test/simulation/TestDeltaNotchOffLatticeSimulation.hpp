@@ -330,13 +330,13 @@ public:
 
         // Check that the simulation converges on the expected values
         double notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
-        TS_ASSERT_DELTA(notch_0b, 0.2938, 1e-04);  //Default solution at t=10
+        TS_ASSERT_DELTA(notch_0b, 0.3538417, 1e-04);  //Default solution at t=10
         double delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
-        TS_ASSERT_DELTA(delta_0b, 0.0925, 1e-04);  //Default solution at t=10
+        TS_ASSERT_DELTA(delta_0b, 0.0740040, 1e-04);  //Default solution at t=10
         double notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
-        TS_ASSERT_DELTA(notch_1b, 0.4220, 1e-04);  //Default solution at t=10
+        TS_ASSERT_DELTA(notch_1b, 0.3538417, 1e-04);  //Default solution at t=10
         double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
-        TS_ASSERT_DELTA(delta_1b, 0.0598, 1e-04);  //Default solution at t=10
+        TS_ASSERT_DELTA(delta_1b, 0.0740040, 1e-04);  //Default solution at t=10
 
         // Avoid memory leaks
         for (unsigned i=0; i<nodes.size(); i++)
