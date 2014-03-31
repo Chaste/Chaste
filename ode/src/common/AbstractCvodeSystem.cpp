@@ -420,17 +420,21 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
 void AbstractCvodeSystem::RecordStoppingPoint(double stopTime)
 {
 //    DebugSteps(mpCvodeMem, this);
-    // If we're forcing a reset there's no point recording last stopping point?
-    if (!mForceReset)
+
+    // If we're forcing a reset then we don't record the stopping time
+    // as a result it won't match and we will force a reset in SetupCvode() on
+    // the next solve call.
+    if (mForceReset) return;
+
+    // Otherwise we will store the state variables and time for comparison on the
+    // next solve call, to work out whether we need to reset.
+    const unsigned size = GetNumberOfStateVariables();
+    CreateVectorIfEmpty(mLastSolutionState, size);
+    for (unsigned i=0; i<size; i++)
     {
-        const unsigned size = GetNumberOfStateVariables();
-        CreateVectorIfEmpty(mLastSolutionState, size);
-        for (unsigned i=0; i<size; i++)
-        {
-            SetVectorComponent(mLastSolutionState, i, GetVectorComponent(mStateVariables, i));
-        }
-        mLastSolutionTime = stopTime;
+        SetVectorComponent(mLastSolutionState, i, GetVectorComponent(mStateVariables, i));
     }
+    mLastSolutionTime = stopTime;
 }
 
 
