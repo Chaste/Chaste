@@ -383,6 +383,17 @@ public:
 
     void TestSequentialSolveCalls() throw (Exception)
     {
+        /*
+         * All of the tests in this section pass when using Sundials >= 2.4.0
+         * with 'ForcedReset' defaulting to false.
+         *
+         * Unfortunately they don't pass when using Sundials 2.3.0, probably because it
+         * isn't as smart about going back in time when it sees changes in the RHS function.
+         * (done as parameter changes here).
+         *
+         * So this messiness means that we have to switch on 'Forced Resetting' for
+         * Sundials 2.3.0 as default to make sure it gives good answers.
+         */
 #ifdef CHASTE_CVODE
         {
             ParameterisedCvode ode;
@@ -437,7 +448,7 @@ public:
             // (We tricked ODE system by resetting a state variable in minimal reset mode).
         }
 #else
-        std::cout << "Cvode is not enabled.\n";
+        std::cout << "Cvode is not enabled - this test was not run.\n";
 #endif // CHASTE_CVODE
     }
 
