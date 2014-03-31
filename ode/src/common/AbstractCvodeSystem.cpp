@@ -122,7 +122,13 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
     : AbstractParameterisedSystem<N_Vector>(numberOfStateVariables),
       mLastSolutionState(NULL),
       mLastSolutionTime(0.0),
+#if CHASTE_SUNDIALS_VERSION >=20400
       mForceReset(false),
+#else
+      // Old Sundials don't seem to 'go back' when something has changed
+      // properly, and give more inaccurate answers.
+      mForceReset(true),
+#endif
       mForceMinimalReset(false),
       mUseAnalyticJacobian(false),
       mpCvodeMem(NULL),

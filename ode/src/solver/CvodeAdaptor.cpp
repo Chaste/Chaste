@@ -452,7 +452,11 @@ CvodeAdaptor::CvodeAdaptor(double relTol, double absTol)
       mCheckForRoots(false),
       mLastSolutionState(NULL),
       mLastSolutionTime(0.0),
+#if CHASTE_SUNDIALS_VERSION >= 20400
       mForceReset(false),
+#else
+      mForceReset(true),
+#endif
       mForceMinimalReset(false)
 {
 }

@@ -52,8 +52,12 @@ AbstractCardiacCellInterface*  AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
 #ifdef CHASTE_CVODE
         if (dynamic_cast<AbstractCvodeCell*>(p_cell))
         {
+#if CHASTE_SUNDIALS_VERSION >= 20400
             // Tell the single cell model solver not to re-initialise on subsequent Solve calls.
+            // Unfortunately the oldest CVODE we currently support (2.5.0 in Sundials 2.3.0) doesn't
+            // work very well this this enabled, so we will go without and take a performance hit.
             static_cast<AbstractCvodeCell*>(p_cell)->SetMinimalReset(true);
+#endif // SUNDIALS_VERSION
             // Use the PDE timestep as the [maximum] CVODE timestep.
             static_cast<AbstractCvodeCell*>(p_cell)->SetTimestep(HeartConfig::Instance()->GetPdeTimeStep());
         }
