@@ -82,7 +82,7 @@ private:
      */
     double mDensity;
 
-    std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
+    std::map<unsigned, Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
     std::vector<double> mFlux; /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
     std::vector<double> mPressure; /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
     std::map<unsigned, double> mPressureCondition; /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
@@ -182,6 +182,14 @@ public:
     void SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure);
 
     /**
+     * Gets the most recent pressure at a boundary node
+     *
+     * @param rNode The node to get the pressure for.
+     * @return The pressure at the node.
+     */
+    double GetPressureAtBoundaryNode(const Node<3>& rNode);
+
+    /**
      * Sets a Dirichlet flux boundary condition for a given node.
      *
      * The given boundary condition will be applied at the next time step and persist through
@@ -247,7 +255,7 @@ public:
      *  @param rDirName A directory name relative to CHASTE_TEST_OUTPUT.
      *  @param rFileBaseName The base name of the new VTK file.
      */
-    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(VentilationProblem*, double, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
+    void Solve(TimeStepper& rTimeStepper, void (*pBoundaryConditionFunction)(VentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&), const std::string& rDirName, const std::string& rFileBaseName);
 
     /**
      * Read a problem definition from a file and use then solve that problem
@@ -296,6 +304,16 @@ public:
     void SetDynamicResistance(bool dynamicResistance = true)
     {
         mDynamicResistance = dynamicResistance;
+    }
+
+    /**
+     * @param rNode The node to get the acinus at. Must be a boundary node!
+     * @return The acinar unit at the given node.
+     */
+    Swan2012AcinarUnit* GetAcinus(const Node<3>& rNode)
+    {
+        assert(mAcinarUnits.count(rNode.GetIndex()));
+        return mAcinarUnits[rNode.GetIndex()];
     }
 
 };

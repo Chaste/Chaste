@@ -55,23 +55,27 @@ std::vector<double> pressureAt5;
 std::vector<double> pressureAt6;
 std::vector<double> pressureAt7;
 
-void LinearTimeBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
+void LinearTimeBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
+    double time = rTimeStepper.GetTime();
     pProblem->SetPressureAtBoundaryNode(rNode, 15*time);
 }
 
-void SineBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
+void SineBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
+    double time = rTimeStepper.GetTime();
     pProblem->SetPressureAtBoundaryNode(rNode, 15.0*sin(time*5.0/(2.0*M_PI)));
 }
 
-void FileBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
+void FileBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
+    double time = rTimeStepper.GetTime();
+
     unsigned timestep= (unsigned) floor(time*100.0+0.5);
     pProblem->SetPressureAtBoundaryNode(rNode, pressureAt7[timestep]);
 }
 
-void GravitationalBCs(VentilationProblem* pProblem, double time, const Node<3>& rNode)
+void GravitationalBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
 {
     double x_max =  6.0;
     double x_min = -6.0;
@@ -82,6 +86,26 @@ void GravitationalBCs(VentilationProblem* pProblem, double time, const Node<3>& 
     double pressure = delta_p * (x - x_min)/(x_max - x_min);
 
     pProblem->SetPressureAtBoundaryNode(rNode, pressure);
+}
+
+void SwanAcinarUnitsBC(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
+{
+    double time = rTimeStepper.GetTime();
+
+    Swan2012AcinarUnit* p_acinus = pProblem->GetAcinus(rNode);
+
+    double pleural_pressure = -0.49 - 2.4*(1 + sin((M_PI/2)*(time - 1)));
+
+    p_acinus->SetPleuralPressure(pleural_pressure);
+    p_acinus->SetAirwayPressure(pProblem->GetPressureAtBoundaryNode(rNode));
+
+    if (time != rTimeStepper.GetNextTime()) //Don't advance if we're at the end of the simulation
+    {
+        p_acinus->SolveAndUpdateState(time, rTimeStepper.GetNextTime());
+
+        //Note that the acinar model defines positive flow as out of the acinus.
+        pProblem->SetFluxAtBoundaryNode(rNode, -p_acinus->GetFlow());
+    }
 }
 
 class TestVentilationProblem : public CxxTest::TestSuite
@@ -369,6 +393,31 @@ public:
         problem.Solve(stepper, &GravitationalBCs, "TestVentilation", "three_bifurcations_gravity");
     }
 
+    void TestSwanThreeBifurcations() throw (Exception)
+    {
+         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+//        VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
+
+         //The three_bifurcation mesh has very small radii leading to instability, we adjust them to the physiological range.
+         ///\todo This is partially ignored by the solver, which calculates the resistance of the acinar ducts in the constructor
+         TetrahedralMesh<1,3>& r_mesh = problem.rGetMesh();
+         for (TetrahedralMesh<1,3>::ElementIterator iter = r_mesh.GetElementIteratorBegin();
+              iter != r_mesh.GetElementIteratorEnd();
+              ++iter)
+         {
+             iter->SetAttribute(0.5);
+         }
+
+         problem.SetRadiusOnEdge();
+         problem.SetOutflowPressure(0.0);
+
+         TimeStepper stepper(0.0, 1.0, 0.005);
+         problem.Solve(stepper, &SwanAcinarUnitsBC, "TestVentilation", "swan_three_bifurcations");
+
+         ///\todo The above runs and looks plausible, although the acinar don't expand as much as they should.
+         //Further tests are needed, at a minimum compare total inspired volume against change in acinar volume
+    }
+
     /*
      * HOW_TO_TAG Continuum mechanics/Ventilation
      * Solve a simple ventilation problem defined in a file.
@@ -431,6 +480,7 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
         problem.Solve();
+
         // For debugging...
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
@@ -447,7 +497,6 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 56379u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 56378u);
         problem.Solve();
-//        problem.Solve();
 
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25

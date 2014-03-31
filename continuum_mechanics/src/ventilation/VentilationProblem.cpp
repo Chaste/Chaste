@@ -63,8 +63,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
      * should be factored out into a factory to allow setup of other acinar units and
      * other initial conditions
      */
-    unsigned num_acinar = mMesh.GetNumBoundaryNodes() - 1;
-    double acinus_volume = 1.2e9/num_acinar; //Assumes a residual capacity of 1.2l (x10^9 in mm^3)
+    //unsigned num_acinar = mMesh.GetNumBoundaryNodes() - 1;
+    double acinus_volume = 1.2e6/31000; //Assumes a residual capacity of 1.2l (x10^6 in mm^3)
 
     for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
           iter != mMesh.GetBoundaryNodeIteratorEnd();
@@ -78,7 +78,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
             p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
             p_acinus->SetUndeformedVolume(acinus_volume);
             p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
-            p_acinus->SetAirwayPressure(-0.49);
+            p_acinus->SetAirwayPressure(0.0);
 
             //Calculates the resistance of the terminal bronchiole.
             //This should be updated dynamically during the simulation
@@ -92,8 +92,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
             double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
             p_acinus->SetTerminalBronchioleResistance(resistance);
 
-            mAcinarUnits.push_back(p_acinus);
-            ///\todo make a map for node->acinar (rather than a vector)?
+            mAcinarUnits[(*iter)->GetIndex()] = p_acinus;
         }
     }
 
@@ -341,6 +340,15 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
     mPressureCondition[rNode.GetIndex()] = pressure;
 }
 
+double VentilationProblem::GetPressureAtBoundaryNode(const Node<3>& rNode)
+{
+    if (rNode.IsBoundaryNode() == false)
+    {
+        EXCEPTION("Boundary conditions cannot be got at internal nodes");
+    }
+    return mPressure[rNode.GetIndex()];
+}
+
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)
 {
     if (rNode.IsBoundaryNode() == false)
@@ -402,20 +410,35 @@ void VentilationProblem::WriteVtk(const std::string& rDirName, const std::string
 }
 
 void VentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
-        const std::string& rSuffix)
+                                      const std::string& rSuffix)
 {
     std::vector<double> pressures;
     std::vector<double> fluxes;
     GetSolutionAsFluxesAndPressures(fluxes, pressures);
     rVtkWriter.AddCellData("Flux"+rSuffix, fluxes);
     rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
+
+    std::vector<double> volumes(mMesh.GetNumNodes());
+    std::vector<double> stretch_ratios(mMesh.GetNumNodes());
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+             iter != mMesh.GetBoundaryNodeIteratorEnd();
+             ++iter)
+    {
+        if( (*iter)->GetIndex() != mOutletNodeIndex)
+        {
+            volumes[(*iter)->GetIndex()] = mAcinarUnits[(*iter)->GetIndex()]->GetVolume();
+            stretch_ratios[(*iter)->GetIndex()] = mAcinarUnits[(*iter)->GetIndex()]->GetStretchRatio();
+        }
+    }
+    rVtkWriter.AddPointData("Volume"+rSuffix, volumes);
+    rVtkWriter.AddPointData("Stretch"+rSuffix, stretch_ratios);
 }
 
 #endif // CHASTE_VTK
 
 
 void VentilationProblem::Solve(TimeStepper& rTimeStepper,
-        void (*pBoundaryConditionFunction)(VentilationProblem*, double, const Node<3>&),
+        void (*pBoundaryConditionFunction)(VentilationProblem*, TimeStepper& rTimeStepper, const Node<3>&),
         const std::string& rDirName, const std::string& rFileBaseName)
 {
 #ifdef CHASTE_VTK
@@ -441,7 +464,7 @@ void VentilationProblem::Solve(TimeStepper& rTimeStepper,
             if ((*iter)->GetIndex() != mOutletNodeIndex)
             {
                 //Boundary conditions at each boundary/leaf node
-                pBoundaryConditionFunction(this, rTimeStepper.GetTime(), *(*iter));
+                pBoundaryConditionFunction(this, rTimeStepper, *(*iter));
             }
         }
 

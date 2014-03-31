@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Swan2012AcinarUnit.hpp"
 #include "TimeStepper.hpp"
+#include "MathsCustomFunctions.hpp"
 
 //#include "PetscSetupAndFinalize.hpp"
 
@@ -86,9 +87,9 @@ public:
     void TestSwan2012AcinarUnitInspiration() throw(Exception)
     {
         double viscosity = 1.92e-8;
-        double terminal_airway_radius = 0.25; //mm
+        double terminal_airway_radius = 0.5; //mm
         double terminal_airway_length = 1.0;  //mm
-        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(terminal_airway_radius*terminal_airway_radius*terminal_airway_radius*terminal_airway_radius);
+        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/SmallPow(terminal_airway_radius, 4);
         double airway_pressure = 0.0;
 
         Swan2012AcinarUnit acinus;
@@ -107,15 +108,16 @@ public:
         TS_ASSERT_DELTA(acinus.GetVolume(), 1.0, 1e-2); //With no pressure change we expect no volume change
 
         //Sinussoidal inspiration followed by fixed pleural pressure
-        TimeStepper time_stepper(0.0, 2.0, 0.005);
+        TimeStepper time_stepper(0.0, 2, 0.005);
         double old_compliance = DBL_MAX;
         double old_flow = DBL_MAX;
+        double old_pressure = DBL_MAX;
         double flow_integral = 0.0;
         while (!time_stepper.IsTimeAtEnd())
         {
             if(time_stepper.GetNextTime() <= 1.0) //breath in
             {
-                double pleural_pressure = -0.49 - 3.0*(1 + sin((M_PI/2)*(time_stepper.GetNextTime() - 1)));
+                double pleural_pressure = -0.49 - 2.4*(1 + sin((M_PI/2)*(time_stepper.GetNextTime() - 1)));
                 acinus.SetPleuralPressure(pleural_pressure);
                 acinus.SetAirwayPressure(airway_pressure);
 
@@ -133,15 +135,17 @@ public:
             {
                 acinus.SetAirwayPressure(airway_pressure);
                 acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
-                airway_pressure = acinus.GetFlow()/terminal_airway_resistance;
+                airway_pressure = acinus.GetFlow()*terminal_airway_resistance;
 
                 TS_ASSERT_LESS_THAN_EQUALS(acinus.GetFlow(), old_flow);
+                TS_ASSERT_LESS_THAN_EQUALS(airway_pressure, old_pressure);
                 old_flow = acinus.GetFlow();
+                old_pressure = airway_pressure;
             }
             time_stepper.AdvanceOneTimeStep();
-        }
 
-        TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);
+            std::cout << acinus.GetVolume() << std::endl;
+        }
     }
 };
 #endif /*_TESTACINARUNITMODELS_HPP_*/
