@@ -175,7 +175,7 @@ public:
         // Test GetAspectRatio()
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 3u);
-        TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
+        TS_ASSERT_DELTA(element.GetAspectRatio(), 1.0,1e-5);
 
         element.AddNode(nodes[0]);
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 2u);
@@ -199,7 +199,13 @@ public:
         element.DeleteNode(element.GetNodeLocalIndex(1));
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(1), 0u);
+        TS_ASSERT_DELTA(element.GetAspectRatio(), 1.0,1e-5);
+
+        Node<2>* p_node_4 = new Node<2>(4, false, 2.0, 2.0);
+        element.AddNode(p_node_4);
         TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
+
+
 
 
         // Test MarkAsDeleted()
