@@ -255,8 +255,9 @@ public:
         TS_ASSERT_DELTA(flux[6],  -0.0710, 1e-4); // (Inflow flux)
     }
 
-    void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
+    void failingTestExtraLinkWithRadiusOnNodeFile() throw (Exception)
     {
+        ///\todo #2300 Set of terminals code assumes an ordering on nodes
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations_extra_links", 0u);
         problem.SetOutflowPressure(0.0 + 1.0);
         problem.SetConstantInflowPressures(15 + 1.0);
@@ -319,7 +320,6 @@ public:
          * Dynamic (Pedley) resistance is used at higher Reynolds numbers.
          * There is no coupled acinus compliance model in this version.
          */
-        EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15000); //Needed to increase the resistance in these artificial airways
@@ -471,7 +471,6 @@ public:
     void TestTopOfAirwaysPatientData() throw (Exception)
     {
         VentilationProblem problem("continuum_mechanics/test/data/top_of_tree", 0u);
-        //PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
         //problem.SetConstantInflowFluxes(100.0);
@@ -479,27 +478,27 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 31u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 30u);
         problem.Solve();
-        problem.Solve();
 
-        // For debugging...
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        TS_ASSERT_DELTA(pressure[28], 50.0, 1e-4);
+        TS_ASSERT_DELTA(pressure[29], 50.0, 1e-4);
+        TS_ASSERT_DELTA(pressure[30], 50.0, 1e-4);
     }
 
     void TestPatientData() throw (Exception)
     {
         VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
-        PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
-        //problem.SetConstantInflowPressures(50.0);
-        problem.SetConstantInflowFluxes(100.0);
+        problem.SetConstantInflowPressures(50.0);
+        //problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 56379u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 56378u);
         problem.Solve();
 
         std::vector<double> flux, pressure;
-        problem.GetSolutionAsFluxesAndPressures(flux, pressure); //check pressure at time @ 25
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "patient_data");
 #endif

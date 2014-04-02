@@ -35,9 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VentilationProblem.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "ReplicatableVector.hpp"
 #include "Warnings.hpp"
-#include "Debug.hpp"
+//#include "Debug.hpp"
 
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
@@ -98,7 +97,6 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
 
     mFlux.resize(mMesh.GetNumElements());
     mPressure.resize(mMesh.GetNumNodes());
-    mAccumulatedResistance.resize(mMesh.GetNumElements());
 }
 
 VentilationProblem::~VentilationProblem()
@@ -149,83 +147,131 @@ void VentilationProblem::SolveDirectFromFlux()
 }
 void VentilationProblem::SolveIterativelyFromPressure()
 {
-    // The first step is to accumulate the resistances all the way down the tree
-    // This could use a tree walker - it's dangerous to assume that the edges are in topological
-    // sort order.
-    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
-         iter != mMesh.GetElementIteratorEnd();
-         ++iter)
+    const unsigned num_non_zeroes = 50;
+    std::map<unsigned, unsigned> node_index_to_terminal;
+    std::map<unsigned, unsigned> terminal_to_node_index;
+    std::map<unsigned, unsigned> terminal_to_edge_index;
+
+    Mat terminal_interaction_matrix;
+    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, num_non_zeroes, NULL, &terminal_interaction_matrix);
+    PetscMatTools::SetOption(terminal_interaction_matrix, MAT_SYMMETRIC);
+    PetscMatTools::SetOption(terminal_interaction_matrix, MAT_SYMMETRY_ETERNAL);
+
+    /* Map each edge to its terminal descendants so that we can keep track
+     * of which terminals can affect each other via a particular edge.
+     */
+    std::vector<std::set<unsigned> > descendant_nodes(mMesh.GetNumElements());
+    unsigned terminal_index=0;
+    for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
     {
-        //Poiseuille resistance for this edge
-        double resistance = CalculateResistance(*iter);
-        unsigned edge_index = iter->GetIndex();
-        if (edge_index == 0)
+        Node<3>* p_node = mMesh.GetNode(node_index);
+        Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
+        unsigned parent_index = *element_iterator;
+        ++element_iterator;
+        if (p_node->IsBoundaryNode())
         {
-            mAccumulatedResistance[edge_index] = resistance;
+            node_index_to_terminal[node_index] = terminal_index;
+            terminal_to_node_index[terminal_index] = node_index;
+            terminal_to_edge_index[terminal_index] = parent_index;
+            descendant_nodes[parent_index].insert(terminal_index++);
         }
         else
         {
-            unsigned parent_index = *(iter->GetNode(0)->ContainingElementsBegin());
-            assert(parent_index<edge_index);
-            // This is based on a symmetric solution
-            mAccumulatedResistance[edge_index] = 2.0*mAccumulatedResistance[parent_index] + resistance;
+
+            for (;element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+            {
+                descendant_nodes[parent_index].insert(descendant_nodes[*element_iterator].begin(),descendant_nodes[*element_iterator].end());
+            }
+            //Failure at this point means that we found an internal node before its descendants
+            assert(descendant_nodes[parent_index].size() != 0u);
         }
+        double parent_resistance = CalculateResistance(*(mMesh.GetElement(parent_index)));
+        if (descendant_nodes[parent_index].size() <= num_non_zeroes)
+        {
+            std::vector<PetscInt> indices( descendant_nodes[parent_index].begin(), descendant_nodes[parent_index].end() );
+            std::vector<double> resistance_to_add(indices.size()*indices.size(), parent_resistance);
+
+            MatSetValues(terminal_interaction_matrix,
+                         indices.size(), (PetscInt*) &indices[0],
+                         indices.size(), (PetscInt*) &indices[0], &resistance_to_add[0], ADD_VALUES);
+        }
+        ///\todo #2300 add to diagonals anyway
     }
+    //Failure at this point means that we found an internal node before its descendants
+    assert(descendant_nodes[mOutletNodeIndex].size() == terminal_index);
+    PetscMatTools::Finalise(terminal_interaction_matrix);
+    assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
+
+    KSP ksp_solver;
+    KSPCreate(PETSC_COMM_SELF, &ksp_solver);
+    KSPSetOperators(ksp_solver, terminal_interaction_matrix, terminal_interaction_matrix, SAME_PRECONDITIONER);
+    KSPSetFromOptions(ksp_solver);
+    KSPSetUp(ksp_solver);
 
     /* Now use the pressure boundary conditions to determine suitable flux boundary conditions
      * and iteratively update them until we are done
      */
     assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
+
     unsigned max_iterations=500;
     double relative_tolerance = 1e-10;
     double max_relative_boundary_flux_change;
-    //double max_delta_pressure;
-    //double big_flux_change;
-    //std::map<unsigned, double> last_flux_change;
+    std::map<unsigned, double> last_flux_change;
     bool converged=false;
+    std::vector<double> estimated_flux_changes(mMesh.GetNumBoundaryNodes()-1, 0.0);
+    Vec flux_change;
+    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &flux_change);
+    Vec pressure_change;
+    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &pressure_change);
+    double scaling = 1.0;
+    double last_norm_pressure_change;
     for (unsigned iteration = 0; iteration < max_iterations && converged==false; iteration++)
     {
         max_relative_boundary_flux_change = 0.0;
-        //max_delta_pressure = 0.0;
-        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
-                iter != mMesh.GetBoundaryNodeIteratorEnd();
-                ++iter)
+        for (unsigned terminal=0; terminal<terminal_index; terminal++)
         {
-            unsigned node_index = (*iter)->GetIndex();
-            unsigned edge_index = *((*iter)->ContainingElementsBegin());
-            if (node_index != mOutletNodeIndex)
-            {
-                // How far we are away from matching this boundary condition.
-                double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
-//                if (fabs(delta_pressure) > max_delta_pressure)
-//                {
-//                    max_delta_pressure = fabs(delta_pressure);
-//                }
+            unsigned node_index = terminal_to_node_index[terminal];
 
-                // Offset the first iteration
-                if (iteration == 0)
-                {
-                    delta_pressure += mPressureCondition[mOutletNodeIndex];
-                }
-                // Estimate the flux based on there being a symmetric path to this terminus
-                double estimated_flux_change =  delta_pressure/mAccumulatedResistance[edge_index];
-                if (edge_index ==9)
-                {
-                    //PRINT_3_VARIABLES(iteration, delta_pressure, mFlux[edge_index]);
-                }
-////                PRINT_3_VARIABLES(last_flux_change[edge_index], mFlux[edge_index], mFlux[edge_index] + estimated_flux_change);
-//                last_flux_change[edge_index] = mFlux[edge_index];
-                mFlux[edge_index] += estimated_flux_change;
-                double relative_boundary_flux_change = fabs( estimated_flux_change );
-                if (mFlux[edge_index] != 0.0)
-                {
-                    relative_boundary_flux_change /= fabs(mFlux[edge_index]);
-                }
-                if (relative_boundary_flux_change > max_relative_boundary_flux_change)
-                {
-                    max_relative_boundary_flux_change = relative_boundary_flux_change;
-                    //big_flux_change = estimated_flux_change;
-                }
+            // How far we are away from matching this boundary condition.
+            double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
+
+            // Offset the first iteration
+            if (iteration == 0)
+            {
+                delta_pressure += mPressureCondition[mOutletNodeIndex];
+            }
+            VecSetValue(pressure_change, terminal, delta_pressure, INSERT_VALUES);
+        }
+        double norm_pressure_change, norm_flux_change;
+        VecNorm(pressure_change, NORM_1, &norm_pressure_change);
+
+        if (iteration != 0 && norm_pressure_change > 1e-8 && (last_norm_pressure_change / norm_pressure_change < 2.0))
+        {
+            scaling = (last_norm_pressure_change / norm_pressure_change);
+        }
+        last_norm_pressure_change = norm_pressure_change;
+//        PRINT_4_VARIABLES(iteration, norm_pressure_change, last_norm_pressure_change, scaling);
+
+        KSPSolve(ksp_solver, pressure_change, flux_change);
+        VecNorm(flux_change, NORM_1, &norm_flux_change);
+        double* p_flux_change;
+        VecGetArray(flux_change, &p_flux_change);
+
+
+
+        for (unsigned terminal=0; terminal<terminal_index; terminal++)
+        {
+            double estimated_flux_change=p_flux_change[terminal];
+            unsigned edge_index = terminal_to_edge_index[terminal];
+            mFlux[edge_index] += scaling * estimated_flux_change;
+            double relative_boundary_flux_change = fabs( estimated_flux_change );
+            if (mFlux[edge_index] != 0.0)
+            {
+                relative_boundary_flux_change /= fabs(mFlux[edge_index]);
+            }
+            if (relative_boundary_flux_change > max_relative_boundary_flux_change)
+            {
+                max_relative_boundary_flux_change = relative_boundary_flux_change;
             }
         }
         if (max_relative_boundary_flux_change <= relative_tolerance)
@@ -234,14 +280,17 @@ void VentilationProblem::SolveIterativelyFromPressure()
         }
         else
         {
-            //        PRINT_4_VARIABLES(iteration, max_relative_boundary_flux_change, max_delta_pressure, big_flux_change);
             SolveDirectFromFlux();
         }
     }
     if(!converged)
     {
-        //std::cout<<max_relative_boundary_flux_change<<"\n";
+        NEVER_REACHED;
     }
+    PetscTools::Destroy(terminal_interaction_matrix);
+    PetscTools::Destroy(flux_change);
+    PetscTools::Destroy(pressure_change);
+    KSPDestroy(PETSC_DESTROY_PARAM(ksp_solver));
 }
 
 double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool usePedley, double flux)

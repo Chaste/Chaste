@@ -87,8 +87,6 @@ private:
     std::vector<double> mPressure; /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
     std::map<unsigned, double> mPressureCondition; /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
     bool mFluxGivenAtInflow; /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
-    std::vector<double> mAccumulatedResistance; /**< Used in pressure boundary solver.  This holds the approximate combined resistance at each edge from the root of the tree, based on a symmetric solution.*/
-
 
     /**
      * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.
