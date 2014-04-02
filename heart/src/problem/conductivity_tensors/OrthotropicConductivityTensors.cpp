@@ -90,8 +90,9 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
         {
             /*
              *  For every element of the mesh we compute its tensor like (from
-             * "Laminar Arrangement of Ventricular Myocites Influences Electrical
-             * Behavior of the Heart", DA Hooks et al. 2007):
+             * "Laminar Arrangement of Ventricular Myocytes Influences Electrical
+             * Behavior of the Heart, DA Hooks et al. 2007):
+             *
              *
              *                         [g_f  0   0 ] [a_f']
              *  tensor = [a_f a_l a_n] [ 0  g_l  0 ] [a_l']
