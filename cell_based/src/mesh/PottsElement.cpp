@@ -68,13 +68,6 @@ double PottsElement<DIM>::GetAspectRatio()
 {
     assert(DIM==2);
 
-	assert(this->GetNumNodes()>0);
-
-    if (this->GetNumNodes() <= 2)
-    {
-    	return 1.0;
-	}
-
     double eig_max;
     double eig_min;
 
@@ -190,7 +183,7 @@ double PottsElement<DIM>::GetAspectRatio()
 //
 //        // Lapack returns eigenvalues in ascending order
 //        eig_max = eigs[DIM-1];
-//        eig_min = eigs[0] +eigs[1];
+//        eig_min = eigs[0];
 //        break;
 //    }
     default:
