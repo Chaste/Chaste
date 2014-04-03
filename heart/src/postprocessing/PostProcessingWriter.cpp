@@ -205,16 +205,14 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
              ++index)
         {
             unsigned node_idx = index.Local;
-            // pad with zeros if no pace defined at this node
+            // pad with -999 if no pace defined at this node
             if (pace_idx < rDataPayload[node_idx].size() )
             {
                 distributed_vector[index] = rDataPayload[node_idx][pace_idx];
             }
             else
             {
-                /// \todo #1660 make a test that has different numbers of APDs at different nodes.
-                NEVER_REACHED;
-                //distributed_vector[index] = 0.0;
+                distributed_vector[index] = -999.0;
             }
         }
         writer.PutVector(apd_id, apd_vec);

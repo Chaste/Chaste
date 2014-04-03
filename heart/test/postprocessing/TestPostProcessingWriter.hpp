@@ -96,7 +96,7 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "postprocessingapd");
+        CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "PostProcessingWriter/postprocessingapd");
 
         ///\todo #2359 - it isn't nice that the Postprocessing writer
         /// and HDF5 converter can't be in the same scope.
@@ -127,22 +127,22 @@ public:
         TS_ASSERT(output_file.Exists());
 
         std::string file1 = output_file.GetAbsolutePath();
-        std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
+        std::string file2 = "heart/test/data/PostProcessingWriter/good_apd_postprocessing.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
 
         file1 = FileFinder("output/UpstrokeTimeMap_minus_30.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/good_upstroke_time_postprocessing.dat";
+        file2 = "heart/test/data/PostProcessingWriter/good_upstroke_time_postprocessing.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
         file1 = FileFinder("output/MaxUpstrokeVelocityMap_minus_30.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/good_upstroke_velocity_postprocessing.dat";
+        file2 = "heart/test/data/PostProcessingWriter/good_upstroke_velocity_postprocessing.dat";
         NumericFileComparison comp3(file1, file2);
         TS_ASSERT(comp3.CompareFiles(1e-12));
 
         file1 = FileFinder("output/ConductionVelocityFromNode0.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/conduction_velocity_10_nodes_from_node_0.dat";
+        file2 = "heart/test/data/PostProcessingWriter/conduction_velocity_10_nodes_from_node_0.dat";
         NumericFileComparison comp4(file1, file2);
         TS_ASSERT(comp4.CompareFiles(1e-12));
     }
@@ -170,7 +170,7 @@ public:
                                                  HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
 
         std::string file1 = FileFinder("output/Apd_90_minus_30_Map.dat", output_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/PostProcessorWriter/101_zeroes.dat";
+        std::string file2 = "heart/test/data/PostProcessingWriter/101_zeroes.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
@@ -230,57 +230,57 @@ public:
                                                  HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
 
         std::string file1 = FileFinder("output/Apd_80_minus_30_Map.dat", test_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/PostProcessorWriter/101_zeroes.dat";
+        std::string file2 = "heart/test/data/PostProcessingWriter/101_zeroes.dat";
         NumericFileComparison comp1(file1, file2);
         TS_ASSERT(comp1.CompareFiles(1e-12));
 
         file1 = FileFinder("output/Apd_90_minus_20_Map.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/101_zeroes.dat";
+        file2 = "heart/test/data/PostProcessingWriter/101_zeroes.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
         file1 = FileFinder("output/UpstrokeTimeMap_minus_70.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/UpstrokeTimeMap_-70.dat";
+        file2 = "heart/test/data/PostProcessingWriter/UpstrokeTimeMap_-70.dat";
         NumericFileComparison comp3(file1, file2);
         TS_ASSERT(comp3.CompareFiles(1e-12));
 
         file1 = FileFinder("output/UpstrokeTimeMap_20.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/UpstrokeTimeMap_20.dat";
+        file2 = "heart/test/data/PostProcessingWriter/UpstrokeTimeMap_20.dat";
         NumericFileComparison comp4(file1, file2);
         TS_ASSERT(comp4.CompareFiles(1e-12));
 
         file1 = FileFinder("output/MaxUpstrokeVelocityMap_minus_50.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/MaxUpstrokeVelocityMap_-50.dat";
+        file2 = "heart/test/data/PostProcessingWriter/MaxUpstrokeVelocityMap_-50.dat";
         NumericFileComparison comp5(file1, file2);
         TS_ASSERT(comp5.CompareFiles(1e-12));
 
         file1 = FileFinder("output/MaxUpstrokeVelocityMap_50.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/MaxUpstrokeVelocityMap_50.dat";
+        file2 = "heart/test/data/PostProcessingWriter/MaxUpstrokeVelocityMap_50.dat";
         NumericFileComparison comp6(file1, file2);
         TS_ASSERT(comp6.CompareFiles(1e-12));
 
         file1 = FileFinder("output/ConductionVelocityFromNode0.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/conduction_velocity_100_nodes_from_node_0.dat";
+        file2 = "heart/test/data/PostProcessingWriter/conduction_velocity_100_nodes_from_node_0.dat";
         NumericFileComparison comp7(file1, file2);
         TS_ASSERT(comp7.CompareFiles(1e-12));
 
         file1 = FileFinder("output/PseudoEcgFromElectrodeAt_11_0_0.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/PseudoEcgFromElectrodeAt_11_0_0.dat";
+        file2 = "heart/test/data/PostProcessingWriter/PseudoEcgFromElectrodeAt_11_0_0.dat";
         NumericFileComparison comp8(file1, file2);
         TS_ASSERT(comp8.CompareFiles(1e-12));
 
         file1 = FileFinder("output/PseudoEcgFromElectrodeAt_-1_0_0.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/PseudoEcgFromElectrodeAt_-1_0_0.dat";
+        file2 = "heart/test/data/PostProcessingWriter/PseudoEcgFromElectrodeAt_-1_0_0.dat";
         NumericFileComparison comp9(file1, file2);
         TS_ASSERT(comp9.CompareFiles(1e-12));
 
         file1 = FileFinder("AboveThresholdDepolarisations_minus_40.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/AboveThresholdDepolarisations-40.dat";
+        file2 = "heart/test/data/PostProcessingWriter/AboveThresholdDepolarisations-40.dat";
         NumericFileComparison comp10(file1, file2);
         TS_ASSERT(comp10.CompareFiles(1e-12));
 
         file1 = FileFinder("NodalTraces_V.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/NodalTrace_V_Valid.dat";
+        file2 = "heart/test/data/PostProcessingWriter/NodalTrace_V_Valid.dat";
         NumericFileComparison comp_nodes(file1, file2);
         TS_ASSERT(comp_nodes.CompareFiles(1e-12));
 
@@ -321,14 +321,14 @@ public:
 
         //check the file with V (assuming default variable name was V)
         std::string file1 = FileFinder("NodalTraces_V.dat", output_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/PostProcessorWriter/NodalTrace_V_WithPermutationValid.dat";
+        std::string file2 = "heart/test/data/PostProcessingWriter/NodalTrace_V_WithPermutationValid.dat";
 
         NumericFileComparison comp_V(file1, file2);
         TS_ASSERT(comp_V.CompareFiles(1e-3));
 
         //check file with Phi_e (assuming default variable name was Phi_e)
         file1 = FileFinder("NodalTraces_Phi_e.dat", output_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/NodalTrace_Phi_e_WithPermutationValid.dat";
+        file2 = "heart/test/data/PostProcessingWriter/NodalTrace_Phi_e_WithPermutationValid.dat";
 
         NumericFileComparison comp_phie(file1, file2);
         TS_ASSERT(comp_phie.CompareFiles(1e-3));
@@ -343,13 +343,13 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "Ead");
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "PostProcessingWriter/Ead");
 
         PostProcessingWriter<1,1> writer(mesh, output_dir, "Ead");
         writer.WriteAboveThresholdDepolarisationFile(-30.0);
 
         std::string file1 = FileFinder("AboveThresholdDepolarisations_minus_30.dat", output_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/PostProcessorWriter/AboveThresholdDepolarisations-30.dat";
+        std::string file2 = "heart/test/data/PostProcessingWriter/AboveThresholdDepolarisations-30.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
     }
@@ -364,7 +364,7 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "postprocessingapd");
+        CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "PostProcessingWriter/postprocessingapd");
 
         ///\todo #2359 allow PostProcessingWriter and Hdf5 converters to be in same scope (conflicting Hdf5DataReaders).
         {
@@ -394,12 +394,12 @@ public:
 //                                           true);
 
         std::string file1 = FileFinder("output/Apd_60_minus_30_Map.dat", test_dir).GetAbsolutePath();
-        std::string file2 = "heart/test/data/PostProcessorWriter/good_apd_postprocessing.dat";
+        std::string file2 = "heart/test/data/PostProcessingWriter/good_apd_postprocessing.dat";
         NumericFileComparison comp(file1, file2);
         TS_ASSERT(comp.CompareFiles(1e-12));
 
         file1 = FileFinder("AboveThresholdDepolarisations_minus_30.dat", test_dir).GetAbsolutePath();
-        file2 = "heart/test/data/PostProcessorWriter/good_ead_postprocessing.dat";
+        file2 = "heart/test/data/PostProcessingWriter/good_ead_postprocessing.dat";
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
@@ -423,7 +423,7 @@ public:
         DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "postprocessingapd");
+        CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "PostProcessingWriter/postprocessingapd");
 
         ///\todo #2359 See comment below for the reason for the block.
         {
@@ -532,6 +532,49 @@ public:
 #else
         std::cout << "VTK is not installed / Chaste is not configured to use it, this test didn't do anything.\n";
 #endif
+    }
+
+    void TestDifferentNumberOfPaces() throw (Exception)
+    {
+        HeartConfig::Instance()->Reset();
+        FileFinder output_dir("TestPostProcessingWriter_DifferentNumberOfPaces", RelativeTo::ChasteTestOutput);
+        {
+            DistributedTetrahedralMesh<1,1> mesh;
+            mesh.ConstructRegularSlabMesh(1.0, 1.0);
+
+            CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "PostProcessingWriter/DifferentNumberOfPaces");
+
+            std::vector<double> upstroke_time_map;
+            upstroke_time_map.push_back(0.0);
+            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_time_map);
+
+            PostProcessingWriter<1,1> writer(mesh, output_dir, "DifferentNumberOfPaces");
+            writer.WritePostProcessingFiles();
+        }
+        {
+            Hdf5DataReader reader(output_dir, "DifferentNumberOfPaces", "UpstrokeTimeMap_0");
+
+            std::vector<double> reference;
+            reference.push_back(1.0);
+            reference.push_back(1.0);
+            reference.push_back(501.0);
+            reference.push_back(-999.0);     // padded value from PostProcessingWriter.cpp
+
+            DistributedVectorFactory factory(reader.GetNumberOfRows());
+            Vec data = factory.CreateVec();
+            reader.GetVariableOverNodes(data, "UpstrokeTimeMap_0");
+            DistributedVector distributed_vector = factory.CreateDistributedVector(data);
+
+            for (DistributedVector::Iterator index = distributed_vector.Begin();
+                                 index!= distributed_vector.End();
+                                 ++index)
+            {
+                TS_ASSERT_DELTA(distributed_vector[index], reference[index.Global], 1e-9);
+            }
+
+            PetscTools::Destroy(data);
+
+        }
     }
 };
 
