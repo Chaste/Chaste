@@ -253,7 +253,7 @@ public:
 
     void TestEadCalculation() throw(Exception)
     {
-       Hdf5DataReader ead_file("heart/test/data", "Ead", false);
+       Hdf5DataReader ead_file("heart/test/data/PostProcessingWriter", "Ead", false);
        PropagationPropertiesCalculator ead_calc(&ead_file);
 
        TS_ASSERT_EQUALS(ead_calc.CalculateAllAboveThresholdDepolarisations(97u,-40.0)[0],1u);
