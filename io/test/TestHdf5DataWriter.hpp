@@ -1453,6 +1453,17 @@ public:
         // Can't apply permutation after define mode
         TS_ASSERT_THROWS_THIS(writer.ApplyPermutation(rotation_perm), "Cannot define permutation when not in Define mode");
 
+
+        // However, we can force the permutation to be applied by using the unsafe/extending flag.
+        Hdf5DataWriter writer_unsafe_perm(factory, "TestHdf5DataWriter", "hdf5_permuted_unsafe", false);
+        writer_unsafe_perm.DefineFixedDimension(number_nodes);
+        writer_unsafe_perm.DefineVariable("index","dimensionless");
+        writer_unsafe_perm.DefineVariable("V_m", "millivolts");
+        writer_unsafe_perm.DefineVariable("Phi_e", "millivolts");
+        writer_unsafe_perm.EndDefineMode();
+        writer_unsafe_perm.ApplyPermutation(rotation_perm, /*unsafe*/ true);
+
+
         Vec petsc_data_short = factory.CreateVec();
         DistributedVector distributed_vector_short = factory.CreateDistributedVector(petsc_data_short);
         for (DistributedVector::Iterator index = distributed_vector_short.Begin();
@@ -1463,6 +1474,7 @@ public:
         }
         distributed_vector_short.Restore();
         writer.PutVector(index_id, petsc_data_short);
+        writer_unsafe_perm.PutVector(index_id, petsc_data_short);
 
         Vec petsc_data_long = factory.CreateVec(2);
         DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
@@ -1477,15 +1489,18 @@ public:
         }
         distributed_vector_long.Restore();
         writer.PutStripedVector(variable_IDs, petsc_data_long);
-
+        writer_unsafe_perm.PutStripedVector(variable_IDs, petsc_data_long);
 
         writer.Close();
+        writer_unsafe_perm.Close();
 
         PetscTools::Destroy(petsc_data_short);
         PetscTools::Destroy(petsc_data_long);
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("TestHdf5DataWriter", "hdf5_permuted", true,
                                                 "io/test/data", "hdf5_unpermuted", false));
         TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_permuted", true,
+                                                "io/test/data", "hdf5_permuted", false));
+        TS_ASSERT(CompareFilesViaHdf5DataReader("TestHdf5DataWriter", "hdf5_permuted_unsafe", true,
                                                 "io/test/data", "hdf5_permuted", false));
     }
 

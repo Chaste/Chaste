@@ -253,9 +253,11 @@ public:
      * Apply a permutation to all occurences of PutVector
      * Should be called when in define mode
      * @param rPermutation  a forward/?reverse permutation
+     * @param unsafeExtendingMode is true when we are extending a file which requires a permutation to be applied to it.
+     *        In particular we are extending a cardiac simulation with "original node ordering"
      * @return success value.  A value "false" indictates that the permutation was empty or was the identity and was not applied
      */
-    bool ApplyPermutation(const std::vector<unsigned>& rPermutation);
+    bool ApplyPermutation(const std::vector<unsigned>& rPermutation, bool unsafeExtendingMode=false);
 
      /**
      * Define the fixed dimension, assuming incomplete data output (subset of the nodes) and using a matrix
