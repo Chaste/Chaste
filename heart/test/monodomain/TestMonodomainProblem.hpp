@@ -1418,7 +1418,7 @@ public:
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE
     }
-    void inprogessTestMonodomainProblem2DWithArchiving() throw(Exception)
+    void TestMonodomainProblem2DWithArchiving() throw(Exception)
     {
         // Names of output and archive directories
         std::string output_dir = "MonodomainProblem2DWithArchiving_Parallel";
@@ -1431,7 +1431,7 @@ public:
 
             // Standard HeartConfig set-up
             HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
-            HeartConfig::Instance()->SetSimulationDuration(2); //ms
+            HeartConfig::Instance()->SetSimulationDuration(.5); //ms
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
             HeartConfig::Instance()->SetOutputDirectory(output_dir);
             HeartConfig::Instance()->SetOutputFilenamePrefix(output_dir);
@@ -1453,33 +1453,14 @@ public:
 
             // Solve and save
             monodomain_problem.Solve();
-
-
-            // Check whether the mesh has been permuted
-            std::vector<unsigned> node_permutation = monodomain_problem.rGetMesh().rGetNodePermutation();
-            if (node_permutation.size() == 0)
-            {
-                std::cout << "Mesh has not been permuted\n";
-            }
-            else
-            {
-                // Not writing permutation out as it will be rather long
-                // But could do with checking whether the permutation changes the position of
-                // several nodes to a noticeable extent
-                std::cout << "Mesh has been permuted\n";
-            }
-
-
-            // Save
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(monodomain_problem, archive_location_1);
         }
 
-//        HeartConfig::Instance()->Reset();
 
-        // Second stage - load from archive and run for an extra 2ms before saving again
+        // Second stage - load from archive and run for an extra time before saving again
         { // Load and run - first go
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_1);
-            HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
+            HeartConfig::Instance()->SetSimulationDuration(1.0); //ms
             p_monodomain_problem->Solve();
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_2);
             delete p_monodomain_problem;
@@ -1488,31 +1469,18 @@ public:
         // Third stage - repeat procedure from second
         { // Load and run - second go
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_2);
-            HeartConfig::Instance()->SetSimulationDuration(6.0); //ms
+            HeartConfig::Instance()->SetSimulationDuration(1.5); //ms
             p_monodomain_problem->Solve();
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_3);
             delete p_monodomain_problem;
         }
-        ///\todo #1369 Read back Meshalyzer .dat file?
 
-        // Locate file
-        FileFinder meshalyzer_dat(output_dir+"/output/"+output_dir+"_V.dat", RelativeTo::ChasteTestOutput);
-        std::ifstream dat_file(meshalyzer_dat.GetAbsolutePath().c_str());
-        std::vector<double> meshalyzer_contents;
-
-        // Make a vector containing the meshalyzer contents (perhaps not the best way of doing it, but it works for now...)
-        // Perhaps do a compare to another version?
-        if (dat_file)
-        {
-            double current_value;
-            while (dat_file >> current_value)
-            {
-                meshalyzer_contents.push_back(current_value);
-            }
-        }
-
-
-
+        // Compare file (possibly produced in parallel) with the original sequential ordering
+        OutputFileHandler handler(output_dir, false);
+        std::string file1=handler.GetOutputDirectoryFullPath()+"/output/"+output_dir+"_V.dat";
+        std::string file2="heart/test/data/MonoProblem2dOriginalPermutation/AfterArchivingTwice_V.dat";
+        NumericFileComparison comp_meshalyzer_original_order(file1, file2);
+        TS_ASSERT(comp_meshalyzer_original_order.CompareFiles(1e-3));
     }
 };
 

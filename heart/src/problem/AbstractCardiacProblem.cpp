@@ -823,7 +823,7 @@ bool AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::InitialiseWriter
     //Possibility of applying a permutation
     if (HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering())
     {
-        bool success = mpWriter->ApplyPermutation(mpMesh->rGetNodePermutation());
+        bool success = mpWriter->ApplyPermutation(mpMesh->rGetNodePermutation(), true/*unsafe mode - extending*/);
         if (success == false)
         {
             //It's not really a permutation, so reset
