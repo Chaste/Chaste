@@ -205,9 +205,6 @@ public:
         element.AddNode(p_node_4);
         TS_ASSERT_THROWS_THIS(element.GetAspectRatio(), "All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
 
-
-
-
         // Test MarkAsDeleted()
         element.MarkAsDeleted();
 
@@ -223,6 +220,7 @@ public:
         }
         delete p_node_2;
         delete p_node_3;
+        delete p_node_4;
     }
 
     void Test3dPottsElement()
