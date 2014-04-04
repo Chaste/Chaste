@@ -345,6 +345,9 @@ public:
     const std::vector<unsigned>& rGetCellCyclePhaseCount() const;
 
     /**
+     * This counts the number of cells that the cell iterator covers. It does not include dead cells or cells that are
+     * associated with a deleted location in the mesh.
+     *
      * @return the number of real cells.
      */
     unsigned GetNumRealCells();

@@ -67,10 +67,12 @@ public:
     CellVariablesWriter();
 
     /**
+     * Overridden VisitCell() method.
+     *
      * Visit a cell and write its data.
      *
-     * @param pCell the cell to write
-     * @param pCellPopulation a pointer to the cell population owning the cell.
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 };

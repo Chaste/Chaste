@@ -214,11 +214,11 @@ CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationInde
     std::set<CellPtr> cells = mLocationCellMap[index];
 
     // If there is only one cell attached return the cell. Note currently only one cell per index.
-    if (cells.size()==1)
+    if (cells.size() == 1)
     {
         return *(cells.begin());
     }
-    if (cells.size()==0)
+    if (cells.size() == 0)
     {
         EXCEPTION("Location index input argument does not correspond to a Cell");
     }
@@ -480,8 +480,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             // The top-most process adds a newline
             if (PetscTools::AmTopMost())
             {
-              std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
-              std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
+                std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
+                std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
             }
             CloseOutputFiles();
         }

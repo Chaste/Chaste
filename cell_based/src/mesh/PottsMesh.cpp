@@ -279,7 +279,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
     mMooreNeighbouringNodeIndices[index].clear();
 
     assert(mVonNeumannNeighbouringNodeIndices.size()==mMooreNeighbouringNodeIndices.size());
-    for( unsigned node_index = 0;
+    for (unsigned node_index = 0;
          node_index < mVonNeumannNeighbouringNodeIndices.size();
          node_index++)
     {
@@ -306,7 +306,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
     assert(mVonNeumannNeighbouringNodeIndices.size()==num_nodes);
     assert(mMooreNeighbouringNodeIndices.size()==num_nodes);
 
-    for( unsigned node_index = 0; node_index < num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
     {
         // Reduce the index of all nodes greater than  node "index"
         if (node_index >= index)

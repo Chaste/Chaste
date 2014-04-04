@@ -249,19 +249,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     std::vector<double> cell_radii(num_nodes);
     std::vector<std::vector<double> > cellwise_data;
 
-    // CellData does not deal with particles, similarly to the situation for ghost nodes see #1975
-    unsigned num_cell_data_items = 0;
-//          // This code is commented  because CellData can't deal with ghost nodes see #1975
-//      //We assume that the first cell is representative of all cells
-//      num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-
-    assert(num_cell_data_items == 0);
-//        for (unsigned var=0; var<num_cell_data_items; var++)
-//        {
-//            std::vector<double> cellwise_data_var(num_nodes);
-//            cellwise_data.push_back(cellwise_data_var);
-//        }
-//    }
+    ///\todo #1975 - deal with possibility of information stored in CellData
 
     // Loop over nodes
     for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
@@ -356,16 +344,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     {
         mesh_writer.AddPointData("Cell radii", cell_radii);
     }
-    if (num_cell_data_items > 0)
-    {
-//        for (unsigned var=0; var<cellwise_data.size(); var++)
-//        {
-//            std::stringstream data_name;
-//            data_name << "Cellwise data " << var;
-//            std::vector<double> cellwise_data_var = cellwise_data[var];
-//            mesh_writer.AddPointData(data_name.str(), cellwise_data_var);
-//        }
-    }
+    ///\todo #1975 - deal with possibility of information stored in CellData
 
     mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
 
@@ -375,7 +354,6 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
-
 }
 
 template<unsigned DIM>
@@ -385,10 +363,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::OutputCellPopulationParameters(o
     NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class NodeBasedCellPopulationWithParticles<1>;
 template class NodeBasedCellPopulationWithParticles<2>;
 template class NodeBasedCellPopulationWithParticles<3>;

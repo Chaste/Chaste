@@ -673,10 +673,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
 #endif //CHASTE_VTK
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class MultipleCaBasedCellPopulation<1>;
 template class MultipleCaBasedCellPopulation<2>;
 template class MultipleCaBasedCellPopulation<3>;

@@ -51,6 +51,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -76,7 +77,7 @@ public:
     /**
      * Visit a cell and write its data.
      *
-     * @param pCell the cell to write
+     * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell.
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;

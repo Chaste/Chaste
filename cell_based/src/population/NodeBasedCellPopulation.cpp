@@ -959,10 +959,7 @@ void NodeBasedCellPopulation<DIM>::AddHaloCell(CellPtr pCell, boost::shared_ptr<
     mLocationHaloCellMap[pNode->GetIndex()] = pCell;
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class NodeBasedCellPopulation<1>;
 template class NodeBasedCellPopulation<2>;
 template class NodeBasedCellPopulation<3>;

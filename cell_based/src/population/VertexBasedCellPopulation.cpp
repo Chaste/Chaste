@@ -724,10 +724,7 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     return p_mesh;
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class VertexBasedCellPopulation<1>;
 template class VertexBasedCellPopulation<2>;
 template class VertexBasedCellPopulation<3>;

@@ -45,7 +45,8 @@ CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesWr
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    *this->mpOutStream << pCell->GetCellCycleModel()->GetCurrentCellCyclePhase() << " ";
+    double phase = pCell->GetCellCycleModel()->GetCurrentCellCyclePhase();
+    *this->mpOutStream << phase << " ";
 }
 
 // Explicit instantiation

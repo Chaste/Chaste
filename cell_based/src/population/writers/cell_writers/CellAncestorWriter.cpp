@@ -45,14 +45,8 @@ CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::CellAncestorWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    unsigned ancestor = pCell->GetAncestor();
-    if (ancestor == UNSIGNED_UNSET)
-    {
-        // Set the file to -1 to mark this case.
-        ancestor = 1;
-        *this->mpOutStream << "-";
-    }
-    *this->mpOutStream << ancestor << " ";
+    double ancestor_index = (pCell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)pCell->GetAncestor();
+    *this->mpOutStream << ancestor_index << " ";
 }
 
 // Explicit instantiation

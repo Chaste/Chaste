@@ -198,10 +198,10 @@ double PottsElement<DIM>::GetAspectRatio()
     }
 
     // As matrix is symmetric positive semidefinite
-    assert(eig_min >=0);
-    assert(eig_max >=0);
+    assert(eig_min >= 0);
+    assert(eig_max >= 0);
 
-    if(eig_min==0)
+    if (eig_min == 0)
     {
         EXCEPTION("All nodes in an element lie in the same line/plane (2D/3D) so aspect ratio is infinite. This interferes with calculation of the Hamiltonian.");
     }
@@ -209,11 +209,7 @@ double PottsElement<DIM>::GetAspectRatio()
     return eig_max/eig_min;
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class PottsElement<1>;
 template class PottsElement<2>;
 template class PottsElement<3>;

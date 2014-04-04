@@ -324,17 +324,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         std::vector<double> cell_volumes(num_elements);
         std::vector<std::vector<double> > cellwise_data;
 
-        unsigned num_cell_data_items = 0;
-        // This code is commented  because CellData can't deal with ghost nodes see #1975
-//        //We assume that the first cell is representative of all cells
-//            num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-
-        for (unsigned var=0; var<num_cell_data_items; var++)
-        {
-            // This code is commented code is because CellData can't deal with ghost nodes see #1975
-            //std::vector<double> cellwise_data_var(num_elements);
-            //cellwise_data.push_back(cellwise_data_var);
-        }
+        ///\todo #1975 - deal with possibility of information stored in CellData
 
         // Loop over Voronoi elements
         for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
@@ -384,11 +374,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
                     cell_volumes[elem_index] = cell_volume;
                 }
 
-                for (unsigned var=0; var<num_cell_data_items; var++)
-                {
-                    // This code is commented  because CellData can't deal with ghost nodes see #1975
-                    //cellwise_data[var][elem_index] =  cell_iter->GetCellData()->GetItem(var);
-                }
+                ///\todo #1975 - deal with possibility of information stored in CellData
             }
             else
             {
@@ -444,19 +430,8 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         {
             mesh_writer.AddCellData("Cell volumes", cell_volumes);
         }
-        ///\todo #1975
-        // This code is commented code is because Cellwise Data can't deal with ghost nodes see #1975
-        if (num_cell_data_items > 0)
-        {
-//            for (unsigned var=0; var<cellwise_data.size(); var++)
-//            {
-//                // This code is commented  because Cellwise Data can't deal with ghost nodes see #1975
-//                std::stringstream data_name;
-//                data_name << "Cellwise data " << var;
-//                std::vector<double> cellwise_data_var = cellwise_data[var];
-//                mesh_writer.AddCellData(data_name.str(), cellwise_data_var);
-//            }
-        }
+        ///\todo #1975 - deal with possibility of information stored in CellData
+
         mesh_writer.WriteVtkUsingMesh(*(this->mpVoronoiTessellation), time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
         *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -476,10 +451,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::OutputCellPopulationParameters(
     MeshBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class MeshBasedCellPopulationWithGhostNodes<1>;
 template class MeshBasedCellPopulationWithGhostNodes<2>;
 template class MeshBasedCellPopulationWithGhostNodes<3>;
