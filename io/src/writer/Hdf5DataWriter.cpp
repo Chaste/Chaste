@@ -315,7 +315,47 @@ void Hdf5DataWriter::OpenFile()
         {
             H5Pset_istore_k(fcpl, (mNumberOfChunks+1)/2);
         }
+        /* 
+         * Align objects to disk block size. Useful for striped filesystem e.g. Lustre
+         * Ideally this should match the chunk size (see "target_size_in_bytes" below).
+         */
+        // H5Pset_alignment(fapl, 0, 1024*1024); // Align to 1 M blocks
+
+        /*
+         * The stripe size can be set on the directory just before creation of the H5
+         * file, and set back to normal just after, so that the H5 file inherits these
+         * settings, by uncommenting the lines below. Adjust the command for your 
+         * specific filesystem!
+         */
+        /*
+        std::string command;
+        // Turn on striping for directory, which the newly created HDF5 file will inherit.
+        if ( PetscTools::AmMaster() )
+        {
+            // Increase stripe count
+            command = "lfs setstripe --size 1M --count -1 "; // -1 means use all OSTs
+            command.append(mDirectory.GetAbsolutePath());
+            std::cout << command << std::endl;
+            system(command.c_str());
+        }
+        */
+
+        // Create file
         mFileId = H5Fcreate(file_name.c_str(), H5F_ACC_TRUNC, fcpl, fapl);
+
+        /*
+        // Turn off striping so other output files stay unstriped.
+        if ( PetscTools::AmMaster() )
+        {
+            // Use one stripe
+            command = "lfs setstripe --size 1M --count 1 ";
+            command.append(mDirectory.GetAbsolutePath());
+            std::cout << command << std::endl;
+            system(command.c_str());
+        }
+        PetscTools::Barrier(); // Don't let other processes run away
+        */
+
         attempting_to = "create";
         H5Pclose(fcpl);
     }
@@ -1179,11 +1219,35 @@ hsize_t Hdf5DataWriter::CalculateNumberOfChunks()
     return num_chunks;
 }
 
+void Hdf5DataWriter::CalculateChunkDims( unsigned targetSize, unsigned* pChunkSizeInBytes, bool* pAllOneChunk )
+{
+    bool all_one_chunk = true;
+    unsigned chunk_size_in_bytes = 8u; // 8 bytes/double
+    unsigned divisors[DATASET_DIMS];
+    // Loop over dataset dimensions, dividing each dimension into the integer number of chunks that results
+    // in the number of entries closest to the targetSize. This means the chunks will span the dataset with
+    // as little waste as possible.
+    for (unsigned i=0; i<DATASET_DIMS; ++i)
+    {
+        // What do I divide the dataset by to get targetSize entries per chunk?
+        divisors[i] = CeilDivide(mDatasetDims[i], targetSize);
+        // If I divide my dataset into divisors pieces, how big is each chunk?
+        mChunkSize[i] = CeilDivide(mDatasetDims[i], divisors[i]);
+        // If my chunks are this big, how many bytes is that?
+        chunk_size_in_bytes *= mChunkSize[i];
+        // Check if all divisors==1, which means we have one big chunk.
+        all_one_chunk = all_one_chunk && divisors[i]==1u;
+    }
+    // Update pointers
+    *pChunkSizeInBytes = chunk_size_in_bytes;
+    *pAllOneChunk = all_one_chunk;
+}
+
 void Hdf5DataWriter::SetChunkSize()
 {
     /*
      * The size in each dimension is increased in step until the size of
-     * the chunk exceeds a limit, or we end up with one big chunk...
+     * the chunk exceeds a limit, or we end up with one big chunk.
      *
      * Also make sure we don't have too many chunks. Over 75 K makes the
      * H5Pset_istore_k optimisation above very detrimental to performance
@@ -1194,45 +1258,50 @@ void Hdf5DataWriter::SetChunkSize()
     if (mUseOptimalChunkSizeAlgorithm)
     {
         /*
-         * The line below initially shoots for (at least) 128 K chunks, which
-         * seems to be a good compromise. For large problems, performance usually
-         * improves with increased chunk size, so the user may wish to
-         * increase this to 1 M (or more) chunks. The chunk cache is set to
-         * 128 M by default which should be plenty.
+         * The line below sets the chunk size to (just under) 128 K chunks, which
+         * seems to be a good compromise. 
+         *
+         * For large problems performance usually improves with increased chunk size. 
+         * A sweet spot seems to be 1 M chunks.
+         *
+         * On a striped filesystem, for best performance, try to match the chunk size 
+         * and alignment (see "H5Pset_alignment" above) with the file stripe size.
          */
-        unsigned target_size_bytes = 1024*1024/8; // 128 K
-        unsigned target_size = 1; // Size of chunk (in entries) for all dims
-        unsigned divisors[DATASET_DIMS];
+        unsigned target_size_in_bytes = 1024*1024/8; // 128 K
+        
+        unsigned target_size = 0;
         unsigned chunk_size_in_bytes;
+        bool all_one_chunk;
 
-        // While we have too many chunks, make target_size_bytes larger
+        // While we have too many chunks, make target_size_in_bytes larger
         do
         {
-            // While the chunks are too small, make mChunkSize[i]s larger
+            // While the chunks are too small, make mChunkSize[i]s larger, unless
+            // we end up with a chunk that spans the dataset.
             do
             {
-                chunk_size_in_bytes = 8u; // 8 bytes/double
-                bool all_one_chunk = true;
-                for (unsigned i=0; i<DATASET_DIMS; ++i)
-                {
-                    divisors[i] = CeilDivide(mDatasetDims[i], target_size);
-                    mChunkSize[i] = CeilDivide(mDatasetDims[i], divisors[i]);
-                    chunk_size_in_bytes *= mChunkSize[i];
-                    all_one_chunk = all_one_chunk && divisors[i]==1u;
-                }
-                // Check if all divisors==1, which means we have one big chunk
-                if (all_one_chunk)
-                {
-                    break;
-                }
-                target_size++; // Increase target size for next iteration
+                target_size++;
+                CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
             }
-            while ( chunk_size_in_bytes < target_size_bytes );
+            while ( chunk_size_in_bytes < target_size_in_bytes && !all_one_chunk);
+
+            // Go one step back if the target size has been exceeded
+            if ( chunk_size_in_bytes > target_size_in_bytes && !all_one_chunk )
+            {
+                target_size--;
+                CalculateChunkDims(target_size, &chunk_size_in_bytes, &all_one_chunk);
+            }
 
             mNumberOfChunks = CalculateNumberOfChunks();
 
-            target_size_bytes *= 2; // Increase target size for next iteration
+            /*
+            if ( PetscTools::AmMaster() )
+            {
+                std::cout << "Hdf5DataWriter dataset contains " << mNumberOfChunks << " chunks of " << chunk_size_in_bytes << " B." << std::endl;
+            }
+            */
 
+            target_size_in_bytes *= 2; // Increase target size for next iteration
         }
         while ( mNumberOfChunks > recommended_max_number_chunks );
     }

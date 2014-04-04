@@ -124,11 +124,20 @@ private:
     hsize_t CalculateNumberOfChunks();
 
     /**
-     * This method sets the member variables which record the chunk dimensions to use in the main dataset.
-     * If the user has specified a chunk size using #SetFixedChunkSize then these are used, otherwise an
-     * algorithm sets the chunk dimensions by increasing each dimension in step until a threshold size
-     * (in bytes) is exceeded. By default, this threshold is 128 K, which seems to be a good compromise
-     * size. We found "squarish" shaped chunks in general perform better than other shapes.
+     * Calculate (and save in the member variables) chunk dimensions based on a target size.
+     * Chunks are kept as "square" as possible while wasting as little space around the edges
+     * of the dataset as possible.
+     * @param[in] targetSize The target number of entries in each dimension in the chunk.
+     * @param[out] pChunkSizeInBytes The size of the resulting chunk in bytes.
+     * @param[out] pAllOneChunk Whether the dataset is spanned by a single chunk.
+     */
+    void CalculateChunkDims( unsigned targetSize, unsigned* pChunkSizeInBytes, bool* pAllOneChunk );
+
+    /**
+     * This method sets the chunk size by building up in each dimension until a threshold is reached,
+     * unless user-specified values have been set using #SetFixedChunkSize.
+     * By default, chunks of 128 K are used, which seems to be a good compromise. For large problems
+     * performance will usually improve by increasing this value (to e.g. 1 M).
      */
     void SetChunkSize();
 
