@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh,
@@ -272,7 +272,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
                 double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
                 cell_types[node_index] = cell_type;
             }
-            if (this-> template HasWriter<CellMutationStatesWriter>())
+            if (this-> template HasWriter<CellMutationStatesCountWriter>())
             {
                 double mutation_state = cell_iter->GetMutationState()->GetColour();
                 cell_mutation_states[node_index] = mutation_state;
@@ -304,7 +304,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
             {
                 cell_types[node_index] = -2.0;
             }
-            if (this-> template HasWriter<CellMutationStatesWriter>())
+            if (this-> template HasWriter<CellMutationStatesCountWriter>())
             {
                 cell_mutation_states[node_index] = -2.0;
             }
@@ -328,7 +328,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);
     }
-    if (this-> template HasWriter<CellMutationStatesWriter>())
+    if (this-> template HasWriter<CellMutationStatesCountWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
     }

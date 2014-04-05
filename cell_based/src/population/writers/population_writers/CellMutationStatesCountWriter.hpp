@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLMUTATIONSTATESWRITER_HPP_
-#define CELLMUTATIONSTATESWRITER_HPP_
+#ifndef CELLMUTATIONSTATESCOUNTWRITER_HPP_
+#define CELLMUTATIONSTATESCOUNTWRITER_HPP_
 
 #include "AbstractCellPopulationWriter.hpp"
 #include "ChasteSerialization.hpp"
@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** A class written using the visitor pattern for writing cell mutations states from a cell population to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellMutationStatesWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class CellMutationStatesCountWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -64,7 +64,7 @@ public:
     /**
      * Default constructor.
      */
-    CellMutationStatesWriter();
+    CellMutationStatesCountWriter();
 
     /**
      * Write the header to file.
@@ -118,6 +118,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMutationStatesWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMutationStatesCountWriter)
 
-#endif /*CELLMUTATIONSTATESWRITER_HPP_*/
+#endif /*CELLMUTATIONSTATESCOUNTWRITER_HPP_*/

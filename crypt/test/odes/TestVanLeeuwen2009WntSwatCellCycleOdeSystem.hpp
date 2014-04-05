@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "FakePetscSetup.hpp"
 
 class TestVanLeeuwen2009WntSwatCellCycleOdeSystem : public CxxTest::TestSuite
@@ -651,7 +651,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Set cell population to output cell types
-        crypt.AddPopulationWriter<CellMutationStatesWriter>();
+        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetWntConcentrationParameter(1.0/3.0);

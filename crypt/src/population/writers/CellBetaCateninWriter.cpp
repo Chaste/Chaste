@@ -33,51 +33,40 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLBETACATENINWRITER_HPP_
-#define CELLBETACATENINWRITER_HPP_
+#include "CellBetaCateninWriter.hpp"
+#include "AbstractCellPopulation.hpp"
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-#include "AbstractCellWriter.hpp"
-#include "AbstractVanLeeuwen2009WntSwatCellCycleModel.hpp"
-
-/** A class written using the visitor pattern for writing cell beta catenin levels to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellBetaCateninWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
+CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::CellBetaCateninWriter()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizbetacatenin")
 {
-private:
-    /** Needed for serialization. */
-    friend class boost::serialization::access;
-    /**
-     * Serialize the object and its member variables.
-     *
-     * @param archive the archive
-     * @param version the current version of this class
-     */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
-    {
-        archive & boost::serialization::base_object<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
-    }
+}
 
-public:
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    assert(SPACE_DIM == 2);
 
-    /**
-     * Default constructor.
-     */
-    CellBetaCateninWriter();
+    unsigned global_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+    double x = pCellPopulation->GetLocationOfCellCentre(pCell)[0];
+    double y = pCellPopulation->GetLocationOfCellCentre(pCell)[1];
 
-    /**
-     * Overridden VisitCell() method.
-     * Visit a cell and write its data.
-     *
-     * @param pCell the cell to write
-     * @param pCellPopulation a pointer to the cell population owning the cell.
-     */
-    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
-};
+    AbstractVanLeeuwen2009WntSwatCellCycleModel* p_model = dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(pCell->GetCellCycleModel());
+    double b_cat_membrane = p_model->GetMembraneBoundBetaCateninLevel();
+    double b_cat_cytoplasm = p_model->GetCytoplasmicBetaCateninLevel();
+    double b_cat_nuclear = p_model->GetNuclearBetaCateninLevel();
 
-#include "SerializationExportWrapper.hpp"
+    *this->mpOutStream << global_index << " " << x << " " << y << " " << b_cat_membrane << " " << b_cat_cytoplasm << " " << b_cat_nuclear << " ";
+}
+
+// Explicit instantiation
+template class CellBetaCateninWriter<1,1>;
+template class CellBetaCateninWriter<1,2>;
+template class CellBetaCateninWriter<2,2>;
+template class CellBetaCateninWriter<1,3>;
+template class CellBetaCateninWriter<2,3>;
+template class CellBetaCateninWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellBetaCateninWriter)
-
-#endif /*CELLBETACATENINWRITER_HPP_*/

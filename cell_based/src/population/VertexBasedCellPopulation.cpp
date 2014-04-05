@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
@@ -445,7 +445,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
             double cell_type = p_cell->GetCellProliferativeType()->GetColour();
             cell_types[elem_index] = cell_type;
         }
-        if (this-> template HasWriter<CellMutationStatesWriter>())
+        if (this-> template HasWriter<CellMutationStatesCountWriter>())
         {
             double mutation_state = p_cell->GetMutationState()->GetColour();
             cell_mutation_states[elem_index] = mutation_state;
@@ -480,7 +480,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     {
         mesh_writer.AddCellData("Ancestors", cell_ancestors);
     }
-    if (this-> template HasWriter<CellMutationStatesWriter>())
+    if (this-> template HasWriter<CellMutationStatesCountWriter>())
     {
         mesh_writer.AddCellData("Mutation states", cell_mutation_states);
     }

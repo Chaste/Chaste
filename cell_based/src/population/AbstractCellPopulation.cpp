@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
@@ -180,9 +180,9 @@ std::set<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellAncest
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellMutationStateCount()
 {
-    if (!HasWriter<CellMutationStatesWriter>())
+    if (!HasWriter<CellMutationStatesCountWriter>())
     {
-        EXCEPTION("Call AddPopulationWriter<CellMutationStatesWriter>() before using this function");
+        EXCEPTION("Call AddPopulationWriter<CellMutationStatesCountWriter>() before using this function");
     }
     return mCellMutationStateCount;
 }
@@ -592,7 +592,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
     {
         if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
         {
-            ///\todo only do this if HasWriter<CellMutationStatesWriter>? (#2441)
+            ///\todo only do this if HasWriter<CellMutationStatesCountWriter>? (#2441)
             mCellMutationStateCount.push_back(r_cell_properties[i]->GetCellCount());
         }
     }

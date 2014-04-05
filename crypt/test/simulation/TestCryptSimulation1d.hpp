@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NumericFileComparison.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -698,7 +698,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<1> crypt(mesh, cells);
-        crypt.AddPopulationWriter<CellMutationStatesWriter>();
+        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
         crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
 
         AbstractCellPopulation<1>::Iterator cell_iterator = crypt.Begin();

@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Cell population writers
 #include "CellPopulationAreaWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 
@@ -912,9 +912,9 @@ public:
 
         node_based_cell_population.Update(); // so cell neighbours are calculated
 
-        TS_ASSERT(!node_based_cell_population.HasWriter<CellMutationStatesWriter>());
-        node_based_cell_population.AddPopulationWriter<CellMutationStatesWriter>();
-        TS_ASSERT(node_based_cell_population.HasWriter<CellMutationStatesWriter>());
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellMutationStatesCountWriter>());
+        node_based_cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellMutationStatesCountWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellIdWriter>());
         node_based_cell_population.AddCellWriter<CellIdWriter>();
@@ -1041,7 +1041,7 @@ public:
         std::string output_directory = "TestNodeBasedCellPopulationWriters2d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        node_based_cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        node_based_cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         node_based_cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
         node_based_cell_population.AddCellWriter<CellProliferativePhasesWriter>();
@@ -1131,7 +1131,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.AddCellWriter<CellVolumesWriter>();
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();

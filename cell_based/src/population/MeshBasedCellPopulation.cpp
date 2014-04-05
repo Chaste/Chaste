@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 #include "NodeVelocityWriter.hpp"
@@ -599,7 +599,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             {
                 cell_types[node_index] = cell_iter->GetCellProliferativeType()->GetColour();
             }
-            if (this-> template HasWriter<CellMutationStatesWriter>())
+            if (this-> template HasWriter<CellMutationStatesCountWriter>())
             {
                 double mutation_state = cell_iter->GetMutationState()->GetColour();
 
@@ -636,7 +636,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         {
             cells_writer.AddPointData("Ancestors", cell_ancestors);
         }
-        if (this-> template HasWriter<CellMutationStatesWriter>())
+        if (this-> template HasWriter<CellMutationStatesCountWriter>())
         {
             cells_writer.AddPointData("Mutation states", cell_mutation_states);
         }
@@ -710,7 +710,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             {
                 cell_types[elem_index] = p_cell->GetCellProliferativeType()->GetColour();
             }
-            if (this-> template HasWriter<CellMutationStatesWriter>())
+            if (this-> template HasWriter<CellMutationStatesCountWriter>())
             {
                 cell_mutation_states[elem_index] = p_cell->GetMutationState()->GetColour();
             }
@@ -740,7 +740,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         {
             mesh_writer.AddCellData("Ancestors", cell_ancestors);
         }
-        if (this-> template HasWriter<CellMutationStatesWriter>())
+        if (this-> template HasWriter<CellMutationStatesCountWriter>())
         {
             mesh_writer.AddCellData("Mutation states", cell_mutation_states);
         }

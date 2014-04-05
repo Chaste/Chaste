@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SloughingCellKiller.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "StochasticWntCellCycleModel.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -79,11 +79,11 @@ public:
      * with build=GccOpt to speed up the test.
      *
      * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
-     * The earliest version of Boost supported is 1.34
+     * The earliest version of Boost supported is 1.37.
      *
      * NB: Produce archives with
-       scons build=GccOpt_hostconfig,boost=1-34,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
-       cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
+     *  scons build=GccOpt_hostconfig,boost=1-37,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
+     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
      */
     void TestLoadArchive() throw (Exception)
@@ -99,7 +99,7 @@ public:
             StochasticWntCellCycleModel ccm;
             SloughingCellKiller<2> killer(&crypt, 1.0);
             GeneralisedLinearSpringForce<2> force;
-            crypt.AddPopulationWriter<CellMutationStatesWriter>();
+            crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
         }
 
         // Directory in which the stored results were archived

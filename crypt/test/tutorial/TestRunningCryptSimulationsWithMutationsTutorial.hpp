@@ -102,7 +102,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * into the lumen once they reach the top of the crypt.
  */
 #include "SloughingCellKiller.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 /* The final header ensures that this test is only ever run sequentially, not in parallel. */
 #include "FakePetscSetup.hpp"
 
@@ -151,7 +151,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         /* In order to visualize mutant cells and to count how many cells there are of each type we need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         /*
          * We set the height of the crypt. As well as passing this variable into the {{{SloughingCellKiller}}},

@@ -67,7 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "NodeVelocityWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
@@ -105,7 +105,7 @@ public:
         }
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
         cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
@@ -185,7 +185,7 @@ public:
         }
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
@@ -258,7 +258,7 @@ public:
         }
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells,location_indices);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
@@ -331,7 +331,7 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation

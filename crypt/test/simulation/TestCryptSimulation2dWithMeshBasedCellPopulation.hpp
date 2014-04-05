@@ -75,7 +75,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
@@ -435,7 +435,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.AddPopulationWriter<CellMutationStatesWriter>();
+        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         // Create crypt simulation from cell population and force law
         CryptSimulation2d simulator(crypt);
@@ -1046,8 +1046,8 @@ public:
 
         // Cover exceptions
         TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellMutationStateCount(),
-                              "Call AddPopulationWriter<CellMutationStatesWriter>() before using this function");
-        simulator.rGetCellPopulation().AddPopulationWriter<CellMutationStatesWriter>();
+                              "Call AddPopulationWriter<CellMutationStatesCountWriter>() before using this function");
+        simulator.rGetCellPopulation().AddPopulationWriter<CellMutationStatesCountWriter>();
 
         TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellProliferativeTypeCount(),
                               "Call AddPopulationWriter<CellProliferativeTypesCountWriter>() before using this function");
@@ -1204,7 +1204,7 @@ public:
         simulator.rGetCellPopulation().GetCellUsingLocationIndex(56)->SetMutationState(p_apc1);
         simulator.rGetCellPopulation().GetCellUsingLocationIndex(51)->SetMutationState(p_apc2);
         simulator.rGetCellPopulation().GetCellUsingLocationIndex(63)->SetMutationState(p_bcat1);
-        simulator.rGetCellPopulation().AddPopulationWriter<CellMutationStatesWriter>();
+        simulator.rGetCellPopulation().AddPopulationWriter<CellMutationStatesCountWriter>();
 
         // Run simulation
         simulator.Solve();
@@ -1587,7 +1587,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.AddPopulationWriter<CellMutationStatesWriter>();
+        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
         crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         crypt.AddPopulationWriter<CellProliferativePhasesCountWriter>();
         crypt.AddCellWriter<CellProliferativePhasesWriter>();
@@ -1845,7 +1845,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
-        crypt.AddPopulationWriter<CellMutationStatesWriter>();
+        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(crypt);
@@ -1903,7 +1903,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2>* p_crypt = new MeshBasedCellPopulationWithGhostNodes<2>(*p_mesh, cells, location_indices, false, 30.0); // Last parameter adjusts Ghost spring stiffness in line with the linear_force later on
 
         // Set simulation to output cell types and cell ancestors
-        p_crypt->AddPopulationWriter<CellMutationStatesWriter>();
+        p_crypt->AddPopulationWriter<CellMutationStatesCountWriter>();
         p_crypt->AddCellWriter<CellAncestorWriter>();
 
         // Create crypt simulation from cell population

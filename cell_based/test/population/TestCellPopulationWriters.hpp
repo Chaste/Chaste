@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeLocationWriter.hpp"
 #include "BoundaryNodeWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
@@ -216,7 +216,7 @@ public:
         FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationElementWriter/results.vizelements_twice").CompareFiles();
     }
 
-    void TestCellMutationStatesWriter() throw (Exception)
+    void TestCellMutationStatesCountWriter() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -236,16 +236,16 @@ public:
         location_indices.push_back(17);
 
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.GenerateCellResults();
 
         // Create an output directory for the writer
-        std::string output_directory = "TestCellMutationStatesWriter";
+        std::string output_directory = "TestCellMutationStatesCountWriter";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        // Create a CellMutationStatesWriter and test that the correct output is generated
-        CellMutationStatesWriter<2,2> mutation_states_writer;
+        // Create a CellMutationStatesCountWriter and test that the correct output is generated
+        CellMutationStatesCountWriter<2,2> mutation_states_writer;
         mutation_states_writer.OpenOutputFile(output_directory);
         mutation_states_writer.WriteHeader(&cell_population);
         mutation_states_writer.WriteTimeStamp();
@@ -253,7 +253,7 @@ public:
         mutation_states_writer.WriteNewline();
         mutation_states_writer.CloseFile();
 
-        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesWriter/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesCountWriter/cellmutationstates.dat").CompareFiles();
 
         // Test that we can append to files
         mutation_states_writer.OpenOutputFileForAppend(output_directory);
@@ -262,17 +262,17 @@ public:
         mutation_states_writer.WriteNewline();
         mutation_states_writer.CloseFile();
 
-        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesWriter/cellmutationstates_twice.dat").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesCountWriter/cellmutationstates_twice.dat").CompareFiles();
     }
 
-    void TestArchivingOfCellMutationStatesWriter() throw (Exception)
+    void TestArchivingOfCellMutationStatesCountWriter() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesWriter.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesCountWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellMutationStatesWriter<2,2>();
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellMutationStatesCountWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -553,7 +553,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        // Create a CellMutationStatesWriter and test that the correct output is generated
+        // Create a CellMutationStatesCountWriter and test that the correct output is generated
         CellPopulationAreaWriter<3,3> area_writer;
         area_writer.OpenOutputFile(output_directory);
         area_writer.WriteTimeStamp();

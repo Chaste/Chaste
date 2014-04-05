@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Cell population writers
 #include "CellPopulationElementWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -533,7 +533,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             // No elements associated with this gridpoint
             cell_types.push_back(-1.0);
             elem_ids.push_back(-1.0);
-            if (this-> template HasWriter<CellMutationStatesWriter>())
+            if (this-> template HasWriter<CellMutationStatesCountWriter>())
             {
                 cell_mutation_states.push_back(-1.0);
                 cell_labels.push_back(-1.0);
@@ -551,7 +551,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             double cell_type = p_cell->GetCellProliferativeType()->GetColour();
             cell_types.push_back(cell_type);
 
-            if (this-> template HasWriter<CellMutationStatesWriter>())
+            if (this-> template HasWriter<CellMutationStatesCountWriter>())
             {
                 double cell_mutation_state = p_cell->GetMutationState()->GetColour();
                 cell_mutation_states.push_back(cell_mutation_state);
@@ -578,7 +578,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     mesh_writer.AddPointData("Element index", elem_ids);
     mesh_writer.AddPointData("Cell types", cell_types);
 
-    if (this-> template HasWriter<CellMutationStatesWriter>())
+    if (this-> template HasWriter<CellMutationStatesCountWriter>())
     {
         assert(cell_mutation_states.size() == num_nodes);
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);

@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
@@ -829,7 +829,7 @@ public:
 
         cell_population.AddPopulationWriter<VertexT1SwapLocationsWriter>();
         cell_population.AddPopulationWriter<VertexT3SwapLocationsWriter>();
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
         cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
 

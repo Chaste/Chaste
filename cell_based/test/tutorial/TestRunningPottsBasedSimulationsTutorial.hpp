@@ -88,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "TransitCellProliferativeType.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 
 /*
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
@@ -255,7 +255,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},
          * and set the output directory and end time. */
@@ -349,7 +349,7 @@ public:
         PottsBasedCellPopulation<3> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         /* We then pass in the cell population into an {{{OnLatticeSimulation}}},
          * and set the output directory and end time. */

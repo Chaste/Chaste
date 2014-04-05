@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Cell population writers
 #include "CellProliferativeTypesCountWriter.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 
 // This test is always run sequentially (never in parallel)
@@ -281,7 +281,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<3> cell_population(*p_mesh, cells, location_indices);
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator(cell_population);
@@ -306,7 +306,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<3> cell_population2(*p_mesh, cells2);
         cell_population2.AddPopulationWriter<VoronoiDataWriter>();
         cell_population2.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population2.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population2.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population2.AddCellWriter<CellVolumesWriter>();
 
         OffLatticeSimulation<3> simulator2(cell_population2);

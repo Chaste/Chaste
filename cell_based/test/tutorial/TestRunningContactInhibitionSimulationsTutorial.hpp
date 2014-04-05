@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The remaining header files define classes that will be also be used and are presented in other tutorials. */
 #include "OffLatticeSimulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "StochasticDurationCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "TransitCellProliferativeType.hpp"
@@ -163,7 +163,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells (i.e. those that are inhibited from division) you need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);
@@ -277,7 +277,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);
@@ -368,7 +368,7 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>();
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);

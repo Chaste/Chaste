@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
@@ -595,7 +595,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
         {
             cell_types[cell] = cell_ptr->GetCellProliferativeType()->GetColour();
         }
-        if (this-> template HasWriter<CellMutationStatesWriter>())
+        if (this-> template HasWriter<CellMutationStatesCountWriter>())
         {
             cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
         }
@@ -626,7 +626,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);
     }
-    if (this-> template HasWriter<CellMutationStatesWriter>())
+    if (this-> template HasWriter<CellMutationStatesCountWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
     }
@@ -638,7 +638,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     {
         mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
     }
-    if (this-> template HasWriter<CellMutationStatesWriter>())
+    if (this-> template HasWriter<CellMutationStatesCountWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
         mesh_writer.AddPointData("Cell labels", cell_labels);

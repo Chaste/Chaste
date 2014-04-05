@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 
 // Needed for NodesOnlyMesh
 #include "PetscSetupAndFinalize.hpp"
@@ -89,7 +89,7 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesWriter>(); // So outputs the labelled cells
+        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>(); // So outputs the labelled cells
 
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

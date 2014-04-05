@@ -33,7 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellMutationStatesWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "MultipleCaBasedCellPopulation.hpp"
@@ -42,13 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::CellMutationStatesWriter()
+CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellMutationStatesCountWriter()
     : AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>("cellmutationstates.dat")
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     if (PetscTools::AmMaster())
     {
@@ -71,7 +71,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellP
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
@@ -85,7 +85,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(Abstra
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
@@ -99,37 +99,37 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopula
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }
 
 // Explicit instantiation
-template class CellMutationStatesWriter<1,1>;
-template class CellMutationStatesWriter<1,2>;
-template class CellMutationStatesWriter<2,2>;
-template class CellMutationStatesWriter<1,3>;
-template class CellMutationStatesWriter<2,3>;
-template class CellMutationStatesWriter<3,3>;
+template class CellMutationStatesCountWriter<1,1>;
+template class CellMutationStatesCountWriter<1,2>;
+template class CellMutationStatesCountWriter<2,2>;
+template class CellMutationStatesCountWriter<1,3>;
+template class CellMutationStatesCountWriter<2,3>;
+template class CellMutationStatesCountWriter<3,3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMutationStatesWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMutationStatesCountWriter)
