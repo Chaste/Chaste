@@ -119,12 +119,19 @@ tetgen_notice="""///////////////////////////////////////////////////////////////
 //                                                                           //
 // TetGen                                                                    //
 //                                                                           //
-// A Quality Tetrahedral Mesh Generator and A 3D Delaunay Triangulator       //
+// A Quality Tetrahedral Mesh Generator and 3D Delaunay Triangulator         //
 //                                                                           //
-// Version 1.5                                                               //
-// November 4, 2013                                                          //
+// Version 1.4                                                               //
+// April 16, 2007                                                            //
 //                                                                           //
-// TetGen is freely available through the website: http://www.tetgen.org.    //
+// Copyright (C) 2002--2007                                                  //
+// Hang Si                                                                   //
+// Research Group Numerical Mathematics and Scientific Computing             //
+// Weierstrass Institute for Applied Analysis and Stochastics                //
+// Mohrenstr. 39, 10117 Berlin, Germany                                      //
+// si@wias-berlin.de                                                         //
+//                                                                           //
+// TetGen is freely available through the website: http://tetgen.berlios.de. //
 //   It may be copied, modified, and redistributed for non-commercial use.   //
 //   Please consult the file LICENSE for the detailed copyright notices.     //
 //                                                                           //
