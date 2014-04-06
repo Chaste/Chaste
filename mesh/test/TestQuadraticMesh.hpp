@@ -673,13 +673,7 @@ public:
                             
     }
 
-    /**
-     * \todo #2486 needs checking.
-     *
-     * I can't see why this should work (constructing a Quad mesh with and without tetgen getting
-     * same answers, but it did with Tetgen 1.4.2, and doesn't with 1.5.0.
-     */
-    void xTestConstructionConversionVersusConstruction3d()
+    void TestConstructionConversionVersusConstruction3d()
     {
         QuadraticMesh<3> quad_mesh_read_back;
         QuadraticMesh<3> quad_mesh_constructed;
@@ -687,16 +681,16 @@ public:
         double height = 2.0;
         double depth  = 3.0;
         {
-            // Three-dimensional cubes linear meshing
+            //Three-dimensional cubes
             TetrahedralMesh<3,3> mesh;
             mesh.ConstructRegularSlabMesh(1.0, width, height, depth);
             TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "TempGrid3d", false);
             mesh_writer.WriteFilesUsingMesh(mesh);
 
-            // Convert to quadratic
+            //Convert to quadratic
             std::string output_dir = mesh_writer.GetOutputDirectory();
-            TrianglesMeshReader<3,3> linear_mesh_reader(output_dir + "TempGrid3d");
-            quad_mesh_read_back.ConstructFromLinearMeshReader(linear_mesh_reader);
+            TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "TempGrid3d");
+            quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
             
             quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
         }
@@ -730,6 +724,7 @@ public:
             BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
+                            
     }
 
 
@@ -798,7 +793,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh.GetNumNodes(), 285u);
         TS_ASSERT_EQUALS(quad_mesh.GetNumVertices(), 51u);
         TS_ASSERT_EQUALS(quad_mesh.GetNumElements(), 136u);
-        TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 219u);
+        TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 194u);
 
         //Output
         TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "converted_cube", false);
@@ -816,7 +811,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumNodes(), 285u);
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumVertices(), 51u);
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumElements(), 136u);
-        TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumBoundaryNodes(), 219u);
+        TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumBoundaryNodes(), 194u);
     }
 
     void TestLinearToQuadraticMeshConversion3dNonconvex() throw(Exception)
@@ -838,7 +833,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh.GetNumVertices(), 16u);
         TS_ASSERT_EQUALS(quad_mesh.GetNumElements(), 18u);
         TS_ASSERT_EQUALS(quad_mesh.GetNumNodes(), 63u);
-        TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 53u); // All on boundary
+        TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 58u); // All on boundary
         TS_ASSERT_DELTA(quad_mesh.GetVolume(), 3.0, 1e-15);
         TS_ASSERT_DELTA(quad_mesh.GetSurfaceArea(), 14.0, 1e-15);
     }
@@ -902,7 +897,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh.GetNumVertices(), 173u);
         TS_ASSERT_EQUALS(quad_mesh.GetNumElements(), 610u);
         TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryElements(), 312u);
-        TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 774u);
+        TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 626u);
 
         // Check some node co-ordinates
         TS_ASSERT_DELTA(tet_mesh.GetNode(0)->GetPoint()[0], 0.0963, 1e-4);
