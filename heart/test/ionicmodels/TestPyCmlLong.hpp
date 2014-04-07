@@ -182,7 +182,12 @@ private:
             }
             try
             {
+                unsigned num_failed_asserts = CxxTest::tracker().testFailedAsserts();
                 RunTest(rOutputDirName + "/" + rModels[i], rModels[i], rArgs, testLookupTables, tableTestV);
+                if (CxxTest::tracker().testFailedAsserts() > num_failed_asserts)
+                {
+                    EXCEPTION((CxxTest::tracker().testFailedAsserts() - num_failed_asserts) << " test assertion failure(s).");
+                }
             }
             catch (const Exception& e)
             {
