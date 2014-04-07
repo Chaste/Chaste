@@ -397,9 +397,11 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population_with_ghost_nodes(mesh, cells, cell_location_indices);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
 
         // Num real cells should be num_nodes (81) - num_ghosts (11) = 70
         TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.GetNumRealCells(), 70u);
+        TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.GetNumAllCells(), 70u);
 
         p_simulation_time->IncrementTimeOneStep();
 
@@ -408,6 +410,7 @@ public:
         TS_ASSERT_EQUALS(num_removed_with_ghost_nodes, 1u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 80u);
         TS_ASSERT_DIFFERS(cell_population_with_ghost_nodes.rGetCells().size(), cells.size()); // CellPopulation now copies cells
+        TS_ASSERT_DIFFERS(cell_population_with_ghost_nodes.GetNumAllCells(), cells.size()); // CellPopulation now copies cells
 
         // Num real cells should be num_nodes (81) - num_ghosts (11) - 1 deleted node = 69
         TS_ASSERT_EQUALS(cell_population_with_ghost_nodes.GetNumRealCells(), 69u);

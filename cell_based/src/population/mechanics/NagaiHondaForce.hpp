@@ -48,7 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A force class for use in vertex-based simulations, based on a mechanical
  * model proposed by T. Nagai and H. Honda ("A dynamic cell model for the formation
- * of epithelial tissues", Philosophical Magazine Part B 81:699-719).
+ * of epithelial tissues", Philosophical Magazine Part B 81:699-719). In contrast to the force proposed
+ * by Nagai and Honda this force has an additional force term implemented that scales with the perimeter
+ * of a cell to simulate the surface membrane energy. This particular perimeter force term in turn differs from the one
+ * proposed by Farhadifar et al (2007) in the sense that it employs a target perimeter.
  *
  * Each of the model parameter member variables are rescaled such that mDampingConstantNormal
  * takes the default value 1, whereas Nagai and Honda (who denote the parameter by
@@ -93,6 +96,9 @@ protected:
 
     /**
      * Cell-cell adhesion energy parameter. Has has units of kg (cell size at equilibrium rest length)^2 s^-2.
+     * This parameter corresponds to 1/2 of the Lambda parameter in forces proposed by Farhadifar et al (2007).
+     * This slight difference comes from the fact that when we apply the forces to a particular node, each
+     * edge is visited twice - and hence the force originating from that edge is applied twice.
      */
     double mNagaiHondaCellCellAdhesionEnergyParameter;
 
@@ -170,7 +176,8 @@ public:
     void SetNagaiHondaMembraneSurfaceEnergyParameter(double nagaiHondaMembraneSurfaceEnergyParameter);
 
     /**
-     * Set mNagaiHondaCellCellAdhesionEnergyParameter.
+     * Set mNagaiHondaCellCellAdhesionEnergyParameter. This parameter corresponds to 1/2 of the Lambda parameter in the forces by
+     * Farhadifar et al (2007).
      *
      * @param nagaiHondaCellCellAdhesionEnergyEnergyParameter the new value of mNagaiHondaCellCellAdhesionEnergyParameter
      */

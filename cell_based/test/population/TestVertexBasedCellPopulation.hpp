@@ -393,6 +393,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), old_num_nodes+2);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), old_num_elements+1);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), old_num_cells+1);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), old_num_cells+1);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), old_num_elements+1);
 
         // Check the location of the new nodes
@@ -477,6 +478,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 1u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
 
         // Add a new cell by dividing element 0 along the axis (1,0)
@@ -495,6 +497,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 2u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
         // Check the location of the new nodes
@@ -719,6 +722,10 @@ public:
 
         p_simulation_time->IncrementTimeOneStep();
 
+        // This is where the two counters should differ
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 24u);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
+
         // Remove dead cells
         unsigned num_cells_removed = cell_population.RemoveDeadCells();
 
@@ -727,6 +734,7 @@ public:
         // We should now have one less real cell, since one cell has been
         // marked as dead, so is skipped by the cell population iterator
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 23u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
@@ -735,6 +743,7 @@ public:
         cell_population.Update();
 
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 23u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 23u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 23u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 23u);

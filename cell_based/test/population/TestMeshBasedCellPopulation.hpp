@@ -127,6 +127,8 @@ private:
         }
 
         TS_ASSERT_EQUALS(counter, cell_population.GetNumRealCells());
+        //Since no cells died, this should be all cells in the mesh.
+        TS_ASSERT_EQUALS(counter, cell_population.GetNumAllCells());
     }
 
 public:
@@ -400,6 +402,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), old_num_nodes+1);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), old_num_cells+1);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), old_num_nodes+1);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), old_num_nodes+1);
 
         // Same test via cell population class
         TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumNodes(), old_num_nodes+1);
@@ -439,6 +442,7 @@ public:
         cell_population.CalculateRestLengths();
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 4u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 4u);
 
         // Check rest lengths
         TS_ASSERT_DELTA(cell_population.GetRestLength(0,1), 1.0, 1e-6);
@@ -457,6 +461,7 @@ public:
         cell_population.DivideLongSprings(1.0);
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 5u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5u);
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(0u)->GetCellId(), 452u);
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(1u)->GetCellId(), 453u);
         TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(2u)->GetCellId(), 454u);
@@ -484,9 +489,11 @@ public:
 
         cell_population.DivideLongSprings(0.8);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 9u); // Mesh has 8 elements and 9 nodes
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 9u); // Mesh has 8 elements and 9 nodes
 
         cell_population.DivideLongSprings(0.45);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 25u); // Mesh has 32 Elements and 25 nodes
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 25u); // Mesh has 32 Elements and 25 nodes
     }
 
     void TestRemoveDeadCellsAndUpdate()
@@ -535,6 +542,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 81u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 81u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 81u);
 
         // Test GetNeighbouringNodeIndices() method
         std::set<unsigned> node_50_neighbours = cell_population.GetNeighbouringNodeIndices(50);
@@ -555,6 +563,7 @@ public:
         TS_ASSERT_EQUALS(num_removed, 1u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 80u);
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 80u);
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 80u);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 80u);
         TS_ASSERT_DIFFERS(cell_population.rGetCells().size(), cells.size());
 

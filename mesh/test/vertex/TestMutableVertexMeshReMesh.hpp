@@ -652,6 +652,15 @@ public:
             bool expected_boundary_node = (i!=3);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
+
+        // Test T2 swap location tracking
+        std::vector< c_vector<double, 2> > t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
+        TS_ASSERT_EQUALS(t2_locations.size(), 1u);
+
+        // Test T1 swap location clearing
+        vertex_mesh.ClearLocationsOfT2Swaps();
+        t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
+        TS_ASSERT_EQUALS(t2_locations.size(), 0u);
     }
 
     void TestPerformT2SwapWithBoundaryNodes() throw(Exception)
@@ -1273,7 +1282,7 @@ public:
         TS_ASSERT_DELTA(t3_locations[1][0], 0.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[1][1], 0.5, 1e-6);
 
-        // Test T1 swap Location clearing
+        // Test T3 swap Location clearing
         mesh.ClearLocationsOfT3Swaps();
         t3_locations = mesh.GetLocationsOfT3Swaps();
         TS_ASSERT_EQUALS(t3_locations.size(), 0u);

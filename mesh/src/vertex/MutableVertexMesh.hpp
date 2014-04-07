@@ -96,6 +96,12 @@ protected:
     std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps;
 
     /**
+     * Locations of T2 swaps (the centre of the removed triangle), stored so they can be accessed and output by the cell population.
+     * The locations are stored until they are cleared by ClearLocationsOfT2Swaps().
+     */
+    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT2Swaps;
+
+    /**
      * Locations of T3 swaps (the location of the intersection with the edge), stored so they can be accessed and output by the cell population.
      * The locations are stored until they are cleared by ClearLocationsOfT3Swaps().
      */
@@ -254,6 +260,7 @@ protected:
         archive & mCheckForInternalIntersections;
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
+        ///todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
@@ -358,6 +365,11 @@ public:
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
 
     /**
+     * @return the locations of the T1 swaps
+     */
+    std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT2Swaps();
+
+    /**
      * @return the locations of the T3 swaps
      */
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
@@ -366,6 +378,11 @@ public:
      * Helper method to clear the stored T1 swaps
      */
     void ClearLocationsOfT1Swaps();
+
+    /**
+     * Helper method to clear the stored T1 swaps
+     */
+    void ClearLocationsOfT2Swaps();
 
     /**
      * Helper method to clear the stored T3 swaps

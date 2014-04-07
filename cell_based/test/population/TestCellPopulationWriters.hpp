@@ -59,6 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "NodeVelocityWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
+#include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 
@@ -408,7 +409,7 @@ public:
         FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestVoronoiDataWriter/voronoi_twice.dat").CompareFiles();
     }
 
-    void TestVertexT1AndT3SwapLocationsWriters() throw (Exception)
+    void TestVertexT1AndT2AndT3SwapLocationsWriters() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -424,7 +425,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create an output directory for the writer
-        std::string output_directory = "TestVertexT1AndT3SwapLocationsWriters";
+        std::string output_directory = "TestVertexT1AndT2AndT3SwapLocationsWriters";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
@@ -436,7 +437,7 @@ public:
         t1_swaps_writer.WriteNewline();
         t1_swaps_writer.CloseFile();
 
-        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T1SwapLocations.dat").CompareFiles();
+        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T1SwapLocations.dat").CompareFiles();
 
         // Test that we can append to files
         t1_swaps_writer.OpenOutputFileForAppend(output_directory);
@@ -445,7 +446,26 @@ public:
         t1_swaps_writer.WriteNewline();
         t1_swaps_writer.CloseFile();
 
-        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T1SwapLocations_twice.dat").CompareFiles();
+        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T1SwapLocations_twice.dat").CompareFiles();
+
+        // Create a VertexT2SwapLocationsWriter and test that the correct output is generated
+        VertexT2SwapLocationsWriter<2,2> t2_swaps_writer;
+        t2_swaps_writer.OpenOutputFile(output_directory);
+        t2_swaps_writer.WriteTimeStamp();
+        t2_swaps_writer.Visit(&cell_population);
+        t2_swaps_writer.WriteNewline();
+        t2_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T2SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T2SwapLocations.dat").CompareFiles();
+
+        // Test that we can append to files
+        t2_swaps_writer.OpenOutputFileForAppend(output_directory);
+        t2_swaps_writer.WriteTimeStamp();
+        t2_swaps_writer.Visit(&cell_population);
+        t2_swaps_writer.WriteNewline();
+        t2_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T2SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T2SwapLocations_twice.dat").CompareFiles();
 
         // Create a VertexT3SwapLocationsWriter and test that the correct output is generated
         VertexT3SwapLocationsWriter<2,2> t3_swaps_writer;
@@ -455,7 +475,7 @@ public:
         t3_swaps_writer.WriteNewline();
         t3_swaps_writer.CloseFile();
 
-        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T3SwapLocations.dat").CompareFiles();
+        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T3SwapLocations.dat").CompareFiles();
 
         // Test that we can append to files
         t3_swaps_writer.OpenOutputFileForAppend(output_directory);
@@ -464,7 +484,7 @@ public:
         t3_swaps_writer.WriteNewline();
         t3_swaps_writer.CloseFile();
 
-        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT3SwapLocationsWriters/T3SwapLocations_twice.dat").CompareFiles();
+        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T3SwapLocations_twice.dat").CompareFiles();
 
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
@@ -476,6 +496,7 @@ public:
             MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
 
             TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&mesh_based_cell_population));
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&mesh_based_cell_population));
             TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&mesh_based_cell_population));
         }
 
@@ -494,6 +515,7 @@ public:
         MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
 
         TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&ca_based_cell_population));
+        TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&ca_based_cell_population));
         TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&ca_based_cell_population));
 
         {
@@ -509,6 +531,7 @@ public:
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
 
             TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&node_based_cell_population));
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&node_based_cell_population));
             TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&node_based_cell_population));
 
             // Tidy up
@@ -525,6 +548,7 @@ public:
         PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
         TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&potts_based_cell_population));
+        TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&potts_based_cell_population));
         TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&potts_based_cell_population));
     }
 

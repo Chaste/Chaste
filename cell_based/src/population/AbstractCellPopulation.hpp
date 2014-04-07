@@ -353,6 +353,14 @@ public:
     unsigned GetNumRealCells();
 
     /**
+     * This returns the number of cells that are present in the internal mCells vector. It also includes dead cells and cells
+     * that are associated with a deleted location in the mesh.
+     *
+     * @return the number of real cells.
+     */
+    unsigned GetNumAllCells();
+
+    /**
      * Sets the Ancestor index of all the cells at this time to be the
      * same as their location index, can be used to trace clonal populations.
      */
