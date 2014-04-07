@@ -102,7 +102,7 @@ public:
 
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        TS_ASSERT_DELTA(vtk_data, 0.7, 1e-6);
+        TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
 
         // Avoid memory leak
         WntConcentration<2>::Destroy();
