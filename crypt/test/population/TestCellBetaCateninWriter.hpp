@@ -83,16 +83,16 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellBetaCateninWriter and test that the correct output is generated
-        CellBetaCateninWriter<2,2> beta_catenin_writer;
-        beta_catenin_writer.OpenOutputFile(output_directory);
-        beta_catenin_writer.WriteTimeStamp();
+        CellBetaCateninWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            beta_catenin_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(*cell_iter, &cell_population);
         }
-        beta_catenin_writer.CloseFile();
+        cell_writer.CloseFile();
 
         /*
          * To verify this test, we can eyeball the results file to check that the correct default
@@ -100,11 +100,15 @@ public:
          */
         FileComparison(results_dir + "results.vizbetacatenin", "crypt/test/data/TestCellBetaCateninWriter/results.vizbetacatenin").CompareFiles();
 
+        // Test the correct data are returned for VTK output for the first cell
+        double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_DELTA(vtk_data, 0.7, 1e-6);
+
         // Avoid memory leak
         WntConcentration<2>::Destroy();
     }
 
-    void TestArchivingOfCellBetaCateninWriter() throw (Exception)
+    void TestCellBetaCateninWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);

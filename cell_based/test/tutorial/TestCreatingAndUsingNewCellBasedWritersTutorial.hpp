@@ -162,6 +162,14 @@ public:
     }
 
     /*
+     * The next method provides functionality that will be used in future for outputting data to VTK.
+     */
+    double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+    {
+        return pCell->HasCellProperty<MotileCellProperty>();
+    }
+
+    /*
      * The implementation of the {{{VisitCell()}}} method defines the data this writer commits to the file.
      * Data can be streamed into the member variable {{{mpOutputStream}}} using the {{{<<}}} operator.
      * These data are then written to file.

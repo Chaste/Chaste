@@ -36,9 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTCELLWRITER_HPP_
 #define ABSTRACTCELLWRITER_HPP_
 
-#include "AbstractCellBasedWriter.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
+#include "AbstractCellBasedWriter.hpp"
 #include "Cell.hpp"
 
 // Forward declaration prevents circular include chain
@@ -66,6 +66,13 @@ private:
         archive & boost::serialization::base_object<AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
+protected:
+
+    /**
+     * The name of the cell data used in VTK output.
+     */
+    std::string mVtkCellDataName;
+
 public:
 
     /**
@@ -73,6 +80,15 @@ public:
      * @param rFileName the name of the file to write to.
      */
     AbstractCellWriter(const std::string &rFileName);
+
+    /*
+     * Get a double associated with a cell. This method reduces duplication
+     * of code between the methods VisitCell() and AddVtkData().
+     *
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell.
+     */
+    virtual double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit a cell and write its data.

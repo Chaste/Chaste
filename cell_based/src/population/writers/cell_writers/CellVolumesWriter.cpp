@@ -40,6 +40,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellVolumesWriter<ELEMENT_DIM, SPACE_DIM>::CellVolumesWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellareas.dat")
 {
+    this->mVtkCellDataName = "Cell volumes";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double CellVolumesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    double volume = pCellPopulation->GetVolumeOfCell(pCell);
+    return volume;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

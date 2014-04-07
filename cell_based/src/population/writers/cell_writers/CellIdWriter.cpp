@@ -40,6 +40,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellIdWriter<ELEMENT_DIM, SPACE_DIM>::CellIdWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("loggedcell.dat")
 {
+    this->mVtkCellDataName = "Cell IDs";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double CellIdWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    double cell_id = pCell->GetCellId();
+    return cell_id;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

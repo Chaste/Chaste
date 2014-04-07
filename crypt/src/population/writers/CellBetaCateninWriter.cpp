@@ -40,6 +40,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::CellBetaCateninWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizbetacatenin")
 {
+    this->mVtkCellDataName = "Beta catenin";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    ///\todo #2441 - implement this method
+    return 0.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

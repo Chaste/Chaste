@@ -67,6 +67,16 @@ public:
      */
     CellBetaCateninWriter();
 
+    /* Overridden GetCellDataForVtkOutput() method.
+     *
+     * Get a double associated with a cell. This method reduces duplication
+     * of code between the methods VisitCell() and AddVtkData().
+     *
+     * @param pCell a cell
+     * @param pCellPopulation a pointer to the cell population owning the cell
+     */
+    double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+
     /**
      * Overridden VisitCell() method.
      * Visit a cell and write its data.

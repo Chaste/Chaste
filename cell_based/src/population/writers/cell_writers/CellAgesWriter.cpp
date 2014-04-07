@@ -40,6 +40,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::CellAgesWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellages.dat")
 {
+    this->mVtkCellDataName = "Ages";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double CellAgesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    return pCell->GetAge();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

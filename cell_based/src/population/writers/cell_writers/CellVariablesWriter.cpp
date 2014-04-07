@@ -41,6 +41,14 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::CellVariablesWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellvariables.dat")
 {
+    this->mVtkCellDataName = "Cell variables";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+{
+    ///\todo (#2441) - implement this method
+    return 0.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
