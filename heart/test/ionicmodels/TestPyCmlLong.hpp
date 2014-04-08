@@ -129,13 +129,13 @@ private:
             }
         }
 #endif
-        double sampling_interval = 2.0; // ms
+        double sampling_interval = 1.0; // ms; used as max dt for CVODE too
         double start_cpu_time = (double) std::clock();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
         double end_cpu_time = (double) std::clock();
         double elapsed_secs = (end_cpu_time - start_cpu_time)/(CLOCKS_PER_SEC);
         std::cout << "Model " << rModelName << " writing to " << rOutputDirName << " took " << elapsed_secs << "s." << std::endl;
-        const unsigned output_freq = 5; // Only output every N samples
+        const unsigned output_freq = 10; // Only output every N samples
         solution.WriteToFile(rOutputDirName, rModelName, "ms", output_freq, false);
         // Check an AP was produced
         std::vector<double> voltages = solution.GetVariableAtIndex(pCell->GetVoltageIndex());
