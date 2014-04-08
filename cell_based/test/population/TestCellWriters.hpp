@@ -534,9 +534,13 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<2; i++)
         {
             FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
@@ -544,8 +548,19 @@ public:
             p_cell->SetBirthTime(-0.7 - i*0.5);
             cells.push_back(p_cell);
         }
+        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        CellPtr p_cell(new Cell(p_mutant_state, p_cell_model));
+        p_cell->SetCellProliferativeType(p_type);
+        p_cell->SetBirthTime(-0.1);
+        cells.push_back(p_cell);
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // For coverage of GetCellDataForVtkOutput() label a cell and set a cell to be apoptotic
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        cell_iter->AddCellProperty(p_label);
+        ++cell_iter;
+        cell_iter->AddCellProperty(p_apoptotic_state);
 
         // Create output directory
         std::string output_directory = "TestCellProliferativeTypesWriter";

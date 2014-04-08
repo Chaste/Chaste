@@ -66,7 +66,8 @@ public:
      */
     CellVariablesWriter();
 
-    /* Overridden GetCellDataForVtkOutput() method.
+    /**
+     * Overridden GetCellDataForVtkOutput() method.
      *
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
