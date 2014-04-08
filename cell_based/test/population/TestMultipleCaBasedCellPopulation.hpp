@@ -377,7 +377,7 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        FileComparison( results_dir + "results.parameters", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").CompareFiles();
+        FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").CompareFiles();
 #ifdef CHASTE_VTK
         //Test that VTK writer has produced a file
         FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
