@@ -52,6 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
+#include "VertexT2SwapLocationsWriter.hpp"
 #include "VertexT3SwapLocationsWriter.hpp"
 
 template<unsigned DIM>
@@ -530,6 +531,12 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirect
         {
             this-> template AddPopulationWriter<VertexT1SwapLocationsWriter>();
         }
+
+        if (!this-> template HasWriter<VertexT2SwapLocationsWriter>())
+        {
+            this-> template AddPopulationWriter<VertexT2SwapLocationsWriter>();
+        }
+
         if (!this-> template HasWriter<VertexT3SwapLocationsWriter>())
         {
             this-> template AddPopulationWriter<VertexT3SwapLocationsWriter>();

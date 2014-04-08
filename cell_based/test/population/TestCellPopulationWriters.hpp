@@ -871,6 +871,35 @@ public:
        }
     }
 
+    void TestArchivingOfVertexT2SwapLocationsWriter() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VertexT2SwapLocationsWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new VertexT2SwapLocationsWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+       }
+    }
+
     void TestArchivingOfVertexT3SwapLocationsWriter() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class

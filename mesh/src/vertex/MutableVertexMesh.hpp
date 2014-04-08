@@ -365,7 +365,7 @@ public:
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT1Swaps();
 
     /**
-     * @return the locations of the T1 swaps
+     * @return the locations of the T2 swaps
      */
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT2Swaps();
 
@@ -380,7 +380,7 @@ public:
     void ClearLocationsOfT1Swaps();
 
     /**
-     * Helper method to clear the stored T1 swaps
+     * Helper method to clear the stored T2 swaps
      */
     void ClearLocationsOfT2Swaps();
 
