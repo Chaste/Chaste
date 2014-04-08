@@ -2062,19 +2062,30 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0u)->rGetLocation()[0],  -2.5, 1e-8);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0u)->rGetLocation()[1],   0.5, 1e-8);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0u)->rGetLocation()[2],   0.5, 1e-8);
-        TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(0u)->rGetLocation() - voronoi_mesh.GetNode(11u)->rGetLocation()),   3.75, DBL_EPSILON);
-        TS_ASSERT_DELTA(norm_1(voronoi_mesh.GetNode(0u)->rGetLocation() - voronoi_mesh.GetNode(14u)->rGetLocation()),   6.0, DBL_EPSILON);
+
+        // Work out how many Voronoi nodes share the same location
+        unsigned pairs_in_same_loc = 0u;
+        for (unsigned i=0; i<voronoi_mesh.GetNumNodes(); i++)
+        {
+            for (unsigned j=i+1; j<voronoi_mesh.GetNumNodes(); j++)
+            {
+                if (norm_1(voronoi_mesh.GetNode(i)->rGetLocation()
+                         - voronoi_mesh.GetNode(j)->rGetLocation()) <= DBL_EPSILON)
+                {
+                    pairs_in_same_loc++;
+                }
+            }
+        }
+        TS_ASSERT_EQUALS(pairs_in_same_loc, 40u); // More than num nodes since sometimes 4 in same place!
 
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumFaces(), 32u);
-        TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(0u)), 7.7942, 1e-4); //Degenerate quad (is triangle)
-        TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(1u)), 2.7556, 1e-4); //Five point, but is triangle
-        TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(2u)), 0.0000, 1e-4); //Degenerate triangle
-        TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(4u)), 0.0000, 1e-12); //Degenerate triangle
-        TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(5u)), 2.7556, 1e-4); //Triangle
-        for (unsigned i=0; i<15; i++)
+        double sum_of_face_areas = 0.0;
+        for (unsigned i=0; i<voronoi_mesh.GetNumFaces(); i++)
         {
-            voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(i));
+            sum_of_face_areas += voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(i));
         }
+        TS_ASSERT_DELTA(sum_of_face_areas, 86.3581, 1e-4);
+
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 7.5937, 1e-4);
         double volume=0.0;
