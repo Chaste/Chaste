@@ -288,7 +288,7 @@ public:
      * @param ydot  storage for the derivatives of the system; will be filled in on return
      */
     virtual void EvaluateYDerivatives(realtype time,
-                                      N_Vector y,
+                                      const N_Vector y,
                                       N_Vector ydot)=0;
 
 
