@@ -63,7 +63,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
 #include "CellIdWriter.hpp"
+#include "CellLabelWriter.hpp"
+#include "CellLocationWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
+#include "CellProliferativeTypesWriter.hpp"
+#include "CellVariablesWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
@@ -794,9 +799,8 @@ public:
 //        TS_ASSERT_EQUALS(p_tessellation1->GetNumNodes(), 4u);
     }
 
-    void TestCellPopulationWritersIn2d()
+    void TestMeshBasedCellPopulationWriteResultsToFile()
     {
-        // Cannot write cell populations in parallel
         EXIT_IF_PARALLEL;
 
         // Set up SimulationTime (needed if VTK is used)
@@ -805,17 +809,41 @@ public:
         // Resetting the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
-        // Create a simple mesh
+        // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Set up cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
-        // Cover mutation state reporting
+        std::vector<CellPtr> cells;
+        for (unsigned elem_index=0; elem_index<mesh.GetNumNodes(); elem_index++)
+        {
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+
+            CellPtr p_cell(new Cell(p_wildtype, p_model));
+            if (elem_index%3 == 0)
+            {
+                p_cell->SetCellProliferativeType(p_stem);
+            }
+            else if (elem_index%3 == 1)
+            {
+                p_cell->SetCellProliferativeType(p_transit);
+            }
+            else
+            {
+                p_cell->SetCellProliferativeType(p_diff);
+            }
+
+            double birth_time = 0.0 - elem_index;
+            p_cell->SetBirthTime(birth_time);
+
+            cells.push_back(p_cell);
+        }
+
         boost::shared_ptr<AbstractCellProperty> p_apc1(CellPropertyRegistry::Instance()->Get<ApcOneHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_apc2(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_bcat1(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
@@ -828,9 +856,8 @@ public:
         cells[3]->SetMutationState(p_bcat1);
         cells[4]->AddCellProperty(p_label);
 
-        // Create cell population
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-
+        cell_population.InitialiseCells();
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-2-2");
 
         // Test set/get methods
@@ -853,27 +880,37 @@ public:
             cell_iter->GetCellData()->SetItem("var2", (double) 3.0);
         }
 
+        cell_population.SetCellAncestorsToLocationIndices();
+
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
-
-        cell_population.AddPopulationWriter<CellPopulationAreaWriter>();
-        cell_population.AddCellWriter<CellVolumesWriter>();
         cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
-        cell_population.SetCellAncestorsToLocationIndices();
+        cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellLabelWriter>();
+        cell_population.AddCellWriter<CellLocationWriter>();
+        cell_population.AddCellWriter<CellMutationStatesWriter>();
+        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellProliferativeTypesWriter>();
+        cell_population.AddCellWriter<CellVariablesWriter>();
+        cell_population.AddCellWriter<CellVolumesWriter>();
 
         // This method is usually called by Update()
         cell_population.CreateVoronoiTessellation();
 
-        std::string output_directory = "TestCellPopulationWritersIn2d";
+        std::string output_directory = "TestMeshBasedCellPopulationWriteResultsToFile";
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.OpenWritersFiles(output_directory);
+        cell_population.WriteResultsToFiles(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+
         cell_population.WriteResultsToFiles(output_directory);
         cell_population.CloseOutputFiles();
 
@@ -888,9 +925,9 @@ public:
         // Test the GetCellProliferativeTypeCount() function - we should have five stem cells
         std::vector<unsigned> cell_types = cell_population.GetCellProliferativeTypeCount();
         TS_ASSERT_EQUALS(cell_types.size(), 4u);
-        TS_ASSERT_EQUALS(cell_types[0], 5u);
-        TS_ASSERT_EQUALS(cell_types[1], 0u);
-        TS_ASSERT_EQUALS(cell_types[2], 0u);
+        TS_ASSERT_EQUALS(cell_types[0], 2u);
+        TS_ASSERT_EQUALS(cell_types[1], 2u);
+        TS_ASSERT_EQUALS(cell_types[2], 1u);
         TS_ASSERT_EQUALS(cell_types[3], 0u);
 
         // Test that the cell population parameters are output correctly
@@ -901,24 +938,52 @@ public:
         parameter_file->close();
 
         std::vector<std::string> files_to_compare;
-        files_to_compare.push_back("results.vizelements");
         files_to_compare.push_back("results.viznodes");
+        files_to_compare.push_back("results.vizelements");
+        files_to_compare.push_back("cellages.dat");
+        files_to_compare.push_back("results.vizancestors");
+        files_to_compare.push_back("loggedcell.dat");
+        files_to_compare.push_back("results.vizlabels");
+        files_to_compare.push_back("results.vizlocations");
+        files_to_compare.push_back("results.vizmutationstates");
+        files_to_compare.push_back("results.vizcellphases");
         files_to_compare.push_back("results.vizcelltypes");
-        files_to_compare.push_back("cellpopulationareas.dat");
+        files_to_compare.push_back("cellvariables.dat");
         files_to_compare.push_back("cellareas.dat");
         files_to_compare.push_back("cellmutationstates.dat");
-        files_to_compare.push_back("voronoi.dat");
-        files_to_compare.push_back("results.vizancestors");
-        files_to_compare.push_back("results.parameters");
+        files_to_compare.push_back("cellcyclephases.dat");
+        files_to_compare.push_back("celltypes.dat");
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         for (unsigned i=0; i<files_to_compare.size(); i++)
         {
-            FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestCellPopulationWritersIn2d/" + files_to_compare[i]);
+            FileComparison comparer(results_dir + files_to_compare[i],"cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/" + files_to_compare[i]);
             TS_ASSERT(comparer.CompareFiles());
         }
+
+#ifdef CHASTE_VTK
+        // Test that VTK writer has produced some files
+
+        // Initial condition files
+        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
+
+        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_mesh_file.Exists());
+
+        // Final files
+        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file2.Exists());
+
+        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_mesh_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(results_dir + "results.pvd", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file3.Exists());
+ #endif //CHASTE_VTK
     }
 
     void TestCellPopulationWritersIn3d()

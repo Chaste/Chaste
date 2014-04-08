@@ -37,9 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCELLWRITERS_HPP_
 
 #include <cxxtest/TestSuite.h>
+
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include "ArchiveOpener.hpp"
+
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 #include "Cell.hpp"
@@ -76,6 +78,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCellWriters : public AbstractCellBasedTestSuite
 {
 public:
+
+    void TestAddCellWriterToAPopulation() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a 3D NodeBasedCellPopulation
+        std::vector<Node<3>* > nodes;
+        nodes.push_back(new Node<3>(0, false));
+        nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
+
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
+        generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+
+        // Create a cell writer and test that it is correctly added to the cell population
+        cell_population.AddCellWriter<CellIdWriter>();
+
+        ///\todo test something here (#2404, #2441)
+
+        // Avoid memory leaks (note that the writers are deleted by the population destructor)
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
 
     void TestCellAgesWriter() throw (Exception)
     {
@@ -270,6 +302,9 @@ public:
     {
         EXIT_IF_PARALLEL;
 
+        // Resetting the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
+
         // Set up SimulationTime (this is usually done by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
 
@@ -322,7 +357,7 @@ public:
         // Test the correct data are returned for VTK output for the first cell
         // (there have been six cells created since the start of this test suite)
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        TS_ASSERT_DELTA(vtk_data, 6.0, 1e-6);
+        TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
 
         // Test GetVtkCellDataName() method
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell IDs");
@@ -937,6 +972,9 @@ public:
     void TestCellVolumesWriter() throw (Exception)
     {
         EXIT_IF_PARALLEL;
+
+        // Resetting the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
 
         // Create a simple vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 6);

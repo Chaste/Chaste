@@ -45,18 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
 
-// Cell writers
-#include "CellIdWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-
 // Cell population writers
-#include "NodeLocationWriter.hpp"
 #include "BoundaryNodeWriter.hpp"
-#include "CellPopulationElementWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
-#include "CellProliferativeTypesCountWriter.hpp"
+#include "CellPopulationElementWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
+#include "CellProliferativeTypesCountWriter.hpp"
+#include "NodeLocationWriter.hpp"
 #include "NodeVelocityWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
 #include "VertexT2SwapLocationsWriter.hpp"
@@ -85,11 +81,11 @@ class TestCellPopulationWriters : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestNodeLocationWriter() throw (Exception)
+    void TestAddCellPopulationWriterToAPopulation() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
-        // Create a simple 3D NodeBasedCellPopulation
+        // Create a 3D NodeBasedCellPopulation
         std::vector<Node<3>* > nodes;
         nodes.push_back(new Node<3>(0, false));
         nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
@@ -103,33 +99,16 @@ public:
 
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
-        // Create an output directory for the writer
-        std::string output_directory = "TestNodeLocationWriter";
-        OutputFileHandler output_file_handler(output_directory, false);
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+        // Create a writer and test that it is correctly added to the cell population
+        cell_population.AddPopulationWriter<CellPopulationElementWriter>();
 
-        // Create a NodeLocationWriter and test that the correct output is generated
-        NodeLocationWriter<3,3> location_writer;
-        location_writer.OpenOutputFile(output_directory);
-        location_writer.WriteTimeStamp();
-        location_writer.Visit(&cell_population);
-        location_writer.WriteNewline();
-        location_writer.CloseFile();
+        ///\todo test something here (#2404, #2441)
 
-        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeLocationWriter/results.viznodes").CompareFiles();
-
-        // Test that we can append to files
-        location_writer.OpenOutputFileForAppend(output_directory);
-        location_writer.WriteTimeStamp();
-        location_writer.Visit(&cell_population);
-        location_writer.WriteNewline();
-        location_writer.CloseFile();
-
-        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeLocationWriter/results.viznodes_twice").CompareFiles();
-
-        // Avoid memory leaks
-        delete nodes[0];
-        delete nodes[1];
+        // Avoid memory leaks (note that the writers are deleted by the population destructor)
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestBoundaryNodeWriter() throw (Exception)
@@ -144,11 +123,9 @@ public:
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
-
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
 
         // Create an output directory for the writer
@@ -164,7 +141,7 @@ public:
         boundary_writer.WriteNewline();
         boundary_writer.CloseFile();
 
-        FileComparison(results_dir + "results.vizboundarynodes", "cell_based/test/data/TestBoundaryNodeWriter/results.vizboundarynodes").CompareFiles();
+        FileComparison(results_dir + "results.vizboundarynodes", "cell_based/test/data/TestCellPopulationWriters/results.vizboundarynodes").CompareFiles();
 
         // Test that we can append to files
         boundary_writer.OpenOutputFileForAppend(output_directory);
@@ -173,48 +150,30 @@ public:
         boundary_writer.WriteNewline();
         boundary_writer.CloseFile();
 
-        FileComparison(results_dir + "results.vizboundarynodes", "cell_based/test/data/TestBoundaryNodeWriter/results.vizboundarynodes_twice").CompareFiles();
+        FileComparison(results_dir + "results.vizboundarynodes", "cell_based/test/data/TestCellPopulationWriters/results.vizboundarynodes_twice").CompareFiles();
     }
 
-    void TestCellPopulationElementWriter() throw (Exception)
+    void TestBoundaryNodeWriterArchiving() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BoundaryNodeWriter.arch";
 
-        // Create a simple 2D VertexBasedCellPopulation
-        HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new BoundaryNodeWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
 
-        std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
-
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create an output directory for the writer
-        std::string output_directory = "TestCellPopulationElementWriter";
-        OutputFileHandler output_file_handler(output_directory, false);
-
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        // Create a CellPopulationElementWriter and test that the correct output is generated
-        CellPopulationElementWriter<2,2> element_writer;
-        element_writer.OpenOutputFile(output_directory);
-        element_writer.WriteTimeStamp();
-        element_writer.Visit(&cell_population);
-        element_writer.WriteNewline();
-        element_writer.CloseFile();
-
-        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationElementWriter/results.vizelements").CompareFiles();
-
-        // Test that we can append to files
-        element_writer.OpenOutputFileForAppend(output_directory);
-        element_writer.WriteTimeStamp();
-        element_writer.Visit(&cell_population);
-        element_writer.WriteNewline();
-        element_writer.CloseFile();
-
-        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationElementWriter/results.vizelements_twice").CompareFiles();
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
     }
 
     void TestCellMutationStatesCountWriter() throw (Exception)
@@ -224,19 +183,17 @@ public:
         // Create a simple 2D MultipleCaBasedCellPopulation
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
-
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 5u);
-
         std::vector<unsigned> location_indices;
         location_indices.push_back(7);
         location_indices.push_back(11);
         location_indices.push_back(12);
         location_indices.push_back(13);
         location_indices.push_back(17);
-
         MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
         cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.GenerateCellResults();
 
@@ -254,7 +211,7 @@ public:
         mutation_states_writer.WriteNewline();
         mutation_states_writer.CloseFile();
 
-        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesCountWriter/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellPopulationWriters/cellmutationstates.dat").CompareFiles();
 
         // Test that we can append to files
         mutation_states_writer.OpenOutputFileForAppend(output_directory);
@@ -263,10 +220,10 @@ public:
         mutation_states_writer.WriteNewline();
         mutation_states_writer.CloseFile();
 
-        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellMutationStatesCountWriter/cellmutationstates_twice.dat").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCellPopulationWriters/cellmutationstates_twice.dat").CompareFiles();
     }
 
-    void TestArchivingOfCellMutationStatesCountWriter() throw (Exception)
+    void TestCellMutationStatesCountWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -274,282 +231,19 @@ public:
 
         {
             AbstractCellBasedWriter<2,2>* const p_population_writer = new CellMutationStatesCountWriter<2,2>();
-
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
             output_arch << p_population_writer;
-
             delete p_population_writer;
         }
 
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
-
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
             input_arch >> p_population_writer_2;
-
             delete p_population_writer_2;
        }
-    }
-
-    void TestCellProliferativeTypesAndPhasesCountWriters() throw (Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a simple 3D MeshBasedCellPopulation
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        MeshBasedCellPopulation<3> cell_population(mesh, cells);
-
-        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
-
-        cell_population.GenerateCellResults();
-
-        // Create an output directory for the writer
-        std::string output_directory = "TestCellProliferativeTypesAndPhasesCountWriters";
-        OutputFileHandler output_file_handler(output_directory, false);
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        // Create a CellProliferativeTypesCountWriter and test that the correct output is generated
-        CellProliferativeTypesCountWriter<3,3> types_count_writer;
-        types_count_writer.OpenOutputFile(output_directory);
-        types_count_writer.WriteTimeStamp();
-        types_count_writer.Visit(&cell_population);
-        types_count_writer.WriteNewline();
-        types_count_writer.CloseFile();
-
-        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/celltypes.dat").CompareFiles();
-
-        // Test that we can append to files
-        types_count_writer.OpenOutputFileForAppend(output_directory);
-        types_count_writer.WriteTimeStamp();
-        types_count_writer.Visit(&cell_population);
-        types_count_writer.WriteNewline();
-        types_count_writer.CloseFile();
-
-        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/celltypes_twice.dat").CompareFiles();
-
-        // Create a CellProliferativePhasesCountWriter and test that the correct output is generated
-        CellProliferativePhasesCountWriter<3,3> phases_count_writer;
-        phases_count_writer.OpenOutputFile(output_directory);
-        phases_count_writer.WriteTimeStamp();
-        phases_count_writer.Visit(&cell_population);
-        phases_count_writer.WriteNewline();
-        phases_count_writer.CloseFile();
-
-        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/cellcyclephases.dat").CompareFiles();
-
-        // Test that we can append to files
-        phases_count_writer.OpenOutputFileForAppend(output_directory);
-        phases_count_writer.WriteTimeStamp();
-        phases_count_writer.Visit(&cell_population);
-        phases_count_writer.WriteNewline();
-        phases_count_writer.CloseFile();
-
-        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellProliferativeTypesAndPhasesCountWriters/cellcyclephases_twice.dat").CompareFiles();
-    }
-
-    void TestVoronoiDataWriter() throw (Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a simple 3D MeshBasedCellPopulation
-        std::vector<Node<3>*> nodes;
-        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
-        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
-        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
-        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
-        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        MeshBasedCellPopulation<3> cell_population(mesh, cells);
-        cell_population.CreateVoronoiTessellation();
-
-        // Create an output directory for the writer
-        std::string output_directory = "TestVoronoiDataWriter";
-        OutputFileHandler output_file_handler(output_directory, false);
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        // Create a VoronoiDataWriter and test that the correct output is generated
-        VoronoiDataWriter<3,3> voronoi_writer;
-        voronoi_writer.OpenOutputFile(output_directory);
-        voronoi_writer.WriteTimeStamp();
-        voronoi_writer.Visit(&cell_population);
-        voronoi_writer.WriteNewline();
-        voronoi_writer.CloseFile();
-
-        FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestVoronoiDataWriter/voronoi.dat").CompareFiles();
-
-        // Test that we can append to files
-        voronoi_writer.OpenOutputFileForAppend(output_directory);
-        voronoi_writer.WriteTimeStamp();
-        voronoi_writer.Visit(&cell_population);
-        voronoi_writer.WriteNewline();
-        voronoi_writer.CloseFile();
-
-        FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestVoronoiDataWriter/voronoi_twice.dat").CompareFiles();
-    }
-
-    void TestVertexT1AndT2AndT3SwapLocationsWriters() throw (Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a simple 2D VertexBasedCellPopulation
-        HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
-
-        std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
-
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-
-        // Create an output directory for the writer
-        std::string output_directory = "TestVertexT1AndT2AndT3SwapLocationsWriters";
-        OutputFileHandler output_file_handler(output_directory, false);
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
-        VertexT1SwapLocationsWriter<2,2> t1_swaps_writer;
-        t1_swaps_writer.OpenOutputFile(output_directory);
-        t1_swaps_writer.WriteTimeStamp();
-        t1_swaps_writer.Visit(&cell_population);
-        t1_swaps_writer.WriteNewline();
-        t1_swaps_writer.CloseFile();
-
-        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T1SwapLocations.dat").CompareFiles();
-
-        // Test that we can append to files
-        t1_swaps_writer.OpenOutputFileForAppend(output_directory);
-        t1_swaps_writer.WriteTimeStamp();
-        t1_swaps_writer.Visit(&cell_population);
-        t1_swaps_writer.WriteNewline();
-        t1_swaps_writer.CloseFile();
-
-        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T1SwapLocations_twice.dat").CompareFiles();
-
-        // Create a VertexT2SwapLocationsWriter and test that the correct output is generated
-        VertexT2SwapLocationsWriter<2,2> t2_swaps_writer;
-        t2_swaps_writer.OpenOutputFile(output_directory);
-        t2_swaps_writer.WriteTimeStamp();
-        t2_swaps_writer.Visit(&cell_population);
-        t2_swaps_writer.WriteNewline();
-        t2_swaps_writer.CloseFile();
-
-        FileComparison(results_dir + "T2SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T2SwapLocations.dat").CompareFiles();
-
-        // Test that we can append to files
-        t2_swaps_writer.OpenOutputFileForAppend(output_directory);
-        t2_swaps_writer.WriteTimeStamp();
-        t2_swaps_writer.Visit(&cell_population);
-        t2_swaps_writer.WriteNewline();
-        t2_swaps_writer.CloseFile();
-
-        FileComparison(results_dir + "T2SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T2SwapLocations_twice.dat").CompareFiles();
-
-        // Create a VertexT3SwapLocationsWriter and test that the correct output is generated
-        VertexT3SwapLocationsWriter<2,2> t3_swaps_writer;
-        t3_swaps_writer.OpenOutputFile(output_directory);
-        t3_swaps_writer.WriteTimeStamp();
-        t3_swaps_writer.Visit(&cell_population);
-        t3_swaps_writer.WriteNewline();
-        t3_swaps_writer.CloseFile();
-
-        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T3SwapLocations.dat").CompareFiles();
-
-        // Test that we can append to files
-        t3_swaps_writer.OpenOutputFileForAppend(output_directory);
-        t3_swaps_writer.WriteTimeStamp();
-        t3_swaps_writer.Visit(&cell_population);
-        t3_swaps_writer.WriteNewline();
-        t3_swaps_writer.CloseFile();
-
-        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestVertexT1AndT2AndT3SwapLocationsWriters/T3SwapLocations_twice.dat").CompareFiles();
-
-        {
-            // Coverage of the Visit() method when called on a MeshBasedCellPopulation
-            HoneycombMeshGenerator tet_generator(5, 5, 0);
-            MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
-            std::vector<CellPtr> mesh_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
-            mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
-            MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
-
-            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&mesh_based_cell_population));
-            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&mesh_based_cell_population));
-            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&mesh_based_cell_population));
-        }
-
-        // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
-        PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
-        std::vector<CellPtr> ca_based_cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
-        ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
-        std::vector<unsigned> location_indices;
-        location_indices.push_back(7);
-        location_indices.push_back(11);
-        location_indices.push_back(12);
-        location_indices.push_back(13);
-        location_indices.push_back(17);
-        MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
-
-        TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&ca_based_cell_population));
-        TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&ca_based_cell_population));
-        TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&ca_based_cell_population));
-
-        {
-            // Coverage of the Visit() method when called on a NodeBasedCellPopulation
-            std::vector<Node<2>* > node_based_nodes;
-            node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-            node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
-            NodesOnlyMesh<2> node_based_mesh;
-            node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
-            std::vector<CellPtr> node_based_cells;
-            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
-            node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
-            NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
-
-            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&node_based_cell_population));
-            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&node_based_cell_population));
-            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&node_based_cell_population));
-
-            // Tidy up
-            delete node_based_nodes[0];
-            delete node_based_nodes[1];
-        }
-
-        // Coverage of the Visit() method when called on a PottsBasedCellPopulation
-        PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
-        PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
-        std::vector<CellPtr> potts_based_cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
-        potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
-        PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
-
-        TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&potts_based_cell_population));
-        TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&potts_based_cell_population));
-        TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&potts_based_cell_population));
     }
 
     void TestCellPopulationAreaWriter() throw (Exception)
@@ -564,12 +258,11 @@ public:
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
         MutableMesh<3,3> mesh(nodes);
-
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
+
         cell_population.CreateVoronoiTessellation();
 
         // Create an output directory for the writer
@@ -585,7 +278,7 @@ public:
         area_writer.WriteNewline();
         area_writer.CloseFile();
 
-        FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationAreaWriter/cellpopulationareas.dat").CompareFiles();
+        FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationWriters/cellpopulationareas.dat").CompareFiles();
 
         // Test that we can append to files
         area_writer.OpenOutputFileForAppend(output_directory);
@@ -594,7 +287,294 @@ public:
         area_writer.WriteNewline();
         area_writer.CloseFile();
 
-        FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationAreaWriter/cellpopulationareas_twice.dat").CompareFiles();
+        FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationWriters/cellpopulationareas_twice.dat").CompareFiles();
+    }
+
+    void TestCellPopulationAreaWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationAreaWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellPopulationAreaWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
+    }
+
+    void TestCellPopulationElementWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D VertexBasedCellPopulation
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellPopulationElementWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a CellPopulationElementWriter and test that the correct output is generated
+        CellPopulationElementWriter<2,2> element_writer;
+        element_writer.OpenOutputFile(output_directory);
+        element_writer.WriteTimeStamp();
+        element_writer.Visit(&cell_population);
+        element_writer.WriteNewline();
+        element_writer.CloseFile();
+
+        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWriters/results.vizelements").CompareFiles();
+
+        // Test that we can append to files
+        element_writer.OpenOutputFileForAppend(output_directory);
+        element_writer.WriteTimeStamp();
+        element_writer.Visit(&cell_population);
+        element_writer.WriteNewline();
+        element_writer.CloseFile();
+
+        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWriters/results.vizelements_twice").CompareFiles();
+    }
+
+    void TestCellPopulationElementWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationElementWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellPopulationElementWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
+    }
+
+    void TestCellProliferativePhasesCountWriters() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 3D MeshBasedCellPopulation
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
+        MutableMesh<3,3> mesh(nodes);
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+
+        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.GenerateCellResults();
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellProliferativePhasesCountWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a CellProliferativePhasesCountWriter and test that the correct output is generated
+        CellProliferativePhasesCountWriter<3,3> phases_count_writer;
+        phases_count_writer.OpenOutputFile(output_directory);
+        phases_count_writer.WriteTimeStamp();
+        phases_count_writer.Visit(&cell_population);
+        phases_count_writer.WriteNewline();
+        phases_count_writer.CloseFile();
+
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationWriters/cellcyclephases.dat").CompareFiles();
+
+        // Test that we can append to files
+        phases_count_writer.OpenOutputFileForAppend(output_directory);
+        phases_count_writer.WriteTimeStamp();
+        phases_count_writer.Visit(&cell_population);
+        phases_count_writer.WriteNewline();
+        phases_count_writer.CloseFile();
+
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationWriters/cellcyclephases_twice.dat").CompareFiles();
+    }
+
+    void TestCellProliferativePhasesCountWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativePhasesCountWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellProliferativePhasesCountWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
+    }
+
+    void TestCellProliferativeTypesCountWriters() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 3D MeshBasedCellPopulation
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
+        MutableMesh<3,3> mesh(nodes);
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+
+        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        cell_population.GenerateCellResults();
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellProliferativeTypesCountWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a CellProliferativeTypesCountWriter and test that the correct output is generated
+        CellProliferativeTypesCountWriter<3,3> types_count_writer;
+        types_count_writer.OpenOutputFile(output_directory);
+        types_count_writer.WriteTimeStamp();
+        types_count_writer.Visit(&cell_population);
+        types_count_writer.WriteNewline();
+        types_count_writer.CloseFile();
+
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellPopulationWriters/celltypes.dat").CompareFiles();
+
+        // Test that we can append to files
+        types_count_writer.OpenOutputFileForAppend(output_directory);
+        types_count_writer.WriteTimeStamp();
+        types_count_writer.Visit(&cell_population);
+        types_count_writer.WriteNewline();
+        types_count_writer.CloseFile();
+
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestCellPopulationWriters/celltypes_twice.dat").CompareFiles();
+    }
+
+    void TestCellProliferativeTypesCountWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativeTypesCountWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellProliferativeTypesCountWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
+    }
+
+    void TestNodeLocationWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 3D NodeBasedCellPopulation
+        std::vector<Node<3>* > nodes;
+        nodes.push_back(new Node<3>(0, false));
+        nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
+        NodesOnlyMesh<3> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
+        generator.GenerateBasic(cells, mesh.GetNumNodes());
+        NodeBasedCellPopulation<3> cell_population(mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestNodeLocationWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a NodeLocationWriter and test that the correct output is generated
+        NodeLocationWriter<3,3> location_writer;
+        location_writer.OpenOutputFile(output_directory);
+        location_writer.WriteTimeStamp();
+        location_writer.Visit(&cell_population);
+        location_writer.WriteNewline();
+        location_writer.CloseFile();
+
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWriters/results.viznodes").CompareFiles();
+
+        // Test that we can append to files
+        location_writer.OpenOutputFileForAppend(output_directory);
+        location_writer.WriteTimeStamp();
+        location_writer.Visit(&cell_population);
+        location_writer.WriteNewline();
+        location_writer.CloseFile();
+
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWriters/results.viznodes_twice").CompareFiles();
+
+        // Avoid memory leaks
+        delete nodes[0];
+        delete nodes[1];
+    }
+
+    void TestNodeLocationWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NodeLocationWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new NodeLocationWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
     }
 
     void TestNodeVelocityWriterWithMeshBasedCellPopulation() throw (Exception)
@@ -611,7 +591,6 @@ public:
         mesh_based_nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         mesh_based_nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         mesh_based_nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-
         MutableMesh<3,3> mesh_based_mesh(mesh_based_nodes);
         std::vector<CellPtr> mesh_based_cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> mesh_based_cells_generator;
@@ -652,7 +631,7 @@ public:
         mesh_based_writer.WriteNewline();
         mesh_based_writer.CloseFile();
 
-        FileComparison(mesh_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestNodeVelocityWriter/nodevelocities_mesh.dat").CompareFiles();
+        FileComparison(mesh_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestCellPopulationWriters/nodevelocities_mesh.dat").CompareFiles();
     }
 
     void TestNodeVelocityWriterWithNodeBasedCellPopulation() throw (Exception)
@@ -695,7 +674,7 @@ public:
         node_based_writer.CloseFile();
 
         // At this time step, the node velocity components should all be zero
-        FileComparison(node_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestNodeVelocityWriter/nodevelocities_node.dat").CompareFiles();
+        FileComparison(node_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestCellPopulationWriters/nodevelocities_node.dat").CompareFiles();
 
         // Now increment time and add a non-zero force for each node
         SimulationTime::Instance()->IncrementTimeOneStep();
@@ -720,7 +699,7 @@ public:
         node_based_writer.CloseFile();
 
         // At the next time step, the node velocity components should be increasing positive integers
-        FileComparison(node_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestNodeVelocityWriter/nodevelocities_node_twice.dat").CompareFiles();
+        FileComparison(node_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestCellPopulationWriters/nodevelocities_node_twice.dat").CompareFiles();
 
         // Avoid memory leaks
         delete node_based_nodes[0];
@@ -775,74 +754,132 @@ public:
         vertex_based_writer.WriteNewline();
         vertex_based_writer.CloseFile();
 
-        FileComparison(vertex_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestNodeVelocityWriter/nodevelocities_vertex.dat").CompareFiles();
+        FileComparison(vertex_based_results_dir + "nodevelocities.dat", "cell_based/test/data/TestCellPopulationWriters/nodevelocities_vertex.dat").CompareFiles();
     }
 
-    void TestAddWritersToAPopulation() throw (Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a 3D NodeBasedCellPopulation
-        std::vector<Node<3>* > nodes;
-        nodes.push_back(new Node<3>(0, false));
-        nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
-
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
-        generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        NodeBasedCellPopulation<3> cell_population(mesh, cells);
-
-        // Create a writer and test that it is correctly added to the cell population
-        cell_population.AddPopulationWriter<CellPopulationElementWriter>();
-
-        ///\todo test something here (#2404, #2441)
-
-        // Create another writer and test that it is correctly added to the cell population
-        cell_population.AddCellWriter<CellIdWriter>();
-
-        ///\todo test something here (#2404, #2441)
-
-        // Avoid memory leaks (note that the writers are deleted by the population destructor)
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
-
-    void TestArchivingOfCellPopulationAreaWriter() throw (Exception)
+    void TestNodeVelocityWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationAreaWriter.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NodeVelocityWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellPopulationAreaWriter<2,2>();
-
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new NodeVelocityWriter<2,2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
-            output_arch << p_cell_writer;
-
-            delete p_cell_writer;
+            output_arch << p_population_writer;
+            delete p_population_writer;
         }
 
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
-
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
-            input_arch >> p_cell_writer_2;
-
-            delete p_cell_writer_2;
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
        }
     }
 
-    void TestArchivingOfVertexT1SwapLocationsWriter() throw (Exception)
+    void TestVertexT1SwapLocationsWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D VertexBasedCellPopulation
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestVertexT1SwapLocationsWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
+        VertexT1SwapLocationsWriter<2,2> t1_swaps_writer;
+        t1_swaps_writer.OpenOutputFile(output_directory);
+        t1_swaps_writer.WriteTimeStamp();
+        t1_swaps_writer.Visit(&cell_population);
+        t1_swaps_writer.WriteNewline();
+        t1_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestCellPopulationWriters/T1SwapLocations.dat").CompareFiles();
+
+        // Test that we can append to files
+        t1_swaps_writer.OpenOutputFileForAppend(output_directory);
+        t1_swaps_writer.WriteTimeStamp();
+        t1_swaps_writer.Visit(&cell_population);
+        t1_swaps_writer.WriteNewline();
+        t1_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T1SwapLocations.dat", "cell_based/test/data/TestCellPopulationWriters/T1SwapLocations_twice.dat").CompareFiles();
+
+        {
+            // Coverage of the Visit() method when called on a MeshBasedCellPopulation
+            HoneycombMeshGenerator tet_generator(5, 5, 0);
+            MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
+            std::vector<CellPtr> mesh_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+            mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
+            MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&mesh_based_cell_population));
+        }
+
+        {
+            // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+            PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
+            PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+            std::vector<CellPtr> ca_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
+            std::vector<unsigned> location_indices;
+            location_indices.push_back(7);
+            location_indices.push_back(11);
+            location_indices.push_back(12);
+            location_indices.push_back(13);
+            location_indices.push_back(17);
+            MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&ca_based_cell_population));
+        }
+
+        {
+            // Coverage of the Visit() method when called on a NodeBasedCellPopulation
+            std::vector<Node<2>* > node_based_nodes;
+            node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+            node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+            NodesOnlyMesh<2> node_based_mesh;
+            node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
+            std::vector<CellPtr> node_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
+            NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&node_based_cell_population));
+
+            // Tidy up
+            delete node_based_nodes[0];
+            delete node_based_nodes[1];
+        }
+
+        {
+            // Coverage of the Visit() method when called on a PottsBasedCellPopulation
+            PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
+            PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+            std::vector<CellPtr> potts_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
+            PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&potts_based_cell_population));
+        }
+    }
+
+    void TestVertexT1SwapLocationsWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -853,25 +890,119 @@ public:
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
             output_arch << p_cell_writer;
-
             delete p_cell_writer;
         }
 
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
-
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
             input_arch >> p_cell_writer_2;
-
             delete p_cell_writer_2;
        }
     }
 
-    void TestArchivingOfVertexT2SwapLocationsWriter() throw (Exception)
+    void TestVertexT2SwapLocationsWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D VertexBasedCellPopulation
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestVertexT2SwapLocationsWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
+        VertexT2SwapLocationsWriter<2,2> t2_swaps_writer;
+        t2_swaps_writer.OpenOutputFile(output_directory);
+        t2_swaps_writer.WriteTimeStamp();
+        t2_swaps_writer.Visit(&cell_population);
+        t2_swaps_writer.WriteNewline();
+        t2_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T2SwapLocations.dat", "cell_based/test/data/TestCellPopulationWriters/T2SwapLocations.dat").CompareFiles();
+
+        // Test that we can append to files
+        t2_swaps_writer.OpenOutputFileForAppend(output_directory);
+        t2_swaps_writer.WriteTimeStamp();
+        t2_swaps_writer.Visit(&cell_population);
+        t2_swaps_writer.WriteNewline();
+        t2_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T2SwapLocations.dat", "cell_based/test/data/TestCellPopulationWriters/T2SwapLocations_twice.dat").CompareFiles();
+
+        {
+            // Coverage of the Visit() method when called on a MeshBasedCellPopulation
+            HoneycombMeshGenerator tet_generator(5, 5, 0);
+            MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
+            std::vector<CellPtr> mesh_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+            mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
+            MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&mesh_based_cell_population));
+        }
+
+        {
+            // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+            PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
+            PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+            std::vector<CellPtr> ca_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
+            std::vector<unsigned> location_indices;
+            location_indices.push_back(7);
+            location_indices.push_back(11);
+            location_indices.push_back(12);
+            location_indices.push_back(13);
+            location_indices.push_back(17);
+            MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&ca_based_cell_population));
+        }
+
+        {
+            // Coverage of the Visit() method when called on a NodeBasedCellPopulation
+            std::vector<Node<2>* > node_based_nodes;
+            node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+            node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+            NodesOnlyMesh<2> node_based_mesh;
+            node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
+            std::vector<CellPtr> node_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
+            NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&node_based_cell_population));
+
+            // Tidy up
+            delete node_based_nodes[0];
+            delete node_based_nodes[1];
+        }
+
+        {
+            // Coverage of the Visit() method when called on a PottsBasedCellPopulation
+            PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
+            PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+            std::vector<CellPtr> potts_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
+            PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&potts_based_cell_population));
+        }
+    }
+
+    void TestVertexT2SwapLocationsWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -882,25 +1013,119 @@ public:
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
             output_arch << p_cell_writer;
-
             delete p_cell_writer;
         }
 
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
-
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
             input_arch >> p_cell_writer_2;
-
             delete p_cell_writer_2;
        }
     }
 
-    void TestArchivingOfVertexT3SwapLocationsWriter() throw (Exception)
+    void TestVertexT3SwapLocationsWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 2D VertexBasedCellPopulation
+        HoneycombVertexMeshGenerator generator(4, 6);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestVertexT2SwapLocationsWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
+        VertexT3SwapLocationsWriter<2,2> t3_swaps_writer;
+        t3_swaps_writer.OpenOutputFile(output_directory);
+        t3_swaps_writer.WriteTimeStamp();
+        t3_swaps_writer.Visit(&cell_population);
+        t3_swaps_writer.WriteNewline();
+        t3_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestCellPopulationWriters/T3SwapLocations.dat").CompareFiles();
+
+        // Test that we can append to files
+        t3_swaps_writer.OpenOutputFileForAppend(output_directory);
+        t3_swaps_writer.WriteTimeStamp();
+        t3_swaps_writer.Visit(&cell_population);
+        t3_swaps_writer.WriteNewline();
+        t3_swaps_writer.CloseFile();
+
+        FileComparison(results_dir + "T3SwapLocations.dat", "cell_based/test/data/TestCellPopulationWriters/T3SwapLocations_twice.dat").CompareFiles();
+
+        {
+            // Coverage of the Visit() method when called on a MeshBasedCellPopulation
+            HoneycombMeshGenerator tet_generator(5, 5, 0);
+            MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
+            std::vector<CellPtr> mesh_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+            mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
+            MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&mesh_based_cell_population));
+        }
+
+        {
+            // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+            PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
+            PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+            std::vector<CellPtr> ca_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
+            std::vector<unsigned> location_indices;
+            location_indices.push_back(7);
+            location_indices.push_back(11);
+            location_indices.push_back(12);
+            location_indices.push_back(13);
+            location_indices.push_back(17);
+            MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&ca_based_cell_population));
+        }
+
+        {
+            // Coverage of the Visit() method when called on a NodeBasedCellPopulation
+            std::vector<Node<2>* > node_based_nodes;
+            node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+            node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+            NodesOnlyMesh<2> node_based_mesh;
+            node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
+            std::vector<CellPtr> node_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
+            NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&node_based_cell_population));
+
+            // Tidy up
+            delete node_based_nodes[0];
+            delete node_based_nodes[1];
+        }
+
+        {
+            // Coverage of the Visit() method when called on a PottsBasedCellPopulation
+            PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
+            PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+            std::vector<CellPtr> potts_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
+            PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&potts_based_cell_population));
+        }
+    }
+
+    void TestVertexT3SwapLocationsWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
@@ -908,24 +1133,85 @@ public:
 
         {
             AbstractCellBasedWriter<2,2>* const p_cell_writer = new VertexT3SwapLocationsWriter<2,2>();
-
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
-
             output_arch << p_cell_writer;
-
             delete p_cell_writer;
         }
 
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
-
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
-
             input_arch >> p_cell_writer_2;
-
             delete p_cell_writer_2;
+       }
+    }
+
+    void TestVoronoiDataWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create a simple 3D MeshBasedCellPopulation
+        std::vector<Node<3>*> nodes;
+        nodes.push_back(new Node<3>(0, true,  0.0, 0.0, 0.0));
+        nodes.push_back(new Node<3>(1, true,  1.0, 1.0, 0.0));
+        nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
+        nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
+        nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
+        MutableMesh<3,3> mesh(nodes);
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        MeshBasedCellPopulation<3> cell_population(mesh, cells);
+
+        cell_population.CreateVoronoiTessellation();
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestVoronoiDataWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a VoronoiDataWriter and test that the correct output is generated
+        VoronoiDataWriter<3,3> voronoi_writer;
+        voronoi_writer.OpenOutputFile(output_directory);
+        voronoi_writer.WriteTimeStamp();
+        voronoi_writer.Visit(&cell_population);
+        voronoi_writer.WriteNewline();
+        voronoi_writer.CloseFile();
+
+        FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWriters/voronoi.dat").CompareFiles();
+
+        // Test that we can append to files
+        voronoi_writer.OpenOutputFileForAppend(output_directory);
+        voronoi_writer.WriteTimeStamp();
+        voronoi_writer.Visit(&cell_population);
+        voronoi_writer.WriteNewline();
+        voronoi_writer.CloseFile();
+
+        FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWriters/voronoi_twice.dat").CompareFiles();
+    }
+
+    void TestVoronoiDataWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VoronoiDataWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new VoronoiDataWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
        }
     }
 };
