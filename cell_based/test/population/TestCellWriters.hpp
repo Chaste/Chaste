@@ -584,7 +584,7 @@ public:
 
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
+        TS_ASSERT_DELTA(vtk_data, 5.0, 1e-6);
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
