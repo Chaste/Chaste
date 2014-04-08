@@ -495,8 +495,10 @@ template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    time << num_timesteps;
+
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     unsigned num_nodes = GetNumNodes();
@@ -508,20 +510,18 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     cell_mutation_states.reserve(num_nodes);
     cell_labels.reserve(num_nodes);
     elem_ids.reserve(num_nodes);
-    std::vector<std::vector<double> > cellwise_data;
 
-    unsigned num_cell_data_items = 0;
-    std::vector<std::string> cell_data_names;
+    // When outputting any CellData, we assume that the first cell is representative of all cells
+    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    // We assume that the first cell is representative of all cells
-    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    cell_data_names = this->Begin()->GetCellData()->GetKeys();
-
+    std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cellwise_data_var(num_nodes);
-        cellwise_data.push_back(cellwise_data_var);
+        std::vector<double> cell_data_var(num_nodes);
+        cell_data.push_back(cell_data_var);
     }
+
     for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
          iter != mpPottsMesh->GetNodeIteratorEnd();
          ++iter)
@@ -567,7 +567,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
             }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cellwise_data[var][iter->GetIndex()] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                cell_data[var][iter->GetIndex()] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
     }
@@ -588,9 +588,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
     if (num_cell_data_items > 0)
     {
-        for (unsigned var=0; var<cellwise_data.size(); var++)
+        for (unsigned var=0; var<cell_data.size(); var++)
         {
-            mesh_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
+            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
         }
     }
 
@@ -603,9 +603,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << time.str();
+    *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << time.str();
+    *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }

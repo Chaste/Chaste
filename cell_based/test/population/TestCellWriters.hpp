@@ -128,6 +128,9 @@ public:
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0.7, 1e-6);
 
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Ages");
+
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -220,6 +223,9 @@ public:
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Ancestors");
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
@@ -315,6 +321,9 @@ public:
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 6.0, 1e-6);
 
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell IDs");
+
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -396,6 +405,9 @@ public:
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell locations");
     }
 
     void TestCellLocationWriterArchiving() throw (Exception)
@@ -480,6 +492,9 @@ public:
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 4.0, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cycle phases");
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
@@ -586,6 +601,9 @@ public:
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 5.0, 1e-6);
 
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell types");
+
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -681,6 +699,9 @@ public:
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
 
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell variables");
+
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -755,6 +776,9 @@ public:
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0.8660254, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell volumes");
     }
 
     void TestCellVolumesWriterArchiving() throw (Exception)

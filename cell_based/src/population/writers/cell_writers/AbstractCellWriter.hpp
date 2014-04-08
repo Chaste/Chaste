@@ -82,6 +82,11 @@ public:
     AbstractCellWriter(const std::string &rFileName);
 
     /**
+     * @return mVtkCellDataName
+     */
+    std::string GetVtkCellDataName();
+
+    /**
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
      *

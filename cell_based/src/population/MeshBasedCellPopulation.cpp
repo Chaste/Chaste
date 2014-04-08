@@ -541,32 +541,31 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 {
 #ifdef CHASTE_VTK
     // Write time to file
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    time << num_timesteps;
 
-    unsigned num_points = GetNumNodes();
+    unsigned num_cells = GetNumNodes();
     if (!mWriteVtkAsPoints && (mpVoronoiTessellation != NULL))
     {
-        num_points = mpVoronoiTessellation->GetNumElements();
+        num_cells = mpVoronoiTessellation->GetNumElements();
     }
 
-    std::vector<double> cell_types(num_points);
-    std::vector<double> cell_ancestors(num_points);
-    std::vector<double> cell_mutation_states(num_points);
-    std::vector<double> cell_ages(num_points);
-    std::vector<double> cell_cycle_phases(num_points);
-    std::vector<std::vector<double> > cellwise_data;
+    std::vector<double> cell_types(num_cells);
+    std::vector<double> cell_ancestors(num_cells);
+    std::vector<double> cell_mutation_states(num_cells);
+    std::vector<double> cell_ages(num_cells);
+    std::vector<double> cell_cycle_phases(num_cells);
 
-    unsigned num_cell_data_items = 0;
-    std::vector<std::string> cell_data_names;
-    // We assume that the first cell is representative of all cells
-    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    // When outputting any CellData, we assume that the first cell is representative of all cells
+    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
+    std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cellwise_data_var(num_points);
-        cellwise_data.push_back(cellwise_data_var);
+        std::vector<double> cell_data_var(num_cells);
+        cell_data.push_back(cell_data_var);
     }
 
     if (mOutputMeshInVtk)
@@ -624,7 +623,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+                cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
 
@@ -650,9 +649,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         }
         if (num_cell_data_items > 0)
         {
-            for (unsigned var=0; var<cellwise_data.size(); var++)
+            for (unsigned var=0; var<cell_data.size(); var++)
             {
-                cells_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
+                cells_writer.AddPointData(cell_data_names[var], cell_data[var]);
             }
         }
 
@@ -671,15 +670,15 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         }
 
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
     else if (mpVoronoiTessellation != NULL)
     {
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
-        std::vector<double> cell_volumes(num_points);
+        std::vector<double> cell_volumes(num_cells);
 
         // Loop over elements of mpVoronoiTessellation
         for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
@@ -728,7 +727,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cellwise_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
 
@@ -758,17 +757,17 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
         }
         if (num_cell_data_items > 0)
         {
-            for (unsigned var=0; var<cellwise_data.size(); var++)
+            for (unsigned var=0; var<cell_data.size(); var++)
             {
-                mesh_writer.AddCellData(cell_data_names[var], cellwise_data[var]);
+                mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
             }
         }
 
         mesh_writer.WriteVtkUsingMesh(*mpVoronoiTessellation, time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
 #endif //CHASTE_VTK

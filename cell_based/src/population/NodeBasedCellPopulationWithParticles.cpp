@@ -235,19 +235,20 @@ template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    time << num_timesteps;
+
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
-    unsigned num_nodes = this->GetNumNodes();
-    std::vector<double> particles(num_nodes);
-    std::vector<double> cell_types(num_nodes);
-    std::vector<double> cell_ancestors(num_nodes);
-    std::vector<double> cell_mutation_states(num_nodes);
-    std::vector<double> cell_ages(num_nodes);
-    std::vector<double> cell_cycle_phases(num_nodes);
-    std::vector<double> cell_radii(num_nodes);
-    std::vector<std::vector<double> > cellwise_data;
+    unsigned num_cells = this->GetNumNodes();
+    std::vector<double> particles(num_cells);
+    std::vector<double> cell_types(num_cells);
+    std::vector<double> cell_ancestors(num_cells);
+    std::vector<double> cell_mutation_states(num_cells);
+    std::vector<double> cell_ages(num_cells);
+    std::vector<double> cell_cycle_phases(num_cells);
+    std::vector<double> cell_radii(num_cells);
 
     ///\todo #1975 - deal with possibility of information stored in CellData
 
@@ -349,9 +350,9 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+    *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+    *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }

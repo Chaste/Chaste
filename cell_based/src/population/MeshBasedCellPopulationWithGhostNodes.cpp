@@ -310,9 +310,11 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 #ifdef CHASTE_VTK
     if (this->mpVoronoiTessellation != NULL)
     {
+		unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+		std::stringstream time;
+		time << num_timesteps;
+
         VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
-        std::stringstream time;
-        time << SimulationTime::Instance()->GetTimeStepsElapsed();
 
         unsigned num_elements = this->mpVoronoiTessellation->GetNumElements();
         std::vector<double> ghosts(num_elements);
@@ -322,7 +324,6 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         std::vector<double> cell_ages(num_elements);
         std::vector<double> cell_cycle_phases(num_elements);
         std::vector<double> cell_volumes(num_elements);
-        std::vector<std::vector<double> > cellwise_data;
 
         ///\todo #1975 - deal with possibility of information stored in CellData
 
@@ -434,9 +435,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         mesh_writer.WriteVtkUsingMesh(*(this->mpVoronoiTessellation), time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-        *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+        *(this->mpVtkMetaFile) << num_timesteps;
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
 #endif //CHASTE_VTK

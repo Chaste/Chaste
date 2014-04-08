@@ -40,6 +40,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::CellAncestorWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizancestors")
 {
+    this->mVtkCellDataName = "Ancestors";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

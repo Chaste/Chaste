@@ -40,6 +40,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativePhasesWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesWriter()
     : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizcellphases")
 {
+    this->mVtkCellDataName = "Cycle phases";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

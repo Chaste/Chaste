@@ -500,9 +500,10 @@ template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    ///\todo #2032 Compare with MeshBasedCellPopulation::WriteVtkResultsToFile etc.
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << SimulationTime::Instance()->GetTimeStepsElapsed();
+    time << num_timesteps;
+
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     unsigned num_cells = this->GetNumRealCells();
@@ -515,19 +516,15 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     std::vector<double> cell_cycle_phases(num_cells, -1.0);
     std::vector<Node<DIM>*> nodes;
 
-    std::vector<std::vector<double> > cellwise_data;
+    // When outputting any CellData, we assume that the first cell is representative of all cells
+    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
-    unsigned num_cell_data_items = 0;
-    std::vector<std::string> cell_data_names;
-
-    // We assume that the first cell is representative of all cells
-    num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    cell_data_names = this->Begin()->GetCellData()->GetKeys();
-
+    std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cellwise_data_var(num_cells);
-        cellwise_data.push_back(cellwise_data_var);
+        std::vector<double> cell_data_var(num_cells);
+        cell_data.push_back(cell_data_var);
     }
 
     unsigned cell = 0;
@@ -581,7 +578,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
             {
                 coords[i] += offset[i];
             }
-
         }
 
         nodes.push_back(new Node<DIM>(cell, coords, false));
@@ -609,7 +605,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
         }
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cellwise_data[var][cell] = cell_ptr->GetCellData()->GetItem(cell_data_names[var]);
+            cell_data[var][cell] = cell_ptr->GetCellData()->GetItem(cell_data_names[var]);
         }
 
         cell ++;
@@ -645,9 +641,9 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     }
     if (num_cell_data_items > 0)
     {
-        for (unsigned var=0; var<cellwise_data.size(); var++)
+        for (unsigned var=0; var<cell_data.size(); var++)
         {
-            mesh_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
+            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
         }
     }
 
@@ -660,9 +656,9 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << time.str();
+    *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << time.str();
+    *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 
     // Tidy up

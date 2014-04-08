@@ -41,6 +41,12 @@ AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string
 {
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::string AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVtkCellDataName()
+{
+    return mVtkCellDataName;
+}
+
 // Explicit instantiation
 template class AbstractCellWriter<1,1>;
 template class AbstractCellWriter<1,2>;
