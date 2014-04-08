@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "Cell.hpp"
 #include "WildTypeCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
@@ -62,7 +63,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
 #include "CellIdWriter.hpp"
+#include "CellLabelWriter.hpp"
 #include "CellLocationWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellVariablesWriter.hpp"
@@ -360,6 +363,100 @@ public:
         }
     }
 
+    void TestCellLabelWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false,  1.4));
+        nodes.push_back(new Node<2>(1, false,  2.3));
+        nodes.push_back(new Node<2>(2, false, -6.1));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::vector<CellPtr> cells;
+        for (unsigned i=0; i<3; i++)
+        {
+            FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
+            p_cell->SetCellProliferativeType(p_type);
+            p_cell->SetBirthTime(-0.7 - i*0.5);
+            cells.push_back(p_cell);
+        }
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.Begin()->AddCellProperty(CellPropertyRegistry::Instance()->Get<CellLabel>());
+
+        // Create output directory
+        std::string output_directory = "TestCellLabelWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        CellLabelWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.WriteTimeStamp();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
+        cell_writer.CloseFile();
+
+        // Test that the data are output correctly
+        FileComparison(results_dir + "results.vizlabels", "cell_based/test/data/TestCellWriters/results.vizlabels").CompareFiles();
+
+        // Test the correct data are returned for VTK output for the first cell
+        double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_DELTA(vtk_data, 5.0, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell labels");
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestCellLabelWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellLabelWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAgesWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
     void TestCellLocationWriter() throw (Exception)
     {
         EXIT_IF_PARALLEL;
@@ -418,6 +515,105 @@ public:
 
         {
             AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellLocationWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+    void TestCellMutationStatesWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false,  1.4));
+        nodes.push_back(new Node<2>(1, false,  2.3));
+        nodes.push_back(new Node<2>(2, false, -6.1));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_mutant_state(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::vector<CellPtr> cells;
+        for (unsigned i=0; i<2; i++)
+        {
+            FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
+            p_cell->SetCellProliferativeType(p_type);
+            p_cell->SetBirthTime(-0.7 - i*0.5);
+            cells.push_back(p_cell);
+        }
+        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+        CellPtr p_cell(new Cell(p_mutant_state, p_cell_model));
+        p_cell->SetCellProliferativeType(p_type);
+        p_cell->SetBirthTime(-0.1);
+        cells.push_back(p_cell);
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Create output directory
+        std::string output_directory = "TestCellMutationStatesWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        CellMutationStatesWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.WriteTimeStamp();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
+        cell_writer.CloseFile();
+
+        // Test that the data are output correctly
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestCellWriters/results.vizmutationstates").CompareFiles();
+
+        // Test the correct data are returned for VTK output for the first cell
+        double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Mutation states");
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestCellMutationStatesWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellMutationStatesWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
