@@ -89,6 +89,26 @@ private:
     bool mFluxGivenAtInflow; /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
 
     /**
+     * The symmetric matrix is an estimate of the dense matrix system which determines how flux changes at terminal
+     * nodes are reflected in pressure changes at terminals in the form
+     *  P_{terminal} = A Q_{terminal}.
+     * Each entry in the dense matrix (for Poiseuille flow) is the sum of the resistances of all pipes which are
+     * common ancestors of a pair of terminals.
+     * In order to iteratively match pressure conditions we must invert this equation.
+     */
+    Mat mTerminalInteractionMatrix;
+    std::map<unsigned, unsigned> mTerminalToNodeIndex; /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh node indexing */
+    std::map<unsigned, unsigned> mTerminalToEdgeIndex; /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh element indexing */
+
+    Vec mTerminalFluxChangeVector; /**< Used as the output of the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    Vec mTerminalPressureChangeVector; /**< Used as the input of the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    KSP mTerminalKspSolver; /**< The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    /** The solution method in mTerminalInteractionMatrix may present an underestimate of the resistance
+     * (using fewer branches and/or Poiseuille rather than Pedley resistance.  As a result the pressure to
+     * flux solution is in general an over-estimate and should be scaled back.*/
+    double mTerminalFluxScaling;
+
+    /**
      * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.
      * This involves
      *  * solving directly for parent flux up the tree (using flux balance at each node)
@@ -97,6 +117,13 @@ private:
     void SolveDirectFromFlux();
 
 
+    /**
+     * Set up the PETSc machinery for solving the iterative problem: given pressure conditions at the terminals
+     * guess and refine flux conditions which match them.
+     *
+     * This creates and fills a PETSc Mat.  It also creates two PETSc Vecs and a KSP solver.
+     */
+    void SetupIterativeSolver();
     /**
      * Use pressure boundary conditions at leaves (and pressure condition at root) to perform
      * convert to flux boundary conditions (assuming Poiseuille flow) and then perform a direct solve

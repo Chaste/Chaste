@@ -44,7 +44,12 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
       mDensity(1.51e-6),
-      mFluxGivenAtInflow(false)
+      mFluxGivenAtInflow(false),
+      mTerminalInteractionMatrix(NULL),
+      mTerminalFluxChangeVector(NULL),
+      mTerminalPressureChangeVector(NULL),
+      mTerminalKspSolver(NULL),
+      mTerminalFluxScaling(1.0)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
@@ -105,6 +110,15 @@ VentilationProblem::~VentilationProblem()
     {
         delete mAcinarUnits[i];
     }
+
+    /* Remove the PETSc context used in the iterative solver */
+    if (mTerminalInteractionMatrix)
+    {
+        PetscTools::Destroy(mTerminalInteractionMatrix);
+        PetscTools::Destroy(mTerminalFluxChangeVector);
+        PetscTools::Destroy(mTerminalPressureChangeVector);
+        KSPDestroy(PETSC_DESTROY_PARAM(mTerminalKspSolver));
+    }
 }
 void VentilationProblem::SolveDirectFromFlux()
 {
@@ -145,17 +159,14 @@ void VentilationProblem::SolveDirectFromFlux()
         mPressure[pressure_index_child] = mPressure[pressure_index_parent] - resistance*flux;
     }
 }
-void VentilationProblem::SolveIterativelyFromPressure()
-{
-    const unsigned num_non_zeroes = 50;
-    std::map<unsigned, unsigned> node_index_to_terminal;
-    std::map<unsigned, unsigned> terminal_to_node_index;
-    std::map<unsigned, unsigned> terminal_to_edge_index;
 
-    Mat terminal_interaction_matrix;
-    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, num_non_zeroes, NULL, &terminal_interaction_matrix);
-    PetscMatTools::SetOption(terminal_interaction_matrix, MAT_SYMMETRIC);
-    PetscMatTools::SetOption(terminal_interaction_matrix, MAT_SYMMETRY_ETERNAL);
+void VentilationProblem::SetupIterativeSolver()
+{
+    const unsigned num_non_zeroes = 30;
+
+    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, num_non_zeroes, NULL, &mTerminalInteractionMatrix);
+    PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
+    PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
 
     /* Map each edge to its terminal descendants so that we can keep track
      * of which terminals can affect each other via a particular edge.
@@ -170,9 +181,8 @@ void VentilationProblem::SolveIterativelyFromPressure()
         ++element_iterator;
         if (p_node->IsBoundaryNode())
         {
-            node_index_to_terminal[node_index] = terminal_index;
-            terminal_to_node_index[terminal_index] = node_index;
-            terminal_to_edge_index[terminal_index] = parent_index;
+            mTerminalToNodeIndex[terminal_index] = node_index;
+            mTerminalToEdgeIndex[terminal_index] = parent_index;
             descendant_nodes[parent_index].insert(terminal_index++);
         }
         else
@@ -191,7 +201,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
             std::vector<PetscInt> indices( descendant_nodes[parent_index].begin(), descendant_nodes[parent_index].end() );
             std::vector<double> resistance_to_add(indices.size()*indices.size(), parent_resistance);
 
-            MatSetValues(terminal_interaction_matrix,
+            MatSetValues(mTerminalInteractionMatrix,
                          indices.size(), (PetscInt*) &indices[0],
                          indices.size(), (PetscInt*) &indices[0], &resistance_to_add[0], ADD_VALUES);
         }
@@ -199,98 +209,90 @@ void VentilationProblem::SolveIterativelyFromPressure()
     }
     //Failure at this point means that we found an internal node before its descendants
     assert(descendant_nodes[mOutletNodeIndex].size() == terminal_index);
-    PetscMatTools::Finalise(terminal_interaction_matrix);
+    PetscMatTools::Finalise(mTerminalInteractionMatrix);
     assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
+    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalFluxChangeVector);
+    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
 
-    KSP ksp_solver;
-    KSPCreate(PETSC_COMM_SELF, &ksp_solver);
-    KSPSetOperators(ksp_solver, terminal_interaction_matrix, terminal_interaction_matrix, SAME_PRECONDITIONER);
-    KSPSetFromOptions(ksp_solver);
-    KSPSetUp(ksp_solver);
+    KSPCreate(PETSC_COMM_SELF, &mTerminalKspSolver);
+    KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
+    KSPSetFromOptions(mTerminalKspSolver);
+    KSPSetUp(mTerminalKspSolver);
 
+}
+void VentilationProblem::SolveIterativelyFromPressure()
+{
+    if (mTerminalInteractionMatrix == NULL)
+    {
+        SetupIterativeSolver();
+    }
     /* Now use the pressure boundary conditions to determine suitable flux boundary conditions
      * and iteratively update them until we are done
      */
     assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
 
     unsigned max_iterations=500;
-    double relative_tolerance = 1e-10;
-    double max_relative_boundary_flux_change;
-    std::map<unsigned, double> last_flux_change;
+    unsigned num_terminals = mMesh.GetNumBoundaryNodes()-1u;
+    double pressure_tolerance = 1e-3; //1e-4
     bool converged=false;
-    std::vector<double> estimated_flux_changes(mMesh.GetNumBoundaryNodes()-1, 0.0);
-    Vec flux_change;
-    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &flux_change);
-    Vec pressure_change;
-    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &pressure_change);
-    double scaling = 1.0;
+    mTerminalFluxScaling = 1.0;
+    double last_max_pressure_change;
     double last_norm_pressure_change;
     for (unsigned iteration = 0; iteration < max_iterations && converged==false; iteration++)
     {
-        max_relative_boundary_flux_change = 0.0;
-        for (unsigned terminal=0; terminal<terminal_index; terminal++)
+        for (unsigned terminal=0; terminal<num_terminals; terminal++)
         {
-            unsigned node_index = terminal_to_node_index[terminal];
-
+            unsigned node_index = mTerminalToNodeIndex[terminal];
             // How far we are away from matching this boundary condition.
             double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
-
             // Offset the first iteration
             if (iteration == 0)
             {
                 delta_pressure += mPressureCondition[mOutletNodeIndex];
             }
-            VecSetValue(pressure_change, terminal, delta_pressure, INSERT_VALUES);
+            VecSetValue(mTerminalPressureChangeVector, terminal, delta_pressure, INSERT_VALUES);
         }
-        double norm_pressure_change, norm_flux_change;
-        VecNorm(pressure_change, NORM_1, &norm_pressure_change);
-
-        if (iteration != 0 && norm_pressure_change > 1e-8 && (last_norm_pressure_change / norm_pressure_change < 2.0))
-        {
-            scaling = (last_norm_pressure_change / norm_pressure_change);
-        }
-        last_norm_pressure_change = norm_pressure_change;
-//        PRINT_4_VARIABLES(iteration, norm_pressure_change, last_norm_pressure_change, scaling);
-
-        KSPSolve(ksp_solver, pressure_change, flux_change);
-        VecNorm(flux_change, NORM_1, &norm_flux_change);
-        double* p_flux_change;
-        VecGetArray(flux_change, &p_flux_change);
+        double max_pressure_change, norm_pressure_change;
+        PetscInt temp_index;
+        VecMax(mTerminalPressureChangeVector, &temp_index, &max_pressure_change);
+        VecNorm(mTerminalPressureChangeVector, NORM_2, &norm_pressure_change);
 
 
-
-        for (unsigned terminal=0; terminal<terminal_index; terminal++)
-        {
-            double estimated_flux_change=p_flux_change[terminal];
-            unsigned edge_index = terminal_to_edge_index[terminal];
-            mFlux[edge_index] += scaling * estimated_flux_change;
-            double relative_boundary_flux_change = fabs( estimated_flux_change );
-            if (mFlux[edge_index] != 0.0)
-            {
-                relative_boundary_flux_change /= fabs(mFlux[edge_index]);
-            }
-            if (relative_boundary_flux_change > max_relative_boundary_flux_change)
-            {
-                max_relative_boundary_flux_change = relative_boundary_flux_change;
-            }
-        }
-        if (max_relative_boundary_flux_change <= relative_tolerance)
+        if (norm_pressure_change < pressure_tolerance)
         {
             converged = true;
+            break;
         }
-        else
+        if (iteration > 4)
         {
-            SolveDirectFromFlux();
+            if (max_pressure_change * last_max_pressure_change < 0.0)
+            {
+                // This is overshoot - the resistances have been underestimated, leading to an overestimate in the
+                // fluxes.  If we overestimate by more than 2 then we will in
+                mTerminalFluxScaling *= last_norm_pressure_change/(last_norm_pressure_change + norm_pressure_change);
+            }
         }
+        last_max_pressure_change = max_pressure_change;
+        last_norm_pressure_change = norm_pressure_change;
+
+        KSPSolve(mTerminalKspSolver, mTerminalPressureChangeVector, mTerminalFluxChangeVector);
+        double* p_mTerminalFluxChangeVector;
+        VecGetArray(mTerminalFluxChangeVector, &p_mTerminalFluxChangeVector);
+
+
+
+        for (unsigned terminal=0; terminal<num_terminals; terminal++)
+        {
+            double estimated_mTerminalFluxChangeVector=p_mTerminalFluxChangeVector[terminal];
+            unsigned edge_index = mTerminalToEdgeIndex[terminal];
+            mFlux[edge_index] += mTerminalFluxScaling * estimated_mTerminalFluxChangeVector;
+        }
+        SolveDirectFromFlux();
     }
     if(!converged)
     {
         NEVER_REACHED;
     }
-    PetscTools::Destroy(terminal_interaction_matrix);
-    PetscTools::Destroy(flux_change);
-    PetscTools::Destroy(pressure_change);
-    KSPDestroy(PETSC_DESTROY_PARAM(ksp_solver));
 }
 
 double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool usePedley, double flux)
