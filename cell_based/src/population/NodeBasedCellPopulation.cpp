@@ -499,10 +499,8 @@ template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
-    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
-    time << num_timesteps;
-
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
     // Make sure the nodes are ordered contiguously in memory.
@@ -511,24 +509,30 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
     mesh_writer.SetParallelFiles(*mpNodesOnlyMesh);
 
-    unsigned num_cells = GetNumNodes();
-    std::vector<double> cell_types(num_cells);
-    std::vector<double> cell_ancestors(num_cells);
-    std::vector<double> cell_mutation_states(num_cells);
-    std::vector<double> cell_ages(num_cells);
-    std::vector<double> cell_cycle_phases(num_cells);
-    std::vector<double> cell_radii(num_cells);
-    std::vector<double> rank(num_cells);
+    unsigned num_nodes = GetNumNodes();
+    std::vector<double> cell_types(num_nodes);
+    std::vector<double> cell_ancestors(num_nodes);
+    std::vector<double> cell_mutation_states(num_nodes);
+    std::vector<double> cell_ages(num_nodes);
+    std::vector<double> cell_cycle_phases(num_nodes);
+    std::vector<double> cell_radii(num_nodes);
+    std::vector<std::vector<double> > cellwise_data;
+    std::vector<double> rank(num_nodes);
 
-    // When outputting any CellData, we assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
 
-    std::vector<std::vector<double> > cell_data;
+    // We assume that the first cell is representative of all cells
+    if (num_nodes > 0)
+    {
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    }
+
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cell_data_var(num_cells);
-        cell_data.push_back(cell_data_var);
+        std::vector<double> cellwise_data_var(num_nodes);
+        cellwise_data.push_back(cellwise_data_var);
     }
 
     // Loop over cells
@@ -586,7 +590,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
         for (unsigned var=0; var<num_cell_data_items; var++)
         {
-            cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+            cellwise_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
 
         rank[node_index] = (PetscTools::GetMyRank());
@@ -620,18 +624,18 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     }
     if (num_cell_data_items > 0)
     {
-        for (unsigned var=0; var<cell_data.size(); var++)
+        for (unsigned var=0; var<cellwise_data.size(); var++)
         {
-            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
+            mesh_writer.AddPointData(cell_data_names[var], cellwise_data[var]);
         }
     }
 
     mesh_writer.WriteFilesUsingMesh(*mpNodesOnlyMesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
 #endif //CHASTE_VTK
 }
