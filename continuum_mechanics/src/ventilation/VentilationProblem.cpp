@@ -162,7 +162,7 @@ void VentilationProblem::SolveDirectFromFlux()
 
 void VentilationProblem::SetupIterativeSolver()
 {
-    const unsigned num_non_zeroes = 30;
+    const unsigned num_non_zeroes = 100;
 
     MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, num_non_zeroes, NULL, &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
@@ -231,7 +231,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
      */
     assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
 
-    unsigned max_iterations=500;
+    unsigned max_iterations=1000;
     unsigned num_terminals = mMesh.GetNumBoundaryNodes()-1u;
     double pressure_tolerance = 1e-3; //1e-4
     bool converged=false;
@@ -257,19 +257,25 @@ void VentilationProblem::SolveIterativelyFromPressure()
         VecMax(mTerminalPressureChangeVector, &temp_index, &max_pressure_change);
         VecNorm(mTerminalPressureChangeVector, NORM_2, &norm_pressure_change);
 
-
         if (norm_pressure_change < pressure_tolerance)
         {
             converged = true;
             break;
         }
-        if (iteration > 4)
+        if (iteration > 1)
         {
             if (max_pressure_change * last_max_pressure_change < 0.0)
             {
                 // This is overshoot - the resistances have been underestimated, leading to an overestimate in the
                 // fluxes.  If we overestimate by more than 2 then we will in
                 mTerminalFluxScaling *= last_norm_pressure_change/(last_norm_pressure_change + norm_pressure_change);
+            }
+            else if (mDynamicResistance)
+            {
+#define COVERAGE_IGNORE
+                // Nasty hack to get scaling to settle down near to the correct Pedley resistance
+                mTerminalFluxScaling *= last_norm_pressure_change/(last_norm_pressure_change - norm_pressure_change);
+#undef COVERAGE_IGNORE
             }
         }
         last_max_pressure_change = max_pressure_change;
@@ -393,11 +399,17 @@ void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double 
 
 double VentilationProblem::GetPressureAtBoundaryNode(const Node<3>& rNode)
 {
-    if (rNode.IsBoundaryNode() == false)
-    {
-        EXCEPTION("Boundary conditions cannot be got at internal nodes");
-    }
+// //This doesn't actually present any problems -- we could call it GetPressureAtNode
+//    if (rNode.IsBoundaryNode() == false)
+//    {
+//        EXCEPTION("Boundary conditions cannot be got at internal nodes");
+//    }
     return mPressure[rNode.GetIndex()];
+}
+
+double VentilationProblem::GetFluxAtOutflow()
+{
+    return mFlux[mOutletNodeIndex];
 }
 
 void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux)

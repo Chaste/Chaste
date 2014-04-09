@@ -215,6 +215,11 @@ public:
     double GetPressureAtBoundaryNode(const Node<3>& rNode);
 
     /**
+     * Gets the most recent flux at the outflow/outlet (mouth)
+     *  @return The flux at outflow.
+     */
+    double GetFluxAtOutflow();
+    /**
      * Sets a Dirichlet flux boundary condition for a given node.
      *
      * The given boundary condition will be applied at the next time step and persist through

@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "VentilationProblem.hpp"
 
+#include "Debug.hpp"
+
 // Pressures read from file.  Pressures labelled P10, P20, P21, P30, P31, P32, P33 map to the mesh
 // nodes 1, 2, 3, 4, 5, 6, 7 (respectively).
 std::vector<double> pressureAt1;
@@ -491,17 +493,45 @@ public:
         VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(50.0);
-        //problem.SetConstantInflowFluxes(100.0);
         TetrahedralMesh<1, 3>& r_mesh=problem.rGetMesh();
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 56379u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 56378u);
-        problem.Solve();
 
+        bool dynamic = false; ///\todo #2300
+        problem.SetDynamicResistance(dynamic);
+        problem.Solve();
+        if (dynamic)
+        {
+            // Pedley
+            TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.24606e5, 1.0);
+        }
+        else
+        {
+            // Poiseuille
+            TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.975182e6, 1.0);
+        }
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "patient_data");
 #endif
+    }
+    void longTestPatientDataLong() throw (Exception)
+    {
+        VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
+        problem.SetConstantInflowPressures(0.0);
+        for (unsigned pressure = 0 ; pressure<20; pressure+=1)
+        {
+            problem.SetOutflowPressure((double) pressure);
+
+            problem.SetDynamicResistance(false);
+            problem.Solve();
+            double flux_poiseuille = problem.GetFluxAtOutflow();
+            problem.SetDynamicResistance(true);
+            problem.Solve();
+            double flux_pedley = problem.GetFluxAtOutflow();
+            std::cout<<pressure<<"\t"<<flux_poiseuille<<"\t"<<flux_pedley<<"\n";
+        }
     }
     void TestExceptions() throw(Exception)
     {
