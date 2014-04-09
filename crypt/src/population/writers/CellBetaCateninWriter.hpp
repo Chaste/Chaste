@@ -75,6 +75,8 @@ public:
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
+     *
+     * @return data associated with the cell
      */
     double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 

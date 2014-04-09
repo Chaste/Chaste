@@ -470,7 +470,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellLabelWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAgesWriter<2,2>();
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellLabelWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
