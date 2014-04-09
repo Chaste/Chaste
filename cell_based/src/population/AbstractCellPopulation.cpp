@@ -406,21 +406,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std:
         }
     }
 
-    ///\todo (#2441) employ std::for_each here?
-    for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
-         pop_writer_iter != mCellPopulationWriters.end();
-         ++pop_writer_iter)
-    {
-        (*pop_writer_iter)->OpenOutputFile(rDirectory);
-        (*pop_writer_iter)->WriteHeader(this);
-    }
+    // Use typedef below to save some typing
+    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&cell_writer_t::OpenOutputFile, _1, rDirectory));
 
-    for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
-         cell_writer_iter != mCellWriters.end();
-         ++cell_writer_iter)
-    {
-        (*cell_writer_iter)->OpenOutputFile(rDirectory);
-    }
+    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&pop_writer_t::OpenOutputFile, _1, rDirectory));
+    std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&pop_writer_t::WriteHeader, _1, this));
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
