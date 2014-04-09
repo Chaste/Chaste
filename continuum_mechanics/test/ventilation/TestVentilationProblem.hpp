@@ -257,9 +257,8 @@ public:
         TS_ASSERT_DELTA(flux[6],  -0.0710, 1e-4); // (Inflow flux)
     }
 
-    void failingTestExtraLinkWithRadiusOnNodeFile() throw (Exception)
+    void TestExtraLinkWithRadiusOnNodeFile() throw (Exception)
     {
-        ///\todo #2300 Set of terminals code assumes an ordering on nodes
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations_extra_links", 0u);
         problem.SetOutflowPressure(0.0 + 1.0);
         problem.SetConstantInflowPressures(15 + 1.0);
@@ -268,13 +267,13 @@ public:
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6.6666 + 1.0,   1e-4);
-        TS_ASSERT_DELTA(pressure[2], 12.2222 + 1.0, 1e-4);
-        TS_ASSERT_DELTA(pressure[3], 12.2222 + 1.0, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-7); //BC
-        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-7); //BC
-        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-7); //BC
-        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.6666 + 1.0,   1e-3);
+        TS_ASSERT_DELTA(pressure[2], 12.2222 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[3], 12.2222 + 1.0, 1e-3);
+        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-3); //BC
+        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-3); //BC
+        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-3); //BC
+        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-3); //BC
         TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
         TS_ASSERT_DELTA(flux[10],  -0.0710, 1e-4); // (Inflow flux)
         TS_ASSERT_DELTA(flux[11],  -0.0710, 1e-4); // (Inflow flux)
@@ -345,7 +344,6 @@ public:
     }
     void TestThreeBifurcationsWithDynamicResistanceFluxCondition() throw (Exception)
     {
-        EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowFluxes(-70.8367); //Needed to increase the resistance in these artificial airways

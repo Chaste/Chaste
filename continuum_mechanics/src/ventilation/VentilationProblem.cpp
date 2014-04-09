@@ -173,29 +173,47 @@ void VentilationProblem::SetupIterativeSolver()
      */
     std::vector<std::set<unsigned> > descendant_nodes(mMesh.GetNumElements());
     unsigned terminal_index=0;
-    for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
+    //First set up all the boundary nodes
+    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+              iter != mMesh.GetBoundaryNodeIteratorEnd();
+              ++iter)
     {
-        Node<3>* p_node = mMesh.GetNode(node_index);
-        Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
-        unsigned parent_index = *element_iterator;
-        ++element_iterator;
-        if (p_node->IsBoundaryNode())
+        unsigned node_index = (*iter)->GetIndex();
+        if (node_index != mOutletNodeIndex)
         {
+            unsigned parent_index =  *((*iter)->ContainingElementsBegin());
             mTerminalToNodeIndex[terminal_index] = node_index;
             mTerminalToEdgeIndex[terminal_index] = parent_index;
             descendant_nodes[parent_index].insert(terminal_index++);
         }
-        else
+    }
+    // The outer loop here is for special cases where we find an internal node before its descendants
+    // In this case we need to scan the tree more than once (up to log(N)) before the sets are correctly propagated
+    while (descendant_nodes[mOutletNodeIndex].size() != terminal_index)
+    {
+        //Work back up the tree making the unions of the sets of descendants
+        for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
         {
-
-            for (;element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+            Node<3>* p_node = mMesh.GetNode(node_index);
+            if (p_node->IsBoundaryNode() == false)
             {
-                descendant_nodes[parent_index].insert(descendant_nodes[*element_iterator].begin(),descendant_nodes[*element_iterator].end());
+                Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
+                unsigned parent_index = *element_iterator;
+                ++element_iterator;
+                for (;element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+                {
+                    descendant_nodes[parent_index].insert(descendant_nodes[*element_iterator].begin(),descendant_nodes[*element_iterator].end());
+                }
             }
-            //Failure at this point means that we found an internal node before its descendants
-            assert(descendant_nodes[parent_index].size() != 0u);
         }
-        double parent_resistance = CalculateResistance(*(mMesh.GetElement(parent_index)));
+    }
+    // Use the descendant sets to build the mTerminalInteractionMatrix structure of resistances
+    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+            iter != mMesh.GetElementIteratorEnd();
+            ++iter)
+    {
+        unsigned parent_index = iter->GetIndex();
+        double parent_resistance = CalculateResistance(*iter);
         if (descendant_nodes[parent_index].size() <= num_non_zeroes)
         {
             std::vector<PetscInt> indices( descendant_nodes[parent_index].begin(), descendant_nodes[parent_index].end() );
@@ -207,8 +225,6 @@ void VentilationProblem::SetupIterativeSolver()
         }
         ///\todo #2300 add to diagonals anyway
     }
-    //Failure at this point means that we found an internal node before its descendants
-    assert(descendant_nodes[mOutletNodeIndex].size() == terminal_index);
     PetscMatTools::Finalise(mTerminalInteractionMatrix);
     assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
     VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalFluxChangeVector);
@@ -218,7 +234,6 @@ void VentilationProblem::SetupIterativeSolver()
     KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
     KSPSetFromOptions(mTerminalKspSolver);
     KSPSetUp(mTerminalKspSolver);
-
 }
 void VentilationProblem::SolveIterativelyFromPressure()
 {
