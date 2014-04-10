@@ -54,15 +54,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
     }
 
     // Get cell volume
-    double cell_volume = 0.0;;
-    try
-    {
-    	double cell_volume = mpCell->GetCellData()->GetItem("volume");
-    }
-    catch(...)
-    {
-    	EXCEPTION("You need to add a TargetAreaGrowthModifier to the simulation.");
-    }
+    double cell_volume = mpCell->GetCellData()->GetItem("volume");
 
     // Removes the cell label
     mpCell->RemoveCellProperty<CellLabel>();

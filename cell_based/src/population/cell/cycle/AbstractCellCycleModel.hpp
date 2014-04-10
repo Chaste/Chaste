@@ -45,10 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "OutputFileHandler.hpp"
-#include "CellCyclePhases.hpp" // \todo change to have only two phases
+#include "CellCyclePhases.hpp"
 #include "SimulationTime.hpp"
 #include "Cell.hpp"
-
 
 class Cell; // Circular definition (cells need to know about cycle models and vice-versa)
 typedef boost::shared_ptr<Cell> CellPtr;
