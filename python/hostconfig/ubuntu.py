@@ -46,12 +46,15 @@ ubuntu_ver = fp.read().split()[1]
 fp.close()
 
 # First deal with special cases for beta releases etc.
-if ubuntu_ver == 'natty':
-    ubuntu_ver = [11,04]
+if ubuntu_ver == 'Trusty':
+    ubuntu_ver = [14,04]
 else:
-    ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2]) 
+    ubuntu_ver = map(int, ubuntu_ver.split('.')[0:2])
 
-if ubuntu_ver >= [12,10]:
+if ubuntu_ver >= [14,04]:
+    petsc_ver = 3.4
+    petsc_path = '/usr/lib/petscdir/3.4.2/'
+elif ubuntu_ver >= [12,10]:
     petsc_ver = 3.2
     petsc_path = '/usr/lib/petscdir/3.2/'
 elif ubuntu_ver >= [10,10]:
@@ -80,7 +83,6 @@ libs_for_petsc = ['petsccontrib', 'X11',
                   'umfpack', 'amd' # Both for Umfpack
                   ]
 
-#Fixes (possibly temporary) for Natty
 if ubuntu_ver >= [11,04]:
     libs_for_petsc.append(['HYPRE_utilities', 
                            'HYPRE_struct_mv', 'HYPRE_struct_ls',  
