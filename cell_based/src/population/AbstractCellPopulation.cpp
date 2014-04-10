@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <boost/foreach.hpp>
+
 #include "AbstractCellPopulation.hpp"
 #include "AbstractOdeBasedCellCycleModel.hpp"
 #include "Exception.hpp"
@@ -406,13 +408,17 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std:
         }
     }
 
-    // Use typedef below to save some typing
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-    std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&cell_writer_t::OpenOutputFile, _1, rDirectory));
-
+    BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_writer, mCellWriters)
+    {
+        p_writer->OpenOutputFile(rDirectory);
+    }
     typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
-    std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&pop_writer_t::OpenOutputFile, _1, rDirectory));
-    std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&pop_writer_t::WriteHeader, _1, this));
+    BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_writer, mCellPopulationWriters)
+    {
+        p_writer->OpenOutputFile(rDirectory);
+        p_writer->WriteHeader(this);
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
