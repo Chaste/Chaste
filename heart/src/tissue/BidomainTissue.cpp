@@ -182,7 +182,7 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& BidomainTissue<SPACE_DIM>::rGetExt
     }
     else
     {
-        return this->mpConductivityModifier->rGetModifiedConductivityTensor(elementIndex, (*mpExtracellularConductivityTensors)[elementIndex]);
+        return this->mpConductivityModifier->rGetModifiedConductivityTensor(elementIndex, (*mpExtracellularConductivityTensors)[elementIndex], 1u);
     }
 }
 

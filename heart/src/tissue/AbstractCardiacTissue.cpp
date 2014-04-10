@@ -367,7 +367,7 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM,
     }
     else
     {
-        return mpConductivityModifier->rGetModifiedConductivityTensor(elementIndex, (*mpIntracellularConductivityTensors)[elementIndex]);
+        return mpConductivityModifier->rGetModifiedConductivityTensor(elementIndex, (*mpIntracellularConductivityTensors)[elementIndex], 0u);
     }
 }
 

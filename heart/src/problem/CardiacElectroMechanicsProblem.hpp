@@ -174,11 +174,8 @@ protected :
     /** A vector of deformation gradients (each entry a matrix), one for each element in the mechanics mesh */
     std::vector<c_matrix<double,DIM,DIM> > mDeformationGradientsForEachMechanicsElement;
 
-    /** A pair of (element_index, deformed_conductivity) for the last element on which the deformed conductivity
-     *  sigma_def = F^{-1} sigma_undef F^{-T} has been computed. Used in rGetModifiedConductivityTensor().
-     */
-    std::pair<unsigned, c_matrix<double,DIM,DIM> > mLastModifiedConductivity;
-
+    /** Somewhere to store the modified conductivity tensor */
+    c_matrix<double,DIM,DIM> mModifiedConductivityTensor;
 
     /**
      *  Determine which node is closest to the watched location
@@ -278,7 +275,7 @@ public :
      *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
      *  @return Reference to a modified conductivity tensor.
      */
-    c_matrix<double,DIM,DIM>& rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity);
+    c_matrix<double,DIM,DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity);
 
 
     /**

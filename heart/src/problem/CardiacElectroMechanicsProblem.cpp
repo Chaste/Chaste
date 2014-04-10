@@ -166,30 +166,19 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
-c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity)
+c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity)
 {
-    if(mLastModifiedConductivity.first==elementIndex)
-    {
-        // if already computed on this electrics element, just return conductivity
-        return mLastModifiedConductivity.second;
-    }
-    else
-    {
-        // new element, need to compute conductivity
 
-        // first get the deformation gradient for this electrics element
-        unsigned containing_mechanics_elem = mpMeshPair->rGetCoarseElementsForFineElementCentroids()[elementIndex];
-        c_matrix<double,DIM,DIM>& r_deformation_gradient = mDeformationGradientsForEachMechanicsElement[containing_mechanics_elem];
+    // first get the deformation gradient for this electrics element
+    unsigned containing_mechanics_elem = mpMeshPair->rGetCoarseElementsForFineElementCentroids()[elementIndex];
+    c_matrix<double,DIM,DIM>& r_deformation_gradient = mDeformationGradientsForEachMechanicsElement[containing_mechanics_elem];
 
-        // compute sigma_def = F^{-1} sigma_undef F^{-T}
-        c_matrix<double,DIM,DIM> inv_F = Inverse(r_deformation_gradient);
-        mLastModifiedConductivity.second = prod(inv_F, rOriginalConductivity);
-        mLastModifiedConductivity.second = prod(mLastModifiedConductivity.second, trans(inv_F));
+    // compute sigma_def = F^{-1} sigma_undef F^{-T}
+    c_matrix<double,DIM,DIM> inv_F = Inverse(r_deformation_gradient);
+    mModifiedConductivityTensor = prod(inv_F, rOriginalConductivity);
+    mModifiedConductivityTensor = prod(mModifiedConductivityTensor, trans(inv_F));
 
-        // save the current element and return the tensor
-        mLastModifiedConductivity.first = elementIndex;
-        return mLastModifiedConductivity.second;
-    }
+    return mModifiedConductivityTensor;
 }
 
 
@@ -330,8 +319,6 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
     {
         mDeformationOutputDirectory = "";
     }
-
-    mLastModifiedConductivity.first = UNSIGNED_UNSET; //important
 
 //    mpImpactRegion=NULL;
 }
@@ -688,7 +675,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             //  The deformation gradient needs to be set up but does not need to be passed to the tissue
             //  so that F is used to compute the conductivity. Instead this is
             //  done through the line "mpElectricsProblem->GetMonodomainTissue()->SetConductivityModifier(this);" line above, which means
-            //  rGetModifiedConductivityTensor() will be called on this class by the tissue, which then uses the F
+            //  rCalculateModifiedConductivityTensor() will be called on this class by the tissue, which then uses the F
 
             mpCardiacMechSolver->ComputeDeformationGradientAndStretchInEachElement(mDeformationGradientsForEachMechanicsElement, mStretchesForEachMechanicsElement);
         }

@@ -39,30 +39,53 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 
 /**
- *  Abstract class which just defines an interface. The pure method
- *  rGetModifiedConductivityTensor() should take in a conductivity and return a modified
- *  conductivity (for example, made dependent on current deformation, etc.
+ *  Abstract class which just defines an interface and caching method. The pure method
+ *  rCalculateModifiedConductivityTensor() should take in a conductivity and return a modified
+ *  conductivity (for example, dependent on current deformation, etc.)
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractConductivityModifier
 {
-public:
-    /** Constructor does nothing */
-    AbstractConductivityModifier()
-    {
-    }
+private:
+    /** Cache recently-seen elementindex-tensor pairs, one per "domain" */
+    std::vector<std::pair<unsigned, c_matrix<double,SPACE_DIM,SPACE_DIM> > > mCache;
 
+public:
     /** Destructor */
     virtual ~AbstractConductivityModifier()
     {
     }
 
-    /** Pure method which alters the given conductivity tensor
+    /** Method that checks element index and the domain (intra/extra/other) and returns cached value if available.
+     *  @param elementIndex Index of current element
+     *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
+     *  @param domainIndex Index to tell the method if we want the intracellular, extracellular, etc.
+     *  @return Reference to a modified conductivity tensor.
+     */
+    c_matrix<double,SPACE_DIM,SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity, unsigned domainIndex)
+    {
+        // Have we got space for this domain?
+        if ( mCache.size() <= domainIndex )
+        {
+            mCache.resize(domainIndex+1);
+            mCache[domainIndex].first = UNSIGNED_UNSET;
+        }
+        // Is this not the same element as last time?
+        if (mCache[domainIndex].first != elementIndex)
+        {
+            mCache[domainIndex].first = elementIndex;
+            mCache[domainIndex].second = rCalculateModifiedConductivityTensor(elementIndex, rOriginalConductivity);
+        }
+        // Return cached tensor
+        return mCache[domainIndex].second;
+    }
+
+    /** Pure method that alters the given conductivity tensor
      *  @param elementIndex Index of current element
      *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
      *  @return Reference to a modified conductivity tensor.
      */
-    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity)=0;
+    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity)=0;
 };
 
 
