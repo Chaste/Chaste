@@ -64,6 +64,11 @@ import threading
 
 try:
     import psutil
+    if psutil.version_info[0] > 1:
+        # New API :(
+        get_prop = lambda proc, prop: getattr(proc, prop)()
+    else:
+        get_prop = lambda proc, prop: getattr(proc, prop)
 except ImportError:
     psutil = None
 
@@ -84,7 +89,7 @@ def KillTest(pid=None, exe=None):
     if pid:
         try:
             for proc in psutil.process_iter():
-                if proc.ppid == pid:
+                if get_prop(proc, 'ppid') == pid:
                     KillTest(proc.pid)
             print "Killing", pid
             os.kill(pid, signal.SIGKILL)
@@ -95,7 +100,7 @@ def KillTest(pid=None, exe=None):
         #print "Killing", exe
         for proc in psutil.process_iter():
             try:
-                if proc.exe == exe:
+                if get_prop(proc, 'exe') == exe:
                     KillTest(proc.pid)
             except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
                 pass
