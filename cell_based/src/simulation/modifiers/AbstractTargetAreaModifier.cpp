@@ -66,24 +66,18 @@ void AbstractTargetAreaModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>
 template<unsigned DIM>
 void AbstractTargetAreaModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Make sure the cell population is updated
-    ///\todo #2488: double check that this update call doesn't break anything (i.e. counting of swaps etc.)
-    rCellPopulation.Update();
-
     ///\todo (#2489) maybe move this to SetupSolve() to avoid repeated dynamic casting
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
     {
         EXCEPTION("AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
     }
 
-    VertexBasedCellPopulation<DIM>* p_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation);
-
-    for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = p_cell_population->rGetMesh().GetElementIteratorBegin();
-         elem_iter != p_cell_population->rGetMesh().GetElementIteratorEnd();
-         ++elem_iter)
+    // Loop over the list of cells, rather than using the population iterator, so as to include dead cells
+    for (std::list<CellPtr>::iterator cell_iter = rCellPopulation.rGetCells().begin();
+         cell_iter != rCellPopulation.rGetCells().end();
+         ++cell_iter)
     {
-        unsigned elem_index = elem_iter->GetIndex();
-        UpdateTargetAreaOfCell( p_cell_population->GetCellUsingLocationIndex(elem_index) );
+        UpdateTargetAreaOfCell(*cell_iter);
     }
 }
 
