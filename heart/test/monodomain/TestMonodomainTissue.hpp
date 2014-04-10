@@ -318,29 +318,6 @@ public:
         PetscTools::Destroy(voltage2);
     }
 
-    void TestGetConductivityAndConductivityModifier() throw(Exception)
-    {
-        HeartConfig::Instance()->Reset();
-        TetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 2 node mesh
-
-        MyCardiacCellFactory cell_factory;
-        cell_factory.SetMesh(&mesh);
-
-        MonodomainTissue<1> monodomain_tissue( &cell_factory );
-
-        double orig_conductivity_0 = monodomain_tissue.rGetIntracellularConductivityTensor(0)(0,0);
-        double orig_conductivity_1 = monodomain_tissue.rGetIntracellularConductivityTensor(1)(0,0);
-        TS_ASSERT_DELTA(orig_conductivity_0, 1.75, 1e-9); // hard-coded using default
-        TS_ASSERT_DELTA(orig_conductivity_1, 1.75, 1e-9); // hard-coded using default
-
-        SimpleConductivityModifier modifier;
-        monodomain_tissue.SetConductivityModifier(&modifier);
-
-        TS_ASSERT_DELTA(monodomain_tissue.rGetIntracellularConductivityTensor(0)(0,0), 2*orig_conductivity_0, 1e-9);
-        TS_ASSERT_DELTA(monodomain_tissue.rGetIntracellularConductivityTensor(1)(0,0), 3*orig_conductivity_1, 1e-9);
-    }
-
     void TestNodeExchange() throw(Exception)
     {
         HeartConfig::Instance()->Reset();

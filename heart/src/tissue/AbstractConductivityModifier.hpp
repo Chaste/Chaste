@@ -67,8 +67,9 @@ public:
         // Have we got space for this domain?
         if ( mCache.size() <= domainIndex )
         {
-            mCache.resize(domainIndex+1);
-            mCache[domainIndex].first = UNSIGNED_UNSET;
+            // Not a pretty line! Initialises every new entry with an UNSIGNED_UNSET and a zero matrix.
+            mCache.resize(domainIndex+1, std::pair<unsigned, c_matrix<double,SPACE_DIM,SPACE_DIM> >
+                                             (UNSIGNED_UNSET, zero_matrix<double>(SPACE_DIM,SPACE_DIM)));
         }
         // Is this not the same element as last time?
         if (mCache[domainIndex].first != elementIndex)

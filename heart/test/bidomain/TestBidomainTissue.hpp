@@ -335,23 +335,28 @@ public:
     {
         HeartConfig::Instance()->Reset();
         TetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 2 node mesh
+        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 1 element mesh
 
         MyCardiacCellFactory<1> cell_factory;
         cell_factory.SetMesh(&mesh);
 
         BidomainTissue<1> bidomain_tissue( &cell_factory );
 
-        double orig_conductivity_0 = bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0);
-        double orig_conductivity_1 = bidomain_tissue.rGetExtracellularConductivityTensor(1)(0,0);
-        TS_ASSERT_DELTA(orig_conductivity_0, 7.0, 1e-9); // hard-coded using default
-        TS_ASSERT_DELTA(orig_conductivity_1, 7.0, 1e-9); // hard-coded using default
+        double orig_extra_conductivity = bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0);
+        double orig_intra_conductivity = bidomain_tissue.rGetIntracellularConductivityTensor(0)(0,0);
+
+        TS_ASSERT_DELTA(orig_extra_conductivity, 7.0, 1e-9); // hard-coded using default
+        TS_ASSERT_DELTA(orig_intra_conductivity, 1.75, 1e-9); // hard-coded using default
 
         SimpleConductivityModifier modifier;
         bidomain_tissue.SetConductivityModifier(&modifier);
 
-        TS_ASSERT_DELTA(bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0), 2*orig_conductivity_0, 1e-9);
-        TS_ASSERT_DELTA(bidomain_tissue.rGetExtracellularConductivityTensor(1)(0,0), 3*orig_conductivity_1, 1e-9);
+        TS_ASSERT_DELTA(bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0), 2*orig_extra_conductivity, 1e-9);
+        TS_ASSERT_DELTA(bidomain_tissue.rGetIntracellularConductivityTensor(0)(0,0), 2*orig_intra_conductivity, 1e-9);
+
+        // The following asks for element 1 which doesn't exist
+        TS_ASSERT_THROWS_THIS(bidomain_tissue.rGetExtracellularConductivityTensor(1)(0,0),
+                              "Conductivity tensor requested for element with global_index=1, but there are only 1 elements in the mesh.")
     }
 
 
