@@ -499,17 +499,48 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     std::stringstream time;
     time << num_timesteps;
 
+    // Create mesh writer for VTK output
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
+    // Iterate over any cell writers that are present
     unsigned num_nodes = GetNumNodes();
-    std::vector<double> cell_types;
-    std::vector<double> cell_mutation_states;
-    std::vector<double> cell_labels;
-    std::vector<double> elem_ids;
-    cell_types.reserve(num_nodes);
-    cell_mutation_states.reserve(num_nodes);
-    cell_labels.reserve(num_nodes);
-    elem_ids.reserve(num_nodes);
+    for (typename std::set<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+         cell_writer_iter != this->mCellWriters.end();
+         ++cell_writer_iter)
+    {
+        // Create vector to store VTK cell data
+        std::vector<double> vtk_cell_data(num_nodes);
+
+        // Iterate over nodes in the mesh
+        for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
+             iter != mpPottsMesh->GetNodeIteratorEnd();
+             ++iter)
+        {
+            // Get the index of this node in the mesh and those elements (i.e. cells) that contain this node
+            unsigned node_index = iter->GetIndex();
+            std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
+
+            // If there are no elements associated with this node, then we set the value of any VTK cell data to be -1 at this node...
+            if (element_indices.empty())
+            {
+                // Populate the vector of VTK cell data
+                vtk_cell_data[node_index] = -1.0;
+            }
+            else
+            {
+                // ... otherwise there should be exactly one element (i.e. cell) containing this node
+                assert(element_indices.size() == 1);
+                unsigned elem_index = *(element_indices.begin());
+                CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
+
+                // Populate the vector of VTK cell data
+                vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            }
+        }
+
+        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+    }
+
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
@@ -526,72 +557,34 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
          iter != mpPottsMesh->GetNodeIteratorEnd();
          ++iter)
     {
+        // Get the index of this node in the mesh and those elements (i.e. cells) that contain this node
+        unsigned node_index = iter->GetIndex();
         std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
 
+        // If there are no elements associated with this node, then we set the value of any VTK cell data to be -1 at this node...
         if (element_indices.empty())
         {
-            // No elements associated with this gridpoint
-            cell_types.push_back(-1.0);
-            elem_ids.push_back(-1.0);
-            if (this-> template HasWriter<CellMutationStatesCountWriter>())
+            for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cell_mutation_states.push_back(-1.0);
-                cell_labels.push_back(-1.0);
+                cell_data[var][node_index] = -1.0;
             }
         }
         else
         {
-            // The number of elements should be zero or one
+            // ... otherwise there should be exactly one element (i.e. cell) containing this node
             assert(element_indices.size() == 1);
+            unsigned elem_index = *(element_indices.begin());
+            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
 
-            unsigned element_index = *(element_indices.begin());
-            elem_ids.push_back((double)element_index);
-
-            CellPtr p_cell = this->GetCellUsingLocationIndex(element_index);
-            double cell_type = p_cell->GetCellProliferativeType()->GetColour();
-            cell_types.push_back(cell_type);
-
-            if (this-> template HasWriter<CellMutationStatesCountWriter>())
-            {
-                double cell_mutation_state = p_cell->GetMutationState()->GetColour();
-                cell_mutation_states.push_back(cell_mutation_state);
-
-                double cell_label = 0.0;
-                if (p_cell->HasCellProperty<CellLabel>())
-                {
-                    CellPropertyCollection collection = p_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
-                    cell_label = p_label->GetColour();
-                }
-                cell_labels.push_back(cell_label);
-            }
             for (unsigned var=0; var<num_cell_data_items; var++)
             {
-                cell_data[var][iter->GetIndex()] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+                cell_data[var][node_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
             }
         }
     }
-
-    assert(cell_types.size() == num_nodes);
-    assert(elem_ids.size() == num_nodes);
-
-    mesh_writer.AddPointData("Element index", elem_ids);
-    mesh_writer.AddPointData("Cell types", cell_types);
-
-    if (this-> template HasWriter<CellMutationStatesCountWriter>())
+    for (unsigned var=0; var<cell_data.size(); var++)
     {
-        assert(cell_mutation_states.size() == num_nodes);
-        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
-        assert(cell_labels.size() == num_nodes);
-        mesh_writer.AddPointData("Cell labels", cell_labels);
-    }
-
-    if (num_cell_data_items > 0)
-    {
-        for (unsigned var=0; var<cell_data.size(); var++)
-        {
-            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
-        }
+        mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
     }
 
     /*
@@ -599,7 +592,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
      * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
      */
     NodesOnlyMesh<DIM> temp_mesh;
-    temp_mesh.ConstructNodesWithoutMesh(*mpPottsMesh, 1.5); // Arbitrary cut-off as connectivity not used.
+    temp_mesh.ConstructNodesWithoutMesh(*mpPottsMesh, 1.5); // This cut-off is arbitrary, as node connectivity is not used here
     mesh_writer.WriteFilesUsingMesh(temp_mesh);
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
