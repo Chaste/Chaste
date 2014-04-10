@@ -785,6 +785,7 @@ public:
 
     void TestCellPopulationWritersIn3dWithGhostNodes()
     {
+
         // Set up SimulationTime (needed if VTK is used)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -852,22 +853,13 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        // Added these instead of directly checking the elements have been numbered in the same
-        // way, as it appears tetgen can do this differently on different machines if it feels like it!
-        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumNodes(), 13u);
-        TS_ASSERT_EQUALS(cell_population.rGetMesh().GetNumElements(), 32u);
-        TS_ASSERT_EQUALS(cell_population.GetVoronoiTessellation()->GetNumNodes(), 32u);
-        TS_ASSERT_EQUALS(cell_population.GetVoronoiTessellation()->GetNumElements(), 5u);
-
-        // See comment above
-        //FileComparison( results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizelements").CompareFiles();
+        FileComparison( results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizelements").CompareFiles();
         FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.viznodes").CompareFiles();
         FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizcelltypes").CompareFiles();
         FileComparison( results_dir + "results.vizlocations", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizlocations").CompareFiles();
         FileComparison( results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellpopulationareas.dat").CompareFiles();
         FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellareas.dat").CompareFiles();
-        // See comment above
-        //FileComparison( results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat").CompareFiles();
+        FileComparison( results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat").CompareFiles();
         FileComparison( results_dir + "results.vizancestors", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizancestors").CompareFiles();
 
         // Test the GetCellMutationStateCount function: there should only be healthy cells

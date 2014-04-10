@@ -1149,7 +1149,7 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
 
 def CheckForSpecialFiles(env, component, files, otherVars):
     """Schedule compiles of source files that need special compilation flags."""
-    special_files = [('mesh', 'src/3rdparty/tetgen1.5.0/predicates.cpp')]
+    special_files = [('mesh', 'src/3rdparty/tetgen1.4.2/predicates.cpp')]
     special_objs = []
     overrides = {'CCFLAGS': '-O0'}
     for special_comp, special_file in special_files:
