@@ -1053,7 +1053,7 @@ public:
                               "Call AddPopulationWriter<CellProliferativeTypesCountWriter>() before using this function");
         simulator.rGetCellPopulation().AddPopulationWriter<CellProliferativeTypesCountWriter>();
 
-        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().rGetCellCyclePhaseCount(),
+        TS_ASSERT_THROWS_THIS(simulator.rGetCellPopulation().GetCellCyclePhaseCount(),
                               "Call AddPopulationWriter<CellProliferativePhasesCountWriter>() before using this function");
         simulator.rGetCellPopulation().AddPopulationWriter<CellProliferativePhasesCountWriter>();
         simulator.rGetCellPopulation().AddCellWriter<CellProliferativePhasesWriter>();
@@ -1616,7 +1616,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count1[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count1[3], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count1 = crypt.rGetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count1 = crypt.GetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count1.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count1[1], 0u);
@@ -1661,7 +1661,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count3[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count3[3], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count3 = crypt.rGetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count3 = crypt.GetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count3.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count3[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count3[1], 2u);
@@ -1719,7 +1719,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count4[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count4[3], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count4 = crypt.rGetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count4 = crypt.GetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count4.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count4[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count4[1], 2u);
@@ -1754,7 +1754,7 @@ public:
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
         TS_ASSERT_EQUALS(cell_type_count5[2], 0u);
 
-        std::vector<unsigned> cell_cycle_phase_count5 = p_simulator->rGetCellPopulation().rGetCellCyclePhaseCount();
+        std::vector<unsigned> cell_cycle_phase_count5 = p_simulator->rGetCellPopulation().GetCellCyclePhaseCount();
         TS_ASSERT_EQUALS(cell_cycle_phase_count5.size(), 5u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count5[0], 0u);
         TS_ASSERT_EQUALS(cell_cycle_phase_count5[1], 1u);

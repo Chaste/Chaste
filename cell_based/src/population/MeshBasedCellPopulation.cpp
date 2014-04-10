@@ -272,9 +272,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     ///\todo check if there is a more efficient way of keeping track of node velocity information (#2404)
+    bool output_node_velocities = (this-> template HasWriter<NodeVelocityWriter>());
+
     std::map<unsigned, c_vector<double, SPACE_DIM> > old_node_applied_force_map;
     old_node_applied_force_map.clear();
-    if (this-> template HasWriter<NodeVelocityWriter>())
+    if (output_node_velocities)
     {
         /*
          * If outputting node velocities, we must keep a record of the applied force at each
@@ -290,7 +292,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
         }
     }
 
-    NodeMap node_map(static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).GetNumAllNodes());
+    NodeMap node_map(this->mrMesh.GetNumAllNodes());
+
+    // We must use a static_cast to call ReMesh() as this method is not defined in parent mesh classes
     static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).ReMesh(node_map);
 
     if (!node_map.IsIdentityMap())
@@ -314,7 +318,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
             unsigned new_node_index = node_map.GetNewIndex(old_node_index);
             this->SetCellUsingLocationIndex(new_node_index,*it);
 
-            if (this-> template HasWriter<NodeVelocityWriter>())
+            if (output_node_velocities)
             {
                 this->GetNode(new_node_index)->AddAppliedForceContribution(old_node_applied_force_map[old_node_index]);
             }
@@ -322,7 +326,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
 
         this->Validate();
     }
-    else if (this-> template HasWriter<NodeVelocityWriter>())
+    else if (output_node_velocities)
     {
         for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
         {

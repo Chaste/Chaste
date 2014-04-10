@@ -206,7 +206,7 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellPro
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<unsigned>& AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetCellCyclePhaseCount() const
+std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyclePhaseCount()
 {
     if (!HasWriter<CellProliferativePhasesCountWriter>())
     {

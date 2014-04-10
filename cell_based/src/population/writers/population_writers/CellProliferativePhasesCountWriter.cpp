@@ -50,7 +50,7 @@ CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePha
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
+    std::vector<unsigned> phases_count = pCellPopulation->GetCellCyclePhaseCount();
 
     for (unsigned i=0; i < phases_count.size(); i++)
     {
@@ -61,7 +61,7 @@ void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulat
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> phases_count = pCellPopulation->rGetCellCyclePhaseCount();
+    std::vector<unsigned> phases_count = pCellPopulation->GetCellCyclePhaseCount();
 
     for (unsigned i=0; i < phases_count.size(); i++)
     {

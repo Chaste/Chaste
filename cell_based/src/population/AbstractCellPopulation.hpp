@@ -342,7 +342,7 @@ public:
      * [3] = G_TWO_PHASE
      * [4] = M_PHASE
      */
-    const std::vector<unsigned>& rGetCellCyclePhaseCount() const;
+    std::vector<unsigned> GetCellCyclePhaseCount();
 
     /**
      * This counts the number of cells that the cell iterator covers. It does not include dead cells or cells that are
@@ -389,7 +389,7 @@ public:
     /**
      * Get the set of cells corresponding to a given location index.
      *
-     * Note the set may be empty.
+     * Note that the set may be empty.
      *
      * @param index the location index
      *

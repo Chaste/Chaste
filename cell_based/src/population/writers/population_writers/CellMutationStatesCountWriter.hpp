@@ -67,6 +67,8 @@ public:
     CellMutationStatesCountWriter();
 
     /**
+     * Overridden WriteHeader() method.
+     *
      * Write the header to file.
      *
      * @param pCellPopulation a pointer to the population to be written.
