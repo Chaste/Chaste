@@ -127,28 +127,6 @@ public:
     }
 };
 
-
-
-
-class SimpleConductivityModifier : public AbstractConductivityModifier<1,1>
-{
-private:
-    c_matrix<double,1,1> mTensor;
-
-public:
-    SimpleConductivityModifier()
-        : AbstractConductivityModifier<1,1>()
-    {
-    }
-
-    c_matrix<double,1,1>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,1,1>& rOriginalConductivity)
-    {
-        mTensor(0,0) = (elementIndex+2.0)*rOriginalConductivity(0,0); //so conductivity on element 0 gets scaled by 2, and by 3 on element 1
-        return mTensor;
-    }
-};
-
-
 class TestMonodomainTissue : public CxxTest::TestSuite
 {
 public:
