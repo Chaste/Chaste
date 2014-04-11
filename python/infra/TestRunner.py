@@ -146,16 +146,22 @@ class TestKillerTimer(object):
             self.extraTimer.join()
         # Wait for the main timer to finish
         self.mainTimer.join()
+    
+    def GetCpuTime(self, process):
+        """Recursively compute the total CPU time used by a process and its children."""
+        cpu_time = sum(process.get_cpu_times())
+        for child in process.get_children():
+            cpu_time += self.GetCpuTime(child)
+        return cpu_time
 
     def MaybeDoKill(self):
         """Only kill the test if it has consumed a reasonable amount of CPU, otherwise wait a bit longer."""
         try:
             test_proc = psutil.Process(self.pid)
-            cpu_times = sum(test_proc.get_cpu_times())
-            if cpu_times < 0.5 * self.timeLimit:
-                # The machine is probably loaded, or code generation & compiling is taking a while.
-                # Allow some extra grace time.
-                self.extraTimer = threading.Timer(self.timeLimit * 5, self.DoKill)
+            cpu_time = self.GetCpuTime(test_proc)
+            if cpu_time < 0.5 * self.timeLimit:
+                # The machine is probably loaded, so allow some extra grace time.
+                self.extraTimer = threading.Timer(self.timeLimit, self.DoKill)
                 self.extraTimer.start()
         except:
             self.DoKill()
