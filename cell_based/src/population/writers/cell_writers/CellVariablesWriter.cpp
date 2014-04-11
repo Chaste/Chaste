@@ -47,14 +47,19 @@ CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::CellVariablesWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    ///\todo (#2441) - implement this method
+    /*
+     * At present it is not possible to output all cell variables via this method, we just return zero.
+     * If the user requires cell variables to be output to VTK, the easiest way to do this is to store
+     * them in the cell's CellData using a modifier object, since any CellData is automatically output
+     * to VTK (if CHASTE_VTK is turned on).
+     */
     return 0.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    AbstractOdeBasedCellCycleModel* p_model =  dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel());
+    AbstractOdeBasedCellCycleModel* p_model = dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel());
     if (p_model)
     {
         // Write location index corresponding to cell

@@ -46,7 +46,7 @@ CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::CellLocationWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    ///\todo (#2441) - implement this method
+    // The method GetCellDataForVtkOutput() is not suitable for this class, so we simply return zero
     return 0.0;
 }
 
