@@ -49,15 +49,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulationModifierInfo(out_stream& rParamsFile)
 {
     std::string modifier_type = GetIdentifier();
-
     *rParamsFile << "\t\t<" << modifier_type << ">\n";
     *rParamsFile << "\t\t</" << modifier_type << ">\n";
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractCellBasedSimulationModifier<1,1>;
 template class AbstractCellBasedSimulationModifier<1,2>;
 template class AbstractCellBasedSimulationModifier<2,2>;

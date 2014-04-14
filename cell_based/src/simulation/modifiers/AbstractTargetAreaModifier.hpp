@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-
 #include "AbstractCellBasedSimulationModifier.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
@@ -87,7 +86,7 @@ public:
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
      *
-     * Specifies what to do in the simulation at the end of each time step.
+     * Specify what to do in the simulation at the end of each time step.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -96,7 +95,7 @@ public:
     /**
      * Overridden SetupSolve() method.
      *
-     * Specifies what to do in the simulation before the start of the time loop.
+     * Specify what to do in the simulation before the start of the time loop.
      *
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored

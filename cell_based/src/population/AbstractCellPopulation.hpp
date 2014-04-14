@@ -521,11 +521,6 @@ public:
     void OpenWritersFilesForAppend(const std::string& rDirectory);
 
     /**
-     * Clear the counters used for cell population output.
-     */
-    void ResetCellCounters();
-
-    /**
      * Write results from the current cell population state to output files.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored

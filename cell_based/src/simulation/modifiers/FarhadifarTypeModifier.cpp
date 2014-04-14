@@ -52,25 +52,10 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-    double cell_age = pCell->GetAge();
-    double G1_duration = pCell->GetCellCycleModel()->GetG1Duration();
-    double S_duration = pCell->GetCellCycleModel()->GetSDuration();
-    double M_duration = pCell->GetCellCycleModel()->GetMDuration();
-    double G2_duration = pCell->GetCellCycleModel()->GetG2Duration();
-    double growth_start_time = M_duration + G1_duration + S_duration;
-
-    // If the cell is differentiated then its G1 duration is infinite
-    // I believe we won't need that in this modifier...
-    // if (g1_duration == DBL_MAX) // don't use magic number, compare to DBL_MAX
-    // {
-    //    This is just for fixed cell-cycle models, need to work out how to find the g1 duration
-    //    g1_duration = pCell->GetCellCycleModel()->GetTransitCellG1Duration();
-    // }
-
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {
         // The target area of an apoptotic cell decreases linearly to zero (and past it negative)
-        /// todo: which cells are apoptotic? if they get apoptotic during G2-phase then this line has to be changed
+        ///\todo: which cells are apoptotic? if they get apoptotic during G2-phase then this line has to be changed
         cell_target_area = cell_target_area - 0.5*cell_target_area/(pCell->GetApoptosisTime())*(SimulationTime::Instance()->GetTime()-pCell->GetStartOfApoptosisTime());
 
         // Don't allow a negative target area
@@ -81,10 +66,17 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     }
     else
     {
+        double cell_age = pCell->GetAge();
+
+        // Get the combined duration of the cell's M, G1 and S phases
+        AbstractCellCycleModel* p_model = pCell->GetCellCycleModel();
+        double growth_start_time = p_model->GetMDuration() + p_model->GetG1Duration() + p_model->GetSDuration();
+
         // The target area of a proliferating cell increases linearly from A to 2A over the course of the G2 phase
         if (cell_age > growth_start_time)
         {
-            cell_target_area *= (1 + (cell_age-growth_start_time)/G2_duration);
+            double g2_duration = p_model->GetG2Duration();
+            cell_target_area *= (1 + (cell_age-growth_start_time)/g2_duration);
         }
 
         /**
@@ -100,15 +92,11 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
         }
     }
 
-    // set cell data here
+    // Set cell data
     pCell->GetCellData()->SetItem("target area", cell_target_area);
-
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class FarhadifarTypeModifier<1>;
 template class FarhadifarTypeModifier<2>;
 template class FarhadifarTypeModifier<3>;

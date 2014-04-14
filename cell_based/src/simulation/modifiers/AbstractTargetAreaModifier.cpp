@@ -94,12 +94,7 @@ void AbstractTargetAreaModifier<DIM>::SetReferenceTargetArea(double referenceTar
     mReferenceTargetArea = referenceTargetArea;
 }
 
-////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-////////////////////////////////////////////////////////////////////////////
-
 template class AbstractTargetAreaModifier<1>;
 template class AbstractTargetAreaModifier<2>;
 template class AbstractTargetAreaModifier<3>;
-
-

@@ -73,7 +73,7 @@ public:
     virtual ~AbstractCellBasedSimulationModifier();
 
     /**
-     * Specifies what to do in the simulation at the end of each timestep.
+     * Specify what to do in the simulation at the end of each timestep.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -82,7 +82,7 @@ public:
     }
 
     /**
-     * Specifies what to do in the simulation at the end of each output timestep.
+     * Specify what to do in the simulation at the end of each output timestep.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -91,7 +91,7 @@ public:
     }
 
     /**
-     * Specifies what to do in the simulation before the start of the time loop.
+     * Specify what to do in the simulation before the start of the time loop.
      *
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
@@ -101,7 +101,7 @@ public:
     }
 
     /**
-     * Specifies what to do in the simulation at the end of each time loop.
+     * Specify what to do in the simulation at the end of each time loop.
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -110,7 +110,7 @@ public:
     }
 
     /**
-     * Outputs modifiers used in the simulation to file.
+     * Output modifiers used in the simulation to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

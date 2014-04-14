@@ -67,14 +67,16 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
       mpCellPropertyRegistry(CellPropertyRegistry::Instance()->TakeOwnership()),
       mOutputResultsForChasteVisualizer(true)
 {
-    // To avoid double-counting problems, clear the passed-in cells vector.
-    // We force a reallocation of memory so that subsequent usage of the vector is more likely
-    // to give an error.
+    /*
+     * To avoid double-counting problems, clear the passed-in cells vector.
+     * We force a reallocation of memory so that subsequent usage of the
+     * vector is more likely to give an error.
+     */
     std::vector<CellPtr>().swap(rCells);
 
+	// There must be a one-one correspondence between cells and location indices
     if (!locationIndices.empty())
     {
-        // There must be a one-one correspondence between cells and location indices
         if (mCells.size() != locationIndices.size())
         {
             EXCEPTION("There is not a one-one correspondence between cells and location indices");
@@ -88,7 +90,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
     std::list<CellPtr>::iterator it = mCells.begin();
     for (unsigned i=0; it != mCells.end(); ++it, ++i)
     {
-        // Give each cell a pointer to the property registry (we have taken ownership in this constructor).
+        // Give each cell a pointer to the property registry (we have taken ownership in this constructor)
         (*it)->rGetCellPropertyCollection().SetCellPropertyRegistry(mpCellPropertyRegistry.get());
     }
 
@@ -120,7 +122,9 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::~AbstractCellPopulation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
+         cell_iter!=this->End();
+         ++cell_iter)
     {
         cell_iter->InitialiseCellCycleModel();
     }
@@ -129,7 +133,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(const std::string& dataName, double dataValue)
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
+         cell_iter!=this->End();
+         ++cell_iter)
     {
         cell_iter->GetCellData()->SetItem(dataName, dataValue);
     }
@@ -151,7 +157,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNumRealCells()
 {
     unsigned counter = 0;
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin(); cell_iter!=this->End(); ++cell_iter)
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
+         cell_iter!=this->End();
+         ++cell_iter)
     {
         counter++;
     }
@@ -226,7 +234,7 @@ CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationInde
     {
         return *(cells.begin());
     }
-    if (cells.size() == 0)
+    if (cells.empty())
     {
         EXCEPTION("Location index input argument does not correspond to a Cell");
     }
@@ -249,15 +257,8 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAttachedToLocationInd
     // Get the set of pointers to cells corresponding to this location index
     std::set<CellPtr> cells = mLocationCellMap[index];
 
-    // Check if there is a cell attached to the location index
-    if (cells.size() == 0)
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+    // Return whether there is a cell attached to the location index
+    return !(cells.empty());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -360,19 +361,20 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//                             Output methods                               //
-//////////////////////////////////////////////////////////////////////////////
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 {
-    // Save some typing
-    typedef AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> writer_t;
+    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
 
-    std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::CloseFile, _1));
-    std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::CloseFile, _1));
+    BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
+    {
+        p_cell_writer->CloseFile();
+    }
+    BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
+    {
+        p_pop_writer->CloseFile();
+    }
 
 #ifdef CHASTE_VTK
     *mpVtkMetaFile << "    </Collection>\n";
@@ -409,46 +411,50 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std:
     }
 
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-    BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_writer, mCellWriters)
-    {
-        p_writer->OpenOutputFile(rDirectory);
-    }
     typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
-    BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_writer, mCellPopulationWriters)
+    BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
-        p_writer->OpenOutputFile(rDirectory);
-        p_writer->WriteHeader(this);
+        p_cell_writer->OpenOutputFile(rDirectory);
+    }
+    BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
+    {
+        p_pop_writer->OpenOutputFile(rDirectory);
+        p_pop_writer->WriteHeader(this);
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFilesForAppend(const std::string& rDirectory)
 {
-    for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
-         pop_writer_iter != mCellPopulationWriters.end();
-         ++pop_writer_iter)
+    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
-        (*pop_writer_iter)->OpenOutputFileForAppend(rDirectory);
+        p_cell_writer->OpenOutputFileForAppend(rDirectory);
     }
-
-    for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
-         cell_writer_iter != mCellWriters.end();
-         ++cell_writer_iter)
+    BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
     {
-        (*cell_writer_iter)->OpenOutputFileForAppend(rDirectory);
+        p_pop_writer->OpenOutputFileForAppend(rDirectory);
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
 {
-    // Save some typing
-    typedef AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> writer_t;
+	typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+	typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
 
     if (!(mCellWriters.empty() && mCellPopulationWriters.empty()))
     {
-        ResetCellCounters();
+        // Reset cell counters
+		for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
+		{
+			mCellCyclePhaseCount[i] = 0;
+		}
+		mCellProliferativeTypesCount.clear();
+		mCellMutationStateCount.clear();
 
+        // Populate mCellCyclePhaseCount, mCellProliferativeTypesCount and mCellMutationStateCount
         GenerateCellResults();
 
         PetscTools::BeginRoundRobin();
@@ -458,8 +464,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             // The master process writes time stamps
             if (PetscTools::AmMaster())
             {
-                std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
-                std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteTimeStamp, _1));
+                BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
+                {
+                    p_cell_writer->WriteTimeStamp();
+                }
+                BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
+                {
+                    p_pop_writer->WriteTimeStamp();
+                }
             }
 
             for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
@@ -484,8 +496,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
             // The top-most process adds a newline
             if (PetscTools::AmTopMost())
             {
-                std::for_each(mCellWriters.begin(), mCellWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
-                std::for_each(mCellPopulationWriters.begin(), mCellPopulationWriters.end(), boost::bind(&writer_t::WriteNewline, _1));
+                BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
+                {
+                    p_cell_writer->WriteNewline();
+                }
+                BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
+                {
+                    p_pop_writer->WriteNewline();
+                }
             }
             CloseOutputFiles();
         }
@@ -497,17 +515,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
     {
        WriteVtkResultsToFile(rDirectory);
     }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ResetCellCounters()
-{
-    for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
-    {
-        mCellCyclePhaseCount[i] = 0;
-    }
-    mCellProliferativeTypesCount.clear();
-    mCellMutationStateCount.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -735,10 +742,7 @@ std::pair<unsigned,unsigned> AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Crea
     return ordered_pair;
 }
 
-/////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////
-
 template class AbstractCellPopulation<1,1>;
 template class AbstractCellPopulation<1,2>;
 template class AbstractCellPopulation<2,2>;

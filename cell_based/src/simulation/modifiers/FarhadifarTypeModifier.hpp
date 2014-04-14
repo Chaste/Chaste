@@ -45,6 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A modifier class in which the target area property of each cell is updated.
  * It is used to implement growth in vertex-based simulations.
+ * The precise growth rule is that proposed by:
+ *
+ * Farhadifar et al. 2007.
+ * The influence of cell mechanics, cell-cell interactions, and proliferation on epithelial packing.
+ * Current Biology 17(24):2095-2104.
+ * http://dx.doi.org/10.1016/j.cub.2007.11.049
+ *
+ * \todo Consider renaming as FarhadifarTargetAreaModifier for clarity
  */
 template<unsigned DIM>
 class FarhadifarTypeModifier : public AbstractTargetAreaModifier<DIM>
@@ -79,7 +87,7 @@ public:
     /**
      * Helper method to update the target area property of an individual cell.
      *
-     * @param pCell pointer to the cell
+     * @param pCell pointer to a cell
      */
     void UpdateTargetAreaOfCell(const CellPtr pCell);
 };

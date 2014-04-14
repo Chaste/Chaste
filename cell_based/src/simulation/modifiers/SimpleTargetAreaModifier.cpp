@@ -52,7 +52,6 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-    double cell_age = pCell->GetAge();
     double g1_duration = pCell->GetCellCycleModel()->GetG1Duration();
 
     // If the cell is differentiated then its G1 duration is infinite
@@ -81,6 +80,8 @@ void SimpleTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     }
     else
     {
+        double cell_age = pCell->GetAge();
+
         // The target area of a proliferating cell increases linearly from A/2 to A over the course of the G1 phase
         if (cell_age < g1_duration)
         {

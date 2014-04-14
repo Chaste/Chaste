@@ -310,127 +310,63 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 #ifdef CHASTE_VTK
     if (this->mpVoronoiTessellation != NULL)
     {
-		unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
-		std::stringstream time;
-		time << num_timesteps;
+        unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+        std::stringstream time;
+        time << num_timesteps;
 
+        // Create mesh writer for VTK output
         VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
-        unsigned num_elements = this->mpVoronoiTessellation->GetNumElements();
-        std::vector<double> ghosts(num_elements);
-        std::vector<double> cell_types(num_elements);
-        std::vector<double> cell_ancestors(num_elements);
-        std::vector<double> cell_mutation_states(num_elements);
-        std::vector<double> cell_ages(num_elements);
-        std::vector<double> cell_cycle_phases(num_elements);
-        std::vector<double> cell_volumes(num_elements);
-
-        ///\todo #1975 - deal with possibility of information stored in CellData
-
-        // Loop over Voronoi elements
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
-             elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
-             ++elem_iter)
+        // Iterate over any cell writers that are present
+        unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
+        for (typename std::set<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+             cell_writer_iter != this->mCellWriters.end();
+             ++cell_writer_iter)
         {
-            // Get index of this element in the Voronoi tessellation mesh
-            unsigned elem_index = elem_iter->GetIndex();
+            // Create vector to store VTK cell data
+            std::vector<double> vtk_cell_data(num_vtk_cells);
 
-            unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-
-            ghosts[elem_index] = (double)(this->IsGhostNode(node_index));
-
-            if (!this->IsGhostNode(node_index))
+            // Loop over elements of mpVoronoiTessellation
+            for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
+                 elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
+                 ++elem_iter)
             {
-                // Get the cell corresponding to this element
-                CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+                // Get the indices of this element and the corresponding node in mrMesh
+                unsigned elem_index = elem_iter->GetIndex();
+                unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
 
-                if (this-> template HasWriter<CellAncestorWriter>())
+                // If this node corresponds to a ghost node, set any "cell" data to be -1.0
+                if (this->IsGhostNode(node_index))
                 {
-                    double ancestor_index = (p_cell->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)p_cell->GetAncestor();
-                    cell_ancestors[elem_index] = ancestor_index;
+                    // Populate the vector of VTK cell data
+                    vtk_cell_data[elem_index] = -1.0;
                 }
-                if (this-> template HasWriter<CellProliferativeTypesWriter>())
+                else
                 {
-                    double cell_type = p_cell->GetCellProliferativeType()->GetColour();
-                    cell_types[elem_index] = cell_type;
-                }
-                if (this-> template HasWriter<CellMutationStatesCountWriter>())
-                {
-                    double mutation_state = p_cell->GetMutationState()->GetColour();
-                    cell_mutation_states[elem_index] = mutation_state;
-                }
-                if (this-> template HasWriter<CellAgesWriter>())
-                {
-                    double age = p_cell->GetAge();
-                    cell_ages[elem_index] = age;
-                }
-                if (this-> template HasWriter<CellProliferativePhasesWriter>())
-                {
-                    double cycle_phase = p_cell->GetCellCycleModel()->GetCurrentCellCyclePhase();
-                    cell_cycle_phases[elem_index] = cycle_phase;
-                }
-                if (this-> template HasWriter<CellVolumesWriter>())
-                {
-                    double cell_volume = this->mpVoronoiTessellation->GetVolumeOfElement(elem_index);
-                    cell_volumes[elem_index] = cell_volume;
-                }
+                    // Get the cell corresponding to this node
+                    CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
-                ///\todo #1975 - deal with possibility of information stored in CellData
-            }
-            else
-            {
-                if (this-> template HasWriter<CellAncestorWriter>())
-                {
-                    cell_ancestors[elem_index] = -1.0;
-                }
-                if (this-> template HasWriter<CellProliferativeTypesWriter>())
-                {
-                    cell_types[elem_index] = -1.0;
-                }
-                if (this-> template HasWriter<CellMutationStatesCountWriter>())
-                {
-                    cell_mutation_states[elem_index] = -1.0;
-                }
-                if (this-> template HasWriter<CellAgesWriter>())
-                {
-                    cell_ages[elem_index] = -1.0;
-                }
-                if (this-> template HasWriter<CellProliferativePhasesWriter>())
-                {
-                    cell_cycle_phases[elem_index] = -1.0;
-                }
-                if (this-> template HasWriter<CellVolumesWriter>())
-                {
-                    cell_volumes[elem_index] = -1.0;
+                    // Populate the vector of VTK cell data
+                    vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
                 }
             }
+
+            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
         }
 
+        // Next, record which nodes are ghost nodes
+        ///\todo #2441 - make use of the cell writer hierarchy to do this
+        std::vector<double> ghosts(num_vtk_cells);
+		for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
+			 elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
+			 ++elem_iter)
+		{
+			unsigned elem_index = elem_iter->GetIndex();
+			unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+            ghosts[elem_index]  = (double) (this->IsGhostNode(node_index));
+        }
         mesh_writer.AddCellData("Non-ghosts", ghosts);
-        if (this-> template HasWriter<CellProliferativeTypesWriter>())
-        {
-            mesh_writer.AddCellData("Cell types", cell_types);
-        }
-        if (this-> template HasWriter<CellAncestorWriter>())
-        {
-            mesh_writer.AddCellData("Ancestors", cell_ancestors);
-        }
-        if (this-> template HasWriter<CellMutationStatesCountWriter>())
-        {
-            mesh_writer.AddCellData("Mutation states", cell_mutation_states);
-        }
-        if (this-> template HasWriter<CellAgesWriter>())
-        {
-            mesh_writer.AddCellData("Ages", cell_ages);
-        }
-        if (this-> template HasWriter<CellProliferativePhasesWriter>())
-        {
-            mesh_writer.AddCellData("Cycle phases", cell_cycle_phases);
-        }
-        if (this-> template HasWriter<CellVolumesWriter>())
-        {
-            mesh_writer.AddCellData("Cell volumes", cell_volumes);
-        }
+
         ///\todo #1975 - deal with possibility of information stored in CellData
 
         mesh_writer.WriteVtkUsingMesh(*(this->mpVoronoiTessellation), time.str());

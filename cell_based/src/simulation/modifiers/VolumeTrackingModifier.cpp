@@ -97,11 +97,7 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
     }
 }
 
-
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class VolumeTrackingModifier<1>;
 template class VolumeTrackingModifier<2>;
 template class VolumeTrackingModifier<3>;
