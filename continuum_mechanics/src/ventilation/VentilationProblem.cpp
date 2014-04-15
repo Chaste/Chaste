@@ -48,8 +48,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mTerminalInteractionMatrix(NULL),
       mTerminalFluxChangeVector(NULL),
       mTerminalPressureChangeVector(NULL),
-      mTerminalKspSolver(NULL),
-      mTerminalFluxScaling(1.0)
+      mTerminalKspSolver(NULL)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
@@ -248,9 +247,9 @@ void VentilationProblem::SolveIterativelyFromPressure()
 
     unsigned max_iterations=1000;
     unsigned num_terminals = mMesh.GetNumBoundaryNodes()-1u;
-    double pressure_tolerance = 1e-3; //1e-4
+    double pressure_tolerance = 1e-4;
     bool converged=false;
-    mTerminalFluxScaling = 1.0;
+    double terminal_flux_correction = 0.0;
     double last_max_pressure_change;
     double last_norm_pressure_change;
     for (unsigned iteration = 0; iteration < max_iterations && converged==false; iteration++)
@@ -269,32 +268,14 @@ void VentilationProblem::SolveIterativelyFromPressure()
         }
         double max_pressure_change, norm_pressure_change;
         PetscInt temp_index;
-        VecMax(mTerminalPressureChangeVector, &temp_index, &max_pressure_change);
-        VecNorm(mTerminalPressureChangeVector, NORM_2, &norm_pressure_change);
+        VecMax(mTerminalPressureChangeVector, &temp_index, &last_max_pressure_change);
+        VecNorm(mTerminalPressureChangeVector, NORM_2, &last_norm_pressure_change);
 
-        if (norm_pressure_change < pressure_tolerance)
+        if (last_norm_pressure_change < pressure_tolerance)
         {
             converged = true;
             break;
         }
-        if (iteration > 1)
-        {
-            if (max_pressure_change * last_max_pressure_change < 0.0)
-            {
-                // This is overshoot - the resistances have been underestimated, leading to an overestimate in the
-                // fluxes.  If we overestimate by more than 2 then we will in
-                mTerminalFluxScaling *= last_norm_pressure_change/(last_norm_pressure_change + norm_pressure_change);
-            }
-            else if (mDynamicResistance)
-            {
-#define COVERAGE_IGNORE
-                // Nasty hack to get scaling to settle down near to the correct Pedley resistance
-                mTerminalFluxScaling *= last_norm_pressure_change/(last_norm_pressure_change - norm_pressure_change);
-#undef COVERAGE_IGNORE
-            }
-        }
-        last_max_pressure_change = max_pressure_change;
-        last_norm_pressure_change = norm_pressure_change;
 
         KSPSolve(mTerminalKspSolver, mTerminalPressureChangeVector, mTerminalFluxChangeVector);
         double* p_mTerminalFluxChangeVector;
@@ -306,9 +287,60 @@ void VentilationProblem::SolveIterativelyFromPressure()
         {
             double estimated_mTerminalFluxChangeVector=p_mTerminalFluxChangeVector[terminal];
             unsigned edge_index = mTerminalToEdgeIndex[terminal];
-            mFlux[edge_index] += mTerminalFluxScaling * estimated_mTerminalFluxChangeVector;
+            mFlux[edge_index] +=  estimated_mTerminalFluxChangeVector;
         }
         SolveDirectFromFlux();
+        /* Look at the magnitude of the response */
+
+        for (unsigned terminal=0; terminal<num_terminals; terminal++)
+        {
+            unsigned node_index = mTerminalToNodeIndex[terminal];
+            // How far we are away from matching this boundary condition.
+            double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
+            // Offset the first iteration
+            if (iteration == 0)
+            {
+                delta_pressure += mPressureCondition[mOutletNodeIndex];
+            }
+            VecSetValue(mTerminalPressureChangeVector, terminal, delta_pressure, INSERT_VALUES);
+        }
+        VecMax(mTerminalPressureChangeVector, &temp_index, &max_pressure_change);
+        VecNorm(mTerminalPressureChangeVector, NORM_2, &norm_pressure_change);
+        if (norm_pressure_change < pressure_tolerance)
+        {
+            converged = true;
+            break;
+        }
+        bool rescale = true;
+        if (max_pressure_change*last_max_pressure_change < 0.0)
+        {
+            /* The pressure correction has changed sign
+             *  * so we have overshot the root
+             *  * back up by setting a correction factor
+             */
+            terminal_flux_correction =  last_norm_pressure_change / (last_norm_pressure_change + norm_pressure_change) - 1.0;
+        }
+        else if (last_norm_pressure_change > norm_pressure_change)
+        {
+            /* We have a better solution without rescaling. */
+            rescale = false;
+        }
+        else
+        {
+            //use the previous scaling factor based on the last overshoot
+            //assert(terminal_flux_correction != 0.0);
+        }
+
+        if (rescale)
+        {
+            for (unsigned terminal=0; terminal<num_terminals; terminal++)
+            {
+                double estimated_mTerminalFluxChangeVector=p_mTerminalFluxChangeVector[terminal];
+                unsigned edge_index = mTerminalToEdgeIndex[terminal];
+                mFlux[edge_index] +=  terminal_flux_correction*estimated_mTerminalFluxChangeVector;
+            }
+            SolveDirectFromFlux();
+        }
     }
     if(!converged)
     {

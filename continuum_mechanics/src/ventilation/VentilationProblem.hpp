@@ -103,10 +103,6 @@ private:
     Vec mTerminalFluxChangeVector; /**< Used as the output of the mTerminalInteractionMatrix terminal pressure to flux solver*/
     Vec mTerminalPressureChangeVector; /**< Used as the input of the mTerminalInteractionMatrix terminal pressure to flux solver*/
     KSP mTerminalKspSolver; /**< The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
-    /** The solution method in mTerminalInteractionMatrix may present an underestimate of the resistance
-     * (using fewer branches and/or Poiseuille rather than Pedley resistance.  As a result the pressure to
-     * flux solution is in general an over-estimate and should be scaled back.*/
-    double mTerminalFluxScaling;
 
     /**
      * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.

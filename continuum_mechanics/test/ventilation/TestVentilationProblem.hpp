@@ -280,7 +280,7 @@ public:
         TS_ASSERT_DELTA(flux[12],  -0.0710, 1e-4); // (Inflow flux)
         TS_ASSERT_DELTA(flux[13],  -0.0710, 1e-4); // (Inflow flux)
         //This is the extra node at the Trachea
-        TS_ASSERT_DELTA(pressure[8], 2.2222 + 1.0, 1e-4); //Between root and first bifurcation
+        TS_ASSERT_DELTA(pressure[8], 2.2222 + 1.0, 1e-3); //Between root and first bifurcation
 
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");
@@ -495,7 +495,7 @@ public:
         TS_ASSERT_EQUALS(r_mesh.GetNumNodes(), 56379u);
         TS_ASSERT_EQUALS(r_mesh.GetNumElements(), 56378u);
 
-        bool dynamic = false; ///\todo #2300
+        bool dynamic = false;
         problem.SetDynamicResistance(dynamic);
         problem.Solve();
         if (dynamic)
@@ -516,18 +516,23 @@ public:
     }
     void longTestPatientDataLong() throw (Exception)
     {
-        VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
-        problem.SetConstantInflowPressures(0.0);
+        VentilationProblem problem_poiseuille("continuum_mechanics/test/data/all_of_tree", 0u);
+        problem_poiseuille.SetDynamicResistance(false);
+        problem_poiseuille.SetConstantInflowPressures(0.0);
+
+        VentilationProblem problem_pedley("continuum_mechanics/test/data/all_of_tree", 0u);
+        problem_pedley.SetDynamicResistance(true);
+        problem_pedley.SetConstantInflowPressures(0.0);
+
         for (unsigned pressure = 0 ; pressure<20; pressure+=1)
         {
-            problem.SetOutflowPressure((double) pressure);
+            problem_poiseuille.SetOutflowPressure((double) pressure);
+            problem_poiseuille.Solve();
+            double flux_poiseuille = problem_poiseuille.GetFluxAtOutflow();
 
-            problem.SetDynamicResistance(false);
-            problem.Solve();
-            double flux_poiseuille = problem.GetFluxAtOutflow();
-            problem.SetDynamicResistance(true);
-            problem.Solve();
-            double flux_pedley = problem.GetFluxAtOutflow();
+            problem_pedley.SetOutflowPressure((double) pressure);
+            problem_pedley.Solve();
+            double flux_pedley = problem_pedley.GetFluxAtOutflow();
             std::cout<<pressure<<"\t"<<flux_poiseuille<<"\t"<<flux_pedley<<"\n";
         }
     }
