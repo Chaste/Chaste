@@ -1413,7 +1413,7 @@ public:
     	VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
     	// Set the birth time to -5 such that the target area modifier assigns mature cell target areas
-    	for (typename AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+    	for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
     			cell_iter != cell_population.End();
     			++cell_iter)
     	{
@@ -1488,7 +1488,7 @@ public:
     	VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
     	// Set the birth time to -5 such that the target area modifier assigns mature cell target areas
-    	for (typename AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+    	for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
     			cell_iter != cell_population.End();
     			++cell_iter)
     	{
