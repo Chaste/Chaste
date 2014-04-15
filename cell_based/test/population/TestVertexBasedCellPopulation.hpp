@@ -322,6 +322,7 @@ public:
 
     void TestAddCellWithSimpleMesh() throw (Exception)
     {
+    	// This also tests the correct implementation of ShortAxisDivisionRule.
         // Make some nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 2.0, -1.0));

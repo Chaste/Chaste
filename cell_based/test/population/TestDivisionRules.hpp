@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "AbstractCellDivisionRule.hpp"
 #include "DiagonalDivisionRule.hpp"
+#include "RandomDirectionDivisionRule.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -59,6 +60,11 @@ public:
 
     void TestAddCellwithDiagonalDivisionRule()
     {
+    	/**
+    	 * In this test we basically test that the AbstractDivisionRule is implemented and joined with the population
+    	 * correctly. We make a new DiagonalDivisionRule, divide a cell with it and check that the new vertices
+    	 * are in the correct position.
+    	 */
         // Make some nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 2.0, 0.0));
@@ -121,6 +127,123 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes)->rGetLocation()[1], 1.0, 1e-12);
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[0], -1.0, 1e-12);
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], -1.0, 1e-12);
+    }
+
+    void TestRandomDirectionDivisionRule()
+    {
+    	/**
+    	 * This tests the RandomDirectionDivisionRule. We first create a vertex based cell population and check whether we can
+    	 * give the division rule to the population and get it back. Then we create 10000 division vectors and check that they point
+    	 * uniformly in random directions.
+    	 */
+
+    	// Make some nodes
+    	std::vector<Node<2>*> nodes;
+    	nodes.push_back(new Node<2>(0, true, 2.0, 0.0));
+    	nodes.push_back(new Node<2>(1, true, 0.0, 2.0));
+    	nodes.push_back(new Node<2>(2, true, -2.0, 0.0));
+    	nodes.push_back(new Node<2>(3, true, 0.0, -2.0));
+
+    	// Make a rectangular element out of nodes 0,1,2,3
+    	std::vector<Node<2>*> nodes_elem_1;
+    	nodes_elem_1.push_back(nodes[0]);
+    	nodes_elem_1.push_back(nodes[1]);
+    	nodes_elem_1.push_back(nodes[2]);
+    	nodes_elem_1.push_back(nodes[3]);
+
+    	std::vector<VertexElement<2,2>*> vertex_elements;
+    	vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+
+    	// Make a vertex mesh
+    	MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+    	TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
+    	TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
+
+    	// Create cells
+    	std::vector<CellPtr> cells;
+    	CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
+    	cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
+
+    	// Create a cell population
+    	VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+
+        CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
+
+    	// Set the division rule for our population to be the random direction division rule
+    	boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule_to_set(new RandomDirectionDivisionRule<2>());
+    	cell_population.SetDivisionRule(p_division_rule_to_set);
+
+    	// Get the division rule back from the population
+    	boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
+
+    	// Get 10000 division vectors, check each length, their mean and their variance.
+    	c_vector<double, 2> average_axis = zero_vector<double>(2);
+    	c_vector<double, 2> axis_variance = zero_vector<double>(2);
+    	double average_angle = 0.0;
+    	double angle_variance = 0.0;
+    	for(unsigned iteration = 0; iteration < 10000; iteration++)
+    	{
+    		c_vector<double, 2> random_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
+    		TS_ASSERT_DELTA(norm_2(random_axis), 1.0,1e-6);
+    		average_axis(0) += random_axis(0);
+    		axis_variance(0) += random_axis(0)*random_axis(0);
+    		average_axis(1) += random_axis(1);
+    		axis_variance(1) += random_axis(1)*random_axis(1);
+    		average_angle += asin(random_axis(0));
+    		angle_variance += asin(random_axis(0))*asin(random_axis(0));
+    	}
+    	average_axis(0) /= 10000.0;
+    	average_axis(1) /= 10000.0;
+    	axis_variance(0) /= 10000.0;
+    	axis_variance(1) /= 10000.0;
+    	average_angle /= 10000.0;
+    	angle_variance /= 10000.0;
+
+    	TS_ASSERT_DELTA(average_axis(0), 0.0, 1e-2);
+    	TS_ASSERT_DELTA(average_axis(1), 0.0, 1e-2);
+    	TS_ASSERT_DELTA(axis_variance(0), 0.5, 1e-2);
+    	TS_ASSERT_DELTA(axis_variance(1), 0.5, 1e-2);
+    	TS_ASSERT_DELTA(average_angle, 0.0, 1e-2);
+    	TS_ASSERT_DELTA(angle_variance, M_PI*M_PI/12.0, 1e-2);
+    }
+
+    void TestArchiveRandomDirectionDivisionRule() throw(Exception)
+    {
+    	FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+    	std::string archive_file = "division_rules.arch";
+
+    	// Create data structures to store variables to test for equality here
+    	{
+    		boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule(new RandomDirectionDivisionRule<2>());
+
+    		// Create output archive
+    		ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+    		boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+    		// Record values to test into data structures
+    		// If necessary you can use static_cast<ConcreteClass*>(p_abstract_class)
+    		// (if your abstract class doesn't contain the necessary variables and methods)
+
+    		(*p_arch) << p_division_rule;
+    	}
+
+    	{
+    		boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule;
+
+    		// Create an input archive
+    		ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+    		boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+    		// restore from the archive
+    		(*p_arch) >> p_division_rule;
+
+    		// Check things in the data structures with TS_ASSERTS here.
+    		// If necessary you can use static_cast<ConcreteClass*>(p_abstract_class_2)
+    		// (if your abstract class doesn't contain the necessary variables and methods)
+    		// Check that we have got back the right kind of division rule.
+    		TS_ASSERT(dynamic_cast <RandomDirectionDivisionRule<2>* > (p_division_rule.get()));
+    	}
     }
 
     void TestArchiveDiagonalDivisionRule() throw(Exception)
