@@ -806,24 +806,24 @@ public:
         {
             FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
 
-			CellPtr p_cell(new Cell(p_wildtype, p_model));
-			if (elem_index%3 == 0)
-			{
-				p_cell->SetCellProliferativeType(p_stem);
-			}
-			else if (elem_index%3 == 1)
-			{
-				p_cell->SetCellProliferativeType(p_transit);
-			}
-			else
-			{
-				p_cell->SetCellProliferativeType(p_diff);
-			}
+            CellPtr p_cell(new Cell(p_wildtype, p_model));
+            if (elem_index%3 == 0)
+            {
+                p_cell->SetCellProliferativeType(p_stem);
+            }
+            else if (elem_index%3 == 1)
+            {
+                p_cell->SetCellProliferativeType(p_transit);
+            }
+            else
+            {
+                p_cell->SetCellProliferativeType(p_diff);
+            }
 
             double birth_time = 0.0 - elem_index;
             p_cell->SetBirthTime(birth_time);
 
-			cells.push_back(p_cell);
+            cells.push_back(p_cell);
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);

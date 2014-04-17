@@ -66,14 +66,14 @@ void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
 template<unsigned DIM>
 double PottsElement<DIM>::GetAspectRatio()
 {
-    assert(DIM==2);
+    assert(DIM == 2);
 
-	assert(this->GetNumNodes()>0);
+    assert(this->GetNumNodes() != 0);
 
     if (this->GetNumNodes() <= 2)
     {
-    	return 1.0;
-	}
+        return 1.0;
+    }
 
     double eig_max;
     double eig_min;

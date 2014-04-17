@@ -138,10 +138,10 @@ public:
     double GetEquilibriumVolume();
 
     /**
-    * Set method for mCurrentQuiescentDuration.
-    *
-    * @param currentQuiescentDuration the new value of mCurrentQuiescentDuration
-    */
+     * Set method for mCurrentQuiescentDuration.
+     *
+     * @param currentQuiescentDuration the new value of mCurrentQuiescentDuration
+     */
     void SetCurrentQuiescentDuration(double currentQuiescentDuration);
 
     /**
@@ -150,10 +150,10 @@ public:
     double GetCurrentQuiescentDuration();
 
     /**
-    * Set method for mCurrentQuiescentOnsetTime.
-    *
-    * @param currentQuiescentOnsetTime the new value of mCurrentQuiescentOnsetTime
-    */
+     * Set method for mCurrentQuiescentOnsetTime.
+     *
+     * @param currentQuiescentOnsetTime the new value of mCurrentQuiescentOnsetTime
+     */
     void SetCurrentQuiescentOnsetTime(double currentQuiescentOnsetTime);
 
     /**

@@ -108,7 +108,7 @@ public:
         double steady_beta_cat_at_wnt_equals_1 = p_cycle_model->GetBetaCateninConcentration();
 
 #ifdef CHASTE_CVODE
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4362, 2e-3); 
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4362, 2e-3);
         // (Different CVODE versions give slightly different answers here...)
 #else
         TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4511, 1e-4);

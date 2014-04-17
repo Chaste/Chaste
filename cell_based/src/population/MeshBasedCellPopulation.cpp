@@ -673,28 +673,28 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
             mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
         }
 
-		// Loop over elements of mpVoronoiTessellation
-		for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
-			 elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
-			 ++elem_iter)
-		{
-			// Get index of this element in mpVoronoiTessellation
-			unsigned elem_index = elem_iter->GetIndex();
+        // Loop over elements of mpVoronoiTessellation
+        for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = mpVoronoiTessellation->GetElementIteratorBegin();
+             elem_iter != mpVoronoiTessellation->GetElementIteratorEnd();
+             ++elem_iter)
+        {
+            // Get index of this element in mpVoronoiTessellation
+            unsigned elem_index = elem_iter->GetIndex();
 
-			// Get the cell corresponding to this element, via the index of the corresponding node in mrMesh
-			unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-			CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+            // Get the cell corresponding to this element, via the index of the corresponding node in mrMesh
+            unsigned node_index = mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+            CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
-			for (unsigned var=0; var<num_cell_data_items; var++)
-			{
-				cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
-			}
-		}
+            for (unsigned var=0; var<num_cell_data_items; var++)
+            {
+                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
+            }
+        }
 
-		for (unsigned var=0; var<cell_data.size(); var++)
-		{
-			mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
-		}
+        for (unsigned var=0; var<cell_data.size(); var++)
+        {
+            mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+        }
 
         mesh_writer.WriteVtkUsingMesh(*mpVoronoiTessellation, time.str());
         *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";

@@ -81,7 +81,7 @@ public:
 
     /**
      * Overridden VisitCell() method.
-     * 
+     *
      * Visit a cell and write its data.
      *
      * @param pCell the cell to write

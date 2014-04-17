@@ -148,12 +148,12 @@ public:
         CellAgesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_directory);
         cell_writer.WriteTimeStamp();
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-		    cell_writer.VisitCell(*cell_iter, &cell_population);
-		}
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
@@ -244,12 +244,12 @@ public:
         CellAncestorWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_directory);
         cell_writer.WriteTimeStamp();
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-		    cell_writer.VisitCell(*cell_iter, &cell_population);
-		}
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
@@ -343,12 +343,12 @@ public:
         CellIdWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_directory);
         cell_writer.WriteTimeStamp();
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-		    cell_writer.VisitCell(*cell_iter, &cell_population);
-		}
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
@@ -709,12 +709,12 @@ public:
         CellProliferativePhasesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_directory);
         cell_writer.WriteTimeStamp();
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-		    cell_writer.VisitCell(*cell_iter, &cell_population);
-		}
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
@@ -817,12 +817,12 @@ public:
         CellProliferativeTypesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_directory);
         cell_writer.WriteTimeStamp();
-		for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
-			 other_cell_iter != cell_population.End();
-			 ++other_cell_iter)
-		{
-		    cell_writer.VisitCell(*other_cell_iter, &cell_population);
-		}
+        for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
+             other_cell_iter != cell_population.End();
+             ++other_cell_iter)
+        {
+            cell_writer.VisitCell(*other_cell_iter, &cell_population);
+        }
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
@@ -915,12 +915,12 @@ public:
         CellVariablesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_directory);
         cell_writer.WriteTimeStamp();
-		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-			 cell_iter != cell_population.End();
-			 ++cell_iter)
-		{
-		    cell_writer.VisitCell(*cell_iter, &cell_population);
-		}
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
         cell_writer.CloseFile();
 
         // Test that the data are output correctly

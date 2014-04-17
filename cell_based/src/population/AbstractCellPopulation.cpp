@@ -74,7 +74,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( Abstract
      */
     std::vector<CellPtr>().swap(rCells);
 
-	// There must be a one-one correspondence between cells and location indices
+    // There must be a one-one correspondence between cells and location indices
     if (!locationIndices.empty())
     {
         if (mCells.size() != locationIndices.size())
@@ -441,18 +441,18 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFilesForAppend(c
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
 {
-	typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-	typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
 
     if (!(mCellWriters.empty() && mCellPopulationWriters.empty()))
     {
         // Reset cell counters
-		for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
-		{
-			mCellCyclePhaseCount[i] = 0;
-		}
-		mCellProliferativeTypesCount.clear();
-		mCellMutationStateCount.clear();
+        for (unsigned i=0; i<mCellCyclePhaseCount.size(); i++)
+        {
+            mCellCyclePhaseCount[i] = 0;
+        }
+        mCellProliferativeTypesCount.clear();
+        mCellMutationStateCount.clear();
 
         // Populate mCellCyclePhaseCount, mCellProliferativeTypesCount and mCellMutationStateCount
         GenerateCellResults();

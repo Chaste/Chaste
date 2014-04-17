@@ -62,9 +62,9 @@ private:
     double mSloughHeight;
 
     /**
-    * The width of the domain, non-dimensionalised with cell length.
-    * This determines when cells are sloughed from sides of the domain in 2D.
-    */
+     * The width of the domain, non-dimensionalised with cell length.
+     * This determines when cells are sloughed from sides of the domain in 2D.
+     */
     double mSloughWidth;
 
     /** Needed for serialization. */

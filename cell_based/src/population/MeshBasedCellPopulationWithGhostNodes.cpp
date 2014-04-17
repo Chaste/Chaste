@@ -357,12 +357,12 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         // Next, record which nodes are ghost nodes
         ///\todo #2441 - make use of the cell writer hierarchy to do this
         std::vector<double> ghosts(num_vtk_cells);
-		for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
-			 elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
-			 ++elem_iter)
-		{
-			unsigned elem_index = elem_iter->GetIndex();
-			unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
+        for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
+             elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();
+             ++elem_iter)
+        {
+            unsigned elem_index = elem_iter->GetIndex();
+            unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
             ghosts[elem_index]  = (double) (this->IsGhostNode(node_index));
         }
         mesh_writer.AddCellData("Non-ghosts", ghosts);
