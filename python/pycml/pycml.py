@@ -170,27 +170,20 @@ def make_xml_binder():
     to python classes, and setting namespace prefixes.
     """
     binder = amara.bindery.binder(prefixes=NSS)
-    binder.set_binding_class(NSS[u'cml'], "model",
-                             cellml_model)
-    binder.set_binding_class(NSS[u'cml'], "component",
-                             cellml_component)
-    binder.set_binding_class(NSS[u'cml'], "variable",
-                             cellml_variable)
-    binder.set_binding_class(NSS[u'cml'], "units",
-                             cellml_units)
-    binder.set_binding_class(NSS[u'cml'], "unit",
-                             cellml_unit)
+    binder.set_binding_class(NSS[u'cml'], "model", cellml_model)
+    binder.set_binding_class(NSS[u'cml'], "component", cellml_component)
+    binder.set_binding_class(NSS[u'cml'], "variable", cellml_variable)
+    binder.set_binding_class(NSS[u'cml'], "units", cellml_units)
+    binder.set_binding_class(NSS[u'cml'], "unit", cellml_unit)
     for mathml_elt in ['math', 'degree', 'logbase', 'otherwise',
                        'diff', 'plus', 'minus', 'times', 'divide',
                        'exp', 'ln', 'log', 'abs', 'power', 'root',
                        'leq', 'geq', 'lt', 'gt', 'eq', 'neq',
+                       'rem',
                        'ci', 'cn', 'apply', 'piecewise', 'piece']:
-        exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % \
-             (mathml_elt, mathml_elt)
-    binder.set_binding_class(NSS[u'm'], "and_",
-                             mathml_and)
-    binder.set_binding_class(NSS[u'm'], "or_",
-                             mathml_or)
+        exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % (mathml_elt, mathml_elt)
+    binder.set_binding_class(NSS[u'm'], "and_", mathml_and)
+    binder.set_binding_class(NSS[u'm'], "or_", mathml_or)
     return binder
 
 def amara_parse_cellml(source, uri=None, prefixes=None):
@@ -4348,7 +4341,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
 
     class OPS:
         """Classifications of operators."""
-        absRound = frozenset(('abs', 'floor', 'ceiling'))
+        absRound = frozenset(('abs', 'floor', 'ceiling', 'rem'))
         timesDivide = frozenset(('times', 'divide'))
         plusMinus = frozenset(('plus', 'minus'))
         trig = frozenset(('sin', 'cos', 'tan', 'sec', 'csc', 'cot',
@@ -6159,6 +6152,16 @@ class mathml_eq(mathml_operator, mathml_units_mixin_equalise_operands):
             return ops.next()
         else:
             raise ValueError("Not an assignment expression.")
+
+class mathml_rem(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <rem> operator."""
+    def evaluate(self):
+        """Return the remainder when the first operand is divided by the second."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 2:
+            self.wrong_number_of_operands(len(ops), [2])
+        return self.eval(ops[0]) % self.eval(ops[1])
 
 class mathml_logbase(mathml, mathml_units_mixin_container):
     """Class representing the MathML <logbase> element."""

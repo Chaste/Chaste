@@ -682,7 +682,7 @@ class CellMLTranslator(object):
     function_map = {'power': 'pow', 'abs': 'fabs', 'ln': 'log', 'exp': 'exp',
                     'floor': 'floor', 'ceiling': 'ceil',
                     'factorial': 'factorial', # Needs external definition
-                    'not': '!',
+                    'not': '!', 'rem': 'fmod',
                     'sin': 'sin', 'cos': 'cos', 'tan': 'tan',
                     'sec': '1/cos', 'csc': '1/sin', 'cot': '1/tan',
                     'sinh': 'sinh', 'cosh': 'cosh', 'tanh': 'tanh',
@@ -4128,7 +4128,7 @@ class CellMLToMatlabTranslator(CellMLTranslator):
         self.function_map.update(CellMLTranslator.function_map)
         self.function_map.update(
             {'power': 'power', 'abs': 'abs',
-             'xor': 'xor', 'not': '~',
+             'xor': 'xor', 'not': '~', 'rem': 'rem',
              'sec': 'sec', 'csc': 'csc', 'cot': 'cot',
              'sech': 'sech', 'csch': 'csch', 'coth': 'coth',
              'arcsec': 'asec', 'arccsc': 'acsc', 'arccot': 'acot',
@@ -4466,6 +4466,8 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
     NOT_A_NUMBER = 'float("nan")'
     USES_SUBSIDIARY_FILE = False
     
+    binary_ops = CellMLToChasteTranslator.binary_ops.copy()
+    binary_ops.update({'rem': '%'})
     nary_ops = CellMLToChasteTranslator.nary_ops.copy()
     nary_ops.update({'and': 'and', 'or': 'or'})
     function_map = {'power': 'math.pow', 'abs': 'abs', 'ln': 'math.log', 'log': 'math.log', 'exp': 'math.exp',

@@ -305,6 +305,7 @@ private:
         rModels.push_back("jafri_rice_winslow_model_1998");
         rModels.push_back("kurata_model_2002");
         rModels.push_back("livshitz_rudy_2007");
+        rModels.push_back("luo_rudy_1994");
         rModels.push_back("mahajan_2008");
         rModels.push_back("matsuoka_model_2003");
         rModels.push_back("noble_model_1991");
