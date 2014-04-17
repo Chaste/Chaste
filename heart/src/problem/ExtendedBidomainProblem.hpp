@@ -287,7 +287,8 @@ protected:
     /** Used by the writer, stores the variable output names*/
     std::vector<signed int> mVariablesIDs;
 
-    /** Flag for checking that the user specified conductivities for the second cell. Get method available for this variable.*/
+    /** Flag for checking that the user specified conductivities for the second cell.
+     * Get method available for this variable.*/
     bool mUserSpecifiedSecondCellConductivities;
 
     /** flag used to check whwther the user wanted specific, out-of-heartconfig  values*/
@@ -303,7 +304,8 @@ protected:
     double mCmFirstCell;
     /**Cm for the second cell, set by the user and, if so,  set into the PDE*/
     double mCmSecondCell;
-    /**Conductance, in mS of the gap junction conductance, set by the user and, if so,  set into the PDE (otherwise its default value is 0 */
+    /**Conductance, in mS of the gap junction conductance, set by the user and,
+     * if so,  set into the PDE (otherwise its default value is 0 */
     double mGGap;
 
     /**
