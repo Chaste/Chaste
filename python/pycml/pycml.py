@@ -269,7 +269,6 @@ class element_base(amara.bindery.element_base):
                             prev.next_elem = next
                             break
             del self.xml_children[index]
-        return
 
     def xml_doc(self):
         msg = []
@@ -359,8 +358,6 @@ def add_methods_to_amara():
     for method in ['getAttributeNS', 'xml_element_children', 'safe_remove_child', 'replace_child']:
         meth = new.instancemethod(locals()[method], None, amara.bindery.element_base)
         setattr(amara.bindery.element_base, method, meth)
-    #    setattr(amara.bindery.element_base, method,
-    #            getattr(element_base, method).__get__(amara.bindery.element_base))
 
 add_methods_to_amara()
 
@@ -4358,7 +4355,6 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         super(mathml_apply, self).__init__()
         self._cml_units = None
         self.clear_dependency_info()
-        return
     
     def clear_dependency_info(self):
         """Clear the type, dependency, etc. information for this equation.
@@ -4418,8 +4414,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         if hasattr(op, 'evaluate') and callable(op.evaluate):
             return op.evaluate()
         else:
-            raise EvaluationError("Don't know how to evaluate the operator " +
-                                  op.localName)
+            raise EvaluationError("Don't know how to evaluate the operator " + op.localName)
 
     def tree_complexity(self, **kw):
         """
@@ -4442,9 +4437,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         # Complexity of this function
         op_name = self.operator().localName
         OPS = self.OPS
-        if op_name in OPS.plusMinus \
-             or op_name in OPS.logical \
-             or op_name in OPS.relations:
+        if op_name in OPS.plusMinus or op_name in OPS.logical or op_name in OPS.relations:
             if kw['algebraic']: ac['op'] = (len(list(self.operands())) - 1)
             else: ac += 1 * (len(list(self.operands())) - 1)
         elif op_name in OPS.absRound:
@@ -4464,11 +4457,9 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             if kw['algebraic']: ac['divide'] = 1
             else: ac += 15
         elif op_name == 'power':
-            # This will vary depending on the exponent - gcc can optimise
-            # for 2 and 3, it seems.
+            # This will vary depending on the exponent - gcc can optimise for 2 and 3, it seems.
             exponent = list(self.operands())[1]
-            if exponent.localName == u'cn' and \
-               unicode(exponent).strip() in [u'2', u'3']:
+            if exponent.localName == u'cn' and unicode(exponent).strip() in [u'2', u'3']:
                 if kw['algebraic']: ac['power2'] = 1
                 else: ac += 5
             else:
@@ -4481,9 +4472,8 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             if kw['algebraic']: ac['variable'] = 1
             else: ac += 0.7
         else:
-            raise EvaluationError("Don't know complexity of operator " +
-                                  op_name)
-            
+            raise EvaluationError("Don't know complexity of operator " + op_name)
+
         # Complexity of operands
         for elt in self.operands():
             if kw['algebraic']:
@@ -4524,7 +4514,6 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 raise UnitsError(self, u' '.join([
                     "Don't know how to select units for operands of operator",
                     op.localName, "when its units are", units.description()]))
-        return
 
     def get_units(self):
         """Recursively check this expression for dimensional consistency.
@@ -4590,22 +4579,19 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                     base = _child1(self.logbase)
                     u = self._get_element_units(base)
                     if not u.dimensionally_equivalent(dimensionless):
-                        raise UnitsError(self, u' '.join([
-                            u'The logbase qualifier must have dimensionless',
-                            u'units, not',u.description()]))
+                        raise UnitsError(self, u' '.join([u'The logbase qualifier must have dimensionless',
+                                                          u'units, not',u.description()]))
             # Result has units of dimensionless
             our_units = UnitsSet([dimensionless])
         elif op == 'power':
             # Arg1 : any, Arg2 : dimensionless
             arg_units = operand_units.next()
             if boolean in arg_units:
-                raise UnitsError(
-                    self, u'The argument of <power> should not be boolean')
+                raise UnitsError(self, u'The argument of <power> should not be boolean')
             exponent_units = operand_units.next()
             if not exponent_units.dimensionally_equivalent(dimensionless):
-                raise UnitsError(self, u' '.join([
-                    u'The second operand to power must have dimensionless',
-                    u'units, not',exponent_units.description()]))
+                raise UnitsError(self, u' '.join([u'The second operand to power must have dimensionless',
+                                                  u'units, not',exponent_units.description()]))
             # Result has units that are the units on the (first)
             # operand raised to the power of the second operand.  If
             # units on the first operand are dimensionless, then so is
@@ -4627,9 +4613,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 try:
                     expt = self.eval(expt)
                 except EvaluationError, e:
-                    raise UnitsError(self, u' '.join([
-                        u'Unable to evaluate the exponent of a power element:',
-                        unicode(e)]),
+                    raise UnitsError(self, u' '.join([u'Unable to evaluate the exponent of a power element:', unicode(e)]),
                                      warn=True,
                                      level=logging.WARNING_TRANSLATE_ERROR)
                 our_units = dimensionless.simplify(arg_units, expt)
@@ -4637,8 +4621,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             # Arg : any, <degree> : dimensionless
             arg_units = operand_units.next()
             if boolean in arg_units:
-                raise UnitsError(
-                    self, u'The argument of <root> should not be boolean')
+                raise UnitsError(self, u'The argument of <root> should not be boolean')
             if hasattr(self, u'degree'):
                 degree = _child1(self.degree)
                 u = self._get_element_units(degree)
@@ -4672,8 +4655,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             # Arg : any, <bvar> : any, <degree> : dimensionless
             arg_units = operand_units.next()
             if boolean in arg_units:
-                raise UnitsError(
-                    self, u'The argument of <diff> should not be boolean')
+                raise UnitsError(self, u'The argument of <diff> should not be boolean')
             if hasattr(self, u'bvar'):
                 if hasattr(self.bvar, u'degree'):
                     degree = _child1(self.bvar.degree)
@@ -4685,8 +4667,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                 else:
                     degree = 1.0 # Default is first derivative
             else:
-                raise UnitsError(self, 
-                    u'A diff operator must have a bvar qualifier')
+                raise UnitsError(self, u'A diff operator must have a bvar qualifier')
             # Result has units that are the quotient of the units of the
             # operand, over the units of the term in the bvar qualifier
             # raised to the value of the degree qualifier
@@ -4713,8 +4694,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                                  u'diff element does not have a valid bvar')
             our_units = arg_units.simplify(bvar_units, -degree)
         elif op in self.OPS.absRound | self.OPS.timesDivide:
-            # No restrictions on operand units, except that they shouldn't
-            # be boolean
+            # No restrictions on operand units, except that they shouldn't be boolean
             for u in self._get_operand_units():
                 if boolean in u:
                     raise UnitsError(self, u' '.join([
@@ -4774,7 +4754,6 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
                         u'Variable', var.fullname(),
                         u'is assigned to in a math element, but has its',
                         iface, u'set to "in".']))
-        return
 
     def classify_variables(self, root=False,
                            dependencies_only=False,
@@ -4941,8 +4920,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
 
         # Do we have an annotation?
         if hasattr(self, u'binding_time'):
-            self._cml_binding_time = getattr(BINDING_TIMES,
-                                             self.binding_time)
+            self._cml_binding_time = getattr(BINDING_TIMES, self.binding_time)
             return self._cml_binding_time
 
         # Does operator have a specialised method for this?
@@ -4958,8 +4936,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
             self._cml_binding_time = max(bts)
 
         # Annotate the element with the binding time
-        self.xml_set_attribute((u'pe:binding_time', NSS[u'pe']),
-                               unicode(self._cml_binding_time))
+        self.xml_set_attribute((u'pe:binding_time', NSS[u'pe']), unicode(self._cml_binding_time))
         return self._cml_binding_time
 
     def _reduce(self, check_operator=True):
@@ -4967,8 +4944,7 @@ class mathml_apply(Colourable, mathml_constructor, mathml_units_mixin):
         # Check to see if this operator requires a special
         # reduction strategy
         op = self.operator()
-        DEBUG('partial-evaluator', "Reducing", op.localName,
-              getattr(self, u'id', ''))
+        DEBUG('partial-evaluator', "Reducing", op.localName, getattr(self, u'id', ''))
         if check_operator and hasattr(op, '_reduce'):
             op._reduce()
         else:
@@ -5032,7 +5008,6 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
         super(mathml_piecewise, self).__init__()
         self._cml_units = None
         self._cml_binding_time = None
-        return
 
     def tree_complexity(self, **kw):
         """
@@ -5059,8 +5034,7 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
         if alg: ac, piece_dicts = {}, []
         else: ac = 0
         piece_acs = []
-        count_lts = hasattr(self.rootNode, 'num_lookup_tables') and \
-                    kw.get('count_tables', True) and not alg
+        count_lts = hasattr(self.rootNode, 'num_lookup_tables') and kw.get('count_tables', True) and not alg
         if count_lts:
             # Alternative method of counting number of lookup tables;
             # handles the Zhang model better!
@@ -5076,8 +5050,7 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
             piece_ac = self._tree_complexity(child_i(piece, 1), **kw)
             if alg:
                 piece_dicts.append(piece_ac)
-                piece_acs.append(self._tree_complexity(child_i(piece, 1),
-                                                       count_tables=False))
+                piece_acs.append(self._tree_complexity(child_i(piece, 1), count_tables=False))
             else:
                 piece_acs.append(piece_ac)
             if count_lts:
@@ -5089,8 +5062,7 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
             if alg:
                 piece_dicts.append(ow_ac)
                 piece_acs.append(
-                    self._tree_complexity(child_i(self.otherwise, 1),
-                                          count_tables=False))
+                    self._tree_complexity(child_i(self.otherwise, 1), count_tables=False))
             else:
                 piece_acs.append(ow_ac)
             if count_lts:
@@ -5122,9 +5094,7 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
             self._set_element_in_units(child_i(piece, 1), units, no_act)
             self._set_element_in_units(child_i(piece, 2), boolean, no_act)
         if hasattr(self, u'otherwise'):
-            self._set_element_in_units(child_i(self.otherwise, 1), units,
-                                       no_act)
-        return
+            self._set_element_in_units(child_i(self.otherwise, 1), units, no_act)
 
     def get_units(self):
         """Recursively check this expression for dimensional consistency.
@@ -5357,7 +5327,6 @@ class mathml_piecewise(mathml_constructor, mathml_units_mixin):
             self.replace_child(self, new_elt, self.xml_parent)
             # May need to reduce our replacement
             self._reduce_elt(new_elt)
-        return
 
     @staticmethod
     def create_new(elt, pieces, otherwise=None):
@@ -5392,9 +5361,6 @@ class mathml_lambda(mathml_constructor):
     Note that we don't support lambda occuring in CellML models.  However, it is used
     for defining special units conversion rules using the protocol syntax.
     """
-    def __init__(self):
-        super(mathml_lambda, self).__init__()
-    
     @staticmethod
     def create_new(elt, bound_var_names, body_expr):
         """Create a new lambda from the sequence of bvar names and expression."""
@@ -5410,10 +5376,6 @@ class mathml_lambda(mathml_constructor):
 
 class mathml_operator(mathml):
     """Base class for MathML operator elements."""
-    def __init__(self):
-        super(mathml_operator, self).__init__()
-        return
-
     def wrong_number_of_operands(self, found, wanted):
         """Raise an EvaluationError due to wrong operand count.
 
@@ -5427,10 +5389,6 @@ class mathml_operator(mathml):
 
 class mathml_diff(mathml_operator):
     """Class representing the diff element, containing some useful methods."""
-    def __init__(self):
-        super(mathml_diff, self).__init__()
-        return
-
     @property
     def independent_variable(self):
         """
@@ -5495,7 +5453,6 @@ class mathml_diff(mathml_operator):
                                          level=logging.WARNING_TRANSLATE_ERROR)
             # TODO: Add to list of independent vars?
             indep._set_type(VarTypes.Free)
-        return
 
     def _get_binding_time(self):
         """Return the binding time of the enclosing <apply> element.
@@ -5528,8 +5485,7 @@ class mathml_diff(mathml_operator):
             for ci in [app.ci, app.bvar.ci]:
                 ci._set_variable_obj(ci.variable.get_source_variable(recurse=True))
                 ci._rename()
-        return
-    
+
     @staticmethod
     def create_new(elt, bvar, state_var, rhs):
         """Construct an ODE expression: d(state_var)/d(bvar) = rhs."""
@@ -5540,9 +5496,6 @@ class mathml_diff(mathml_operator):
         return ode
 
 class reduce_commutative_nary(object):
-    def __init__(self, *args, **kwargs):
-        super(reduce_commutative_nary, self).__init__(*args, **kwargs)
-        
     def _reduce(self):
         """Reduce this expression by evaluating its static parts.
 
@@ -5571,7 +5524,6 @@ class reduce_commutative_nary(object):
                 new_expr._reduce()
             # Now reduce all our operands as normal
             app._reduce(check_operator=False)
-        return
 
 class mathml_plus(mathml_operator, mathml_units_mixin_set_operands, reduce_commutative_nary):
     """Class representing the MathML <plus> operator."""
@@ -5590,10 +5542,6 @@ class mathml_plus(mathml_operator, mathml_units_mixin_set_operands, reduce_commu
 
 class mathml_minus(mathml_operator, mathml_units_mixin_set_operands):
     """Class representing the MathML <minus> operator."""
-    def __init__(self):
-        super(mathml_minus, self).__init__()
-        return
-
     def evaluate(self):
         """Evaluate the enclosing <apply> element.
 
@@ -5612,10 +5560,6 @@ class mathml_minus(mathml_operator, mathml_units_mixin_set_operands):
 
 class mathml_times(mathml_operator, mathml_units_mixin_choose_nearest, reduce_commutative_nary):
     """Class representing the MathML <times> operator."""
-    def __init__(self):
-        super(mathml_times, self).__init__()
-        return
-
     def evaluate(self):
         """
         Evaluate by taking the product of the operands of the enclosing <apply>.
@@ -5629,10 +5573,6 @@ class mathml_times(mathml_operator, mathml_units_mixin_choose_nearest, reduce_co
 
 class mathml_divide(mathml_operator, mathml_units_mixin_choose_nearest):
     """Class representing the MathML <divide> operator."""
-    def __init__(self):
-        super(mathml_divide, self).__init__()
-        return
-
     def evaluate(self):
         """Evaluate by dividing the 2 operands of the enclosing <apply>."""
         app = self.xml_parent
@@ -5678,14 +5618,9 @@ class mathml_divide(mathml_operator, mathml_units_mixin_choose_nearest):
             else:
                 # Evaluate this expression as normal
                 app._reduce(check_operator=False)
-        return
 
 class mathml_exp(mathml_operator, mathml_units_mixin_set_operands):
     """Class representing the MathML <exp> operator."""
-    def __init__(self):
-        super(mathml_exp, self).__init__()
-        return
-
     def evaluate(self):
         """Return e to the power of the single operand."""
         app = self.xml_parent
@@ -5730,10 +5665,6 @@ class mathml_abs(mathml_operator, mathml_units_mixin_set_operands):
 
 class mathml_power(mathml_operator, mathml_units_mixin):
     """Class representing the MathML <power> operator."""
-    def __init__(self):
-        super(mathml_power, self).__init__()
-        return
-
     def _set_in_units(self, units, no_act=False):
         """Set the units of the application of this operator.
 
@@ -5802,10 +5733,6 @@ class mathml_power(mathml_operator, mathml_units_mixin):
 
 class mathml_root(mathml_operator, mathml_units_mixin):
     """Class representing the MathML <root> operator."""
-    def __init__(self):
-        super(mathml_root, self).__init__()
-        return
-
     def _set_in_units(self, units, no_act=False):
         """Set the units of the application of this operator.
 
@@ -5830,7 +5757,6 @@ class mathml_root(mathml_operator, mathml_units_mixin):
         for src_units_set, src_units in defn_units_set._get_sources(defn_units):
             expr = src_units_set.get_expression()
             self._set_element_in_units(expr, src_units, no_act)
-        return
 
     def evaluate(self):
         """
@@ -5849,10 +5775,6 @@ class mathml_root(mathml_operator, mathml_units_mixin):
 
 class mathml_and(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <and> operator."""
-    def __init__(self):
-        super(mathml_and, self).__init__()
-        return
-
     def evaluate(self):
         """Return the logical conjunction of the operands.
 
@@ -5892,10 +5814,6 @@ class mathml_and(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_or(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <or> operator."""
-    def __init__(self):
-        super(mathml_or, self).__init__()
-        return
-
     def evaluate(self):
         """Return the logical disjunction of the operands.
 
@@ -5935,10 +5853,6 @@ class mathml_or(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_leq(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <leq> operator."""
-    def __init__(self):
-        super(mathml_leq, self).__init__()
-        return
-
     def evaluate(self):
         """
         Return True iff the value of the first operand is
@@ -5952,10 +5866,6 @@ class mathml_leq(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_lt(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <lt> operator."""
-    def __init__(self):
-        super(mathml_lt, self).__init__()
-        return
-
     def evaluate(self):
         """
         Return True iff the value of the first operand is
@@ -5969,10 +5879,6 @@ class mathml_lt(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_geq(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <geq> operator."""
-    def __init__(self):
-        super(mathml_geq, self).__init__()
-        return
-
     def evaluate(self):
         """
         Return True iff the value of the first operand is
@@ -5986,10 +5892,6 @@ class mathml_geq(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_gt(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <gt> operator."""
-    def __init__(self):
-        super(mathml_gt, self).__init__()
-        return
-
     def evaluate(self):
         """
         Return True iff the value of the first operand is
@@ -6003,10 +5905,6 @@ class mathml_gt(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_neq(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <neq> operator."""
-    def __init__(self):
-        super(mathml_neq, self).__init__()
-        return
-
     def evaluate(self):
         """Evaluate the enclosing <apply> element.
 
@@ -6021,10 +5919,6 @@ class mathml_neq(mathml_operator, mathml_units_mixin_equalise_operands):
 
 class mathml_eq(mathml_operator, mathml_units_mixin_equalise_operands):
     """Class representing the MathML <eq> operator."""
-    def __init__(self):
-        super(mathml_eq, self).__init__()
-        return
-
     def _is_top_level(self):
         """Return True iff the enclosing <apply> is a top-level expression."""
         return self.xml_parent.is_top_level()
@@ -6045,7 +5939,6 @@ class mathml_eq(mathml_operator, mathml_units_mixin_equalise_operands):
                 self.xml_parent._cml_units = units
         else:
             super(mathml_eq, self)._set_in_units(units, no_act)
-        return
 
     def evaluate(self):
         """Evaluate the enclosing <apply> element.
@@ -6127,7 +6020,6 @@ class mathml_eq(mathml_operator, mathml_units_mixin_equalise_operands):
             app._reduce_elt(rhs)
         else:
             app._reduce(check_operator=False)
-        return
 
     @property
     def rhs(self):
@@ -6165,24 +6057,14 @@ class mathml_rem(mathml_operator, mathml_units_mixin_set_operands):
 
 class mathml_logbase(mathml, mathml_units_mixin_container):
     """Class representing the MathML <logbase> element."""
-    def __init__(self):
-        super(mathml_logbase, self).__init__()
-        return
-
     def evaluate(self):
-        """Evaluate this element, by evaluating its child.
-        """
+        """Evaluate this element, by evaluating its child."""
         return self.eval(_child1(self))
 
 class mathml_degree(mathml, mathml_units_mixin_container):
     """Class representing the MathML <degree> element."""
-    def __init__(self):
-        super(mathml_degree, self).__init__()
-        return
-
     def evaluate(self):
-        """Evaluate this element, by evaluating its child.
-        """
+        """Evaluate this element, by evaluating its child."""
         return self.eval(_child1(self))
 
 class mathml_otherwise(mathml):

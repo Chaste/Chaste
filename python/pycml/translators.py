@@ -729,8 +729,7 @@ class CellMLTranslator(object):
             self.write(self.code_name(op.dependent_variable, ode=True))
         else:
             # Unrecognised operator
-            self.error(["Unsupported operator element " + str(op.localName)],
-                       xml=expr)
+            self.error(["Unsupported operator element " + str(op.localName)], xml=expr)
 
     def output_function(self, func_name, args, paren, reciprocal=False):
         """Output a function call with name func_name and arguments args.
@@ -3507,8 +3506,7 @@ class CellMLToMapleTranslator(CellMLTranslator):
         self.omit_constants = omit_constants
         self.compute_full_jacobian = compute_full_jacobian
         # Update some function names
-        self.function_map = {}
-        self.function_map.update(CellMLTranslator.function_map)
+        self.function_map = CellMLTranslator.function_map.copy()
         del self.function_map['power']
         self.function_map.update(
             {'abs': 'abs', 'ln': 'ln', 'not': 'not',
@@ -3519,11 +3517,9 @@ class CellMLToMapleTranslator(CellMLTranslator):
              'arcsinh': 'arcsinh', 'arccosh': 'arccosh', 'arctanh': 'arctanh',
              'arcsech': 'arcsech', 'arccsch': 'arccsch', 'arccoth': 'arccoth'})
         self.recip_trig = {}
-        self.nary_ops = {}
-        self.nary_ops.update(CellMLTranslator.nary_ops)
+        self.nary_ops = CellMLTranslator.nary_ops.copy()
         self.nary_ops.update({'and': 'and', 'or': 'or'})
-        self.binary_ops = {}
-        self.binary_ops.update(CellMLTranslator.binary_ops)
+        self.binary_ops = CellMLTranslator.binary_ops.copy()
         self.binary_ops.update({'xor': 'xor', 'eq': '=', 'neq': '<>',
                                 'power': '^'})
         self.special_roots = {}
@@ -4124,8 +4120,7 @@ class CellMLToMatlabTranslator(CellMLTranslator):
     def __init__(self, **kwargs):
         super(CellMLToMatlabTranslator, self).__init__(**kwargs)
         # Update some function, etc. names
-        self.function_map = {}
-        self.function_map.update(CellMLTranslator.function_map)
+        self.function_map = CellMLTranslator.function_map.copy()
         self.function_map.update(
             {'power': 'power', 'abs': 'abs',
              'xor': 'xor', 'not': '~', 'rem': 'rem',
@@ -4135,13 +4130,11 @@ class CellMLToMatlabTranslator(CellMLTranslator):
              'arcsech': 'asech', 'arccsch': 'acsch', 'arccoth': 'acoth'
              })
         self.recip_trig = {}
-        self.binary_ops = {}
-        self.binary_ops.update(CellMLTranslator.binary_ops)
+        self.binary_ops = CellMLTranslator.binary_ops.copy()
         del self.binary_ops['xor']
         self.binary_ops['neq'] = '~='
         self.binary_ops['divide'] = './'
-        self.nary_ops = {}
-        self.nary_ops.update(CellMLTranslator.nary_ops)
+        self.nary_ops = CellMLTranslator.nary_ops.copy()
         self.nary_ops['times'] = '.*'
         self.special_roots = {2: 'sqrt'}
 
