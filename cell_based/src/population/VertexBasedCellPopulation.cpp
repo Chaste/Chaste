@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "ChasteSyscalls.hpp"
 #include "IsNan.hpp"
-#include "ShortAxisDivisionRule.hpp"
+#include "ShortAxisVertexBasedDivisionRule.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -66,7 +66,7 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(MutableVertexMesh<DIM,
       mOutputCellRearrangementLocations(true)
 {
     mpMutableVertexMesh = static_cast<MutableVertexMesh<DIM, DIM>* >(&(this->mrMesh));
-    mpDivisionRule.reset(new ShortAxisDivisionRule<DIM>());
+    mpVertexBasedDivisionRule.reset(new ShortAxisVertexBasedDivisionRule<DIM>());
 
     // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
     std::list<CellPtr>::iterator it = this->mCells.begin();
@@ -515,9 +515,9 @@ void VertexBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& 
     *rParamsFile << "\t\t<OutputCellRearrangementLocations>" << mOutputCellRearrangementLocations << "</OutputCellRearrangementLocations>\n";
 
     // Add the division rule parameters
-    *rParamsFile << "\t\t<DivisionRule>\n";
-    mpDivisionRule->OutputCellDivisionRuleInfo(rParamsFile);
-    *rParamsFile << "\t\t</DivisionRule>\n";
+    *rParamsFile << "\t\t<VertexBasedDivisionRule>\n";
+    mpVertexBasedDivisionRule->OutputCellVertexBasedDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</VertexBasedDivisionRule>\n";
 
     // Call method on direct parent class
     AbstractOffLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
@@ -539,15 +539,15 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(un
 }
 
 template<unsigned DIM>
-boost::shared_ptr<AbstractCellDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetDivisionRule()
+boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > VertexBasedCellPopulation<DIM>::GetVertexBasedDivisionRule()
 {
-    return mpDivisionRule;
+    return mpVertexBasedDivisionRule;
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::SetDivisionRule(boost::shared_ptr<AbstractCellDivisionRule<DIM> > pDivisionRule)
+void VertexBasedCellPopulation<DIM>::SetVertexBasedDivisionRule(boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > pVertexBasedDivisionRule)
 {
-    mpDivisionRule = pDivisionRule;
+    mpVertexBasedDivisionRule = pVertexBasedDivisionRule;
 }
 
 template<unsigned DIM>

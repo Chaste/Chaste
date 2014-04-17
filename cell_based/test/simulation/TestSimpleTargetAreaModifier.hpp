@@ -63,7 +63,7 @@ class TestSimpleTargetAreaModifier : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestUpdateTargetAreasException() throw (Exception)
+    void TestSetupSolveException() throw (Exception)
     {
         // First set up SimulationTime (this is usually handled by a simulation object)
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -82,7 +82,7 @@ public:
         MeshBasedCellPopulation<2> population(*p_mesh, cells);
 
         // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
-        TS_ASSERT_THROWS_THIS(p_modifier->UpdateTargetAreas(population),
+        TS_ASSERT_THROWS_THIS(p_modifier->SetupSolve(population, "unused_argument"),
             "AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
         CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
 

@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "RandomDirectionDivisionRule.hpp"
+#include "RandomDirectionVertexBasedDivisionRule.hpp"
 
 template <unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> RandomDirectionDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
+c_vector<double, SPACE_DIM> RandomDirectionVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
@@ -48,10 +48,10 @@ c_vector<double, SPACE_DIM> RandomDirectionDivisionRule<SPACE_DIM>::CalculateCel
 }
 
 // Explicit instantiation
-template class RandomDirectionDivisionRule<1>;
-template class RandomDirectionDivisionRule<2>;
-template class RandomDirectionDivisionRule<3>;
+template class RandomDirectionVertexBasedDivisionRule<1>;
+template class RandomDirectionVertexBasedDivisionRule<2>;
+template class RandomDirectionVertexBasedDivisionRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)

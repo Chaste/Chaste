@@ -33,34 +33,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractCellDivisionRule.hpp"
+#include "ShortAxisVertexBasedDivisionRule.hpp"
 
-template<unsigned SPACE_DIM>
-AbstractCellDivisionRule<SPACE_DIM>::AbstractCellDivisionRule()
+template <unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> ShortAxisVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
+    CellPtr pParentCell,
+    VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-}
-
-template<unsigned SPACE_DIM>
-AbstractCellDivisionRule<SPACE_DIM>::~AbstractCellDivisionRule()
-{
-}
-
-template<unsigned SPACE_DIM>
-void AbstractCellDivisionRule<SPACE_DIM>::OutputCellDivisionRuleInfo(out_stream& rParamsFile)
-{
-    std::string cell_division_rule_type = GetIdentifier();
-
-    *rParamsFile << "\t\t\t<" << cell_division_rule_type << ">\n";
-    OutputCellDivisionRuleParameters(rParamsFile);
-    *rParamsFile << "\t\t\t</" << cell_division_rule_type << ">\n";
-}
-
-template<unsigned SPACE_DIM>
-void AbstractCellDivisionRule<SPACE_DIM>::OutputCellDivisionRuleParameters(out_stream& rParamsFile)
-{
+    unsigned elem_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
+    return rCellPopulation.rGetMesh().GetShortAxisOfElement(elem_index);
 }
 
 // Explicit instantiation
-template class AbstractCellDivisionRule<1>;
-template class AbstractCellDivisionRule<2>;
-template class AbstractCellDivisionRule<3>;
+template class ShortAxisVertexBasedDivisionRule<1>;
+template class ShortAxisVertexBasedDivisionRule<2>;
+template class ShortAxisVertexBasedDivisionRule<3>;
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShortAxisVertexBasedDivisionRule)

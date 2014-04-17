@@ -33,31 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTCELLDIVISIONRULE_HPP_
-#define ABSTRACTCELLDIVISIONRULE_HPP_
+#ifndef DIAGONALVERTEXBASEDDIVISIONRULE_HPP_
+#define DIAGONALVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-#include "Identifiable.hpp"
+#include <boost/serialization/base_object.hpp>
+#include "AbstractVertexBasedDivisionRule.hpp"
+
 #include "VertexBasedCellPopulation.hpp"
 
-// Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
+template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * An abstract cell division rule for use in vertex based simulations.
- *
- * The purpose of this class is to return a vector parallel to the new boundary
- * between the daughter cells.
- *
- * NOTE: When this is used in 3D we will want to return the vector perpendicular
- * to the new boundary plane. This will be the opposite to the current behaviour
- * in 2D.
+ * A division rule for vertex-based cell populations to generate a division vector
+ * in the direction (1,1).
  */
-template<unsigned SPACE_DIM>
-class AbstractCellDivisionRule : public Identifiable
+template <unsigned SPACE_DIM>
+class DiagonalVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -68,48 +64,33 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
+        archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
     }
 
-protected:
-    /**
-     * Output any parameters associated with the division rule.
-     * Currently empty since this class has no member variables. Should
-     * be overridden by any child classes that have parameters.
-     *
-     * @param rParamsFile  The stream of the parameter file
-     */
-    virtual void OutputCellDivisionRuleParameters(out_stream& rParamsFile);
-
 public:
+
     /**
      * Default constructor.
      */
-    AbstractCellDivisionRule();
+    DiagonalVertexBasedDivisionRule(){};
 
     /**
      * Empty destructor.
      */
-    virtual ~AbstractCellDivisionRule();
+    virtual ~DiagonalVertexBasedDivisionRule(){};
 
     /**
-     * Return the vector that will divide the two halves of the existing cell
-     * to form the boundary between parent and daughter cell.
+     * This function returns the diagonal division vector.
      *
-     * @param pParentCell  The existing cell
-     * @param rCellPopulation  The vertex-based cell population
+     * @param pParentCell  The cell to divide
+     * @param rCellPopulation  The Vertex cell population
      * @return the division vector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-                                                            VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
-
-    /**
-     * Output the name of the concrete class and call OutputCellDivisionRuleParameters().
-     *
-     * @param rParamsFile  The stream of the parameter file
-     */
-    void OutputCellDivisionRuleInfo(out_stream& rParamsFile);
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellDivisionRule)
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiagonalVertexBasedDivisionRule)
 
-#endif /*CELLDIVISIONRULEACTFORCE_HPP_*/
+#endif // DIAGONALVERTEXBASEDDIVISIONRULE_HPP_

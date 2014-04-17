@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
-#include "ShortAxisDivisionRule.hpp"
+#include "ShortAxisVertexBasedDivisionRule.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -322,7 +322,7 @@ public:
 
     void TestAddCellWithSimpleMesh() throw (Exception)
     {
-    	// This also tests the correct implementation of ShortAxisDivisionRule.
+    	// This also tests the correct implementation of ShortAxisVertexBasedDivisionRule.
         // Make some nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
@@ -389,7 +389,7 @@ public:
         p_temp_cell->SetCellProliferativeType(p_stem_type);
         p_temp_cell->SetBirthTime(-1);
 
-        boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
         c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
         TS_ASSERT_DELTA(short_axis[0], 0.0, 1e-9);
@@ -592,7 +592,7 @@ public:
 
         CellPtr p_new_cell = cell_population.GetCellUsingLocationIndex(4)->Divide();
 
-        c_vector<double, 2> new_location = cell_population.GetDivisionRule()
+        c_vector<double, 2> new_location = cell_population.GetVertexBasedDivisionRule()
                 ->CalculateCellDivisionVector(p_cell4, cell_population);
 
         // Add new cell to the cell population

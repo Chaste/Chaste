@@ -33,31 +33,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SHORTAXISDIVISIONRULE_HPP_
-#define SHORTAXISDIVISIONRULE_HPP_
+#ifndef ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_
+#define ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-#include "AbstractCellDivisionRule.hpp"
+#include "ClassIsAbstract.hpp"
+#include "Identifiable.hpp"
 #include "VertexBasedCellPopulation.hpp"
 
 // Forward declaration prevents circular include chain
-///\todo unnecessary?
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractCellDivisionRule;
 
 /**
- * A class to generate the short axis of a cell for Vertex-based cell
- * populations, to be used in cell division. This is the default rule that
- * is used in most of the vertex-based simulations.
+ * An abstract cell division rule for use in vertex-based simulations.
  *
- * The short axis is the eigenvector associated with the largest eigenvalue
- * of the moment of inertia of the cell's polygon.
+ * The purpose of this class is to return a vector parallel to the new boundary
+ * between the daughter cells.
+ *
+ * NOTE: When this is used in 3D we will want to return the vector perpendicular
+ * to the new boundary plane. This will be the opposite to the current behaviour
+ * in 2D.
  */
-template <unsigned SPACE_DIM>
-class ShortAxisDivisionRule  : public AbstractCellDivisionRule<SPACE_DIM>
+template<unsigned SPACE_DIM>
+class AbstractVertexBasedDivisionRule : public Identifiable
 {
 private:
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -68,39 +69,49 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellDivisionRule<SPACE_DIM> >(*this);
     }
+
+protected:
+
+/**
+     * Output any parameters associated with the division rule.
+     * Currently empty since this class has no member variables. Should
+     * be overridden by any child classes that have parameters.
+     *
+     * @param rParamsFile  The stream of the parameter file
+     */
+    virtual void OutputCellVertexBasedDivisionRuleParameters(out_stream& rParamsFile);
 
 public:
     /**
      * Default constructor.
      */
-    ShortAxisDivisionRule()
-    {
-    }
+    AbstractVertexBasedDivisionRule();
 
     /**
      * Empty destructor.
      */
-    virtual ~ShortAxisDivisionRule()
-    {
-    }
+    virtual ~AbstractVertexBasedDivisionRule();
 
     /**
-     * Overridden CalculateCellDivisionVector() method.
+     * Return the vector that will divide the two halves of the existing cell
+     * to form the boundary between parent and daughter cell.
      *
-     * Return the short axis of the existing cell, which will be used to
-     * form the boundary between the daughter cells.
-     *
-     * @param pParentCell  The existing cell
+     * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-                                  VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
+
+    /**
+     * Output the name of the concrete class and call OutputCellVertexBasedDivisionRuleParameters().
+     *
+     * @param rParamsFile  The stream of the parameter file
+     */
+    void OutputCellVertexBasedDivisionRuleInfo(out_stream& rParamsFile);
 };
 
-#include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShortAxisDivisionRule)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractVertexBasedDivisionRule)
 
-#endif // SHORTAXISDIVISIONRULE_HPP_
+#endif /*ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_*/

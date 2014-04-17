@@ -46,23 +46,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-#include "AbstractCellDivisionRule.hpp"
-#include "DiagonalDivisionRule.hpp"
-#include "RandomDirectionDivisionRule.hpp"
+#include "AbstractVertexBasedDivisionRule.hpp"
+#include "DiagonalVertexBasedDivisionRule.hpp"
+#include "RandomDirectionVertexBasedDivisionRule.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestDivisionRules : public AbstractCellBasedTestSuite
+class TestVertexBasedDivisionRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestAddCellwithDiagonalDivisionRule()
+    void TestAddCellwithDiagonalVertexBasedDivisionRule()
     {
     	/**
-    	 * In this test we basically test that the AbstractDivisionRule is implemented and joined with the population
-    	 * correctly. We make a new DiagonalDivisionRule, divide a cell with it and check that the new vertices
+    	 * In this test we basically test that the AbstractVertexBasedDivisionRule is implemented and joined with the population
+    	 * correctly. We make a new DiagonalVertexBasedDivisionRule, divide a cell with it and check that the new vertices
     	 * are in the correct position.
     	 */
         // Make some nodes
@@ -109,11 +109,11 @@ public:
 
         // Set the division rule for our population to be the diagonal division rule
 
-        boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule_to_set(new DiagonalDivisionRule<2>());
-        cell_population.SetDivisionRule(p_division_rule_to_set);
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new DiagonalVertexBasedDivisionRule<2>());
+        cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population and add new cell by dividing element 0 along diagonal axis
-        boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
+        boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
         c_vector<double, 2> diagonal_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
         // Check that the axis is pointing in direction (1,1)
@@ -129,10 +129,10 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(old_num_nodes+1)->rGetLocation()[1], -1.0, 1e-12);
     }
 
-    void TestRandomDirectionDivisionRule()
+    void TestRandomDirectionVertexBasedDivisionRule()
     {
     	/**
-    	 * This tests the RandomDirectionDivisionRule. We first create a vertex based cell population and check whether we can
+    	 * This tests the RandomDirectionVertexBasedDivisionRule. We first create a vertex based cell population and check whether we can
     	 * give the division rule to the population and get it back. Then we create 10000 division vectors and check that they point
     	 * uniformly in random directions.
     	 */
@@ -171,18 +171,18 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
     	// Set the division rule for our population to be the random direction division rule
-    	boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule_to_set(new RandomDirectionDivisionRule<2>());
-    	cell_population.SetDivisionRule(p_division_rule_to_set);
+    	boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule_to_set(new RandomDirectionVertexBasedDivisionRule<2>());
+    	cell_population.SetVertexBasedDivisionRule(p_division_rule_to_set);
 
     	// Get the division rule back from the population
-    	boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule = cell_population.GetDivisionRule();
+    	boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule = cell_population.GetVertexBasedDivisionRule();
 
     	// Get 10000 division vectors, check each length, their mean and their variance.
     	c_vector<double, 2> average_axis = zero_vector<double>(2);
     	c_vector<double, 2> axis_variance = zero_vector<double>(2);
     	double average_angle = 0.0;
     	double angle_variance = 0.0;
-    	for(unsigned iteration = 0; iteration < 10000; iteration++)
+    	for (unsigned iteration = 0; iteration < 10000; iteration++)
     	{
     		c_vector<double, 2> random_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
     		TS_ASSERT_DELTA(norm_2(random_axis), 1.0,1e-6);
@@ -208,14 +208,14 @@ public:
     	TS_ASSERT_DELTA(angle_variance, M_PI*M_PI/12.0, 1e-2);
     }
 
-    void TestArchiveRandomDirectionDivisionRule() throw(Exception)
+    void TestArchiveRandomDirectionVertexBasedDivisionRule() throw(Exception)
     {
     	FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
     	std::string archive_file = "division_rules.arch";
 
     	// Create data structures to store variables to test for equality here
     	{
-    		boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule(new RandomDirectionDivisionRule<2>());
+    		boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new RandomDirectionVertexBasedDivisionRule<2>());
 
     		// Create output archive
     		ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -229,7 +229,7 @@ public:
     	}
 
     	{
-    		boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule;
+    		boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
     		// Create an input archive
     		ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -242,18 +242,18 @@ public:
     		// If necessary you can use static_cast<ConcreteClass*>(p_abstract_class_2)
     		// (if your abstract class doesn't contain the necessary variables and methods)
     		// Check that we have got back the right kind of division rule.
-    		TS_ASSERT(dynamic_cast <RandomDirectionDivisionRule<2>* > (p_division_rule.get()));
+    		TS_ASSERT(dynamic_cast <RandomDirectionVertexBasedDivisionRule<2>* > (p_division_rule.get()));
     	}
     }
 
-    void TestArchiveDiagonalDivisionRule() throw(Exception)
+    void TestArchiveDiagonalVertexBasedDivisionRule() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "division_rules.arch";
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule(new DiagonalDivisionRule<2>());
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule(new DiagonalVertexBasedDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -267,7 +267,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractCellDivisionRule<2> > p_division_rule;
+            boost::shared_ptr<AbstractVertexBasedDivisionRule<2> > p_division_rule;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -280,7 +280,7 @@ public:
             // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class_2)
             // (if your abstract class doesn't contain the necessary variables and methods)
             // Check that we have got back the right kind of division rule.
-            TS_ASSERT(dynamic_cast <DiagonalDivisionRule<2>* > (p_division_rule.get()));
+            TS_ASSERT(dynamic_cast <DiagonalVertexBasedDivisionRule<2>* > (p_division_rule.get()));
         }
     }
 

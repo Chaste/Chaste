@@ -56,6 +56,11 @@ void AbstractTargetAreaModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulati
 template<unsigned DIM>
 void AbstractTargetAreaModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
+    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
+    {
+        EXCEPTION("AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
+    }
+
     /*
      * We must update CellData in SetupSolve(), otherwise it will not have been
      * fully initialised by the time we enter the main time loop.
@@ -66,11 +71,7 @@ void AbstractTargetAreaModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>
 template<unsigned DIM>
 void AbstractTargetAreaModifier<DIM>::UpdateTargetAreas(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    ///\todo (#2489) maybe move this to SetupSolve() to avoid repeated dynamic casting
-    if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
-    {
-        EXCEPTION("AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
-    }
+    // Assume that SetupSolve() has already been called, so we must be using a VertexBasedCellPopulation
 
     // Loop over the list of cells, rather than using the population iterator, so as to include dead cells
     for (std::list<CellPtr>::iterator cell_iter = rCellPopulation.rGetCells().begin();

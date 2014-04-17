@@ -33,24 +33,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef RANDOMDIRECTIONDIVISIONRULE_HPP_
-#define RANDOMDIRECTIONDIVISIONRULE_HPP_
+#ifndef SHORTAXISVERTEXBASEDDIVISIONRULE_HPP_
+#define SHORTAXISVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractCellDivisionRule.hpp"
+#include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "RandomNumberGenerator.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractCellDivisionRule;
+template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit lengths that points in a random direction.
+ * A class to generate the short axis of a cell for vertex-based cell
+ * populations, to be used in cell division. This is the default rule that
+ * is used in most of the vertex-based simulations.
+ *
+ * The short axis is the eigenvector associated with the largest eigenvalue
+ * of the moment of inertia of the cell's polygon.
  */
 template <unsigned SPACE_DIM>
-class RandomDirectionDivisionRule  : public AbstractCellDivisionRule<SPACE_DIM>
+class ShortAxisVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:
     friend class boost::serialization::access;
@@ -63,38 +67,39 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellDivisionRule<SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
     }
 
 public:
     /**
      * Default constructor.
      */
-    RandomDirectionDivisionRule()
+    ShortAxisVertexBasedDivisionRule()
     {
     }
 
     /**
      * Empty destructor.
      */
-    virtual ~RandomDirectionDivisionRule()
+    virtual ~ShortAxisVertexBasedDivisionRule()
     {
     }
 
     /**
      * Overridden CalculateCellDivisionVector() method.
      *
-     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
+     * Return the short axis of the existing cell, which will be used to
+     * form the boundary between the daughter cells.
      *
-     * @param pParentCell  The existing cell
+     * @param pParentCell  The cell to divide
      * @param rCellPopulation  The vertex-based cell population
      * @return the division vector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-                                  VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(ShortAxisVertexBasedDivisionRule)
 
-#endif // RANDOMDIRECTIONDIVISIONRULE_HPP_
+#endif // SHORTAXISVERTEXBASEDDIVISIONRULE_HPP_

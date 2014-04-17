@@ -33,46 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DIAGONALDIVISIONRULE_HPP_
-#define DIAGONALDIVISIONRULE_HPP_
+#ifndef RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
+#define RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractCellDivisionRule.hpp"
-
+#include "AbstractVertexBasedDivisionRule.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "RandomNumberGenerator.hpp"
 
+// Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
-template<unsigned SPACE_DIM> class AbstractCellDivisionRule;
+template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A division rule for Vertex-based cell populations to generate a division vector
- * in direction (1,1).
+ * A class to generate a division vector of unit lengths that points in a random direction.
  */
 template <unsigned SPACE_DIM>
-class DiagonalDivisionRule  : public AbstractCellDivisionRule<SPACE_DIM>
+class RandomDirectionVertexBasedDivisionRule  : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
-public:
-    /**
-     * Default Constructor.
-     */
-    DiagonalDivisionRule(){};
-
-    /**
-     * Empty destructor.
-     */
-    virtual ~DiagonalDivisionRule(){};
-
-    /**
-     * This function returns the diagonal division vector.
-     *
-     * @param pParentCell  The existing vertex cell
-     * @param rCellPopulation  The Vertex cell population
-     * @return the division vector.
-     */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-                                                            VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
-
 private:
     friend class boost::serialization::access;
     /**
@@ -84,11 +63,38 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellDivisionRule<SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractVertexBasedDivisionRule<SPACE_DIM> >(*this);
     }
+
+public:
+    /**
+     * Default constructor.
+     */
+    RandomDirectionVertexBasedDivisionRule()
+    {
+    }
+
+    /**
+     * Empty destructor.
+     */
+    virtual ~RandomDirectionVertexBasedDivisionRule()
+    {
+    }
+
+    /**
+     * Overridden CalculateCellDivisionVector() method.
+     *
+     * Return a unit vector in a random direction, i.e the arguments are redundant for this division rule.
+     *
+     * @param pParentCell  The cell to divide
+     * @param rCellPopulation  The vertex-based cell population
+     * @return the division vector.
+     */
+    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiagonalDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(RandomDirectionVertexBasedDivisionRule)
 
-#endif // DIAGONALDIVISIONRULE_HPP_
+#endif // RANDOMDIRECTIONVERTEXBASEDDIVISIONRULE_HPP_

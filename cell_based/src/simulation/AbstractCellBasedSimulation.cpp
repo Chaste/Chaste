@@ -113,16 +113,14 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
          ++cell_iter)
     {
         // Check if this cell is ready to divide
-        if (cell_iter->GetAge() > 0.0)
+        double cell_age = cell_iter->GetAge();
+        if (cell_age > 0.0)
         {
             if (cell_iter->ReadyToDivide())
             {
                 // Check if there is room into which the cell may divide
                 if (mrCellPopulation.IsRoomToDivide(*cell_iter))
                 {
-                    // Store age before division
-                    double cell_age = cell_iter->GetAge();
-
                     // Create a new cell
                     CellPtr p_new_cell = cell_iter->Divide();
 

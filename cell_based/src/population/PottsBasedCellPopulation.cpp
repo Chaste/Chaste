@@ -327,7 +327,6 @@ void PottsBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
 }
 
-
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
 {

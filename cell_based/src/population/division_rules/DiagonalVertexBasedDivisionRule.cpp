@@ -33,27 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DiagonalDivisionRule.hpp"
+#include "DiagonalVertexBasedDivisionRule.hpp"
 
 template <unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> DiagonalDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(CellPtr pParentCell,
-                                                                               VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+c_vector<double, SPACE_DIM> DiagonalVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
+    CellPtr pParentCell,
+    VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
     c_vector<double, SPACE_DIM> diagonal_axis;
     diagonal_axis[0] = 1;
     diagonal_axis[1] = 1;
 
-    //will return some nonsense if SPACE_DIM is not 2.
+    // Note that this will return some nonsense if SPACE_DIM is not 2.
     return diagonal_axis;
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-template class DiagonalDivisionRule<1>;
-template class DiagonalDivisionRule<2>;
-template class DiagonalDivisionRule<3>;
+template class DiagonalVertexBasedDivisionRule<1>;
+template class DiagonalVertexBasedDivisionRule<2>;
+template class DiagonalVertexBasedDivisionRule<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiagonalDivisionRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiagonalVertexBasedDivisionRule)
