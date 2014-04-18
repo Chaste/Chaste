@@ -46,10 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GetCurrentWorkingDirectory.hpp"
 #include "BoostFilesystem.hpp"
 #include "IsNan.hpp"
+
 /**
  * Test for a strange 'feature' of Debian sarge systems, where the
  * current working directory changes on PETSc initialisation.  There
- * is now code in PetscSetupAndFinalize.hpp to work around this.
+ * is now code in PetscSetupUtils::CommonSetup() to work around this.
  */
 class TestCwd : public CxxTest::TestSuite
 {
