@@ -548,10 +548,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
     std::stringstream time;
     time << num_timesteps;
 
-    unsigned num_cells = GetNumNodes();
+    unsigned num_cells_from_mesh = GetNumNodes();
     if (!mWriteVtkAsPoints && (mpVoronoiTessellation != NULL))
     {
-        num_cells = mpVoronoiTessellation->GetNumElements();
+        num_cells_from_mesh = mpVoronoiTessellation->GetNumElements();
     }
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
@@ -561,7 +561,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
     std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
-        std::vector<double> cell_data_var(num_cells);
+        std::vector<double> cell_data_var(num_cells_from_mesh);
         cell_data.push_back(cell_data_var);
     }
 
@@ -643,7 +643,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
     {
         // Create mesh writer for VTK output
         VertexMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(rDirectory, "results", false);
-        std::vector<double> cell_volumes(num_cells);
+        std::vector<double> cell_volumes(num_cells_from_mesh);
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
