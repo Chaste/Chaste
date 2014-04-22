@@ -64,8 +64,8 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     mpModel->SetMinimalReset(true);
 
     const unsigned num_paces_to_analyse = (mTwoPaceScan) ? 2u : 1u;
-    const unsigned max_evaluations = (unsigned)(mMaxNumPaces/num_paces_to_analyse); // Only allow 10000 paces at the moment.
-    for (unsigned i=0; i<max_evaluations; i++)
+
+    for (unsigned i=0; i<mMaxNumPaces; i=i+num_paces_to_analyse)
     {
         // Look at two paces in the hope of detecting alternans and still saying we're steady-ish.
         mpModel->Solve((pacing_cycle_length)*(double)(i), (pacing_cycle_length)*(double)(i+num_paces_to_analyse), maximum_time_step);

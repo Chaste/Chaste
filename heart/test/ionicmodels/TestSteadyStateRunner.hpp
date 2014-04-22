@@ -115,7 +115,7 @@ public:
         result = steady_runner.RunToSteadyState();
 
         TS_ASSERT_EQUALS(result,true);
-        // Your mileage may vary. 32-bit machine, default build gives 520 evaluations.
+        // Your mileage may vary. 32-bit machine, default build gives 520 evaluations, 484 on recent 64-bit CVODE.
         TS_ASSERT_LESS_THAN(steady_runner.GetNumEvaluations(),550u);
 
         // For coverage
