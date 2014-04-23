@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTDELTANOTCHOFFLATTICESIMULATION_HPP_
-#define TESTDELTANOTCHOFFLATTICESIMULATION_HPP_
+#ifndef TESTDELTANOTCHMODIFIER_HPP_
+#define TESTDELTANOTCHMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-class TestDeltaNotchOffLatticeSimulation : public AbstractCellBasedTestSuite
+class TestDeltaNotchModifier : public AbstractCellBasedTestSuite
 {
 private:
     double mLastStartTime;
@@ -550,4 +550,4 @@ public:
     }
 };
 
-#endif /*TESTDELTANOTCHOFFLATTICESIMULATION_HPP_*/
+#endif /*TESTDELTANOTCHMODIFIER_HPP_*/

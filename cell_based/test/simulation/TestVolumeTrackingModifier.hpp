@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTVOLUMETRACKEDOFFLATTICESIMULATION_HPP_
-#define TESTVOLUMETRACKEDOFFLATTICESIMULATION_HPP_
+#ifndef TESTVOLUMETRACKINGMODIFIER_HPP_
+#define TESTVOLUMETRACKINGMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -72,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-class TestVolumeTrackedOffLatticeSimulation : public AbstractCellBasedTestSuite
+class TestVolumeTrackingModifier : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -464,4 +464,4 @@ public:
     }
 };
 
-#endif /*TESTVOLUMETRACKEDOFFLATTICESIMULATION_HPP_*/
+#endif /*TESTVOLUMETRACKINGMODIFIER_HPP_*/
