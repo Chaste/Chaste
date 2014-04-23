@@ -95,7 +95,7 @@ public:
     void TestArchiveCellMutationState() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mutation.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_mutation_state.arch";
 
         // Archive a mutation state
         {

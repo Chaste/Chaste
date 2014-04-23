@@ -201,7 +201,7 @@ public:
          * mutation state, as follows (further details on how to implement and
          * test archiving can be found at ChasteGuides/BoostSerialization).  */
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mutation.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "p53_mutation.arch";
 
         {
             AbstractCellProperty* const p_const_state = new P53GainOfFunctionCellMutationState();

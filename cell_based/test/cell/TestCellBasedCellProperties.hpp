@@ -82,7 +82,7 @@ public:
          */
 
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "mutation.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_id.arch";
 
         // Archive Cell ID
         {
