@@ -50,7 +50,7 @@ population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 simulation/TestCellBasedPdeSolver.hpp
-simulation/TestDeltaNotchOffLatticeSimulation.hpp
+simulation/TestDeltaNotchModifier.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
 simulation/TestOffLatticeSimulationWithNodeBasedCellPopulation.hpp
