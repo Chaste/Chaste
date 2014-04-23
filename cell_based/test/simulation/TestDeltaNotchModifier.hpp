@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -405,19 +406,20 @@ public:
         TS_ASSERT_DELTA(mean_delta, 0.9921, 1e-04);
     }
 
-    void TestUpdateAtEndOfTimeStepMeshBased() throw (Exception)
+    void TestUpdateAtEndOfTimeStepMeshBasedWithGhostes() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
         // Create a 2D honeycomb mesh
-        HoneycombMeshGenerator generator(2, 2, 0);
+        HoneycombMeshGenerator generator(2, 2, 2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();//**Changed**//
 
         // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<location_indices.size(); i++)
         {
             DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
             p_model->SetDimension(2);
@@ -430,12 +432,11 @@ public:
         }
 
         // Create cell population
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<NodeVelocityWriter>();
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create and configure cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep");
+        simulator.SetOutputDirectory("TestDeltaNotchMeshBasedWithGhostNodesUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
 
         // Add Delta-Notch tracking modifier
@@ -450,11 +451,6 @@ public:
         // Run simulation
 //        TS_ASSERT_THROWS_NOTHING(simulator.Solve());
         simulator.Solve();
-
-        // Test that the node velocities file exists
-        OutputFileHandler output_file_handler("TestDeltaNotchMeshBasedUpdateAtEndOfTimeStep", false);
-        FileFinder generated = output_file_handler.FindFile("results_from_time_0/nodevelocities.dat");
-        TS_ASSERT(generated.Exists());
 
         // Check levels in cell 0
         CellPtr cell0 = cell_population.rGetCells().front();

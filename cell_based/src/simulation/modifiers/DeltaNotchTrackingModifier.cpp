@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
 
@@ -97,7 +98,29 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
 
         // Get the set of neighbouring location indices
         std::set<unsigned> neighbour_indices;
-        if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation))
+
+        if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
+        {
+        	MeshBasedCellPopulationWithGhostNodes<DIM> * p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
+
+        	neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
+
+        	// Remove ghost nodes from the neighbour indices
+            for(std::set<unsigned>::iterator iter = neighbour_indices.begin();
+					iter != neighbour_indices.end();)
+			{
+			   if(p_cell_population->IsGhostNode(*iter))
+			   {
+				   neighbour_indices.erase(iter++);
+			   }
+			   else
+			   {
+				  ++iter;
+			   }
+			}
+
+        }
+        else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation))
         {
             neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
         }
