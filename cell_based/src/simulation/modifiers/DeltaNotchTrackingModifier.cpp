@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
 
 template<unsigned DIM>
@@ -103,6 +104,10 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation))
         {
             neighbour_indices = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetNeighbouringElementIndices(index);
+        }
+        else if(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+        {
+            neighbour_indices = static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetNeighbouringElementIndices(index);
         }
         else
         {

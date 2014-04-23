@@ -51,12 +51,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "PottsMeshGenerator.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "OnLatticeSimulation.hpp"
 #include "DeltaNotchTrackingModifier.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "NodeVelocityWriter.hpp"
+#include "CellIdWriter.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -461,6 +465,56 @@ public:
         double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
+
+    void TestUpdateAtEndOfTimeStepPottsBased() throw (Exception)
+	{
+		EXIT_IF_PARALLEL;
+
+		// Create a simple 2D PottsMesh
+		PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		// Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+		std::vector<CellPtr> cells;
+		MAKE_PTR(WildTypeCellMutationState, p_state);
+		MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+		for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
+		{
+			DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
+			p_model->SetDimension(2);
+
+			CellPtr p_cell(new Cell(p_state, p_model));
+			p_cell->SetCellProliferativeType(p_diff_type);
+			double birth_time = 0.0;
+			p_cell->SetBirthTime(birth_time);
+			cells.push_back(p_cell);
+		}
+
+		// Create cell population
+		PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+		cell_population.AddCellWriter<CellIdWriter>();
+
+		// Create and configure cell-based simulation
+		OnLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestDeltaNotchPottsBasedUpdateAtEndOfTimeStep");
+		simulator.SetEndTime(0.01);
+
+		// Add Delta-Notch tracking modifier
+		MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+		simulator.AddSimulationModifier(p_modifier);
+
+		// Run simulation
+		simulator.Solve();
+
+		// Check levels in cell 0
+		CellPtr cell0 = cell_population.rGetCells().front();
+		double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+		TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
+		double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+		TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
+		double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+		TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
+	}
 
     void TestArchiving() throw (Exception)
     {
