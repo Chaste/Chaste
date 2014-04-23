@@ -322,6 +322,15 @@ public:
      */
     unsigned AddElement(PottsElement<DIM>* pNewElement);
 
+    /**
+     * Given an element, find a set containing the indices of its neighbouring elements.
+     *
+     * @param elementIndex global index of the element
+     * @return its neighbouring element indices
+     */
+    std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
+
+
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //
     //////////////////////////////////////////////////////////////////////

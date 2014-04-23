@@ -509,6 +509,51 @@ unsigned PottsMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement)
     return pNewElement->GetIndex();
 }
 
+
+
+template<unsigned DIM>
+std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elementIndex)
+{
+	// Get a pointer to this element
+    PottsElement<DIM>* p_element = this->GetElement(elementIndex);
+
+    // Create a set of neighbouring element indices
+    std::set<unsigned> neighbouring_element_indices;
+
+    // Loop over nodes owned by this element
+    for (unsigned local_index=0; local_index<p_element->GetNumNodes(); local_index++)
+    {
+        // Get a pointer to this node
+        Node<DIM>* p_node = p_element->GetNode(local_index);
+
+        // Find the indices of the elements owned by neighbours of this node
+
+        // Loop over neighbouring nodes. Only want Von Neuman neighbours  (i.e N,S,E,W) as need to share an edge
+		std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_node->GetIndex());
+
+ 	    // Iterate over these neighbouring nodes
+ 	    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+			   neighbour_iter != neighbouring_node_indices.end();
+			   ++neighbour_iter)
+ 	    {
+ 	    	std::set<unsigned> neighbouring_node_containing_elem_indices = this->GetNode(*neighbour_iter)->rGetContainingElementIndices();
+
+ 	    	assert(neighbouring_node_containing_elem_indices.size()<2); // Either in element or in medium
+
+ 	    	if (neighbouring_node_containing_elem_indices.size()==1) // Node is in an element
+ 	    	{
+ 	    		// Add this element to the neighbouring elements set
+ 	    		neighbouring_element_indices.insert(*(neighbouring_node_containing_elem_indices.begin()));
+ 	    	}
+ 	    }
+    }
+
+    // Lastly remove this element's index from the set of neighbouring element indices
+    neighbouring_element_indices.erase(elementIndex);
+
+    return neighbouring_element_indices;
+}
+
 template<unsigned DIM>
 void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
 {

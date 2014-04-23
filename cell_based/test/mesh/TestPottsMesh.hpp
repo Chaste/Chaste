@@ -185,6 +185,17 @@ public:
         TS_ASSERT_DELTA(vector[0], 1.0, 1e-12);
         TS_ASSERT_DELTA(vector[1], 0.0, 1e-12);
 
+        // Test GetNeighbouringElementIndices Method
+        std::set<unsigned> neighbouring_elements = basic_potts_mesh.GetNeighbouringElementIndices(0);
+        std::set<unsigned> temp_list3;
+        temp_list3.insert(1u);
+        TS_ASSERT_EQUALS(neighbouring_elements, temp_list3);
+
+        neighbouring_elements = basic_potts_mesh.GetNeighbouringElementIndices(1);
+        std::set<unsigned> temp_list4;
+        temp_list4.insert(0u);
+        TS_ASSERT_EQUALS(neighbouring_elements, temp_list4);
+
         // Coverage
         TS_ASSERT_EQUALS(basic_potts_mesh.SolveNodeMapping(0), 0u);
         TS_ASSERT_EQUALS(basic_potts_mesh.SolveElementMapping(0), 0u);
