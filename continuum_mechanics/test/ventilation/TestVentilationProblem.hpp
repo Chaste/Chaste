@@ -498,18 +498,23 @@ public:
         bool dynamic = false;
         problem.SetDynamicResistance(dynamic);
         problem.Solve();
+        std::vector<double> flux, pressure;
+        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
+        double top_radius = r_mesh.GetNode(0)->rGetNodeAttributes()[0];
+        TS_ASSERT_DELTA(top_radius, 8.0517, 1e-4); //mm
+        double top_reynolds_number = fabs( 2.0 * problem.GetDensity() * flux[0] / (problem.GetViscosity() * M_PI * top_radius) );
         if (dynamic)
         {
             // Pedley
             TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.24606e5, 1.0);
+            TS_ASSERT_DELTA(top_reynolds_number, 4505, 1.0);
         }
         else
         {
             // Poiseuille
             TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.975182e6, 1.0);
+            TS_ASSERT_DELTA(top_reynolds_number, 49591, 1.0);
         }
-        std::vector<double> flux, pressure;
-        problem.GetSolutionAsFluxesAndPressures(flux, pressure);
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "patient_data");
 #endif
@@ -524,13 +529,14 @@ public:
         problem_pedley.SetDynamicResistance(true);
         problem_pedley.SetConstantInflowPressures(0.0);
 
-        for (unsigned pressure = 0 ; pressure<20; pressure+=1)
+        for (unsigned pressure_step = 0 ; pressure_step<20; pressure_step+=1)
         {
-            problem_poiseuille.SetOutflowPressure((double) pressure);
+            double pressure = pressure_step / 10.0;
+            problem_poiseuille.SetOutflowPressure(pressure);
             problem_poiseuille.Solve();
             double flux_poiseuille = problem_poiseuille.GetFluxAtOutflow();
 
-            problem_pedley.SetOutflowPressure((double) pressure);
+            problem_pedley.SetOutflowPressure(pressure);
             problem_pedley.Solve();
             double flux_pedley = problem_pedley.GetFluxAtOutflow();
             std::cout<<pressure<<"\t"<<flux_poiseuille<<"\t"<<flux_pedley<<"\n";
