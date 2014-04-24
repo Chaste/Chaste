@@ -493,7 +493,8 @@ public:
         // Create and configure cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestDeltaNotchPottsBasedUpdateAtEndOfTimeStep");
-        simulator.SetEndTime(0.1);
+        simulator.SetDt(0.01);
+        simulator.SetEndTime(0.01);
 
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
@@ -505,9 +506,9 @@ public:
         // Check levels in cell 0
         CellPtr cell0 = cell_population.rGetCells().front();
         double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
-        TS_ASSERT_DELTA(notch, 0.9990, 1e-04);
+        TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
         double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
-        TS_ASSERT_DELTA(delta, 0.9058, 1e-04);
+        TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
         double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
