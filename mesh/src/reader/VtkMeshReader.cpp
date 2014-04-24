@@ -140,9 +140,14 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     if (ELEMENT_DIM == 2u)
     {
         vtkDataSetSurfaceFilter* p_surface = vtkDataSetSurfaceFilter::New();
-        p_surface->SetInput(mpVtkUnstructuredGrid);
         mpVtkFilterEdges = vtkFeatureEdges::New();
+#if VTK_MAJOR_VERSION >= 6
+        p_surface->SetInputData(mpVtkUnstructuredGrid);
+        mpVtkFilterEdges->SetInputConnection(p_surface->GetOutputPort());
+#else
+        p_surface->SetInput(mpVtkUnstructuredGrid);
         mpVtkFilterEdges->SetInput(p_surface->GetOutput());
+#endif
         mpVtkFilterEdges->Update();
         mNumFaces = mpVtkFilterEdges->GetOutput()->GetNumberOfCells();
         p_surface->Delete();
@@ -150,7 +155,11 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     else if (ELEMENT_DIM == 3u)
     {
         mpVtkGeometryFilter = vtkGeometryFilter::New();
+#if VTK_MAJOR_VERSION >= 6
+        mpVtkGeometryFilter->SetInputData(mpVtkUnstructuredGrid);
+#else
         mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
+#endif
         mpVtkGeometryFilter->Update();
 
         mNumFaces = mpVtkGeometryFilter->GetOutput()->GetNumberOfCells();
