@@ -114,6 +114,7 @@ void SimulationTime::SetEndTimeAndNumberOfTimeSteps(double endTime, unsigned tot
     assert(mStartTime != DOUBLE_UNSET);
     assert(!mpTimeStepper);
     assert(endTime > mStartTime);
+    assert(totalTimeStepsInSimulation != 0u);
 
     mpTimeStepper.reset(new TimeStepper(mStartTime, endTime, (endTime-mStartTime)/totalTimeStepsInSimulation, true));
 }
