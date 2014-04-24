@@ -244,10 +244,12 @@ public:
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
         double tol = 1e-4;
-        const double expected_g1_duration = 6.18461;
-
+        
 #ifdef CHASTE_CVODE
+        const double expected_g1_duration = 6.18461;
         tol = 1e-5;
+#else
+        const double expected_g1_duration = 6.1959;
 #endif //CHASTE_CVODE
 
         // Progress through the cell cycle under a constant Wnt concentration
@@ -477,7 +479,11 @@ public:
 
         // These numbers (below) have been lifted from the above test for hypothesis one -
         // and so are probably not correct for hypothesis two if run for long enough
+#ifdef CHASTE_CVODE
         const double expected_g1_duration = 6.18461;
+#else
+        const double expected_g1_duration = 6.1959;
+#endif //CHASTE_CVODE
 
         // Progress through the cell cycle under a constant Wnt concentration
         for (unsigned i=0; i<num_timesteps; i++)
@@ -545,9 +551,13 @@ public:
         p_stem_cell_1->InitialiseCellCycleModel();
 
         // Run the Wnt model for a full constant Wnt stimulus for 20 hours.
-        // Model should enter S phase at 4.79936 hrs and then finish dividing
-        // 10 hours later at 14.79936 hours.
+        // Model should enter S phase at 4.804 hrs and then finish dividing
+        // 10 hours later at 14.804 hours.
+#ifdef CHASTE_CVODE
         double expected_g1_duration = 4.7998;
+#else
+        double expected_g1_duration = 4.8084;
+#endif //CHASTE_CVODE
 
         for (unsigned i=0; i<num_timesteps/2; i++)
         {
@@ -556,8 +566,12 @@ public:
         }
 
         p_cell_model_1->ResetForDivision();
-
+#ifdef CHASTE_CVODE
         expected_g1_duration = 4.806;
+#else
+        expected_g1_duration = 4.8084;
+#endif //CHASTE_CVODE
+
         TS_ASSERT_DELTA(SG2M_duration, 10.0, 1e-5);
         for (unsigned i=0; i<num_timesteps/2; i++)
         {
