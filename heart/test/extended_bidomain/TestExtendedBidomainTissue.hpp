@@ -148,6 +148,39 @@ public:
     }
 };
 
+class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
+{
+private:
+    c_matrix<double,2,2> mTensor;
+
+public:
+    SimpleConductivityModifier()
+        : AbstractConductivityModifier<2,2>(),
+          mTensor(zero_matrix<double>(2,2))
+          // Conductivity tensors are diagonal, so we can only need to do the diagonal if we initialise our tensor with the above line
+    {
+    }
+
+    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity)
+    {
+        // Increase by factor of two for element 1
+        if ( elementIndex==1 )
+        {
+            for ( unsigned dim=0; dim<2; dim++)
+            {
+                mTensor(dim,dim) = 2.0*rOriginalConductivity(dim,dim);
+            }
+        }
+        else
+        {
+            for ( unsigned dim=0; dim<2; dim++)
+            {
+                mTensor(dim,dim) = rOriginalConductivity(dim,dim);
+            }
+        }
+        return mTensor;
+    }
+};
 class TestExtendedBidomainTissue : public CxxTest::TestSuite
 {
 public:
@@ -302,14 +335,14 @@ public:
        std::vector< c_vector<double,3> > intra_conductivities;
        std::vector< c_vector<double,3> > extra_conductivities;
 
-       //first cuboid include element 0
+       //first cuboid includes element 0
        ChastePoint<3> cornerA(-1, -1,-1);
-       ChastePoint<3> cornerB(0.48, 2.0,0.48);
+       ChastePoint<3> cornerB(0.48, 2.0, 0.48);
        ChasteCuboid<3> cuboid_1(cornerA, cornerB);
 
        heterogeneity_area.push_back(cuboid_1);
 
-       //second cuboid include element 2
+       //second cuboid includes element 2
        ChastePoint<3> cornerC(0.52, -1, 0.52);
        ChastePoint<3> cornerD(2, 2, 2);
        ChasteCuboid<3> cuboid_2(cornerC, cornerD);
@@ -317,12 +350,12 @@ public:
        heterogeneity_area.push_back(cuboid_2);
 
        //within the first area
-       intra_conductivities.push_back( Create_c_vector(1.0, 2.0,3.0) );
-       extra_conductivities.push_back( Create_c_vector(51.0, 52.0,53.0) );
+       intra_conductivities.push_back( Create_c_vector(1.0, 2.0, 3.0) );
+       extra_conductivities.push_back( Create_c_vector(51.0, 52.0, 53.0) );
 
        //within the second area
-       intra_conductivities.push_back( Create_c_vector(11.0, 22.0,33.0) );
-       extra_conductivities.push_back( Create_c_vector(151.0, 152.0,153.0) );
+       intra_conductivities.push_back( Create_c_vector(11.0, 22.0, 33.0) );
+       extra_conductivities.push_back( Create_c_vector(151.0, 152.0, 153.0) );
 
        HeartConfig::Instance()->SetConductivityHeterogeneities(heterogeneity_area, intra_conductivities, extra_conductivities);
 
@@ -343,24 +376,28 @@ public:
        //2D tissue
        ExtendedBidomainTissue<2>  extended_bidomain_tissue( &cell_factory_1,  &cell_factory_2, &extracellular_stimulus_factory);
 
+       // Do conductivity modifier here too (for coverage)
+       SimpleConductivityModifier conductivity_modifier;
+       extended_bidomain_tissue.SetConductivityModifier( &conductivity_modifier );
+
        extended_bidomain_tissue.SetIntracellularConductivitiesSecondCell(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity));
        extended_bidomain_tissue.CreateIntracellularConductivityTensorSecondCell();
 
        //first cell
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensor(0u)(0,0),1.0);//within first cuboid
-       TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensor(1u)(0,0),15.0);//within no cuboid
+       TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensor(1u)(0,0),30.0);//within no cuboid (modified from 15 to 30!)
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensor(2u)(1,1),22.0);//within second cuboid
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensor(3u)(0,0),15.0);//within no cuboid
 
        //second cell, should be the same as first cell
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensorSecondCell(0u)(0,0),1.0);//within first cuboid
-       TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensorSecondCell(1u)(0,0),15.0);//within no cuboid
+       TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensorSecondCell(1u)(0,0),30.0);//within no cuboid (modified from 15 to 30!)
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensorSecondCell(2u)(1,1),22.0);//within second cuboid
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularConductivityTensorSecondCell(3u)(0,0),15.0);//within no cuboid
 
        //sigma_e
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(0u)(0,0),51.0);//within first cuboid
-       TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(1u)(0,0),65.0);//within no cuboid
+       TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(1u)(0,0),130.0);//within no cuboid (modified from 65 to 130!)
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(2u)(1,1),152.0);//within second cuboid
        TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetExtracellularConductivityTensor(3u)(0,0),65.0);//within no cuboid
    }

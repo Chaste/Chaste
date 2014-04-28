@@ -400,14 +400,28 @@ template <unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
 {
     assert(mpExtracellularConductivityTensors);
-    return (*mpExtracellularConductivityTensors)[elementIndex];
+    if (this->mpConductivityModifier==NULL)
+    {
+        return (*mpExtracellularConductivityTensors)[elementIndex];
+    }
+    else
+    {
+        return this->mpConductivityModifier->rGetModifiedConductivityTensor(elementIndex, (*mpExtracellularConductivityTensors)[elementIndex], 1u);
+    }
 }
 
 template <unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>::rGetIntracellularConductivityTensorSecondCell(unsigned elementIndex)
 {
     assert(mpIntracellularConductivityTensorsSecondCell);
-    return (*mpIntracellularConductivityTensorsSecondCell)[elementIndex];
+    if (this->mpConductivityModifier==NULL)
+    {
+        return (*mpIntracellularConductivityTensorsSecondCell)[elementIndex];
+    }
+    else
+    {
+        return this->mpConductivityModifier->rGetModifiedConductivityTensor(elementIndex, (*mpIntracellularConductivityTensorsSecondCell)[elementIndex], 2u);
+    }
 }
 
 template <unsigned SPACE_DIM>
