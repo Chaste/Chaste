@@ -126,6 +126,18 @@ double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
     return scale*var_gamma();
 }
 
+double RandomNumberGenerator::ExponentialRandomDeviate(double scale)
+{
+	// make an exponential distribution
+    boost::exponential_distribution<> ed(scale);
+
+    // `merge' this distribution with our random number generator
+    boost::variate_generator<boost::mt19937& , boost::exponential_distribution<> > var_exponential(mMersenneTwisterGenerator, ed);
+
+    // return the random number
+    return var_exponential();
+}
+
 void RandomNumberGenerator::Reseed(unsigned seed)
 {
     mMersenneTwisterGenerator.seed(seed);

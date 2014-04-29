@@ -152,6 +152,13 @@ public:
     double GammaRandomDeviate(double shape, double scale);
 
     /**
+     * @return Generate a random number from an exponential distribution with specified scale parameter.
+     *
+     * @param The scale parameter of the exponential distribution from which the random number is drawn, often named lambda
+     */
+    double ExponentialRandomDeviate(double scale);
+
+    /**
      * @return Generate a random number modulo base (i.e. an integer
      * within the range [0, base) == [0,1,..,base-1] ).
      *

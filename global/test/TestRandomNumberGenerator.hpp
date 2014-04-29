@@ -399,6 +399,24 @@ public:
         TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 3.5595, 1e-4);
         TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(3.5, 2.9), 12.6437, 1e-4);
     }
+
+    void TestExponentialRandomDeviate()
+    {
+        /**
+         * Here we test the exponentially distributed random number generation. As with the other
+         * distributions we only test reproducability and trust the underlying boost library
+         * to correctly implement the distribution. This test is only a
+         * sanity check that we interfaced the boost library correctly.
+         */
+        RandomNumberGenerator::Destroy();
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+        p_gen->Reseed(21);
+
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(1.0), 0.0499, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(2.0), 0.8029, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(3.0), 0.1137, 1e-4);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(4.0), 0.2847, 1e-4);
+    }
 };
 
 #endif /*TESTRANDOMNUMBERGENERATOR_HPP_*/
