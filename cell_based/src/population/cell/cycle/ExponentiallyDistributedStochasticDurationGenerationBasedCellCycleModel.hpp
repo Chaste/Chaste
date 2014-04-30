@@ -107,7 +107,11 @@ public:
     double GetRate();
 
     /**
-     * Set the rate parameter of the exponential distribution
+     * Set the rate parameter of the exponential distribution. For consistency,
+     * this function also resets the internal values for mTransitCellG1Duration
+     * and mStemCellG1Duration to the average value of the exponential random variable,
+     * i.e. 1.0/rate. This ensures that GetAverageTransitCellCycleTime and GetAverageStemCellCycleTime
+     * returns correct values.
      *
      * @param rate
      */

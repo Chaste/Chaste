@@ -381,6 +381,13 @@ public:
         p_stem_model->SetRate(0.25);
         TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.25, 1e-10);
 
+        // When we set the rate parameter we also reset the TransitCellG1Duration and StemCellG1Duration such that
+        // average cell cycle times are calculated correctly
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetAverageTransitCellCycleTime(), 14.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetAverageStemCellCycleTime(), 14.0, 1e-10);
+
         // make a stem cell with the model
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));

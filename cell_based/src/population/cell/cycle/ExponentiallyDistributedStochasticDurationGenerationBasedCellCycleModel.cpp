@@ -109,6 +109,10 @@ double ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::
 void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetRate(double rate)
 {
 	mRate = rate;
+
+	// These are now set to the average value of the G1Duration
+	SetTransitCellG1Duration(1.0/rate);
+	SetStemCellG1Duration(1.0/rate);
 }
 
 void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
