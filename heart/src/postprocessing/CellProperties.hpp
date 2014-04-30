@@ -253,6 +253,13 @@ public:
     std::vector<double> GetActionPotentialAmplitudes();
 
     /**
+     * Returns the amplitude of the last action potential that was recorded.
+     *
+     * @return The amplitude of the last action potential that was recorded.
+     */
+    double GetLastActionPotentialAmplitude();
+
+    /**
      * @return a vector containing the number of above-threshold depolarisations for each Ap.
      */
     std::vector<unsigned> GetNumberOfAboveThresholdDepolarisationsForAllAps();

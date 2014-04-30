@@ -233,6 +233,7 @@ public:
         TS_ASSERT_DELTA(cell_props.GetPeakPotentials()[size-1], 43.1665, 0.0001);
         TS_ASSERT_DELTA(cell_props.GetRestingPotentials()[size-1], -84.4395, 0.0001);
         TS_ASSERT_DELTA(cell_props.GetActionPotentialAmplitudes()[size-1], 127.606, 0.001);
+        TS_ASSERT_DELTA(cell_props.GetLastActionPotentialAmplitude(), 127.606, 0.001);
         TS_ASSERT_DELTA(cell_props.GetLastPeakPotential(), 43.1665, 0.0001);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(20), 6.5202, timestep);
         TS_ASSERT_DELTA(cell_props.GetLastActionPotentialDuration(50), 271.1389, timestep);

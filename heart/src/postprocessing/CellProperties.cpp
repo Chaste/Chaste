@@ -278,6 +278,11 @@ std::vector<double> CellProperties::GetActionPotentialAmplitudes()
     return amplitudes;
 }
 
+double CellProperties::GetLastActionPotentialAmplitude()
+{
+    return GetActionPotentialAmplitudes().back();
+}
+
 void CellProperties::CheckExceededThreshold(void)
 {
     // mOnsets and mRestingValues are all
