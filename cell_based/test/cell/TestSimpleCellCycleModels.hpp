@@ -1045,7 +1045,7 @@ public:
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 4);
 
             // As usual, we archive via a pointer to the most abstract class possible
-            AbstractCellCycleModel* const p_model = new GammaDistributedStochasticDurationCellCycleModel;
+            AbstractCellCycleModel* const p_model = new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
             static_cast<ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*>(p_model)->SetRate(13.42);
 
             std::ofstream ofs(archive_filename.c_str());
