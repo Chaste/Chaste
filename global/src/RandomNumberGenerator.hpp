@@ -154,7 +154,7 @@ public:
     /**
      * @return Generate a random number from an exponential distribution with specified scale parameter.
      *
-     * @param The scale parameter of the exponential distribution from which the random number is drawn, often named lambda
+     * @param scale The scale parameter of the exponential distribution from which the random number is drawn, often named lambda
      */
     double ExponentialRandomDeviate(double scale);
 
