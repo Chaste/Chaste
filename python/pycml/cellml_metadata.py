@@ -139,6 +139,9 @@ METADATA_NAMES = frozenset(
      # I_Kur
      'membrane_ultrarapid_delayed_rectifier_potassium_current',
         'membrane_ultrarapid_delayed_rectifier_potassium_current_conductance',
+     # I_Kss or Iss   
+     'membrane_non_inactivating_steady_state_potassium_current',
+        'membrane_non_inactivating_steady_state_potassium_current_conductance',   
      # I K1
      'membrane_inward_rectifier_potassium_current',     
         'membrane_inward_rectifier_potassium_current_conductance',
