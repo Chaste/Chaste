@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DistributedVector.hpp"
 #include "OrthotropicConductivityTensors.hpp"
+#include "AxisymmetricConductivityTensors.hpp"
 #include "AbstractStimulusFunction.hpp"
 #include "ChastePoint.hpp"
 #include "AbstractChasteRegion.hpp"
@@ -193,7 +194,43 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::READ_MESH);
     this->mpConfig = HeartConfig::Instance();
-    mpIntracellularConductivityTensorsSecondCell = new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+
+    if (this->mpConfig->IsMeshProvided() && this->mpConfig->GetLoadMesh())
+    {
+        assert(this->mFibreFilePathNoExtension != "");
+
+        switch (this->mpConfig->GetConductivityMedia())
+        {
+            case cp::media_type::Orthotropic:
+            {
+            	mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
+                assert(ortho_file.Exists());
+                mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(ortho_file);
+                break;
+            }
+
+            case cp::media_type::Axisymmetric:
+            {
+            	mpIntracellularConductivityTensorsSecondCell =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
+                assert(axi_file.Exists());
+                mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(axi_file);
+                break;
+            }
+
+            case cp::media_type::NoFibreOrientation:
+            	mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                break;
+
+            default :
+                NEVER_REACHED;
+        }
+    }
+    else // Slab defined in config file or SetMesh() called; no fibre orientation assumed
+    {
+    	mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+    }
 
     // this definition must be here (and not inside the if statement) because SetNonConstantConductivities() will keep
     // a pointer to it and we don't want it to go out of scope before Init() is called
@@ -293,8 +330,42 @@ const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& ExtendedBidomai
 template <unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 {
+    if (this->mpConfig->IsMeshProvided() && this->mpConfig->GetLoadMesh())
+    {
+        assert(this->mFibreFilePathNoExtension != "");
+        switch (this->mpConfig->GetConductivityMedia())
+        {
+            case cp::media_type::Orthotropic:
+            {
+                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
+                assert(ortho_file.Exists());
+                mpExtracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
+                break;
+            }
 
-    mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+            case cp::media_type::Axisymmetric:
+            {
+                mpExtracellularConductivityTensors =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
+                assert(axi_file.Exists());
+                mpExtracellularConductivityTensors->SetFibreOrientationFile(axi_file);
+                break;
+            }
+
+            case cp::media_type::NoFibreOrientation:
+                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                break;
+
+            default :
+                NEVER_REACHED;
+        }
+    }
+    else // no fibre orientation assumed
+    {
+        mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+    }
+
     c_vector<double, SPACE_DIM> extra_conductivities;
     this->mpConfig->GetExtracellularConductivities(extra_conductivities);
 

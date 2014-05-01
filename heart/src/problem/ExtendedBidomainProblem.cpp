@@ -107,7 +107,7 @@ Vec ExtendedBidomainProblem<DIM>::CreateInitialCondition()
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::ProcessExtracellularStimulus()
 {
-    if ( mpExtracellularStimulusFactory == NULL )//user has not passed in any extracelular stimulus in any form
+    if ( mpExtracellularStimulusFactory == NULL )//user has not passed in any extracellular stimulus in any form
     {
         mpExtracellularStimulusFactory = new AbstractStimulusFactory<DIM>();
         //create one (with default implementation to zero stimulus everywhere)
@@ -234,18 +234,16 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 3>* ExtendedBidomainProblem<DIM>::Creat
      * NOTE: The this->mpBoundaryConditionsContainer.get() lines below convert a
      * boost::shared_ptr to a normal pointer, as this is what the assemblers are
      * expecting. We have to be a bit careful though as boost could decide to delete
-     * them whenever it feels like as it won't count the assembers as using them.
+     * them whenever it feels like as it won't count the assemblers as using them.
      *
      * As long as they are kept as member variables here for as long as they are
      * required in the assemblers it should all work OK.
      */
 
-
     mpSolver = new ExtendedBidomainSolver<DIM,DIM>( mHasBath,
                                                     this->mpMesh,
                                                     mpExtendedBidomainTissue,
                                                     this->mpBoundaryConditionsContainer.get());
-
 
     try
     {

@@ -7,6 +7,7 @@ extended_bidomain/TestArchivingExtendedBidomain.hpp
 extended_bidomain/TestExtendedVsBidomainProblem.hpp
 extended_bidomain/TestExtendedBidomainTissue.hpp
 extended_bidomain/TestExtendedBidomainProblem.hpp
+extended_bidomain/TestFibreReaderAbilityExtendedBidomainProblem.hpp
 extended_bidomain/TestStimulusFactory.hpp
 extended_bidomain/TestGIModifiedModels.hpp
 convergence/TestConvergenceTester.hpp

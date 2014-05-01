@@ -62,7 +62,9 @@ public:
      *  @param domainIndex Index to tell the method if we want the intracellular, extracellular, etc.
      *  @return Reference to a modified conductivity tensor.
      */
-    c_matrix<double,SPACE_DIM,SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity, unsigned domainIndex)
+    c_matrix<double,SPACE_DIM,SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex,
+                                                                         const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity,
+                                                                         unsigned domainIndex)
     {
         // Have we got space for this domain?
         if ( mCache.size() <= domainIndex )
