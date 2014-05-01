@@ -42,17 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Boost Ublas library.
  */
 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/matrix_expression.hpp>
+#include "UblasIncludes.hpp"
 
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
-
-using namespace boost::numeric::ublas;
 
 // COMMON DETERMINANTS - SQUARE
 

@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BidomainAssembler.hpp"
 #include "PdeSimulationTime.hpp"
 #include "UblasIncludes.hpp"
-#include <boost/numeric/ublas/vector_proxy.hpp>
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

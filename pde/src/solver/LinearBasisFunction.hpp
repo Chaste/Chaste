@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _LINEARBASISFUNCTION_HPP_
 
 #include "ChastePoint.hpp"
+#include "UblasMatrixInclude.hpp"
 
 /**
  * Linear basis functions for the finite element method,

@@ -40,13 +40,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Convenience header for including ublas types in default namespace
  */
 
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
+#include "UblasVectorInclude.hpp"
+#include "UblasMatrixInclude.hpp"
 
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
-using namespace boost::numeric::ublas;
+namespace ublas = boost::numeric::ublas;
+
+using boost::numeric::ublas::matrix_column;
+using boost::numeric::ublas::matrix_row;
+using boost::numeric::ublas::matrix_slice;
+
+using boost::numeric::ublas::noalias;
+using boost::numeric::ublas::prod;
+using boost::numeric::ublas::outer_prod;
+using boost::numeric::ublas::inner_prod;
+using boost::numeric::ublas::trans;
+using boost::numeric::ublas::norm_2;
+using boost::numeric::ublas::slice;
 
 #endif /*UBLASINCLUDES_HPP_*/

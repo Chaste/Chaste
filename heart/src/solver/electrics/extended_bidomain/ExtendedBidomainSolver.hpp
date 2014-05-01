@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BidomainAssembler.hpp"
 #include "BidomainMassMatrixAssembler.hpp"
 #include "ExtendedBidomainNeumannSurfaceTermAssembler.hpp"
-#include <boost/numeric/ublas/vector_proxy.hpp>
 
 /**
  *  An extended bidomain solver, which computes the right-hand-side (RHS) vector of the linear

@@ -39,9 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <vector>
 
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-using namespace boost::numeric::ublas;
+#include "UblasIncludes.hpp"
 #include "Exception.hpp"
 
 /**

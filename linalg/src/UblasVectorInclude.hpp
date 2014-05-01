@@ -42,6 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/numeric/ublas/vector.hpp>
 
-using namespace boost::numeric::ublas;
+using boost::numeric::ublas::c_vector;
+using boost::numeric::ublas::zero_vector;
+using boost::numeric::ublas::scalar_vector;
+using boost::numeric::ublas::unit_vector;
 
 #endif /*UBLASVECTORINCLUDE_HPP_*/

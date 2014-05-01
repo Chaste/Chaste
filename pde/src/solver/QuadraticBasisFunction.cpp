@@ -33,11 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-
 #include "QuadraticBasisFunction.hpp"
 #include "Exception.hpp"
+#include "UblasIncludes.hpp"
 
 /**
  * Specialization for 0d.
@@ -343,7 +341,7 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(const ChastePoin
  */
 template <unsigned ELEMENT_DIM>
 void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                                    c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
+                                                                          c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
 {
     assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
 
@@ -369,8 +367,8 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const 
  */
 template <unsigned ELEMENT_DIM>
 void QuadraticBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                                                  const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,
-                                                                                  c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
+                                                                                     const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,
+                                                                                     c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
 {
     assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
 

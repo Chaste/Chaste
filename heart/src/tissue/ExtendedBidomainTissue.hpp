@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include <vector>
-#include <boost/numeric/ublas/matrix.hpp>
+#include "UblasMatrixInclude.hpp"
 
 #include "AbstractStimulusFunction.hpp"
 #include "AbstractStimulusFactory.hpp"

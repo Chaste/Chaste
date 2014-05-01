@@ -35,9 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _QUADRATICBASISFUNCTION_HPP_
 #define _QUADRATICBASISFUNCTION_HPP_
 
-#include <boost/numeric/ublas/matrix.hpp>
-
 #include "ChastePoint.hpp"
+#include "UblasMatrixInclude.hpp"
 
 /**
  * Quadratic basis functions for the finite element method,

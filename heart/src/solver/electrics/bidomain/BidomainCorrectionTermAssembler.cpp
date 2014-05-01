@@ -68,8 +68,8 @@ c_vector<double,2*(ELEM_DIM+1)> BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_D
 
     c_vector<double,2*(ELEM_DIM+1)> ret;
 
-    vector_slice<c_vector<double, 2*(ELEM_DIM+1)> > slice_V  (ret, slice (0, 2, ELEM_DIM+1));
-    vector_slice<c_vector<double, 2*(ELEM_DIM+1)> > slice_Phi(ret, slice (1, 2, ELEM_DIM+1));
+    ublas::vector_slice<c_vector<double, 2*(ELEM_DIM+1)> > slice_V  (ret, slice (0, 2, ELEM_DIM+1));
+    ublas::vector_slice<c_vector<double, 2*(ELEM_DIM+1)> > slice_Phi(ret, slice (1, 2, ELEM_DIM+1));
 
     // add on the SVI ionic current, and take away the original NCI (linearly
     // interpolated ionic current) that would have been added as part of

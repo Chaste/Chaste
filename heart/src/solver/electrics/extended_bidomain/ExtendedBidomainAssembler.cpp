@@ -34,7 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ExtendedBidomainAssembler.hpp"
-#include <boost/numeric/ublas/vector_proxy.hpp>
 
 #include "Exception.hpp"
 #include "DistributedVector.hpp"

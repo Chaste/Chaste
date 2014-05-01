@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTUBLASCUSTOMFUNCTIONS_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include <boost/numeric/ublas/matrix.hpp>
+#include "UblasMatrixInclude.hpp"
 #include <boost/numeric/ublas/io.hpp>
 #include "UblasCustomFunctions.hpp"
 #include "PetscSetupAndFinalize.hpp"

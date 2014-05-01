@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/numeric/ublas/matrix.hpp>
 
-using namespace boost::numeric::ublas;
+using boost::numeric::ublas::c_matrix;
+using boost::numeric::ublas::zero_matrix;
+using boost::numeric::ublas::identity_matrix;
 
 #endif /*UBLASMATRIXINCLUDE_HPP_*/

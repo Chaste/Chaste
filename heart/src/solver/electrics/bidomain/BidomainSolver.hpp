@@ -51,8 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BidomainCorrectionTermAssembler.hpp"
 #include "BidomainNeumannSurfaceTermAssembler.hpp"
 
-#include <boost/numeric/ublas/vector_proxy.hpp>
-
 /**
  *  A bidomain solver, which uses various assemblers to set up the bidomain
  *  FEM linear system.
