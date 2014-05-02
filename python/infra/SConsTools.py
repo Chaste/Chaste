@@ -1026,6 +1026,15 @@ def DoDynamicallyLoadableModules(baseEnv, otherVars):
         so_dir = os.path.join(curdir, os.pardir, os.pardir, os.path.dirname(s))
         this_dyn_only = (otherVars['dyn_libs_only'] and
                          os.path.realpath(so_dir).startswith(os.path.realpath(otherVars['dyn_folder'])))
+        if this_dyn_only and not otherVars['use_chaste_libs']:
+            # Warn the user that this combination is unsupported and likely to break
+            import SCons.Warnings
+            class DynamicLoadingWarning(SCons.Warnings.Warning):
+                pass
+            SCons.Warnings.enableWarningClass(DynamicLoadingWarning)
+            SCons.Warnings.warn(DynamicLoadingWarning,
+                                "Using dynamically loaded cell models MAY NOT WORK with chaste_libs=0.\n"
+                                "    If you get unresolved symbol errors, use chaste_libs=1 as an argument to scons.")
         if this_dyn_only or not otherVars['dyn_libs_only']:
             # Note: if building direct from CellML, there will be more than 1 target
             dyn_objs = dyn_env.SharedObject(source=s)
