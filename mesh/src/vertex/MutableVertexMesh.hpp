@@ -163,7 +163,7 @@ protected:
      *                   with indices of VertexElements in the new mesh.  This should be created
      *                   with the correct size, GetNumElements()
      */
-    void IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap);
+    virtual void IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap);
 
     /**
      * Helper method for ReMesh(), called by IdentifySwapType().
