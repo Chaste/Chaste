@@ -587,7 +587,6 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
 
         c_vector<double, DIM> location = p_node->rGetLocation();
 
-        ///\todo we do not yet consider boundaryness in vertex meshes (see #1558)
         unsigned is_boundary_node = p_node->IsBoundaryNode() ? 1 : 0;
 
         (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
@@ -654,10 +653,19 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
          edge_iter != tetrahedral_edges.end();
          ++edge_iter)
     {
-        std::pair<unsigned, unsigned> this_edge;
+        std::pair<unsigned, unsigned> this_edge = *edge_iter;
 
-        ///\todo we do not yet consider boundaryness in vertex meshes (see #1558)
-        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << 0 << std::endl;
+        // To be a boundary edge both nodes need to be boundary nodes.
+        bool is_boundary_edge = false;
+        if (this_edge.first  < mpMutableVertexMesh->GetNumNodes() &&
+            this_edge.second  < mpMutableVertexMesh->GetNumNodes())
+        {
+        	is_boundary_edge = (mpMutableVertexMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
+        	        	        mpMutableVertexMesh->GetNode(this_edge.second)->IsBoundaryNode() );
+        }
+        unsigned is_boundary_edge_unsigned = is_boundary_edge ? 1 : 0;
+
+        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << is_boundary_edge_unsigned << std::endl;
     }
     p_edge_file->close();
 
@@ -670,7 +678,7 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     }
 
     // Delete the temporary files
-    output_file_handler.FindFile("").Remove();
+    //output_file_handler.FindFile("").Remove();
 
     // The original files have been deleted, it is better if the mesh object forgets about them
     p_mesh->SetMeshHasChangedSinceLoading();
