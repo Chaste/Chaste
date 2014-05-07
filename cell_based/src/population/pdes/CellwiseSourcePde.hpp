@@ -104,7 +104,7 @@ public:
      * @return the constant in u part of the source term, i.e g(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    virtual double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTerm() method.
@@ -115,7 +115,8 @@ public:
      * @return the coefficient of u in the linear part of the source term, i.e f(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.
@@ -124,7 +125,7 @@ public:
      * @return the coefficient of u in the linear part of the source term, i.e f(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode);
+    virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -133,7 +134,7 @@ public:
      *
      * @return a matrix.
      */
-    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
 };
 
 #include "SerializationExportWrapper.hpp"
