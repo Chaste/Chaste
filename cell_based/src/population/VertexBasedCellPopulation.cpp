@@ -678,7 +678,7 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
     }
 
     // Delete the temporary files
-    //output_file_handler.FindFile("").Remove();
+    output_file_handler.FindFile("").Remove();
 
     // The original files have been deleted, it is better if the mesh object forgets about them
     p_mesh->SetMeshHasChangedSinceLoading();
