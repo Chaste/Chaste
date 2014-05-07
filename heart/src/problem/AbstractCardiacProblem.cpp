@@ -341,6 +341,10 @@ AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM> & AbstractCardiacProblem<ELEMENT_
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::GetTissue()
 {
+    if (mpCardiacTissue == NULL)
+    {
+        EXCEPTION("Tissue not yet set up, you may need to call Initialise() before GetTissue().");
+    }
     return mpCardiacTissue;
 }
 

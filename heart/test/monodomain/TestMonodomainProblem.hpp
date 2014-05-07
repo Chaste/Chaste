@@ -260,6 +260,10 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         MonodomainProblem<1> monodomain_problem( &cell_factory );
 
+        // Just checking an exception message here.
+        TS_ASSERT_THROWS_THIS(monodomain_problem.GetTissue(),
+                              "Tissue not yet set up, you may need to call Initialise() before GetTissue().");
+
         monodomain_problem.Initialise();
 
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
