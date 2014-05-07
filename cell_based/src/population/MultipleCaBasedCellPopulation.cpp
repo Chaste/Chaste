@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
@@ -509,7 +509,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     unsigned num_cells = this->GetNumRealCells();
     std::vector<double> cell_types(num_cells, -1.0);
     std::vector<double> cell_mutation_states(num_cells, -1.0);
-    std::vector<double> cell_labels(num_cells, -1.0);
     std::vector<double> cell_ids(num_cells, -1.0);
     std::vector<double> cell_ancestors(num_cells, -1.0);
     std::vector<double> cell_ages(num_cells, -1.0);
@@ -591,9 +590,20 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
         {
             cell_types[cell] = cell_ptr->GetCellProliferativeType()->GetColour();
         }
-        if (this-> template HasWriter<CellMutationStatesCountWriter>())
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
+
+            // TODO split these all off as Label not mutation states see #2534
+            CellPropertyCollection collection = cell_ptr->rGetCellPropertyCollection();
+            CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
+
+            if (label_collection.GetSize() == 1)
+            {
+                boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                cell_mutation_states[cell] = p_label->GetColour();
+            }
+
         }
         if (this-> template HasWriter<CellAgesWriter>())
         {
@@ -618,13 +628,13 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     {
         mesh_writer.AddPointData("Cell types", cell_types);
     }
+    if (this-> template HasWriter<CellMutationStatesWriter>())
+	{
+		mesh_writer.AddPointData("Mutation states", cell_mutation_states);
+	}
     if (this-> template HasWriter<CellAncestorWriter>())
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);
-    }
-    if (this-> template HasWriter<CellMutationStatesCountWriter>())
-    {
-        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
     }
     if (this-> template HasWriter<CellAgesWriter>())
     {
@@ -633,11 +643,6 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
     if (this-> template HasWriter<CellProliferativePhasesWriter>())
     {
         mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
-    }
-    if (this-> template HasWriter<CellMutationStatesCountWriter>())
-    {
-        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
-        mesh_writer.AddPointData("Cell labels", cell_labels);
     }
     if (num_cell_data_items > 0)
     {
