@@ -204,13 +204,6 @@ protected:
     unsigned DoCellRemoval();
 
     /**
-     * A method for subclasses to do something at the end of each timestep.
-     */
-    virtual void UpdateAtEndOfTimeStep()
-    {
-    }
-
-    /**
      * A method for subclasses to do something at before the start of the time loop.
      */
     virtual void SetupSolve()
@@ -429,10 +422,9 @@ public:
      *
      * Next, we call UpdateCellLocationsAndTopology(), which is pure virtual in the parent class so
      * must be overridden. As the cell population has been updated, we then increment
-     * SimulationTime by one time step. We then call UpdateAtEndOfTimeStep(), which is empty in the
-     * parent class but may be overridden, e.g. to write additional output. We also call
-     * UpdateAtEndOfTimeStep() on any member objects inheriting from AbstractCellBasedSimulationModifier
-     * in an analogous manner to the calls to SetupSolve() prior to entering the main time loop.
+     * SimulationTime by one time step. We then call UpdateAtEndOfTimeStep() on any
+     * AbstractCellBasedSimulationModifiers present, e.g. to write additional output.
+     * In an analogous manner to the calls to SetupSolve() prior to entering the main time loop.
      *
      * The last step within the main time loop is to output the present results to file.
      *

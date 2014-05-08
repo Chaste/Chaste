@@ -452,11 +452,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
             CellBasedEventHandler::EndEvent(CellBasedEventHandler::PDE);
         }
 
-        // Call UpdateAtEndOfTimeStep(), which may be implemented by child classes
-        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
-        UpdateAtEndOfTimeStep();
-
         // Call UpdateAtEndOfTimeStep() on each modifier
+        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
              iter != mSimulationModifiers.end();
              ++iter)
