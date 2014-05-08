@@ -104,10 +104,18 @@ public:
 
         /* We will auto-generate a mesh this time, and pass it in, rather than
          * provide a mesh file name. This is how to generate a cuboid mesh with
-         * a given spatial stepsize h */
-        TetrahedralMesh<3,3> mesh;
+         * a given spatial stepsize h.
+         *
+         * Using a `DistributedTetrahedralMesh` is faster than `TetrahedralMesh` when running on multiple processes.
+         * However, it permutes the node ordering for output. Most of time time this won't matter, but later in this
+         * test we want to access specific node indices. One method of doing this is to ask HeartConfig to use the
+         * original node ordering for the output.
+         *
+         */
+        DistributedTetrahedralMesh<3,3> mesh;
         double h=0.02;
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
+        HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
         /* (In 2D the call is identical, but without the depth parameter).
          *
          * EMPTYLINE

@@ -179,7 +179,7 @@ public: // Tests should be public!
         /* HOW_TO_TAG Cardiac/Problem definition Tell Chaste that a mesh has been modified
          *
          * Since we have modified the mesh by setting element attributes, we need to inform Chaste of this fact.
-         * If we do not, problems will arise when [UserTutorials/CardiacCheckpointingAndRestartingTutorial checkpointing],
+         * If we do not, problems will arise when [wiki:UserTutorials/CardiacCheckpointingAndRestartingTutorial checkpointing],
          * since the code that saves the simulation state will assume that it can just reuse the original mesh files,
          * and thus won't save the new element attributes.
          *

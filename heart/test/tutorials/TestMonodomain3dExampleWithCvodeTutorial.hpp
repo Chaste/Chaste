@@ -165,9 +165,10 @@ public:
     void TestMonodomain3d() throw(Exception)
     {
 #ifdef CHASTE_CVODE
-        TetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3,3> mesh;
         double h=0.02;
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
+        HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
 
         HeartConfig::Instance()->SetSimulationDuration(5); //ms
         HeartConfig::Instance()->SetOutputDirectory("Monodomain3dExampleWithCvode");

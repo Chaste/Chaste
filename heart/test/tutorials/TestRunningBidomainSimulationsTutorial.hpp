@@ -190,7 +190,10 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
-        /* It is possible to over-ride the default visualisation output (which is done during simulation
+        /* There is an alternate method of loading a mesh that can be seen in [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample],
+         *  using `DistributedTetrahedralMesh`.
+         *
+         * It is possible to over-ride the default visualisation output (which is done during simulation
          * post-processing).
          */
         HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);

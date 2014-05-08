@@ -47,9 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * = 3D monodomain rabbit heart example =
  *
- * In this tutorial we show how to run a 3D simulation using the monodomain equation.
- * To go from monodomain to bidomain or vice versa is trivial, and for 2d to 3d is
- * also very easy. This tutorial runs a simulation on a whole heart mesh. Note that this
+ * This tutorial runs a simulation on a whole rabbit heart mesh. Note that this
  * mesh is far too coarse for converged simulations, but provides a useful example.
  *
  * First include the headers, `MonodomainProblem` this time.
@@ -80,7 +78,7 @@ public:
     {
         double z = pNode->rGetLocation()[2];
 
-        if (z <= 0.04248)
+        if (z <= 0.05)
         {
             return new CellLuoRudy1991FromCellMLBackwardEuler(mpSolver, mpStimulus);
         }
@@ -107,55 +105,56 @@ public:
         /*
          * Specify the conductivity vector to use in the simulation. Since this is going to be
          * a monodomain simulation, we only specify intra-cellular conductivities.
-         * And additionally, because this is an Axi-symmetric mesh then we must specify
-         * conductivity along sheet and normal directions to be the same (an exception will be
+         * Additionally, because this is an Axi-symmetric mesh then we must specify
+         * conductivity along the sheet and normal directions to be the same (an exception will be
          * thrown if not).
          *
          * The 3rd entry would be different for an orthotropic mesh with fibre, sheet and
-         * normal directions there would just be one entry for no fibre directions.
+         * normal directions. For a simulation without fibre directions, there should be one value.
          */
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.19, 0.19));
 
         /*
-         * Set the simulation duration, and output directory etc.
+         * Set the simulation duration, output directory, filename and VTK visualization.
          *
          * We have set the simulation duration to be very short here so this tutorial runs
-         * fast, increase it to see decent propagation of the wavefront.
+         * quickly, increase it to see decent propagation of the wavefront.
          */
-        HeartConfig::Instance()->SetSimulationDuration(1); //ms
+        HeartConfig::Instance()->SetSimulationDuration(2); //ms
         HeartConfig::Instance()->SetOutputDirectory("Monodomain3dRabbitHeart");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
 
         /* The ODE and PDE timesteps should be refined when using this code for real
          * scientific simulations. The values here are sufficient to ensure stability
-         * in this case, but not converged numerical behaviour.
+         * in this case, but not sufficient for converged numerical behaviour.
         */
-        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.02, 0.1, 0.5);
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.02, 0.1, 0.2);
 
         /*
          * Here we create an instance of our cell factory, which will tell the `MonodomainProblem`
-         * class which action potential models to use at which nodes.
+         * class which action potential models to use at which nodes. The rest of the problem is set up
+         * identically to [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample].
          */
         RabbitHeartCellFactory cell_factory;
-
-        /* Now we declare the problem class, `MonodomainProblem<3>` instead of `BidomainProblem<2>`.
-         * The interface for both is the same.
-         */
         MonodomainProblem<3> monodomain_problem( &cell_factory );
-
-        /* `SetWriteInfo` is a useful method that means that the min/max voltage is
-         * printed as the simulation runs (useful for verifying that cells are stimulated
-         * and the wave propagating, for example) (although note scons does buffer output
-         * before printing to screen) */
         monodomain_problem.SetWriteInfo();
-
-        /* the problem must be initialised to set up the mesh, cell models and PDE. */
         monodomain_problem.Initialise();
-        /*
-         * Call Solve to run the simulation.
-         */
         monodomain_problem.Solve();
+
+
+        /* We can access nodes in the mesh using a `NodeIterator`. Here, we check that each node
+         * has not been assigned to bath, and throw an error if it has. This is not a particularly useful test,
+         * but it does demonstrate the principle.
+         * */
+
+        AbstractTetrahedralMesh<3,3>* p_mesh = &(monodomain_problem.rGetMesh());
+
+        for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
+                         iter != p_mesh->GetNodeIteratorEnd(); ++iter)
+        {
+            TS_ASSERT_EQUALS(HeartRegionCode::IsRegionBath( iter->GetRegion() ), false);
+        }
     }
 };
 
@@ -168,6 +167,9 @@ public:
  *  * [source:/data/public/OxfordRabbitHeart/OxfordRabbitHeartWithBath_binary.tgz OxfordRabbitHeartWithBath_binary.tgz]  - 846MB.
  *
  * These will probably require HPC resources, and finer ODE and PDE time steps than we used here.
+ *
+ * To visualize these results, see ChasteGuides/VisualisationGuides/ParaviewForCardiac. The colour axes in Paraview
+ * may need to be rescaled in order to see the voltage changes.
  */
 
 #endif /*TESTMONODOMAIN3DRABBITHEARTTUTORIAL_HPP_*/
