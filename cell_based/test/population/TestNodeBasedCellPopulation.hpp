@@ -882,6 +882,96 @@ public:
         TS_ASSERT_DELTA(size_of_pop[0], 0.5, 1e-4);
     }
 
+    void TestNodeBasedCellPopulationOutputInParallel() throw (Exception)
+    {
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a simple mesh
+        std::vector<Node<2>* > nodes;
+        for (unsigned i=0; i<5; i++)
+        {
+            nodes.push_back(new Node<2>(i, false, 0.0, 0.75*i));
+        }
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        for (unsigned i=0; i<cells.size(); i++)
+        {
+            cells[i]->SetBirthTime(0.0);
+        }
+
+        // Create a cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+
+        node_based_cell_population.Update(); // so cell neighbours are calculated
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellMutationStatesCountWriter>());
+        node_based_cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellMutationStatesCountWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellIdWriter>());
+        node_based_cell_population.AddCellWriter<CellIdWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellIdWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativeTypesCountWriter>());
+        node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativeTypesCountWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativePhasesCountWriter>());
+        node_based_cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativePhasesCountWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativePhasesWriter>());
+        node_based_cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativePhasesWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellAgesWriter>());
+        node_based_cell_population.AddCellWriter<CellAgesWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellAgesWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellVolumesWriter>());
+        node_based_cell_population.AddCellWriter<CellVolumesWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellVolumesWriter>());
+
+        TS_ASSERT(!node_based_cell_population.HasWriter<CellAncestorWriter>());
+        node_based_cell_population.AddCellWriter<CellAncestorWriter>();
+        TS_ASSERT(node_based_cell_population.HasWriter<CellAncestorWriter>());
+
+
+        // Test set methods
+        std::string output_directory = "TestNodeBasedCellPopulationWritersParallel";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        node_based_cell_population.OpenWritersFiles(output_directory);
+        node_based_cell_population.WriteResultsToFiles(output_directory);
+
+        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CloseOutputFiles());
+
+        // Compare output with saved files of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellmutationstates.dat").CompareFiles();
+
+        // Cell ages and volumes file differs because it writes the global index of the node to file, which is different depending on how many processes there are.
+        //FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellages.dat").CompareFiles();
+        //FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
 
     void TestNodeBasedCellPopulationOutputWriters2d()
     {
