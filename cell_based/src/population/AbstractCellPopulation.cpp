@@ -34,6 +34,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <boost/foreach.hpp>
+#include <boost/bind.hpp>
+#include <boost/mem_fn.hpp>
+
+#include <algorithm>
+#include <functional>
 
 #include "AbstractCellPopulation.hpp"
 #include "AbstractOdeBasedCellCycleModel.hpp"
@@ -51,11 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
 
-#include <boost/bind.hpp>
-#include <boost/mem_fn.hpp>
-
-#include <algorithm>
-#include <functional>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -337,6 +337,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDefaultCellMutationState
         mutations_and_proliferative_types.push_back(p_registry->Get<StemCellProliferativeType>());
         mutations_and_proliferative_types.push_back(p_registry->Get<TransitCellProliferativeType>());
         mutations_and_proliferative_types.push_back(p_registry->Get<DifferentiatedCellProliferativeType>());
+        // Parallel process with no cells won't have the default property, so add it in
+        mutations_and_proliferative_types.push_back(p_registry->Get<DefaultCellProliferativeType>());
         p_registry->SpecifyOrdering(mutations_and_proliferative_types);
     }
 }
@@ -587,15 +589,12 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
         unsigned global_size;
 
         MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
-        mCellProliferativeTypesCount.resize(global_size, 0u);
+        assert(local_size == global_size);
 
-        std::vector<unsigned> types_counts(mCellProliferativeTypesCount.size(), 0u);
-        for (unsigned i=0; i<types_counts.size(); i++)
-        {
-            MPI_Allreduce(&mCellProliferativeTypesCount[i], &types_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-        }
+        std::vector<unsigned> total_types_counts(global_size);
+        MPI_Allreduce(&mCellProliferativeTypesCount[0], &total_types_counts[0], total_types_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
 
-        mCellProliferativeTypesCount = types_counts;
+        mCellProliferativeTypesCount = total_types_counts;
     }
 
     // Calculate mutation states count
@@ -614,15 +613,11 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateCellResults()
         // Make sure the vector on each process has the same size
         unsigned local_size = mCellMutationStateCount.size();
         unsigned global_size;
-
         MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
-        mCellMutationStateCount.resize(global_size, 0u);
+        assert(local_size == global_size);
 
-        std::vector<unsigned> mutation_counts(mCellMutationStateCount.size(), 0u);
-        for (unsigned i=0; i<mutation_counts.size(); i++)
-        {
-            MPI_Allreduce(&mCellMutationStateCount[i], &mutation_counts[i], 1, MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-        }
+        std::vector<unsigned> mutation_counts(global_size);
+        MPI_Allreduce(&mCellMutationStateCount[0], &mutation_counts[0], mutation_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
 
         mCellMutationStateCount = mutation_counts;
     }
