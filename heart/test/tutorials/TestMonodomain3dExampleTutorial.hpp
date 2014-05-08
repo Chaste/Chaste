@@ -108,7 +108,7 @@ public:
          *
          * Using a `DistributedTetrahedralMesh` is faster than `TetrahedralMesh` when running on multiple processes.
          * However, it permutes the node ordering for output. Most of time time this won't matter, but later in this
-         * test we want to access specific node indices. One method of doing this is to ask HeartConfig to use the
+         * test we want to access specific node indices. One method of doing this is to ask `HeartConfig` to use the
          * original node ordering for the output.
          *
          */
