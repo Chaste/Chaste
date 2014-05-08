@@ -1207,6 +1207,10 @@ public:
                 it != static_cast<MutableMesh<2,2>* >(p_mesh)->GetNodeIteratorEnd();
                 ++it)
             {
+                // Mess with the locations of the nodes before archiving.
+                // checks that a modified version of the mesh is written to archive.
+                (it->rGetModifiableLocation())[0] +=  0.1;
+                (it->rGetModifiableLocation())[1] += -0.1;
                 node_locations.push_back(it->rGetLocation());
             }
 
