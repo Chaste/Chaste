@@ -43,9 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-
-// Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 template<unsigned DIM>
 NodeBasedCellPopulation<DIM>::NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh,
@@ -557,10 +555,11 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
             double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
             cell_types[node_index] = cell_type;
         }
-        if (this-> template HasWriter<CellMutationStatesCountWriter>())
+        if (this-> template HasWriter<CellMutationStatesWriter>())
         {
             double mutation_state = cell_iter->GetMutationState()->GetColour();
 
+            // TODO split these all off as Label not mutation states see #2534
             CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
             CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
 
@@ -606,7 +605,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);
     }
-    if (this-> template HasWriter<CellMutationStatesCountWriter>())
+    if (this-> template HasWriter<CellMutationStatesWriter>())
     {
         mesh_writer.AddPointData("Mutation states", cell_mutation_states);
     }
