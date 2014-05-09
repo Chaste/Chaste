@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellVariablesWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -350,6 +351,8 @@ public:
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVariablesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
+        cell_population.AddCellWriter<CellMutationStatesWriter>();
+
 
         // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
@@ -365,6 +368,7 @@ public:
         FileComparison(results_dir + "results.vizlocations", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizlocations").CompareFiles();
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
         FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizmutationstates").CompareFiles();
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellages.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellareas.dat").CompareFiles();
@@ -378,11 +382,33 @@ public:
 
         // Compare output with saved files of what they should look like
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").CompareFiles();
+
+        // Test VTK Output //TODO check all properties not just mutations
 #ifdef CHASTE_VTK
-        //Test that VTK writer has produced a file
-        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file.Exists());
- #endif //CHASTE_VTK
+		cell_population.WriteVtkResultsToFile(output_directory);
+
+
+		// Read VTK file & check it doesn't cause any problems.
+		VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+
+		std::vector<double> mutation_states_data;
+
+		// first cell 5 as labeled rest are zeros since all wild type
+		vtk_reader.GetPointData("Mutation states", mutation_states_data);
+		TS_ASSERT_EQUALS(mutation_states_data.size(), 5u);
+		for (unsigned i=0; i<mutation_states_data.size(); i++)
+		{
+			if (i==0)
+			{
+				TS_ASSERT_DELTA(mutation_states_data[i], 5.0, 1e-9);
+			}
+			else
+			{
+				TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
+			}
+		}
+#endif
+
     }
 
     void TestRemoveDeadCellsAndUpdate() throw(Exception)

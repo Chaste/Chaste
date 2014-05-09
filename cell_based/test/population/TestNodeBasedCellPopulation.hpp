@@ -67,6 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellMutationStatesWriter.hpp"
 
 // Cell population writers
 #include "CellPopulationAreaWriter.hpp"
@@ -1048,6 +1049,7 @@ public:
         node_based_cell_population.AddCellWriter<CellAgesWriter>();
         node_based_cell_population.AddCellWriter<CellVolumesWriter>();
         node_based_cell_population.AddCellWriter<CellAncestorWriter>();
+        node_based_cell_population.AddCellWriter<CellMutationStatesWriter>();
 
         node_based_cell_population.SetCellAncestorsToLocationIndices();
 
@@ -1062,6 +1064,7 @@ public:
         FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.viznodes").CompareFiles();
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizcelltypes").CompareFiles();
         FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.vizmutationstates").CompareFiles();
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellages.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/cellareas.dat").CompareFiles();
@@ -1097,6 +1100,32 @@ public:
 
         // Compare output with saved files of what they should look like
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
+
+
+        // Test VTK Output //TODO check all properties not just mutations
+#ifdef CHASTE_VTK
+        node_based_cell_population.WriteVtkResultsToFile(output_directory);
+
+
+		// Read VTK file & check it doesn't cause any problems.
+		VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+
+		std::vector<double> mutation_states_data;
+		std::vector<double> saved_mutation_states_data;
+		saved_mutation_states_data.push_back(5.0);
+		saved_mutation_states_data.push_back(3.0);
+		saved_mutation_states_data.push_back(4.0);
+		saved_mutation_states_data.push_back(4.0);
+
+		//
+		vtk_reader.GetPointData("Mutation states", mutation_states_data);
+		TS_ASSERT_EQUALS(mutation_states_data.size(), 4u);
+		for (unsigned i=0; i<mutation_states_data.size(); i++)
+		{
+			TS_ASSERT_DELTA(mutation_states_data[i], saved_mutation_states_data[i], 1e-9);
+		}
+
+#endif
     }
 
     void TestNodeBasedCellPopulationOutputWriters3d()
@@ -1136,6 +1165,7 @@ public:
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
+        cell_population.AddCellWriter<CellMutationStatesWriter>();
 
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.AddCellWriter<CellAncestorWriter>();
@@ -1151,9 +1181,31 @@ public:
         FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.viznodes").CompareFiles();
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizcelltypes").CompareFiles();
         FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/results.vizmutationstates").CompareFiles();
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellmutationstates.dat").CompareFiles();
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
+
+        // Test VTK Output //TODO check all properties not just mutations
+#ifdef CHASTE_VTK
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+
+		// Read VTK file & check it doesn't cause any problems.
+		VtkMeshReader<3,3> vtk_reader(results_dir + "/results_0.vtu");
+
+		std::vector<double> mutation_states_data;
+
+		// all zeros since all wild type
+		vtk_reader.GetPointData("Mutation states", mutation_states_data);
+		TS_ASSERT_EQUALS(mutation_states_data.size(), 51u);
+		for (unsigned i=0; i<mutation_states_data.size(); i++)
+		{
+			TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
+		}
+
+#endif
+
     }
 
     void TestWritingCellCyclePhases()
