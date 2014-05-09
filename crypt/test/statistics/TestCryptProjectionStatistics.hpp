@@ -158,11 +158,11 @@ public:
             unsigned node_index = crypt.GetLocationIndexUsingCell(test_section2[i]);
             if (node_index == 399u || node_index == 421u )
             {
-                //TS_ASSERT_EQUALS(labelled_cells[i], true);
+                TS_ASSERT_EQUALS(labelled_cells[i], true);
             }
             else
             {
-                //TS_ASSERT_EQUALS(labelled_cells[i], false);
+                TS_ASSERT_EQUALS(labelled_cells[i], false);
             }
         }
 
