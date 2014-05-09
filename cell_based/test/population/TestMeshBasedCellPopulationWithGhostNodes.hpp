@@ -172,7 +172,7 @@ public:
             is_ghost_node[*it] = true;
         }
 
-        //TS_ASSERT_EQUALS(cell_population.rGetGhostNodes(), is_ghost_node);
+        TS_ASSERT_EQUALS(cell_population.rGetGhostNodes(), is_ghost_node);
 
         // Test the GetGhostNodeIndices method
         std::set<unsigned> ghost_node_indices2 = cell_population.GetGhostNodeIndices();
@@ -185,7 +185,7 @@ public:
              ++cell_iter)
         {
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            //TS_ASSERT_EQUALS(is_ghost_node[node_index], false);
+            TS_ASSERT_EQUALS(is_ghost_node[node_index], false);
             counter++;
         }
 
