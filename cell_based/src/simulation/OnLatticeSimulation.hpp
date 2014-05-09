@@ -72,19 +72,9 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulation<DIM> >(*this);
-        archive & mOutputCellVelocities;
     }
 
 protected:
-
-    /**
-     * Whether to write the cell velocities to a file.
-     * Initialised to false in constuctor.
-     */
-    bool mOutputCellVelocities;
-
-    /** Results file cell velocities. */
-    out_stream mpCellVelocitiesFile;
 
     /**
      * Overridden UpdateCellPopulation() method.
@@ -156,29 +146,6 @@ public:
      * Method to remove all the PottsUpdateRules
      */
     void RemoveAllPottsUpdateRules();
-
-    /**
-     * Overridden OutputAdditionalSimulationSetup() method.
-     * @return the update rule information.
-     */
-    bool GetOutputCellVelocities();
-
-    /**
-     * Set mOutputCellVelocities.
-     *
-     * @param outputCellVelocities the new value of mOutputCellVelocities
-     */
-    void SetOutputCellVelocities(bool outputCellVelocities);
-
-    /**
-     * Overridden SetupSolve() method to setup the cell velocities file.
-     */
-    virtual void SetupSolve();
-
-    /**
-     * Overridden UpdateAtEndOfSolve() method to close the cell velocities file.
-     */
-    virtual void UpdateAtEndOfSolve();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method to output the force and cell

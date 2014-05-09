@@ -8,3 +8,4 @@
 		<EndTime>0.5</EndTime>
 		<SamplingTimestepMultiple>1</SamplingTimestepMultiple>
 		<OutputDivisionLocations>0</OutputDivisionLocations>
+		<OutputCellVelocities>0</OutputCellVelocities>

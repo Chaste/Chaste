@@ -92,7 +92,7 @@ private:
 
 public:
 
-    void TestOutputNodeVelocitiesAndDivisionLocations() throw(Exception)
+    void TestOutputNodeAndCellVelocitiesAndDivisionLocations() throw(Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
@@ -112,7 +112,7 @@ public:
 
         // Set up simulation
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOutputNodeVelocitiesAndDivisionLocations");
+        simulator.SetOutputDirectory("TestOutputNodeAndCellVelocitiesAndDivisionLocations");
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
@@ -127,20 +127,29 @@ public:
         TS_ASSERT_EQUALS(simulator.GetOutputDivisionLocations(), false);
         simulator.SetOutputDivisionLocations(true);
 
+        // Record cell velocities
+		TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), false);
+		simulator.SetOutputCellVelocities(true);
+
         // Run simulation
         simulator.Solve();
 
         // Check node velocities file
-        OutputFileHandler handler("TestOutputNodeVelocitiesAndDivisionLocations", false);
+        OutputFileHandler handler("TestOutputNodeAndCellVelocitiesAndDivisionLocations", false);
 
         std::string node_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/nodevelocities.dat";
-        NumericFileComparison node_velocities(node_velocities_file, "cell_based/test/data/TestOutputNodeVelocitiesAndDivisionLocations/nodevelocities.dat");
+        NumericFileComparison node_velocities(node_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/nodevelocities.dat");
         TS_ASSERT(node_velocities.CompareFiles(1e-2));
 
-        // Check node velocities file
+        //Check Division locations file
         std::string division_locations_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/divisions.dat";
-        NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeVelocitiesAndDivisionLocations/divisions.dat");
+        NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/divisions.dat");
         TS_ASSERT(division_locations.CompareFiles(1e-2));
+
+        //Check Cell Velocities file
+        std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";
+        NumericFileComparison cell_velocities(cell_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/cellvelocities.dat");
+        TS_ASSERT(cell_velocities.CompareFiles(1e-2));
 
         // Test vtk files exist
 #ifdef CHASTE_VTK

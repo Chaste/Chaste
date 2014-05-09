@@ -47,8 +47,7 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
                                               bool initialiseCells)
     : AbstractCellBasedSimulation<DIM>(rCellPopulation,
                                        deleteCellPopulationInDestructor,
-                                       initialiseCells),
-      mOutputCellVelocities(false)
+                                       initialiseCells)
 {
     if (!dynamic_cast<AbstractOnLatticeCellPopulation<DIM>*>(&rCellPopulation))
     {
@@ -113,92 +112,10 @@ void OnLatticeSimulation<DIM>::WriteVisualizerSetupFile()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellLocationsAndTopology()
 {
-    // Store whether we are sampling results at the current timestep
-    SimulationTime* p_time = SimulationTime::Instance();
-    bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
-
-    /*
-     * If required, store the current locations of cell centres. Note that we need to
-     * use a std::map between cells and locations, rather than (say) a std::vector with
-     * location indices corresponding to cells, since once we call UpdateCellLocations()
-     * the location index of each cell may change. This is especially true in the case
-     * of a CaBasedCellPopulation.
-     */
-    std::map<CellPtr, c_vector<double, DIM> > old_cell_locations;
-    if (mOutputCellVelocities && at_sampling_timestep)
-    {
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-             cell_iter != this->mrCellPopulation.End();
-             ++cell_iter)
-        {
-            old_cell_locations[*cell_iter] = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
-        }
-    }
-
     // Update cell locations
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
     static_cast<AbstractOnLatticeCellPopulation<DIM>*>(&(this->mrCellPopulation))->UpdateCellLocations(this->mDt);
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
-
-    // Now write cell velocities to file if required
-    if (mOutputCellVelocities && at_sampling_timestep)
-    {
-        *mpCellVelocitiesFile << p_time->GetTime() << "\t";
-
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
-             cell_iter != this->mrCellPopulation.End();
-             ++cell_iter)
-        {
-            unsigned index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-            const c_vector<double,DIM>& position = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
-
-            c_vector<double, DIM> velocity; // Two lines for profile build
-            velocity = (position - old_cell_locations[*cell_iter])/this->mDt;
-
-            *mpCellVelocitiesFile << index  << " ";
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *mpCellVelocitiesFile << position[i] << " ";
-            }
-
-            for (unsigned i=0; i<DIM; i++)
-            {
-                *mpCellVelocitiesFile << velocity[i] << " ";
-            }
-        }
-        *mpCellVelocitiesFile << "\n";
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::SetupSolve()
-{
-    if (mOutputCellVelocities)
-    {
-        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
-        mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
-    }
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::UpdateAtEndOfSolve()
-{
-    if (mOutputCellVelocities)
-    {
-        mpCellVelocitiesFile->close();
-    }
-}
-
-template<unsigned DIM>
-bool OnLatticeSimulation<DIM>::GetOutputCellVelocities()
-{
-    return mOutputCellVelocities;
-}
-
-template<unsigned DIM>
-void OnLatticeSimulation<DIM>::SetOutputCellVelocities(bool outputCellVelocities)
-{
-    mOutputCellVelocities = outputCellVelocities;
 }
 
 template<unsigned DIM>
@@ -269,8 +186,6 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::OutputSimulationParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
-
     // Call method on direct parent class
     AbstractCellBasedSimulation<DIM>::OutputSimulationParameters(rParamsFile);
 }

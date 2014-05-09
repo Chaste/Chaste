@@ -97,6 +97,8 @@ private:
         archive & mOutputDirectory;
         archive & mNumBirths;
         archive & mNumDeaths;
+        archive & mOutputDivisionLocations;
+        archive & mOutputCellVelocities;
         archive & mCellKillers;
         archive & mSimulationModifiers;
         archive & mSamplingTimestepMultiple;
@@ -146,6 +148,15 @@ protected:
 
     /** Output file for location of division events. */
     out_stream mpDivisionLocationFile;
+
+    /**
+     * Whether to write the cell velocities to a file.
+     * Initialised to false in constuctor.
+     */
+    bool mOutputCellVelocities;
+
+    /** Results file for cell velocities. */
+    out_stream mpCellVelocitiesFile;
 
     /** List of cell killers. */
     std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
@@ -207,14 +218,6 @@ protected:
      * A method for subclasses to do something at before the start of the time loop.
      */
     virtual void SetupSolve()
-    {
-    }
-
-    /**
-     * This method may be overridden in subclasses to do something
-     * at the end of each time loop.
-     */
-    virtual void UpdateAtEndOfSolve()
     {
     }
 
@@ -431,8 +434,7 @@ public:
      * Finishing up:
      *
      * After exiting the main time loop, we call UpdateCellPopulation() in order to carry out a final
-     * update of the cell population. We then call UpdateAtEndOfSolve(), which is empty in the parent
-     * class but may be overridden, e.g. to close additional output files. We also call
+     * update of the cell population. We also call
      * UpdateAtEndOfSolve()} on any member objects inheriting from AbstractCellBasedSimulationModifier
      * in an analogous manner to the aforementioned calls to SetupSolve() UpdateAtEndOfTimeStep().
      * Finally, we close output files. This completes the Solve() method.
@@ -460,6 +462,19 @@ public:
      * @param outputDivisionLocations the new value of mOutputDivisionLocations
      */
     void SetOutputDivisionLocations(bool outputDivisionLocations);
+
+    /**
+     * @return mOutputCellVelocities
+     */
+    bool GetOutputCellVelocities();
+
+    /**
+     * Set mOutputCellVelocities.
+     *
+     * @param outputCellVelocities the new value of mOutputCellVelocities
+     */
+    void SetOutputCellVelocities(bool outputCellVelocities);
+
 
     /**
      * Outputs simulation parameters to file

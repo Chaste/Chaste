@@ -63,6 +63,7 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
       mNumBirths(0),
       mNumDeaths(0),
       mOutputDivisionLocations(false),
+      mOutputCellVelocities(false),
       mSamplingTimestepMultiple(1),
       mpCellBasedPdeHandler(NULL)
 {
@@ -362,6 +363,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
     }
+    if (mOutputCellVelocities)
+    {
+        OutputFileHandler output_file_handler2(this->mSimulationOutputDirectory+"/", false);
+        mpCellVelocitiesFile = output_file_handler2.OpenOutputFile("cellvelocities.dat");
+    }
+
 
     if (PetscTools::AmMaster())
     {
@@ -435,8 +442,61 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
         UpdateCellPopulation();
 
+
+        // Store whether we are sampling results at the current timestep
+        SimulationTime* p_time = SimulationTime::Instance();
+        bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
+
+        /*
+         * If required, store the current locations of cell centres. Note that we need to
+         * use a std::map between cells and locations, rather than (say) a std::vector with
+         * location indices corresponding to cells, since once we call UpdateCellLocations()
+         * the location index of each cell may change. This is especially true in the case
+         * of a CaBasedCellPopulation.
+         */
+        std::map<CellPtr, c_vector<double, SPACE_DIM> > old_cell_locations;
+        if (mOutputCellVelocities && at_sampling_timestep)
+        {
+            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+                 cell_iter != mrCellPopulation.End();
+                 ++cell_iter)
+            {
+                old_cell_locations[*cell_iter] = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+            }
+        }
+
         // Update cell locations and topology
         UpdateCellLocationsAndTopology();
+
+        // Now write cell velocities to file if required
+		if (mOutputCellVelocities && at_sampling_timestep)
+		{
+			// Offset as doing this before we increase time by mDt
+			*mpCellVelocitiesFile << p_time->GetTime() + mDt<< "\t";
+
+			for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+				 cell_iter != mrCellPopulation.End();
+				 ++cell_iter)
+			{
+				unsigned index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+				const c_vector<double,SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+				c_vector<double, SPACE_DIM> velocity; // Two lines for profile build
+				velocity = (position - old_cell_locations[*cell_iter])/mDt;
+
+				*mpCellVelocitiesFile << index  << " ";
+				for (unsigned i=0; i<SPACE_DIM; i++)
+				{
+					*mpCellVelocitiesFile << position[i] << " ";
+				}
+
+				for (unsigned i=0; i<SPACE_DIM; i++)
+				{
+					*mpCellVelocitiesFile << velocity[i] << " ";
+				}
+			}
+			*mpCellVelocitiesFile << "\n";
+		}
 
         // Update the assignment of cells to processes.
         mrCellPopulation.UpdateCellProcessLocation();
@@ -495,8 +555,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     }
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
-    UpdateAtEndOfSolve();
-
     // Call UpdateAtEndOfSolve(), on each modifier
     for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
          iter != mSimulationModifiers.end();
@@ -513,6 +571,10 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     if (mOutputDivisionLocations)
     {
         mpDivisionLocationFile->close();
+    }
+    if (mOutputCellVelocities)
+    {
+        mpCellVelocitiesFile->close();
     }
 
     if (PetscTools::AmMaster())
@@ -576,6 +638,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputDivisionLocations(bool outputDivisionLocations)
 {
     mOutputDivisionLocations = outputDivisionLocations;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetOutputCellVelocities()
+{
+    return mOutputCellVelocities;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::SetOutputCellVelocities(bool outputCellVelocities)
+{
+    mOutputCellVelocities = outputCellVelocities;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -653,6 +727,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     *rParamsFile << "\t\t<EndTime>" << mEndTime << "</EndTime>\n";
     *rParamsFile << "\t\t<SamplingTimestepMultiple>" << mSamplingTimestepMultiple << "</SamplingTimestepMultiple>\n";
     *rParamsFile << "\t\t<OutputDivisionLocations>" << mOutputDivisionLocations << "</OutputDivisionLocations>\n";
+    *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////

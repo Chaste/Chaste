@@ -112,14 +112,9 @@ protected:
     virtual void UpdateNodePositions();
 
     /**
-     * Overridden SetupSolve() method to setup the node velocities file.
+     * Overridden SetupSolve() method to Clear the forces applied to the nodes.
      */
     virtual void SetupSolve();
-
-    /**
-     * Overridden UpdateAtEndOfSolve() method to close the node velocities file.
-     */
-    virtual void UpdateAtEndOfSolve();
 
     /**
      * Overridden CalculateCellDivisionVector() method for determining how cell division occurs.
