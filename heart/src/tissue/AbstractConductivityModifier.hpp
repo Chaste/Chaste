@@ -83,12 +83,20 @@ public:
         return mCache[domainIndex].second;
     }
 
-    /** Pure method that alters the given conductivity tensor
-     *  @param elementIndex Index of current element
-     *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
-     *  @return Reference to a modified conductivity tensor.
+    /**
+     * Pure method that alters the given conductivity tensor on an element-wise basis for a particular domain.
+     *
+     * @param elementIndex Global index of current element.
+     * @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor.
+     * @param domainIndex  The index of the domain (0=intracellular, 1=extracellular, [2=second intracellular in extended bidomain]).
+     * @return Reference to a modified conductivity tensor,
+     *         N.B. the fact this is a reference means the tensor object has to persist,
+     *         and should therefore generally be a member variable of your subclass
+     *         (it gets copied/cached appropriately by the calling code, so doesn't have to persist for subsequent calls!).
      */
-    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity, unsigned domainIndex)=0;
+    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex,
+                                                                                       const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity,
+                                                                                       unsigned domainIndex)=0;
 };
 
 
