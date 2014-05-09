@@ -59,7 +59,7 @@ public:
     /** Method that checks element index and the domain (intra/extra/other) and returns cached value if available.
      *  @param elementIndex Index of current element
      *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
-     *  @param domainIndex Index to tell the method if we want the intracellular, extracellular, etc.
+     *  @param domainIndex Used to tailor modification to the domain. 0 = intracellular, 1 = extracellular, 2 = second intracellular (tridomain)
      *  @return Reference to a modified conductivity tensor.
      */
     c_matrix<double,SPACE_DIM,SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex,
@@ -77,7 +77,7 @@ public:
         if (mCache[domainIndex].first != elementIndex)
         {
             mCache[domainIndex].first = elementIndex;
-            mCache[domainIndex].second = rCalculateModifiedConductivityTensor(elementIndex, rOriginalConductivity);
+            mCache[domainIndex].second = rCalculateModifiedConductivityTensor(elementIndex, rOriginalConductivity, domainIndex);
         }
         // Return cached tensor
         return mCache[domainIndex].second;
@@ -88,7 +88,7 @@ public:
      *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
      *  @return Reference to a modified conductivity tensor.
      */
-    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity)=0;
+    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity, unsigned domainIndex)=0;
 };
 
 

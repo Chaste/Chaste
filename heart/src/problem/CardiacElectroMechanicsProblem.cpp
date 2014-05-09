@@ -166,7 +166,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
-c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity)
+c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity, unsigned domainIndex)
 {
 
     // first get the deformation gradient for this electrics element

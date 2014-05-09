@@ -273,9 +273,10 @@ public :
      *  call this method.
      *  @param elementIndex Index of current element
      *  @param rOriginalConductivity Reference to the original (for example, undeformed) conductivity tensor
+     *  @param domainIndex Used to tailor modification to the domain. 0 = intracellular, 1 = extracellular, 2 = second intracellular (tridomain)
      *  @return Reference to a modified conductivity tensor.
      */
-    c_matrix<double,DIM,DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity);
+    c_matrix<double,DIM,DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity, unsigned domainIndex);
 
 
     /**

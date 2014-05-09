@@ -161,7 +161,7 @@ public:
     {
     }
 
-    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity)
+    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
     {
         // Increase by factor of two for element 1
         if ( elementIndex==1 )

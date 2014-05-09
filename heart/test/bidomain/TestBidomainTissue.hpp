@@ -108,9 +108,21 @@ public:
     {
     }
 
-    c_matrix<double,1,1>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,1,1>& rOriginalConductivity)
+    c_matrix<double,1,1>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,1,1>& rOriginalConductivity, unsigned domainIndex)
     {
-        mTensor(0,0) = (elementIndex+2.0)*rOriginalConductivity(0,0); //so conductivity on element 0 gets scaled by 2, and by 3 on element 1
+        // We can change the behaviour of the modifier for intra/extra-cellular by probing domainIndex
+        double domain_scaling;
+        if (domainIndex==0)
+        {
+            // Intracellular
+            domain_scaling = 1.0;
+        }
+        else // domainIndex==1
+        {
+            // Extracellular
+            domain_scaling = 1.5;
+        }
+        mTensor(0,0) = domain_scaling*(elementIndex+2.0)*rOriginalConductivity(0,0); //so conductivity on element 0 gets scaled by 2, and by 3 on element 1
         return mTensor;
     }
 };
@@ -351,7 +363,7 @@ public:
         SimpleConductivityModifier modifier;
         bidomain_tissue.SetConductivityModifier(&modifier);
 
-        TS_ASSERT_DELTA(bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0), 2*orig_extra_conductivity, 1e-9);
+        TS_ASSERT_DELTA(bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0), 1.5*2*orig_extra_conductivity, 1e-9);
         TS_ASSERT_DELTA(bidomain_tissue.rGetIntracellularConductivityTensor(0)(0,0), 2*orig_intra_conductivity, 1e-9);
 
         // The following asks for element 1 which doesn't exist
