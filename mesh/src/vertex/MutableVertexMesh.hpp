@@ -130,15 +130,16 @@ protected:
      * Check if any neighbouring nodes in an element are closer than the mCellRearrangementThreshold
      * and are not contained in any triangular elements. If any such pair of nodes are found, then
      * call IdentifySwapType(), which in turn implements the appropriate local remeshing operation
-     * (a T1, T2 or T3 swap or node merge).
+     * (a T1 swap, void removal, or node merge).
      *
      * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
      *                   with indices of VertexElements in the new mesh.  This should be created
-     *                   with the correct size, GetNumElements()
+     *                   with the correct size, GetNumElements().
      *
      * @return whether we need to check for, and implement, any further local remeshing operations
+     *                   (true if any swaps are performed).
      */
-    bool CheckForT1Swaps(VertexElementMap& rElementMap);
+    bool CheckForSwapsFromShortEdges(VertexElementMap& rElementMap);
 
     /**
      * Helper method for ReMesh().
@@ -151,11 +152,11 @@ protected:
     bool CheckForIntersections();
 
     /**
-     * Helper method for ReMesh(), called by CheckForT1Swaps().
-     *
-     * Identify the type of local remeshing operation required (T1 swap, T3 swap or node merge) when
+     * Helper method for ReMesh(), called by CheckForSwapsFromShortEdges() when
      * neighbouring nodes in an element have been found to be closer than the mCellRearrangementThreshold
-     * and are not contained in any triangular elements.
+     * and do not share any triangular elements.
+     *
+     * Identify the type of local remeshing operation required (T1 swap, void removal, or node merge).
      *
      * @param pNodeA one of the nodes to perform the swap with
      * @param pNodeB the other node to perform the swap
@@ -169,7 +170,8 @@ protected:
      * Helper method for ReMesh(), called by IdentifySwapType().
      *
      * Merge two given nodes in the mesh and update node/element ownership, by replacing
-     * the node contained in the least number of elements with the other node.
+     * the node contained in the least number of elements with the other node. The merged
+     * node is moved to the centre between the two old node positions.
      *
      * @param pNodeA one of the nodes to perform the merge with
      * @param pNodeB the other node to perform the merge with
@@ -501,7 +503,7 @@ public:
      * or T1, T2 or T3 swaps) that are required, and store any changes in element indices using
      * the given VertexElementMap.
      *
-     * This method calls several other methods, in particular CheckForT2Swaps(), CheckForT1Swaps()
+     * This method calls several other methods, in particular CheckForT2Swaps(), CheckForSwapsFromShortEdges()
      * and CheckForIntersections().
      *
      * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh

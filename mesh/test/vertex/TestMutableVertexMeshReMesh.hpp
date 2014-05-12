@@ -582,6 +582,199 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map), "Nodes are too close together, this shouldn't happen");
     }
 
+    void TestPerformT1SwapWithAddingEdgeToTriangularElement() throw(Exception)
+    {
+        /**
+         * Create a mesh comprising six nodes contained in two triangle and two rhomboid elements, as shown below.
+         * We will test that the triangles are allowed to gain an edge.
+         *  _____
+         * |\   /|
+         * | \ / |
+         * |  |  |
+         * | / \ |
+         * |/___\|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true,  1.0, 1.0));
+        nodes.push_back(new Node<2>(3, true,  0.0, 1.0));
+        nodes.push_back(new Node<2>(4, false, 0.5, 0.4));
+        nodes.push_back(new Node<2>(5, false, 0.5, 0.6));
+
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[3] = {2, 3, 5};
+        unsigned node_indices_elem_1[4] = {2, 5, 4, 1};
+        unsigned node_indices_elem_2[3] = {1, 4, 0};
+        unsigned node_indices_elem_3[4] = {0, 4, 5, 3};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+                nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            }
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+        }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Ensure that the inner node will swap
+        vertex_mesh.SetCellRearrangementThreshold(0.21);
+
+        // Perform a T1 swap on nodes 4 and 5
+        VertexElementMap map(vertex_mesh.GetNumElements());
+        vertex_mesh.CheckForSwapsFromShortEdges(map);
+
+        // Test that each element contains the correct nodes following the rearrangement
+        unsigned node_indices_element_0[4] = {2, 3, 5, 4};
+        unsigned node_indices_element_1[3] = {2, 4, 1};
+        unsigned node_indices_element_2[4] = {1, 4, 5, 0};
+        unsigned node_indices_element_3[3] = {0, 5, 3};
+
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
+            }
+        }
+
+    }
+
+    void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
+	{
+    	/**
+    	 * In this test we check that a T1 swap does not occur if one of the elements is triangular
+    	 * and would loose an edge by swapping nodes. The mesh looks like this
+    	 *
+    	 *       ______________
+    	 *      |\             |
+    	 *      | \ _________  |
+    	 *      |  |          \| ...where the funny shaped element in the middle is supposed to be
+    	 *      |  |_________ /|    a very long triangle that has the third vertex on the right hand boundary.
+    	 *      | /            |
+    	 *      |/_____________|
+    	 */
+    	std::vector<Node<2>*> nodes;
+    	nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+    	nodes.push_back(new Node<2>(1, true,  2.0, 0.0));
+    	nodes.push_back(new Node<2>(2, true,  2.0, 2.0));
+    	nodes.push_back(new Node<2>(3, true,  0.0, 2.0));
+    	nodes.push_back(new Node<2>(4, false, 0.2, 0.95));
+    	nodes.push_back(new Node<2>(5, true, 2.0, 1.0));
+    	nodes.push_back(new Node<2>(6, false, 0.2, 1.05));
+
+    	std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        unsigned node_indices_elem_0[4] = {0, 1, 5, 4};
+        unsigned node_indices_elem_1[4] = {5, 2, 3, 6};
+        unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
+        unsigned node_indices_elem_3[3] = { 4, 5, 6};
+        for (unsigned i=0; i<4; i++)
+        {
+            if (i < 3)
+            {
+                nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
+            }
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+            nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+        }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Ensure that the inner edge will be considered for a swap
+        vertex_mesh.SetCellRearrangementThreshold(0.11);
+
+        // Check for T1 swaps and carry them out if allowed - the short edge should not swap!
+        VertexElementMap map(vertex_mesh.GetNumElements());
+        vertex_mesh.CheckForSwapsFromShortEdges(map);
+
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
+
+        // Test that each element still contains the correct nodes following the rearrangement
+        for (unsigned i=0; i<4; i++)
+        {
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_elem_0[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_elem_1[i]);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_elem_2[i]);
+            if (i < 3)
+            {
+                TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_elem_3[i]);
+            }
+        }
+	}
+
+    void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement() throw(Exception)
+	{
+    	/**
+    	 * In this test we check that void removal does not occur if one of the adjacent elements is triangular
+    	 * and would loose an edge by swapping nodes. The code should throw and exception in this case.
+    	 * The mesh looks like this
+    	 *
+    	 *       ______________./This corner is not a node.
+    	 *      |\      1      |
+    	 *      | \ _________  |
+    	 *      |  |   void   \| ...where elements 1, and 2 are triangles that share the right hand vertex
+    	 *      |  |_________ /|    with the triangular void in the middle.
+    	 *      | /     2      |
+    	 *      |/_____________|.This corner is not a node either.
+    	 */
+    	std::vector<Node<2>*> nodes;
+    	nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+    	nodes.push_back(new Node<2>(1, true,  0.0, 2.0));
+    	nodes.push_back(new Node<2>(2, true, 0.2, 0.95));
+    	nodes.push_back(new Node<2>(3, true, 2.0, 1.0));
+    	nodes.push_back(new Node<2>(4, true, 0.2, 1.05));
+
+    	std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        unsigned node_indices_elem_0[4] = {0, 2, 4, 1};
+        unsigned node_indices_elem_1[3] = {1, 4, 3};
+        unsigned node_indices_elem_2[3] = {0, 3, 2};
+
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
+            if (i < 3)
+            {
+                nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
+                nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
+            }
+        }
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Ensure that the inner edge will be considered for a swap
+        vertex_mesh.SetCellRearrangementThreshold(0.11);
+
+        // Check for possible swaps and carry them out if allowed - the short edge should not swap and
+        // the void should not be removed!
+        VertexElementMap map(vertex_mesh.GetNumElements());
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForSwapsFromShortEdges(map),
+                              "Triangular element next to triangular void, not implemented yet.");
+	}
+
     void TestPerformT2Swap() throw(Exception)
     {
         /*
@@ -1907,7 +2100,7 @@ public:
     {
         /*
          * Create a mesh comprising eleven nodes contain in four elements with two small
-         * triangle voids, as shown velow. We will test that trying to remove the voids
+         * triangle voids, as shown below. We will test that trying to remove the voids
          * results in the correct exception being thrown.
          *    _________
          *   |        /|

@@ -794,7 +794,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         bool recheck_mesh = true;
         while (recheck_mesh == true)
         {
-            recheck_mesh = CheckForT1Swaps(rElementMap);
+        	// We check for any short edges and perform swaps if necessary and possible.
+            recheck_mesh = CheckForSwapsFromShortEdges(rElementMap);
         }
 
         // Check for element intersections
@@ -824,7 +825,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT1Swaps(VertexElementMap& rElementMap)
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges(VertexElementMap& rElementMap)
 {
     // Loop over elements to check for T1 swaps
     for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
@@ -836,14 +837,12 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT1Swaps(VertexElementMap
         unsigned num_nodes = elem_iter->GetNumNodes();
         assert(num_nodes > 0);
 
-        unsigned new_num_nodes = num_nodes;    ///\todo Is this required? (see #2401)
-
         // Loop over the nodes contained in this element
         for (unsigned local_index=0; local_index<num_nodes; local_index++)
         {
             // Find locations of the current node and anticlockwise node
             Node<SPACE_DIM>* p_current_node = elem_iter->GetNode(local_index);
-            unsigned local_index_plus_one = (local_index+1)%new_num_nodes;    ///\todo Use iterators to tidy this up (see #2401)
+            unsigned local_index_plus_one = (local_index+1)%num_nodes;    ///\todo Use iterators to tidy this up (see #2401)
             Node<SPACE_DIM>* p_anticlockwise_node = elem_iter->GetNode(local_index_plus_one);
 
             // Find distance between nodes
@@ -852,29 +851,29 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT1Swaps(VertexElementMap
             // If the nodes are too close together...
             if (distance_between_nodes < mCellRearrangementThreshold)
             {
-                // ...then check if any triangular elements contain in the nodes...
+                // ...then check if any triangular elements are shared by these nodes...
                 std::set<unsigned> elements_of_node_a = p_current_node->rGetContainingElementIndices();
                 std::set<unsigned> elements_of_node_b = p_anticlockwise_node->rGetContainingElementIndices();
 
-                std::set<unsigned> all_elements;
-                std::set_union(elements_of_node_a.begin(), elements_of_node_a.end(),
+                std::set<unsigned> shared_elements;
+                std::set_intersection(elements_of_node_a.begin(), elements_of_node_a.end(),
                                elements_of_node_b.begin(), elements_of_node_b.end(),
-                               std::inserter(all_elements, all_elements.begin()));
+                               std::inserter(shared_elements, shared_elements.begin()));
 
-                bool either_node_contained_in_triangular_element = false;
-                for (std::set<unsigned>::const_iterator it = all_elements.begin();
-                     it != all_elements.end();
+                bool both_nodes_share_triangular_element = false;
+                for (std::set<unsigned>::const_iterator it = shared_elements.begin();
+                     it != shared_elements.end();
                      ++it)
                 {
                     if (this->GetElement(*it)->GetNumNodes() <= 3)
                     {
-                        either_node_contained_in_triangular_element = true;
+                        both_nodes_share_triangular_element = true;
                         break;
                     }
                 }
 
                 // ...and if none are, then perform the required type of swap and halt the search, returning true
-                if (!either_node_contained_in_triangular_element)
+                if (!both_nodes_share_triangular_element)
                 {
                     IdentifySwapType(p_current_node, p_anticlockwise_node, rElementMap);
                     return true;
@@ -902,7 +901,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
             {
                 // ...then perform a T2 swap and break out of the loop
                 PerformT2Swap(*elem_iter);
-                // todo: cover this line in a test
+                ///\todo: cover this line in a test
                 rElementMap.SetDeleted(elem_iter->GetIndex());
                 return true;
             }
@@ -997,7 +996,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
     std::set_union(nodeA_elem_indices.begin(), nodeA_elem_indices.end(),
                    nodeB_elem_indices.begin(), nodeB_elem_indices.end(),
                    std::inserter(temp_union_set, temp_union_set.begin()));
-    all_indices.swap(temp_union_set); // temp_set will be deleted
+    all_indices.swap(temp_union_set); // temp_set will be deleted, all_indices now contains all the indices of elements
+                                      // that touch the potentially swapping nodes
 
     if ((nodeA_elem_indices.size()>3) || (nodeB_elem_indices.size()>3))
     {
@@ -1079,7 +1079,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                          */
                         EXCEPTION("There are non-boundary nodes contained only in two elements; something has gone wrong.");
                     }
-                }
+                }// from [if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)]
                 else
                 {
                     /*
@@ -1092,6 +1092,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                      *     (1) \
                      *
                      * ///\todo this should be a T1 swap (see #1263 and #2401)
+                     * Referring to the todo: this should probably stay a node-merge. If this is a T1 swap then
+                     * the single boundary node will travel from element 1 to element 2, but still remain a single node.
+                     * I.e. we would not reduce the total number of nodes in this situation.
                      */
                     PerformNodeMerge(pNodeA, pNodeB);
                     RemoveDeletedNodes();
@@ -1122,17 +1125,23 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                 }
                 else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 {
-                    // element in nodeA_elem_indices which is not in nodeB_elem_indices contains a shared node with the element in nodeA_elem_indices which is not in nodeB_elem_indices.
+                    // The short edge must be at the boundary. We need to check whether this edge is
+                	// adjacent to a triangular void before we swap. If it is a triangular void, we perform a T2-type swap.
+                	// If not, then we perform a normal T1 swap. I.e. in detail we need to check whether the
+                	// element in nodeA_elem_indices which is not in nodeB_elem_indices contains a shared node
+                	// with the element in nodeB_elem_indices which is not in nodeA_elem_indices.
 
                     std::set<unsigned> element_A_not_B, temp_set;
-                    std::set_difference(all_indices.begin(), all_indices.end(), nodeB_elem_indices.begin(), nodeB_elem_indices.end(), std::inserter(temp_set, temp_set.begin()));
+                    std::set_difference(all_indices.begin(), all_indices.end(), nodeB_elem_indices.begin(),
+                    		nodeB_elem_indices.end(), std::inserter(temp_set, temp_set.begin()));
                     element_A_not_B.swap(temp_set);
 
                     // There must be only one such element
                     assert(element_A_not_B.size() == 1);
 
                     std::set<unsigned> element_B_not_A;
-                    std::set_difference(all_indices.begin(), all_indices.end(), nodeA_elem_indices.begin(), nodeA_elem_indices.end(), std::inserter(temp_set, temp_set.begin()));
+                    std::set_difference(all_indices.begin(), all_indices.end(), nodeA_elem_indices.begin(),
+                    		nodeA_elem_indices.end(), std::inserter(temp_set, temp_set.begin()));
                     element_B_not_A.swap(temp_set);
 
                     // There must be only one such element
@@ -1143,10 +1152,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                     unsigned local_index_1 = p_element_A_not_B->GetNodeLocalIndex(pNodeA->GetIndex());
                     unsigned next_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + 1)%(p_element_A_not_B->GetNumNodes()));
-                    unsigned previous_node_1 = p_element_A_not_B->GetNodeGlobalIndex((local_index_1 + p_element_A_not_B->GetNumNodes() - 1)%(p_element_A_not_B->GetNumNodes()));
+                    unsigned previous_node_1 = p_element_A_not_B->GetNodeGlobalIndex(
+                    		(local_index_1 + p_element_A_not_B->GetNumNodes() - 1)%(p_element_A_not_B->GetNumNodes()));
                     unsigned local_index_2 = p_element_B_not_A->GetNodeLocalIndex(pNodeB->GetIndex());
-                    unsigned next_node_2 = p_element_B_not_A->GetNodeGlobalIndex((local_index_2 + 1)%(p_element_B_not_A->GetNumNodes()));
-                    unsigned previous_node_2 = p_element_B_not_A->GetNodeGlobalIndex((local_index_2 + p_element_B_not_A->GetNumNodes() - 1)%(p_element_B_not_A->GetNumNodes()));
+                    unsigned next_node_2 = p_element_B_not_A->GetNodeGlobalIndex(
+                    		(local_index_2 + 1)%(p_element_B_not_A->GetNumNodes()));
+                    unsigned previous_node_2 = p_element_B_not_A->GetNodeGlobalIndex(
+                    		(local_index_2 + p_element_B_not_A->GetNumNodes() - 1)%(p_element_B_not_A->GetNumNodes()));
 
                     if (next_node_1 == previous_node_2 || next_node_2 == previous_node_1)
                      {
@@ -1166,6 +1178,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         assert(pNodeB->IsBoundaryNode());
 
                         // Get the third node in the triangular void
+
                         unsigned nodeC_index;
                         if (next_node_1 == previous_node_2 && next_node_2 != previous_node_1)
                         {
@@ -1178,6 +1191,25 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                         else
                         {
                              assert(next_node_1 == previous_node_2 && next_node_2 == previous_node_1);
+                             /**
+                              * Here, the triangular element would be along the short edge. Since we
+                              * are already checking in CheckForSwapsFromShortEdges() whether the element
+                              * is triangular, this exception is redundant for simulations. We leave it in for
+                              * clarity.
+                              * ///\todo: consider removing the checking for this exception (see #2401)
+                              */
+                             EXCEPTION("Triangular element next to triangular void, not implemented yet.");
+                        }
+
+                        if(p_element_A_not_B->GetNumNodes() == 3u || p_element_B_not_A->GetNumNodes() == 3u)
+                        {
+                        	/**
+                        	 * If this is true then one of the elements adjacent to the triangular void
+                        	 * is triangular. This element will then not share the short edge that is considered
+                        	 * for a swap. Nevertheless, it would loose an edge during the swap. We are currently
+                        	 * not able to deal with this situation.
+                        	 * Related to #2533 and #2401.
+                        	 */
                              EXCEPTION("Triangular element next to triangular void, not implemented yet.");
                         }
 
@@ -1201,7 +1233,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                         PerformT1Swap(pNodeA, pNodeB, all_indices);
                     }
-                }
+                } // from else if (nodeA_elem_indices.size()==2 && nodeB_elem_indices.size()==2)
                 else
                 {
                     // In this case, one node must be contained in two elements and the other in three elements.
