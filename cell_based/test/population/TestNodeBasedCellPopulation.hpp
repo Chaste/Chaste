@@ -1101,13 +1101,12 @@ public:
         // Compare output with saved files of what they should look like
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
 
-
-        // Test VTK Output //TODO check all properties not just mutations
+        // Test VTK output
+        ///\todo check all properties, not just mutations
 #ifdef CHASTE_VTK
         node_based_cell_population.WriteVtkResultsToFile(output_directory);
 
-
-		// Read VTK file & check it doesn't cause any problems.
+		// Read VTK file and check it doesn't cause any problems
 		VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
 
 		std::vector<double> mutation_states_data;
@@ -1117,14 +1116,12 @@ public:
 		saved_mutation_states_data.push_back(4.0);
 		saved_mutation_states_data.push_back(4.0);
 
-		//
 		vtk_reader.GetPointData("Mutation states", mutation_states_data);
 		TS_ASSERT_EQUALS(mutation_states_data.size(), 4u);
 		for (unsigned i=0; i<mutation_states_data.size(); i++)
 		{
 			TS_ASSERT_DELTA(mutation_states_data[i], saved_mutation_states_data[i], 1e-9);
 		}
-
 #endif
     }
 
@@ -1186,26 +1183,23 @@ public:
         FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellages.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
 
-        // Test VTK Output //TODO check all properties not just mutations
+        // Test VTK output
+        ///\todo check all properties, not just mutations
 #ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 
-
-		// Read VTK file & check it doesn't cause any problems.
+		// Read VTK file and check it doesn't cause any problems
 		VtkMeshReader<3,3> vtk_reader(results_dir + "/results_0.vtu");
 
+		// All cells are wild type
 		std::vector<double> mutation_states_data;
-
-		// all zeros since all wild type
 		vtk_reader.GetPointData("Mutation states", mutation_states_data);
 		TS_ASSERT_EQUALS(mutation_states_data.size(), 51u);
 		for (unsigned i=0; i<mutation_states_data.size(); i++)
 		{
 			TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
 		}
-
 #endif
-
     }
 
     void TestWritingCellCyclePhases()

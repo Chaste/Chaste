@@ -383,32 +383,24 @@ public:
         // Compare output with saved files of what they should look like
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").CompareFiles();
 
-        // Test VTK Output //TODO check all properties not just mutations
+        // Test VTK output
+        ///\todo check all properties, not just mutations
 #ifdef CHASTE_VTK
 		cell_population.WriteVtkResultsToFile(output_directory);
 
-
-		// Read VTK file & check it doesn't cause any problems.
+		// Read VTK file and check it doesn't cause any problems
 		VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
 
+		// The first cell is labelled; the remaining cells are wild type
 		std::vector<double> mutation_states_data;
-
-		// first cell 5 as labeled rest are zeros since all wild type
 		vtk_reader.GetPointData("Mutation states", mutation_states_data);
 		TS_ASSERT_EQUALS(mutation_states_data.size(), 5u);
-		for (unsigned i=0; i<mutation_states_data.size(); i++)
+		TS_ASSERT_DELTA(mutation_states_data[0], 5.0, 1e-9);
+		for (unsigned i=1; i<mutation_states_data.size(); i++)
 		{
-			if (i==0)
-			{
-				TS_ASSERT_DELTA(mutation_states_data[i], 5.0, 1e-9);
-			}
-			else
-			{
-				TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
-			}
+            TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
 		}
 #endif
-
     }
 
     void TestRemoveDeadCellsAndUpdate() throw(Exception)

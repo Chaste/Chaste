@@ -594,7 +594,7 @@ void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string
         {
             cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
 
-            // TODO split these all off as Label not mutation states see #2534
+            ///\todo split these all off as cell label not mutation states (see #2534)
             CellPropertyCollection collection = cell_ptr->rGetCellPropertyCollection();
             CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
 

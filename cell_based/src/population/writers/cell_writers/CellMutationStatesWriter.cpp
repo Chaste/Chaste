@@ -65,7 +65,7 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, 
 {
     double mutation_state = pCell->GetMutationState()->GetColour();
 
-    // TODO split these all off as Label not mutation states see #2534
+    ///\todo split these all off as cell label not mutation states (see #2534)
     CellPropertyCollection collection = pCell->rGetCellPropertyCollection();
     CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
 

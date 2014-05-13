@@ -559,7 +559,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
         {
             double mutation_state = cell_iter->GetMutationState()->GetColour();
 
-            // TODO split these all off as Label not mutation states see #2534
+            ///\todo split these all off as cell label not mutation states (see #2534)
             CellPropertyCollection collection = cell_iter->rGetCellPropertyCollection();
             CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
 

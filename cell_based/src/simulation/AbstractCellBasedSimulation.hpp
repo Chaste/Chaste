@@ -475,7 +475,6 @@ public:
      */
     void SetOutputCellVelocities(bool outputCellVelocities);
 
-
     /**
      * Outputs simulation parameters to file
      *

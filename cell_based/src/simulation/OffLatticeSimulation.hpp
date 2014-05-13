@@ -112,7 +112,7 @@ protected:
     virtual void UpdateNodePositions();
 
     /**
-     * Overridden SetupSolve() method to Clear the forces applied to the nodes.
+     * Overridden SetupSolve() method to clear the forces applied to the nodes.
      */
     virtual void SetupSolve();
 

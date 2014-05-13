@@ -141,12 +141,12 @@ public:
         NumericFileComparison node_velocities(node_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/nodevelocities.dat");
         TS_ASSERT(node_velocities.CompareFiles(1e-2));
 
-        //Check Division locations file
+        // Check division locations file
         std::string division_locations_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/divisions.dat";
         NumericFileComparison division_locations(division_locations_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/divisions.dat");
         TS_ASSERT(division_locations.CompareFiles(1e-2));
 
-        //Check Cell Velocities file
+        // Check cell velocities file
         std::string cell_velocities_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvelocities.dat";
         NumericFileComparison cell_velocities(cell_velocities_file, "cell_based/test/data/TestOutputNodeAndCellVelocitiesAndDivisionLocations/cellvelocities.dat");
         TS_ASSERT(cell_velocities.CompareFiles(1e-2));
