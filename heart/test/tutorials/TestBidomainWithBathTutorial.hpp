@@ -176,7 +176,8 @@ public: // Tests should be public!
             }
         }
 
-        /* HOW_TO_TAG Cardiac/Problem definition Tell Chaste that a mesh has been modified
+        /* HOW_TO_TAG Cardiac/Problem definition
+         * Tell Chaste that a mesh has been modified
          *
          * Since we have modified the mesh by setting element attributes, we need to inform Chaste of this fact.
          * If we do not, problems will arise when [wiki:UserTutorials/CardiacCheckpointingAndRestarting checkpointing],
