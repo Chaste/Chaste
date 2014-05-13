@@ -98,6 +98,14 @@ void AbstractOnLatticeCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoi
 }
 
 template<unsigned DIM>
+std::set<unsigned> AbstractOnLatticeCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
+{
+    EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a subclass of AbstractOnLatticeCellPopulation, need to go through the PottsMesh instead");
+    std::set<unsigned> neighbouring_node_indices;
+    return neighbouring_node_indices;
+}
+
+template<unsigned DIM>
 void AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<UpdateNodesInRandomOrder>" << mUpdateNodesInRandomOrder << "</UpdateNodesInRandomOrder>\n";

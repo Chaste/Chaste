@@ -458,14 +458,6 @@ void PottsBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& r
 }
 
 template<unsigned DIM>
-std::set<unsigned> PottsBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
-{
-    EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
-    std::set<unsigned> neighbouring_node_indices;
-    return neighbouring_node_indices;
-}
-
-template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::SetTemperature(double temperature)
 {
     mTemperature = temperature;

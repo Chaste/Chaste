@@ -489,14 +489,6 @@ void MultipleCaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stre
 }
 
 template<unsigned DIM>
-std::set<unsigned> MultipleCaBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
-{
-    EXCEPTION("Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
-    std::set<unsigned> neighbouring_node_indices;
-    return neighbouring_node_indices;
-}
-
-template<unsigned DIM>
 void MultipleCaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK

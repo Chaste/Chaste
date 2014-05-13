@@ -533,7 +533,7 @@ public:
 
         // Test GetNeighbouringNodeIndices() method
         TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(10),
-            "Cannot call GetNeighbouringNodeIndices() on a PottsBasedCellPopulation, need to go through the PottsMesh instead");
+            "Cannot call GetNeighbouringNodeIndices() on a subclass of AbstractOnLatticeCellPopulation, need to go through the PottsMesh instead");
     }
 
     void TestGetLocationOfCellCentre() throw (Exception)

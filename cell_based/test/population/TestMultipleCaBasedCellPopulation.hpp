@@ -129,7 +129,7 @@ public:
 
         // For coverage of GetNeighbouringNodeIndices() method
         TS_ASSERT_THROWS_THIS(cell_population.GetNeighbouringNodeIndices(0),
-            "Cannot call GetNeighbouringNodeIndices() on a MultipleCaBasedCellPopulation, need to go through the PottsMesh instead");
+            "Cannot call GetNeighbouringNodeIndices() on a subclass of AbstractOnLatticeCellPopulation, need to go through the PottsMesh instead");
     }
 
     void TestConstructorWithMultipleCellsPerSite() throw(Exception)

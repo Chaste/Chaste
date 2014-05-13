@@ -48,21 +48,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "WildTypeCellMutationState.hpp"
 
-///\todo Is this needed in this case?
 template<unsigned DIM>
 class AbstractMultipleCaUpdateRule; // Circular definition
 
 /**
- * \todo This description is pasted from Potts and needs to be changed (#2066)
- *
  * A facade class encapsulating a cell population under the Cellular
- * Potts Model framework.
+ * Automota framework.
  *
  * Contains a group of cells and maintains the associations
- * between CellPtrs and elements in a specialised PottsMesh class.
+ * between CellPtrs and nodes in a specialised PottsMesh class.
  *
- * The code currently requires the PottsMesh object to be fixed,
- * in the sense that no new nodes or elements can be added.
+ * When used here the PottsMesh has no elements as Cells are associated with nodes.
+ * The PottsMesh is used to define node connectivity.
+ *
+ * Multiple cells can be associated at a single node.
+ *
  */
 template<unsigned DIM>
 class MultipleCaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
@@ -111,13 +111,17 @@ private:
     }
 
     /**
-     * Check the consistency of internal data structures.
-     * Each PottsElement must have a CellPtr associated with it.
+     * Overriden Validate Method.
+     *
+     * Not used in CA simulations so just contains NEVER_REACHED
      */
     void Validate();
 
+
     /**
      * Overridden WriteVtkResultsToFile() method.
+     *
+     * This method offsets cells so can visulaise multiple cells at a single site
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
@@ -126,14 +130,14 @@ private:
 public:
 
     /**
-     * Create a new cell population facade from a mesh and collection of cells.
+     * Create a new cell population facade from a mesh, a vector of location indices
+     * and a collection of cells.
      *
-     * There must be precisely one CellPtr for each PottsElement in
-     * the mesh.
+     * There must be precisely one CellPtr for each entry of the locationIndices vector.
      *
      * @param rMesh reference to a PottsMesh
      * @param rCells reference to a vector of CellPtrs
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param locationIndices a vector of location indices that correspond to real cells
      * @param latticeCarryingCapacity an optional parameter to allow more than one cell per site
      * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction
      *                   (defaults to false)
@@ -141,7 +145,7 @@ public:
      */
     MultipleCaBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                   std::vector<CellPtr>& rCells,
-                                  const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
+                                  const std::vector<unsigned> locationIndices,
                                   unsigned latticeCarryingCapacity=1u,
                                   bool deleteMesh=false,
                                   bool validate=false);
@@ -205,7 +209,7 @@ public:
      *
      * @param pCell the cell
      *
-     * @return the location of the centre of mass of the element corresponding to this cell.
+     * @return the location of the node corresponding to this cell.
      */
     c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
@@ -370,17 +374,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile);
-
-    /**
-     * Overridden GetNeighbouringNodeIndices() method.
-     *
-     * This method currently returns an exception as the two types of neighbourhood
-     * (Moore and Von Neumann) are defined in the PottsMesh.
-     *
-     * @param index the node index
-     * @return the set of neighbouring node indices.
-     */
-    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
     /**
      * Overridden IsRoomToDivide() method.

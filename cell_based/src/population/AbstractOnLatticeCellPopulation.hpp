@@ -161,6 +161,19 @@ public:
     void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
 
     /**
+     * Overridden GetNeighbouringNodeIndices() method.
+     *
+     * This method currently returns an exception as the two types of neighbourhood
+     * (Moore and Von Neumann) are defined in the PottsMesh.
+     *
+     * @param index the node index
+     * @return the set of neighbouring node indices.
+     */
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
+
+
+
+    /**
      * Outputs CellPopulation parameters to file
      *
      * @param rParamsFile the file stream to which the parameters are output
