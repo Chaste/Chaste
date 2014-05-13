@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"

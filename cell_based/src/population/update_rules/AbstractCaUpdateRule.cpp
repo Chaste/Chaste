@@ -33,20 +33,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractMultipleCaUpdateRule.hpp"
+#include "AbstractCaUpdateRule.hpp"
 
 template<unsigned DIM>
-AbstractMultipleCaUpdateRule<DIM>::AbstractMultipleCaUpdateRule()
+AbstractCaUpdateRule<DIM>::AbstractCaUpdateRule()
 {
 }
 
 template<unsigned DIM>
-AbstractMultipleCaUpdateRule<DIM>::~AbstractMultipleCaUpdateRule()
+AbstractCaUpdateRule<DIM>::~AbstractCaUpdateRule()
 {
 }
 
 template<unsigned DIM>
-void AbstractMultipleCaUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParamsFile)
+void AbstractCaUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParamsFile)
 {
     std::string update_type = GetIdentifier();
 
@@ -56,7 +56,7 @@ void AbstractMultipleCaUpdateRule<DIM>::OutputUpdateRuleInfo(out_stream& rParams
 }
 
 template<unsigned DIM>
-void AbstractMultipleCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
     // No parameters to output
 }
@@ -65,6 +65,6 @@ void AbstractMultipleCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& r
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class AbstractMultipleCaUpdateRule<1>;
-template class AbstractMultipleCaUpdateRule<2>;
-template class AbstractMultipleCaUpdateRule<3>;
+template class AbstractCaUpdateRule<1>;
+template class AbstractCaUpdateRule<2>;
+template class AbstractCaUpdateRule<3>;

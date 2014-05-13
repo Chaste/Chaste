@@ -33,14 +33,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DIFFUSIONMULTIPLECAUPDATERULE_HPP_
-#define DIFFUSIONMULTIPLECAUPDATERULE_HPP_
+#ifndef DIFFUSIONCAUPDATERULE_HPP_
+#define DIFFUSIONCAUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-#include "AbstractMultipleCaUpdateRule.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "AbstractCaUpdateRule.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 // Needed here to avoid serialization errors (on Boost<1.37)
 #include "CellLabel.hpp"
@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A diffusion update rule for use in cell-based simulations
- * using the cellular MultipleCa model.
+ * using the cellular Ca model.
  *
  * The probability of moving to an adjacent lattice site is
  *
@@ -60,9 +60,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned DIM>
-class DiffusionMultipleCaUpdateRule : public AbstractMultipleCaUpdateRule<DIM>
+class DiffusionCaUpdateRule : public AbstractCaUpdateRule<DIM>
 {
-friend class TestMultipleCaUpdateRules;
+friend class TestCaUpdateRules;
 
 private:
 
@@ -90,7 +90,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractMultipleCaUpdateRule<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCaUpdateRule<DIM> >(*this);
         archive & mDiffusionParameter;
     }
 
@@ -99,12 +99,12 @@ public:
     /**
      * Constructor.
      */
-    DiffusionMultipleCaUpdateRule();
+    DiffusionCaUpdateRule();
 
     /**
      * Destructor.
      */
-    ~DiffusionMultipleCaUpdateRule();
+    ~DiffusionCaUpdateRule();
 
     /**
      * Calculate the probability of a given move.
@@ -121,7 +121,7 @@ public:
      */
     double EvaluateProbability(unsigned currentNodeIndex,
                                unsigned targetNodeIndex,
-                               MultipleCaBasedCellPopulation<DIM>& rCellPopulation,
+                               CaBasedCellPopulation<DIM>& rCellPopulation,
                                double dt,
                                double deltaX,
                                CellPtr cell
@@ -160,6 +160,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionMultipleCaUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionCaUpdateRule)
 
-#endif /*DIFFUSIONMULTIPLECAUPDATERULE_HPP_*/
+#endif /*DIFFUSIONCAUPDATERULE_HPP_*/

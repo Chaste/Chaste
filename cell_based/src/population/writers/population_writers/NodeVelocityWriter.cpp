@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeVelocityWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -93,7 +93,7 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     ///\todo replace with warning or exception? (#2404)
 }

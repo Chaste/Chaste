@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "Version.hpp"
 #include "ExecutableSupport.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCellPopulation,
@@ -58,20 +58,20 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::AddMultipleCaUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule)
+void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
 {
-    if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
+        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
     }
 }
 
 template<unsigned DIM>
-void OnLatticeSimulation<DIM>::RemoveAllMultipleCaUpdateRules()
+void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
 {
-    if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
+        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
     }
 }
 
@@ -122,7 +122,7 @@ template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
     bool update_cell_population_this_timestep = true;
-    if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
         /*
          * If mInitialiseCells is false, then the simulation has been loaded from an archive.
@@ -136,7 +136,7 @@ void OnLatticeSimulation<DIM>::UpdateCellPopulation()
         if (!this->mInitialiseCells && (SimulationTime::Instance()->GetTimeStepsElapsed() == 0))
         {
             NEVER_REACHED;
-            ///\todo #2066 This code should be covered by  cell_based/test/simulation/TestOnLatticeSimulationWithMultipleCaBasedCellPopulation.hpp TestLoad
+            ///\todo #2066 This code should be covered by  cell_based/test/simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp TestLoad
 //            update_cell_population_this_timestep = false;
         }
     }
@@ -164,12 +164,12 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
             (*iter)->OutputUpdateRuleInfo(rParamsFile);
         }
     }
-    else if (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
     {
-        std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > > collection =
-            static_cast<MultipleCaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
+        std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > collection =
+            static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
 
-        for (typename std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >::iterator iter = collection.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iter = collection.begin();
              iter != collection.end();
              ++iter)
         {
@@ -178,7 +178,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
     }
     else
     {
-        //\todo define the method for `MultipleCaBasedCellPopulation`
+        //\todo define the method for `CaBasedCellPopulation`
     }
     *rParamsFile << "\t</UpdateRules>\n";
 }

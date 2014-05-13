@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "CellsGenerator.hpp"
@@ -511,7 +511,7 @@ public:
         location_indices.push_back(13);
         location_indices.push_back(17);
 
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create output directory
         std::string output_directory = "TestCellLocationWriter";

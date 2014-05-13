@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTONLATTICESIMULATIONWITHMULTIPLECABASEDCELLPOPULATION_HPP_
-#define TESTONLATTICESIMULATIONWITHMULTIPLECABASEDCELLPOPULATION_HPP_
+#ifndef TESTONLATTICESIMULATIONWITHCABASEDCELLPOPULATION_HPP_
+#define TESTONLATTICESIMULATIONWITHCABASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "OnLatticeSimulation.hpp"
@@ -65,9 +65,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
-#include "DiffusionMultipleCaUpdateRule.hpp"
+#include "DiffusionCaUpdateRule.hpp"
 
-class TestOnLatticeSimulationWithMultipleCaBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 private:
 
@@ -144,7 +144,7 @@ public:
             "OffLatticeSimulations require a subclass of AbstractOffLatticeCellPopulation.");
     }
 
-    void TestMultipleCaSingleCellRandomMovement() throw (Exception)
+    void TestCaSingleCellRandomMovement() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -169,19 +169,19 @@ public:
         location_indices.push_back(4);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        std::string output_directory = "TestMultipleCaSingleCellRandomMovement";
+        std::string output_directory = "TestCaSingleCellRandomMovement";
         simulator.SetOutputDirectory(output_directory);
         simulator.SetDt(delta_t);
         simulator.SetEndTime(delta_t);
 
         // Add update rule
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         for (unsigned i=1; i<=num_runs; i++)
         {
@@ -228,7 +228,7 @@ public:
         TS_ASSERT_DELTA(probability_of_occupation[8], diffusion_parameter*delta_t/4.0, 1e-2);
 
         // For coverage
-        simulator.RemoveAllMultipleCaUpdateRules();
+        simulator.RemoveAllCaUpdateRules();
     }
 
     void TestCaMonolayerWithBirth() throw (Exception)
@@ -251,19 +251,19 @@ public:
         location_indices.push_back(51);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        std::string output_directory = "TestMultipleCaMonolayerWithBirth";
+        std::string output_directory = "TestCaMonolayerWithBirth";
         simulator.SetOutputDirectory(output_directory);
         simulator.SetDt(0.1);
         simulator.SetEndTime(40);
 
         // Adding update rule(s)
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
         simulator.SetOutputDivisionLocations(true);
 
         // Run simulation
@@ -326,11 +326,11 @@ public:
         TS_ASSERT_EQUALS(location_indices.size(),p_mesh->GetNumNodes());
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMultipleCaMonolayerWithDeath");
+        simulator.SetOutputDirectory("TestCaMonolayerWithDeath");
         simulator.SetDt(0.1);
         simulator.SetEndTime(0.1); // only one step as we only care about cells being killed
 
@@ -369,11 +369,11 @@ public:
     }
 
     /*
-     * RandomMovement has been tested in TestMultipleCaSingleCellRandomMovement for one cell
+     * RandomMovement has been tested in TestCaSingleCellRandomMovement for one cell
      * per lattice site.
      * This test is just to ensure that the above test works when there are multiple cells per lattice site.
      */
-    void TestMultipleCaMultipleCellsRandomMovement() throw (Exception)
+    void TestCaMultipleCellsRandomMovement() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -398,19 +398,19 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        std::string output_directory = "TestMultipleCaMultipleCellRandomMovement";
+        std::string output_directory = "TestCaMultipleCellRandomMovement";
         simulator.SetOutputDirectory(output_directory);
         simulator.SetDt(1);
         simulator.SetEndTime(10);
 
         // Add update rule
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -418,7 +418,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 40u);
     }
 
-    void TestMultipleCaMultipleCellsRandomMovementIn3d() throw (Exception)
+    void TestCaMultipleCellsRandomMovementIn3d() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -443,19 +443,19 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<3> cell_population(*p_mesh, cells, location_indices, 4u);
+        CaBasedCellPopulation<3> cell_population(*p_mesh, cells, location_indices, 4u);
 
         // Set up cell-based simulation
         OnLatticeSimulation<3> simulator(cell_population);
-        std::string output_directory = "TestMultipleCaMultipleCellRandomMovementIn3d";
+        std::string output_directory = "TestCaMultipleCellRandomMovementIn3d";
         simulator.SetOutputDirectory(output_directory);
         simulator.SetDt(1);
         simulator.SetEndTime(100);
 
         // Add update rule
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<3>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<3>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -464,7 +464,7 @@ public:
     }
 
     /*
-     * Cellular birth has been tested in TestMultipleCaSingleCellWithBirth for one cell per lattice site.
+     * Cellular birth has been tested in TestCaSingleCellWithBirth for one cell per lattice site.
      * This test adds to the above by further testing cellular birth considering multiple cells per lattice site.
      * A  two-lattice mesh was created and only one lattice had free space to add one daughter cell.
      */
@@ -489,7 +489,7 @@ public:
         location_indices.push_back(1);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -499,9 +499,9 @@ public:
         simulator.SetEndTime(40);
 
         // Add update rule
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -560,7 +560,7 @@ public:
         TS_ASSERT_EQUALS(location_indices.size(),2*p_mesh->GetNumNodes());
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -619,18 +619,18 @@ public:
             location_indices.push_back(index);
         }
 
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationStandardResult");
+        simulator.SetOutputDirectory("TestOnLatticeSimulationWithCaBasedCellPopulationStandardResult");
         simulator.SetDt(1);
         simulator.SetEndTime(20);
 
         // Add update rule
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -662,18 +662,18 @@ public:
             location_indices.push_back(index);
         }
 
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 4);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad");
+        simulator.SetOutputDirectory("TestOnLatticeSimulationWithCaBasedCellPopulationSaveAndLoad");
         simulator.SetDt(1);
         simulator.SetEndTime(10);
 
         // Add update rule
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.1);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Run simulation
         simulator.Solve();
@@ -689,7 +689,7 @@ public:
 
         // Load the simulation from the TestSave() method above and run it from time 10 to 15
         OnLatticeSimulation<2>* p_simulator1;
-        p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad", 10.0);
+        p_simulator1 = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithCaBasedCellPopulationSaveAndLoad", 10.0);
 
         p_simulator1->SetEndTime(15);
         p_simulator1->Solve();
@@ -697,7 +697,7 @@ public:
         // Save, then reload and run from time 15 to 20
         CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Save(p_simulator1);
         OnLatticeSimulation<2>* p_simulator2
-            = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithMultipleCaBasedCellPopulationSaveAndLoad", 15.0);
+            = CellBasedSimulationArchiver<2, OnLatticeSimulation<2> >::Load("TestOnLatticeSimulationWithCaBasedCellPopulationSaveAndLoad", 15.0);
 
         p_simulator2->SetEndTime(20);
         p_simulator2->Solve();
@@ -706,7 +706,7 @@ public:
         TS_ASSERT_EQUALS(p_simulator2->rGetCellPopulation().GetNumRealCells(), 10u);
 
         CellPtr p_cell = *(p_simulator2->rGetCellPopulation().Begin());
-        c_vector<double, 2> cell_location = static_cast <MultipleCaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
+        c_vector<double, 2> cell_location = static_cast <CaBasedCellPopulation<2>*>(&p_simulator2->rGetCellPopulation())->GetLocationOfCellCentre(p_cell);
         TS_ASSERT_DELTA(cell_location[0], 1.0, 1e-4);
         TS_ASSERT_DELTA(cell_location[1], 0.0, 1e-4);
 
@@ -716,4 +716,4 @@ public:
     }
 };
 
-#endif /*TESTONLATTICESIMULATIONWITHMULTIPLECABASEDCELLPOPULATION_HPP_*/
+#endif /*TESTONLATTICESIMULATIONWITHCABASEDCELLPOPULATION_HPP_*/

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
 #include "CellBasedPdeSolver.hpp"
 #include "Exception.hpp"
@@ -173,7 +173,7 @@ template<unsigned DIM>
 void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
 {
     // If appropriate, make a coarse mesh which exactly overlays the lattice sites of a PottsMesh (used for all OnLattice simulations)
-    if ((dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
+    if ((dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL) && mpCoarsePdeMesh==NULL)
     {
         assert(DIM ==2);
         ChasteCuboid<DIM> cuboid = mpCellPopulation->rGetMesh().CalculateBoundingBox();
@@ -184,7 +184,7 @@ void CellBasedPdeHandler<DIM>::OpenResultsFiles(std::string outputDirectory)
         UseCoarsePdeMesh(1, cuboid, false);
     }
 
-    // If using a NodeBasedCellPopulation a VertexBasedCellPopulation, a MultipleCABasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
+    // If using a NodeBasedCellPopulation a VertexBasedCellPopulation, a CaBasedCellPopulation or a PottsBasedCellPopulation, mpCoarsePdeMesh must be set up
     if (PdeSolveNeedsCoarseMesh() && mpCoarsePdeMesh==NULL)
     {
         EXCEPTION("Trying to solve a PDE on a cell population that doesn't have a mesh. Try calling UseCoarsePdeMesh().");
@@ -248,7 +248,7 @@ void CellBasedPdeHandler<DIM>::UseCoarsePdeMesh(double stepSize, ChasteCuboid<DI
     // If solving PDEs on a coarse mesh, each PDE must have an averaged source term
     for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
     {
-        if (mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == false && !dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation))
+        if (mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == false && !dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation))
         {
             EXCEPTION("UseCoarsePdeMesh() should only be called if averaged-source PDEs are specified.");
         }
@@ -315,7 +315,7 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
     for (unsigned pde_index=0; pde_index<mPdeAndBcCollection.size(); pde_index++)
     {
         assert(mPdeAndBcCollection[pde_index]);
-        assert(mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == using_coarse_pde_mesh || dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation));
+        assert(mPdeAndBcCollection[pde_index]->HasAveragedSourcePde() == using_coarse_pde_mesh || dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation));
     }
 
     // Make sure the cell population is in a nice state
@@ -841,7 +841,7 @@ bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 {
     return ((dynamic_cast<NodeBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
             || (dynamic_cast<PottsBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
-            || (dynamic_cast<MultipleCaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
+            || (dynamic_cast<CaBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL)
             || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(mpCellPopulation) != NULL));
 }
 

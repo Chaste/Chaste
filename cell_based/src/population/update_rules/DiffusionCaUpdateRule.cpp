@@ -33,24 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DiffusionMultipleCaUpdateRule.hpp"
+#include "DiffusionCaUpdateRule.hpp"
 
 template<unsigned DIM>
-DiffusionMultipleCaUpdateRule<DIM>::DiffusionMultipleCaUpdateRule()
-    : AbstractMultipleCaUpdateRule<DIM>(),
+DiffusionCaUpdateRule<DIM>::DiffusionCaUpdateRule()
+    : AbstractCaUpdateRule<DIM>(),
       mDiffusionParameter(0.5)
 {
 }
 
 template<unsigned DIM>
-DiffusionMultipleCaUpdateRule<DIM>::~DiffusionMultipleCaUpdateRule()
+DiffusionCaUpdateRule<DIM>::~DiffusionCaUpdateRule()
 {
 }
 
 template<unsigned DIM>
-double DiffusionMultipleCaUpdateRule<DIM>::EvaluateProbability(unsigned currentNodeIndex,
+double DiffusionCaUpdateRule<DIM>::EvaluateProbability(unsigned currentNodeIndex,
                                                                unsigned targetNodeIndex,
-                                                               MultipleCaBasedCellPopulation<DIM>& rCellPopulation,
+                                                               CaBasedCellPopulation<DIM>& rCellPopulation,
                                                                double dt,
                                                                double deltaX,
                                                                CellPtr cell)
@@ -62,46 +62,46 @@ double DiffusionMultipleCaUpdateRule<DIM>::EvaluateProbability(unsigned currentN
 }
 
 template<unsigned DIM>
-double DiffusionMultipleCaUpdateRule<DIM>::GetDiffusionParameter()
+double DiffusionCaUpdateRule<DIM>::GetDiffusionParameter()
 {
     return mDiffusionParameter;
 }
 
 template<unsigned DIM>
-void DiffusionMultipleCaUpdateRule<DIM>::SetDiffusionParameter(double diffusionParameter)
+void DiffusionCaUpdateRule<DIM>::SetDiffusionParameter(double diffusionParameter)
 {
     mDiffusionParameter = diffusionParameter;
 }
 
 //template<unsigned DIM>
-//double DiffusionMultipleCaUpdateRule<DIM>::GetTimeStep()
+//double DiffusionCaUpdateRule<DIM>::GetTimeStep()
 //{
 //    return mDt;
 //}
 //
 //template<unsigned DIM>
-//void DiffusionMultipleCaUpdateRule<DIM>::SetTimeStep(double dt)
+//void DiffusionCaUpdateRule<DIM>::SetTimeStep(double dt)
 //{
 //  mDt = dt;
 //}
 
 template<unsigned DIM>
-void DiffusionMultipleCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
+void DiffusionCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DiffusionParameter>" << mDiffusionParameter << "</DiffusionParameter>\n";
 
     // Call method on direct parent class
-    AbstractMultipleCaUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
+    AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
 /////////////////////////////////////////////////////////////////////////////
 
-template class DiffusionMultipleCaUpdateRule<1u>;
-template class DiffusionMultipleCaUpdateRule<2u>;
-template class DiffusionMultipleCaUpdateRule<3u>;
+template class DiffusionCaUpdateRule<1u>;
+template class DiffusionCaUpdateRule<2u>;
+template class DiffusionCaUpdateRule<3u>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionMultipleCaUpdateRule)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(DiffusionCaUpdateRule)

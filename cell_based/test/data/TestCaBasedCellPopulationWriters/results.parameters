@@ -1,3 +1,3 @@
-		<OnlyUseNearestNeighboursForDivision>0</OnlyUseNearestNeighboursForDivision>
-		<UseVonNeumannNeighbourhoods>0</UseVonNeumannNeighbourhoods>
+		<UpdateNodesInRandomOrder>1</UpdateNodesInRandomOrder>
+		<IterateRandomlyOverUpdateRuleCollection>0</IterateRandomlyOverUpdateRuleCollection>
 		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

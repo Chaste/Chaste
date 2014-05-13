@@ -58,9 +58,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "PottsBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
-#include "DiffusionMultipleCaUpdateRule.hpp"
+#include "DiffusionCaUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "ChemotaxisPottsUpdateRule.hpp"
@@ -260,7 +260,7 @@ public:
         }
     }
 
-    void TestMultipleCaBasedWithoutCoarseMesh() throw(Exception)
+    void TestCaBasedWithoutCoarseMesh() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -280,11 +280,11 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnNaturalMesh");
+        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdesOnNaturalMesh");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
@@ -309,9 +309,9 @@ public:
 
 
         // Create update rules and pass to the simulation
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Solve the system
         simulator.Solve();
@@ -342,7 +342,7 @@ public:
     }
 
     // In this test there are only 50 cells but 100 lattice sites
-    void TestMultipleCaBasedWithCellwiseSourcePde() throw(Exception)
+    void TestCaBasedWithCellwiseSourcePde() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -362,11 +362,11 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnNaturalMesh");
+        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdesOnNaturalMesh");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
@@ -419,7 +419,7 @@ public:
     /*
      * Note only solves one PDE
      */
-    void TestMultipleCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
+    void TestCaBasedWithoutCoarseMeshUsingPdeHandlerOnCuboid() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -439,11 +439,11 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesOnCuboid");
+        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdesOnCuboid");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
@@ -483,7 +483,7 @@ public:
     /*
      * This tests that a sensible error is thrown if the coarse mesh is too small/
      */
-    void TestMultipleCaBasedCellsOutsideMesh() throw(Exception)
+    void TestCaBasedCellsOutsideMesh() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -503,11 +503,11 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdesWithCellsOutsideMesh");
+        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdesWithCellsOutsideMesh");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
@@ -537,7 +537,7 @@ public:
     }
 
 
-    void TestMultipleCaBasedWithCoarseMesh() throw(Exception)
+    void TestCaBasedWithCoarseMesh() throw(Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -554,11 +554,11 @@ public:
         location_indices.push_back(12);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestMultipleCaBasedCellPopulationWithPdes");
+        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdes");
         simulator.SetEndTime(0.1);
 
 
@@ -591,9 +591,9 @@ public:
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
         // Create update rules and pass to the simulation
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Solve the system
         simulator.Solve();
@@ -748,7 +748,7 @@ public:
         location_indices.push_back(66);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
@@ -772,9 +772,9 @@ public:
         simulator.SetCellBasedPdeHandler(&pde_handler);
 
         // Create update rules and pass to the simulation
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2>, p_diffusion_update_rule);
+        MAKE_PTR(DiffusionCaUpdateRule<2>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(0.5);
-        simulator.AddMultipleCaUpdateRule(p_diffusion_update_rule);
+        simulator.AddCaUpdateRule(p_diffusion_update_rule);
 
         // Solve the system
         simulator.Solve();

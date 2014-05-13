@@ -80,9 +80,9 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the MultipleCaBasedCellPopulation to visit.
+     * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.

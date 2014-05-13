@@ -33,13 +33,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef MULTIPLECABASEDCELLPOPULATION_HPP_
-#define MULTIPLECABASEDCELLPOPULATION_HPP_
+#ifndef CABASEDCELLPOPULATION_HPP_
+#define CABASEDCELLPOPULATION_HPP_
 
 #include "AbstractOnLatticeCellPopulation.hpp"
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
-#include "AbstractMultipleCaUpdateRule.hpp"
+#include "AbstractCaUpdateRule.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 
 template<unsigned DIM>
-class AbstractMultipleCaUpdateRule; // Circular definition
+class AbstractCaUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
@@ -65,9 +65,9 @@ class AbstractMultipleCaUpdateRule; // Circular definition
  *
  */
 template<unsigned DIM>
-class MultipleCaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
+class CaBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
 {
-    friend class TestMultipleCaBasedCellPopulation;
+    friend class TestCaBasedCellPopulation;
 
 private:
 
@@ -75,7 +75,7 @@ private:
     unsigned mLatticeCarryingCapacity;
 
     /** The update rules used to determine the new location of the cells. */
-    std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > > mUpdateRuleCollection;
+    std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
@@ -143,7 +143,7 @@ public:
      *                   (defaults to false)
      * @param validate whether to validate the cell population when it is created (defaults to false as not used in CA simulations)
      */
-    MultipleCaBasedCellPopulation(PottsMesh<DIM>& rMesh,
+    CaBasedCellPopulation(PottsMesh<DIM>& rMesh,
                                   std::vector<CellPtr>& rCells,
                                   const std::vector<unsigned> locationIndices,
                                   unsigned latticeCarryingCapacity=1u,
@@ -155,12 +155,12 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    MultipleCaBasedCellPopulation(PottsMesh<DIM>& rMesh);
+    CaBasedCellPopulation(PottsMesh<DIM>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
      */
-    virtual ~MultipleCaBasedCellPopulation();
+    virtual ~CaBasedCellPopulation();
 
     /**
      * @return mAvailableSpaces.
@@ -351,7 +351,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    void AddUpdateRule(boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Method to remove all the update rules
@@ -363,7 +363,7 @@ public:
      *
      * @return the update rule collection
      */
-    const std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
+    const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
 
     /**
      * Outputs CellPopulation parameters to file
@@ -387,7 +387,7 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(MultipleCaBasedCellPopulation)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(CaBasedCellPopulation)
 
 // No archiving yet so untested
 #define COVERAGE_IGNORE
@@ -396,11 +396,11 @@ namespace boost
 namespace serialization
 {
 /**
- * Serialize information required to construct a MultipleCaBasedCellPopulation.
+ * Serialize information required to construct a CaBasedCellPopulation.
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const MultipleCaBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const CaBasedCellPopulation<DIM> * t, const BOOST_PFTO unsigned int file_version)
 {
     // Save data required to construct instance
     const PottsMesh<DIM>* p_mesh = &(t->rGetMesh());
@@ -408,22 +408,22 @@ inline void save_construct_data(
 }
 
 /**
- * De-serialize constructor parameters and initialise a MultipleCaBasedCellPopulation.
+ * De-serialize constructor parameters and initialise a CaBasedCellPopulation.
  * Loads the mesh from separate files.
  */
 template<class Archive, unsigned DIM>
 inline void load_construct_data(
-    Archive & ar, MultipleCaBasedCellPopulation<DIM> * t, const unsigned int file_version)
+    Archive & ar, CaBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
     PottsMesh<DIM>* p_mesh;
     ar >> p_mesh;
 
     // Invoke inplace constructor to initialise instance
-    ::new(t)MultipleCaBasedCellPopulation<DIM>(*p_mesh);
+    ::new(t)CaBasedCellPopulation<DIM>(*p_mesh);
 }
 }
 } // namespace ...
 #undef COVERAGE_IGNORE
 
-#endif /*MULTIPLECABASEDCELLPOPULATION_HPP_*/
+#endif /*CABASEDCELLPOPULATION_HPP_*/

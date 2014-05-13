@@ -33,23 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTMULTIPLECAUPDATERULE_HPP_
-#define ABSTRACTMULTIPLECAUPDATERULE_HPP_
+#ifndef ABSTRACTCAUPDATERULE_HPP_
+#define ABSTRACTCAUPDATERULE_HPP_
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "Identifiable.hpp"
 
 template<unsigned DIM>
-class MultipleCaBasedCellPopulation; // Circular definition
+class CaBasedCellPopulation; // Circular definition
 
 /**
  * An abstract CA update rule class, for use in cell-based simulations
  * using the cellular automota model.
  */
 template<unsigned DIM>
-class AbstractMultipleCaUpdateRule : public Identifiable
+class AbstractCaUpdateRule : public Identifiable
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -70,12 +70,12 @@ public:
     /**
      * Default constructor.
      */
-    AbstractMultipleCaUpdateRule();
+    AbstractCaUpdateRule();
 
     /**
      * Destructor.
      */
-    virtual ~AbstractMultipleCaUpdateRule();
+    virtual ~AbstractCaUpdateRule();
 
    /**
      * Calculate the probability of a given move.
@@ -92,7 +92,7 @@ public:
      */
     double virtual EvaluateProbability(unsigned currentNodeIndex,
                                        unsigned targetNodeIndex,
-                                       MultipleCaBasedCellPopulation<DIM>& rCellPopulation,
+                                       CaBasedCellPopulation<DIM>& rCellPopulation,
                                        double dt,
                                        double deltaX,
                                        CellPtr cell) = 0;
@@ -116,6 +116,6 @@ public:
     virtual void OutputUpdateRuleParameters(out_stream& rParamsFile)=0;
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractMultipleCaUpdateRule)
+TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCaUpdateRule)
 
-#endif /*ABSTRACTMULTIPLECAUPDATERULE_HPP_*/
+#endif /*ABSTRACTCAUPDATERULE_HPP_*/

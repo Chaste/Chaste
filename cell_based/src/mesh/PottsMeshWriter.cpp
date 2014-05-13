@@ -212,7 +212,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
     /*
      * Note that in contrast to other mesh classes, it is perfectly reasonable for
      * a PottsMesh to have no elements, particularly in when it is being used in
-     * the context of a MultipleCaBasedCellPopulation.
+     * the context of a CaBasedCellPopulation.
      */
     if (num_elements != 0)
     {

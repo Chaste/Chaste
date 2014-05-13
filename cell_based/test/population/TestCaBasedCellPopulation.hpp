@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTMULTIPLECABASEDCELLPOPULATION_HPP_
-#define TESTMULTIPLECABASEDCELLPOPULATION_HPP_
+#ifndef TESTCABASEDCELLPOPULATION_HPP_
+#define TESTCABASEDCELLPOPULATION_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -44,11 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 #include "CellsGenerator.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "DiffusionMultipleCaUpdateRule.hpp"
+#include "DiffusionCaUpdateRule.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ArchiveOpener.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -71,7 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-class TestMultipleCaBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCaBasedCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -90,7 +90,7 @@ public:
         location_indices.push_back(12);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Test that the mesh and cells are correctly assigned
         TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh);
@@ -147,7 +147,7 @@ public:
         std::vector<unsigned> location_indices;
 
         // Test that the correct exception is thrown when we try to create a cell population without location indices
-        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),
+        TS_ASSERT_THROWS_THIS(CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),
             "No location indices being passed. Specify where cells lie before creating the cell population.");
 
         cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
@@ -158,7 +158,7 @@ public:
         location_indices.push_back(0);
 
         // Test that the correct exception is thrown when we try to add more cells than the carrying capacity
-        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),
+        TS_ASSERT_THROWS_THIS(CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2),
             "One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
 
         cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
@@ -166,14 +166,14 @@ public:
            // Change the initial cell location to avoid the above exception
         location_indices[2] = 1u;
 
-        // Test that the correct exception is thrown when we try to create a cell population with validate = true (there is no validation in the case of a MultipleCaBasedCellPopulation)
-        TS_ASSERT_THROWS_THIS(MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2, false, true),
-            "There is no validation for MultipleCaBasedCellPopulation.");
+        // Test that the correct exception is thrown when we try to create a cell population with validate = true (there is no validation in the case of a CaBasedCellPopulation)
+        TS_ASSERT_THROWS_THIS(CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2, false, true),
+            "There is no validation for CaBasedCellPopulation.");
 
         cells_generator.GenerateBasicRandom(cells, 3, p_diff_type);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
         // Test that cells are in the correct locations
         TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(0).size(), 2u);
@@ -218,7 +218,7 @@ public:
         location_indices.push_back(1);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices, 2);
 
         // Check cells are in the correct location
         TS_ASSERT(cell_population.IsCellAttachedToLocationIndex(0));
@@ -314,7 +314,7 @@ public:
         // Reset the maximum cell ID to zero (to account for previous tests)
         CellId::ResetMaxCellId();
 
-        std::string output_directory = "TestMultipleCaBasedCellPopulationWriters";
+        std::string output_directory = "TestCaBasedCellPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Create a simple 2D PottsMesh
@@ -334,13 +334,13 @@ public:
         location_indices.push_back(17);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // For coverage, label one cell
         boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(location_indices[0])->AddCellProperty(p_label);
 
-        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MultipleCaBasedCellPopulation-2");
+        TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "CaBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
@@ -364,14 +364,14 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.viznodes").CompareFiles();
-        FileComparison(results_dir + "results.vizlocations", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizlocations").CompareFiles();
-        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
-        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizancestors").CompareFiles();
-        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.vizmutationstates").CompareFiles();
-        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
-        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellages.dat").CompareFiles();
-        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizlocations", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizlocations").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizmutationstates").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestCaBasedCellPopulationWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestCaBasedCellPopulationWriters/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestCaBasedCellPopulationWriters/cellareas.dat").CompareFiles();
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
@@ -381,7 +381,7 @@ public:
         parameter_file->close();
 
         // Compare output with saved files of what they should look like
-        FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestMultipleCaBasedCellPopulationWriters/results.parameters").CompareFiles();
+        FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.parameters").CompareFiles();
 
         // Test VTK output
         ///\todo check all properties, not just mutations
@@ -419,7 +419,7 @@ public:
         location_indices.push_back(13);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 2u);
@@ -451,7 +451,7 @@ public:
         location_indices.push_back(initial_cell_index);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 1u);
@@ -512,7 +512,7 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Test we have the correct number of cells and elements
         TS_ASSERT_EQUALS(cell_population.rGetCells().size(), 25u);
@@ -546,14 +546,14 @@ public:
         location_indices.push_back(initial_cell_index);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
         // Set node selection to non-random lattice sweeping: this will loop over the nodes in index order
         TS_ASSERT_EQUALS(true, cell_population.GetUpdateNodesInRandomOrder());
         cell_population.SetUpdateNodesInRandomOrder(false);
 
-        // Create a multiple CA update rule and pass to the population
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        // Create a CA update rule and pass to the population
+        MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(1.0);
         cell_population.AddUpdateRule(p_diffusion_update_rule);
 
@@ -586,7 +586,7 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
         unsigned location_index = 0;
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -626,14 +626,14 @@ public:
         location_indices.push_back(initial_cell_index);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
         // Set node selection to random lattice sweeping and (for coverage) random iteration over update rules
         cell_population.SetUpdateNodesInRandomOrder(true);
         cell_population.SetIterateRandomlyOverUpdateRuleCollection(true);
 
-        // Create a multiple CA update rule and pass to the population
-        MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+        // Create a CA update rule and pass to the population
+        MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
         p_diffusion_update_rule->SetDiffusionParameter(1.0);
         cell_population.AddUpdateRule(p_diffusion_update_rule);
 
@@ -650,7 +650,7 @@ public:
     void TestArchiving() throw(Exception)
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-        std::string archive_file = "MultipleCaBasedCellPopulation-2.arch";
+        std::string archive_file = "CaBasedCellPopulation-2.arch";
 
         // The following line is required because the loading of a cell population
         // is usually called by the method CellBasedSimulation::Load()
@@ -663,7 +663,7 @@ public:
             SimulationTime* p_simulation_time = SimulationTime::Instance();
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
-            // Create a multiple CA cell population object
+            // Create a CA cell population object
             PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
             PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -682,7 +682,7 @@ public:
             }
 
             AbstractCellPopulation<2>* const p_cell_population =
-                new MultipleCaBasedCellPopulation<2>(*p_mesh, cells, location_indices, 4);
+                new CaBasedCellPopulation<2>(*p_mesh, cells, location_indices, 4);
 
             // Run each cell to time 0
             for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
@@ -693,13 +693,13 @@ public:
             }
 
             // Create an update rule and pass to the population
-            MAKE_PTR(DiffusionMultipleCaUpdateRule<2u>, p_diffusion_update_rule);
+            MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
             p_diffusion_update_rule->SetDiffusionParameter(1.0);
-            static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population)->AddUpdateRule(p_diffusion_update_rule);
+            static_cast<CaBasedCellPopulation<2>*>(p_cell_population)->AddUpdateRule(p_diffusion_update_rule);
 
             // Set member variables in order to test that they are archived correctly
-            static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population)->SetUpdateNodesInRandomOrder(false);
-            static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population)->SetIterateRandomlyOverUpdateRuleCollection(true);
+            static_cast<CaBasedCellPopulation<2>*>(p_cell_population)->SetUpdateNodesInRandomOrder(false);
+            static_cast<CaBasedCellPopulation<2>*>(p_cell_population)->SetIterateRandomlyOverUpdateRuleCollection(true);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -734,7 +734,7 @@ public:
             (*p_arch) >> p_cell_population;
 
             // Test that the member variables have been archived correctly
-            MultipleCaBasedCellPopulation<2>* p_static_population = static_cast<MultipleCaBasedCellPopulation<2>*>(p_cell_population);
+            CaBasedCellPopulation<2>* p_static_population = static_cast<CaBasedCellPopulation<2>*>(p_cell_population);
 
             TS_ASSERT_EQUALS(p_static_population->GetNumNodes(), 100u);
 
@@ -756,9 +756,9 @@ public:
             TS_ASSERT_EQUALS(p_static_population->GetIterateRandomlyOverUpdateRuleCollection(), true);
 
             // Test that the update rule has been archived correctly
-            std::vector<boost::shared_ptr<AbstractMultipleCaUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
+            std::vector<boost::shared_ptr<AbstractCaUpdateRule<2> > > update_rule_collection = p_static_population->rGetUpdateRuleCollection();
             TS_ASSERT_EQUALS(update_rule_collection.size(), 1u);
-            TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "DiffusionMultipleCaUpdateRule-2");
+            TS_ASSERT_EQUALS((*update_rule_collection[0]).GetIdentifier(), "DiffusionCaUpdateRule-2");
 
             // Tidy up
             delete p_cell_population;
@@ -766,4 +766,4 @@ public:
     }
 };
 
-#endif /*TESTMULTIPLECABASEDCELLPOPULATION_HPP_*/
+#endif /*TESTCABASEDCELLPOPULATION_HPP_*/

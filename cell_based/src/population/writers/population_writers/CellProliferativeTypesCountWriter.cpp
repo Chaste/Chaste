@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -76,7 +76,7 @@ void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellProliferativeTypesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

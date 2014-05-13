@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellPopulationElementWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -86,7 +86,7 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPop
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 

@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
@@ -180,7 +180,7 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a simple 2D MultipleCaBasedCellPopulation
+        // Create a simple 2D CaBasedCellPopulation
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
@@ -192,7 +192,7 @@ public:
         location_indices.push_back(12);
         location_indices.push_back(13);
         location_indices.push_back(17);
-        MultipleCaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
         cell_population.GenerateCellResults();
@@ -830,7 +830,7 @@ public:
         }
 
         {
-            // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+            // Coverage of the Visit() method when called on a CaBasedCellPopulation
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
@@ -842,7 +842,7 @@ public:
             location_indices.push_back(12);
             location_indices.push_back(13);
             location_indices.push_back(17);
-            MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+            CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
 
             TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&ca_based_cell_population));
         }
@@ -953,7 +953,7 @@ public:
         }
 
         {
-            // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+            // Coverage of the Visit() method when called on a CaBasedCellPopulation
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
@@ -965,7 +965,7 @@ public:
             location_indices.push_back(12);
             location_indices.push_back(13);
             location_indices.push_back(17);
-            MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+            CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
 
             TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&ca_based_cell_population));
         }
@@ -1076,7 +1076,7 @@ public:
         }
 
         {
-            // Coverage of the Visit() method when called on a MultipleCaBasedCellPopulation
+            // Coverage of the Visit() method when called on a CaBasedCellPopulation
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
             PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
@@ -1088,7 +1088,7 @@ public:
             location_indices.push_back(12);
             location_indices.push_back(13);
             location_indices.push_back(17);
-            MultipleCaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+            CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
 
             TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&ca_based_cell_population));
         }

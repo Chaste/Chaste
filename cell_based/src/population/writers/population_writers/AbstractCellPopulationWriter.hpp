@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class MeshBasedCellPopulation;
-template<unsigned SPACE_DIM> class MultipleCaBasedCellPopulation;
+template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 template<unsigned SPACE_DIM> class NodeBasedCellPopulation;
 template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
@@ -94,9 +94,9 @@ public:
     /**
      * Visit the population and write the data.
      *
-     * @param pCellPopulation a pointer to the MultipleCaBasedCellPopulation to visit.
+     * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(MultipleCaBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
+    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.

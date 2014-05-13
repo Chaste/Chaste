@@ -40,11 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include "AbstractMultipleCaUpdateRule.hpp"
-#include "DiffusionMultipleCaUpdateRule.hpp"
+#include "AbstractCaUpdateRule.hpp"
+#include "DiffusionCaUpdateRule.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "MultipleCaBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
@@ -60,7 +60,7 @@ class TestMulitpleCaUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestDiffusionMultipleCaUpdateRuleIn2d() throw (Exception)
+    void TestDiffusionCaUpdateRuleIn2d() throw (Exception)
     {
         // timestep and size of domain to let us calculate the probabilities of movement.
         double delta_t = 1;
@@ -68,7 +68,7 @@ public:
         double diffusion_parameter = 0.1;
 
         // Create an update law system
-        DiffusionMultipleCaUpdateRule<2> diffusion_update_rule;
+        DiffusionCaUpdateRule<2> diffusion_update_rule;
 
         // Test get/set methods
         TS_ASSERT_DELTA(diffusion_update_rule.GetDiffusionParameter(), 0.5, 1e-12);
@@ -96,7 +96,7 @@ public:
         location_indices.push_back(0u);
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
         // Note we just pass a pointer to the only cell as DiffusionUpdateRule is independent of cell type.
         CellPtr p_cell = cell_population.rGetCells().front();
@@ -122,7 +122,7 @@ public:
         TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x, p_cell),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
-    void TestDiffusionMultipleCaUpdateRuleIn2dWithMultipleCells() throw (Exception)
+    void TestDiffusionCaUpdateRuleIn2dWithMultipleCells() throw (Exception)
     {
         // timestep and size of domain to let us calculate the probabilities of movement.
         double delta_t = 1;
@@ -130,7 +130,7 @@ public:
         double diffusion_parameter = 0.1;
 
         // Create an update law system
-        DiffusionMultipleCaUpdateRule<2> diffusion_update_rule;
+        DiffusionCaUpdateRule<2> diffusion_update_rule;
 
         // Test get/set methods
         TS_ASSERT_DELTA(diffusion_update_rule.GetDiffusionParameter(), 0.5, 1e-12);
@@ -169,7 +169,7 @@ public:
         }
 
         // Create cell population
-        MultipleCaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices, 2);
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices, 2);
 
         // Note we just pass a pointer to the first cell as DiffusionUpdateRule is independent of cell type.
         CellPtr p_cell = cell_population.rGetCells().front();
@@ -195,13 +195,13 @@ public:
         TS_ASSERT_DELTA(diffusion_update_rule.EvaluateProbability(24,23,cell_population, delta_t, delta_x, p_cell),diffusion_parameter*delta_t/delta_x/delta_x/2.0,1e-6);
     }
 
-    void TestArchiveDiffusionMultipleCaUpdateRule() throw(Exception)
+    void TestArchiveDiffusionCaUpdateRule() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionMultipleCaUpdateRule.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DiffusionCaUpdateRule.arch";
 
         {
-            DiffusionMultipleCaUpdateRule<2> update_rule;
+            DiffusionCaUpdateRule<2> update_rule;
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -210,12 +210,12 @@ public:
             update_rule.SetDiffusionParameter(1.0);
 
             // Serialize via pointer to most abstract class possible
-            AbstractMultipleCaUpdateRule<2>* const p_update_rule = &update_rule;
+            AbstractCaUpdateRule<2>* const p_update_rule = &update_rule;
             output_arch << p_update_rule;
         }
 
         {
-            AbstractMultipleCaUpdateRule<2>* p_update_rule;
+            AbstractCaUpdateRule<2>* p_update_rule;
 
             // Create an input archive
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -225,7 +225,7 @@ public:
             input_arch >> p_update_rule;
 
             // Test the member data
-            TS_ASSERT_DELTA((static_cast<DiffusionMultipleCaUpdateRule<2>*>(p_update_rule))->GetDiffusionParameter(), 1.0, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DiffusionCaUpdateRule<2>*>(p_update_rule))->GetDiffusionParameter(), 1.0, 1e-6);
 
             // Tidy up
             delete p_update_rule;
@@ -234,14 +234,14 @@ public:
 
     void TestUpdateRuleOutputUpdateRuleInfo()
     {
-        std::string output_directory = "TestMultipleCaUpdateRulesOutputParameters";
+        std::string output_directory = "TestCaUpdateRulesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Test with VolumeConstraintPottsUpdateRule
-        DiffusionMultipleCaUpdateRule<2> diffusion_update_rule;
+        DiffusionCaUpdateRule<2> diffusion_update_rule;
         diffusion_update_rule.SetDiffusionParameter(1.0);
 
-        TS_ASSERT_EQUALS(diffusion_update_rule.GetIdentifier(), "DiffusionMultipleCaUpdateRule-2");
+        TS_ASSERT_EQUALS(diffusion_update_rule.GetIdentifier(), "DiffusionCaUpdateRule-2");
 
         out_stream diffusion_update_rule_parameter_file = output_file_handler.OpenOutputFile("diffusion_update_rule_results.parameters");
         diffusion_update_rule.OutputUpdateRuleInfo(diffusion_update_rule_parameter_file);
@@ -249,7 +249,7 @@ public:
 
         // Compare the generated file in test output with a reference copy in the source code.
         FileFinder generated = output_file_handler.FindFile("diffusion_update_rule_results.parameters");
-        FileFinder reference("cell_based/test/data/TestMultipleCaUpdateRules/diffusion_update_rule_results.parameters",
+        FileFinder reference("cell_based/test/data/TestCaUpdateRules/diffusion_update_rule_results.parameters",
                 RelativeTo::ChasteSourceRoot);
         FileComparison comparer(generated, reference);
         TS_ASSERT(comparer.CompareFiles());
