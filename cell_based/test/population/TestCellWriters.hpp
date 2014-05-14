@@ -285,7 +285,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -385,7 +385,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -479,7 +479,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -558,7 +558,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -657,7 +657,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -750,7 +750,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -858,7 +858,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -956,7 +956,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 
@@ -1031,7 +1031,7 @@ public:
 
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
 

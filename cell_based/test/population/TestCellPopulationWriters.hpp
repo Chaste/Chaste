@@ -166,7 +166,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -236,7 +236,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -303,7 +303,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -364,7 +364,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -432,7 +432,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -500,7 +500,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -567,7 +567,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -770,7 +770,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -893,7 +893,7 @@ public:
             output_arch << p_cell_writer;
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -1016,7 +1016,7 @@ public:
             output_arch << p_cell_writer;
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -1138,7 +1138,7 @@ public:
             output_arch << p_cell_writer;
             delete p_cell_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
@@ -1205,7 +1205,7 @@ public:
             output_arch << p_population_writer;
             delete p_population_writer;
         }
-
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
