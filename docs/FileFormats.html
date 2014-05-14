@@ -196,6 +196,18 @@
 
 <h2>Cell-based</h2>
 <dl>
+  <dt>*.arch</dt>
+  <dd>
+    File format for a saved (archived) simulation.
+  </dd>
+  <dt>build.info</dt>
+  <dd>
+    Details of computer setup for a particular <tt>cell_based</tt> chaste simulation. This contains information on versions of librarys used and the revision of the Chaste code.
+  </dd>
+  <dt>results.parameters</dt>
+  <dd>
+    Details of all the classes and parameters used in a <tt>cell_based</tt> chaste simulation.
+  </dd>
   <dt>.viz*</dt>
   <dd>
     General format of results files written by <tt>cell_based</tt> chaste for the <tt>Visualize2dCentreCells.java</tt> and <tt>Visualize2dVertexCells.java</tt> programs.
@@ -217,6 +229,10 @@
    <dt>.vizcelltypes</dt>
   <dd>
     The cell type of each cell at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time c_1 c_2 ... c_n</tt>.
+  </dd>
+   <dt>.vizcellphases</dt>
+  <dd>
+    The cell cycle phase that each cell is in at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time p_1 p_2 ... p_n</tt>.
   </dd>
   <dt>.vizcoarsepdesolution</dt>
   <dd>
