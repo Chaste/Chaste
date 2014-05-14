@@ -79,14 +79,18 @@ def index(req):
             text = 'Old %s builds.' % tests_type[:-4]
         else:
             text = 'Recent %s builds.' % tests_type
-        output.append('\n    <li><a href="%s/recent?type=%s">%s</a></li>'
-                        % (_our_url, tests_type, text))
+        output.append('\n    <li><a href="%s/recent?type=%s">%s</a></li>' % (_our_url, tests_type, text))
+        if tests_type == 'nightly':
+            # Special case links to show only or all but project builds
+            output.append('\n    <ul>')
+            output.append('\n        <li><a href="%s/recent?type=nightly&targets=!*projects*">Only core builds</a></li>' % _our_url)
+            output.append('\n        <li><a href="%s/recent?type=nightly&targets=*projects*">Only project builds</a></li>' % _our_url)
+            output.append('\n    </ul>')
     output.append("""</ul>
     <p>Branch/project builds: (<a style='text-decoration: underline; color: blue;' onclick="toggle_visibility('branch-list');">toggle visibility</a>)</p>
     <ul id='branch-list' style='display:none;'>""")
     for tests_type in branch_types:
-        output.append('\n    <li><a href="%s/recent?type=%s">Recent %s builds.</a></li>' %
-                      (_our_url, tests_type, tests_type))
+        output.append('\n    <li><a href="%s/recent?type=%s">Recent %s builds.</a></li>' % (_our_url, tests_type, tests_type))
     output.append("""</ul>
     
     <p>
@@ -203,10 +207,13 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
         if filters:
             for filter_name, filter_value in filters.items():
                 if filter_name in poss_filters:
-                    if '*' in filter_value:
-                        where.append(filter_name + ' GLOB ?')
+                    if len(filter_value) > 0 and filter_value[0] == '!':
+                        filter_value = filter_value[1:]
+                        negated = True
                     else:
-                        where.append(filter_name + '=?')
+                        negated = False
+                    op = [['=', '!='], ['GLOB', 'NOT GLOB']]['*' in filter_value][negated]
+                    where.append(filter_name + ' ' + op + ' ?')
                     params.append(filter_value)
         if where:
             where = ' where ' + ' and '.join(where)
@@ -287,7 +294,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
                 'build_type': _linkBuildType(build_type, revision, wrappableText=True),
                 'status': _linkSummary(overall_status, type, revision, machine, build_type)}
         for poss_filter in poss_filters:
-            if poss_filter not in filters:
+            if poss_filter not in filters or '*' in filters[poss_filter]:
                 new_filters = filters.copy()
                 new_filters[poss_filter] = locals()[poss_filter]
                 subs[poss_filter] += ' [' + _linkRecent('filter', type, 0, **new_filters) + ']'
