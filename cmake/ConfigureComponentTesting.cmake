@@ -16,3 +16,5 @@ option(ENABLE_crypt_TESTING "Generate the test infrastructure for the crypt comp
 mark_as_advanced(ENABLE_crypt_TESTING)
 option(ENABLE_continuum_mechanics_TESTING "Generate the test infrastructure for the continuum_mechanics component" ON)
 mark_as_advanced(ENABLE_continuum_mechanics_TESTING)
+option(ENABLE_NottinghamSTI_TESTING "Generate the test infrastructure for the NottinghamSTI component" ON)
+mark_as_advanced(ENABLE_NottinghamSTI_TESTING)

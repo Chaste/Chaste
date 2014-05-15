@@ -106,7 +106,7 @@ OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
                   << rDirectory.GetAbsolutePath() << "' is not under '"
                   << output_root.GetAbsolutePath() << "'.");
     }
-    if (*output_root.GetAbsolutePath().rbegin() != '/')
+    if (*output_root.GetAbsolutePath().rbegin() != '/' && !relative_path.empty())
     {
         assert(*relative_path.begin() == '/');
         relative_path.erase(0, 1); // Remove leading slash
