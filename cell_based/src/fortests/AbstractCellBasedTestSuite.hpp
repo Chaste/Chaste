@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CellPropertyRegistry.hpp"
+#include "CellId.hpp"
 
 /**
  * This class provides setUp and tearDown methods that are common to
@@ -58,12 +59,10 @@ protected:
      */
     void setUp()
     {
-        // The following won't work: it returns from this setup method, but not the test suite
-        //EXIT_IF_PARALLEL; // defined in PetscTools
-
         SimulationTime::Instance()->SetStartTime(0.0);
         RandomNumberGenerator::Instance()->Reseed(0);
         CellPropertyRegistry::Instance()->Clear();
+        CellId::ResetMaxCellId();
     }
 
     /**

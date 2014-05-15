@@ -72,7 +72,7 @@ public:
     const std::vector<boost::shared_ptr<AbstractCellProperty> >& rGetAllCellProperties();
 
     /**
-     * Clear all registered cell proeprties.
+     * Clear all registered cell properties.
      */
     void Clear();
 

@@ -393,10 +393,12 @@ public:
         FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.vizancestors").CompareFiles();
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellmutationstates.dat").CompareFiles();
 
-        // Cell ages and volumes file differs because it writes the global index of the node to file, which is different depending on how many processes there are.
-        //FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellages.dat").CompareFiles();
-        //FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
-
+        if (PetscTools::IsSequential())
+        {
+            // Cell ages and volumes file differs because it writes the global index of the node to file, which is different depending on how many processes there are.
+            FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellages.dat").CompareFiles();
+            FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
+        }
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {

@@ -467,11 +467,11 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 5u);
         TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5u);
-        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(0u)->GetCellId(), 452u);
-        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(1u)->GetCellId(), 453u);
-        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(2u)->GetCellId(), 454u);
-        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(3u)->GetCellId(), 455u);
-        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(4u)->GetCellId(), 456u);
+        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(0u)->GetCellId(), 0u);
+        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(1u)->GetCellId(), 1u);
+        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(2u)->GetCellId(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(3u)->GetCellId(), 3u);
+        TS_ASSERT_EQUALS(cell_population.GetCellUsingLocationIndex(4u)->GetCellId(), 4u);
 
         // For coverage of GetCellVolume() for 2D in 3D
         TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(0u)), 1.0/6.0, 1e-6);

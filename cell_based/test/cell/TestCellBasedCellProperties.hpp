@@ -60,8 +60,8 @@ public:
 
     void TestCellIdMethods() throw(Exception)
     {
-        // Resetting the Maximum cell Id to zero (to account for previous tests)
-        CellId::ResetMaxCellId();
+        // Resetting the Maximum cell Id to zero (to account for previous tests) is done in the Setup method...
+        // CellId::ResetMaxCellId();
 
         MAKE_PTR(CellId, p_cell_id);
 
@@ -77,9 +77,9 @@ public:
 
     void TestArchiveCellId() throw(Exception)
     {
-        /* In this test the Max Cell Id starts at 2 as continues from previous test.
-         * If you add more tests this will fail.
-         */
+        MAKE_PTR(CellId, p_extra_cell_id);
+        p_extra_cell_id->AssignCellId();
+        // In this test the Max Cell Id starts at 2 because we just made a cell and assigned to it
 
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell_id.arch";
