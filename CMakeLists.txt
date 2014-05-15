@@ -352,7 +352,7 @@ execute_process(COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${CHASTE_BUILD_DIR_NAME}/ti
     OUTPUT_FILE build_timestamp)
 
 # List the available Chaste components
-set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt NottinghamSTI)
+set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
 
 # Specify which other components each depends on.
 # This information is used to set up CMake dependencies, include search paths and libraries to link against.
@@ -365,7 +365,6 @@ set(CHASTE_DEPENDS_pde ode mesh linalg io global)
 set(CHASTE_DEPENDS_cell_based pde ode mesh linalg io global)
 set(CHASTE_DEPENDS_crypt cell_based pde ode mesh linalg io global)
 set(CHASTE_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
-set(CHASTE_DEPENDS_NottinghamSTI continuum_mechanics pde ode mesh linalg io global)
 
 foreach(component ${CHASTE_COMPONENTS})
     # Set up the component source & include directories
