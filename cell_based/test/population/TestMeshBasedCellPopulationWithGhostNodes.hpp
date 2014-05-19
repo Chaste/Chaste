@@ -71,6 +71,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+///\todo #2481 -- Is OSX Mavericks' libc++ implementation of vector<bool> dubious?
+typedef const typename std::vector<bool>::value_type& const_reference;
+
 class TestMeshBasedCellPopulationWithGhostNodes : public AbstractCellBasedTestSuite
 {
 public:
