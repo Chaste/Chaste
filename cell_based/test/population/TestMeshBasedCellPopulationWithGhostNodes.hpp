@@ -71,8 +71,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-///\todo #2481 -- Is OSX Mavericks' libc++ implementation of vector<bool> dubious?
-typedef const typename std::vector<bool>::value_type& const_reference;
 
 class TestMeshBasedCellPopulationWithGhostNodes : public AbstractCellBasedTestSuite
 {
@@ -175,7 +173,9 @@ public:
             is_ghost_node[*it] = true;
         }
 
-        TS_ASSERT_EQUALS(cell_population.rGetGhostNodes(), is_ghost_node);
+        std::vector<bool> copy_of_ghost_node_vector = cell_population.rGetGhostNodes();
+        TS_ASSERT(copy_of_ghost_node_vector == is_ghost_node);
+        TS_ASSERT_EQUALS(copy_of_ghost_node_vector, is_ghost_node);
 
         // Test the GetGhostNodeIndices method
         std::set<unsigned> ghost_node_indices2 = cell_population.GetGhostNodeIndices();
