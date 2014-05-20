@@ -101,18 +101,22 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(Element<ELEMENT_DIM,SPA
 {
     unsigned new_elt_index;
 
-    /* If this assertion trips then you need to reimplement the
-     * method in a similar way to the AddNode method above to reuse
-     * deleted element indices.
-     */
-    assert(mDeletedElementIndices.empty());
+    if (mDeletedElementIndices.empty())
+    {
+        new_elt_index = this->mElements.size();
+        this->mElements.push_back(pNewElement);
+        pNewElement->ResetIndex(new_elt_index);
+    }
+    else
+    {
+        unsigned index = mDeletedElementIndices.back();
+        pNewElement->ResetIndex(index);
+        mDeletedElementIndices.pop_back();
+        delete this->mElements[index];
+        this->mElements[index] = pNewElement;
+    }
 
-    new_elt_index = this->mElements.size();
-    this->mElements.push_back(pNewElement);
-
-    pNewElement->ResetIndex(new_elt_index);
-
-    return new_elt_index;
+    return pNewElement->GetIndex();
 }
 
 
