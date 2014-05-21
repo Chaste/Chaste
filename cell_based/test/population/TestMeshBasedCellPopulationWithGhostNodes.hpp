@@ -173,9 +173,9 @@ public:
             is_ghost_node[*it] = true;
         }
 
-        std::vector<bool> copy_of_ghost_node_vector = cell_population.rGetGhostNodes();
-        TS_ASSERT(copy_of_ghost_node_vector == is_ghost_node);
-        TS_ASSERT_EQUALS(copy_of_ghost_node_vector, is_ghost_node);
+        //Note in the following that some compilers (clang on recent OSX) can't cope with operator== overloading in CxxTest TS_ASSERT_EQUALS
+        TS_ASSERT(cell_population.rGetGhostNodes() == is_ghost_node);
+        //TS_ASSERT_EQUALS(cell_population.rGetGhostNodes(), is_ghost_node); // might not compile on recent clang
 
         // Test the GetGhostNodeIndices method
         std::set<unsigned> ghost_node_indices2 = cell_population.GetGhostNodeIndices();
@@ -188,7 +188,8 @@ public:
              ++cell_iter)
         {
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            TS_ASSERT_EQUALS(is_ghost_node[node_index], false);
+            TS_ASSERT( !(is_ghost_node[node_index]) );
+            //TS_ASSERT_EQUALS(is_ghost_node[node_index], false); // might not compile on recent clang
             counter++;
         }
 
