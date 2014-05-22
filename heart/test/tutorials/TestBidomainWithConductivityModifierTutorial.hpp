@@ -66,23 +66,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
 {
-private:
+
     /*
-     * This private member is "working memory" to hold the returned modified tensor.
+     * mTensor is "working memory" to hold the returned modified tensor.
      * This is needed because we return by reference to the problem class, so we need
      * to make sure the memory isn't overwritten before it's done with.
+     *
+     * Most of the time, we will modify the original conductivity tensor,
+     * but sometimes we want to return some "constant" matrix.
      */
+private:
+
     c_matrix<double,2,2> mTensor;
-    /*
-     * Let's say we want to return some "constant" matrix sometimes.
-     */
     c_matrix<double,2,2> mSpecialMatrix;
 
+
 public:
-    /*
-     * Constructor. In Chaste, all conductivity tensors are diagonal, so we initialise our "constant matrix"
-     * to zero so that we only need to set the diagonal entries in the constructor.
-     */
+     /*
+      * Constructor. In Chaste, all conductivity tensors are diagonal, so we initialise our "constant matrix"
+      * to zero so that we only need to set the diagonal entries in the constructor.
+      */
     SimpleConductivityModifier() : AbstractConductivityModifier<2,2>(),
     mSpecialMatrix( zero_matrix<double>(2,2) )
     {
@@ -90,32 +93,32 @@ public:
         mSpecialMatrix(1,1) = 0.707;
     }
 
+   /*
+    * `rCalculateModifiedConductivityTensor` returns a reference to the "processed" conductivity tensor.
+    */
     c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
     {
-        /*
-         * For element 0 let's return the "special matrix", regardless of intra/extra-cellular.
-         */
+
         if ( elementIndex==0 )
         {
+            // For element 0 let's return the "special matrix", regardless of intra/extra-cellular.
             return mSpecialMatrix;
         }
-        /*
-         * We can change the behaviour of the modifier for intra/extra-cellular by probing the domainIndex.
-         * 0 = intracellular, 1 = extracellular, (2 = extended bidomain)
-         */
+
+
+        // Otherwise, we change the behaviour depending on the `domainIndex` (intra/extra-cellular).
         double domain_scaling;
-        if (domainIndex==0)
+        if ( domainIndex==0 )
         {
-            domain_scaling = 1.0; // Intracellular
+            domain_scaling = 1.0; // Intracellular, domainIndex==0
         }
         else
         {
-            domain_scaling = 1.5; // Extracellular
+            domain_scaling = 1.5; // Extracellular, domainIndex==1
         }
-        /*
-         * Modify the current conductivity according to some expression by running along the diagonal,
-         * save to the "working memory", and return.
-         */
+
+        // Modify the current conductivity according to some expression by running along the diagonal,
+        // save to the "working memory", and return.
         for ( unsigned i=0; i<2; i++ )
         {
             mTensor(i,i) = domain_scaling*elementIndex*rOriginalConductivity(i,i);
@@ -148,7 +151,7 @@ public:
         bidomain_problem.SetMesh( &mesh );
 
         /*
-         * The problem generates the BidomainTissue, but only after Initialise(), so do that now and get
+         * The problem generates the `BidomainTissue`, but only after `Initialise()`, so do that now and get
          * the tissue so we can apply the modifier later.
          */
         bidomain_problem.Initialise();
@@ -156,7 +159,7 @@ public:
 
         /*
          * Get the original conductivity tensor values. We haven't set them using
-         * HeartConfig->SetIntra/ExtracellularConductivities so they'll just be the defaults.
+         * `HeartConfig->SetIntra/ExtracellularConductivities` so they'll just be the defaults.
          *
          * The first argument below is the element ID (we just check the zeroth here). The second accesses
          * the diagonal elements. We just do (0,0), as (1,1) should be the same (no fibre orientation).
@@ -172,7 +175,7 @@ public:
         TS_ASSERT_DELTA(orig_extra_conductivity_0, 7.0, 1e-9); // hard-coded using default
 
         /*
-         * Now we make the modifier object and set it on the tissue using SetConductivityModifier.
+         * Now we make the modifier object and set it on the tissue using `SetConductivityModifier`.
          */
         SimpleConductivityModifier modifier;
         p_bidomain_tissue->SetConductivityModifier( &modifier );
