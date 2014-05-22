@@ -96,38 +96,6 @@ public:
 };
 
 
-
-class SimpleConductivityModifier : public AbstractConductivityModifier<1,1>
-{
-private:
-    c_matrix<double,1,1> mTensor;
-
-public:
-    SimpleConductivityModifier()
-        : AbstractConductivityModifier<1,1>()
-    {
-    }
-
-    c_matrix<double,1,1>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,1,1>& rOriginalConductivity, unsigned domainIndex)
-    {
-        // We can change the behaviour of the modifier for intra/extra-cellular by probing domainIndex
-        double domain_scaling;
-        if (domainIndex==0)
-        {
-            // Intracellular
-            domain_scaling = 1.0;
-        }
-        else // domainIndex==1
-        {
-            // Extracellular
-            domain_scaling = 1.5;
-        }
-        mTensor(0,0) = domain_scaling*(elementIndex+2.0)*rOriginalConductivity(0,0); //so conductivity on element 0 gets scaled by 2, and by 3 on element 1
-        return mTensor;
-    }
-};
-
-
 class TestBidomainTissue : public CxxTest::TestSuite
 {
 public:
@@ -342,35 +310,6 @@ public:
         TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(4u)(1,1),152.0);//within second ellipsoid
         TS_ASSERT_EQUALS(bidomain_tissue.rGetExtracellularConductivityTensor(8u)(0,0),65.0);//elsewhere, e.g. element 8
     }
-
-    void TestGetConductivityAndConductivityModifier() throw(Exception)
-    {
-        HeartConfig::Instance()->Reset();
-        TetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 1 element mesh
-
-        MyCardiacCellFactory<1> cell_factory;
-        cell_factory.SetMesh(&mesh);
-
-        BidomainTissue<1> bidomain_tissue( &cell_factory );
-
-        double orig_extra_conductivity = bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0);
-        double orig_intra_conductivity = bidomain_tissue.rGetIntracellularConductivityTensor(0)(0,0);
-
-        TS_ASSERT_DELTA(orig_extra_conductivity, 7.0, 1e-9); // hard-coded using default
-        TS_ASSERT_DELTA(orig_intra_conductivity, 1.75, 1e-9); // hard-coded using default
-
-        SimpleConductivityModifier modifier;
-        bidomain_tissue.SetConductivityModifier(&modifier);
-
-        TS_ASSERT_DELTA(bidomain_tissue.rGetExtracellularConductivityTensor(0)(0,0), 1.5*2*orig_extra_conductivity, 1e-9);
-        TS_ASSERT_DELTA(bidomain_tissue.rGetIntracellularConductivityTensor(0)(0,0), 2*orig_intra_conductivity, 1e-9);
-
-        // The following asks for element 1 which doesn't exist
-        TS_ASSERT_THROWS_THIS(bidomain_tissue.rGetExtracellularConductivityTensor(1)(0,0),
-                              "Conductivity tensor requested for element with global_index=1, but there are only 1 elements in the mesh.")
-    }
-
 
     void TestSaveAndLoadCardiacPDE()
     {
