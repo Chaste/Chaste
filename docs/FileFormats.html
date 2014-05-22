@@ -22,8 +22,8 @@
     <li>Simulation statistics. The structure of each file varies depending on the data they contain. The structure should be described by comments in the methods which write these data.<br>
     An example is the <tt>CellAgesWriter</tt> class:
         <ul>
-        <li> The output format is a line of space-separated values.<br>
-        <li> Each line has the form '...[location index] [x-pos] [y-pos] [z-pos] [cell age] ...' where [y-pos] and [z-pos] are included for 2 and 3 dimensional simulations, respectively.</li>
+        <li> The output is a single value [current simulation time], followed by a tab, followed by a sequence of space-separated values.
+        <li> This sequence has the form '...[location index] [x-pos] [y-pos] [z-pos] [cell age] ...' where [y-pos] and [z-pos] are included for 2 and 3 dimensional simulations, respectively.</li>
         </ul>
     <li>Also used for the fixed-width space-separated column data file format, written by the <tt>ColumnDataWriter</tt> class, and compatible with <a href="http://www.gnuplot.info/">Gnuplot</a>.
         <ul>
