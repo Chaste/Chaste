@@ -82,7 +82,14 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its data.
+     * Visit a cell and write its location index.
+     * (Is this all data required for output? #2543)
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[cell location index] ...
+     *
+     * This is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCell the cell to write
      * @param pCellPopulation a pointer to the cell population owning the cell.

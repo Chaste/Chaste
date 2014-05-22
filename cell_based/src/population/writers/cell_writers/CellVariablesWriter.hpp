@@ -82,7 +82,13 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its data.
+     * Visit a cell and write its protein concentrations.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[location index] [protein 1 conc] [protein 2 conc] ... [protein n conc] ...
+     *
+     * This is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
