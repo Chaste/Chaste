@@ -86,12 +86,13 @@ public:
       * Constructor. In Chaste, all conductivity tensors are diagonal, so we initialise our "constant matrix"
       * to zero so that we only need to set the diagonal entries in the constructor.
       */
-    SimpleConductivityModifier() : AbstractConductivityModifier<2,2>(),
-    mSpecialMatrix( zero_matrix<double>(2,2) )
-    {
-        mSpecialMatrix(0,0) = 3.14;
-        mSpecialMatrix(1,1) = 0.707;
-    }
+    SimpleConductivityModifier()
+        : AbstractConductivityModifier<2,2>(),
+          mSpecialMatrix( zero_matrix<double>(2,2) )
+          {
+              mSpecialMatrix(0,0) = 3.14;
+              mSpecialMatrix(1,1) = 0.707;
+          }
 
    /*
     * `rCalculateModifiedConductivityTensor` returns a reference to the "processed" conductivity tensor.
@@ -99,7 +100,7 @@ public:
     c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
     {
 
-        if ( elementIndex==0 )
+        if ( elementIndex == 0 )
         {
             // For element 0 let's return the "special matrix", regardless of intra/extra-cellular.
             return mSpecialMatrix;
@@ -108,7 +109,7 @@ public:
 
         // Otherwise, we change the behaviour depending on the `domainIndex` (intra/extra-cellular).
         double domain_scaling;
-        if ( domainIndex==0 )
+        if ( domainIndex == 0 )
         {
             domain_scaling = 1.0; // Intracellular, domainIndex==0
         }
@@ -139,7 +140,7 @@ public:
         /*
          * Generate the mesh.
          */
-        TetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0, 0.5); // Mesh has 4 elements
 
         /*
@@ -161,18 +162,27 @@ public:
          * Get the original conductivity tensor values. We haven't set them using
          * `HeartConfig->SetIntra/ExtracellularConductivities` so they'll just be the defaults.
          *
-         * The first argument below is the element ID (we just check the zeroth here). The second accesses
+         * The first argument below is the element ID (we just check the first element we own here). The second accesses
          * the diagonal elements. We just do (0,0), as (1,1) should be the same (no fibre orientation).
          * Off-diagonal elements will be 0.
+         *
+         * As we don't have many elements, when we run on more than two processors some processors
+         * will not own any elements. We only try to access the conductivity tensors if the process
+         * owns at least one element.
+         *
+         * We then check that we have the correct (default) conductivity values.
          */
-        double orig_intra_conductivity_0 = p_bidomain_tissue->rGetIntracellularConductivityTensor(0)(0,0);
-        double orig_extra_conductivity_0 = p_bidomain_tissue->rGetExtracellularConductivityTensor(0)(0,0);
+        double orig_intra_conductivity_0 = 0.0;
+        double orig_extra_conductivity_0 = 0.0;
+        if (mesh.GetElementIteratorBegin() != mesh.GetElementIteratorEnd())
+        {
+            unsigned first_element = mesh.GetElementIteratorBegin()->GetIndex();
+            orig_intra_conductivity_0 = p_bidomain_tissue->rGetIntracellularConductivityTensor(first_element)(0,0);
+            orig_extra_conductivity_0 = p_bidomain_tissue->rGetExtracellularConductivityTensor(first_element)(0,0);
 
-        /*
-         * Check that we've got the right (default) values.
-         */
-        TS_ASSERT_DELTA(orig_intra_conductivity_0, 1.75, 1e-9); // hard-coded using default
-        TS_ASSERT_DELTA(orig_extra_conductivity_0, 7.0, 1e-9); // hard-coded using default
+            TS_ASSERT_DELTA(orig_intra_conductivity_0, 1.75, 1e-9); // hard-coded using default
+            TS_ASSERT_DELTA(orig_extra_conductivity_0, 7.0, 1e-9); // hard-coded using default
+        }
 
         /*
          * Now we make the modifier object and set it on the tissue using `SetConductivityModifier`.
@@ -181,18 +191,30 @@ public:
         p_bidomain_tissue->SetConductivityModifier( &modifier );
 
         /*
-         * Check that the conductivities have changed!
+         * Check that the conductivities have changed! We iterate over all elements owned by this process
+         * and check their conductivity.
          */
-        TS_ASSERT_DELTA(p_bidomain_tissue->rGetIntracellularConductivityTensor(0)(0,0), 3.14, 1e-9);
-        TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(0)(0,0), 3.14, 1e-9);
-        TS_ASSERT_DELTA(p_bidomain_tissue->rGetIntracellularConductivityTensor(0)(1,1), 0.707, 1e-9);
-        TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(0)(1,1), 0.707, 1e-9);
-
-        TS_ASSERT_DELTA(p_bidomain_tissue->rGetIntracellularConductivityTensor(3)(0,0), 1.0*3u*orig_intra_conductivity_0, 1e-9);
-        TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(3)(0,0), 1.5*3u*orig_extra_conductivity_0, 1e-9);
+        for (AbstractTetrahedralMesh<2,2>::ElementIterator elt_iter=mesh.GetElementIteratorBegin();
+             elt_iter!=mesh.GetElementIteratorEnd();
+             ++elt_iter)
+        {
+            unsigned index = elt_iter->GetIndex();
+            if (index == 0u)
+            {
+                TS_ASSERT_DELTA(p_bidomain_tissue->rGetIntracellularConductivityTensor(0)(0,0), 3.14, 1e-9);
+                TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(0)(0,0), 3.14, 1e-9);
+                TS_ASSERT_DELTA(p_bidomain_tissue->rGetIntracellularConductivityTensor(0)(1,1), 0.707, 1e-9);
+                TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(0)(1,1), 0.707, 1e-9);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(p_bidomain_tissue->rGetIntracellularConductivityTensor(index)(0,0), 1.0*index*orig_intra_conductivity_0, 1e-9);
+                TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(index)(0,0), 1.5*index*orig_extra_conductivity_0, 1e-9);
+            }
+        }
 
         /*
-         * This is just for coverage! The following asks for element 8 which doesn't exist and checks the assertion.
+         * This is just for coverage! The following asks for element 4 which doesn't exist and checks the assertion.
          */
         TS_ASSERT_THROWS_THIS(p_bidomain_tissue->rGetExtracellularConductivityTensor(4),
                               "Conductivity tensor requested for element with global_index=4, but there are only 4 elements in the mesh.")
