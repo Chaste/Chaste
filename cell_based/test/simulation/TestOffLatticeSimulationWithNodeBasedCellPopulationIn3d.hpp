@@ -105,7 +105,7 @@ public:
         OffLatticeSimulation<3> simulator(node_based_cell_population);
         simulator.SetOutputDirectory("NodeBased3dOnSphere");
         simulator.SetSamplingTimestepMultiple(120);
-        simulator.SetEndTime(50.0); // 50.0
+        simulator.SetEndTime(10.0); // 50.0
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(GeneralisedLinearSpringForce<3>, p_linear_force);
@@ -115,7 +115,7 @@ public:
         // Create some boundary conditions and pass them to the simulation
         c_vector<double,3> centre = zero_vector<double>(3);
         centre(2) = 1.0;
-        double radius = 1.0;
+        double radius = 2.0;
         MAKE_PTR_ARGS(SphereGeometryBoundaryCondition<3>, p_boundary_condition, (&node_based_cell_population, centre, radius)); // Circle radius 1 centre (0,0,1)
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
 
@@ -135,9 +135,6 @@ public:
             c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);
         }
-
-        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 16u);
-        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 12u);
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
