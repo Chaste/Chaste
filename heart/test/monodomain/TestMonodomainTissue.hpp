@@ -218,6 +218,8 @@ public:
 
         TS_ASSERT_THROWS_THIS(monodomain_tissue.rGetExtracellularConductivityTensor(0),
                               "Monodomain tissues do not have extracellular conductivity tensors.");
+        TS_ASSERT_THROWS_THIS(monodomain_tissue.rGetIntracellularConductivityTensor(1),
+                              "Conductivity tensor requested for element with global_index=1, but there are only 1 elements in the mesh.");
 
         PetscTools::Destroy(voltage);
     }

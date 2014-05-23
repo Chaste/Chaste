@@ -212,12 +212,6 @@ public:
                 TS_ASSERT_DELTA(p_bidomain_tissue->rGetExtracellularConductivityTensor(index)(0,0), 1.5*index*orig_extra_conductivity_0, 1e-9);
             }
         }
-
-        /*
-         * This is just for coverage! The following asks for element 4 which doesn't exist and checks the assertion.
-         */
-        TS_ASSERT_THROWS_THIS(p_bidomain_tissue->rGetExtracellularConductivityTensor(4),
-                              "Conductivity tensor requested for element with global_index=4, but there are only 4 elements in the mesh.")
     }
 };
 
