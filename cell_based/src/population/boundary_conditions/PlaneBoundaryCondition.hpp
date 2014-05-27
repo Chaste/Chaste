@@ -63,6 +63,12 @@ private:
      */
     c_vector<double, DIM> mNormalToPlane;
 
+    /**
+     * Whether to jiggle the cells on the bottom surface, initialised to false
+     * in the constructor.
+     */
+    bool mUseJiggledNodesOnPlane;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -75,6 +81,7 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<DIM> >(*this);
+        archive & mUseJiggledNodesOnPlane;
     }
 
 public:
@@ -99,6 +106,16 @@ public:
      * @return #mNormalToPlane.
      */
     const c_vector<double, DIM>& rGetNormalToPlane() const;
+
+    /**
+     * Set method for mUseJiggledNodesOnPlane
+     *
+     * @param useJiggledNodesOnPlane whether to jiggle the nodes on the surface of the plane, can help stop overcrowding on plane.
+     */
+    void SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane);
+
+    /** @return #mUseJiggledNodesOnPlane. */
+    bool GetUseJiggledNodesOnPlane();
 
     /**
      * Overridden ImposeBoundaryCondition() method.

@@ -137,6 +137,68 @@ public:
                               "PlaneBoundaryCondition is not implemented in 1D");
     }
 
+    void TestPlaneBoundaryConditionWithNodeBasedCellPopulationAndJiggledNodes() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
+        // Create mesh
+        HoneycombMeshGenerator generator(2, 2, 0);
+        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Set up cell population boundary condition
+        c_vector<double,2> point = zero_vector<double>(2);
+        point(0) = 2.0;
+        c_vector<double,2> normal = zero_vector<double>(2);
+        normal(0) = -1.0;
+        PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
+
+        // Turn on the jiggle nodes
+        TS_ASSERT(!(boundary_condition.GetUseJiggledNodesOnPlane()));
+        boundary_condition.SetUseJiggledNodesOnPlane(true);
+        TS_ASSERT(boundary_condition.GetUseJiggledNodesOnPlane());
+
+        // Impose boundary condition
+        std::map<Node<2>*, c_vector<double,2> > old_locations;
+        for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+             cell_iter != cell_population.rGetCells().end();
+             ++cell_iter)
+        {
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            old_locations[p_node] = p_node->rGetLocation();
+        }
+
+        boundary_condition.ImposeBoundaryCondition(old_locations);
+
+        // Test that all nodes satisfy the boundary condition. Note these are random so depend on the seed
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(0)->rGetLocation()[0],2.00005,1e-5);
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(0)->rGetLocation()[1],0.0,1e-5);
+
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(1)->rGetLocation()[0],2.00006,1e-5);
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(1)->rGetLocation()[1],0.0,1e-5);
+
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(2)->rGetLocation()[0],2.00007,1e-5);
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(2)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
+
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[0],2.00008,1e-5);
+		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
+
+
+        // Test VerifyBoundaryCondition() method
+        TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
+    }
+
     void TestPlaneBoundaryConditionWithVertexBasedCellPopulation() throw(Exception)
     {
         // Create mesh
@@ -200,6 +262,37 @@ public:
         PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
         TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
                               "PlaneBoundaryCondition is not implemented in 1D");
+
+
+        // Now test with the jiggled nodes for coverage
+        x_boundary = 0.8;
+        point(0) = x_boundary;
+        PlaneBoundaryCondition<2> boundary_condition_2(&cell_population, point, normal);
+
+        TS_ASSERT(!(boundary_condition_2.GetUseJiggledNodesOnPlane()));
+        boundary_condition_2.SetUseJiggledNodesOnPlane(true);
+        TS_ASSERT(boundary_condition_2.GetUseJiggledNodesOnPlane());
+
+        boundary_condition_2.ImposeBoundaryCondition(old_locations);
+
+        // Test that all nodes satisfy the jiggled boundary condition
+        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+                node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            c_vector<double, 2> location = node_iter->rGetLocation();
+            if (old_locations[&(*node_iter)][0] < x_boundary)
+            {
+            	TS_ASSERT_LESS_THAN(x_boundary, location[0]);// note strict inequality
+                TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(location[0], old_locations[&(*node_iter)][0], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
+            }
+        }
+
     }
 
     void TestPlaneBoundaryConditionExceptions() throw(Exception)

@@ -36,13 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "AbstractCentreBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "RandomNumberGenerator.hpp"
 
 template<unsigned DIM>
 PlaneBoundaryCondition<DIM>::PlaneBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation,
                                                     c_vector<double, DIM> point,
                                                     c_vector<double, DIM> normal)
         : AbstractCellPopulationBoundaryCondition<DIM>(pCellPopulation),
-          mPointOnPlane(point)
+          mPointOnPlane(point),
+          mUseJiggledNodesOnPlane(false)
 {
     assert(norm_2(normal) > 0.0);
     mNormalToPlane = normal/norm_2(normal);
@@ -60,6 +62,19 @@ const c_vector<double, DIM>& PlaneBoundaryCondition<DIM>::rGetNormalToPlane() co
     return mNormalToPlane;
 }
 
+
+template<unsigned DIM>
+void PlaneBoundaryCondition<DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
+{
+    mUseJiggledNodesOnPlane = useJiggledNodesOnPlane;
+}
+
+template<unsigned DIM>
+bool PlaneBoundaryCondition<DIM>::GetUseJiggledNodesOnPlane()
+{
+    return mUseJiggledNodesOnPlane;
+}
+
 template<unsigned DIM>
 void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
 {
@@ -72,6 +87,9 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DI
     assert((dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
             || (dynamic_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation)) );
 
+    // THis is a magic number.
+    double max_jiggle = 1e-4;
+
     if (DIM != 1)
     {
         if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
@@ -80,16 +98,24 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DI
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {
-                c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
-
                 unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
                 Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
-                double signed_distance = inner_prod(cell_location - mPointOnPlane, mNormalToPlane);
+                c_vector<double, DIM> node_location = p_node->rGetLocation();
+
+                double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
                 if (signed_distance > 0.0)
                 {
-                    // For the closest point on the plane we travel from cell_location the signed_distance in the direction of -mNormalToPlane
-                    c_vector<double, DIM> nearest_point = cell_location - signed_distance*mNormalToPlane;
+                    // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
+                	c_vector<double, DIM> nearest_point;
+                	if (mUseJiggledNodesOnPlane)
+                	{
+                		nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
+                	}
+                	else
+                	{
+                		nearest_point = node_location - signed_distance*mNormalToPlane;
+                	}
                     p_node->rGetModifiableLocation() = nearest_point;
                 }
             }
@@ -110,8 +136,16 @@ void PlaneBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DI
                 double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
                 if (signed_distance > 0.0)
                 {
-                    // For the closest point on the plane we travel from cell_location the signed_distance in the direction of -mNormalToPlane
-                    c_vector<double, DIM> nearest_point = node_location - signed_distance*mNormalToPlane;
+                    // For the closest point on the plane we travel from node_location the signed_distance in the direction of -mNormalToPlane
+                	c_vector<double, DIM> nearest_point;
+                	if (mUseJiggledNodesOnPlane)
+                	{
+                		nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
+                	}
+                	else
+                	{
+                		nearest_point = node_location - signed_distance*mNormalToPlane;
+                	}
                     p_node->rGetModifiableLocation() = nearest_point;
                 }
             }
@@ -164,11 +198,12 @@ void PlaneBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameter
     *rParamsFile << mPointOnPlane[DIM-1] << "</PointOnPlane>\n";
 
     *rParamsFile << "\t\t\t<NormalToPlane>";
-     for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
-     {
-         *rParamsFile << mNormalToPlane[index] << ",";
-     }
-     *rParamsFile << mNormalToPlane[DIM-1] << "</NormalToPlane>\n";
+	for (unsigned index=0; index != DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+	{
+		*rParamsFile << mNormalToPlane[index] << ",";
+	}
+	*rParamsFile << mNormalToPlane[DIM-1] << "</NormalToPlane>\n";
+	*rParamsFile << "\t\t\t<UseJiggledNodesOnPlane>" << mUseJiggledNodesOnPlane << "</UseJiggledNodesOnPlane>\n";
 
     // Call method on direct parent class
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);

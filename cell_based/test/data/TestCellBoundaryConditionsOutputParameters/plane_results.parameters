@@ -1,2 +1,3 @@
 			<PointOnPlane>0,0</PointOnPlane>
 			<NormalToPlane>0,1</NormalToPlane>
+			<UseJiggledNodesOnPlane>0</UseJiggledNodesOnPlane>
