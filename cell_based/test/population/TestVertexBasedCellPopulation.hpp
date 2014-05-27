@@ -783,7 +783,7 @@ public:
         // Test Warnings
         // The case where the warning doesn't occur is tested in TestT2SwapCellKiller
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "A Cell is removed without performing a T2 swap. This could leave a void in the mesh.");
         Warnings::QuietDestroy();
     }
 

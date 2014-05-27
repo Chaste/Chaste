@@ -233,7 +233,7 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
             {
                 // This warning relies on the fact that there is only one other possibility for
                 // vertex elements to be marked as deleted: a T2 swap
-                WARNING("A Cell is removed without performing a T2 swap. This leaves a void in the mesh.");
+            	WARN_ONCE_ONLY("A Cell is removed without performing a T2 swap. This could leave a void in the mesh.");
                 mpMutableVertexMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
             }
 
