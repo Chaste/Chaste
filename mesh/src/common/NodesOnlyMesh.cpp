@@ -109,6 +109,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::SolveNodeMapping(unsigned index) const
 
     if (node_position == mNodesMapping.end())
     {
+    	assert(0);
         EXCEPTION("Requested node " << index << " does not belong to process " << PetscTools::GetMyRank());
     }
 
