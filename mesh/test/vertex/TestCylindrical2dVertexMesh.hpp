@@ -89,6 +89,11 @@ public:
 
         TS_ASSERT_DELTA(width, 4, 1e-4);
         TS_ASSERT_DELTA(height, 13.0*0.5/sqrt(3.0), 1e-4);
+
+
+        //Scale mesh and check its updated correctly
+        p_mesh->Scale(0.5,1.0);
+        TS_ASSERT_DELTA(p_mesh->GetWidth(0), 2, 1e-4);
     }
 
     void TestGetVectorFromAtoB() throw (Exception)

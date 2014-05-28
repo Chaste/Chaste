@@ -148,6 +148,15 @@ public:
     unsigned AddNode(Node<2>* pNewNode);
 
     /**
+     * Overridden Scale method to also scale the width (mWidth) of the mesh
+     *
+     * @param xFactor is the scale in the x-direction (defaults to 1.0)
+     * @param yFactor is the scale in the y-direction (defaults to 1.0)
+     * @param zFactor is the scale in the z-direction (defaults to 1.0) note this has to be 1.0 as only a 2d Mesh
+     */
+    void Scale(const double xScale=1.0, const double yScale=1.0,const double zScale=1.0);
+
+    /**
      * Return a pointer to an extended mesh that is a 'non-periodic'
      * version of our mesh. This can then be used when writing to
      * VTK.
