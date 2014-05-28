@@ -510,7 +510,7 @@ public:
      *                   with indices of VertexElements in the new mesh.  This should be created
      *                   with the correct size, GetNumElements()
      */
-    void ReMesh(VertexElementMap& rElementMap);
+    virtual void ReMesh(VertexElementMap& rElementMap);
 
     /**
      * Alternative version of ReMesh which takes no parameters and does not require a VertexElementMap.
