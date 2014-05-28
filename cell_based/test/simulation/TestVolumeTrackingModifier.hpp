@@ -155,7 +155,7 @@ public:
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
-        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 2u);
+        TS_ASSERT_EQUALS(cell_population.GetCellPropertyRegistry()->Get<CellLabel>()->GetCellCount(), 1u);
     }
 
     void TestMeshBasedSimulationWithContactInhibition()
