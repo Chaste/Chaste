@@ -117,7 +117,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
     {
         unsigned node_global_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
 
-        if (!num_real_elems_for_node[node_global_index] > 0)
+        if (!(num_real_elems_for_node[node_global_index] > 0))
         {
             NEVER_REACHED;
             // This code is commented because CellwiseData Can't deal with ghost nodes so won't ever come into this statement see #1975

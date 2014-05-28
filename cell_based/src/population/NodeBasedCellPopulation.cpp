@@ -392,8 +392,8 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             // Get the location of this node
             c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
 
-            // Get the vector the two nodes (assuming no periodicities etc.)
-            c_vector<double, DIM> node_to_node_vector = node_i_location - node_j_location;
+            // Get the vector the two nodes (using GetVectorFromAtoB to catch periodicities etc.)
+            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location);
 
             // Calculate the distance between the two nodes
             double distance_between_nodes = norm_2(node_to_node_vector);
@@ -423,6 +423,9 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
 template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
+	// Not implemented or tested in 1D
+	assert(DIM==2 ||DIM==3);
+
     // Get node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
     Node<DIM>* p_node = this->GetNode(node_index);
@@ -440,6 +443,18 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     // Get the set of node indices corresponding to this cell's neighbours
     std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
 
+    // THe number of neighbours in equilibrium configuration, from sphere packing problem
+    unsigned num_neighbours_equil;
+    if (DIM==2)
+    {
+    	num_neighbours_equil = 6;
+    }
+    else
+    {
+    	assert(DIM==3);
+    	num_neighbours_equil = 12;
+    }
+
     // Loop over this set
     for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
          iter != neighbouring_node_indices.end();
@@ -456,7 +471,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
         assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
 
         // Calculate the distance between the two nodes and add to cell radius
-        double separation = norm_2(node_j_location - node_i_location);
+        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location));
 
         if (separation < cell_radius+neighbouring_cell_radius)
         {
@@ -465,13 +480,15 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
             num_cells++;
         }
     }
-    if (num_cells == 0)
+    if (num_cells < num_neighbours_equil)
     {
-        averaged_cell_radius = cell_radius;
+        averaged_cell_radius += (num_neighbours_equil-num_cells)*cell_radius;
+
+        averaged_cell_radius /=num_neighbours_equil;
     }
     else
     {
-        averaged_cell_radius /= num_cells;
+    	averaged_cell_radius /= num_cells;
     }
     assert(averaged_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
 

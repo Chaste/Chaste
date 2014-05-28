@@ -147,10 +147,12 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                      */
                     if (mOutputDivisionLocations)
                     {
+                    	c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
                         *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
                         for (unsigned i=0; i<SPACE_DIM; i++)
                         {
-                            *mpDivisionLocationFile << new_location[i] << "\t";
+                            *mpDivisionLocationFile << cell_location[i] << "\t";
                         }
                         *mpDivisionLocationFile << "\t" << cell_age << "\n";
                     }
@@ -361,7 +363,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     if (mOutputDivisionLocations)
     {
-        mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
+    	mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
     }
     if (mOutputCellVelocities)
     {
