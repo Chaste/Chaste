@@ -138,7 +138,7 @@ void OutputFileHandler::CommonConstructor(const std::string &rDirectory,
     mDirectory = MakeFoldersAndReturnFullPath(rDirectory);
 
     // Clean the directory (default)
-    if (rDirectory != "" && cleanOutputDirectory) // Don't clean CHASTE_TEST_OUTPUT
+    if (rDirectory != "" && cleanOutputDirectory) // Clean directory but don't ever clean CHASTE_TEST_OUTPUT at the top level
     {
         FileFinder signature_file(mDirectory + SIG_FILE_NAME, RelativeTo::Absolute);
         if (!signature_file.Exists())

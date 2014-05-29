@@ -62,7 +62,7 @@ public:
      *
      * Will check that the directory exists and create it if needed.
      *
-     * @note This MUST be called collectively, since it contains a barrier call.
+     * @note This MUST be called collectively, since the directory creation routine contains a barrier call.
      *
      * @param rDirectory  the directory to put output files in.
      * @param cleanOutputDirectory  whether to remove any existing files in the output directory
