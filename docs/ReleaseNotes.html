@@ -8,6 +8,120 @@
 <h1>Chaste Release Notes</h1>
 
 
+<h2>Release 3.2 (changes since Release 3.1)</h2>
+
+<p>
+This is a minor release, but includes new support for many recent versions of dependencies, wider cross-platform support, and a large number of fixes and small performance improvements in both cardiac and cell-based components. We recommend upgrading from any prior version of Chaste to 3.2.
+</p>
+
+<h3>Headline features</h3>
+
+<h4>General</h4>
+<ul><li>The non-cardiac portions of Chaste have now been ported to Windows.  See <a href="https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/Windows">InstallGuides/Windows</a> for install and usage instructions.
+</li><li>Chaste has been ported to Mac OS X and continuous integration tests are performed on OS X v10.8 "Mountain Lion".
+</li><li>The Ubuntu package now also supports up to Trusty Tahr (14.04 Long-Term Support edition). 
+</li><li>Chaste works with most recent PETSc versions up to and including PETSc 3.4.
+</li><li>Chaste works with most recent VTK versions up to and including VTK 6.1.
+</li><li>Chaste works with most recent Boost versions up to and including Boost 1.54.
+</li><li>We no longer test Chaste on a 32-bit machine, so some tests may fail if run in a 32-bit context. We no longer provide a 32-bit stand-alone cardiac executable. 
+</li><li>We now allow access to the latest development version of the code (see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/AccessCodeRepository">ChasteGuides/AccessCodeRepository</a>), provide resources for external developers (see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/ExternalDeveloperGuide">ChasteGuides/ExternalDeveloperGuide</a>), and allow public registration on the trac wiki to view and open 'tickets'.
+</li><li>Chaste includes a CITATION.txt file for easy citation.
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>Analytic Jacobians can now be auto-generated for cardiac cell models, using maple, and used by CVODE solvers to provide between 5-30% speed up in ODE solving. These can be used in single cell and tissue. If present, the analytic Jacobian is used by default (see <a class="closed ticket" href="https://chaste.cs.ox.ac.uk/trac/ticket/1795" title="user story: Set up analytic jacobians for Cvode systems (closed: fixed)">#1795</a> for some benchmarking).
+</li><li>HDF5 file access has been improved to use more appropriate 'chunk' sizes. This speeds up cardiac output file reading/writing/postprocessing in quite a lot of situations.
+</li><li>Postprocessing maps can now be written to VTK as well as meshalyzer. They are now written via HDF5, so you can get them to any format you like with an appropriate HDF converter.
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>There is a new cell-based modifier mechanism which allows you to modify the cell population. This replaces the old hierarchy where each modification involved making a new subclass of the population. Examples of use cases would include modifying the target area of cells, tracking Delta-Notch, calculating the volume of all cells, or outputting statistics. Methods such as <tt>UpdateAfterSolve</tt> and <tt>UpdateAfterTimestep</tt> have been moved from simulation classes and into the relevant modifiers. 
+</li><li>We have re-factored the way cell populations write data to file by creating a writer hierarchy. One of these writers is created for each file that needs to be written, and then the population visits each writer it owns when it writes to file. This shouldn't affect user projects as the interfaces in tests for simulations hadn't changed. User tests of populations may fail if <tt>AbstractCellPopulation::OpenWritersFiles()</tt> hasn't been called before writing.
+</li><li>Cellular Automata class changes: <tt>MultipleCaBasedCellPopulation</tt> has been removed, as <tt>CaBasedCellPopulation</tt> now allows (optionally) for more than one species at a site. 
+</li><li><tt>NodesOnlyMesh</tt> now works in parallel and uses a <tt>DistributedBoxCollection</tt> to select which nodes it owns based on the decomposition in the box collection. It is necessary to include the <tt>PetscSetupAndFinalize.hpp</tt> header in the test to use this type of mesh.
+</li></ul><h3>Major new functionality &amp; code changes</h3>
+
+<h4>General</h4>
+<ul><li>To enable cross-platform support, we have removed all linux system calls to <tt>rm</tt> and <tt>cp</tt>, these are now done via <tt>FileFinder</tt>. The following are of note:
+<ul><li><tt>FileFinder::Remove()</tt> this operates like <tt>rm</tt> for a file, and <tt>rm -r</tt> for a folder. It will only delete things that are in a <tt>testoutput</tt> folder that contains the signature file (.chaste_deletable_folder denoting the fact Chaste made the folder in the first place).
+</li><li><tt>FileFinder::DangerousRemove()</tt> this operates like <tt>rm -f</tt> for a file, and <tt>rm -rf</tt> for a folder. It will delete anything in the <tt>testoutput</tt> or chaste source folders (but not elsewhere), regardless of the presence of a signature file. This is used very very rarely in the code, and should be avoided if possible.
+</li><li>There is no command to remove files from anywhere else on your machine. If you did manage to set your <tt>CHASTE_TEST_OUTPUT</tt> to be "/" then <tt>DangerousRemove()</tt> could wipe large parts of your system, obviously this should be avoided.
+</li></ul></li><li>To enable cross-platform support, have moved from a <tt>rand()</tt> based random number algorithm, to <tt>boost::random</tt> (Mersenne Twister), this is supposed to be "more random", and has the benefit of getting the same answers on different platforms to facilitate testing. So any programs you have that use random numbers (this includes most of <tt>cell_based</tt> and <tt>crypt</tt>) will get subtly different results now.
+</li><li>Reading of binary mesh files was scaling badly with mesh size (for file sizes of &gt;0.5Gb) on some file systems. This has been fixed so that partitioning and loading binary meshes on supercomputers is now faster. 
+</li><li>All mesh element files now have floating point attributes by default.  Old binary element files with attributes <strong>cannot be read</strong> by Chaste.  A conversion utility <tt>./python/utils/ConvertBinaryElementAttributes.py</tt> is provided to assist users with this change.
+</li><li>Simple airway tree ventilation models (Poiseuille flow and Pedley resistance) have been added to <tt>continuum_mechanics</tt>.
+</li><li><tt>Node</tt> now uses a <tt>NodeAttributes</tt> class to store its attributes. It is only created if the attributes are used so any code in projects that calls <tt>Node::rGetNodeAttributes()</tt> without having first set an attribute will encounter an error. If you need to check whether any attributes are set up, <tt>Node::GetNumNodeAttributes</tt> will return the number of attributes (0 if none set).
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>3D quadrature now uses second order (rather than first order) integration. This may change results slightly (for the better!).
+</li><li>Fibre reading capability for extended bidomain problem has been implemented such that <tt>ExtendedBidomainTissue</tt> has modified conductivities in all 3 fields (thanks to Shameer). 
+</li><li>Heterogeneous contraction models can now be used in electro-mechanics simulations, on a per-element basis on the mechanics mesh. This is done by creating a factory inheriting from <tt>AbstractContractionCellFactory</tt>, and setting this in the electro-mechanics problem definition.
+</li><li>Fixed a bug when using parMETIS partitioning (the default, <tt>PARMETIS_LIBRARY</tt>) which often resulted in deadlock when using <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/StateVariableInterpolation">state variable interpolation (SVI)</a> in 3-D.
+</li><li>Changed cell factories from passing node indices to pointers to Node objects, and element indices to pointers to Element objects.
+<ul><li>For most users this will mean updating all instances of <tt>CreateCardiacCellForTissueNode</tt> to have the correct argument (from e.g. <tt>unsigned node</tt> to e.g. <tt>Node&lt;DIM&gt;* pNode</tt> where <tt>DIM</tt> is probably 1, 2, or 3) and replacing all occurrences like <tt>GetMesh()-&gt;GetNode(node)</tt> with simply <tt>pNode</tt>.
+</li><li>Contraction cell factory (<tt>AbstractContractionCellFactory</tt> and <tt>LabelBasedContractionCellFactory</tt>) methods <tt>CreateContractionCellForElement</tt> have changed from taking an <tt>unsigned</tt> to an <tt>Element&lt;DIM,DIM&gt;*</tt>.
+</li><li><tt>AbstractPurkinjeCellFactory::CreatePurkinjeCellForTissueNode</tt> has changed from taking an <tt>unsigned</tt> to a <tt>Node&lt;DIM&gt;*</tt>.
+</li></ul></li><li> In Bidomain with bath simulations electrode 'on' and 'off' events are now required to coincide with printing time-steps. If they do not coincide then a run-time exception is thrown.
+</li><li>A script <tt>python/utils/AddVtuTimeAnnotations.py</tt> has been added. This can convert VTK output so that it is easily animated in Paraview. Note that the resulting files are paraview-specific and not part of the generic VTK standard.
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>Fixed bug in area and volume calculations for 3-d cell-centred mesh-based simulations and 3-d vertex mesh simulations
+</li><li>The definition of the cut-off length in a <tt>NodeBasedCellPopulation</tt> has been moved to the underlying <tt>NodesOnlyMesh</tt>. Consequently it should be set when constructing the mesh using <tt>ConstructNodesWithoutMesh(mesh, cut_off)</tt> rather than calling <tt>NodeBasedCellPopulation::SetMechanicsCutOffLength(cut_off)</tt>.
+</li><li>Cell radii in <tt>NodeBasedCellPopulation</tt> type simulations are now stored in the <tt>NodeAttributes</tt> of each <tt>Node</tt>. It should now be accessed directly through the node, rather than through <tt>NodesOnlyMesh</tt>.
+</li><li>Forces on a node in <tt>OffLatticeSimulation</tt> are now stored in the <tt>NodeAttributes</tt> rather than a separate vector. This means that <tt>AbstractForce::AddForceContribution</tt> now only takes the cell population as an argument. For example, in a cell population or a force class <tt>rForces[p_node-&gt;GetIndex()]</tt> is replaced with <tt>p_node-&gt;rGetAppliedForce()</tt> and <tt>rForces[p_node-&gt;GetIndex()] += force</tt> is replaced with <tt>p_node-&gt;AddAppliedForceContribution(force)</tt>.
+</li><li><tt>AbstractCellProperty</tt> is more widely used throughout the code, and classes such as <tt>ProliferativeType</tt>s now use this framework.
+</li></ul>
+
+<h3>Minor</h3>
+<p>
+New functionality and code changes, which may still require changes to user code
+</p>
+
+<h4>General</h4>
+<ul><li>For developers, you no longer have to type "test_suite=" after <tt>scons</tt>, this makes it easier to use tab completion.
+</li><li><tt>AbstractNonlinearElasticitySolver::WriteCurrentDeformationGradients</tt> has been renamed, replace calls of <tt>solver.WriteCurrentDeformationGradients(..)</tt> with <tt>solver.WriteCurrentStrains(DEFORMATION_GRADIENT_F,..)</tt>. Other strains can also be written - see How To page. 
+</li><li>One dimensional meshes can now be written out to VTK format using the <tt>VtkMeshWriter</tt>, 2D and 3D were before.
+</li><li><i>Change to CVODE solving:</i> <tt>AbstractCvodeSystem</tt> and <tt>CvodeAdaptor</tt> have enabled the <tt>CVodeSetStopTime</tt> option to make sure that CVODE stops exactly where requested (before it solved up to where it felt like, and interpolated an answer back to you). Users should not notice much difference (you may get changes in e.g. 4th decimal place due to more accurate answers now). Because of this, we have also changed the default behaviour on repeated Solve calls to re-initialise CVODE only when it is evident something has changed (tStart != last time's tEnd, or state variables have changed), previously we re-initialised CVODE on every call to <tt>Solve</tt> as default. You can still re-initialise on every call by manually calling the method <tt>AbstractCvodeSystem::SetForceReset(true);</tt> if you need to.
+</li><li>Additional time points are no longer permitted in <tt>TimeStepper</tt>. 
+</li><li>Auto-generated quadratic slab/rectangular meshes have different node/element indexing to release 3.1.
+</li><li>Continuum mechanics solvers now reference <tt>AbstractTetrahedralMesh</tt> rather than (subclass) <tt>QuadraticMesh</tt> to allow use of a parallel version (<tt>DistributedQuadraticMesh</tt>). This may break any user projects that contain solver subclasses.
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>What was called <tt>DynamicRestitutionStimulus</tt> has been renamed <tt>SteadyStateRestitutionStimulus</tt>, as we talked to some physiologists!
+</li><li>Unfortunately, an error was discovered in a calculation behind the <tt>CompressibleExponentialLaw</tt> (a material law, and for compressible cardiac electro-mechanics the default law), which will have resulted in too small stresses and overly large deformations. The class has been fixed. This may change user projects results
+</li><li>The coarsened version of the Oxford Rabbit mesh located at <tt>apps/texttest/weekly/Propagation3d</tt> has been renamed <tt>OxfordRabbitHeart_481um</tt>.
+</li><li>When constraints are placed on valid values for cardiac cell model state variables (e.g. gating variables should stay between 0 and 1), CVODE is now allowed to break these to within a factor of its specified absolute tolerances, following the CVODE documentation on "Advice on controlling unphysical negative values".
+</li><li><tt>AbstractCardiacCellInterface::UseCellMLDefaultStimulus()</tt> now returns a <tt>boost::shared_ptr&lt;RegularStimulus&gt;</tt> to the stimulus instead of returning <tt>void</tt>. <strong>This may break user projects if you are storing auto-generated models</strong>. In this case the method should be updated as per <a class="changeset" href="https://chaste.cs.ox.ac.uk/trac/changeset/19552" title="#2412 Make dealing with the CellML default stimulus nicer.">r19552</a>. This has the benefit of providing access to the <tt>RegularStimulus</tt> methods, without having to remember how to static cast a boost shared pointer to an <tt>AbstractStimulusFunction</tt>. 
+</li><li> You can now print out additional action potential model variables in a <tt>BidomainWithBath</tt> simulation, previously this failed because a <tt>FakeBathCell</tt> doesn't have them.
+</li><li><tt>HeartConfig::Instance()-&gt;SetVisualizeWithVtk();</tt> will now work in 1D as well as 2D and 3D.
+</li><li>The CVODE change (see general above) has led to a small improvement in accuracy for CVODE in heart tissue, since voltage was not being updated at precisely the correct time before.
+</li><li>Fibre input and output in parallel has been improved. Binary fibre files are preferred.
+</li><li>PyCML has the ability to produce cells that can be solved using <i>generalised</i> Rush-Larsen (release 3.1 added original Rush-Larsen).
+</li><li>When constraints are placed on valid values for cardiac cell model state variables (e.g. gating variables should stay between 0 and 1), CVODE is now allowed to break these to within a tolerance, following the CVODE documentation on "Advice on controlling unphysical negative values". 
+</li><li>Altered the output from <tt>PseudoEcgCalculator</tt> to include the time value along with the ECG value. Also added the ability to skip time steps which allows an ECG graph to be computed more quickly. 
+</li><li><tt>PostprocessingWriter</tt> and <tt>PseudoEcgCalculator</tt> now use <tt>FileFinder</tt>s in their constructors to specify directories (instead of a string and a bool).
+</li><li>Code generation for Backward Euler cell models now uses a slightly different Maple routine (to allow for discontinuities on the right-hand side). This means code can now be generated for models where it used to fail. Note that a finer resolution in lookup tables can be required, so try reducing the table step if you find the Newton solver failing to converge.
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>Bug in vertex-based simulations which involved cells not being counted as removed after T2 swaps has been fixed.
+</li><li>When calculating the volume of cells in Node based simulations we now take into account the number of cells connected and its relation to the optimal packing of spheres. 
+</li></ul>
+
+
+<h3>Future Plans</h3>
+<ul><li><strong>General</strong>: The next release of Chaste will no longer support versions of boost &lt; 1.40.
+</li><li><strong>Cardiac</strong>: The next release of Chaste will no longer output Meshalyzer format as default (it will remain an option to enable).
+</li></ul>
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr />
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
 
 
 <h2>Release 3.1 (changes since Release 3.0)</h2>
@@ -59,7 +173,7 @@ Release 3.1 is a minor release, which brings support for newer versions of libra
 <ul>
 <li>A <tt>CellMLLoader</tt> class is available which makes the dynamic loading of CellML files into (almost) a one line call.
 </li><li>The Cmgui script that helps the user to load the simulation data has been adapted to Cmgui version 2.8 or later. It is still compatible with previous Cmgui versions 2.7 and 2.6. The name of the script is now LoadSolutions.com in both the undeformed and deformed cases. 
-</li><li>A CellML project has been created containing many annotated CellML files for use with Chaste. See the Chaste wiki (<a class="wiki" href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML">ChasteGuides/CodeGenerationFromCellML</a>) for details of how to access it.
+</li><li>A CellML project has been created containing many annotated CellML files for use with Chaste. See the Chaste wiki (<a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML">ChasteGuides/CodeGenerationFromCellML</a>) for details of how to access it.
 </li>
 </ul>
 
@@ -92,7 +206,7 @@ Release 3.1 is a minor release, which brings support for newer versions of libra
 <ul>
 <li>Most of the heart solvers and cell factories now use <tt>AbstractCardiacCellInterface</tt>, not <tt>AbstractCardiacCell</tt> (to enable the use of CVODE solvers).
 </li><li>In the version 3.1 XML parameters file, the <tt>ConductivityHeterogeneities</tt> element has been moved from inside <tt>&lt;Simulation&gt;</tt> to inside <tt>&lt;Physiological&gt;</tt>. New files written to this version of the schema will need to reflect this; old files still using a previous version can still be used unchanged. 
-</li><li>For simulations with <i>compressible</i> material laws, the electro-mechanics solver should have been scaling the active tension returned by the contraction model, by the determinant of the deformation gradient. This has now been fixed. (See <a class="wiki" href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/FiniteElementImplementations">ChasteGuides/FiniteElementImplementations</a> for the (corrected) equations). Results using the compressible material law in the repository have barely changed, since this material law is nearly incompressible. However, simulation results with any user-defined highly compressible law might change. 
+</li><li>For simulations with <i>compressible</i> material laws, the electro-mechanics solver should have been scaling the active tension returned by the contraction model, by the determinant of the deformation gradient. This has now been fixed. (See <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/FiniteElementImplementations">ChasteGuides/FiniteElementImplementations</a> for the (corrected) equations). Results using the compressible material law in the repository have barely changed, since this material law is nearly incompressible. However, simulation results with any user-defined highly compressible law might change. 
 </li><li>Pseudo ECG calculations for Bidomain-with-Bath simulations have been changed, as pointed out on the mailing list, these had a bug that meant the integral was performed over the whole mesh (including bath) instead of just cardiac tissue.
 </li><li>Fixed a small bug in cardiac checkpointing, when loading and running a simulation from an archive to a new output folder the voltage at the final time step in the .h5 file was spuriously reported as "0".
 </li><li><tt>FibreReader::GetNextFibreVector(vec)</tt> has been changed to <tt>FibreReader::GetFibreVector(index,vec)</tt> and <tt>GetNextFibreSheetAndNormalMatrix(mat)</tt> to <tt>GetFibreSheetAndNormalMatrix(index,mat)</tt>.
