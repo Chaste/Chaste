@@ -17,7 +17,7 @@ code. The easiest way to use existing source codes is to create a test
 file which can call upon any of the source files.  The Chaste build
 system can build this file for you and handle all of the dependencies
 and library calls, e.g.
-scons test_suite=projects/example/test/TestHello.hpp
+scons projects/example/test/TestHello.hpp
 
 We suggest you use the projects directory in this manner to store your
 own source and test files if you do not wish to modify the Chaste
