@@ -163,6 +163,12 @@ public:
      * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
      * java executable.
      *
+     * EMPTYLINE
+     *
+     * Results can also be visualized using Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     *
+     * EMPTYLINE
+     *
      * == Test 2 - basic node-based simulation ==
      *
      * We next show how to modify the previous test to implement a 'node-based' simulation,
@@ -449,6 +455,7 @@ public:
     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0}}}.
     * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
     * java executable.
+    *
     */
 };
 
