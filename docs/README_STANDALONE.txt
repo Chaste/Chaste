@@ -22,10 +22,11 @@ For an XX bits machine and release name YYYY, type
 
 tar xvfz StandaloneChaste_YYYY_XXbit.tgz
 
-There are 16 items:
-StandaloneChaste_YYYY_XXbit/README.txt (this file)
-StandaloneChaste_YYYY_XXbit/Chaste     (the executable file)
-StandaloneChaste_YYYY_XXbit/Chaste.sh  (A wrapper for running the executable Chaste with the correct libraries)
+There are 17 items:
+StandaloneChaste_YYYY_XXbit/README.txt   (this file)
+StandaloneChaste_YYYY_XXbit/CITATION.txt (how to cite Chaste)
+StandaloneChaste_YYYY_XXbit/Chaste       (the executable file)
+StandaloneChaste_YYYY_XXbit/Chaste.sh    (A wrapper for running the executable Chaste with the correct libraries)
 StandaloneChaste_YYYY_XXbit/ChasteParameters.xml (where to specify all the parameters for a simulation e.g., mesh, cell models, output directory etc.)
 StandaloneChaste_YYYY_XXbit/ChasteParametersFullFormat.xml (fully documented xml file showing all available options)
 StandaloneChaste_YYYY_XXbit/ChasteParametersResumeSimulationFullFormat.xml (fully documented xml file showing resume options)
