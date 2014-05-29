@@ -227,7 +227,7 @@ public:
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
     * test output from the new folder, {{{Test2DNodeBasedMonolayerSimulationForVisualizing}}}.
-    * After opening Paraview, load the file results.pvd, then click "Apply" in the object inspector panel.
+    * After opening Paraview, load the file results_..vtu, then click "Apply" in the object inspector panel.
     * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
     * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
     *
