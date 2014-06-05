@@ -1006,6 +1006,7 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
         HeartConfig::Instance()->SetOutputDirectory("BidomainBathOutputVariables");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 
         std::vector<std::string> output_variables;
         output_variables.push_back("cytosolic_calcium_concentration");

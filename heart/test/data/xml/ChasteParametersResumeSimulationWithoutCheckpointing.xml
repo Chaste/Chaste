@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ChasteParameters
-    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0"
+    xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/2_0 ../../../src/io/ChasteParameters_2_0.xsd">
+	xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_3 ../../../src/io/ChasteParameters_3_3.xsd">
        
 	<ResumeSimulation>
         <ArchiveDirectory>ChasteResults_10ms</ArchiveDirectory>
         <SpaceDimension>3</SpaceDimension>
 	    <SimulationDuration unit="ms">20.0</SimulationDuration>
 	    <Domain>Mono</Domain>
-        <OutputVisualizer meshalyzer="yes" vtk="yes" cmgui="yes"/>
 	</ResumeSimulation>
 	
 	<!-- These elements must exist, but their contents are ignored -->

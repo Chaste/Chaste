@@ -1391,7 +1391,7 @@ public:
         }
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
-                         "Unable to locate schema file ChasteParameters_3_1.xsd. You will need to ensure it is available when resuming from the checkpoint.");
+                         "Unable to locate schema file ChasteParameters_3_3.xsd. You will need to ensure it is available when resuming from the checkpoint.");
     }
 
     void TestArchiving() throw (Exception)
@@ -1476,6 +1476,7 @@ public:
             TS_ASSERT(p_heart_config->GetDefaultIonicModel().Hardcoded().present());
             TS_ASSERT_EQUALS( user_ionic, p_heart_config->GetDefaultIonicModel().Hardcoded().get());
             TS_ASSERT(!HeartConfig::Instance()->GetCheckpointSimulation());
+            TS_ASSERT(!HeartConfig::Instance()->GetVisualizeWithMeshalyzer());
         }
     }
 
@@ -1544,6 +1545,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/2_3"), 2003u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_0"), 3000u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"), 3001u);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"), 3003u);
         // and exceptions
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/1__1"),
                               "https://chaste.comlab.ox.ac.uk/nss/parameters/1__1 is not a recognised Chaste parameters namespace.");
@@ -1659,6 +1661,18 @@ public:
         TS_ASSERT(!HeartConfig::Instance()->HasPurkinje());
         TS_ASSERT_DELTA(HeartConfig::Instance()->GetPurkinjeCapacitance(), 1.0, 1e-10);
         TS_ASSERT_DELTA(HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio(), 2800.0, 1e-10);
+
+        // Check that release 3.1 xml can be loaded with release 3.1 schema
+        HeartConfig::Reset();
+        HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_1.xml");
+        TS_ASSERT(HeartConfig::Instance()->GetVisualizeWithMeshalyzer());
+
+        // Check that release 3.1 xml can be loaded with latest schema
+        HeartConfig::Reset();
+        HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_1.xml");
+        TS_ASSERT(HeartConfig::Instance()->GetVisualizeWithMeshalyzer());
     }
 
     /**
@@ -1840,17 +1854,20 @@ public:
         TS_ASSERT( ! HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer().present());
 
         // And the normal Get methods
-        TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
+        TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
         TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithCmgui() );
         TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithVtk() );
         TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithParallelVtk() );
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVisualizerOutputPrecision(), 0u);
 
         // Set methods
-        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(false);
-        TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
+        TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
         TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->meshalyzer(),
-                         cp::yesno_type::no);
+                         cp::yesno_type::yes);
+        // Setting one doesn't change the others...
+        TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithCmgui() );
+        TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithVtk() );
 
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
         TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithCmgui() );
@@ -1870,10 +1887,6 @@ public:
         HeartConfig::Instance()->SetVisualizerOutputPrecision(10u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVisualizerOutputPrecision(), 10u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->mpParameters->Simulation()->OutputVisualizer()->precision(), 10u);
-
-        // Setting one doesn't change the others...
-        TS_ASSERT( HeartConfig::Instance()->GetVisualizeWithCmgui() );
-        TS_ASSERT( ! HeartConfig::Instance()->GetVisualizeWithMeshalyzer() );
 
         // Parameters file which does specify OutputVisualizer
         HeartConfig::Reset();
@@ -1927,8 +1940,10 @@ private:
         map["cp23"].schema = "ChasteParameters_2_3.xsd";
         map["cp30"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_0";
         map["cp30"].schema = "ChasteParameters_3_0.xsd";
-        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
-        map["cp"].schema = "ChasteParameters_3_1.xsd";
+        map["cp31"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
+        map["cp31"].schema = "ChasteParameters_3_1.xsd";
+        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
+        map["cp"].schema = "ChasteParameters_3_3.xsd";
         cp::ChasteParameters(*p_parameters_file, *pParams, map);
     }
 

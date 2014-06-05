@@ -641,6 +641,7 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_100_elements");
         HeartConfig::Instance()->SetOutputDirectory("BidomainFallsOver");
         HeartConfig::Instance()->SetOutputFilenamePrefix("res");
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 
         // Something happens at 0.1ms
 
@@ -1053,6 +1054,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(0.5); //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainUnpermuted1d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );

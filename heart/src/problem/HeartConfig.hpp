@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasIncludes.hpp"
 
 #include "ArchiveLocationInfo.hpp"
-#include "ChasteParameters_3_1.hpp"
+#include "ChasteParameters_3_3.hpp"
 
 #include "AbstractStimulusFunction.hpp"
 // These are needed here for Boost < 1.37
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerializationVersion.hpp"
 #include <boost/serialization/split_member.hpp>
 
-namespace cp = chaste::parameters::v3_1;
+namespace cp = chaste::parameters::v3_3;
 
 // Forward declaration to avoid circular includes
 class HeartFileFinder;

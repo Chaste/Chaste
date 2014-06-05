@@ -717,6 +717,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(0.1);  //ms
         HeartConfig::Instance()->SetOutputDirectory("Monodomain2d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain2d");
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 
         //set the postprocessing information we want
         std::vector<unsigned> origin_nodes;
@@ -1263,8 +1264,9 @@ public:
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
         HeartConfig::Instance()->SetCapacitance(1.0);
 
-        HeartConfig::Instance()->SetVisualizeWithVtk(true);
-        HeartConfig::Instance()->SetVisualizeWithCmgui(true);
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
+        HeartConfig::Instance()->SetVisualizeWithVtk();
+        HeartConfig::Instance()->SetVisualizeWithCmgui();
 
         monodomain_problem.Solve();
 
@@ -1383,10 +1385,11 @@ public:
             HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d_" + str_stream.str());
             HeartConfig::Instance()->SetOutputDirectory("TestCvodePrintTimestepDependence" + str_stream.str());
             HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(ode_and_pde_steps, ode_and_pde_steps, print_steps[i]);
+            HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 
             MonodomainProblem<1> monodomain_problem( &cell_factory );
             monodomain_problem.SetMesh(&mesh);
-            monodomain_problem.SetWriteInfo();
+            //monodomain_problem.SetWriteInfo(); //Uncomment for progress
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
 
@@ -1439,6 +1442,7 @@ public:
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
             HeartConfig::Instance()->SetOutputDirectory(output_dir);
             HeartConfig::Instance()->SetOutputFilenamePrefix(output_dir);
+            HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
             HeartConfig::Instance()->SetVisualizeWithVtk();
             HeartConfig::Instance()->SetVisualizeWithParallelVtk();
 

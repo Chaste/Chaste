@@ -177,6 +177,16 @@ public:
      */
     static void MoveConductivityHeterogeneities(xercesc::DOMDocument* pDocument,
                                                 xercesc::DOMElement* pRootElement);
+
+    /**
+     * Release 3.3 changed the default setting for meshalyzer visualization from
+     * true to false.  Older parameters files need to retain the original default.
+     *
+     * @param pDocument  the DOM document containing the tree to be transformed
+     * @param pRootElement  the root of the tree to be transformed
+     */
+    static void SetDefaultVisualizer(xercesc::DOMDocument* pDocument,
+                                     xercesc::DOMElement* pRootElement);
 };
 
 //
@@ -285,10 +295,12 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     map["cp23"].schema = "ChasteParameters_2_3.xsd";
     map["cp30"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_0";
     map["cp30"].schema = "ChasteParameters_3_0.xsd";
+    map["cp31"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
+    map["cp31"].schema = "ChasteParameters_3_1.xsd";
     // We use 'cp' as prefix for the latest version to avoid having to change saved
     // versions for comparison at every release.
-    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
-    map["cp"].schema = "ChasteParameters_3_1.xsd";
+    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
+    map["cp"].schema = "ChasteParameters_3_3.xsd";
 
     cp::ChasteParameters(*p_parameters_file, *mpParameters, map);
 
@@ -351,7 +363,7 @@ void HeartConfig::CopySchema(const std::string& rToDirectory)
     // in a situation where it can handle EXCEPTION()s nicely, e.g.
     // TRY_IF_MASTER(CopySchema(...));
 
-    std::string schema_name("ChasteParameters_3_1.xsd");
+    std::string schema_name("ChasteParameters_3_3.xsd");
     FileFinder schema_location("heart/src/io/" + schema_name, RelativeTo::ChasteSourceRoot);
     if (!schema_location.Exists())
     {
@@ -386,6 +398,7 @@ void HeartConfig::SetDefaultSchemaLocations()
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/2_3"] = root_dir + "ChasteParameters_2_3.xsd";
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_0"] = root_dir + "ChasteParameters_3_0.xsd";
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"] = root_dir + "ChasteParameters_3_1.xsd";
+    mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"] = root_dir + "ChasteParameters_3_3.xsd";
 }
 
 unsigned HeartConfig::GetVersionFromNamespace(const std::string& rNamespaceUri)
@@ -479,9 +492,10 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
         {
             XmlTransforms::MoveConductivityHeterogeneities(p_doc.get(), p_root_elt);
         }
-        if (version < 3001) // Not the latest release
+        if (version < 3003) // Not the latest release
         {
-            XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1");
+            XmlTransforms::SetDefaultVisualizer(p_doc.get(), p_root_elt);
+            XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3");
         }
         // Parse DOM to object model
         std::auto_ptr<cp::chaste_parameters_type> p_params(cp::ChasteParameters(*p_doc, ::xml_schema::flags::dont_initialize, props));
@@ -573,11 +587,14 @@ void HeartConfig::UpdateParametersFromResumeSimulation(boost::shared_ptr<cp::cha
                                                          pResumeParameters->ResumeSimulation()->CheckpointSimulation()->max_checkpoints_on_disk());
     }
 
-    //Visualization parameters are compulsory
-    HeartConfig::Instance()->SetVisualizeWithParallelVtk(pResumeParameters->ResumeSimulation()->OutputVisualizer().parallel_vtk() == cp::yesno_type::yes);
-    HeartConfig::Instance()->SetVisualizeWithVtk(pResumeParameters->ResumeSimulation()->OutputVisualizer().vtk() == cp::yesno_type::yes);
-    HeartConfig::Instance()->SetVisualizeWithCmgui(pResumeParameters->ResumeSimulation()->OutputVisualizer().cmgui() == cp::yesno_type::yes);
-    HeartConfig::Instance()->SetVisualizeWithMeshalyzer(pResumeParameters->ResumeSimulation()->OutputVisualizer().meshalyzer() == cp::yesno_type::yes);
+    //Visualization parameters are no longer compulsory
+    if (pResumeParameters->ResumeSimulation()->OutputVisualizer().present())
+    {
+        HeartConfig::Instance()->SetVisualizeWithParallelVtk(pResumeParameters->ResumeSimulation()->OutputVisualizer()->parallel_vtk() == cp::yesno_type::yes);
+        HeartConfig::Instance()->SetVisualizeWithVtk(pResumeParameters->ResumeSimulation()->OutputVisualizer()->vtk() == cp::yesno_type::yes);
+        HeartConfig::Instance()->SetVisualizeWithCmgui(pResumeParameters->ResumeSimulation()->OutputVisualizer()->cmgui() == cp::yesno_type::yes);
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(pResumeParameters->ResumeSimulation()->OutputVisualizer()->meshalyzer() == cp::yesno_type::yes);
+    }
 
     // Numerical parameters may be overridden
     {
@@ -1900,7 +1917,7 @@ bool HeartConfig::GetVisualizeWithMeshalyzer() const
 {
     if (!IsOutputVisualizerPresent())
     {
-        return true;
+        return false;
     }
     else
     {
@@ -3040,6 +3057,23 @@ void XmlTransforms::MoveConductivityHeterogeneities(xercesc::DOMDocument* pDocum
         std::vector<xercesc::DOMElement*> p_phys_list = XmlTools::FindElements(pRootElement, "Physiological");
         assert(p_phys_list.size() == 1); // Asserted by schema
         p_phys_list[0]->appendChild(p_child);
+    }
+}
+
+void XmlTransforms::SetDefaultVisualizer(xercesc::DOMDocument* pDocument,
+                                         xercesc::DOMElement* pRootElement)
+{
+    std::vector<xercesc::DOMElement*> p_sim_list = XmlTools::FindElements(pRootElement, "Simulation");
+    if (p_sim_list.size() > 0)
+    {
+        std::vector<xercesc::DOMElement*> p_viz_list = XmlTools::FindElements(p_sim_list[0], "OutputVisualizer");
+        if (p_viz_list.empty())
+        {
+            // Create the element and set meshalyzer (only) to on
+            xercesc::DOMElement* p_viz_elt = pDocument->createElementNS(X("https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"), X("OutputVisualizer"));
+            p_sim_list[0]->appendChild(p_viz_elt);
+            p_viz_elt->setAttribute(X("meshalyzer"), X("yes"));
+        }
     }
 }
 
