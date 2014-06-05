@@ -34,225 +34,104 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 This module abstracts the interface to RDF metadata about CellML models.
 
-Public methods on a single instance of the RdfProcessor class below are also
-exposed as module-level functions, and these should typically be called by users.
+The RdfProcessor class below pretends to be the module itself, so all its properties
+are available at module-level, and these should typically be called by users.
+
+It also provides sets METADATA_NAMES and STIMULUS_NAMES, which contain the local names
+of terms in the ontology that can annotate variables, and the subset of those names
+which define properties of the stimulus current (but not the current itself), respectively.
 """
 
 import logging
+import os
+import sys
 import types
 from cStringIO import StringIO
 
 # We now only support rdflib for RDF processing
 import rdflib
 
-import pycml
 
-# Allowed metadata names, more to come
-# TODO #2547: Use a proper ontology!
-METADATA_NAMES = frozenset(
-    ['state_variable', 'time', 'temperature', 
-     # =====================================================
-     # Cardiac-Specific Labels
-     # =====================================================
-     # VOLTAGES / POTENTIALS
-     'membrane_voltage', 
-     # These are intended to refer to outer cell membrane, new tags should be 
-     # introduced for SR membrane, mitochondrial membranes etc.
-     'sodium_reversal_potential', 'potassium_reversal_potential', 
-     'calcium_reversal_potential', 'chloride_reversal_potential',
-     # Membrane properties
-     'membrane_capacitance', 'membrane_E_R',
-     # =====================================================
-     # Stimulus Current
-     # =====================================================
-     'membrane_stimulus_current', 
-        'membrane_stimulus_current_duration',
-        'membrane_stimulus_current_amplitude',
-        'membrane_stimulus_current_period',
-        'membrane_stimulus_current_offset',
-        'membrane_stimulus_current_end',
-     # =====================================================
-     # IONIC CONCENTRATIONS
-     # =====================================================
-     # basic 'intracellular' and 'extracellular'
-     'extracellular_potassium_concentration', 'extracellular_calcium_concentration', 
-     'extracellular_sodium_concentration', 'extracellular_chloride_concentration',
-     'cytosolic_calcium_concentration','cytosolic_potassium_concentration', 
-     'cytosolic_sodium_concentration','cytosolic_chloride_concentration',
-     # in Calcium subsystem SR = sarcoplasmic reticulum
-     'SR_calcium_concentration', # Some models have just the SR,
-       'JSR_calcium_concentration', # Other models divide it into the Junctional SR (near RyRs),
-       'NSR_calcium_concentration', # and the Network SR (rest of SR),
-     'diadicspace_calcium_concentration', # Some models also have a separate diadic sub-space (cytosol between JSR and t-tubules).
-     # Others
-     'bath_potassium_concentration',
-     # =====================================================
-     # CURRENTS
-     # =====================================================
-     # HISTORIC metadata - only for early models lacking components.
-     'membrane_potassium_current', 
-        'membrane_potassium_current_conductance', 
-        'potassium_channel_n_gate', 
-    'membrane_delayed_rectifier_potassium_current', 
-        'membrane_delayed_rectifier_potassium_current_conductance',
-     'rapid_time_dependent_potassium_current_conductance', 
-        'rapid_time_dependent_potassium_current_Xr1_gate',
-        'rapid_time_dependent_potassium_current_Xr2_gate', 
-     'slow_time_dependent_potassium_current_conductance',
-        'slow_time_dependent_potassium_current_Xs_gate', 
-     'membrane_slow_inward_current',
-        'membrane_slow_inward_current_conductance',
-     'leakage_current',
-     # MODERN metadata - labels all new models should be able to use.
-     # ========================================================================
-     # SODIUM CURRENTS
-     # ========================================================================
-     # I Na (fast)
-     'membrane_fast_sodium_current', 
-        'membrane_fast_sodium_current_conductance', 
-        'membrane_fast_sodium_current_m_gate', 
-        'membrane_fast_sodium_current_h_gate',
-            'membrane_fast_sodium_current_h_gate_tau',
-        'membrane_fast_sodium_current_j_gate', 
-            'membrane_fast_sodium_current_j_gate_tau',
-        'membrane_fast_sodium_current_shift_inactivation', 'membrane_fast_sodium_current_reduced_inactivation', 
-     # I_Na_L (late or persistent)
-     'membrane_persistent_sodium_current', 
-        'membrane_persistent_sodium_current_conductance', 
-     # I Na,b (background)
-     'membrane_background_sodium_current',
-        'membrane_background_sodium_current_conductance',
-     # ========================================================================
-     # Potassium currents
-     # ========================================================================
-     # I Kr
-     'membrane_rapid_delayed_rectifier_potassium_current', 
-        'membrane_rapid_delayed_rectifier_potassium_current_conductance',
-        'membrane_rapid_delayed_rectifier_potassium_current_conductance1', 
-        'membrane_rapid_delayed_rectifier_potassium_current_conductance2',
-     # I Ks
-     'membrane_slow_delayed_rectifier_potassium_current',   
-        'membrane_slow_delayed_rectifier_potassium_current_conductance',
-        'membrane_slow_delayed_rectifier_potassium_current_xs1_gate_tau', # (really scaling factor for tau)
-        'membrane_slow_delayed_rectifier_potassium_current_xs2_gate_tau', # (really scaling factor for tau)
-     # I_Kur
-     'membrane_ultrarapid_delayed_rectifier_potassium_current',
-        'membrane_ultrarapid_delayed_rectifier_potassium_current_conductance',
-     # I_Kss or Iss   
-     'membrane_non_inactivating_steady_state_potassium_current',
-        'membrane_non_inactivating_steady_state_potassium_current_conductance',   
-     # I K1
-     'membrane_inward_rectifier_potassium_current',     
-        'membrane_inward_rectifier_potassium_current_conductance',
-     # I to, sometimes fast and slow components, sometimes not.
-     'membrane_transient_outward_current',
-        'membrane_transient_outward_current_conductance',
-        'membrane_fast_transient_outward_current',
-            'membrane_transient_outward_current_r_gate',
-            'membrane_fast_transient_outward_current_conductance',
-        'membrane_slow_transient_outward_current',
-            'membrane_transient_outward_current_s_gate',    
-            'membrane_slow_transient_outward_current_conductance',       
-        'membrane_transient_outward_current_time_independent_rectification_gate_constant',
-     # I katp
-     'membrane_atp_dependent_potassium_current',
-        'membrane_atp_dependent_potassium_current_conductance',  
-     # I K,b (background current / leak)
-     'membrane_background_potassium_current',
-        'membrane_background_potassium_current_conductance',
-     # ========================================================================
-     # Mixed Currents
-     # ========================================================================   
-     # I f (funny current)
-     # Generally, but not always, this is formulated as I_f = I_f_Na + I_f_K, with separate conductances.
-     # if it isn't try and figure out which ionic species is being modelled for tagging, and give two tags if necessary.
-     'membrane_hyperpolarisation_activated_funny_current',
-        'membrane_hyperpolarisation_activated_funny_current_single_gate',
-        'membrane_hyperpolarisation_activated_funny_current_potassium_component',
-           'membrane_hyperpolarisation_activated_funny_current_potassium_component_conductance',
-        'membrane_hyperpolarisation_activated_funny_current_sodium_component', 
-           'membrane_hyperpolarisation_activated_funny_current_sodium_component_conductance', 
-     # ICaL conductance of non-calcium ions:
-     # Things here are getting a bit confusing, have to be careful as tags may have different
-     # effects in different models. i.e. does main 'membrane_L_type_calcium_current_conductance'
-     # scale all these as well, or are they treated as completely separate ion currents (as per O'Hara).
-     'membrane_L_type_calcium_channel_sodium_current',
-     'membrane_L_type_calcium_channel_sodium_current_conductance',
-     'membrane_L_type_calcium_channel_potassium_current',
-     'membrane_L_type_calcium_channel_potassium_current_conductance',
-     # ========================================================================
-     # CALCIUM CURRENTS
-     # ========================================================================
-     # I CaL
-     'membrane_L_type_calcium_current', 
-        'membrane_L_type_calcium_current_conductance', 
-        'membrane_L_type_calcium_current_d_gate', 
-        'membrane_L_type_calcium_current_f_gate', 
-        'membrane_L_type_calcium_current_fCass_gate',
-        'membrane_L_type_calcium_current_fCa_gate', 
-        'membrane_L_type_calcium_current_fCa2_gate', 
-        'membrane_L_type_calcium_current_f2_gate', 
-        'membrane_L_type_calcium_current_f2ds_gate', 
-        'membrane_L_type_calcium_current_d2_gate', 
-        'membrane_L_type_calcium_current_f_gate_tau', 
-        'membrane_L_type_calcium_current_f2_gate_tau', 
-        'membrane_L_type_calcium_current_fCa_gate_tau', 
-        'membrane_L_type_calcium_current_fCa2_gate_tau',
-        'membrane_L_type_calcium_current_d_gate_power_tau',
-     # I Ca,b (background)
-     'membrane_background_calcium_current',
-        'membrane_background_calcium_current_conductance', 
-     # ========================================================================
-     # Calcium subsystem parameters - needs tidying up.
-     # ========================================================================
-     'SR_release_current', # a.k.a. Jrel or RyR channel current 
-     'SR_uptake_current',# a.k.a. Jup or SERCA current
-     'SR_leak_current', 
-     'SR_leak_current_max', 'SR_release_current_max', 'SR_uptake_current_max', 
-     'SR_release_kmcacyt', 'SR_release_kmcads', 
-     'calcium_dynamics_release_current_maximum', 'calcium_dynamics_leak_current_maximum', 
-     'calcium_leak_current_conductance', 'calcium_dynamics_uptake_current_maximum',
-     # ========================================================================     
-     # Pumps and Exchangers
-     # ========================================================================
-      # I NCX
-      'membrane_sodium_calcium_exchanger_current', 
-        'membrane_sodium_calcium_exchanger_current_conductance', # a.k.a. permeability
-      'SR_sodium_calcium_exchanger_current', 
-        'SR_sodium_calcium_exchanger_current_conductance', # a.k.a. permeability
-      # INaK
-      'membrane_sodium_potassium_pump_current',
-          'membrane_sodium_potassium_pump_current_permeability', # often INaK_max
-      # Ip,Ca
-      'membrane_calcium_pump_current',
-         'membrane_calcium_pump_current_conductance', # a.k.a. permeability
-      # Ip,K 
-      'membrane_potassium_pump_current',
-         'membrane_potassium_pump_current_conductance',      # a.k.a. permeability
-      # Penny and Alan, protocol-specific stuff (to be replaced by Functional Curation in the end)
-      'concentration_clamp_onoff',
-])
-
-# Parameters for the stimulus current
-STIMULUS_NAMES = frozenset('membrane_stimulus_current_'+ v for v in ['duration', 'amplitude', 'period', 'offset', 'end'])
-
-
-def _debug(*args):
-    pycml.DEBUG('cellml-metadata', *args)
+def __init__(module):
+    # Import pycml here, to avoid circular import surprises
+    import pycml
+    module.pycml = pycml
 
 
 class RdfProcessor(object):
     """Implements CellML metadata functionality using the RDFLib library."""
-    def __init__(self):
+    def __init__(self, name):
         """Create the wrapper."""
+        # Magic for pretending to be a module
+        self._module = sys.modules[name]
+        sys.modules[name] = self
+        self._initializing = True
         # Map from cellml_model instances to RDF stores
         self._models = {}
+        # Oxford metadata will be loaded lazily
+        self._metadata_names = self._stimulus_names = None
         # Cope with differences in API between library versions
         rdflib_major_version = int(rdflib.__version__[0])
         if rdflib_major_version >= 3:
             self.Graph = rdflib.Graph
         else:
             self.Graph = rdflib.ConjunctiveGraph
+
+    def __getattribute__(self, name):
+        """Provide access to real module-level variables as though they're class properties."""
+        # call module.__init__ after import introspection is done
+        baseget = super(RdfProcessor, self).__getattribute__
+        module = baseget('_module')
+        if baseget('_initializing') and not name[:2] == '__' == name[-2:]:
+            setattr(self, '_initializing', False)
+            __init__(module)
+        try:
+            return baseget(name)
+        except AttributeError:
+            return getattr(module, name)
+
+    def _debug(*args):
+        pycml.DEBUG('cellml-metadata', *args)
+
+    def _load_ontology(self):
+        """Load the Oxford metadata ontology the first time its needed."""
+        pycml_path = os.path.dirname(os.path.realpath(__file__))
+        oxmeta_ttl = os.path.join(pycml_path, 'oxford-metadata.ttl')
+        oxmeta_rdf = os.path.join(pycml_path, 'oxford-metadata.rdf')
+
+        g = self.Graph()
+        if os.stat(oxmeta_ttl).st_mtime > os.stat(oxmeta_rdf).st_mtime:
+            # Try to regenerate RDF/XML version of ontology
+            try:
+                g.parse(oxmeta_ttl, format='turtle')
+            except Exception, e:
+                print >> sys.stderr, 'Unable to convert metadata from Turtle format to RDF/XML.'
+                print >> sys.stderr, 'Probably you need to upgrade rdflib to version 4.\nDetails of error:'
+                raise
+            g.serialize(oxmeta_rdf, format='xml')
+        else:
+            # Just parse the RDF/XML version
+            g.parse(oxmeta_rdf, format='xml')
+        
+        annotation_terms = list(g.subjects(rdflib.RDF.type, rdflib.URIRef(pycml.NSS['oxmeta']+u'Annotation')))
+        self._metadata_names = frozenset(map(lambda node: self.namespace_member(node, pycml.NSS['oxmeta']), annotation_terms))
+        
+        # Parameters for the stimulus current
+        self._stimulus_names = frozenset(filter(lambda name: name.startswith('membrane_stimulus_current_'), self._metadata_names))
+
+    @property
+    def METADATA_NAMES(self):
+        """Fake a module-level constant as a property for lazy loading."""
+        if self._metadata_names is None:
+            self._load_ontology()
+        return self._metadata_names
+
+    @property
+    def STIMULUS_NAMES(self):
+        """Fake a module-level constant as a property for lazy loading."""
+        if self._stimulus_names is None:
+            self._load_ontology()
+        return self._stimulus_names
 
     def _create_new_store(self, cellml_model):
         """Create a new RDF store for the given CellML model.
@@ -292,7 +171,7 @@ class RdfProcessor(object):
         """The given model is being deleted / no longer needed."""
         if cellml_model in self._models:
             del self._models[cellml_model]
-            _debug('Clearing RDF state for model', cellml_model.name)
+            self._debug('Clearing RDF state for model', cellml_model.name)
 
     def update_serialized_rdf(self, cellml_model):
         """Ensure the RDF serialized into the given CellML model is up-to-date.
@@ -332,7 +211,7 @@ class RdfProcessor(object):
                 qname, nsuri = node_content
                 if nsuri[-1] not in ['#', '/']:
                     nsuri = nsuri + '#'
-                ns = self.Namespace(nsuri)
+                ns = rdflib.Namespace(nsuri)
                 prefix, local_name = pycml.SplitQName(qname)
                 node = ns[local_name]
             elif type(node_content) in types.StringTypes:
@@ -359,7 +238,7 @@ class RdfProcessor(object):
 
     def add_statement(self, cellml_model, source, property, target):
         """Add a statement to the model."""
-        _debug("add_statement(", source, ",", property, ",", target, ")")
+        self._debug("add_statement(", source, ",", property, ",", target, ")")
         rdf_model = self.get_rdf_from_model(cellml_model)
         rdf_model.add((source, property, target))
 
@@ -368,7 +247,7 @@ class RdfProcessor(object):
         
         Any existing statements with the same source and property will first be removed.
         """
-        _debug("replace_statement(", source, ",", property, ",", target, ")")
+        self._debug("replace_statement(", source, ",", property, ",", target, ")")
         rdf_model = self.get_rdf_from_model(cellml_model)
         rdf_model.set((source, property, target))
 
@@ -377,7 +256,7 @@ class RdfProcessor(object):
         
         Any of these may be None to match anything.
         """
-        _debug("remove_statements(", source, ",", property, ",", target, ")")
+        self._debug("remove_statements(", source, ",", property, ",", target, ")")
         rdf_model = self.get_rdf_from_model(cellml_model)
         rdf_model.remove((source, property, target))
 
@@ -395,7 +274,7 @@ class RdfProcessor(object):
             raise ValueError("Too many targets for source " + str(source) + " and property " + str(property))
         if isinstance(target, rdflib.Literal):
             target = str(target)
-        _debug("get_target(", source, ",", property, ") -> ", "'" + str(target) + "'")
+        self._debug("get_target(", source, ",", property, ") -> ", "'" + str(target) + "'")
         return target
 
     def get_targets(self, cellml_model, source, property):
@@ -422,7 +301,7 @@ class RdfProcessor(object):
         
         Will return a list of cellml_variable instances.
         """
-        _debug("find_variables(", property, ",", value, ")")
+        self._debug("find_variables(", property, ",", value, ")")
         rdf_model = self.get_rdf_from_model(cellml_model)
         property = self.create_rdf_node(property)
         if value:
@@ -460,17 +339,11 @@ class RdfProcessor(object):
             local_part = node[len(nsuri):]
         elif not wrong_ns_ok:
             raise ValueError("Node is not in correct namespace.")
-        _debug("namespace_member(", node, ",", nsuri, ") = ", local_part)
+        self._debug("namespace_member(", node, ",", nsuri, ") = ", local_part)
         return local_part
 
 ####################################################################################
-# Finally, instantiate a single processor instance and expose its methods
+# Instantiate a processor instance that pretends to be this module
 ####################################################################################
 
-_instance = RdfProcessor()
-
-for attr in dir(_instance):
-    if attr[0] != '_':
-        meth = getattr(_instance, attr)
-        if isinstance(meth, types.MethodType):
-            globals()[attr] = meth
+RdfProcessor(__name__)

@@ -77,6 +77,7 @@ from cStringIO import StringIO
 
 from utilities import *
 from enum import Enum # Pythonic enums
+
 import cellml_metadata # Handle RDF metadata for CellML
 
 processors = None
