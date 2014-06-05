@@ -343,16 +343,15 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "CaBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVariablesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
         cell_population.AddCellWriter<CellMutationStatesWriter>();
-
 
         // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);

@@ -259,7 +259,7 @@ public:
         MeshBasedCellPopulation<2> crypt(*p_mesh, cells);
 
         // Set cell population to output cell types
-        crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        crypt.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
 
         // Set up instance of WntConcentration singleton and associate it with crypt
         WntConcentration<2>::Instance()->SetType(LINEAR);

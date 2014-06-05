@@ -33,16 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLPROLIFERATIVEPHASESCOUNTWRITER_HPP_
-#define CELLPROLIFERATIVEPHASESCOUNTWRITER_HPP_
+#ifndef CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_
+#define CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_
 
-#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellPopulationCountWriter.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-/** A class written using the visitor pattern for writing the number of cells in each proliferative phase to file. */
+/** A class written using the visitor pattern for writing the number of cells of each proliferative type to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellProliferativePhasesCountWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class CellProliferativeTypesCountWriter : public AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -56,7 +56,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
@@ -64,10 +64,10 @@ public:
     /**
      * Default constructor.
      */
-    CellProliferativePhasesCountWriter();
+    CellProliferativeTypesCountWriter();
 
     /**
-     * A general method for writing to any population.
+     * A general method for writing to any population
      *
      * @param pCellPopulation the population to write.
      */
@@ -111,6 +111,6 @@ public:
 
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellProliferativePhasesCountWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellProliferativeTypesCountWriter)
 
-#endif /*CELLPROLIFERATIVEPHASESCOUNTWRITER_HPP_*/
+#endif /*CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_*/

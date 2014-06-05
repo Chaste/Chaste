@@ -137,7 +137,7 @@ public:
         TS_ASSERT_EQUALS(node_left_index, index_of_node_to_send);
     }
 
-    void TestSendAndRecieveCells() throw (Exception)
+    void TestSendAndReceiveCells() throw (Exception)
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -171,7 +171,7 @@ public:
 #endif
     }
 
-    void TestSendAndRecieveCellsNonBlocking() throw (Exception)
+    void TestSendAndReceiveCellsNonBlocking() throw (Exception)
     {
         unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
@@ -344,7 +344,7 @@ public:
         node_based_cell_population.Update(); // so cell neighbours are calculated
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellMutationStatesCountWriter>());
-        node_based_cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        node_based_cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellMutationStatesCountWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellIdWriter>());
@@ -352,11 +352,11 @@ public:
         TS_ASSERT(node_based_cell_population.HasWriter<CellIdWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativeTypesCountWriter>());
-        node_based_cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        node_based_cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativeTypesCountWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativePhasesCountWriter>());
-        node_based_cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        node_based_cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellProliferativePhasesCountWriter>());
 
         TS_ASSERT(!node_based_cell_population.HasWriter<CellProliferativePhasesWriter>());
@@ -381,6 +381,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         node_based_cell_population.OpenWritersFiles(output_directory);
+        // Write out the files here
         node_based_cell_population.WriteResultsToFiles(output_directory);
 
         TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CloseOutputFiles());

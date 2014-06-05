@@ -439,9 +439,9 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "PottsBasedCellPopulation-2");
 
         cell_population.SetCellAncestorsToLocationIndices();
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();

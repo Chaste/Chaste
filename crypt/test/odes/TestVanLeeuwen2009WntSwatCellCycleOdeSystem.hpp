@@ -651,7 +651,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
         // Set cell population to output cell types
-        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
+        crypt.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetWntConcentrationParameter(1.0/3.0);

@@ -607,7 +607,7 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<1> crypt(mesh, cells);
-        crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        crypt.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
 
         // Set up crypt simulation
         CryptSimulation1d simulator(crypt);
@@ -698,8 +698,8 @@ public:
 
         // Create cell population
         MeshBasedCellPopulation<1> crypt(mesh, cells);
-        crypt.AddPopulationWriter<CellMutationStatesCountWriter>();
-        crypt.AddPopulationWriter<CellProliferativeTypesCountWriter>();
+        crypt.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        crypt.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
 
         AbstractCellPopulation<1>::Iterator cell_iterator = crypt.Begin();
         cell_iterator->SetBirthTime(-1.0);   // Make cell-cycle models do minimum work

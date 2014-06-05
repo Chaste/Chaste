@@ -79,7 +79,7 @@ public:
      * Default constructor.
      * @param rFileName the name of the file to write to.
      */
-    AbstractCellWriter(const std::string &rFileName);
+    AbstractCellWriter(const std::string& rFileName);
 
     /**
      * @return mVtkCellDataName

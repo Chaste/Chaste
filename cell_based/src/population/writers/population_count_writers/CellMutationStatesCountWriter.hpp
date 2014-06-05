@@ -36,13 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CELLMUTATIONSTATESCOUNTWRITER_HPP_
 #define CELLMUTATIONSTATESCOUNTWRITER_HPP_
 
-#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellPopulationCountWriter.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 /** A class written using the visitor pattern for writing cell mutations states from a cell population to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellMutationStatesCountWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class CellMutationStatesCountWriter : public AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -56,7 +56,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:

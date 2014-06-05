@@ -135,9 +135,9 @@ public:
         /* Using the vertex mesh and cells, we create a cell-based population object, and specify which results to
          * output to file. */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();

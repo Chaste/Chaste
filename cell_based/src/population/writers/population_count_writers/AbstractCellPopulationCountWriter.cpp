@@ -32,25 +32,29 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "AbstractCellWriter.hpp"
+#include "AbstractCellPopulationCountWriter.hpp"
 #include "AbstractCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+#include "PottsBasedCellPopulation.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string& rFileName)
+AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulationCountWriter(const std::string& rFileName)
     : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::string AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVtkCellDataName()
+void AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    return mVtkCellDataName;
 }
 
 // Explicit instantiation
-template class AbstractCellWriter<1,1>;
-template class AbstractCellWriter<1,2>;
-template class AbstractCellWriter<2,2>;
-template class AbstractCellWriter<1,3>;
-template class AbstractCellWriter<2,3>;
-template class AbstractCellWriter<3,3>;
+template class AbstractCellPopulationCountWriter<1,1>;
+template class AbstractCellPopulationCountWriter<1,2>;
+template class AbstractCellPopulationCountWriter<2,2>;
+template class AbstractCellPopulationCountWriter<1,3>;
+template class AbstractCellPopulationCountWriter<2,3>;
+template class AbstractCellPopulationCountWriter<3,3>;

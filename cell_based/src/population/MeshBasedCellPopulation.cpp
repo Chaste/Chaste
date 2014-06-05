@@ -535,6 +535,12 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationWriter(boos
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)
+{
+    pPopulationCountWriter->Visit(this);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);

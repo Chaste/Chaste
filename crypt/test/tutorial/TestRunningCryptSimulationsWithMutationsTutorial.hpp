@@ -151,7 +151,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         /* In order to visualize mutant cells and to count how many cells there are of each type we need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
         /*
          * We set the height of the crypt. As well as passing this variable into the {{{SloughingCellKiller}}},

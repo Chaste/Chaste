@@ -992,9 +992,11 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.GenerateCellResults();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+
+        // An ordering must be specified for cell mutation states and cell proliferative types
+        cell_population.SetDefaultCellMutationStateAndProliferativeTypeOrdering();
 
         // Test we have the correct cell mutation state counts
         CellPropertyRegistry* p_registry_before_solve = cell_population.Begin()->rGetCellPropertyCollection().GetCellPropertyRegistry();

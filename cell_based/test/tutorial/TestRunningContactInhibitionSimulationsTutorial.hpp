@@ -163,7 +163,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells (i.e. those that are inhibited from division) you need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);
@@ -277,7 +277,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells (i.e those that are inhibited from division) you need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);
@@ -368,7 +368,7 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
         /* Here we create a simulation as before. We also set up the output directory, the end time and the output multiple.*/
         OffLatticeSimulation<2> simulator(cell_population);

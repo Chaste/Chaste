@@ -852,9 +852,9 @@ public:
 
         cell_population.AddPopulationWriter<VertexT1SwapLocationsWriter>();
         cell_population.AddPopulationWriter<VertexT3SwapLocationsWriter>();
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddPopulationWriter<CellProliferativePhasesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
 
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();

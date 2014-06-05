@@ -33,16 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_
-#define CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_
+#ifndef ABSTRACTCELLPOPULATIONCOUNTWRITER_HPP_
+#define ABSTRACTCELLPOPULATIONCOUNTWRITER_HPP_
 
-#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellBasedWriter.hpp"
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-/** A class written using the visitor pattern for writing the number of cells of each proliferative type to file. */
+// Forward declaration prevents circular include chain
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class MeshBasedCellPopulation;
+template<unsigned SPACE_DIM> class CaBasedCellPopulation;
+template<unsigned SPACE_DIM> class NodeBasedCellPopulation;
+template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
+template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
+
+/**
+ * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellProliferativeTypesCountWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
+class AbstractCellPopulationCountWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -56,61 +66,58 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public:
 
     /**
      * Default constructor.
+     * @param rFileName the name of the file to write to.
      */
-    CellProliferativeTypesCountWriter();
+    AbstractCellPopulationCountWriter(const std::string& rFileName);
 
     /**
-     * A general method for writing to any population
+     * Write the header to file.
      *
-     * @param pCellPopulation the population to write.
+     * @param pCellPopulation a pointer to the population to be written.
      */
-    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
-    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 
     /**
      * Visit the population and write the data.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 };
 
-#include "SerializationExportWrapper.hpp"
-// Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellProliferativeTypesCountWriter)
-
-#endif /*CELLPROLIFERATIVETYPESCOUNTWRITER_HPP_*/
+#endif /*ABSTRACTCELLPOPULATIONCOUNTWRITER_HPP_*/

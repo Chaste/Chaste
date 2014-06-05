@@ -270,7 +270,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* In order to visualize labelled cells we need to use the following command.*/
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple, and end time. */

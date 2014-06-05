@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
+#include <boost/foreach.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
@@ -73,6 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellLabel.hpp"
 #include "CellData.hpp"
 #include "AbstractMesh.hpp"
+#include "AbstractCellPopulationCountWriter.hpp"
 #include "AbstractCellPopulationWriter.hpp"
 #include "AbstractCellWriter.hpp"
 
@@ -101,11 +103,11 @@ private:
         archive & mCells;
         archive & mLocationCellMap;
         archive & mCellLocationMap;
-        archive & mCellCyclePhaseCount;
         archive & mpCellPropertyRegistry;
         archive & mOutputResultsForChasteVisualizer;
         archive & mCellWriters;
         archive & mCellPopulationWriters;
+        archive & mCellPopulationCountWriters;
     }
 
 protected:
@@ -122,15 +124,6 @@ protected:
     /** List of cells. */
     std::list<CellPtr> mCells;
 
-    /** Current cell cycle phase counts. */
-    std::vector<unsigned> mCellCyclePhaseCount;
-
-    /** Current cell proliferative types count. */
-    std::vector<unsigned> mCellProliferativeTypesCount;
-
-    /** Current cell mutation states count. */
-    std::vector<unsigned> mCellMutationStateCount;
-
     /** Population centroid. */
     c_vector<double, SPACE_DIM> mCentroid;
 
@@ -143,11 +136,18 @@ protected:
     /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
     bool mOutputResultsForChasteVisualizer;
 
+    ///\todo #2441 the other sets should also be altered for symmetry
     /** A list of cell writers. */
     std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
 
+    ///\todo #2441 the other sets should also be altered for symmetry
     /** A list of cell population writers. */
     std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationWriters;
+
+    ///\todo #2441 This needs to be a vector so that it can be iterated over in a prescribed order
+    ///\todo #2441 the other sets should also be altered for symmetry
+    /** A list of cell population count writers. */
+    std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
 
     /**
      * Check consistency of our internal data structures.
@@ -509,6 +509,7 @@ public:
     /**
      * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
      *
+     * \todo #2441 Pass the output file handler
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void OpenWritersFiles(const std::string& rDirectory);
@@ -516,13 +517,14 @@ public:
     /**
      * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    void OpenWritersFilesForAppend(const std::string& rDirectory);
+    void OpenWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
 
     /**
      * Write results from the current cell population state to output files.
      *
+     * \todo #2441 Pass the output file handler
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteResultsToFiles(const std::string& rDirectory);
@@ -536,6 +538,14 @@ public:
     virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
+     * A virtual method to accept a cell population count writer so it can
+     * write data from this object to file.
+     *
+     * @param pPopulationCountWriter the population count writer.
+     */
+    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
+
+    /**
      * A virtual method to accept a cell writer so it can
      * write data from this object to file.
      *
@@ -543,11 +553,6 @@ public:
      * @param pCell the cell whose data is being written.
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
-
-    /**
-     * Generate results for all cells in the current cell population.
-     */
-    virtual void GenerateCellResults();
 
     /**
      * Close any output files.
@@ -601,6 +606,18 @@ public:
     }
 
     /**
+     * Add a cell population count writer based on its type. Template parameters are inferred from the population.
+     * The implementation of this function must be available in the header file.
+     *
+     * @return This method returns void
+     */
+    template<template <unsigned, unsigned> class T>
+    void AddCellPopulationCountWriter()
+    {
+        mCellPopulationCountWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+    }
+
+    /**
      * Get whether the population has a writer of the specified type.
      *
      * @return whether the population has this writer
@@ -622,6 +639,14 @@ public:
              ++cell_writer)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(cell_writer->get()))
+            {
+                return true;
+            }
+        }
+        typedef AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> count_writer_t;
+        BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
+        {
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_count_writer.get()))
             {
                 return true;
             }

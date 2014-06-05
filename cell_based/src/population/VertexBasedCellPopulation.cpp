@@ -365,6 +365,12 @@ void VertexBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<Ab
 }
 
 template<unsigned DIM>
+void VertexBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+{
+    pPopulationCountWriter->Visit(this);
+}
+
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);

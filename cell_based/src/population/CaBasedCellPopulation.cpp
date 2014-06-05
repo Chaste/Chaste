@@ -430,6 +430,12 @@ void CaBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<Abstra
 }
 
 template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+{
+    pPopulationCountWriter->Visit(this);
+}
+
+template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);

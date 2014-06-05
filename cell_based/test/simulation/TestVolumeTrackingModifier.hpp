@@ -105,7 +105,7 @@ public:
         }
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
         cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
@@ -185,7 +185,7 @@ public:
         }
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
@@ -258,7 +258,7 @@ public:
         }
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells,location_indices);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation
@@ -331,7 +331,7 @@ public:
         }
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<CellMutationStatesCountWriter>();
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Create a simulation

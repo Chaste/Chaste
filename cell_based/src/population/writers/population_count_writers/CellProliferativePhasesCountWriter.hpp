@@ -33,26 +33,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTCELLBASEDWRITER_HPP_
-#define ABSTRACTCELLBASEDWRITER_HPP_
+#ifndef CELLPROLIFERATIVEPHASESCOUNTWRITER_HPP_
+#define CELLPROLIFERATIVEPHASESCOUNTWRITER_HPP_
 
+#include "AbstractCellPopulationCountWriter.hpp"
 #include "ChasteSerialization.hpp"
-#include "ClassIsAbstract.hpp"
-#include "Identifiable.hpp"
-#include "OutputFileHandler.hpp"
+#include <boost/serialization/base_object.hpp>
 
-/**
- * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
- */
+/** A class written using the visitor pattern for writing the number of cells in each proliferative phase to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractCellBasedWriter : public Identifiable
+class CellProliferativePhasesCountWriter : public AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Serialize the object.
+     * Serialize the object and its member variables.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -60,66 +56,61 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & mFileName;
+        archive & boost::serialization::base_object<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
-
-protected:
-
-    /** The name of the output file. */
-    std::string mFileName;
-
-    /** An output stream for writing data. */
-    out_stream mpOutStream;
 
 public:
 
     /**
-     * Constructor.
+     * Default constructor.
+     */
+    CellProliferativePhasesCountWriter();
+
+    /**
+     * A general method for writing to any population.
      *
-     * @param rFileName the name of the file to write to.
+     * @param pCellPopulation the population to write.
      */
-    AbstractCellBasedWriter(const std::string& rFileName);
+    void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Virtual destructor.
-     */
-    virtual ~AbstractCellBasedWriter();
-
-    /**
-     * Close mpOutStream.
-     */
-    void CloseFile();
-
-    /**
-     * Open mpOutStream for writing.
+     * Visit the population and write the data.
      *
-     * @param directory the directory in which to open this file.
-     * @note In most cases (if the directory may not exist and thus need to be created) then this method should only be
-     *       called collectively.  That is, all parallel processes call it at the same time.
-     * \todo #2441 What's the point of const here?  The directory string ought to be passed by reference
-     * \todo #2441 Change to output file-handler.  Why is this virtual? Where is it overridden?
+     * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void OpenOutputFile(const std::string directory);
+    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Open mpOutStream for appending.
+     * Visit the population and write the data.
      *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
+     */
+    virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the data.
      *
+     * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
-    void OpenOutputFileForAppend(OutputFileHandler& rOutputFileHandler);
+    virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Write the current time stamp to mpOutStream.
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
-    virtual void WriteTimeStamp();
+    virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Add a newline character to mpOutStream.
+     * Visit the population and write the data.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
-    virtual void WriteNewline();
+    virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
-TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellBasedWriter)
+#include "SerializationExportWrapper.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellProliferativePhasesCountWriter)
 
-#endif /*ABSTRACTCELLBASEDWRITER_HPP_*/
+#endif /*CELLPROLIFERATIVEPHASESCOUNTWRITER_HPP_*/
