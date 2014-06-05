@@ -89,7 +89,7 @@ private:
         //static const double magnitude = 0.0;
 public:
         UnStimulatedCellFactory() : AbstractCardiacCellFactory<2>(),
-				    mpStimulus ( new SimpleStimulus(0.0, 1.0)) ///\todo Shouldn't this be a ZeroStimulus?
+                    mpStimulus ( new SimpleStimulus(0.0, 1.0)) ///\todo Shouldn't this be a ZeroStimulus?
     {
     }
 

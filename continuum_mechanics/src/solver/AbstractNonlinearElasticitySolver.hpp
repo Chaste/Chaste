@@ -117,7 +117,7 @@ class  AbstractNonlinearElasticitySolver; //Forward declaration
 
 /**
  * Helper class for dumping the stresses to file.
- * 
+ *
  * Currently located here so that it's easy to feed a pointer to the main
  * class AbstractNonlinearElasticitySolver
  */
@@ -126,8 +126,8 @@ class StressPerElementWriter : public AbstractPerElementWriter<DIM, DIM, DIM*DIM
 {
 private:
     AbstractNonlinearElasticitySolver<DIM>* mpSolver; /**< Pointer to the parent class, set in constructor*/
-public:    
-    
+public:
+
     /** Constructor
      * @param pMesh  A pointer to the mesh whose elements we want to calculate data on.
      * @param pSolver  A pointer to the parent class, used to access data
@@ -282,17 +282,17 @@ protected:
      */
     double mLastDampingValue;
 
-    /** 
+    /**
      *  Whether this is the first Newton iteration or not
      */
     bool mFirstStep;
-    
+
     /**
      *  Whether to take a full first Newton step or not - see documentation for
      *  SetTakeFullFirstNewtonStep()
      */
     bool mTakeFullFirstNewtonStep;
-    
+
     /**
      *  Get Petsc to do a (almost) direct solve
      */
@@ -679,10 +679,10 @@ public:
     /**
      *  The following odd behaviour has been observed: for some problems the solver
      *  will fail in the first Newton iteration, with the residual not decreasing
-     *  in the direction of the Newton update, but: if you take a full Newton 
-     *  step anyway (increasing the residual-norm), the solver then converges 
+     *  in the direction of the Newton update, but: if you take a full Newton
+     *  step anyway (increasing the residual-norm), the solver then converges
      *  perfectly. This method allows the user to choose this.
-     *  
+     *
      *  Does nothing if the SNES solver is used.
      *
      *  See ticket #2304
@@ -702,9 +702,9 @@ public:
      *  pressure-pressure block (to avoid zeros on the diagonal. Hence a few linear solve
      *  iterations are required for this case. Using a direct solve can lead to huge
      *  computation time savings if
-     *  there is enough memory for it: the linear solve may be faster and 
+     *  there is enough memory for it: the linear solve may be faster and
      *  nonlinear convergence likely to be much better, as the linear solve is exact.
-     *  
+     *
      *  @param usePetscDirectSolve Whether to use the Petsc direct solver or not
      */
     void SetUsePetscDirectSolve(bool usePetscDirectSolve = true)

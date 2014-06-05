@@ -162,7 +162,7 @@ public:
     void TestArchiving() throw (Exception)
     {
         EXIT_IF_PARALLEL;
-        
+
         OutputFileHandler handler("TestNodeAttributes", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "node_attributes.arch";
 
@@ -217,7 +217,7 @@ public:
     void TestArchivingNullPointer() throw (Exception)
     {
         EXIT_IF_PARALLEL;
-        
+
         OutputFileHandler handler("TestNodeAttributes", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "null_node_attributes.arch";
 

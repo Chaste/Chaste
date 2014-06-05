@@ -450,7 +450,7 @@ public:
     void TestArchivingCvodeAdaptorSolver() throw(Exception)
     {
         EXIT_IF_PARALLEL;
-        
+
 #ifdef CHASTE_CVODE
         OutputFileHandler handler("archive", false);
         std::string archive_filename;

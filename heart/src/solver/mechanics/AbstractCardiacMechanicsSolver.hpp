@@ -115,9 +115,9 @@ protected:
     /** Time used to integrate the contraction model */
     double mOdeTimestep;
 
-    /** 
-     * The fibre-sheet-normal directions (in a matrix), if constant 
-     * (defaults to the identity, ie fibres in the X-direction, sheet in the XY plane) 
+    /**
+     * The fibre-sheet-normal directions (in a matrix), if constant
+     * (defaults to the identity, ie fibres in the X-direction, sheet in the XY plane)
      */
     c_matrix<double,DIM,DIM> mConstantFibreSheetDirections;
 

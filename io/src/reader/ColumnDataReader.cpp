@@ -199,7 +199,7 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
 
     /*
      * Now read the first line of proper data to determine the field width used when this
-     * file was created. Do this by 
+     * file was created. Do this by
      * 1. reading the first entry and measuring the distance from
      * the decimal point to the 'e'.  This gives the precision; the field width is then
      * precision + 7 (With MSVC on Windows, it's precision + 8).
@@ -209,7 +209,7 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
      *  +1.00000000e+00     => field width = 15
      *  -1.20000000e+01     => field width = 15
      *  -1.12345678e-321    => field width = 15
-     * 2. Because the first column has a varying number of spaces read a few columns and 
+     * 2. Because the first column has a varying number of spaces read a few columns and
      *    do some modular arithmetic to work out the correct width
      */
     std::string first_line;
@@ -229,7 +229,7 @@ void ColumnDataReader::CheckFiles(const std::string& rDirectory, const std::stri
             if (stream.tellg() > 0)
             {
                 last_pos = stream.tellg();
-            } 
+            }
         }
     }
 
@@ -424,7 +424,7 @@ void ColumnDataReader::PushColumnEntryFromLine(const std::string& rLine, int col
         {
 #define COVERAGE_IGNORE
            //  Clang Objective C++ (on Mac OSX) treats reading very small numbers (<2e-308) as an error but other compilers just round to zero
-           d_value = 0.0; 
+           d_value = 0.0;
 #undef COVERAGE_IGNORE
         }
     }

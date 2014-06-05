@@ -72,21 +72,21 @@ public:
         // Get rank
         PetscInt my_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-        
+
         // Make sure that only one process proceeds into the test itself
         if (my_rank != 0)
         {
             PETSCEXCEPT(PetscFinalize());
             exit(0);
         }
-        
+
         // Fool PETSc into thinking it was only run on one process.
         // This ensures any barriers etc. don't cause deadlock.
         PETSC_COMM_WORLD = MPI_COMM_SELF;
-        
+
         return true;
     }
-    
+
     /**
      * Clean up PETSc on the master process after running tests.
      * @return true (by CxxTest convention)

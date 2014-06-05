@@ -86,7 +86,7 @@ DynamicCellModelLoaderPtr CellMLToSharedLibraryConverter::Convert(const FileFind
         EXCEPTION("File does not have an extension: " + absolute_path);
     }
     std::string extension = absolute_path.substr(dot_position+1);
-    // We make a modifiable version of the const FileFinder just incase we feel like 
+    // We make a modifiable version of the const FileFinder just incase we feel like
     // amending the suffix
     FileFinder file_path_copy(rFilePath);
 #ifdef __APPLE__
@@ -194,7 +194,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             // Run scons to generate C++ code and compile it to a .so
             EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
 
-            FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);            
+            FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
             EXCEPT_IF_NOT(so_file.Exists());
             // CD back
             EXPECT0(chdir, old_cwd);

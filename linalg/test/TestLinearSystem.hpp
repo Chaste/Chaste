@@ -649,7 +649,7 @@ public:
         unsigned num_iters_from_perfect = ls.GetNumIterations();
         TS_ASSERT_EQUALS(num_iters_from_perfect, 0u);
         TS_ASSERT_LESS_THAN(num_iters_from_perfect, num_iters_from_zero);
-        
+
         int lo, hi;
         VecGetOwnershipRange(solution_vector,&lo,&hi);
         PetscScalar* p_solution_elements_array;

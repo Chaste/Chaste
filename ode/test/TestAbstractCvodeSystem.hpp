@@ -426,7 +426,7 @@ public:
             ode.SetParameter("a", 1.0);
             ode.Solve(10.0, 15.0, 1.0);
             TS_ASSERT_DELTA(ode.GetStateVariable(0u), 5.0, 1e-12);
-        
+
             // Now we show how you can get befuddled in MinimalReset mode.
             // carrying on in time, but not resetting the solver.
             ode.SetMinimalReset(true);

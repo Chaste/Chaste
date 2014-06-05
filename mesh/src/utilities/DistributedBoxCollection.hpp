@@ -400,7 +400,7 @@ inline void save_construct_data(
     int num_local_rows = (int)(t->GetNumRowsOfBoxes());
     std::vector<int> num_rows(PetscTools::GetNumProcs());
     MPI_Gather(&num_local_rows, 1, MPI_INT, &num_rows[0], 1, MPI_INT, 0, PETSC_COMM_WORLD);
-    
+
     if (PetscTools::AmMaster())
     {
         bool are_boxes_set = t->GetAreLocalBoxesSet();
@@ -418,7 +418,7 @@ inline void save_construct_data(
         unsigned num_procs = PetscTools::GetNumProcs();
         ar << num_procs;
 
-        std::vector<int> const const_num_rows = num_rows; 
+        std::vector<int> const const_num_rows = num_rows;
         ar << const_num_rows;
     }
 }

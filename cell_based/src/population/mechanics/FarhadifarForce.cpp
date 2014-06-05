@@ -54,7 +54,7 @@ template<unsigned DIM>
 void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a VertexBasedCellPopulation
-	///todo: check whether this line influences profiling tests - if so, we should remove it.
+    ///todo: check whether this line influences profiling tests - if so, we should remove it.
     if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) == NULL)
     {
         EXCEPTION("FarhadifarForce is to be used with a VertexBasedCellPopulation only");
@@ -129,9 +129,9 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
 
             // Add the force contribution from this cell's area elasticity (note the minus sign)
             c_vector<double, DIM> element_area_gradient =
-            		p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
+                    p_cell_population->rGetMesh().GetAreaGradientOfElementAtNode(p_element, local_index);
             area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] -
-            		target_areas[elem_index])*element_area_gradient;
+                    target_areas[elem_index])*element_area_gradient;
 
 
             // Get the previous and next nodes in this element
@@ -148,17 +148,17 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
 
             // Compute the gradient of each these edges, computed at the present node
             c_vector<double, DIM> previous_edge_gradient =
-            		-p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
+                    -p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, previous_node_local_index);
             c_vector<double, DIM> next_edge_gradient = p_cell_population->rGetMesh().GetNextEdgeGradientOfElementAtNode(p_element, local_index);
 
             // Add the force contribution from cell-cell and cell-boundary line tension (note the minus sign)
             line_tension_contribution -= previous_edge_line_tension_parameter*previous_edge_gradient +
-            		next_edge_line_tension_parameter*next_edge_gradient;
+                    next_edge_line_tension_parameter*next_edge_gradient;
 
             // Add the force contribution from this cell's perimeter contractility (note the minus sign)
             c_vector<double, DIM> element_perimeter_gradient = previous_edge_gradient + next_edge_gradient;
             perimeter_contractility_contribution -= GetPerimeterContractilityParameter()* element_perimeters[elem_index]*
-            		                                                                                 element_perimeter_gradient;
+                                                                                                     element_perimeter_gradient;
         }
 
         c_vector<double, DIM> force_on_node = area_elasticity_contribution + perimeter_contractility_contribution + line_tension_contribution;

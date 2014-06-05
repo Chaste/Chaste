@@ -40,8 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel()
-	: AbstractSimpleGenerationBasedCellCycleModel(),
-	  mRate(1.0/mTransitCellG1Duration)
+    : AbstractSimpleGenerationBasedCellCycleModel(),
+      mRate(1.0/mTransitCellG1Duration)
 {
 }
 
@@ -86,38 +86,38 @@ void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::Se
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
     if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
-    		|| mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
+            || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
     {
-    	// Generate an exponential random number with mScale
-    	mG1Duration = p_gen->ExponentialRandomDeviate(mRate);
+        // Generate an exponential random number with mScale
+        mG1Duration = p_gen->ExponentialRandomDeviate(mRate);
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {
-    	mG1Duration = DBL_MAX;
+        mG1Duration = DBL_MAX;
     }
     else
     {
-    	NEVER_REACHED;
+        NEVER_REACHED;
     }
 }
 
 double ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::GetRate()
 {
-	return mRate;
+    return mRate;
 }
 
 void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetRate(double rate)
 {
-	mRate = rate;
+    mRate = rate;
 
-	// These are now set to the average value of the G1Duration
-	SetTransitCellG1Duration(1.0/rate);
-	SetStemCellG1Duration(1.0/rate);
+    // These are now set to the average value of the G1Duration
+    SetTransitCellG1Duration(1.0/rate);
+    SetStemCellG1Duration(1.0/rate);
 }
 
 void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-	 *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";
+     *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";
 
     // Call method on direct parent class
     AbstractSimpleGenerationBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

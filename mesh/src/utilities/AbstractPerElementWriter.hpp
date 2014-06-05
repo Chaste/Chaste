@@ -171,7 +171,7 @@ public:
             // a local element index can be applied
             unsigned local_element_index=0u; //Data invariant associates iter with local_element_index
             typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
-            
+
             for (unsigned global_element_index=0; global_element_index<mpMesh->GetNumElements(); global_element_index++)
             {
                 if (mpMesh->CalculateDesignatedOwnershipOfElement(global_element_index))

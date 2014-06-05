@@ -128,7 +128,7 @@ double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
 
 double RandomNumberGenerator::ExponentialRandomDeviate(double scale)
 {
-	// make an exponential distribution
+    // make an exponential distribution
     boost::exponential_distribution<> ed(scale);
 
     // `merge' this distribution with our random number generator

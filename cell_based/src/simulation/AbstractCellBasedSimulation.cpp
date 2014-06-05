@@ -147,7 +147,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
                      */
                     if (mOutputDivisionLocations)
                     {
-                    	c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                        c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
                         *mpDivisionLocationFile << SimulationTime::Instance()->GetTime() << "\t";
                         for (unsigned i=0; i<SPACE_DIM; i++)
@@ -363,7 +363,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     if (mOutputDivisionLocations)
     {
-    	mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
+        mpDivisionLocationFile = output_file_handler.OpenOutputFile("divisions.dat");
     }
     if (mOutputCellVelocities)
     {
@@ -470,34 +470,34 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         UpdateCellLocationsAndTopology();
 
         // Now write cell velocities to file if required
-		if (mOutputCellVelocities && at_sampling_timestep)
-		{
-			// Offset as doing this before we increase time by mDt
-			*mpCellVelocitiesFile << p_time->GetTime() + mDt<< "\t";
+        if (mOutputCellVelocities && at_sampling_timestep)
+        {
+            // Offset as doing this before we increase time by mDt
+            *mpCellVelocitiesFile << p_time->GetTime() + mDt<< "\t";
 
-			for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
-				 cell_iter != mrCellPopulation.End();
-				 ++cell_iter)
-			{
-				unsigned index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-				const c_vector<double,SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+                 cell_iter != mrCellPopulation.End();
+                 ++cell_iter)
+            {
+                unsigned index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                const c_vector<double,SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-				c_vector<double, SPACE_DIM> velocity; // Two lines for profile build
-				velocity = (position - old_cell_locations[*cell_iter])/mDt;
+                c_vector<double, SPACE_DIM> velocity; // Two lines for profile build
+                velocity = (position - old_cell_locations[*cell_iter])/mDt;
 
-				*mpCellVelocitiesFile << index  << " ";
-				for (unsigned i=0; i<SPACE_DIM; i++)
-				{
-					*mpCellVelocitiesFile << position[i] << " ";
-				}
+                *mpCellVelocitiesFile << index  << " ";
+                for (unsigned i=0; i<SPACE_DIM; i++)
+                {
+                    *mpCellVelocitiesFile << position[i] << " ";
+                }
 
-				for (unsigned i=0; i<SPACE_DIM; i++)
-				{
-					*mpCellVelocitiesFile << velocity[i] << " ";
-				}
-			}
-			*mpCellVelocitiesFile << "\n";
-		}
+                for (unsigned i=0; i<SPACE_DIM; i++)
+                {
+                    *mpCellVelocitiesFile << velocity[i] << " ";
+                }
+            }
+            *mpCellVelocitiesFile << "\n";
+        }
 
         // Update the assignment of cells to processes.
         mrCellPopulation.UpdateCellProcessLocation();

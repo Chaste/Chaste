@@ -214,7 +214,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("Bidomain1dSmall");
         HeartConfig::Instance()->SetOutputFilenamePrefix("small");
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 0.1);
-        
+
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainProblem<1> bidomain_problem( &bidomain_cell_factory );
 

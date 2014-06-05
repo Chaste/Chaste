@@ -194,7 +194,7 @@ public:
     void TestCellPhysiologicalPropertiesForRegularLr91(void)
     {
         EXIT_IF_PARALLEL;
-        
+
         /*
          * Set stimulus
          */

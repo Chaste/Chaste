@@ -233,7 +233,7 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
             {
                 // This warning relies on the fact that there is only one other possibility for
                 // vertex elements to be marked as deleted: a T2 swap
-            	WARN_ONCE_ONLY("A Cell is removed without performing a T2 swap. This could leave a void in the mesh.");
+                WARN_ONCE_ONLY("A Cell is removed without performing a T2 swap. This could leave a void in the mesh.");
                 mpMutableVertexMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
             }
 
@@ -666,8 +666,8 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshUsi
         if (this_edge.first  < mpMutableVertexMesh->GetNumNodes() &&
             this_edge.second  < mpMutableVertexMesh->GetNumNodes())
         {
-        	is_boundary_edge = (mpMutableVertexMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
-        	        	        mpMutableVertexMesh->GetNode(this_edge.second)->IsBoundaryNode() );
+            is_boundary_edge = (mpMutableVertexMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
+                                mpMutableVertexMesh->GetNode(this_edge.second)->IsBoundaryNode() );
         }
         unsigned is_boundary_edge_unsigned = is_boundary_edge ? 1 : 0;
 

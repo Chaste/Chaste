@@ -128,8 +128,8 @@ public:
         simulator.SetOutputDivisionLocations(true);
 
         // Record cell velocities
-		TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), false);
-		simulator.SetOutputCellVelocities(true);
+        TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), false);
+        simulator.SetOutputCellVelocities(true);
 
         // Run simulation
         simulator.Solve();

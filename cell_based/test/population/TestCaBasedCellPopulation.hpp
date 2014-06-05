@@ -385,20 +385,20 @@ public:
         // Test VTK output
         ///\todo check all properties, not just mutations
 #ifdef CHASTE_VTK
-		cell_population.WriteVtkResultsToFile(output_directory);
+        cell_population.WriteVtkResultsToFile(output_directory);
 
-		// Read VTK file and check it doesn't cause any problems
-		VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+        // Read VTK file and check it doesn't cause any problems
+        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
 
-		// The first cell is labelled; the remaining cells are wild type
-		std::vector<double> mutation_states_data;
-		vtk_reader.GetPointData("Mutation states", mutation_states_data);
-		TS_ASSERT_EQUALS(mutation_states_data.size(), 5u);
-		TS_ASSERT_DELTA(mutation_states_data[0], 5.0, 1e-9);
-		for (unsigned i=1; i<mutation_states_data.size(); i++)
-		{
+        // The first cell is labelled; the remaining cells are wild type
+        std::vector<double> mutation_states_data;
+        vtk_reader.GetPointData("Mutation states", mutation_states_data);
+        TS_ASSERT_EQUALS(mutation_states_data.size(), 5u);
+        TS_ASSERT_DELTA(mutation_states_data[0], 5.0, 1e-9);
+        for (unsigned i=1; i<mutation_states_data.size(); i++)
+        {
             TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
-		}
+        }
 #endif
     }
 

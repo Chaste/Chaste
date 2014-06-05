@@ -322,7 +322,7 @@ public:
 
     void TestAddCellWithSimpleMesh() throw (Exception)
     {
-    	// This also tests the correct implementation of ShortAxisVertexBasedDivisionRule.
+        // This also tests the correct implementation of ShortAxisVertexBasedDivisionRule.
         // Make some nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 2.0, -1.0));
@@ -1340,13 +1340,13 @@ public:
         /* Create a simple VertexMesh comprising three VertexElements.
          *
          * Note: central node is not a boundary node.
-    	 *   ____
-    	 *	|\  /|
-    	 *  | \/ |
-    	 *	|  \ |
-    	 *	|___\|
-    	 *
-    	 */
+         *   ____
+         *    |\  /|
+         *  | \/ |
+         *    |  \ |
+         *    |___\|
+         *
+         */
 
         std::vector<Node<2>*> vertex_nodes;
         vertex_nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
@@ -1415,7 +1415,7 @@ public:
         // The last 3 Nodes of the TetrahedralMesh should be located at the centroids of the 3 VertexElements and will all be non boundary nodes.
         for (unsigned i=0; i<3; i++)
         {
-        	Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i+5);
+            Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i+5);
             c_vector<double,2> tetrahedral_node_location = p_tetrahedral_node->rGetLocation();
             c_vector<double,2> vertex_element_centroid = p_vertex_mesh->GetCentroidOfElement(i);
 

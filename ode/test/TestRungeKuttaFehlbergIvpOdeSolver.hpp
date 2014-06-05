@@ -130,7 +130,7 @@ public:
 
         // Reset state
         current_y_values = next_y_values;
-        
+
         // Test internal method
         rkf_solver.CalculateNextYValue(&ode, time_step, time, current_y_values, next_y_values);
 

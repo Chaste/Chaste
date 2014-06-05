@@ -112,7 +112,7 @@ public:
         c_vector<double, 2> edge_length_electrics = electrics_mesh.CalculateMinMaxEdgeLengths();
         c_vector<double, 2> edge_length_mechanics = mechanics_mesh.CalculateMinMaxEdgeLengths();
         std::cout << "Typical edge length of electrics and mechanics meshes are, respectively: "
-                  << (edge_length_electrics[0] + edge_length_electrics[1])/2.0 << " " << 
+                  << (edge_length_electrics[0] + edge_length_electrics[1])/2.0 << " " <<
                      (edge_length_mechanics[0] + edge_length_mechanics[1])/2.0<< "\n";
 
 

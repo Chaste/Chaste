@@ -367,14 +367,14 @@ public:
 
     void TestExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel() throw(Exception)
     {
-    	// make sure we can generate this model
+        // make sure we can generate this model
         TS_ASSERT_THROWS_NOTHING(ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel cell_model);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
         // get a pointer to a cell cycle model of this kind
         ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_stem_model =
-        		new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
+                new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
 
         // Test set and get method for the rate parameter
         TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.5, 1e-10);
@@ -431,7 +431,7 @@ public:
         // Check that cell division correctly resets the cell cycle phase
         TS_ASSERT_EQUALS(p_stem_cell->ReadyToDivide(), true);
         ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_stem_model2 =
-        		static_cast <ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*> (p_stem_model->CreateCellCycleModel());
+                static_cast <ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel*> (p_stem_model->CreateCellCycleModel());
         CellPtr p_stem_cell2(new Cell(p_healthy_state, p_stem_model2));
         p_stem_cell2->SetCellProliferativeType(p_stem_type);
         p_stem_cell2->InitialiseCellCycleModel();
@@ -1042,7 +1042,7 @@ public:
     {
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() +
-        		"ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel.arch";
+                "ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel.arch";
 
         // We will also test that the random number generator is archived correctly
         double random_number_test = 0.0;

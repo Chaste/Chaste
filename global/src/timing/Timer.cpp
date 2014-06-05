@@ -51,7 +51,7 @@ void Timer::Print(std::string message)
     double time = MPI_Wtime() - msStartTime;
     if (PetscTools::IsParallel())
     {
-    	std::cout << "proc " << PetscTools::GetMyRank() << ": ";
+        std::cout << "proc " << PetscTools::GetMyRank() << ": ";
     }
     std::cout << message << " time: " << time << "s\n" << std::flush;
     LOG(2,"    " << message << " time: "<< time <<"s");

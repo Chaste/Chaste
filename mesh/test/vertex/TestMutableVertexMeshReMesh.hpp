@@ -653,29 +653,29 @@ public:
     }
 
     void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
-	{
-    	/**
-    	 * In this test we check that a T1 swap does not occur if one of the elements is triangular
-    	 * and would loose an edge by swapping nodes. The mesh looks like this
-    	 *
-    	 *       ______________
-    	 *      |\             |
-    	 *      | \ _________  |
-    	 *      |  |          \| ...where the funny shaped element in the middle is supposed to be
-    	 *      |  |_________ /|    a very long triangle that has the third vertex on the right hand boundary.
-    	 *      | /            |
-    	 *      |/_____________|
-    	 */
-    	std::vector<Node<2>*> nodes;
-    	nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-    	nodes.push_back(new Node<2>(1, true,  2.0, 0.0));
-    	nodes.push_back(new Node<2>(2, true,  2.0, 2.0));
-    	nodes.push_back(new Node<2>(3, true,  0.0, 2.0));
-    	nodes.push_back(new Node<2>(4, false, 0.2, 0.95));
-    	nodes.push_back(new Node<2>(5, true, 2.0, 1.0));
-    	nodes.push_back(new Node<2>(6, false, 0.2, 1.05));
+    {
+        /**
+         * In this test we check that a T1 swap does not occur if one of the elements is triangular
+         * and would loose an edge by swapping nodes. The mesh looks like this
+         *
+         *       ______________
+         *      |\             |
+         *      | \ _________  |
+         *      |  |          \| ...where the funny shaped element in the middle is supposed to be
+         *      |  |_________ /|    a very long triangle that has the third vertex on the right hand boundary.
+         *      | /            |
+         *      |/_____________|
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true,  2.0, 0.0));
+        nodes.push_back(new Node<2>(2, true,  2.0, 2.0));
+        nodes.push_back(new Node<2>(3, true,  0.0, 2.0));
+        nodes.push_back(new Node<2>(4, false, 0.2, 0.95));
+        nodes.push_back(new Node<2>(5, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(6, false, 0.2, 1.05));
 
-    	std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
         unsigned node_indices_elem_0[4] = {0, 1, 5, 4};
         unsigned node_indices_elem_1[4] = {5, 2, 3, 6};
         unsigned node_indices_elem_2[4] = {0, 4, 6, 3};
@@ -719,31 +719,31 @@ public:
                 TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_elem_3[i]);
             }
         }
-	}
+    }
 
     void TestExceptionForVoidRemovalWithRemovingEdgeFromTriangularElement() throw(Exception)
-	{
-    	/**
-    	 * In this test we check that void removal does not occur if one of the adjacent elements is triangular
-    	 * and would loose an edge by swapping nodes. The code should throw and exception in this case.
-    	 * The mesh looks like this
-    	 *
-    	 *       ______________./This corner is not a node.
-    	 *      |\      1      |
-    	 *      | \ _________  |
-    	 *      |  |   void   \| ...where elements 1, and 2 are triangles that share the right hand vertex
-    	 *      |  |_________ /|    with the triangular void in the middle.
-    	 *      | /     2      |
-    	 *      |/_____________|.This corner is not a node either.
-    	 */
-    	std::vector<Node<2>*> nodes;
-    	nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-    	nodes.push_back(new Node<2>(1, true,  0.0, 2.0));
-    	nodes.push_back(new Node<2>(2, true, 0.2, 0.95));
-    	nodes.push_back(new Node<2>(3, true, 2.0, 1.0));
-    	nodes.push_back(new Node<2>(4, true, 0.2, 1.05));
+    {
+        /**
+         * In this test we check that void removal does not occur if one of the adjacent elements is triangular
+         * and would loose an edge by swapping nodes. The code should throw and exception in this case.
+         * The mesh looks like this
+         *
+         *       ______________./This corner is not a node.
+         *      |\      1      |
+         *      | \ _________  |
+         *      |  |   void   \| ...where elements 1, and 2 are triangles that share the right hand vertex
+         *      |  |_________ /|    with the triangular void in the middle.
+         *      | /     2      |
+         *      |/_____________|.This corner is not a node either.
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true,  0.0, 2.0));
+        nodes.push_back(new Node<2>(2, true, 0.2, 0.95));
+        nodes.push_back(new Node<2>(3, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, 0.2, 1.05));
 
-    	std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
+        std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2;
         unsigned node_indices_elem_0[4] = {0, 2, 4, 1};
         unsigned node_indices_elem_1[3] = {1, 4, 3};
         unsigned node_indices_elem_2[3] = {0, 3, 2};
@@ -773,7 +773,7 @@ public:
         VertexElementMap map(vertex_mesh.GetNumElements());
         TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForSwapsFromShortEdges(map),
                               "Triangular element next to triangular void, not implemented yet.");
-	}
+    }
 
     void TestPerformT2Swap() throw(Exception)
     {

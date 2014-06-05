@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Look at  testoutput/$HOSTNAME.BUILD_TYPE/Semaphores...
 # 
 # There are 16 semaphores open, owned by 1 users:
-#	chaste (16)
+# chaste (16)
 # etc.
 # On the relevant machine and with the relevant user:
 # ~/mpi/sbin/cleanipcs

@@ -317,10 +317,10 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
     {
         solver.Solve();
         solver.CreateCmguiOutput();
-        
+
         VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
         vtk_writer.SetWriteElementWiseStrains(DEFORMATION_TENSOR_C);
-        vtk_writer.Write();        
+        vtk_writer.Write();
     }
 
     rSolution.clear();

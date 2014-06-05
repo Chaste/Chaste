@@ -203,7 +203,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         {
             case cp::media_type::Orthotropic:
             {
-            	mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
                 FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
                 assert(ortho_file.Exists());
                 mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(ortho_file);
@@ -212,7 +212,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
 
             case cp::media_type::Axisymmetric:
             {
-            	mpIntracellularConductivityTensorsSecondCell =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensorsSecondCell =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
                 FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
                 assert(axi_file.Exists());
                 mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(axi_file);
@@ -220,7 +220,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             }
 
             case cp::media_type::NoFibreOrientation:
-            	mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
                 break;
 
             default :
@@ -229,7 +229,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
     }
     else // Slab defined in config file or SetMesh() called; no fibre orientation assumed
     {
-    	mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+        mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
     }
 
     // this definition must be here (and not inside the if statement) because SetNonConstantConductivities() will keep

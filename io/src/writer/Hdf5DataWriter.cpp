@@ -315,7 +315,7 @@ void Hdf5DataWriter::OpenFile()
         {
             H5Pset_istore_k(fcpl, (mNumberOfChunks+1)/2);
         }
-        /* 
+        /*
          * Align objects to disk block size. Useful for striped filesystem e.g. Lustre
          * Ideally this should match the chunk size (see "target_size_in_bytes" below).
          */
@@ -324,7 +324,7 @@ void Hdf5DataWriter::OpenFile()
         /*
          * The stripe size can be set on the directory just before creation of the H5
          * file, and set back to normal just after, so that the H5 file inherits these
-         * settings, by uncommenting the lines below. Adjust the command for your 
+         * settings, by uncommenting the lines below. Adjust the command for your
          * specific filesystem!
          */
         /*
@@ -1259,16 +1259,16 @@ void Hdf5DataWriter::SetChunkSize()
     {
         /*
          * The line below sets the chunk size to (just under) 128 K chunks, which
-         * seems to be a good compromise. 
+         * seems to be a good compromise.
          *
-         * For large problems performance usually improves with increased chunk size. 
+         * For large problems performance usually improves with increased chunk size.
          * A sweet spot seems to be 1 M chunks.
          *
-         * On a striped filesystem, for best performance, try to match the chunk size 
+         * On a striped filesystem, for best performance, try to match the chunk size
          * and alignment (see "H5Pset_alignment" above) with the file stripe size.
          */
         unsigned target_size_in_bytes = 1024*1024/8; // 128 K
-        
+
         unsigned target_size = 0;
         unsigned chunk_size_in_bytes;
         bool all_one_chunk;

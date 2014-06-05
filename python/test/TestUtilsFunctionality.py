@@ -108,7 +108,7 @@ class TestUtilsFunctionality(unittest.TestCase):
 
         original = 'python/test/data/input/simple_cube_binary.ele'
         output = os.path.join(CHASTE_TEST_OUTPUT, 'simple_cube_binary.ele')
-	
+
         rc = os.system('python/utils/ConvertBinaryElementAttributes.py ' +  original + ' ' +  output)
         # Byte-for-byte comparion
         self.assertTrue(filecmp.cmp(output, converted))

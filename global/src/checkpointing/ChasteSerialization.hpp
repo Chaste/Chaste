@@ -56,9 +56,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Only Boost 1.37 and above can properly handle serialization of dynamically
  * loaded objects.  We define a convenience macro for code to test if this is
  * possible.
- * 
- * \todo #2417 Mac OS X doesn't appear to be able to checkpoint dynamically loaded 
- * models, so that functionality is switched off here.  
+ *
+ * \todo #2417 Mac OS X doesn't appear to be able to checkpoint dynamically loaded
+ * models, so that functionality is switched off here.
  */
 #include <boost/version.hpp>
 #ifndef CHASTE_CAN_CHECKPOINT_DLLS

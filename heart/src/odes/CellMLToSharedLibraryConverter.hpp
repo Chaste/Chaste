@@ -110,9 +110,9 @@ private:
 
     /** Which component to build the loadable module in. */
     std::string mComponentName;
-    
+
     /** The .so suffix is nearly always "so" (as you might expect).  On Mac OSX this is redefined to "dylib" */
-    static const std::string msSoSuffix; 
+    static const std::string msSoSuffix;
 };
 
 #endif /*CELLMLTOSHAREDLIBRARYCONVERTER_HPP_*/

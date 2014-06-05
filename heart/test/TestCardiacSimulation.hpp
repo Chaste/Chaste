@@ -125,7 +125,7 @@ public:
                 TS_ASSERT_DELTA(p_cell->GetParameter("membrane_fast_sodium_current_conductance"), 23 * 0.99937539038101175, 1e-6);
                 TS_ASSERT_DELTA(p_cell->GetParameter("membrane_rapid_delayed_rectifier_potassium_current_conductance"), 0.282/3.0, 1e-6);
             }
-            
+
             if (p_vector_factory->GetLocalOwnership() > 0)
             {
                 TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), p_vector_factory->GetLocalOwnership());
@@ -298,7 +298,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "resume_bidomain_short_results", false,
-                                                 foldername, "SimulationResults", true, 1e-6));                                          
+                                                 foldername, "SimulationResults", true, 1e-6));
         //assert(0);
     }
 

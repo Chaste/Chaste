@@ -93,7 +93,7 @@ public:
     void TestArchivingMockEulerSolver() throw(Exception)
     {
         EXIT_IF_PARALLEL;
-        
+
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "mock_euler_solver.arch";

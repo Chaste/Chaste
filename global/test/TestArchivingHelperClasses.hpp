@@ -228,7 +228,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(InputArchiveOpener archive_opener_in(archive_dir_finder, archive_base_name),
                                   "Cannot load main archive file: ");
 
-        // Remove write permissions on the archive dir 
+        // Remove write permissions on the archive dir
         //Note: changing *directory* permissions and other attributes does not work on Windows
         //See http://support.microsoft.com/kb/326549
 #ifndef _MSC_VER

@@ -288,7 +288,7 @@ public:
         c_vector<double, 2> domain_size;
         domain_size(0) = 0.0;
         domain_size(1) = 25.0;
-        
+
         DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
 
         box_collection.SetupAllLocalBoxes();
@@ -315,7 +315,7 @@ public:
         int lo, hi;
         VecGetOwnershipRange(petsc_vec, &lo, &hi);
         PetscTools::Destroy(petsc_vec);
-        
+
         unsigned local_rows = (unsigned)(hi-lo);
 
         TS_ASSERT_EQUALS(box_collection.GetNumLocalBoxes(), local_rows);

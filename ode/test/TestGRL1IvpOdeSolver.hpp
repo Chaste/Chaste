@@ -57,13 +57,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "ArchiveLocationInfo.hpp"
 
-/* 
-Megan E. Marsh, Raymond J. Spiteri 
-Numerical Simulation Laboratory 
-University of Saskatchewan 
-December 2011 
-Partial support provided by research grants from the National 
-Science and Engineering Research Council (NSERC) of Canada 
+/*
+Megan E. Marsh, Raymond J. Spiteri
+Numerical Simulation Laboratory
+University of Saskatchewan
+December 2011
+Partial support provided by research grants from the National
+Science and Engineering Research Council (NSERC) of Canada
 and the MITACS/Mprime Canadian Network of Centres of Excellence.
 */
 

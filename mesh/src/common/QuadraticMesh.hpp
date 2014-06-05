@@ -90,8 +90,8 @@ protected:
 
     /**
      * Create a quadratic mesh on a rectangle from (0,0) to (numElemX,numElemY)
-     * with that number of elements in each direction.  
-     * 
+     * with that number of elements in each direction.
+     *
      * The method overloads the equivalent method in
      * AbstractTetrahedralMesh. This is private, users should call ConstructRegularSlabMesh();
      *
@@ -106,7 +106,7 @@ protected:
 
     /**
      * Create a quadratic mesh on a cuobid from (0,0,0) to (numElemX,numElemY,numElemZ)
-     * with that number of elements in each direction. 
+     * with that number of elements in each direction.
      * The method overloads the equivalent method in
      * AbstractTetrahedralMesh. This is private, users should call ConstructRegularSlabMesh();
      *
@@ -115,10 +115,10 @@ protected:
      * @param numElemZ Number of elements in y-direction (also, the depth of the final mesh)
      */
     void ConstructCuboid(unsigned numElemX, unsigned numElemY, unsigned numElemZ);
-    
-    /** 
+
+    /**
      * A helper method used in the private structured mesh constructors (ConstructRectangularMesh etc).
-     * 
+     *
      * Method uses top (and the zero vector) to calculate if the node should be designated as a boundary node.
      * Method uses top to determine if the node is outside the cuboid -- this allows for simpler loops in the caller
      * Method creates node, pushes node onto mNodes and marks it as an internal node.
@@ -127,20 +127,20 @@ protected:
      * @param rLocation  the position of the node in space (coordinates should be integers or multiples of 1/2)
      * @param rTop  the position of top-most node in the line/slab/cuboid
      */
-    Node<DIM>* MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop); 
+    Node<DIM>* MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop);
 
-    /** 
+    /**
      * A helper method used in the private structured mesh constructors (ConstructRectangularMesh etc).
-     * 
+     *
      * Gets the internal node index between two vertex node indices assuming ordered pairs have
      * been used as keys in the map
-     * 
+     *
      * @param globalIndex1  is the index of one of the vertex nodes
      * @param globalIndex2  is the index of the other vertex node (ordering is unimportant)
      * @param rEdgeMap  the map from ordered pairs of vertex indices to internal node index
      * @return  global node index of the internal node between globalIndex1 and globalIndex2
      */
-    unsigned LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap); 
+    unsigned LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap);
 
 
 public:

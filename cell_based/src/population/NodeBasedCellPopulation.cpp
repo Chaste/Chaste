@@ -429,8 +429,8 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
 template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
-	// Not implemented or tested in 1D
-	assert(DIM==2 ||DIM==3);
+    // Not implemented or tested in 1D
+    assert(DIM==2 ||DIM==3);
 
     // Get node index corresponding to this cell
     unsigned node_index = this->GetLocationIndexUsingCell(pCell);
@@ -453,12 +453,12 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     unsigned num_neighbours_equil;
     if (DIM==2)
     {
-    	num_neighbours_equil = 6;
+        num_neighbours_equil = 6;
     }
     else
     {
-    	assert(DIM==3);
-    	num_neighbours_equil = 12;
+        assert(DIM==3);
+        num_neighbours_equil = 12;
     }
 
     // Loop over this set
@@ -494,7 +494,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     }
     else
     {
-    	averaged_cell_radius /= num_cells;
+        averaged_cell_radius /= num_cells;
     }
     assert(averaged_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
 

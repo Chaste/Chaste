@@ -182,17 +182,17 @@ public:
         boundary_condition.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the boundary condition. Note these are random so depend on the seed
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(0)->rGetLocation()[0],2.00005,1e-5);
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(0)->rGetLocation()[1],0.0,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(0)->rGetLocation()[0],2.00005,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(0)->rGetLocation()[1],0.0,1e-5);
 
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(1)->rGetLocation()[0],2.00006,1e-5);
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(1)->rGetLocation()[1],0.0,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(1)->rGetLocation()[0],2.00006,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(1)->rGetLocation()[1],0.0,1e-5);
 
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(2)->rGetLocation()[0],2.00007,1e-5);
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(2)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(2)->rGetLocation()[0],2.00007,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(2)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
 
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[0],2.00008,1e-5);
-		TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[0],2.00008,1e-5);
+        TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
 
 
         // Test VerifyBoundaryCondition() method
@@ -283,7 +283,7 @@ public:
             c_vector<double, 2> location = node_iter->rGetLocation();
             if (old_locations[&(*node_iter)][0] < x_boundary)
             {
-            	TS_ASSERT_LESS_THAN(x_boundary, location[0]);// note strict inequality
+                TS_ASSERT_LESS_THAN(x_boundary, location[0]);// note strict inequality
                 TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
             }
             else

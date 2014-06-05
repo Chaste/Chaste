@@ -237,7 +237,7 @@ public:
         p_parallel_writer->PutVariable(time_var_id, 0.1);
         p_parallel_writer->PutVectorStripe(var1_id, ones);
         p_parallel_writer->AdvanceAlongUnlimitedDimension();
-        
+
         // Check file
         PetscTools::Barrier("TestPutSlice2");
 

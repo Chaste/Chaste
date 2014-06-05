@@ -627,9 +627,9 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         mesh_writer.AddPointData("Cell types", cell_types);
     }
     if (this-> template HasWriter<CellMutationStatesWriter>())
-	{
-		mesh_writer.AddPointData("Mutation states", cell_mutation_states);
-	}
+    {
+        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
+    }
     if (this-> template HasWriter<CellAncestorWriter>())
     {
         mesh_writer.AddPointData("Ancestors", cell_ancestors);

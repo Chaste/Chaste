@@ -251,8 +251,8 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
 ////////
 //    PCSetType(mPCContext.PC_amg_A11, PCBJACOBI);
 
-    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it 
-    // in case it aborts 
+    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
+    // in case it aborts
     PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
@@ -260,7 +260,7 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
         WARNING("PETSc hypre preconditioning library is not installed");
     }
     // Stop supressing error
-    PetscPopErrorHandler();     
+    PetscPopErrorHandler();
 
     //PCHYPRESetType(mPCContext.PC_amg_A11, "euclid");
     PetscOptionsSetValue("-pc_hypre_type", "euclid");
@@ -302,11 +302,11 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
     // Choose between the two following blocks in order to approximate inv(A11) with one AMG cycle
     // or with an CG solve with high tolerance
 ////////
-    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it 
-    // in case it aborts 
+    // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
+    // in case it aborts
     PetscPushErrorHandler(PetscIgnoreErrorHandler, NULL);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
-    // Stop supressing error 
+    // Stop supressing error
     PetscPopErrorHandler();
 
     PetscOptionsSetValue("-pc_hypre_type", "boomeramg");

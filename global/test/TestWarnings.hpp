@@ -75,7 +75,7 @@ public:
         const std::string warning("This one goes into a log file");
         WARNING(warning); // Note that the line number for this (76) will appear in the log file and be tested
         LogFile::Close();
-        
+
         FileFinder log_file_path("TestLogFile/log_warnings.txt", RelativeTo::ChasteTestOutput);
         std::ifstream log_file(log_file_path.GetAbsolutePath().c_str());
         std::string line;

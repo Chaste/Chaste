@@ -949,7 +949,7 @@ public:
     void TestWritingStrain() throw(Exception)
     {
         QuadraticMesh<2> mesh(1.0, 1.0, 1.0);
- 
+
         CompressibleMooneyRivlinMaterialLaw<2> law(1.0, 1.0);
 
         std::vector<unsigned> fixed_nodes;
@@ -1178,7 +1178,7 @@ public:
         FileFinder reference_file("continuum_mechanics/test/data/some_stresses_3d_10.stress", RelativeTo::ChasteSourceRoot);
         NumericFileComparison comparison(generated_file, reference_file);
         TS_ASSERT(comparison.CompareFiles());
-    
+
     }
 
     // quick 2d test that complements above test

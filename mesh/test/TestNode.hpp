@@ -292,7 +292,7 @@ public:
     void TestArchiveNode()
     {
         EXIT_IF_PARALLEL;
-        
+
         OutputFileHandler handler("TestNode", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "node.arch";
 

@@ -101,23 +101,23 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
 
         if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
         {
-        	MeshBasedCellPopulationWithGhostNodes<DIM> * p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
+            MeshBasedCellPopulationWithGhostNodes<DIM> * p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
 
-        	neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
+            neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
 
-        	// Remove ghost nodes from the neighbour indices
+            // Remove ghost nodes from the neighbour indices
             for(std::set<unsigned>::iterator iter = neighbour_indices.begin();
-					iter != neighbour_indices.end();)
-			{
-			   if(p_cell_population->IsGhostNode(*iter))
-			   {
-				   neighbour_indices.erase(iter++);
-			   }
-			   else
-			   {
-				  ++iter;
-			   }
-			}
+                    iter != neighbour_indices.end();)
+            {
+               if(p_cell_population->IsGhostNode(*iter))
+               {
+                   neighbour_indices.erase(iter++);
+               }
+               else
+               {
+                  ++iter;
+               }
+            }
 
         }
         else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation))

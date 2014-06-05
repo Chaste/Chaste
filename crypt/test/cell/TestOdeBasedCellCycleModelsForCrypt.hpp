@@ -244,7 +244,7 @@ public:
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
         double tol = 1e-4;
-        
+
 #ifdef CHASTE_CVODE
         const double expected_g1_duration = 6.18461;
         tol = 1e-5;

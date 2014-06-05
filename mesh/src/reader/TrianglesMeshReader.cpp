@@ -416,9 +416,9 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned in
     {
         // This would be a monotonic (but non-contiguous) read. But we don't actually read faces with this access pattern.
         ///\todo Revisit #1930?
-        mFacesFile.seekg( mFaceItemWidth*(index-mFacesRead), std::ios_base::cur); 
+        mFacesFile.seekg( mFaceItemWidth*(index-mFacesRead), std::ios_base::cur);
     }
-    else 
+    else
     */
     // Put the file stream pointer to the right location
     if ( mFacesRead != index )

@@ -500,7 +500,7 @@ public:
 
         element.SetAttribute(3.0);
         TS_ASSERT_EQUALS(element.GetUnsignedAttribute(), 3u);
-        
+
         //Check that rounding happens correctly
         element.SetAttribute(2.99999999999999999);
         TS_ASSERT_EQUALS(element.GetUnsignedAttribute(), 3u);

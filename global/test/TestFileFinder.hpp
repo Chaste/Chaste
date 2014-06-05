@@ -164,7 +164,7 @@ public:
     {
         TS_ASSERT(!FileFinder::IsAbsolutePath("global/src/FileFinder.hpp"));
 #ifndef _MSC_VER
-        //This would always fail on Windows: it's not a single-root OS 
+        //This would always fail on Windows: it's not a single-root OS
         TS_ASSERT(FileFinder::IsAbsolutePath("/root"));
 #endif
     }

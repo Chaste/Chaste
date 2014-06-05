@@ -47,7 +47,7 @@ public:
      * The global setup for Chaste tests.
      */
     static void CommonSetup();
-    
+
     /**
      * Just initialise PETSc without performing the rest of the common setup.
      */

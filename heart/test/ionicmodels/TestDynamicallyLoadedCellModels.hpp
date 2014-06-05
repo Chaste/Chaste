@@ -384,7 +384,7 @@ public:
             {
                 TS_ASSERT_EQUALS(boost_exception.code, boost::archive::archive_exception::unregistered_class);
                 TS_FAIL("Archiving cell models in unavailable.  Please refer to  #2417");
-                //Bail out 
+                //Bail out
                 return;
             }
         }

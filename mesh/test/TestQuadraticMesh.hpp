@@ -591,13 +591,13 @@ public:
             std::string output_dir = mesh_writer.GetOutputDirectory();
             TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "TempGrid2d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
-            
+
             quad_mesh_constructed.ConstructRectangularMesh(width, height, stagger);
         }
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryNodes(), quad_mesh_read_back.GetNumBoundaryNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
-        
+
         for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
             Element<2,2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
@@ -609,8 +609,8 @@ public:
                 c_vector<double, 2> loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
                 TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
-                
-                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode()); 
+
+                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode());
             }
         }
         // Can't check edges exactly because the linear to quadratic converter doesn't send any boundary information to the
@@ -621,7 +621,7 @@ public:
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
-                            
+
     }
     void TestConstructionConversionVersusConstruction2dWithStagger()
     {
@@ -640,13 +640,13 @@ public:
             std::string output_dir = mesh_writer.GetOutputDirectory();
             TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "TempGrid2d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
-            
+
             quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height);
         }
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumNodes(), quad_mesh_read_back.GetNumNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryNodes(), quad_mesh_read_back.GetNumBoundaryNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
-        
+
         for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
             Element<2,2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
@@ -658,8 +658,8 @@ public:
                 c_vector<double, 2> loc_constructed = p_elem_constructed->GetNode(i)->rGetLocation();
                 TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
-                
-                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode()); 
+
+                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode());
             }
         }
         // Can't check edges exactly because the linear to quadratic converter doesn't send any boundary information to the
@@ -670,7 +670,7 @@ public:
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
-                            
+
     }
 
     void TestConstructionConversionVersusConstruction3d()
@@ -691,7 +691,7 @@ public:
             std::string output_dir = mesh_writer.GetOutputDirectory();
             TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "TempGrid3d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
-            
+
             quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
         }
 
@@ -700,7 +700,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumElements(), quad_mesh_read_back.GetNumElements());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryElements(), quad_mesh_read_back.GetNumBoundaryElements());
-        
+
         for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
             Element<3,3>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
@@ -713,8 +713,8 @@ public:
                 TS_ASSERT_DELTA(loc_read_back[0], loc_constructed[0], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[1], loc_constructed[1], 1e-10);
                 TS_ASSERT_DELTA(loc_read_back[2], loc_constructed[2], 1e-10);
-                
-                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode()); 
+
+                TS_ASSERT_EQUALS(p_elem_read_back->GetNode(i)->IsBoundaryNode(), p_elem_constructed->GetNode(i)->IsBoundaryNode());
             }
         }
 
@@ -724,7 +724,7 @@ public:
             BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
-                            
+
     }
 
 

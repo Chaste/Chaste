@@ -146,14 +146,14 @@ GaussianQuadratureRule<2>::GaussianQuadratureRule(unsigned quadratureOrder)
             mWeights.push_back(one_sixth);
             mWeights.push_back(one_sixth);
             mWeights.push_back(one_sixth);
-            
+
             mPoints.push_back(ChastePoint<2>(two_thirds, one_sixth));
             mPoints.push_back(ChastePoint<2>(one_sixth,  one_sixth));
             mPoints.push_back(ChastePoint<2>(one_sixth,  two_thirds));
             break;
 
         case 3: // 2d, 3rd order - derived by hand and using a Macsyma script to solve the cubic
-                //                60*x^3  - 60*x^2  + 15*x - 1; 
+                //                60*x^3  - 60*x^2  + 15*x - 1;
                 // 6 point rule
             {
                 double w = 1.0/12.0;
@@ -208,24 +208,24 @@ GaussianQuadratureRule<3>::GaussianQuadratureRule(unsigned quadratureOrder)
 
         case 2: //2nd order
                 // 4 point rule
-            {    
+            {
                 double sqrt_fifth = 1.0/sqrt(5.0);
                 double a = (1.0 + 3.0*sqrt_fifth)/4.0; //0.585410196624969;
                 double b = (1.0 - sqrt_fifth)/4.0; //0.138196601125011;
                 double w = 1.0/24.0;
-            
+
                 mWeights.push_back(w);
                 mWeights.push_back(w);
                 mWeights.push_back(w);
                 mWeights.push_back(w);
-            
+
                 mPoints.push_back(ChastePoint<3>(a,b,b));
                 mPoints.push_back(ChastePoint<3>(b,a,b));
                 mPoints.push_back(ChastePoint<3>(b,b,a));
                 mPoints.push_back(ChastePoint<3>(b,b,b));
             }
             break;
-        
+
         case 3: // 3d, 3rd order
             // 8 point rule
             /* The main options were

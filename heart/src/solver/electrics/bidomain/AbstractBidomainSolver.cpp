@@ -192,7 +192,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec exi
             this->mpLinearSystem->SetKspType("gmres"); // Switches the solver
             mpConfig->SetKSPSolver("gmres", true); // Makes sure this change will be reflected in the XML file written to disk at the end of the simulation.
             //(If the user doesn't have gmres then the "true" warns the user about the switch)
-            
+
             // Set average phi_e to zero
             unsigned matrix_size = this->mpLinearSystem->GetSize();
             if (!this->mMatrixIsAssembled)

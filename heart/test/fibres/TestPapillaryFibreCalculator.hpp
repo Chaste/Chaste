@@ -147,7 +147,7 @@ public:
         // Nightly test TestPapillaryFibreCalculatorLong.hpp is a better one if you want to understand it!
 
         ///\todo There may still be a sign issue between flapack and MKL
-        ///\todo THIS TEST IS KNOWN TO STALL IN LAPACK (dgeev_) 
+        ///\todo THIS TEST IS KNOWN TO STALL IN LAPACK (dgeev_)
         //       ON THIS CONFIGURATION :
         //  * 32-bit virtual machine on Ubuntu 8.04 LTS
         //  * build=GccOpt

@@ -188,12 +188,12 @@ public:
 
     /* NOTE: This test has a twin in heart/test/tutorials/TestCardiacElectroMechanicsTutorial.hpp
      * TestCardiacElectroMechanicsTutorial::dontTestTwistingCube()
-     * 
+     *
      * If you need to re-generate the fibres for this test
      * * Remove "dont" from the tutorial
      * * Rerun it
      * * Copy output
-       cp /tmp/$USER/testoutput/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad 
+       cp /tmp/$USER/testoutput/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad
      */
     void TestTwistingCube() throw(Exception)
     {

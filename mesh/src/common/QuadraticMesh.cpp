@@ -90,7 +90,7 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
         x_value_mid_node[0] = element_index+0.5;
 
         Node<DIM>* p_mid_node = MakeNewInternalNode(mid_node_index, x_value_mid_node, top);
-        
+
         //Put in element and cross-reference
         this->mElements[element_index]->AddNode(p_mid_node);
         p_mid_node->AddElement(element_index);
@@ -116,13 +116,13 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     //Make the internal nodes in y-order.  This is important for the distributed case, since we want the top and bottom
     //layers to have predictable numbers
     std::map<std::pair<unsigned, unsigned>, unsigned> edge_to_internal_map;
-    
+
     unsigned node_index = this->GetNumNodes();
     c_vector<double, DIM> top;
     top[0]=numElemX;
     top[1]=numElemY;
     c_vector<double, DIM> node_pos;
-    
+
     for (unsigned j=0; j<numElemY+1; j++)
     {
         node_pos[1]=j;
@@ -135,7 +135,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             node_pos[0]=i+0.5;
             MakeNewInternalNode(node_index, node_pos, top);
         }
-        
+
         //Add the vertical and diagonal nodes to the mid-way above the last set of horizontal edges
         node_pos[1] = j+0.5;
         for (unsigned i=0; i<numElemX+1; i++)
@@ -163,7 +163,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         }
     }
     CountVertices();
-    
+
 //    assert(edge_to_internal_map.size() == this->GetNumNodes()-this->GetNumVertices());
     for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
@@ -179,7 +179,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
             unsigned new_node_index = LookupInternalNode(global_index1, global_index2, edge_to_internal_map);
             iter->AddNode(this->mNodes[new_node_index]);
             this->mNodes[new_node_index]->AddElement(iter->GetIndex());
-        }        
+        }
     }
 
     for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter = this->GetBoundaryElementIteratorBegin();
@@ -192,12 +192,12 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         (*iter)->AddNode(this->mNodes[new_node_index]);
         this->mNodes[new_node_index]->AddBoundaryElement((*iter)->GetIndex());
     }
-    
+
     this->RefreshMesh();
 }
 
 template<unsigned DIM>
-Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop) 
+Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop)
 {
     bool boundary = false;
     for (unsigned dim=0; dim<DIM; dim++)
@@ -222,11 +222,11 @@ Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<do
     {
         this->mBoundaryNodes.push_back(p_node);
     }
-    return p_node;     
+    return p_node;
 }
 
 template<unsigned DIM>
-unsigned QuadraticMesh<DIM>::LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap) 
+unsigned QuadraticMesh<DIM>::LookupInternalNode(unsigned globalIndex1, unsigned globalIndex2, std::map<std::pair<unsigned, unsigned>, unsigned>& rEdgeMap)
 {
     unsigned node_index = 0u;
     assert(globalIndex1 != globalIndex2);
@@ -265,15 +265,15 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
     unsigned node_index = this->GetNumNodes();
     for (unsigned k=0; k<numElemZ+1; k++)
     {
-        //Add a slice of the mid-points to the edges and faces at this z=level 
+        //Add a slice of the mid-points to the edges and faces at this z=level
         node_pos[2] = k;
         for (unsigned j=0; j<numElemY+1; j++)
         {
             unsigned lo_z_lo_y = (numElemX+1)*((numElemY+1)*k + j);
             unsigned lo_z_hi_y = (numElemX+1)*((numElemY+1)*k + j + 1);
-            
+
             node_pos[1] = j;
-            
+
             //The midpoints along the horizontal (y fixed) edges
             for (unsigned i=0; i<numElemX+1; i++)
             {
@@ -300,7 +300,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
                 MakeNewInternalNode(node_index, node_pos, top);
             }
         }
-        //Add a slice of the mid-points to the edges and faces mid-way up the cube z=level 
+        //Add a slice of the mid-points to the edges and faces mid-way up the cube z=level
         node_pos[2] = k+0.5;
         for (unsigned j=0; j<numElemY+1; j++)
         {
@@ -308,7 +308,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             unsigned lo_z_lo_y = (numElemX+1)*((numElemY+1)*k + j);
             unsigned hi_z_lo_y = (numElemX+1)*((numElemY+1)*(k+1) + j);
             unsigned hi_z_hi_y = (numElemX+1)*((numElemY+1)*(k+1) + j + 1);
-            
+
             //The midpoints along the horizontal (y fixed) edges
             for (unsigned i=0; i<numElemX+1; i++)
             {
@@ -317,7 +317,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
                 edge_to_internal_map[edge] = node_index;
                 node_pos[0] = i;
                 MakeNewInternalNode(node_index, node_pos, top);
-                
+
                 // i+0.5, j, k+0.5
                 node_pos[0] = i+0.5;
                 std::pair<unsigned,unsigned> edge2(lo_z_lo_y+i, hi_z_lo_y+i+1);
@@ -341,14 +341,14 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
                 MakeNewInternalNode(node_index, node_pos, top);
             }
         }
-        
+
     }
     CountVertices();
     for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
-        /* The standard tetgen ordering of the internal nodes 4,5,6..9 (using the 
+        /* The standard tetgen ordering of the internal nodes 4,5,6..9 (using the
          * zero-based numbering scheme) is
          * 4 (0,1), 5 (1,2), 6 (0,2) 7 (0,3), 8 (1,3), 9 (2,3)
          * i.e. internal node with local index 4 is half-way between vertex nodes
@@ -359,7 +359,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
          unsigned v2=iter->GetNodeGlobalIndex(2);
          unsigned v3=iter->GetNodeGlobalIndex(3);
          unsigned internal_index;
-         
+
          //4
          internal_index=LookupInternalNode(v0, v1, edge_to_internal_map);
          iter->AddNode(this->mNodes[internal_index]);
@@ -401,7 +401,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             (*iter)->AddNode(this->mNodes[new_node_index]);
             this->mNodes[new_node_index]->AddBoundaryElement((*iter)->GetIndex());
         }
-        
+
     }
     this->RefreshMesh();
 }
