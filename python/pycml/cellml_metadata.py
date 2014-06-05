@@ -247,12 +247,12 @@ class RdfProcessor(object):
         """Create the wrapper."""
         # Map from cellml_model instances to RDF stores
         self._models = {}
-        # Cope with differences in API between library versions?
-        self.Graph = rdflib.ConjunctiveGraph
-        self.URIRef = rdflib.URIRef
-        self.Literal = rdflib.Literal
-        self.BNode = rdflib.BNode
-        self.Namespace = rdflib.Namespace
+        # Cope with differences in API between library versions
+        rdflib_major_version = int(rdflib.__version__[0])
+        if rdflib_major_version >= 3:
+            self.Graph = rdflib.Graph
+        else:
+            self.Graph = rdflib.ConjunctiveGraph
 
     def _create_new_store(self, cellml_model):
         """Create a new RDF store for the given CellML model.
@@ -326,7 +326,7 @@ class RdfProcessor(object):
         If neither are given, a blank node is created.
         """
         if fragment_id:
-            node = self.URIRef(str('#'+fragment_id))
+            node = rdflib.URIRef(str('#'+fragment_id))
         elif node_content:
             if type(node_content) == types.TupleType:
                 qname, nsuri = node_content
@@ -336,12 +336,12 @@ class RdfProcessor(object):
                 prefix, local_name = pycml.SplitQName(qname)
                 node = ns[local_name]
             elif type(node_content) in types.StringTypes:
-                node = self.Literal(node_content)
+                node = rdflib.Literal(node_content)
             else:
                 raise ValueError("Don't know how to make a node from " + str(node_content)
                                  + " of type " + type(node_content))
         else:
-            node = self.BNode()
+            node = rdflib.BNode()
         return node
 
     def create_unique_id(self, cellml_model, base_id):
@@ -429,7 +429,7 @@ class RdfProcessor(object):
             value = self.create_rdf_node(value)
         vars = []
         for result in rdf_model.subjects(property, value):
-            assert isinstance(result, self.URIRef), "Non-resource annotated."
+            assert isinstance(result, rdflib.URIRef), "Non-resource annotated."
             uri = str(result)
             assert uri[0] == '#', "Annotation found on non-local URI"
             var_id = uri[1:] # Strip '#'
@@ -453,7 +453,7 @@ class RdfProcessor(object):
         will be returned instead.
         """
         local_part = ""
-        if not isinstance(node, self.URIRef):
+        if not isinstance(node, rdflib.URIRef):
             if not not_uri_ok:
                 raise ValueError("Cannot extract namespace member for a non-URI RDF node.")
         if node.startswith(nsuri):
