@@ -200,7 +200,6 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
     if _db_module and not req.form.getfirst('nocache', False):
         # Get information from the database
         db = _db_module.TestResultsDatabase(type, verbose=False)
-        db.FastUpdate()
         total_num_of_builds = db.CountResults()
         params = []
         where = []
@@ -557,7 +556,6 @@ def _profileHistory(req, n=20, buildTypes=None):
     # Find the last n revisions
     if _db_module:
         db = _db_module.TestResultsDatabase('nightly', verbose=False)
-        db.FastUpdate()
         cur = db.conn.execute('select distinct revision from summary '
                               'where build_type %s order by revision desc limit ?' % where,
                               tuple(buildTypes + [n]))
@@ -759,7 +757,6 @@ def profileHistoryGraph(req, buildType, machine, testSuite, data='', n=''):
         if not n or not _db_module:
             return _error('Not enough data to plot, or no database available.')
         db = _db_module.TestResultsDatabase('nightly', verbose=False)
-        db.FastUpdate()
         aliases = _test_suite_name_aliases(testSuite)
         suite_test = 'suite_name in (%s)' % ','.join(['?'] * len(aliases))
         machines = _machine_name_aliases(machine)
