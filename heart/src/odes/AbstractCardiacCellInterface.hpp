@@ -54,10 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Strictly speaking this isn't an interface, since some methods have implementations
  * defined.  But the name AbstractCardiacCell was already taken.
- *
- * Note that serialization is not defined for this class.  AbstractCvodeCell does not
- * have (or need) serialization at present, so adding serialization here would break
- * archive backwards compatibility for little gain.
  */
 class AbstractCardiacCellInterface
 {
