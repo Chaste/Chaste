@@ -133,6 +133,7 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.4*conductivity_scale*1.171, 1.4*conductivity_scale*1.171));
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400.0); // 1/cm
         HeartConfig::Instance()->SetCapacitance(1.0); // uF/cm^2
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
 #ifdef CHASTE_VTK
         HeartConfig::Instance()->SetVisualizeWithVtk();
 #endif
