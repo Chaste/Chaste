@@ -50,47 +50,8 @@ CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePha
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> cell_cycle_phase_count(5);
-    for (unsigned i=0; i<5; i++)
-    {
-        cell_cycle_phase_count[i] = 0;
-    }
 
-    for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
-    {
-        switch ((*cell_iter)->GetCellCycleModel()->GetCurrentCellCyclePhase())
-        {
-            case G_ZERO_PHASE:
-                cell_cycle_phase_count[0]++;
-                break;
-            case G_ONE_PHASE:
-                cell_cycle_phase_count[1]++;
-                break;
-            case S_PHASE:
-                cell_cycle_phase_count[2]++;
-                break;
-            case G_TWO_PHASE:
-                cell_cycle_phase_count[3]++;
-                break;
-            case M_PHASE:
-                cell_cycle_phase_count[4]++;
-                break;
-            default:
-                NEVER_REACHED;
-        }
-    }
-
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
-    {
-        std::vector<unsigned> phase_counts(cell_cycle_phase_count.size(), 0u);
-        MPI_Allreduce(&cell_cycle_phase_count[0], &phase_counts[0], phase_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-
-        cell_cycle_phase_count = phase_counts;
-    }
-
+    std::vector<unsigned> cell_cycle_phase_count = pCellPopulation->GetCellCyclePhaseCount();
     if (PetscTools::AmMaster())
     {
         for (unsigned i=0; i < cell_cycle_phase_count.size(); i++)
@@ -103,46 +64,7 @@ void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulat
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> cell_cycle_phase_count(5);
-    for (unsigned i=0; i<5; i++)
-    {
-        cell_cycle_phase_count[i] = 0;
-    }
-
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
-    {
-        switch ((*cell_iter)->GetCellCycleModel()->GetCurrentCellCyclePhase())
-        {
-            case G_ZERO_PHASE:
-                cell_cycle_phase_count[0]++;
-                break;
-            case G_ONE_PHASE:
-                cell_cycle_phase_count[1]++;
-                break;
-            case S_PHASE:
-                cell_cycle_phase_count[2]++;
-                break;
-            case G_TWO_PHASE:
-                cell_cycle_phase_count[3]++;
-                break;
-            case M_PHASE:
-                cell_cycle_phase_count[4]++;
-                break;
-            default:
-                NEVER_REACHED;
-        }
-    }
-
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
-    {
-        std::vector<unsigned> phase_counts(cell_cycle_phase_count.size(), 0u);
-        MPI_Allreduce(&cell_cycle_phase_count[0], &phase_counts[0], phase_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-
-        cell_cycle_phase_count = phase_counts;
-    }
+    std::vector<unsigned> cell_cycle_phase_count = pCellPopulation->GetCellCyclePhaseCount();
 
     if (PetscTools::AmMaster())
     {

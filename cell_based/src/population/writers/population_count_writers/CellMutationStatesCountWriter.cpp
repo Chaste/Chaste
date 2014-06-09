@@ -73,32 +73,7 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(Abstract
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> mutation_state_count;
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties
-        = pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
-
-    // Calculate mutation states count
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
-    {
-        if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
-        {
-            mutation_state_count.push_back(r_cell_properties[i]->GetCellCount());
-        }
-    }
-
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
-    {
-        // Make sure the vector on each process has the same size
-        unsigned local_size = mutation_state_count.size();
-        unsigned global_size;
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
-        assert(local_size == global_size);
-        std::vector<unsigned> mutation_counts(global_size);
-        MPI_Allreduce(&mutation_state_count[0], &mutation_counts[0], mutation_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-
-        mutation_state_count = mutation_counts;
-    }
+    std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
     if (PetscTools::AmMaster())
     {
@@ -112,33 +87,7 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(A
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    std::vector<unsigned> mutation_state_count;
-    const std::vector<boost::shared_ptr<AbstractCellProperty> >& r_cell_properties
-        = pCellPopulation->GetCellPropertyRegistry()->rGetAllCellProperties();
-
-    // Calculate mutation states count
-    for (unsigned i=0; i<r_cell_properties.size(); i++)
-    {
-        if (r_cell_properties[i]->IsSubType<AbstractCellMutationState>())
-        {
-            mutation_state_count.push_back(r_cell_properties[i]->GetCellCount());
-        }
-    }
-
-    // Reduce results onto all processes
-    if (PetscTools::IsParallel())
-    {
-        // Make sure the vector on each process has the same size
-        unsigned local_size = mutation_state_count.size();
-        unsigned global_size;
-        MPI_Allreduce(&local_size, &global_size, 1, MPI_UNSIGNED, MPI_MAX, PetscTools::GetWorld());
-        assert(local_size == global_size);
-
-        std::vector<unsigned> mutation_counts(global_size);
-        MPI_Allreduce(&mutation_state_count[0], &mutation_counts[0], mutation_counts.size(), MPI_UNSIGNED, MPI_SUM, PetscTools::GetWorld());
-
-        mutation_state_count = mutation_counts;
-    }
+    std::vector<unsigned> mutation_state_count = pCellPopulation->GetCellMutationStateCount();
 
     if (PetscTools::AmMaster())
     {
