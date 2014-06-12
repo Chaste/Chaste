@@ -76,7 +76,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
         if ((*iter)->GetIndex() != mOutletNodeIndex)
         {
             ///\todo We need to do some parallel here in order to load balance
-            Swan2012AcinarUnit* p_acinus = new Swan2012AcinarUnit;
+            AbstractAcinarUnit* p_acinus = new Swan2012AcinarUnit;
 
             p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
             p_acinus->SetUndeformedVolume(acinus_volume);

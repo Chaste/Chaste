@@ -33,149 +33,85 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef SWAN2012ACINARUNIT_HPP_
-#define SWAN2012ACINARUNIT_HPP_
+#ifndef ABSTRACTACINARUNIT_HPP_
+#define ABSTRACTACINARUNIT_HPP_
 
-#include "AbstractAcinarUnit.hpp"
 
 /**
- * Implementation of the acinar dynamics model presented in Swan et. al. 2012
- *
- * "A computational model of the topographic distribution of ventilation in
- *  healthy human lungs"
+ * This is the base class for ode-based acinar unit models
  */
-class Swan2012AcinarUnit : public AbstractAcinarUnit
+class AbstractAcinarUnit
 {
-friend class TestAcinarUnitModels;
 
 public:
-    /** Create a new acinar unit.
-     */
-    Swan2012AcinarUnit();
-
-    /** Virtual destructor */
-    virtual ~Swan2012AcinarUnit();
 
     /**
-     * Set the timestep to use for simulating this acinus.
+     * Virtual destructor
+     */
+    virtual ~AbstractAcinarUnit() {};
+
+    /**
+     * Set the timestep to use for simulating this acinar unit's.
      *
      * @param dt  the timestep
      */
-    void SetTimestep(double dt);
+    virtual void SetTimestep(double dt) = 0;
 
     /**
-     * Simulate this acinar's behaviour between the time interval [tStart, tEnd],
+     * Simulate this acinar unit's behaviour between the time interval [tStart, tEnd],
      * with timestemp #mDt, updating the internal state variable values.
      *
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void SolveAndUpdateState(double tStart, double tEnd);
+    virtual void SolveAndUpdateState(double tStart, double tEnd) = 0;
 
     /** Set the air flow
      * @param flow  new value
      */
-    void SetFlow(double flow);
+    virtual void SetFlow(double flow) = 0;
 
     /**
-     * @return the current value of the airflow, as given
-     * in our state variable vector.
+     * @return the current value of the airflow.
      */
-    double GetFlow();
+    virtual double GetFlow() = 0;
 
     /** Set the air pressure
      * @param pressure new value
      */
-    void SetAirwayPressure(double pressure);
+    virtual void SetAirwayPressure(double pressure) = 0;
 
     /** Set the pleural pressure
      * @param pressure new value
      */
-    void SetPleuralPressure(double pressure);
+    virtual void SetPleuralPressure(double pressure) = 0;
 
     /** Set the resistance of the terminal bronchiole entering the acinar unit
      * @param raw new value
      */
-    void SetTerminalBronchioleResistance(double raw);
+    virtual void SetTerminalBronchioleResistance(double raw) = 0;
 
     /**
      * @return the current stretch ratio of the acinus
      */
-    double GetStretchRatio();
+    virtual double GetStretchRatio() = 0;
 
     /**
      * @param lambda The new stretch ratio
      */
-    void SetStretchRatio(double lambda);
+    virtual void SetStretchRatio(double lambda) = 0;
 
     /**
      * @return the current volume of the acinus
      */
-    double GetVolume();
+    virtual double GetVolume() = 0;
 
     /**
      * @param v0 The undeformed volume
      */
-    void SetUndeformedVolume(double v0);
+    virtual void SetUndeformedVolume(double v0) = 0;
 
-private:
-    /** The flow into the acinar unit */
-    double mQ;
-
-    /** The stretch ratio of the acinar unit */
-    double mLambda;
-
-    /** Timestep size */
-    double mDt;
-
-    /** The current air pressure in the acinar duct */
-    double mPaw;
-
-    /** The air pressure in the acinar duct at the previous timestep */
-    double mPawOld;
-
-    /** The current pleural pressure (Pa) */
-    double mPpl;
-
-    /** The pleural pressure at the previous timestep (Pa)*/
-    double mPplOld;
-
-    /** The resistance of the terminal bronchiole entering the acinus */
-    double mRaw;
-
-    /** Fung material law constant */
-    double mA;
-
-    /** Fung material law constant */
-    double mB;
-
-    /** Fung material law constant (Pa) */
-    double mXi;
-
-    /** The initial volume of the acinus */
-    double mV0;
-
-    /**
-     * @return dV / dlambda
-     */
-    double CalculateDerivativeVolumeByStrain();
-
-
-    /**
-     * @return d Pe /dlambda
-     */
-    double CalculateDerivativeStaticRecoilPressureByStrain();
-
-    /**
-     * @return gamma
-     */
-    double CalculateGamma();
-
-    /**
-     * @return The acinar tissue compliance, C_a (dV/dPe)
-     */
-    double CalculateAcinarTissueCompliance();
 };
 
 
-#endif /*SWAN2012ACINARUNIT*/
+#endif /*ABSTRACTACINARUNIT_HPP_*/

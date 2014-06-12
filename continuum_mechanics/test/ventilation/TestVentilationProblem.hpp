@@ -94,7 +94,7 @@ void SwanAcinarUnitsBC(VentilationProblem* pProblem, TimeStepper& rTimeStepper, 
 {
     double time = rTimeStepper.GetTime();
 
-    Swan2012AcinarUnit* p_acinus = pProblem->GetAcinus(rNode);
+    AbstractAcinarUnit* p_acinus = pProblem->GetAcinus(rNode);
 
     double pleural_pressure = -0.49 - 2.4*(1 + sin((M_PI/2)*(time - 1)));
 

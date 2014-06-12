@@ -59,6 +59,12 @@ Swan2012AcinarUnit::~Swan2012AcinarUnit()
 {
 }
 
+
+void Swan2012AcinarUnit::SetTimestep(double dt)
+{
+}
+
+
 void Swan2012AcinarUnit::SolveAndUpdateState(double tStart, double tEnd)
 {
     //Update stretch component

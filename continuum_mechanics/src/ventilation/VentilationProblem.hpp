@@ -82,7 +82,7 @@ private:
      */
     double mDensity;
 
-    std::map<unsigned, Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
+    std::map<unsigned, AbstractAcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. */
     std::vector<double> mFlux; /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
     std::vector<double> mPressure; /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
     std::map<unsigned, double> mPressureCondition; /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
@@ -336,7 +336,7 @@ public:
      * @param rNode The node to get the acinus at. Must be a boundary node!
      * @return The acinar unit at the given node.
      */
-    Swan2012AcinarUnit* GetAcinus(const Node<3>& rNode)
+    AbstractAcinarUnit* GetAcinus(const Node<3>& rNode)
     {
         assert(mAcinarUnits.count(rNode.GetIndex()));
         return mAcinarUnits[rNode.GetIndex()];
