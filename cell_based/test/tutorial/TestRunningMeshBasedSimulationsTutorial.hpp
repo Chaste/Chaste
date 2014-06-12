@@ -151,7 +151,7 @@ public:
          * For longer simulations, we may not want to output the results
          * every time step. In this case we can use the following method,
          * to print results every 12 time steps instead. As the default time step
-         * used by the simulator, is 30 seconds, this method will cause the
+         * used by the simulator is 30 seconds, this method will cause the
          * simulator to print results every 6 minutes (or 0.1 hours).
          */
         simulator.SetSamplingTimestepMultiple(12);

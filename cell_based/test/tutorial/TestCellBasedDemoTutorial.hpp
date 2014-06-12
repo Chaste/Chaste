@@ -155,6 +155,13 @@ public:
 
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         * We are checking that we reached the end time of the simulation
+         * with the correct number of cells.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
     /*
@@ -218,6 +225,13 @@ public:
 
         /* Again we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         * Again, we are checking that we reached the end time of the simulation
+         * with the correct number of cells.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
     /*
@@ -263,6 +277,11 @@ public:
 
         /* Again we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
     /*
@@ -311,6 +330,11 @@ public:
         simulator.AddForce(p_force);
 
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 2.0, 1e-10);
     }
 
     /*
@@ -348,6 +372,11 @@ public:
         simulator.AddForce(p_force);
 
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 29u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
     /*
@@ -393,6 +422,11 @@ public:
 
         /* Finally we call the {{{Solve}}} method as in all other simulations.*/
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 20u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
     /*
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
@@ -449,6 +483,11 @@ public:
 
        /* Again we run the simulation by calling the {{{Solve}}} method.*/
        simulator.Solve();
+
+       /* The next two lines are for test purposes only and are not part of this tutorial.
+        */
+       TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
+       TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
    }
    /*
     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
