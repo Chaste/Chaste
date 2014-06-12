@@ -40,10 +40,9 @@ Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(const FileFinde
                                                                  const std::string& rFileBaseName,
                                                                  AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "xdmf_output", 0u),
-      XdmfMeshWriter<ELEMENT_DIM,SPACE_DIM>("TestHdf5ToXdmfConverter/xdmf_output", rFileBaseName, false /* Not cleaning directory*/)
+      XdmfMeshWriter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory.GetRelativePath(FileFinder("", RelativeTo::ChasteTestOutput)) + "/xdmf_output",
+                                            rFileBaseName, false /* Not cleaning directory*/)
 {
-    ///\todo #1157 The output directory is hard-coded
-
     // Set number of time steps
     std::vector<double> time_values = this->mpReader->GetUnlimitedDimensionValues();
     unsigned num_timesteps = time_values.size();

@@ -880,6 +880,7 @@ public:
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);

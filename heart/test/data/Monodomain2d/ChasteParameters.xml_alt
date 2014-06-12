@@ -12,6 +12,7 @@
     </cp:IonicModels>
     <cp:OutputDirectory>Monodomain2d</cp:OutputDirectory>
     <cp:OutputFilenamePrefix>monodomain2d</cp:OutputFilenamePrefix>
+    <cp:OutputVisualizer cmgui="no" meshalyzer="yes" parallel_vtk="no" precision="0" vtk="no"/>
   </cp:Simulation>
 
   <cp:Physiological>

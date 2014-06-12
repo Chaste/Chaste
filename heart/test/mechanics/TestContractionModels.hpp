@@ -56,6 +56,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakeBathContractionModel.hpp"
 #include "NhsModelWithBackwardSolver.hpp"
 
+#include "FakePetscSetup.hpp"
+
 // specify a functional form of lambda rather than get it from the mechanics.
 // Use tanh so that lambda starts at 1.0 and decreases quickly to 0.8 halfway
 // through the simulation
