@@ -59,6 +59,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * file must be included in any Chaste test.
  */
 #include <cxxtest/TestSuite.h>
+/* The following header is usually included in all cell-based test suites.  It enables us to write tests where the
+ * {{{SimulationTime}}} is handled automatically and simplifies the tests. It also sets up the random number generator
+ * and the {{{CellPropertyRegistry}}}. You will learn about both of them in later tutorials.
+ */
+#include "AbstractCellBasedTestSuite.hpp"
 /* Any test in which the {{{GetIdentifier()}}} method is used, even via the main
  * `cell_based` code (through calls to {{{AbstractCellPopulation}}} output methods),
  * must also include {{{CheckpointArchiveTypes.hpp}}} or {{{CellBasedSimulationArchiver.hpp}}}
@@ -89,10 +94,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 /* Finally the following header ensures that the test never runs in parallel. */
 #include "FakePetscSetup.hpp"
-/* Next, we define the test class, which inherits from {{{CxxTest::TestSuite}}}
- * and defines some test methods.
+/* Next, we define the test class.
  */
-class TestRunningMeshBasedSimulationsTutorial : public CxxTest::TestSuite
+class TestRunningMeshBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
     /*
@@ -103,10 +107,6 @@ public:
      */
     void TestMonolayer() throw(Exception)
     {
-        /* In all cell-based Chaste tests, we begin by setting up the start time.
-         * In later tutorials (UserTutorials/RunningNodeBasedSimulations) you will see a way to do this automatically.*/
-        SimulationTime::Instance()->SetStartTime(0.0);
-
         /* Next, we generate a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}}. This generates a honeycomb-shaped mesh,
          * in which all nodes are equidistant. Here the first and second arguments
@@ -161,20 +161,15 @@ public:
          * spring based model, and pass it to the {{{OffLatticeSimulation}}}.
          * For a list of possible forces see subclasses of {{{AbstractForce}}}.
          * These can be found in the inheritance diagram, here, [class:AbstractForce AbstractForce].
-         * Note that some of these forces are not compatible with mesh-based simulations see the specific class documentation for details,
-         * if you try to use an incompatible class then you will receive a warning.
+         * Note that some of these forces are not compatible with mesh-based simulations,
+         * see the specific class documentation for details.  If you try to use an incompatible class
+         * then you will receive a warning.
          */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
-        /* {{{SimulationTime::Destroy()}}} '''must''' be called at the end of the test.
-         * If not, when {{{SimulationTime::Instance()->SetStartTime(0.0);}}} is called
-         * at the beginning of the next test in this file, an assertion will be triggered.
-         */
-        SimulationTime::Destroy();
     }
 
     /*
@@ -212,10 +207,7 @@ public:
      */
     void TestMonolayerWithGhostNodes() throw(Exception)
     {
-        /* Once again, we begin by setting up the start time. */
-        SimulationTime::Instance()->SetStartTime(0.0);
-
-        /* Next, we generate a mutable mesh. To create a {{{MutableMesh}}}, we can use
+        /* We start by generating a mutable mesh. To create a {{{MutableMesh}}}, we can use
          * the {{{HoneycombMeshGenerator}}} as before. Here the first and second arguments
          * define the size of the mesh - we have chosen a mesh that is 2 nodes (i.e.
          * cells) wide, and 2 nodes high.  The third argument specifies the number of layers
@@ -264,9 +256,6 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
-
-        /* We conclude by calling {{{SimulationTime::Destroy()}}} as before. */
-        SimulationTime::Destroy();
     }
     /*
      * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,

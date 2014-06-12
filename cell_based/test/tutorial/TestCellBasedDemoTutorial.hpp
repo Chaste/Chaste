@@ -94,11 +94,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FakePetscSetup.hpp"
 
-/*
- * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
- * and defines some test methods. We are using {{{AbstractCellBasedTestSuite}}} instead of {{{CxxTest::TestSuite}}} as this
- * handles some of the simulations set up for us, details are given in later tutorials,
- * UserTutorials/RunningMeshBasedSimulations and UserTutorials/RunningNodeBasedSimulations.
+/* Next, we define the test class which inherits from {{{AbstractCellBasedTestSuite}}.
+ * We inherit from {{{AbstractCellBasedTestSuite}}} rather than {{{CxxTest::TestSuite}}} because
+ * this class sets up and destroys some singleton objects for us. Singletons are objects that we want to exist only
+ * once in each simulation, you will learn about each of them in later tutorials.
+ * In detail, {{{SimulationTime}}} is initialised to zero at the beginning of the test and destroyed at the end
+ * of the test; {{{RandomNumberGenerator}}} is re-seeded with zero at the beginning and destroyed at the end of the test;
+ * and {{{CellPropertyRegistry}}} (which stores {{{CellProperties}}}, you learn about these in a later tutorial
+ * [wiki:UserTutorials/CreatingAndUsingANewCellProperty]) is cleared at the beginning of the test.
+ * This makes for cleaner code.
  */
 class TestCellBasedDemoTutorial : public AbstractCellBasedTestSuite
 {

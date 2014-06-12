@@ -87,12 +87,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 /* The next header file defines a boundary condition to be used in the third test.*/
 #include "SphereGeometryBoundaryCondition.hpp"
-/* Next, we define the test class. This time we inherit from {{{AbstractCellBasedTestSuite}}} rather than {{{CxxTest::TestSuite}}}.
- * When using this class the singleton objects are set up and destroyed for us:
- * {{{SimulationTime}}} is initialised to zero at the beginning of the test and destroyed at the end of the test;
- * {{{RandomNumberGenerator}}} is re-seeded with zero at the begining and destroyed at the end of the test; and
- * {{{CellPropertyRegistry}}} (which stores {{{CellProperties}}}, you learn about these in a later tutorial [wiki:UserTutorials/CreatingAndUsingANewCellProperty])  is cleared at the beginning of the test.
- * This makes for cleaner code.
+/* Next, we define the test class.
  */
 class TestRunningNodeBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
