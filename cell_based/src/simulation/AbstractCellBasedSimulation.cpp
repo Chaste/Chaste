@@ -359,7 +359,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     // Create output files for the visualizer
     OutputFileHandler output_file_handler(results_directory+"/", true);
 
-    mrCellPopulation.OpenWritersFiles(results_directory+"/");
+    mrCellPopulation.OpenWritersFiles(output_file_handler);
 
     if (mOutputDivisionLocations)
     {
@@ -566,8 +566,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
-
-    mrCellPopulation.CloseOutputFiles();
 
     if (mOutputDivisionLocations)
     {

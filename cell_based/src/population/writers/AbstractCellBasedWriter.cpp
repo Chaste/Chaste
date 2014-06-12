@@ -53,19 +53,14 @@ void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::CloseFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile(const std::string directory)
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFile(OutputFileHandler& rOutputFileHandler)
 {
-    /* Note that the following line is unsafe to call in parallel (unless the directory exists or the processes are synchronised
-     * to call collectively). */
-    OutputFileHandler output_file_handler(directory, false);
-    mpOutStream = output_file_handler.OpenOutputFile(mFileName);
+    mpOutStream = rOutputFileHandler.OpenOutputFile(mFileName);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::OpenOutputFileForAppend(OutputFileHandler& rOutputFileHandler)
 {
-    /* Note that the following line is unsafe to call in parallel (unless the directory exists or the processes are synchronised
-     * to call collectively). */
     mpOutStream = rOutputFileHandler.OpenOutputFile(mFileName, std::ios::app);
 }
 

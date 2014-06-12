@@ -214,9 +214,9 @@ public:
      *
      * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(const std::string& rDirectory);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
     /**
      * Overridden WriteVtkResultsToFile() method.

@@ -99,7 +99,7 @@ public:
 
         // Create a CellMutationStatesCountWriter and test that the correct output is generated
         CellMutationStatesCountWriter<2,2> mutation_states_writer;
-        mutation_states_writer.OpenOutputFile(output_directory);
+        mutation_states_writer.OpenOutputFile(output_file_handler);
         mutation_states_writer.WriteHeader(&cell_population);
         mutation_states_writer.WriteTimeStamp();
         mutation_states_writer.Visit(&cell_population);
@@ -167,7 +167,7 @@ public:
 
         // Create a CellProliferativePhasesCountWriter and test that the correct output is generated
         CellProliferativePhasesCountWriter<3,3> phases_count_writer;
-        phases_count_writer.OpenOutputFile(output_directory);
+        phases_count_writer.OpenOutputFile(output_file_handler);
         phases_count_writer.WriteTimeStamp();
         phases_count_writer.Visit(&cell_population);
         phases_count_writer.WriteNewline();
@@ -237,7 +237,7 @@ public:
 
         // Create a CellProliferativeTypesCountWriter and test that the correct output is generated
         CellProliferativeTypesCountWriter<3,3> types_count_writer;
-        types_count_writer.OpenOutputFile(output_directory);
+        types_count_writer.OpenOutputFile(output_file_handler);
         types_count_writer.WriteTimeStamp();
         types_count_writer.Visit(&cell_population);
         types_count_writer.WriteNewline();

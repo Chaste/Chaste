@@ -132,7 +132,7 @@ public:
 
         // Create a BoundaryNodeWriter and test that the correct output is generated
         BoundaryNodeWriter<3,3> boundary_writer;
-        boundary_writer.OpenOutputFile(output_directory);
+        boundary_writer.OpenOutputFile(output_file_handler);
         boundary_writer.WriteTimeStamp();
         boundary_writer.Visit(&cell_population);
         boundary_writer.WriteNewline();
@@ -199,7 +199,7 @@ public:
 
         // Create a CellPopulationAreaWriter and test that the correct output is generated
         CellPopulationAreaWriter<3,3> area_writer;
-        area_writer.OpenOutputFile(output_directory);
+        area_writer.OpenOutputFile(output_file_handler);
         area_writer.WriteTimeStamp();
         area_writer.Visit(&cell_population);
         area_writer.WriteNewline();
@@ -260,7 +260,7 @@ public:
 
         // Create a CellPopulationElementWriter and test that the correct output is generated
         CellPopulationElementWriter<2,2> element_writer;
-        element_writer.OpenOutputFile(output_directory);
+        element_writer.OpenOutputFile(output_file_handler);
         element_writer.WriteTimeStamp();
         element_writer.Visit(&cell_population);
         element_writer.WriteNewline();
@@ -323,7 +323,7 @@ public:
 
         // Create a NodeLocationWriter and test that the correct output is generated
         NodeLocationWriter<3,3> location_writer;
-        location_writer.OpenOutputFile(output_directory);
+        location_writer.OpenOutputFile(output_file_handler);
         location_writer.WriteTimeStamp();
         location_writer.Visit(&cell_population);
         location_writer.WriteNewline();
@@ -416,7 +416,7 @@ public:
 
         // Create a NodeNelocityWriter and test that the correct output is generated
         NodeVelocityWriter<3,3> mesh_based_writer;
-        mesh_based_writer.OpenOutputFile(mesh_based_output_directory);
+        mesh_based_writer.OpenOutputFile(mesh_based_output_file_handler);
         mesh_based_writer.WriteTimeStamp();
         mesh_based_writer.Visit(&mesh_based_cell_population);
         mesh_based_writer.WriteNewline();
@@ -458,7 +458,7 @@ public:
 
         // Create a NodeNelocityWriter and test that the correct output is generated
         NodeVelocityWriter<3,3> node_based_writer;
-        node_based_writer.OpenOutputFile(node_based_output_directory);
+        node_based_writer.OpenOutputFile(node_based_output_file_handler);
         node_based_writer.WriteTimeStamp();
         node_based_writer.Visit(&node_based_cell_population);
         node_based_writer.WriteNewline();
@@ -539,7 +539,7 @@ public:
 
         // Create a NodeNelocityWriter and test that the correct output is generated
         NodeVelocityWriter<2,2> vertex_based_writer;
-        vertex_based_writer.OpenOutputFile(vertex_based_output_directory);
+        vertex_based_writer.OpenOutputFile(vertex_based_output_file_handler);
         vertex_based_writer.WriteTimeStamp();
         vertex_based_writer.Visit(&vertex_based_cell_population);
         vertex_based_writer.WriteNewline();
@@ -591,7 +591,7 @@ public:
 
         // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
         VertexT1SwapLocationsWriter<2,2> t1_swaps_writer;
-        t1_swaps_writer.OpenOutputFile(output_directory);
+        t1_swaps_writer.OpenOutputFile(output_file_handler);
         t1_swaps_writer.WriteTimeStamp();
         t1_swaps_writer.Visit(&cell_population);
         t1_swaps_writer.WriteNewline();
@@ -714,7 +714,7 @@ public:
 
         // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
         VertexT2SwapLocationsWriter<2,2> t2_swaps_writer;
-        t2_swaps_writer.OpenOutputFile(output_directory);
+        t2_swaps_writer.OpenOutputFile(output_file_handler);
         t2_swaps_writer.WriteTimeStamp();
         t2_swaps_writer.Visit(&cell_population);
         t2_swaps_writer.WriteNewline();
@@ -837,7 +837,7 @@ public:
 
         // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
         VertexT3SwapLocationsWriter<2,2> t3_swaps_writer;
-        t3_swaps_writer.OpenOutputFile(output_directory);
+        t3_swaps_writer.OpenOutputFile(output_file_handler);
         t3_swaps_writer.WriteTimeStamp();
         t3_swaps_writer.Visit(&cell_population);
         t3_swaps_writer.WriteNewline();
@@ -965,7 +965,7 @@ public:
 
         // Create a VoronoiDataWriter and test that the correct output is generated
         VoronoiDataWriter<3,3> voronoi_writer;
-        voronoi_writer.OpenOutputFile(output_directory);
+        voronoi_writer.OpenOutputFile(output_file_handler);
         voronoi_writer.WriteTimeStamp();
         voronoi_writer.Visit(&cell_population);
         voronoi_writer.WriteNewline();

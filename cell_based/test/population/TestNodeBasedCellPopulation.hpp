@@ -962,10 +962,9 @@ public:
 
         node_based_cell_population.SetCellAncestorsToLocationIndices();
 
-        node_based_cell_population.OpenWritersFiles(output_directory);
+        node_based_cell_population.OpenWritersFiles(output_file_handler);
         node_based_cell_population.WriteResultsToFiles(output_directory);
-
-        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CloseOutputFiles());
+        node_based_cell_population.CloseOutputFiles();
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
@@ -1076,10 +1075,9 @@ public:
         cell_population.SetCellAncestorsToLocationIndices();
         cell_population.AddCellWriter<CellAncestorWriter>();
 
-        cell_population.OpenWritersFiles(output_directory);
+        cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
-
-        TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
+        cell_population.CloseOutputFiles();
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
@@ -1159,7 +1157,7 @@ public:
         node_based_cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         node_based_cell_population.AddCellWriter<CellProliferativePhasesWriter>();
 
-        node_based_cell_population.OpenWritersFiles(output_directory);
+        node_based_cell_population.OpenWritersFiles(output_file_handler);
         node_based_cell_population.WriteResultsToFiles(output_directory);
         node_based_cell_population.CloseOutputFiles();
 

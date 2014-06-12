@@ -380,11 +380,10 @@ public:
         std::string output_directory = "TestNodeBasedCellPopulationWritersParallel";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        node_based_cell_population.OpenWritersFiles(output_directory);
+        node_based_cell_population.OpenWritersFiles(output_file_handler);
         // Write out the files here
         node_based_cell_population.WriteResultsToFiles(output_directory);
 
-        TS_ASSERT_THROWS_NOTHING(node_based_cell_population.CloseOutputFiles());
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();

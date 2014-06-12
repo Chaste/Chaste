@@ -457,11 +457,10 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std::string& rDirectory)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
 #ifdef CHASTE_VTK
-    OutputFileHandler output_file_handler(rDirectory, false);
-    mpVtkMetaFile = output_file_handler.OpenOutputFile("results.pvd");
+    mpVtkMetaFile = rOutputFileHandler.OpenOutputFile("results.pvd");
     *mpVtkMetaFile << "<?xml version=\"1.0\"?>\n";
     *mpVtkMetaFile << "<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\" compressor=\"vtkZLibDataCompressor\">\n";
     *mpVtkMetaFile << "    <Collection>\n";
@@ -488,22 +487,24 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std:
     typedef AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> count_writer_t;
     BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
-        p_cell_writer->OpenOutputFile(rDirectory);
+        p_cell_writer->OpenOutputFile(rOutputFileHandler);
     }
     BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
     {
-        p_pop_writer->OpenOutputFile(rDirectory);
+        p_pop_writer->OpenOutputFile(rOutputFileHandler);
+        ///\todo #2441 Surely this is take care of elsewhere?
         p_pop_writer->WriteHeader(this);
     }
     BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
     {
-        p_count_writer->OpenOutputFile(rDirectory);
+        p_count_writer->OpenOutputFile(rOutputFileHandler);
+        ///\todo #2441 Surely this is take care of elsewhere?
         p_count_writer->WriteHeader(this);
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFilesForAppend(OutputFileHandler& rOutputFileHandler)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler)
 {
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
     typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
@@ -522,7 +523,6 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
 {
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
     typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
-    ///\todo #2441 This should be passed around as much as possible, so might come in from the simulation class
     OutputFileHandler output_file_handler(rDirectory, false);
 
     if (!(mCellWriters.empty() && mCellPopulationWriters.empty() && mCellPopulationCountWriters.empty()))
@@ -532,7 +532,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
 
         PetscTools::BeginRoundRobin();
         {
-            OpenWritersFilesForAppend(output_file_handler);
+            OpenRoundRobinWritersFilesForAppend(output_file_handler);
 
             // The master process writes time stamps
             if (PetscTools::AmMaster())
@@ -547,7 +547,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                 }
             }
 
-            for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
+            for (typename std::vector<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
                  pop_writer_iter != mCellPopulationWriters.end();
                  ++pop_writer_iter)
             {
@@ -558,7 +558,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                  cell_iter != this->End();
                  ++cell_iter)
             {
-                for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
+                for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
                      cell_writer_iter != mCellWriters.end();
                      ++cell_writer_iter)
                 {

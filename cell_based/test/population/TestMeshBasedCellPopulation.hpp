@@ -905,7 +905,8 @@ public:
         std::string output_directory = "TestMeshBasedCellPopulationWriteResultsToFile";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        cell_population.OpenWritersFiles(output_directory);
+        ///\todo #2441 We shouldn't need to call open/close since the following call is responsible for that.
+        cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
 
         SimulationTime::Instance()->IncrementTimeOneStep();
@@ -1049,7 +1050,7 @@ public:
         std::string output_directory = "TestCellPopulationWritersIn3d";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        cell_population.OpenWritersFiles(output_directory);
+        cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
         cell_population.CloseOutputFiles();
 

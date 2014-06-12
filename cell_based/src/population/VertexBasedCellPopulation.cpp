@@ -398,7 +398,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 
     // Iterate over any cell writers that are present
     unsigned num_cells = this->GetNumAllCells();
-    for (typename std::set<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {
@@ -471,7 +471,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 }
 
 template<unsigned DIM>
-void VertexBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
+void VertexBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
@@ -497,7 +497,7 @@ void VertexBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirect
         }
     }
 
-    AbstractCellPopulation<DIM>::OpenWritersFiles(rDirectory);
+    AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
 template<unsigned DIM>

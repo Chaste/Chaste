@@ -442,7 +442,7 @@ void CaBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCell
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
+void CaBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
@@ -452,7 +452,7 @@ void CaBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
         }
     }
 
-    AbstractCellPopulation<DIM>::OpenWritersFiles(rDirectory);
+    AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
 template<unsigned DIM>

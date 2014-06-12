@@ -146,7 +146,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellAgesWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -242,7 +242,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellAncestorWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -341,7 +341,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellIdWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -436,7 +436,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellLabelWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -520,7 +520,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellLocationWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -614,7 +614,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellMutationStatesWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -707,7 +707,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellProliferativePhasesWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -815,7 +815,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellProliferativeTypesWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator other_cell_iter = cell_population.Begin();
              other_cell_iter != cell_population.End();
@@ -913,7 +913,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellVariablesWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -994,7 +994,7 @@ public:
 
         // Create cell writer and output data for each cell to file
         CellVolumesWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

@@ -93,13 +93,9 @@ public:
     /**
      * Open mpOutStream for writing.
      *
-     * @param directory the directory in which to open this file.
-     * @note In most cases (if the directory may not exist and thus need to be created) then this method should only be
-     *       called collectively.  That is, all parallel processes call it at the same time.
-     * \todo #2441 What's the point of const here?  The directory string ought to be passed by reference
-     * \todo #2441 Change to output file-handler.  Why is this virtual? Where is it overridden?
+     * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenOutputFile(const std::string directory);
+    virtual void OpenOutputFile(OutputFileHandler& rOutputFileHandler);
 
     /**
      * Open mpOutStream for appending.

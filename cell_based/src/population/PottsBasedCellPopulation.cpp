@@ -327,7 +327,7 @@ void PottsBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 }
 
 template<unsigned DIM>
-void PottsBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirectory)
+void PottsBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
@@ -337,7 +337,7 @@ void PottsBasedCellPopulation<DIM>::OpenWritersFiles(const std::string& rDirecto
         }
     }
 
-    AbstractCellPopulation<DIM>::OpenWritersFiles(rDirectory);
+    AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
 template<unsigned DIM>
@@ -500,7 +500,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
     // Iterate over any cell writers that are present
     unsigned num_nodes = GetNumNodes();
-    for (typename std::set<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {

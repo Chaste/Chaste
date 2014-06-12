@@ -136,16 +136,12 @@ protected:
     /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
     bool mOutputResultsForChasteVisualizer;
 
-    ///\todo #2441 the other sets should also be altered for symmetry
     /** A list of cell writers. */
-    std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
+    std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
 
-    ///\todo #2441 the other sets should also be altered for symmetry
     /** A list of cell population writers. */
-    std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationWriters;
+    std::vector<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationWriters;
 
-    ///\todo #2441 This needs to be a vector so that it can be iterated over in a prescribed order
-    ///\todo #2441 the other sets should also be altered for symmetry
     /** A list of cell population count writers. */
     std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
 
@@ -182,7 +178,7 @@ public:
      * @note Warning: the passed-in vector of cells will be emptied, even if the constructor
      * throws an exception!
      *
-     * @param rMesh a refernce to the mesh underlying the cell population
+     * @param rMesh a reference to the mesh underlying the cell population
      * @param rCells a vector of cells.  Copies of the cells will be stored in the cell population,
      *     and the passed-in vector cleared.
      * @param locationIndices an optional vector of location indices that correspond to real cells
@@ -506,20 +502,26 @@ public:
      */
     virtual void UpdateCellProcessLocation();
 
+///\todo #2441 private:
     /**
-     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
-     *
-     * \todo #2441 Pass the output file handler
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
-     */
-    virtual void OpenWritersFiles(const std::string& rDirectory);
-
-    /**
-     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
+     * Open all files in mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters for writing (not appending).
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    void OpenWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+
+private:
+    /**
+     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
+     *
+     * Files in mCellPopulationCountWriters are NOT opened in this call since they are not written in
+     * a round-robin fashion
+     *
+     * @param rOutputFileHandler handler for the directory in which to open this file.
+     */
+    void OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
+
+public:
 
     /**
      * Write results from the current cell population state to output files.
@@ -554,10 +556,11 @@ public:
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
 
+///\todo #2441 make private: since this is only called by the simulation class (and doesn't need to be)?
     /**
      * Close any output files.
      */
-    virtual void CloseOutputFiles();
+    void CloseOutputFiles();
 
     /**
      * Outputs CellPopulation used in the simulation to file and then calls OutputCellPopulationParameters to output all relevant parameters.
@@ -590,7 +593,7 @@ public:
     template<template <unsigned, unsigned> class T>
     void AddPopulationWriter()
     {
-        mCellPopulationWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+        mCellPopulationWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
     /**
@@ -602,7 +605,7 @@ public:
     template<template <unsigned, unsigned> class T>
     void AddCellWriter()
     {
-        mCellWriters.insert(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+        mCellWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
     /**
@@ -625,20 +628,18 @@ public:
     template<template <unsigned, unsigned> class T>
     bool HasWriter() const
     {
-        for (typename std::set<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator pop_writer_iter = mCellPopulationWriters.begin();
-             pop_writer_iter != mCellPopulationWriters.end();
-             ++pop_writer_iter)
+        typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> population_writer_t;
+        BOOST_FOREACH(boost::shared_ptr<population_writer_t> p_pop_writer, mCellPopulationWriters)
         {
-            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(pop_writer_iter->get()))
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_pop_writer.get()))
             {
                 return true;
             }
         }
-        for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer = mCellWriters.begin();
-             cell_writer != mCellWriters.end();
-             ++cell_writer)
+        typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+        BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
         {
-            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(cell_writer->get()))
+            if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_cell_writer.get()))
             {
                 return true;
             }

@@ -504,7 +504,7 @@ CellPtr MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AddCell(CellPtr pNewCell
 //////////////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std::string& rDirectory)
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
@@ -514,7 +514,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(const std
         }
     }
 
-    AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(rDirectory);
+    AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -585,7 +585,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {
@@ -653,7 +653,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (typename std::set<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {

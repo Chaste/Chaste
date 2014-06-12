@@ -291,7 +291,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
 
 
 template<unsigned DIM>
-void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(const std::string& rDirectory)
+void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
@@ -301,7 +301,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(const std::str
         }
     }
 
-    MeshBasedCellPopulation<DIM, DIM>::OpenWritersFiles(rDirectory);
+    MeshBasedCellPopulation<DIM, DIM>::OpenWritersFiles(rOutputFileHandler);
 }
 
 template<unsigned DIM>
@@ -319,7 +319,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
-        for (typename std::set<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
              cell_writer_iter != this->mCellWriters.end();
              ++cell_writer_iter)
         {

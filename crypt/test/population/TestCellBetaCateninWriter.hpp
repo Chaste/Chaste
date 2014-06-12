@@ -83,8 +83,9 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellBetaCateninWriter and test that the correct output is generated
+        ///\todo #2441 This should add the writer into the population and not call visit directly
         CellBetaCateninWriter<2,2> cell_writer;
-        cell_writer.OpenOutputFile(output_directory);
+        cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();

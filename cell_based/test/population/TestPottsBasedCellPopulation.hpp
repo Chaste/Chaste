@@ -454,10 +454,9 @@ public:
         // VTK writing needs a simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        cell_population.OpenWritersFiles(output_directory);
+        cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
-
-        TS_ASSERT_THROWS_NOTHING(cell_population.CloseOutputFiles());
+        cell_population.CloseOutputFiles();
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();

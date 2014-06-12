@@ -879,7 +879,7 @@ public:
         std::string output_directory = "TestVertexBasedCellPopulationWriteResultsToFile";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        cell_population.OpenWritersFiles(output_directory);
+        cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
 
         SimulationTime::Instance()->IncrementTimeOneStep();
@@ -887,7 +887,6 @@ public:
         cell_population.WriteResultsToFiles(output_directory);
 
         cell_population.CloseOutputFiles();
-
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
