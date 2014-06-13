@@ -59,7 +59,7 @@ public:
 
     /**
      * Simulate this acinar unit's behaviour between the time interval [tStart, tEnd],
-     * with timestemp #mDt, updating the internal state variable values.
+     * with timestep from SetTimestep, updating the internal state variable values.
      *
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
