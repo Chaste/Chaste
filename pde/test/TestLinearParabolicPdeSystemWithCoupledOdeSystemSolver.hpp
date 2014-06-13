@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "TetrahedralMesh.hpp"
-#include <petsc.h>
 #include <vector>
 #include <cmath>
 #include "BoundaryConditionsContainerImplementation.hpp"
@@ -53,9 +52,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearParabolicPdeSystemWithCoupledOdeSystemSolver.hpp"
 #include "OutputFileHandler.hpp"
 #include "NumericFileComparison.hpp"
+#include "FileComparison.hpp"
 #include "TrianglesMeshReader.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "PetscTools.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestLinearParabolicPdeSystemWithCoupledOdeSystemSolver : public CxxTest::TestSuite
 {
@@ -369,9 +370,28 @@ public:
         solver.SetInitialCondition(initial_condition);
 
         solver.SolveAndWriteResultsToFile();
-//#ifdef CHASTE_VTK
-///\todo #1967 Check that the file was output and has expected content
-//#endif // CHASTE_VTK
+#ifdef CHASTE_VTK
+        // Read back a sample of the output from VTK
+        std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestHeatEquationForCoupledOdeSystemIn2dWithZeroDirichletWithOutput/";
+        //Meta file
+        FileComparison(results_dir + "/results.pvd",
+                       "pde/test/data/results.pvd").CompareFiles();
+        //Final time-step
+        VtkMeshReader<2,2> vtk_reader(results_dir+"results_2.vtu");
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
+        std::vector<double> pde_result, ode_result;
+        vtk_reader.GetPointData("PDE variable 0", pde_result);
+        vtk_reader.GetPointData("ODE variable 0", ode_result);
+        TS_ASSERT_EQUALS(pde_result.size(), 81u );
+        TS_ASSERT_EQUALS(ode_result.size(), 81u);
+        // Centre
+        TS_ASSERT_DELTA(pde_result[4], 0.1427, 1e-4);
+        TS_ASSERT_DELTA(ode_result[4], 1.2545, 1e-4);
+        // Top corner
+        TS_ASSERT_DELTA(pde_result[2], 0.0, 1e-4);
+        TS_ASSERT_DELTA(ode_result[2], 1.0, 1e-4);
+#endif // CHASTE_VTK
 
         // Tidy up
         PetscTools::Destroy(initial_condition);
