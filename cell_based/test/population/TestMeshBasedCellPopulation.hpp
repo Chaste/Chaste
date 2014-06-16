@@ -982,8 +982,7 @@ public:
         TS_ASSERT(vtk_mesh_file2.Exists());
 
         // PVD file
-        FileFinder vtk_file3(results_dir + "results.pvd", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file3.Exists());
+        FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
  #endif //CHASTE_VTK
     }
 

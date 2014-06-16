@@ -383,6 +383,7 @@ public:
         node_based_cell_population.OpenWritersFiles(output_file_handler);
         // Write out the files here
         node_based_cell_population.WriteResultsToFiles(output_directory);
+        node_based_cell_population.CloseOutputFiles();
 
 
         // Compare output with saved files of what they should look like
@@ -398,6 +399,13 @@ public:
             // Cell ages and volumes file differs because it writes the global index of the node to file, which is different depending on how many processes there are.
             FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellages.dat").CompareFiles();
             FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
+            FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
+            FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.pvd").CompareFiles();
+        }
+        else
+        {
+            // Meta-file links to parallel files (which link to the fragments)
+            FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results_from_parallel.pvd").CompareFiles();
         }
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)

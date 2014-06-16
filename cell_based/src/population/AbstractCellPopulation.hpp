@@ -520,13 +520,20 @@ private:
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
     void OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
+    /**
+     * Clos all files in mCellPopulationWriters and mCellWriters.
+     *
+     * Files in mCellPopulationCountWriters are NOT closed in this call since they are not written in
+     * a round-robin fashion
+     *
+     */
+    void CloseRoundRobinWritersFiles();
 
 public:
 
     /**
      * Write results from the current cell population state to output files.
      *
-     * \todo #2441 Pass the output file handler
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteResultsToFiles(const std::string& rDirectory);

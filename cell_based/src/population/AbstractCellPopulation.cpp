@@ -435,6 +435,22 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseRoundRobinWritersFiles()
+{
+    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+
+    BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
+    {
+        p_cell_writer->CloseFile();
+    }
+    BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
+    {
+        p_pop_writer->CloseFile();
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseOutputFiles()
 {
     typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
@@ -492,13 +508,11 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
     BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
     {
         p_pop_writer->OpenOutputFile(rOutputFileHandler);
-        ///\todo #2441 Surely this is take care of elsewhere?
         p_pop_writer->WriteHeader(this);
     }
     BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
     {
         p_count_writer->OpenOutputFile(rOutputFileHandler);
-        ///\todo #2441 Surely this is take care of elsewhere?
         p_count_writer->WriteHeader(this);
     }
 }
@@ -578,7 +592,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                     p_pop_writer->WriteNewline();
                 }
             }
-            CloseOutputFiles();
+            CloseRoundRobinWritersFiles();
         }
         PetscTools::EndRoundRobin();
 

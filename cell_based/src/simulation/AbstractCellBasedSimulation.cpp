@@ -567,6 +567,8 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
 
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::OUTPUT);
 
+    mrCellPopulation.CloseOutputFiles();
+
     if (mOutputDivisionLocations)
     {
         mpDivisionLocationFile->close();

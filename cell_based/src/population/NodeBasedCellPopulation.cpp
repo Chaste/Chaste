@@ -658,7 +658,15 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
-    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    if (PetscTools::IsSequential())
+    {
+        *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    }
+    else
+    {
+        //Parallel vtu files  .vtu -> .pvtu
+        *(this->mpVtkMetaFile) << ".pvtu\"/>\n";
+    }
 #endif //CHASTE_VTK
 }
 
