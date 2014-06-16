@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  *  Abstract class which just defines an interface and caching method. The pure method
  *  rCalculateModifiedConductivityTensor() should take in a conductivity and return a modified
- *  conductivity (for example, dependent on current deformation, etc.)
+ *  conductivity (with some dependence e.g. on tissue deformation in cardiac electromechanics).
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractConductivityModifier
