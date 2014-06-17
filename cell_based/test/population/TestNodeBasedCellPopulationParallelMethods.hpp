@@ -400,13 +400,20 @@ public:
             FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellages.dat").CompareFiles();
             FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
             FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
-            FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.pvd").CompareFiles();
         }
-        else
+
+
+#ifdef CHASTE_VTK
+        if (PetscTools::IsParallel())
         {
             // Meta-file links to parallel files (which link to the fragments)
             FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results_from_parallel.pvd").CompareFiles();
         }
+        else
+        {
+            FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/results.pvd").CompareFiles();
+        }
+#endif //CHASTE_VTK
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
         {
