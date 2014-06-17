@@ -164,8 +164,9 @@ public:
     * To visualize the results, we must first open Paraview. We open the folder containing our test output using the 'file' menu at
     * the top. The output will be located in {{{/tmp/$USER/testoutput/Test2DMonolayerSimulationForVisualizing/results_from_time_0}}}.
     * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
-    * simply select {{{results_..vtu}}}. We should now see {{{results_*}}} in the pipeline browser. We click {{{Apply}}} in the properties tab
-    * of the object inspector, and we should now see a visualization in the right hand window.
+    * simply select {{{results.pvd}}}. We should now see {{{results.pvd}}}  in the pipeline browser. We click {{{Apply}}} in the properties tab
+    * of the object inspector, and we should now see a visualization in the right hand window.  (An alternative to opening the {{{results.pvd}}}
+    * file is to open all the time steps en masse where we open {{{results_..vtu}}} and see {{{results_*}}} appear in the pipeline browser.)
     *
     * At this stage, it will be necessary to refine how we wish to view this particular visualisation. The viewing styles can be edited using
     * the display tab of the object inspector. In particular, under {{{Style}}}, the representation drop down menu allows us to view
@@ -227,7 +228,7 @@ public:
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
     * test output from the new folder, {{{Test2DNodeBasedMonolayerSimulationForVisualizing}}}.
-    * After opening Paraview, load the file results_..vtu, then click "Apply" in the object inspector panel.
+    * After opening Paraview, load the file {{{results.pvd}}}, then click "Apply" in the object inspector panel.
     * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
     * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
     *
