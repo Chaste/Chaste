@@ -321,9 +321,10 @@ public:
         unsigned node_50;
         unsigned node_70;
 
-        // In sequential the permutation vector is empty
-        if (permutation.size() > 0)
+        // In parallel we must look at the permuation vector
+        if ( PetscTools::IsParallel() )
         {
+            TS_ASSERT( permutation.size()>0 );
             node_50 = permutation[50];
             node_70 = permutation[70];
         }
@@ -333,7 +334,7 @@ public:
             node_70 = 70;
         }
 
-        // a couple of hardcoded value
+        // a couple of hardcoded values
         TS_ASSERT_DELTA(sol_repl[2*node_50], 28.3912, 1e-3);
         TS_ASSERT_DELTA(sol_repl[2*node_70], 28.3912, 1e-3);
 

@@ -607,8 +607,9 @@ public:
         unsigned probe_node_1 = 0u;
         unsigned probe_node_2 = 8u;
 
-        if (mesh.rGetNodePermutation().size() > 0)//need to figure out where they end up in permutation
+        if ( PetscTools::IsParallel() )//need to figure out where they end up in permutation
         {
+            TS_ASSERT(mesh.rGetNodePermutation().size() > 0);
             probe_node_1 = mesh.rGetNodePermutation()[probe_node_1];
             probe_node_2 = mesh.rGetNodePermutation()[probe_node_2];
         }
