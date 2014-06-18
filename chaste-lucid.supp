@@ -249,6 +249,15 @@
    fun:PCSetFromOptions
 }
 
+{
+    Leak in nss_lookup_function
+    Memcheck:Leak
+    ...
+    fun:__nss_lookup_function
+    ...
+    fun:getpwuid
+    fun:PetscGetUserName
+}
 
 # This last one is perhaps a little more dubious...
 {
