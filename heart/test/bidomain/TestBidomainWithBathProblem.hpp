@@ -316,27 +316,11 @@ public:
             }
         }
 
-        const std::vector<unsigned>& permutation = p_mesh->rGetNodePermutation();
-
-        unsigned node_50;
-        unsigned node_70;
-
-        // In parallel we must look at the permuation vector
-        if ( PetscTools::IsParallel() )
-        {
-            TS_ASSERT( permutation.size()>0 );
-            node_50 = permutation[50];
-            node_70 = permutation[70];
-        }
-        else
-        {
-            node_50 = 50;
-            node_70 = 70;
-        }
-
-        // a couple of hardcoded values
-        TS_ASSERT_DELTA(sol_repl[2*node_50], 28.3912, 1e-3);
-        TS_ASSERT_DELTA(sol_repl[2*node_70], 28.3912, 1e-3);
+        // A couple of hardcoded values. We would normally have to look up the index in the
+        // permutation vector when using a DistributedTetrahedralMesh, however the call to
+        // Load2dMeshAndSetCircularTissue above imposes a DUMB partition, so no need.
+        TS_ASSERT_DELTA(sol_repl[2*50], 28.3912, 1e-3); // node 50
+        TS_ASSERT_DELTA(sol_repl[2*70], 28.3912, 1e-3); // node 70
 
         delete p_mesh;
     }
