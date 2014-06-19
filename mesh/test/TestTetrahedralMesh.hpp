@@ -1283,6 +1283,12 @@ public:
         TS_ASSERT_EQUALS(indices.size(), 2u);
         TS_ASSERT_EQUALS(indices[0], 1u);
         TS_ASSERT_EQUALS(indices[1], 2u);
+
+        // Check GetNearestNodeToPoint() methods
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point1), 1u); // Answer will be the first of nodes 1 and 2 to be checked; 1, in this case
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point2), 0u); // Point is before start of the fibre, so closest node is the first
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point3), 2u); // Point is exactly at node 2
+
     }
 
     void TestPointWeightsAndInclusion2D() throw(Exception)
@@ -1342,6 +1348,11 @@ public:
         ChastePoint<2> point1(0.051, 0.051);
         ChastePoint<2> point2(0.2, 0.2);
         ChastePoint<2> point3(0.05, 0.05); // node 60 of mesh
+
+
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point1), 60u);
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point2), 120u);   // Closest node is top right node
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point3), 60u);
 
         TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(point1), 110u);
         TS_ASSERT_EQUALS(mesh.GetNearestElementIndex(point1), 110u);
@@ -1499,6 +1510,11 @@ public:
         TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(point1,false,suggested_elements), 2992u);
         suggested_elements.insert(2993);
         TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(point1,false,suggested_elements), 2992u);
+
+        // Check GetNearestNodeToPoint() methods
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point1), 665u); // Close to node 665
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point2), 1330u); // Point is outside mesh, closest node is the one on the outermost corner
+        TS_ASSERT_EQUALS(mesh.GetNearestNodeIndex(point3), 665u); // Point is exactly at node 665
     }
 
     void TestFloatingPointIn3D() throw(Exception)

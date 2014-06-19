@@ -1652,7 +1652,162 @@ public:
         }
         TS_ASSERT_EQUALS(constructed_mesh.CalculateMaximumContainingElementsPerProcess(), 24U);  // Four surrounding cubes may have all 6 tetrahedra meeting at a node
         TS_ASSERT_EQUALS(constructed_mesh.CalculateMaximumNodeConnectivityPerProcess(), 15U);  // Four surrounding cubes may have all 6 tetrahedra meeting at a node
+
+
+        // Test the GetNearestNodeIndex() method
+        // This mesh isn't permuted (dumb partition), so we can check against the non-distributed case
+        ChastePoint<3> outside_mesh(width*2, depth*2, height*2);  // outside mesh
+        ChastePoint<3> within_mesh(width/3, depth/2, height/5);         // somewhere inside the mesh (not necessarily at a node)
+        ChastePoint<3> origin_mesh(0.0, 0.0, 0.0);                      // origin
+        TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(outside_mesh), base_mesh.GetNearestNodeIndex(outside_mesh));
+        TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(within_mesh), base_mesh.GetNearestNodeIndex(within_mesh));
+        TS_ASSERT_EQUALS(constructed_mesh.GetNearestNodeIndex(origin_mesh), base_mesh.GetNearestNodeIndex(origin_mesh));
+
+
+
     }
+
+    void TestNearestNodeIndex2D()
+    {
+
+        // Similar to TestPointinMesh2D from TestTetrahedralMesh
+
+        ChastePoint<2> point1(0.051, 0.051);    // close to node 60 in non-dist mesh
+        ChastePoint<2> point2(0.2, 0.2);        // outside mesh, closest node is 120 (outermost node)
+        ChastePoint<2> point3(0.05, 0.05);      // node 60 of non-dist mesh
+
+        // Read in a mesh and create distributed and non-distributed versions
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2,2> non_distributed_mesh;
+        DistributedTetrahedralMesh<2,2> distributed_mesh;
+        non_distributed_mesh.ConstructFromMeshReader(mesh_reader);
+        distributed_mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check that the closest nodes in the non-dist mesh are the same as those tested in TestPointinMesh2D
+        TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point1), 60u);
+        TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point2), 120u);   // Closest node is top right node
+        TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point3), 60u);
+
+
+        // If we run on one process, the distributed node ordering is the same as with the
+        // no-distributed mesh - we use the same checks
+        if (PetscTools::IsSequential())
+        {
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), 60u);
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), 120u);   // Closest node is top right node
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), 60u);
+
+        }
+        else
+        {
+            // The order of the nodes is permuted
+            // The closest nodes will be permutation[closest node from sequential case]
+            std::vector<unsigned> permutation = distributed_mesh.rGetNodePermutation();
+
+            // We'll give some explanatory output - permuted indices of nodes 60 and 120
+            if (distributed_mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(permutation[60]))
+            {
+                double permuted_node_60_x = distributed_mesh.GetNode(permutation[60])->rGetLocation()[0];
+                double permuted_node_60_y = distributed_mesh.GetNode(permutation[60])->rGetLocation()[1];
+                std::cout << "Original node = 60, permuted node = " << permutation[60]
+                          << ", location = " << permuted_node_60_x << ", " << permuted_node_60_y << "\n";
+            }
+            if (distributed_mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(permutation[120]))
+            {
+                double permuted_node_120_x = distributed_mesh.GetNode(permutation[120])->rGetLocation()[0];
+                double permuted_node_120_y = distributed_mesh.GetNode(permutation[120])->rGetLocation()[1];
+                std::cout << "Original node = 120, permuted node = " << permutation[120]
+                                          << ", location = " << permuted_node_120_x << ", " << permuted_node_120_y << "\n";
+            }
+
+            // Now do the test
+            // Get the closest nodes to the same three points using the distributed mesh
+            unsigned nearest_node_point_1 = distributed_mesh.GetNearestNodeIndex(point1);
+            unsigned nearest_node_point_2 = distributed_mesh.GetNearestNodeIndex(point2);
+            unsigned nearest_node_point_3 = distributed_mesh.GetNearestNodeIndex(point3);
+
+            std::cout << "Process " << PetscTools::GetMyRank()
+                      << ", node for point 1 = " << nearest_node_point_1
+                      << ", node for point 2 = " << nearest_node_point_2
+                      << ", node for point 3 = " << nearest_node_point_3 << "\n";
+
+            // Check the results against the permuted node indices
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), permutation[60]);
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), permutation[120]);   // Closest node is top right node
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), permutation[60]);
+        }
+    }
+
+    void TestNearestNodeIndex1D()
+    {
+        // Similar to TestPointinMesh2D from TestTetrahedralMesh
+
+        ChastePoint<1> point1(0.012);    // close to node 1 in non-dist mesh
+        ChastePoint<1> point2(0.12);     // outside mesh, closest node is 10 (outermost node)
+        ChastePoint<1> point3(0.01);     // node 1 of non-dist mesh
+
+        // Read in a mesh and create distributed and non-distributed versions
+        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1mm_10_elements");
+        TetrahedralMesh<1,1> non_distributed_mesh;
+        DistributedTetrahedralMesh<1,1> distributed_mesh;
+        non_distributed_mesh.ConstructFromMeshReader(mesh_reader);
+        distributed_mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Check that the closest nodes in the non-dist mesh are the same as those tested in TestPointinMesh2D
+        TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point1), 1u);
+        TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point2), 10u);   // Closest node is top right node
+        TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point3), 1u);
+
+
+        // If we run on one process, the distributed node ordering is the same as with the
+        // no-distributed mesh - we use the same checks
+
+        // The closest nodes will be permutation[closest node from sequential case]
+        std::vector<unsigned> permutation = distributed_mesh.rGetNodePermutation();
+
+        // todo #2507 Not sure if the permuted test case ever happens...
+        if (permutation.size()==0) // Will happen if in sequential or if nodes are not permuted
+        {
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), 1u);
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), 10u);   // Closest node is top right node
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), 1u);
+        }
+        else
+        {
+            // The order of the nodes is permuted
+
+            // We'll give some explanatory output - permuted indices of nodes 1 and 10
+            if (distributed_mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(permutation[1]))
+            {
+                double permuted_node_1_x = distributed_mesh.GetNode(permutation[1])->rGetLocation()[0];
+                    std::cout << "Original node = 1, permuted node = " << permutation[1]
+                              << ", location = " << permuted_node_1_x << "\n";
+            }
+            if (distributed_mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(permutation[10]))
+            {
+                double permuted_node_10_x = distributed_mesh.GetNode(permutation[10])->rGetLocation()[0];
+                    std::cout << "Original node = 10, permuted node = " << permutation[10]
+                              << ", location = " << permuted_node_10_x << "\n";
+            }
+
+            // Now do the test
+            // Get the closest nodes to the same three points using the distributed mesh
+            unsigned nearest_node_point_1 = distributed_mesh.GetNearestNodeIndex(point1);
+            unsigned nearest_node_point_2 = distributed_mesh.GetNearestNodeIndex(point2);
+            unsigned nearest_node_point_3 = distributed_mesh.GetNearestNodeIndex(point3);
+
+                std::cout << "Process " << PetscTools::GetMyRank()
+                          << ", node for point 1 = " << nearest_node_point_1
+                          << ", node for point 2 = " << nearest_node_point_2
+                          << ", node for point 3 = " << nearest_node_point_3 << "\n";
+
+            // Check the results against the permuted node indices
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), permutation[1]);
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), permutation[10]);   // Closest node is top right node
+            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), permutation[1]);
+        }
+    }
+
 
     void TestConstructParallelCuboidMeshGeometricPartition()
     {

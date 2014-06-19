@@ -1630,6 +1630,62 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
+{
+    // Hold the best distance from node to point found so far
+    // and the node at which this was recorded
+    //double best_node_index = 0;
+    double best_node_index = UINT_MAX;
+    double best_node_point_distance = DBL_MAX;
+
+
+    // Now loop through the remaining nodes, changing those labelled "best" if found
+    for (unsigned node_index = 0; node_index < this->mNodes.size(); node_index++)
+    {
+        // Loop through the space dimensions to calculate the distance from the chosen
+        // point to the current node
+        double node_point_distance = 0.0;
+        for (unsigned dim=0; dim<SPACE_DIM; dim++)
+        {
+            node_point_distance += (this->mNodes[node_index]->rGetLocation()[dim] - rTestPoint[dim] ) * (this->mNodes[node_index]->rGetLocation()[dim] - rTestPoint[dim]);
+        }
+        node_point_distance = std::sqrt(node_point_distance);
+
+        // Update the "best" distance and node index if necessary
+        if (node_point_distance < best_node_point_distance)
+        {
+            best_node_index = node_index;
+            best_node_point_distance = node_point_distance;
+        }
+    }
+
+    // Return the index of the closest node to the current point
+    // In the distributed case, we'll have to do an AllReduce
+    double global_best_node_index = this->mNodes[best_node_index]->GetIndex();
+
+
+    // This is a handy data structure that will work with MPI_DOUBLE_INT data type.
+    // todo #2507 Is this the best place for this struct?
+    struct
+    {
+        double distance;
+        int node_index;
+    } value, minval;
+
+    value.node_index = global_best_node_index;
+    value.distance = best_node_point_distance;
+
+    MPI_Allreduce( &value, &minval, 1, MPI_DOUBLE_INT, MPI_MINLOC, MPI_COMM_WORLD );
+
+    return minval.node_index;
+
+    // todo #2507 We need to check that this doesn't seg fault if
+    // a processor isn't assigned any nodes.
+
+
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
 {
     c_vector<double, 2> local_min_max =  AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths();

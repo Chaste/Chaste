@@ -278,6 +278,45 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
+{
+    // Hold the best distance from node to point found so far
+    // and the node at which this was recorded
+    //todo #2507 We need to check that this doesn't seg fault if
+    // a processor isn't assigned any nodes.
+    double best_node_index = UINT_MAX;  // suggested by Joe
+    //double best_node_index = 0;
+    double best_node_point_distance = DBL_MAX;
+
+
+    // Now loop through the remaining nodes, changing those labelled "best" if found
+    for (unsigned node_index = 0; node_index < mNodes.size(); node_index++)
+    {
+        // Loop through the space dimensions to calculate the distance from the chosen
+        // point to the current node
+        double node_point_distance = 0.0;
+        for (unsigned dim=0; dim<SPACE_DIM; dim++)
+        {
+            node_point_distance += (mNodes[node_index]->rGetLocation()[dim] - rTestPoint[dim] ) * (mNodes[node_index]->rGetLocation()[dim] - rTestPoint[dim]);
+        }
+        node_point_distance = std::sqrt(node_point_distance);
+
+        // Update the "best" distance and node index if necessary
+        if (node_point_distance < best_node_point_distance)
+        {
+            best_node_index = node_index;
+            best_node_point_distance = node_point_distance;
+        }
+    }
+
+    // Return the index of the closest node to the current point
+    // In the distributed case, we'll have to do an AllReduce
+
+    return mNodes[best_node_index]->GetIndex();
+}
+
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xScale, const double yScale, const double zScale)
 {
     unsigned num_nodes = mNodes.size();

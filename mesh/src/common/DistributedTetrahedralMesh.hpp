@@ -293,13 +293,23 @@ public:
     Node<SPACE_DIM>* GetNodeOrHaloNode(unsigned index) const;
 
     /**
-     * Calculate the bounding box (width extremes for all dimensions of the mesh.
-     * Override for Distribute case
+     * Calculate the bounding box (width extremes for all dimensions of the mesh).
+     * Override for distributed case
      *
      * @return The minimum and maximum co-ordinates of any node in each dimension
      *
      */
     virtual ChasteCuboid<SPACE_DIM> CalculateBoundingBox() const;
+
+    /** GetNearestNodeIndex iterates through all nodes in the mesh and returns the global index
+      * with the smallest distance to the provided point.
+      *
+      * This method is overridden in the distributed case to return the global node index.
+      *
+      * @param rTestPoint reference to the point
+      * @return node index
+      */
+    virtual unsigned GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint);
 
     /**
      * Computes the minimum and maximum lengths of the edges in the mesh.
