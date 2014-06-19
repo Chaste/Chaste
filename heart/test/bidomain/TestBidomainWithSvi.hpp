@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 #include <vector>
 #include "BidomainProblem.hpp"
+//#include "BidomainWithBathProblem.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "LuoRudy1991.hpp"
 #include "PlaneStimulusCellFactory.hpp"
@@ -75,7 +76,7 @@ public:
         }
 
         if (    (DIM==1 && fabs(x)<0.02+1e-6)
-             || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6) )
+             || (DIM==2 && fabs(x)<0.1+1e-6 && fabs(y)<0.1+1e-6) ) // 2D problem needs larger stimulus
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
         }
@@ -83,6 +84,34 @@ public:
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpZeroStimulus);
         }
+    }
+};
+
+class BathCellFactory : public AbstractCardiacCellFactory<2>
+{
+private:
+    boost::shared_ptr<SimpleStimulus> mpStim;
+
+public:
+    BathCellFactory() : AbstractCardiacCellFactory<2>(),
+    mpStim(new SimpleStimulus(-70000.0, 1.0, 0.0))
+    {
+    }
+
+    AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
+    {
+        AbstractCardiacCell* p_cell;
+        ChastePoint<2> node_location = pNode->GetPoint();
+
+        if ( node_location[0]<0.1 && node_location[1]<0.1)
+        {
+            p_cell = new CellLuoRudy1991FromCellML(mpSolver, mpStim);
+        }
+        else
+        {
+            p_cell = new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
+        }
+        return p_cell;
     }
 };
 
@@ -227,7 +256,7 @@ public:
 
         // much lower conductivity in cross-fibre direction - NCI will struggle
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
-        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(7.0, 0.7));
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
 
         // NCI - nodal current interpolation - the default
         {
@@ -236,7 +265,7 @@ public:
 
             HeartConfig::Instance()->SetOutputDirectory("BidomainNci2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
+            
             HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
 
             BlockCellFactory<2> cell_factory;
@@ -255,8 +284,8 @@ public:
 
             HeartConfig::Instance()->SetOutputDirectory("BidomainSvi2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-
-            HeartConfig::Instance()->SetUseStateVariableInterpolation();
+            
+            HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
 
             BlockCellFactory<2> cell_factory;
             BidomainProblem<2> bidomain_problem( &cell_factory );
@@ -273,11 +302,92 @@ public:
         // directions
 
         // node 20 (for h=0.02) is on the x-axis (fibre direction)
-        TS_ASSERT_DELTA(final_voltage_ici[20*2], 22.1924, 1e-3);
-        TS_ASSERT_DELTA(final_solution_svi[20*2], 15.0183, 1e-3);
+        TS_ASSERT_DELTA(final_voltage_ici[20*2], -64.1105, 1e-3);
+        TS_ASSERT_DELTA(final_solution_svi[20*2], -78.0936, 1e-3);
         // node 234 (for h=0.02) is on the y-axis (cross-fibre direction)
-        TS_ASSERT_DELTA(final_voltage_ici[234*2], 19.5676, 1e-3);
-        TS_ASSERT_DELTA(final_solution_svi[234*2], 9.2833, 1e-3);
+        TS_ASSERT_DELTA(final_voltage_ici[234*2], -57.7239, 1e-3);
+        TS_ASSERT_DELTA(final_solution_svi[234*2], 38.9004, 1e-3);
+    }
+
+    void DontTestBidomainWithBathWithSvi() throw(Exception)
+    {
+        DistributedTetrahedralMesh<2,2> mesh;
+        mesh.ConstructRegularSlabMesh(0.04, 0.12, 0.12);
+
+/*
+        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter=mesh.GetElementIteratorBegin();
+                        iter != mesh.GetElementIteratorEnd();
+                        ++iter)
+        {
+            unsigned element_index = iter->GetIndex();
+            std::cout << "Element index: " << element_index << std::endl;
+            for ( unsigned i=0; i<3; ++i )
+            {
+                c_vector<double, 2> node_location = iter->GetNodeLocation(i);
+                std::cout << "x: " << node_location[0]
+                          << " y: " << node_location[1] << std::endl;
+            }
+
+            if ( element_index==8 || element_index==9 )
+            {
+                std::cout << "Setting as bath." << std::endl;
+                iter->SetAttribute(HeartRegionCode::GetValidBathId());
+            }
+            else
+            {
+                std::cout << "Setting as tissue." << std::endl;
+                iter->SetAttribute(HeartRegionCode::GetValidTissueId());
+            }
+        }
+*/
+
+        ChastePoint<2> bath_centre(0.12,0.12,0.12);
+        ChastePoint<2> bath_radius(0.06,0.06,0.06);
+        ChasteEllipsoid<2> bath_region( bath_centre, bath_radius );
+
+        // Set some elements to bath, the rest tissue
+        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter=mesh.GetElementIteratorBegin();
+                iter != mesh.GetElementIteratorEnd();
+                ++iter)
+        {
+            // Is a node within this region?
+            if ( bath_region.DoesContain(iter->GetNode(0)->GetPoint())
+                 //|| bath_region.DoesContain(iter->GetNode(1)->GetPoint())
+                 //|| bath_region.DoesContain(iter->GetNode(2)->GetPoint())
+               )
+            {
+                iter->SetAttribute(HeartRegionCode::GetValidBathId());
+
+                std::cout << "Element index: " << iter->GetIndex() << std::endl;
+                for ( unsigned i=0; i<3; ++i )
+                {
+                    c_vector<double, 2> node_location = iter->GetNodeLocation(i);
+                    std::cout << "x: " << node_location[0]
+                              << " y: " << node_location[1] << std::endl;
+                }
+            }
+            else
+            {
+                iter->SetAttribute(HeartRegionCode::GetValidTissueId());
+            }
+        }
+
+        HeartConfig::Instance()->SetSimulationDuration(10.0); // ms
+        HeartConfig::Instance()->SetOutputDirectory("BidomainWithBathSvi2d");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.025, 0.25);
+        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
+        HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 0.7));
+
+        HeartConfig::Instance()->SetVisualizeWithMeshalyzer();
+        HeartConfig::Instance()->SetVisualizeWithVtk();
+        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
+
+        BathCellFactory cell_factory;
+        BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
+        bidomain_problem.SetMesh( &mesh );
+        bidomain_problem.Initialise();
+        bidomain_problem.Solve();
     }
 };
 
