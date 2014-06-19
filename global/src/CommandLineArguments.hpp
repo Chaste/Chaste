@@ -124,7 +124,7 @@ public:
      * or call one of our convenience methods for common types.
      *
      * @param rOption  the option name as a string.
-     * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
+     * @param valueNumber  the number of the argument following the option definition (defaults to 1, for 1st argument).
      */
     char* GetValueCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
@@ -134,7 +134,7 @@ public:
      * This uses GetValueCorrespondingToOption and converts the char* to a double.
      *
      * @param rOption  the option name as a string.
-     * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
+     * @param valueNumber  the number of the argument following the option definition (defaults to 1, for 1st argument).
      */
     double GetDoubleCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
@@ -144,7 +144,7 @@ public:
      * This uses GetValueCorrespondingToOption and converts the char* to an int.
      *
      * @param rOption  the option name as a string.
-     * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
+     * @param valueNumber  the number of the argument following the option definition (defaults to 1, for 1st argument).
      */
     int GetIntCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
@@ -155,7 +155,7 @@ public:
      * Throws an exception if the option converts to a negative integer.
      *
      * @param rOption  the option name as a string.
-     * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
+     * @param valueNumber  the number of the argument following the option definition (defaults to 1, for 1st argument).
      */
     unsigned GetUnsignedCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
@@ -165,7 +165,7 @@ public:
      * This uses GetValueCorrespondingToOption and converts the char* to a std::string.
      *
      * @param rOption  the option name as a string.
-     * @param valueNumber  the number of the argument following the option definiton (defaults to 1, for 1st argument).
+     * @param valueNumber  the number of the argument following the option definition (defaults to 1, for 1st argument).
      */
     std::string GetStringCorrespondingToOption(const std::string& rOption, int valueNumber=1);
 
