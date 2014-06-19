@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 #include <vector>
 #include "BidomainProblem.hpp"
-//#include "BidomainWithBathProblem.hpp"
+#include "BidomainWithBathProblem.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "LuoRudy1991.hpp"
 #include "PlaneStimulusCellFactory.hpp"
