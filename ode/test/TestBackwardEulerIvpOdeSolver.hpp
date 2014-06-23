@@ -40,8 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <iostream>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include "OdeThirdOrder.hpp"
 #include "OdeThirdOrderWithEvents.hpp"
@@ -50,8 +49,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Ode5Jacobian.hpp"
 #include "VanDerPolOde.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "OutputFileHandler.hpp"
+#include "ArchiveLocationInfo.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 class TestBackwardEulerIvpOdeSolver: public CxxTest::TestSuite
 {
@@ -226,9 +227,9 @@ public:
 
     void TestArchivingSolver() throw(Exception)
     {
-        OutputFileHandler handler("archive",false);
-        std::string archive_filename;
-        archive_filename = handler.GetOutputDirectoryFullPath() + "backward_euler_solver.arch";
+        OutputFileHandler handler("archive", false);
+        ArchiveLocationInfo::SetArchiveDirectory(handler.FindFile(""));
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("backward_euler_solver.arch");
 
         VanDerPolOde ode_system;
 
