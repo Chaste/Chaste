@@ -955,6 +955,9 @@ def _checkBuildFailure(test_set_dir, overall_status, colour):
                 overall_status = 'Build failed (check build log for ": ***").  ' + overall_status
                 colour = 'red'
                 break
+            if line.startswith('Error validating server certificate') and colour == 'green':
+                overall_status = 'Probably failed svn update.  ' + overall_status
+                colour = 'orange'
             if not found_semget and 'semget failed for setnum' in line:
                 overall_status = 'Semaphore error.  ' + overall_status
                 if colour == 'green':
