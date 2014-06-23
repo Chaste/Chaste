@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # This module contains most of the functionality, and is loaded from the
 # repository by a wrapper script.
 
+import glob
 import os
 import operator
 import time
@@ -104,42 +105,40 @@ def index(req):
 
     # Look for the latest revision present.
     type = 'continuous'
-    revisions = os.listdir(os.path.join(_tests_dir, type))
-    revision = str(max(itertools.imap(int, revisions)))
-    # Display summary of each machine & build type combination for this revision
-    test_set_dir = os.path.join(_tests_dir, type, revision)
-    builds = os.listdir(test_set_dir)
+    revision_and_timestamps = os.listdir(os.path.join(_tests_dir, type))
+    latest_revision = str(max(itertools.imap(lambda rts: int(rts[:rts.find('~')]) if '~' in rts else int(rts), revision_and_timestamps)))
+    # Display summary of each build of this revision
+    test_set_dirs = _getResultsParentDirs(type, latest_revision, timestamp=None)
+    builds = []
+    for test_set_dir in test_set_dirs:
+        revision_and_timestamp = os.path.basename(test_set_dir)
+        builds.extend(map(lambda machine_and_buildtype: (revision_and_timestamp, machine_and_buildtype), os.listdir(test_set_dir)))
     if len(builds) < 1:
-        output.append(_error('No test set found for revision '+revision+
-                             '. Probably the build is still in progress.'))
+        output.append(_error('No test set found for revision '+latest_revision+'. Probably the build is still in progress.'))
         output.append('<p><a href="/out/latest">Latest build log.</a></p>')
     else:
         for build in builds:
-            machine, buildType = _extractDotSeparatedPair(build)
-            output.append(_summary(req, type, revision, machine, buildType))
+            revision, timestamp = _extractTildeSeparatedPair(build[0])
+            machine, build_type = _extractDotSeparatedPair(build[1])
+            output.append(_summary(req, type, latest_revision, machine, build_type, timestamp))
 
     output.append(_footer())
-
     return ''.join(output)
 
 
-def testsuite(req, type, revision, machine, buildType, testsuite, status, runtime):
-    """
-    Display the results for the given testsuite, by passing the file back
-    to the user.
-    """
+def testsuite(req, type, revision, machine, buildType, testsuite, status, runtime, timestamp=None):
+    """Display the results for the given testsuite, by passing the file back to the user."""
     req.content_type = 'text/html'
     req.write(_header(), 0)
-    test_set_dir = _testResultsDir(type, revision, machine, buildType)
+    test_set_dir = _testResultsDir(type, revision, machine, buildType, timestamp)
     buildTypesModule = _importBuildTypesModule(revision)
     build = _getBuildObject(buildTypesModule, buildType)
     for suite_name in _test_suite_name_aliases(testsuite):
         if _isWindows(build):
-            import glob
             ctest_results = glob.glob(os.path.join(test_set_dir, '*TestOutputs_*.txt*'))
             testsuite_file = ''.join(ctest_results) #TODO: Hack! (#2016)
         else:
-            testsuite_file = build.ResultsFileName(test_set_dir, suite_name, status, runtime)
+            testsuite_file = build.ResultsFileName(test_set_dir, suite_name, status, float(runtime))
         if os.path.isfile(testsuite_file):
             req.write('\n<pre>\n', 0)
             fp = open(testsuite_file)
@@ -153,11 +152,9 @@ def testsuite(req, type, revision, machine, buildType, testsuite, status, runtim
     req.write(_footer())
 
 
-def graph(req, type, revision, machine, buildType, graphName):
-    """
-    Send the given graph file (a .gif) back to the user.
-    """
-    test_set_dir = _testResultsDir(type, revision, machine, buildType)
+def graph(req, type, revision, machine, buildType, graphName, timestamp=None):
+    """Send the given graph file (a .gif) back to the user."""
+    test_set_dir = _testResultsDir(type, revision, machine, buildType, timestamp)
     graph_name = os.path.basename(graphName) # Foil hackers
     for graph_name in _test_suite_name_aliases(graph_name):
         graph_path = os.path.join(test_set_dir, graph_name)
@@ -194,9 +191,9 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
     if not os.path.isdir(dir):
         return _error(type+' is not a valid type of test.')
 
-    # What keys may be used to filter the builds list    
+    # What keys may be used to filter the builds list
     poss_filters = ['build_type', 'machine', 'targets']
-    
+
     if _db_module and not req.form.getfirst('nocache', False):
         # Get information from the database
         db = _db_module.TestResultsDatabase(type, verbose=False)
@@ -229,10 +226,14 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
     else:
         # Parse the directory structure within dir into a list of builds
         builds = []
-        for revision in os.listdir(dir):
-            for machine_and_build_type in os.listdir(os.path.join(dir, revision)):
-                st = os.stat(os.path.join(dir, revision, machine_and_build_type))
-                mod_time = st.st_mtime
+        for revision_and_timestamp in os.listdir(dir):
+            for machine_and_build_type in os.listdir(os.path.join(dir, revision_and_timestamp)):
+                revision, timestamp = _extractTildeSeparatedPair(revision_and_timestamp)
+                if timestamp is None:
+                    st = os.stat(os.path.join(dir, revision_and_timestamp, machine_and_build_type))
+                    mod_time = st.st_mtime
+                else:
+                    mod_time = float(timestamp)
                 machine, build_type = _extractDotSeparatedPair(machine_and_build_type)
                 builds.append([mod_time, revision, build_type, machine])
         # Sort the list to be most recent first
@@ -248,7 +249,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
                     build_types_module = _importBuildTypesModule(revision)
                     old_revision = revision
                 build = _getBuildObject(build_types_module, build_type)
-                test_set_dir = _testResultsDir(type, revision, machine, build_type)
+                test_set_dir = _testResultsDir(type, revision, machine, build_type, finished)
                 targets, overall_status, colour = _getTestSummary(test_set_dir, build)
                 yield (revision, machine, build_type, targets, finished, overall_status, colour)
 
@@ -291,7 +292,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
                 'date': date, 'machine': machine, 'targets': targets or 'default',
                 'rev': _linkRevision(revision, changes=True),
                 'build_type': _linkBuildType(build_type, revision, wrappableText=True),
-                'status': _linkSummary(overall_status, type, revision, machine, build_type)}
+                'status': _linkSummary(overall_status, type, revision, machine, build_type, finished)}
         for poss_filter in poss_filters:
             if poss_filter not in filters or '*' in filters[poss_filter]:
                 new_filters = filters.copy()
@@ -318,14 +319,14 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
 
 
 
-def summary(req, type, revision, machine, buildType):
+def summary(req, type, revision, machine, buildType, timestamp=None):
     "User-facing page. Content is generated by _summary."
     page_body = """\
     <h1>Build Summary</h1>
-""" +  _summary(req, type, revision, machine, buildType)
+""" +  _summary(req, type, revision, machine, buildType, timestamp)
     return _header('Test Summary') + page_body + _footer()
     
-def _summary(req, type, revision, machine=None, buildType=None):
+def _summary(req, type, revision, machine=None, buildType=None, timestamp=None):
     """Display a summary of a build.
     
     Returns a string representing part of a webpage.
@@ -339,7 +340,7 @@ def _summary(req, type, revision, machine=None, buildType=None):
     if type == 'standalone':
         test_set_dir = _dir
     else:
-        test_set_dir = _testResultsDir(type, revision, machine, buildType)
+        test_set_dir = _testResultsDir(type, revision, machine, buildType, timestamp)
     
     # Now test_set_dir should be the directory containing the test results
     # to summarise. Extract summary info from the filenames.
@@ -355,9 +356,12 @@ def _summary(req, type, revision, machine=None, buildType=None):
         global _overall_status
         _overall_status = overall_status
 
-    # Get the timestamp on the directory
-    st = os.stat(test_set_dir)
-    mod_time = st.st_mtime
+    # Get the timestamp on the directory, if not specified
+    if timestamp:
+        mod_time = float(timestamp)
+    else:
+        st = os.stat(test_set_dir)
+        mod_time = st.st_mtime
     date = time.strftime('%d/%m/%Y %H:%M:%S', time.localtime(mod_time))
 
     # Work out the URL of the build log file
@@ -412,11 +416,11 @@ def _summary(req, type, revision, machine=None, buildType=None):
         subs = {'bgcol': bgcols[bgcol_index],
                 'status_col': _statusColour(testsuite_status[testsuite], build),
                 'testsuite': testsuite,
-                'status': _linkTestSuite(type, revision, machine, buildType,
+                'status': _linkTestSuite(type, revision, machine, buildType, timestamp,
                                          testsuite, testsuite_status[testsuite],
                                          runtime[testsuite], build),
                 'runtime': _formatRunTime(runtime[testsuite]),
-                'graph': _linkGraph(type, revision, machine, buildType,
+                'graph': _linkGraph(type, revision, machine, buildType, timestamp,
                                     graphs.get(testsuite,''))}
         output.append("""\
         <tr>
@@ -433,13 +437,9 @@ def _summary(req, type, revision, machine=None, buildType=None):
 
 
 def buildType(req, buildType, revision=None):
-    """
-    Display information on the compiler settings, etc. used to build a set
-    of tests.
-    buildType is the user-friendly name describing these settings, such as
-    can be passed to scons build=buildType.
-    revision is the code revision of the set of tests, in case the 
-    definition of buildType has changed since.
+    """Display information on the compiler settings, etc. used to build a set of tests.
+    buildType is the user-friendly name describing these settings, such as can be passed to scons build=buildType.
+    revision is the code revision of the set of tests, in case the definition of buildType has changed since.
     """
     if revision is None:
         rev_text = ' at the latest revision'
@@ -534,6 +534,8 @@ def profileHistory(req, n=20, buildTypes=None):
 
 def _profileHistory(req, n=20, buildTypes=None):
     """Show runtimes for the last n profile builds."""
+    if not _db_module:
+        return _error('No database connection present; unable to produce performance plots')
     tests_dir = os.path.join(_tests_dir, 'nightly')
     if not os.path.isdir(tests_dir):
         return _error('No nightly tests found')
@@ -554,85 +556,51 @@ def _profileHistory(req, n=20, buildTypes=None):
         glob_match = False
 
     # Find the last n revisions
-    if _db_module:
-        db = _db_module.TestResultsDatabase('nightly', verbose=False)
-        cur = db.conn.execute('select distinct revision from summary '
-                              'where build_type %s order by revision desc limit ?' % where,
-                              tuple(buildTypes + [n]))
-        revisions = [row[0] for row in cur]
-        revisions.reverse()
-    else:
-        revisions = map(int, os.listdir(tests_dir))
-        revisions.sort()
-        revisions = revisions[-n:]
-    
-    # Extract the build and run information.  We create two maps: builds and run_times.
-    # builds former maps (revision, build_type) -> [machine]
-    # run_times maps suite_name -> {(revision, build_type, machine) -> (run_time, status)}
-    # Find the appropriate builds for these revisions: map from (revision, build_type) -> [machine]
+    db = _db_module.TestResultsDatabase('nightly', verbose=False)
+    cur = db.conn.execute('select distinct revision from summary '
+                          'where build_type %s order by revision desc limit ?' % where,
+                          tuple(buildTypes + [n]))
+    revisions = [row[0] for row in cur]
+    revisions.reverse()
+
+    # Extract the build and run time information.  We create the following maps:
+    #     builds maps (revision, build_type) -> [machine]
+    #     timestamps maps (revision, build_type, machine) -> [timestamp]
+    #     run_times maps suite_name -> {(revision, build_type, machine) -> (run_time, status)}
+    # TODO #2518 The details table needs timestamp info!
     builds = {}
+    timestamps = {}
     run_times = {}
     inf_test_names = ['Copyrights', 'DuplicateFileNames', 'OrphanedTests', 'Schemas']
-    if _db_module and not req.form.getfirst('nocache', False):
-        cur = db.conn.execute('select revision, machine, build_type, suite_name, suite_status, run_time from details'
-                              ' where build_type %s and revision between ? and ?' % where,
-                              tuple(buildTypes + [revisions[0], revisions[-1]]))
-        for row in cur:
-            # The builds dictionary
-            k = (row['revision'], row['build_type'])
-            if not k in builds:
-                builds[k] = set()
-            machine = _canonical_machine_name(row['machine'])
-            builds[k].add(machine)
-            # The run_times dictionary
-            if row['suite_name'] not in inf_test_names:
-                if not row['suite_name'] in run_times:
-                    run_times[row['suite_name']] = {}
-                k = (row['revision'], row['build_type'], machine)
-                run_times[row['suite_name']][k] = (row['run_time'], row['suite_status'])
-        buildTypes = set()
-        for k in builds:
-            builds[k] = list(builds[k])
-            builds[k].sort()
-            buildTypes.add(k[1])
-        buildTypes = list(buildTypes)
-    else:
-        if glob_match:
-            from fnmatch import fnmatch
-        for revision in revisions:
-            rev_dir = os.path.join(tests_dir, str(revision))
-            for machine_and_build_type in os.listdir(rev_dir):
-                machine, build_type = _extractDotSeparatedPair(machine_and_build_type)
-                machine = _canonical_machine_name(machine)
-                if (glob_match and fnmatch(build_type, buildTypes[0])) or build_type in buildTypes:
-                    k = (revision, build_type)
-                    if not builds.has_key(k):
-                        builds[k] = []
-                    builds[k].append(machine)
-    
-        buildTypes = set()
-        for k in builds:
-            buildTypes.add(k[1])
-        buildTypes = list(buildTypes)
-
-        build = FakeBuildType()
-        for revision in revisions:
-            for build_type in buildTypes:
-                for machine in builds.get((revision, build_type), []):
-                    machine = _canonical_machine_name(machine)
-                    k = (revision, build_type, machine)
-                    d = _testResultsDir('nightly', revision, machine, build_type)
-                    statuses, _, _, runtimes, _ = _getTestStatus(d, build)
-                    for test_suite in statuses.keys():
-                        if test_suite not in inf_test_names:
-                            if not run_times.has_key(test_suite):
-                                run_times[test_suite] = {}
-                            run_times[test_suite][k] = (runtimes[test_suite],
-                                                        statuses[test_suite])
+    cur = db.conn.execute('select revision, machine, build_type, suite_name, suite_status, run_time from details'
+                          ' where build_type %s and revision between ? and ?' % where,
+                          tuple(buildTypes + [revisions[0], revisions[-1]]))
+    for row in cur:
+        # The builds dictionary
+        k = (row['revision'], row['build_type'])
+        machine = _canonical_machine_name(row['machine'])
+        builds.setdefault(k, set()).add(machine)
+        # The timestamps dictionary
+        k_ts = k + (machine,)
+        cur_ts = db.conn.execute('select finished from summary where revision=? and build_type=? and machine=?', k_ts)
+        timestamps[k_ts] = sorted(time.mktime(row['finished'].timetuple()) for row in cur_ts)
+        # The run_times dictionary
+        if row['suite_name'] not in inf_test_names:
+            if not row['suite_name'] in run_times:
+                run_times[row['suite_name']] = {}
+            k = (row['revision'], row['build_type'], machine)
+            #2518 TODO: Cope with multiple runs for these key combos
+            run_times[row['suite_name']][k] = (row['run_time'], row['suite_status'])
+    buildTypes = set()
+    for k in builds:
+        builds[k] = list(builds[k])
+        builds[k].sort()
+        buildTypes.add(k[1])
+    buildTypes = list(buildTypes)
     output.append('\n\n<!-- Raw data:\n\n%s\n\n%s\n\n-->\n\n'
                   % (str(builds).replace(', (', ',\n ('),
                      str(run_times).replace('}, u', '},\n u')))
-    
+
     # Display table headings
     buildTypes.sort()
     output.append('<table border="1">\n  <tr><th>Revision</th>\n')
@@ -653,7 +621,7 @@ def _profileHistory(req, n=20, buildTypes=None):
     for rev, bt in revbts:
         for machine in builds.get((rev, bt), []):
             output.append('    <th>%s</th>\n' %
-                          _linkSummary(machine, 'nightly', rev, machine, bt))
+                          _linkSummary(machine, 'nightly', rev, machine, bt, timestamps[(rev, bt, machine)][-1]))
     output.append('  </tr>\n')
     # Display the run times
     _handle_renamed_test_suites(run_times)
@@ -664,15 +632,16 @@ def _profileHistory(req, n=20, buildTypes=None):
         for rev, bt in revbts:
             for machine in builds.get((rev, bt), []):
                 k = (rev, bt, machine)
-                if run_times[test_suite].has_key(k):
+                if k in run_times[test_suite]:
                     run_time, status = run_times[test_suite][k]
                     link_text = _formatRunTime(run_time)
+                    timestamp = timestamps[k][-1]
                     if bt.startswith('GoogleProfile'):
                         # _linkGraph includes the <td> tag
-                        entry = _linkGraph('nightly', rev, machine, bt,
+                        entry = _linkGraph('nightly', rev, machine, bt, timestamp,
                                            test_suite + 'Runner.gif', linkText=link_text)
                     else:
-                        entry = _linkTestSuite('nightly', rev, machine, bt, test_suite,
+                        entry = _linkTestSuite('nightly', rev, machine, bt, timestamp, test_suite,
                                                status, run_time, None, linkText=link_text)
                         entry = '<td>%s</td>' % entry
                     output.append('    %s\n' % entry)
@@ -875,14 +844,46 @@ def _extractDotSeparatedPair(string):
     i = string.rfind('.')
     return string[:i], string[i+1:]
 
-def _testResultsDir(type, revision, machine, buildType):
+def _extractTildeSeparatedPair(string):
+    """Extract both parts from a string of the form revision~timestamp, where the ~timestamp component is optional.
+    
+    If no timestamp is present, returns (revision, None).
+    """
+    i = string.find('~')
+    if i == -1:
+        return string, None
+    else:
+        return string[:i], string[i+1:]
+
+def _getResultsParentDirs(type, revision, timestamp=None):
+    """Get the folder(s) holding test results for this test type, revision, and optionally timestamp.
+    
+    This deals with legacy results where the timestamp information is not included in the path, and
+    the new style where we have revision~timestamp folders.
+    If timestamp is None, a list of all folders for the given revision will be returned, newest first.
+    If timestamp is specified then we check first for a folder with that timestamp, and secondly for a
+    folder with no timestamp, returning a singleton list in either case.
+    """
+    base_path = os.path.join(_tests_dir, type, str(revision))
+    if timestamp is None:
+        results = glob.glob(base_path + '*')
+        results.sort(key=lambda n: -float(n[n.find('~')+1:]) if '~' in n else 0)
+    else:
+        if os.path.isdir(base_path+'~'+str(timestamp)):
+            results = [base_path+'~'+str(timestamp)]
+        else:
+            results = [base_path]
+    return results
+
+def _testResultsDir(type, revision, machine, buildType, timestamp=None):
     """Get the full path to a test results folder.
     This can cope with build machine renamings, using _machine_name_aliases.
     """
     for machine in reversed(_machine_name_aliases(machine)):
-        results_path = os.path.join(_tests_dir, type, str(revision), machine+'.'+buildType)
-        if os.path.isdir(results_path):
-            break
+        for base_path in _getResultsParentDirs(type, revision, timestamp):
+            results_path = os.path.join(base_path, machine+'.'+buildType)
+            if os.path.isdir(results_path):
+                break
     return results_path
 
 _testSummaryRegexp = re.compile(r' *Overall status: <span style="color: (\w+);">(.*)</span>')
@@ -1066,7 +1067,6 @@ Total Test time (real) = 7724.14 sec
 The following tests FAILED:
           9 - TestExceptionRunner (Failed)
     """
-    import glob
     ctest_results = glob.glob(os.path.join(testSetDir, '*TestOutputs_*.txt*'))
     # Regular expressions matching the key lines in the output 
     start_re = re.compile(r'\s+Start\s+\d+: ')
@@ -1240,15 +1240,17 @@ def _getCcFlags(build):
 ##                   HTML helper functions.                        ##
 #####################################################################
 
+def _buildLinkQuery(**parameters):
+    """Build the query string for a hyperlink using the given key-value parameters."""
+    return '&amp;'.join('%s=%s' % pair for pair in sorted(parameters.iteritems()))
+
 def _linkRecent(text, type, start, **filters):
-    "Return a link tag to the recent tests page, starting at the given position."
-    query = 'recent?type=%s&amp;start=%d' % (type, start)
-    for extra_arg in filters.iteritems():
-        query += '&amp;%s=%s' % extra_arg
-    return '<a href="%s/%s">%s</a>' % (_our_url, query, text)
+    """Return a link tag to the recent tests page, starting at the given position."""
+    query = _buildLinkQuery(type=type, start=start, **filters)
+    return '<a href="%s/recent?%s">%s</a>' % (_our_url, query, text)
 
 def _linkRevision(revision, changes=False):
-    "Return a link tag to the source browser for this revision."
+    """Return a link tag to the source browser for this revision."""
     try:
         revision = int(revision)
     except:
@@ -1269,7 +1271,7 @@ def _linkChangeset(revision, text=None):
     return '<a href="%schangeset/%d">%s</a>' % (_trac_url, revision, text)
 
 def _linkBuildType(buildType, revision, wrappableText=False):
-    "Return a link tag to the detailed info page for this build type."
+    """Return a link tag to the detailed info page for this build type."""
     try:
         revision = int(revision)
     except:
@@ -1277,51 +1279,38 @@ def _linkBuildType(buildType, revision, wrappableText=False):
     link_text = buildType
     if wrappableText:
         link_text = link_text.replace(',', ', ')
-    query = 'buildType?buildType=%s&revision=%d' % (buildType, revision)
-    return '<a href="%s/%s">%s</a>' % (_our_url, query, link_text)
+    query = _buildLinkQuery(buildType=buildType, revision=revision)
+    return '<a href="%s/buildType?%s">%s</a>' % (_our_url, query, link_text)
 
-def _linkSummary(text, type, revision, machine, buildType):
-    """
-    Return a link tag to the summary page for this set of tests.
-    text is the text of the link.
-    """
+def _linkSummary(text, type, revision, machine, buildType, timestamp):
+    """Return a link tag to the summary page for this set of tests. text is the text of the link."""
     revision = int(revision)
-    query = 'type=%s&revision=%d&machine=%s&buildType=%s' % (type, revision, machine, buildType)
+    query = _buildLinkQuery(type=type, revision=revision, machine=machine, buildType=buildType, timestamp=timestamp)
     return '<a href="%s/summary?%s">%s</a>' % (_our_url, query, text)
 
-def _linkTestSuite(type, revision, machine, buildType, testsuite,
+def _linkTestSuite(type, revision, machine, buildType, timestamp, testsuite,
                    status, runtime, build, linkText=None):
-    """
-    Return a link tag to a page displaying the output from a single
-    test suite.
-    """
+    """Return a link tag to a page displaying the output from a single test suite."""
     if type == 'standalone':
         filename = build.ResultsFileName(os.curdir, testsuite, status, runtime)
         link = '<a href="%s">%s</a>' % (filename, build.DisplayStatus(status))
     else:
-        query = 'type=%s&amp;revision=%s&amp;machine=%s&amp;buildType=%s'\
-          % (type, revision, machine, buildType)
-        query += '&amp;testsuite=%s&amp;status=%s&amp;runtime=%d'\
-          % (testsuite, status, runtime)
+        query = _buildLinkQuery(type=type, revision=revision, machine=machine, buildType=buildType, timestamp=timestamp,
+                                testsuite=testsuite, status=status, runtime=runtime)
         if linkText is None:
             linkText = build.DisplayStatus(status)
         link = '<a href="%s/testsuite?%s">%s</a>' % (_our_url, query, linkText)
     return link
 
-def _linkGraph(type, revision, machine, buildType, graphFilename,
-               linkText='Profile callgraph'):
-    """
-    Return a link tag in a <td> to the graphics file which contains the graph.
-    """
+def _linkGraph(type, revision, machine, buildType, timestamp, graphFilename, linkText='Profile callgraph'):
+    """Return a link tag in a <td> to the graphics file which contains the graph."""
     if graphFilename == '':
         link = ''
     elif type == 'standalone':
         link = '<td><a href="%s">%s</a></td>' % (graphFilename, linkText)
     else:
         revision = int(revision)
-        query = 'type=%s&amp;revision=%d&amp;machine=%s&amp;buildType=%s' % \
-                (type, revision, machine, buildType)
-        query = query + '&amp;graphName=%s' % (graphFilename)
+        query = _buildLinkQuery(type=type, revision=revision, machine=machine, buildType=buildType, timestamp=timestamp, graphName=graphFilename)
         link = '<td><a href="%s/graph?%s">%s</a></td>' % (_our_url, query, linkText)
     return link
 
