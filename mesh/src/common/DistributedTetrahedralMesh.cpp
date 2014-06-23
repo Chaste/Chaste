@@ -1661,8 +1661,7 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex
 
     // Return the index of the closest node to the current point
     // In the distributed case, we'll have to do an AllReduce
-    double global_best_node_index = this->mNodes[best_node_index]->GetIndex();
-
+    unsigned global_best_node_index = this->mNodes[best_node_index]->GetIndex();
 
     // This is a handy data structure that will work with MPI_DOUBLE_INT data type.
     // todo #2507 Is this the best place for this struct?
