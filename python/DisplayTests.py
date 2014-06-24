@@ -222,7 +222,7 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
         def gen_row(cur=cur):
             for row in cur:
                 yield (row['revision'], row['machine'], row['build_type'], row['targets'],
-                       time.mktime(row['finished'].timetuple()), row['status'], row['colour'])
+                       db.FormatTimestamp(row['finished']), row['status'], row['colour'])
     else:
         # Parse the directory structure within dir into a list of builds
         builds = []
@@ -282,9 +282,9 @@ def _recent(req, type='', start=0, n_per_page=30, **filters):
     old_revision = -1
     for revision, machine, build_type, targets, finished, overall_status, colour in gen_row():
         if type == 'nightly':
-            date = time.strftime('%d/%m/%Y', time.localtime(finished))
+            date = time.strftime('%d/%m/%Y', time.localtime(float(finished)))
         else:
-            date = time.strftime('%d/%m/%Y %H:%M:%S', time.localtime(finished))
+            date = time.strftime('%d/%m/%Y %H:%M:%S', time.localtime(float(finished)))
         if revision != old_revision:
             bgcol_index = 1 - bgcol_index
             old_revision = revision
@@ -583,7 +583,7 @@ def _profileHistory(req, n=20, buildTypes=None):
         # The timestamps dictionary
         k_ts = k + (machine,)
         cur_ts = db.conn.execute('select finished from summary where revision=? and build_type=? and machine=?', k_ts)
-        timestamps[k_ts] = sorted(time.mktime(row['finished'].timetuple()) for row in cur_ts)
+        timestamps[k_ts] = sorted(db.FormatTimestamp(row['finished']) for row in cur_ts)
         # The run_times dictionary
         if row['suite_name'] not in inf_test_names:
             if not row['suite_name'] in run_times:
