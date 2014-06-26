@@ -1759,53 +1759,10 @@ public:
         TS_ASSERT_EQUALS(non_distributed_mesh.GetNearestNodeIndex(point3), 1u);
 
 
-        // If we run on one process, the distributed node ordering is the same as with the
-        // no-distributed mesh - we use the same checks
-
-        // The closest nodes will be permutation[closest node from sequential case]
-        std::vector<unsigned> permutation = distributed_mesh.rGetNodePermutation();
-
-        // todo #2507 Not sure if the permuted test case ever happens...
-        if (permutation.size()==0) // Will happen if in sequential or if nodes are not permuted
-        {
-            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), 1u);
-            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), 10u);   // Closest node is top right node
-            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), 1u);
-        }
-        else
-        {
-            // The order of the nodes is permuted
-
-            // We'll give some explanatory output - permuted indices of nodes 1 and 10
-            if (distributed_mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(permutation[1]))
-            {
-                double permuted_node_1_x = distributed_mesh.GetNode(permutation[1])->rGetLocation()[0];
-                    std::cout << "Original node = 1, permuted node = " << permutation[1]
-                              << ", location = " << permuted_node_1_x << "\n";
-            }
-            if (distributed_mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(permutation[10]))
-            {
-                double permuted_node_10_x = distributed_mesh.GetNode(permutation[10])->rGetLocation()[0];
-                    std::cout << "Original node = 10, permuted node = " << permutation[10]
-                              << ", location = " << permuted_node_10_x << "\n";
-            }
-
-            // Now do the test
-            // Get the closest nodes to the same three points using the distributed mesh
-            unsigned nearest_node_point_1 = distributed_mesh.GetNearestNodeIndex(point1);
-            unsigned nearest_node_point_2 = distributed_mesh.GetNearestNodeIndex(point2);
-            unsigned nearest_node_point_3 = distributed_mesh.GetNearestNodeIndex(point3);
-
-                std::cout << "Process " << PetscTools::GetMyRank()
-                          << ", node for point 1 = " << nearest_node_point_1
-                          << ", node for point 2 = " << nearest_node_point_2
-                          << ", node for point 3 = " << nearest_node_point_3 << "\n";
-
-            // Check the results against the permuted node indices
-            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), permutation[1]);
-            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), permutation[10]);   // Closest node is top right node
-            TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), permutation[1]);
-        }
+        assert(distributed_mesh.rGetNodePermutation().size()==0);
+        TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point1), 1u);
+        TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point2), 10u);   // Closest node is top right node
+        TS_ASSERT_EQUALS(distributed_mesh.GetNearestNodeIndex(point3), 1u);
     }
 
 

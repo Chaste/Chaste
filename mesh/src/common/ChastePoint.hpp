@@ -107,6 +107,11 @@ public:
     c_vector<double, DIM>& rGetLocation();
 
     /**
+     * @return the location of the Point.  Constant non-liberal variety.
+     */
+    const c_vector<double, DIM>& rGetLocation() const;
+
+    /**
      * @return the vector mLocation.
      *
      * @param i the index of the vector to return

@@ -295,8 +295,7 @@ c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const C
     // Find the location with respect to node 0
 ///\todo: #1361 ComputeContainingElements and related methods, and methods called by that down to
 /// here, should really take in const c_vector& rather than ChastePoints.
-    ChastePoint<SPACE_DIM> copy = rTestPoint; // as rGetLocation in line below is not a const method
-    c_vector<double, SPACE_DIM> test_location=copy.rGetLocation()-this->GetNodeLocation(0);
+    c_vector<double, SPACE_DIM> test_location=rTestPoint.rGetLocation()-this->GetNodeLocation(0);
 
     //Multiply by inverse Jacobian
     c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;

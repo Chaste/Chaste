@@ -1632,14 +1632,14 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
+    // Call base method to find closest on local processor
     unsigned best_node_index = AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(rTestPoint);
 
     // Recalculate the distance to the best node (if this process has one)
     double best_node_point_distance = DBL_MAX;
     if (best_node_index != UINT_MAX)
     {
-        ChastePoint<SPACE_DIM> copy = rTestPoint;
-        best_node_point_distance = norm_2(this->GetNode(best_node_index)->rGetLocation() - copy.rGetLocation());
+        best_node_point_distance = norm_2(this->GetNode(best_node_index)->rGetLocation() - rTestPoint.rGetLocation());
     }
 
 
