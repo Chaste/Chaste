@@ -52,6 +52,9 @@ chaste_dir = '.'
 suite_res = {'.hpp': re.compile(r'class\s+(\w+)\s*:\s*public\s+((::)?\s*CxxTest\s*::\s*)?\w*TestSuite\s+$'),
              '.py': re.compile(r'class\s+\w+\(unittest\.TestCase\):\s+$')}
 
+# Should we check for orphans in projects too?
+projects_to_check = sys.argv[1:]
+
 def IsTestFile(test_dir, test_file_path):
     """Does the given file define a test suite?"""
     is_test = False
@@ -71,10 +74,13 @@ def IsTestFile(test_dir, test_file_path):
 test_packs  = set()  # Names of test packs found
 orphans     = set()  # Names of any orphaned test files
 found_tests = set()  # Names of tests found in test packs
-test_dirs = glob.glob('*/test') + glob.glob('projects/*/test')
+test_dirs = glob.glob('*/test')
+test_dirs.extend(map(lambda p: os.path.join(p, 'test'), projects_to_check))
 
 # First get a list of all tests in all test packs
-for test_dir in test_dirs:
+print "Test folders checked:"
+for test_dir in sorted(test_dirs):
+    print "   ", test_dir
     tf, pn = BuildTools.GetTestsInTestPacks(test_dir, returnFoundPacks=True)
     found_tests.update(tf)
     test_packs.update(pn)
@@ -102,7 +108,7 @@ for test_dir in test_dirs:
 # Output the names of test packs found
 if test_packs:
     print "Test packs found:"
-    for test_pack in test_packs:
+    for test_pack in sorted(test_packs):
         print "   ", test_pack
     print
 

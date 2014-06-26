@@ -178,7 +178,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     """Actually run the given test."""
     # Find out how we're supposed to run tests under this build type
     if exefile.startswith("python/infra/Check"):
-        command = exefile + ' 2>&1'
+        command = exefile + ' 2>&1 ' + run_time_flags
     elif exefile.endswith('.py'):
         if build.build_dir == 'line_profile':
             prof = ' --line-profile'

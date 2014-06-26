@@ -267,6 +267,18 @@ if isinstance(build, BuildTypes.CovTool):
 Export("other_libpaths", "other_libs")
 
 
+def RequestedProjects():
+    """Return a list of projects explicitly mentioned on the command line."""
+    projects = []
+    for targ in COMMAND_LINE_TARGETS:
+        if str(targ).startswith('projects'):
+            projects.append(str(targ))
+    for req_test in requested_tests:
+        if req_test[0] in os.listdir('projects'):
+            projects.append(os.path.join('projects', req_test[0]))
+    return projects
+
+
 # Set up the environment to use for building.
 other_libpaths.append(os.path.abspath('lib'))
 if os.environ.get('CHASTE_LOAD_ENV', ''):
@@ -376,9 +388,11 @@ Export('env')
 test_log_files = []
 
 # 'Infrastructure' tests of the codebase layout etc.
-def run_infra(test, out):
+def run_infra(test, out, run_time_flags=''):
+    if run_time_flags:
+        run_time_flags = ' "%s"' % run_time_flags
     os.system('python/infra/TestRunner.py python/infra/' + test + ' ' + str(out)
-              + ' ' + build_type + ' --no-stdout')
+              + ' ' + build_type + ' --no-stdout' + run_time_flags)
 if run_infrastructure_tests and not GetOption('clean'):
     if not os.path.exists(build.GetTestReportDir()):
         os.makedirs(build.GetTestReportDir())
@@ -386,7 +400,7 @@ if run_infrastructure_tests and not GetOption('clean'):
         print "Running infrastructure tests..."
     # Check for orphaned test files
     out = File(build.GetTestReportDir() + 'OrphanedTests.log')
-    run_infra('CheckForOrphanedTests.py', out)
+    run_infra('CheckForOrphanedTests.py', out, ' '.join(RequestedProjects()))
     test_log_files.append(out)
     # Check for duplicate file names in multiple directories
     out = File(build.GetTestReportDir() + 'DuplicateFileNames.log')
@@ -467,17 +481,6 @@ for toplevel_dir in components:
 Clean('.', glob.glob('lib/*'))
 Clean('.', glob.glob('linklib/*'))
 
-
-def RequestedProjects():
-    """Return a list of projects explicitly mentioned on the command line."""
-    projects = []
-    for targ in COMMAND_LINE_TARGETS:
-        if str(targ).startswith('projects'):
-            projects.append(str(targ))
-    for req_test in requested_tests:
-        if req_test[0] in os.listdir('projects'):
-            projects.append(os.path.join('projects', req_test[0]))
-    return projects
 
 # Test summary generation
 if test_summary and not compile_only:
