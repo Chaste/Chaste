@@ -1925,6 +1925,12 @@ public:
                 TS_ASSERT_EQUALS(smallest_mesh.GetNumLocalElements(), 0u);
             }
         }
+
+        // Note that only processes ranked 0 or 1 will get nodes, so with more than
+        // two processes some processes own nothing
+        ChastePoint<1> origin(0.0);
+        TS_ASSERT_EQUALS(smallest_mesh.GetNearestNodeIndex(origin), 0u);
+
     }
 
     void TestConstructRectangularMeshSmallest()
