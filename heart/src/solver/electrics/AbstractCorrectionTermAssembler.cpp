@@ -51,6 +51,14 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
         Element<ELEMENT_DIM, SPACE_DIM>& r_element = *iter;
         if (r_element.GetOwnership())
         {
+            unsigned element_index = r_element.GetIndex();
+            // If bath element, don't try to use SVI
+            if ( r_element.GetAttribute()==HeartRegionCode::GetValidBathId() )
+            {
+                mElementsHasIdenticalCellModels[element_index] = false;
+                continue;
+            }
+            // See if the nodes in this element all use the same cell model
             unsigned node_zero = r_element.GetNodeGlobalIndex(0);
             AbstractCardiacCellInterface* p_cell_zero = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_zero);
             const std::type_info& r_zero_info = typeid(*p_cell_zero);
@@ -62,7 +70,7 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
                 const std::type_info& r_info = typeid(*p_cell);
                 if (r_zero_info != r_info)
                 {
-                    mElementsHasIdenticalCellModels[r_element.GetIndex()] = false;
+                    mElementsHasIdenticalCellModels[element_index] = false;
                     break;
                 }
             }
