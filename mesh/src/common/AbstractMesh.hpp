@@ -339,7 +339,7 @@ public:
       * This method is overridden in the distributed case to return the global node index.
       *
       * This method uses GetVectorFromAtoB distance and hence may return a correct solution
-      * in non-Euclidean space, but only if if this method is overridden in a subclass
+      * in non-Euclidean space, but only if this method is overridden in a subclass
       * (see e.g. Cylindrical2dMesh for an example of this).
       *
       * @param rTestPoint reference to the point
