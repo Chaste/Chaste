@@ -170,6 +170,11 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
     }
 
     /*
@@ -186,7 +191,7 @@ public:
      * This also means there may be "long" edges in the mesh which can cause the cells
      * to move due long range interactions resulting in an artificially rounded shape.
      *
-     * There are two solutiona to this. The first is to define a cut off length on the force,
+     * There are two solutions to this. The first is to define a cut off length on the force,
      * which can be done by using the command
      * {{{p_force->SetCutOffLength(1.5);}}}
      * on the {{{GeneralisedLinearSpringForce}}}. Here there will be no forces exerted
@@ -256,6 +261,11 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
     }
     /*
      * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,

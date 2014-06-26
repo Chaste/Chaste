@@ -106,8 +106,7 @@ public:
         /** The next line is needed because HoneycombMeshGenerator is not designed to be run in parallel */
         EXIT_IF_PARALLEL;
 
-        /* We no longer need to set up the start time as this is fone in the {{{AbstractCellBasedTestSuite}}}.
-         * The first thing we do is generate a nodes only mesh. To do this we first create a {{{MutableMesh}}}
+        /* The first thing we do is generate a nodes only mesh. To do this we first create a {{{MutableMesh}}}
          * to use as a generating mesh.
          * To do this we can use the {{{HoneycombMeshGenerator}}}. This generates a honeycomb-shaped mesh,
          * in which all nodes are equidistant. Here the first and second arguments
@@ -122,7 +121,7 @@ public:
          */
         NodesOnlyMesh<2> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
-         * ConstructNodesWithoutMesh, which defines the connectivity of the nodes by defining
+         * {{{ConstructNodesWithoutMesh}}}, which defines the connectivity of the nodes by defining
          * a radius of interaction. */
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -158,6 +157,11 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
     }
 
     /*
@@ -229,6 +233,11 @@ public:
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
 
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
+
         /* To avoid memory leaks, we conclude by deleting any pointers that we created in the test.*/
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -270,7 +279,7 @@ public:
         nodes.push_back(new Node<3>(3u,  false,  0.0, -0.5, 0.0));
         NodesOnlyMesh<3> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
-         * ConstructNodesWithoutMesh, which defines the connectivity of the nodes by defining
+         * {{{ConstructNodesWithoutMesh}}}, which defines the connectivity of the nodes by defining
          * a radius of interaction. */
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
@@ -312,6 +321,11 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
 
         /* To avoid memory leaks, we conclude by deleting any pointers that we created in the test.*/
         for (unsigned i=0; i<nodes.size(); i++)

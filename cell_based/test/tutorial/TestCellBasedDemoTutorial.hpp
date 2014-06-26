@@ -291,6 +291,8 @@ public:
     /*
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo2}}} to {{{CellBasedDemo3}}}.
+     * To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
+     * generate the required .vtu files. This is detailed in the UserTutorials/VisualizingWithParaview tutorial.
      *
      * == Test 4 - basic mesh-based simulation with ghost nodes ==
      *

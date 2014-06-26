@@ -194,6 +194,11 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 50.0, 1e-10);
     }
 
     /*
@@ -285,6 +290,11 @@ public:
          *
          * To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
 
     /*
@@ -382,6 +392,11 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
     /*
      * EMPTYLINE
