@@ -343,6 +343,12 @@ public:
         TS_ASSERT_DELTA(norm_2(vector), 1.0, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetDistanceBetweenNodes(1, 4), 1.0, 1e-7);
 
+        // Cylindrical at x=3, so closest node should be node 0 at (0,0).
+        c_vector<double, 2> test;
+        test[0] = 2.9;
+        test[1] = 0.0;
+        TS_ASSERT_EQUALS(p_mesh->GetNearestNodeIndex(test), 0u);
+
         // ...and the opposite vector
         vector = p_mesh->GetVectorFromAtoB(location2, location1);
         TS_ASSERT_DELTA(vector[0], -0.5, 1e-7);

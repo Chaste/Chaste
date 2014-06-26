@@ -295,7 +295,7 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
     for (unsigned node_index = 0; node_index < mNodes.size(); node_index++)
     {
         // Calculate the distance from the chosen point to the current node
-        double node_point_distance = norm_2( mNodes[node_index]->rGetLocation() - test_location);
+        double node_point_distance = norm_2( GetVectorFromAtoB(mNodes[node_index]->rGetLocation(), test_location) );
         // Update the "best" distance and node index if necessary
         if (node_point_distance < best_node_point_distance)
         {
@@ -304,7 +304,8 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
         }
     }
 
-    // Return the global index of the closest node to the point (which differs from the local index "best_node_index" in parallel)
+    // Return the global index of the closest node to the point
+    // (which differs from the local index "best_node_index" in parallel)
     // In the distributed case, we'll have to do an AllReduce next
     return mNodes[best_node_index]->GetIndex();
 }
