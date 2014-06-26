@@ -469,7 +469,7 @@ public:
         //AbstractDynamicLinearPdeSolver<1,1,1>* p_solver = monodomain_problem.CreateSolver();
         //MonodomainSolver<1,1>* p_mono_solver = dynamic_cast<MonodomainSolver<1,1>*>(p_solver);
         //MonodomainCorrectionTermAssembler<1,1>* p_assembler = p_mono_solver->mpMonodomainCorrectionTermAssembler;
-        //TS_ASSERT_EQUALS(p_assembler->mElementsHasIdenticalCellModels.size(), 10u);
+        //TS_ASSERT_EQUALS(p_assembler->mElementsCanDoSvi.size(), 10u);
 
         // Therefore, we just test that calling Solve() runs (without the checking that
         // cell models are identical, this fails).

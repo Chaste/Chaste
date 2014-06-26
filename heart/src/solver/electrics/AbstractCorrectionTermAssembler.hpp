@@ -62,11 +62,12 @@ protected:
     void ResetInterpolatedQuantities( void );
 
     /**
-     *  Vector of bools, one bool per element, saying whether that
-     *  element has identical cell models at each node. If this
-     *  is not the case, SVI is certainly not posssible in this element
+     *  Vector of bools, one bool per element, representing whether each
+     *  element can do SVI. If the element has different cell models at
+     *  each node, or has been designated a bath element, then it cannot
+     *  do SVI.
      */
-    std::vector<bool> mElementsHasIdenticalCellModels;
+    std::vector<bool> mElementsCanDoSvi;
 
     /**
      * Interpolates state variables and ionic current.

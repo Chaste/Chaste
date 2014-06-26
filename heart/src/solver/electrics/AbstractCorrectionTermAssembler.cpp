@@ -42,8 +42,8 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
         AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
     : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,CARDIAC>(pMesh,pTissue)
 {
-    // Work out which elements have the same cell at every node, and hence can have SVI done
-    mElementsHasIdenticalCellModels.resize(pMesh->GetNumElements(), true);
+    // Work out which elements can do SVI
+    mElementsCanDoSvi.resize(pMesh->GetNumElements(), true);
     for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = pMesh->GetElementIteratorBegin();
          iter != pMesh->GetElementIteratorEnd();
          ++iter)
@@ -55,14 +55,14 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
             // If bath element, don't try to use SVI
             if ( r_element.GetAttribute()==HeartRegionCode::GetValidBathId() )
             {
-                mElementsHasIdenticalCellModels[element_index] = false;
+                mElementsCanDoSvi[element_index] = false;
                 continue;
             }
             // See if the nodes in this element all use the same cell model
             unsigned node_zero = r_element.GetNodeGlobalIndex(0);
             AbstractCardiacCellInterface* p_cell_zero = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_zero);
             const std::type_info& r_zero_info = typeid(*p_cell_zero);
-            // Check the other nodes match
+            // Check the other nodes match. If they don't, no SVI
             for (unsigned local_index=1; local_index<r_element.GetNumNodes(); local_index++)
             {
                 unsigned global_index = r_element.GetNodeGlobalIndex(local_index);
@@ -70,7 +70,7 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
                 const std::type_info& r_info = typeid(*p_cell);
                 if (r_zero_info != r_info)
                 {
-                    mElementsHasIdenticalCellModels[element_index] = false;
+                    mElementsCanDoSvi[element_index] = false;
                     break;
                 }
             }
@@ -111,8 +111,8 @@ void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Increme
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 bool AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ElementAssemblyCriterion(Element<ELEMENT_DIM,SPACE_DIM>& rElement)
 {
-    // if element doesn't have identical cell models, can't do SVI.
-    if (!mElementsHasIdenticalCellModels[rElement.GetIndex()])
+    // Check that SVI is allowed on this element
+    if (!mElementsCanDoSvi[rElement.GetIndex()])
     {
         return false;
     }
