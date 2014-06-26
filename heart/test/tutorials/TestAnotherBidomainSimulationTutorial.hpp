@@ -134,11 +134,10 @@ public:
          * Specify output formats (for different visualisers)
          *
          * The output will be written to `/tmp/$USER/testoutput/BidomainFibresTutorial`
-         * in HDF5 format, and converted to Meshalyzer format at the end of the simulation.
-         * To adjust this, or convert to Cmgui or VTK format as well, use methods in
-         * `HeartConfig`,  e.g.
+         * in HDF5 format.  It can be converted to visualisable formats (Meshalyzer, Cmgui or VTK) at the end
+         * of the simulation using methods in `HeartConfig`,  e.g.
          */
-        //HeartConfig::Instance()->SetVisualizeWithMeshalyzer(false);
+        //HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
         /* The other option is to write in VTK format (which needs VTK installed), following
          * which the results can be loaded in the visualiser Paraview */
