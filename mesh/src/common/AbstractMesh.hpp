@@ -338,6 +338,9 @@ public:
       *
       * This method is overridden in the distributed case to return the global node index.
       *
+      * This method uses Euclidean distance and hence may return an incorrect solution at the
+      * edge of a cylindrical mesh.
+      *
       * @param rTestPoint reference to the point
       * @return node index
       */
