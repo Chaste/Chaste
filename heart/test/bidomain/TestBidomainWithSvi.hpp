@@ -370,10 +370,10 @@ public:
         }
 
         // ICI
-        TS_ASSERT_DELTA(final_solution_ici[15*2], 7.0918, 1e-3); // Node 15 phi_i
+        TS_ASSERT_DELTA(final_solution_ici[15*2], 7.0918, 2e-3); // Node 15 phi_i
         TS_ASSERT_DELTA(final_solution_ici[15*2+1], 0.0401, 1e-3); // Node 15 phi_e
         // SVI
-        TS_ASSERT_DELTA(final_solution_svi[15*2], 10.6217, 1e-3); // Node 15 phi_i
+        TS_ASSERT_DELTA(final_solution_svi[15*2], 10.6217, 2e-3); // Node 15 phi_i
         TS_ASSERT_DELTA(final_solution_svi[15*2+1], -0.0180, 1e-3); // Node 15 phi_e
 
     }
