@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "CellBasedSimulationArchiver.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -510,14 +511,15 @@ public:
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
         // Load Mesh
-        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
+        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
         MutableMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
         std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),p_diff_type);
 
         // Create a cell population
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
@@ -544,6 +546,56 @@ public:
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(2)->rGetLocation()-simulator.rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
     }
+
+    /**
+	 * This tests archiving a simulation in 3d with a 2d mesh (see #2112)
+	 */
+	void TestArchivingOffLatticeSimulationWith2dMeshIn3d() throw (Exception)
+	{
+		EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
+
+		// Load Mesh
+		TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
+		MutableMesh<2,3> mesh;
+		mesh.ConstructFromMeshReader(mesh_reader);
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),p_diff_type);
+
+		// Create a cell population
+		MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+		cell_population.SetWriteVtkAsPoints(true);
+
+		// Set up cell-based simulation
+		OffLatticeSimulation<2,3> simulator(cell_population);
+		std::string output_dir = "TestOffLatticeSimulationWith2dMeshIn3dArchive";
+		simulator.SetOutputDirectory(output_dir);
+		simulator.SetEndTime(1.0);
+
+		// Create a force law and pass it to the simulation
+		typedef GeneralisedLinearSpringForce<2,3> Force;
+		MAKE_PTR(Force, p_force);
+		p_force->SetCutOffLength(1.5);
+		simulator.AddForce(p_force);
+
+		// Stops remeshing as not possible for 2d in 3d meshes
+		simulator.SetUpdateCellPopulationRule(false);
+
+		CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);
+
+		double start_time = 0.;
+		OffLatticeSimulation<2,3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2,3>, 3 >::Load(output_dir, start_time);
+
+		p_simulator->Solve();
+
+		//Check that nodes are all sat at resting length  (1.0) apart.
+		TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
+		TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
+		TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
+	}
 
     /**
      * Test a cell-based simulation with a periodic mesh.

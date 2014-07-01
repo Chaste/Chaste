@@ -210,6 +210,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 
     std::vector<double> element_attributes;
     GetNextItemFromStream(mElementsFile, mElementsRead, element_data.NodeIndices, mNumElementAttributes, element_attributes);
+
     if (mNumElementAttributes > 0)
     {
         element_data.AttributeValue = element_attributes[0];///only one element attribute registered for the moment
@@ -695,11 +696,12 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     }
     else
     {
+    	// Note that .face files don't have the number of nodes in a face element in the header (its element dim +1)
         element_header_line >> mNumElements >> mNumFaceAttributes;
 
         extra_attributes = mNumFaceAttributes;
 
-        if (ELEMENT_DIM == 1)
+        if (ELEMENT_DIM == 1 || ELEMENT_DIM == 2)
         {
             mNumElementAttributes = mNumFaceAttributes;
         }
@@ -715,7 +717,6 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
 
         mNodesPerElement = ELEMENT_DIM+1;
     }
-
 
     if (mFilesAreBinary)
     {

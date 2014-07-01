@@ -80,7 +80,6 @@ public:
         COMM2
     } EventType;
 };
-//#include "Debug.hpp"
 
 /**
  * An abstract tetrahedral mesh writer class.
