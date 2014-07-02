@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellWriter.hpp"
 
-/** A class written using the visitor pattern for writing cell ages to file. */
+/** A class written using the visitor pattern for writing cell mutation states to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellMutationStatesWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
