@@ -33,16 +33,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLLOCATIONWRITER_HPP_
-#define CELLLOCATIONWRITER_HPP_
+#ifndef CELLLOCATIONINDEXWRITER_HPP_
+#define CELLLOCATIONINDEXWRITER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellWriter.hpp"
 
-/** A class written using the visitor pattern for writing cell locations to file. */
+/** A class written using the visitor pattern for writing cell location indices to file. */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellLocationWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
+class CellLocationIndexWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -64,7 +64,7 @@ public:
     /**
      * Default constructor.
      */
-    CellLocationWriter();
+    CellLocationIndexWriter();
 
     /**
      * Overridden GetCellDataForVtkOutput() method.
@@ -83,7 +83,6 @@ public:
      * Overridden VisitCell() method.
      *
      * Visit a cell and write its location index.
-     * (Is this all data required for output? #2543)
      *
      * Outputs a line of space-separated values of the form:
      * ...[cell location index] ...
@@ -98,6 +97,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellLocationWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellLocationIndexWriter)
 
-#endif /* CELLLOCATIONWRITER_HPP_ */
+#endif /* CELLLOCATIONINDEXWRITER_HPP_ */

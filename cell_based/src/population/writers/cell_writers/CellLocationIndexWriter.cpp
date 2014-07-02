@@ -33,38 +33,38 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellLocationWriter.hpp"
+#include "CellLocationIndexWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::CellLocationWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizlocations")
+CellLocationIndexWriter<ELEMENT_DIM, SPACE_DIM>::CellLocationIndexWriter()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("results.vizlocationindices")
 {
-    this->mVtkCellDataName = "Cell locations";
+    this->mVtkCellDataName = "Location indices";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellLocationIndexWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     // The method GetCellDataForVtkOutput() is not suitable for this class, so we simply return zero
     return 0.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellLocationIndexWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     *this->mpOutStream << location_index << " ";
 }
 
 // Explicit instantiation
-template class CellLocationWriter<1,1>;
-template class CellLocationWriter<1,2>;
-template class CellLocationWriter<2,2>;
-template class CellLocationWriter<1,3>;
-template class CellLocationWriter<2,3>;
-template class CellLocationWriter<3,3>;
+template class CellLocationIndexWriter<1,1>;
+template class CellLocationIndexWriter<1,2>;
+template class CellLocationIndexWriter<2,2>;
+template class CellLocationIndexWriter<1,3>;
+template class CellLocationIndexWriter<2,3>;
+template class CellLocationIndexWriter<3,3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellLocationWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellLocationIndexWriter)

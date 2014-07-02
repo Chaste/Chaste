@@ -362,7 +362,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.viznodes").CompareFiles();
-        FileComparison(results_dir + "results.vizlocations", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizlocations").CompareFiles();
+        FileComparison(results_dir + "results.vizlocationindices", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizlocationindices").CompareFiles();
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizcelltypes").CompareFiles();
         FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizancestors").CompareFiles();
         FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.vizmutationstates").CompareFiles();

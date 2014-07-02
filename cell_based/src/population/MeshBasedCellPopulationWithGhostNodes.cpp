@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-#include "CellLocationWriter.hpp"
+#include "CellLocationIndexWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -295,9 +295,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::OpenWritersFiles(OutputFileHand
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
-        if (!this-> template HasWriter<CellLocationWriter>())
+        if (!this-> template HasWriter<CellLocationIndexWriter>())
         {
-            this-> template AddCellWriter<CellLocationWriter>();
+            this-> template AddCellWriter<CellLocationIndexWriter>();
         }
     }
 

@@ -860,7 +860,7 @@ public:
         FileComparison( results_dir + "results.vizelements", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizelements").CompareFiles();
         FileComparison( results_dir + "results.viznodes", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.viznodes").CompareFiles();
         FileComparison( results_dir + "results.vizcelltypes", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizcelltypes").CompareFiles();
-        FileComparison( results_dir + "results.vizlocations", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizlocations").CompareFiles();
+        FileComparison( results_dir + "results.vizlocationindices", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/results.vizlocationindices").CompareFiles();
         FileComparison( results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellpopulationareas.dat").CompareFiles();
         FileComparison( results_dir + "cellareas.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/cellareas.dat").CompareFiles();
         FileComparison( results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWritersIn3dWithGhostNodes/voronoi.dat").CompareFiles();

@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestorWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabelWriter.hpp"
-#include "CellLocationWriter.hpp"
+#include "CellLocationIndexWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
@@ -859,7 +859,7 @@ public:
         cell_population.AddCellWriter<CellAncestorWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.AddCellWriter<CellLabelWriter>();
-        cell_population.AddCellWriter<CellLocationWriter>();
+        cell_population.AddCellWriter<CellLocationIndexWriter>();
         cell_population.AddCellWriter<CellMutationStatesWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
@@ -895,7 +895,7 @@ public:
         FileComparison(results_dir + "results.vizancestors",      "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizancestors").CompareFiles();
         FileComparison(results_dir + "loggedcell.dat",            "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/loggedcell.dat").CompareFiles();
         FileComparison(results_dir + "results.vizlabels",         "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizlabels").CompareFiles();
-        FileComparison(results_dir + "results.vizlocations",      "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizlocations").CompareFiles();
+        FileComparison(results_dir + "results.vizlocationindices",      "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizlocationindices").CompareFiles();
         FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizmutationstates").CompareFiles();
         FileComparison(results_dir + "results.vizcellphases", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizcellphases").CompareFiles();
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizcelltypes").CompareFiles();

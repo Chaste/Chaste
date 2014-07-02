@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
-#include "CellLocationWriter.hpp"
+#include "CellLocationIndexWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 
@@ -446,9 +446,9 @@ void CaBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFile
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
-        if (!this-> template HasWriter<CellLocationWriter>())
+        if (!this-> template HasWriter<CellLocationIndexWriter>())
         {
-            this-> template AddCellWriter<CellLocationWriter>();
+            this-> template AddCellWriter<CellLocationIndexWriter>();
         }
     }
 

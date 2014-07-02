@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestorWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabelWriter.hpp"
-#include "CellLocationWriter.hpp"
+#include "CellLocationIndexWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
@@ -891,7 +891,7 @@ public:
         cell_population.AddCellWriter<CellAncestorWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.AddCellWriter<CellLabelWriter>();
-        cell_population.AddCellWriter<CellLocationWriter>();
+        cell_population.AddCellWriter<CellLocationIndexWriter>();
         cell_population.AddCellWriter<CellMutationStatesWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
@@ -943,7 +943,7 @@ public:
         files_to_compare.push_back("results.vizancestors");
         files_to_compare.push_back("loggedcell.dat");
         files_to_compare.push_back("results.vizlabels");
-        files_to_compare.push_back("results.vizlocations");
+        files_to_compare.push_back("results.vizlocationindices");
         files_to_compare.push_back("results.vizmutationstates");
         files_to_compare.push_back("results.vizcellphases");
         files_to_compare.push_back("results.vizcelltypes");

@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestorWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabelWriter.hpp"
-#include "CellLocationWriter.hpp"
+#include "CellLocationIndexWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
@@ -492,7 +492,7 @@ public:
         }
     }
 
-    void TestCellLocationWriter() throw (Exception)
+    void TestCellLocationIndexWriter() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -514,12 +514,12 @@ public:
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create output directory
-        std::string output_directory = "TestCellLocationWriter";
+        std::string output_directory = "TestCellLocationIndexWriter";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellLocationWriter<2,2> cell_writer;
+        CellLocationIndexWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2,2>::Iterator cell_iter = cell_population.Begin();
@@ -532,24 +532,24 @@ public:
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
-        FileComparison(results_dir + "results.vizlocations", "cell_based/test/data/TestCellWriters/results.vizlocations").CompareFiles();
+        FileComparison(results_dir + "results.vizlocationindices", "cell_based/test/data/TestCellWriters/results.vizlocationindices").CompareFiles();
 
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
 
         // Test GetVtkCellDataName() method
-        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell locations");
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Location indices");
     }
 
-    void TestCellLocationWriterArchiving() throw (Exception)
+    void TestCellLocationIndexWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellLocationWriter.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellLocationIndexWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellLocationWriter<2,2>();
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellLocationIndexWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
