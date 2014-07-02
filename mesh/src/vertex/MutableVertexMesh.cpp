@@ -795,7 +795,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         while (recheck_mesh == true)
         {
             // We check for any short edges and perform swaps if necessary and possible.
-            recheck_mesh = CheckForSwapsFromShortEdges(rElementMap);
+            recheck_mesh = CheckForSwapsFromShortEdges();
         }
 
         // Check for element intersections
@@ -825,7 +825,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges(VertexElementMap& rElementMap)
+bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
 {
     // Loop over elements to check for T1 swaps
     for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
@@ -875,7 +875,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges(Vert
                 // ...and if none are, then perform the required type of swap and halt the search, returning true
                 if (!both_nodes_share_triangular_element)
                 {
-                    IdentifySwapType(p_current_node, p_anticlockwise_node, rElementMap);
+                    IdentifySwapType(p_current_node, p_anticlockwise_node);
                     return true;
                 }
             }
@@ -985,7 +985,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap)
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
     // Find the sets of elements containing nodes A and B
     std::set<unsigned> nodeA_elem_indices = pNodeA->rGetContainingElementIndices();

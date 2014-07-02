@@ -132,14 +132,10 @@ protected:
      * call IdentifySwapType(), which in turn implements the appropriate local remeshing operation
      * (a T1 swap, void removal, or node merge).
      *
-     * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
-     *                   with indices of VertexElements in the new mesh.  This should be created
-     *                   with the correct size, GetNumElements().
-     *
      * @return whether we need to check for, and implement, any further local remeshing operations
      *                   (true if any swaps are performed).
      */
-    bool CheckForSwapsFromShortEdges(VertexElementMap& rElementMap);
+    bool CheckForSwapsFromShortEdges();
 
     /**
      * Helper method for ReMesh().
@@ -160,11 +156,8 @@ protected:
      *
      * @param pNodeA one of the nodes to perform the swap with
      * @param pNodeB the other node to perform the swap
-     * @param rElementMap a VertexElementMap which associates the indices of VertexElements in the old mesh
-     *                   with indices of VertexElements in the new mesh.  This should be created
-     *                   with the correct size, GetNumElements()
      */
-    virtual void IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, VertexElementMap& rElementMap);
+    virtual void IdentifySwapType(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
     /**
      * Helper method for ReMesh(), called by IdentifySwapType().

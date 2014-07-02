@@ -83,8 +83,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Merge nodes 3 and 4
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
 
         // Test the mesh is correctly updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
@@ -156,8 +155,7 @@ public:
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
 
         // Merge nodes 4 and 5
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
 
         // Test the mesh is correctly updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
@@ -233,8 +231,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
 
         // Perform a T1 swap on nodes 4 and 5
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -325,8 +322,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
 
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -417,8 +413,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Perform a T1 swap on nodes 5 and 4 (this way round to ensure coverage of boundary node tracking)
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -500,8 +495,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
 
         // Perform a T1 swap on nodes 5 and 4.
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4), map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(5), vertex_mesh.GetNode(4));
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -578,8 +572,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1*2.0/1.5);
 
         // Test that trying to perform a T1 swap on nodes 4 and 5 throws the correct exception
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5), map), "Nodes are too close together, this shouldn't happen");
+        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5)), "Nodes are too close together, this shouldn't happen");
     }
 
     void TestPerformT1SwapWithAddingEdgeToTriangularElement() throw(Exception)
@@ -630,8 +623,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.21);
 
         // Perform a T1 swap on nodes 4 and 5
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.CheckForSwapsFromShortEdges(map);
+        vertex_mesh.CheckForSwapsFromShortEdges();
 
         // Test that each element contains the correct nodes following the rearrangement
         unsigned node_indices_element_0[4] = {2, 3, 5, 4};
@@ -649,7 +641,6 @@ public:
                 TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNodeGlobalIndex(i), node_indices_element_3[i]);
             }
         }
-
     }
 
     void TestDoNotPerforT1SwapWithRemovingEdgeFromTriangularElement() throw(Exception)
@@ -703,8 +694,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.11);
 
         // Check for T1 swaps and carry them out if allowed - the short edge should not swap!
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.CheckForSwapsFromShortEdges(map);
+        vertex_mesh.CheckForSwapsFromShortEdges();
 
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
 
@@ -770,8 +760,7 @@ public:
 
         // Check for possible swaps and carry them out if allowed - the short edge should not swap and
         // the void should not be removed!
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForSwapsFromShortEdges(map),
+        TS_ASSERT_THROWS_THIS(vertex_mesh.CheckForSwapsFromShortEdges(),
                               "Triangular element next to triangular void, not implemented yet.");
     }
 
@@ -1229,8 +1218,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
 
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7), map), "There is a boundary node contained in three elements something has gone wrong.");
+        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7)), "There is a boundary node contained in three elements something has gone wrong.");
     }
 
     void TestReMeshExceptionWhenNonBoundaryNodeIsContainedOnlyInTwoElements() throw(Exception)
@@ -2153,8 +2141,7 @@ public:
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
         // Call IdentifySwapType on nodes 6 and 4 (ordering for coverage)
-        VertexElementMap map(vertex_mesh.GetNumElements());
-        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6),vertex_mesh.GetNode(4),map);
+        vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6),vertex_mesh.GetNode(4));
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
@@ -2171,9 +2158,8 @@ public:
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(4)->rGetContainingElementIndices(), expected_elements_containing_node_4);
 
-        // Call IdentifySwapType() on nodes 6 and 7 (originaly nodes 8 and 9)
-        VertexElementMap map_2(vertex_mesh.GetNumElements());
-        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7), map_2),
+        // Call IdentifySwapType() on nodes 6 and 7 (originally nodes 8 and 9)
+        TS_ASSERT_THROWS_THIS(vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(6), vertex_mesh.GetNode(7)),
                               "Triangular element next to triangular void, not implemented yet.");
     }
 
