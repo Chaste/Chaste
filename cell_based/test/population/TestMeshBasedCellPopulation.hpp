@@ -68,7 +68,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
-#include "CellVariablesWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
@@ -896,7 +895,6 @@ public:
         cell_population.AddCellWriter<CellMutationStatesWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
-        cell_population.AddCellWriter<CellVariablesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // This method is usually called by Update()
@@ -949,7 +947,6 @@ public:
         files_to_compare.push_back("results.vizmutationstates");
         files_to_compare.push_back("results.vizcellphases");
         files_to_compare.push_back("results.vizcelltypes");
-        files_to_compare.push_back("cellvariables.dat");
         files_to_compare.push_back("cellareas.dat");
         files_to_compare.push_back("cellmutationstates.dat");
         files_to_compare.push_back("cellcyclephases.dat");

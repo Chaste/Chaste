@@ -91,7 +91,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-#include "CellVariablesWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativePhasesCountWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
@@ -169,7 +168,6 @@ public:
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
-        cell_population.AddCellWriter<CellVariablesWriter>();
 
         /* As we are using the {{{CellData}}} class to store the information about each cell required to
          * solve the Delta/Notch ODE system, we must first instantiate this singleton and associate it with the

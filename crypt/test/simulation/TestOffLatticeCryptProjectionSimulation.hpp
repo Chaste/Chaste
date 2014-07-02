@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
-#include "CellVariablesWriter.hpp"
+#include "CellCycleModelProteinConcentrationsWriter.hpp"
 
 // Cell population writers
 #include "CellProliferativePhasesCountWriter.hpp"
@@ -115,7 +115,7 @@ public:
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddPopulationWriter<CellPopulationAreaWriter>();
-        cell_population.AddCellWriter<CellVariablesWriter>();
+        cell_population.AddCellWriter<CellCycleModelProteinConcentrationsWriter>();
         cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
@@ -144,9 +144,9 @@ public:
 
         OutputFileHandler handler("OffLatticeSimulationWritingProteins", false);
 
-        std::string cell_variables_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellvariables.dat";
-        NumericFileComparison comp_cell_variables(cell_variables_file, "crypt/test/data/OffLatticeSimulationWritingProteins/cellvariables.dat");
-        TS_ASSERT(comp_cell_variables.CompareFiles(1e-2));
+        std::string protein_conc_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/proteinconcentrations.dat";
+        NumericFileComparison comp_protein_conc(protein_conc_file, "crypt/test/data/OffLatticeSimulationWritingProteins/proteinconcentrations.dat");
+        TS_ASSERT(comp_protein_conc.CompareFiles(1e-2));
 
         std::string cell_cycle_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellcyclephases.dat";
         NumericFileComparison comp_cell_cycle(cell_cycle_file, "crypt/test/data/OffLatticeSimulationWritingProteins/cellcyclephases.dat");

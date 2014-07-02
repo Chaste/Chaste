@@ -33,19 +33,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLVARIABLESWRITER_HPP_
-#define CELLVARIABLESWRITER_HPP_
+#ifndef CELLCYCLEMODELPROTEINCONCENTRATIONSWRITER_HPP_
+#define CELLCYCLEMODELPROTEINCONCENTRATIONSWRITER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellWriter.hpp"
 
 /**
- * A class written using the visitor pattern for writing cell variables to file.
- * \todo #2544 improve class name for clarity
+ * A class written using the visitor pattern for writing cell-cycle model protein concentrations to file.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellVariablesWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
+class CellCycleModelProteinConcentrationsWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -67,7 +66,7 @@ public:
     /**
      * Default constructor.
      */
-    CellVariablesWriter();
+    CellCycleModelProteinConcentrationsWriter();
 
     /**
      * Overridden GetCellDataForVtkOutput() method.
@@ -85,7 +84,8 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its protein concentrations.
+     * Visit a cell and write the protein concentrations associated with its cell-cycle model,
+     * if its cell-cycle model is a subclass of AbstractOdeBasedCellCycleModel.
      *
      * Outputs a line of space-separated values of the form:
      * ...[location index] [protein 1 conc] [protein 2 conc] ... [protein n conc] ...
@@ -93,13 +93,17 @@ public:
      * This is appended to the output written by AbstractCellBasedWriter, which is a single
      * value [current simulation time], followed by a tab.
      *
-     * @param pCell a cell
+     * Note that the "protein concentrations" refer to the solution of the ODE system that is
+     * present in the cell-cycle model. If the cell-cycle model does not inherit from
+     * AbstractOdeBasedCellCycleModel, then an exception is thrown.
+     *
+     * @param pCell a pointer to a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
      */
     virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellVariablesWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellCycleModelProteinConcentrationsWriter)
 
-#endif /* CELLVARIABLESWRITER_HPP_ */
+#endif /* CELLCYCLEMODELPROTEINCONCENTRATIONSWRITER_HPP_ */

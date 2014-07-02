@@ -60,7 +60,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
-#include "CellVariablesWriter.hpp"
 #include "CellVolumesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 
@@ -349,7 +348,6 @@ public:
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
-        cell_population.AddCellWriter<CellVariablesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
         cell_population.AddCellWriter<CellMutationStatesWriter>();
 

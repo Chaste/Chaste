@@ -79,7 +79,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedCellPopulation.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellVolumesWriter.hpp"
-#include "CellVariablesWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesCountWriter.hpp"
@@ -141,7 +140,6 @@ public:
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
-        cell_population.AddCellWriter<CellVariablesWriter>();
 
         /* We randomly label some cells using the cell property {{{CellLabel}}}. We begin by creating a shared pointer to
          * this cell property using the helper singleton {{{CellPropertyRegistry}}}. We then loop over the cells and label

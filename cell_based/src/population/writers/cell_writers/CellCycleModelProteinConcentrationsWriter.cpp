@@ -33,19 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "CellVariablesWriter.hpp"
+#include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "AbstractCellPopulation.hpp"
 #include "AbstractOdeBasedCellCycleModel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::CellVariablesWriter()
-    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellvariables.dat")
+CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::CellCycleModelProteinConcentrationsWriter()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("proteinconcentrations.dat")
 {
-    this->mVtkCellDataName = "Cell variables";
+    this->mVtkCellDataName = "Protein concentrations";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     /*
      * At present it is not possible to output all cell variables via this method, we just return zero.
@@ -57,7 +57,7 @@ double CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(Cell
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     AbstractOdeBasedCellCycleModel* p_model = dynamic_cast<AbstractOdeBasedCellCycleModel*>(pCell->GetCellCycleModel());
     if (p_model)
@@ -72,16 +72,20 @@ void CellVariablesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abstr
             *this->mpOutStream << proteins[i] << " ";
         }
     }
+    else
+    {
+        EXCEPTION("CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedCellCycleModel");
+    }
 }
 
 // Explicit instantiation
-template class CellVariablesWriter<1,1>;
-template class CellVariablesWriter<1,2>;
-template class CellVariablesWriter<2,2>;
-template class CellVariablesWriter<1,3>;
-template class CellVariablesWriter<2,3>;
-template class CellVariablesWriter<3,3>;
+template class CellCycleModelProteinConcentrationsWriter<1,1>;
+template class CellCycleModelProteinConcentrationsWriter<1,2>;
+template class CellCycleModelProteinConcentrationsWriter<2,2>;
+template class CellCycleModelProteinConcentrationsWriter<1,3>;
+template class CellCycleModelProteinConcentrationsWriter<2,3>;
+template class CellCycleModelProteinConcentrationsWriter<3,3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellVariablesWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellCycleModelProteinConcentrationsWriter)

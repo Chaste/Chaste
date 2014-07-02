@@ -68,7 +68,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
-#include "CellVariablesWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
 // Cell population writers
@@ -864,7 +863,6 @@ public:
         cell_population.AddCellWriter<CellMutationStatesWriter>();
         cell_population.AddCellWriter<CellProliferativePhasesWriter>();
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
-        cell_population.AddCellWriter<CellVariablesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Coverage of writing CellData to VTK
@@ -901,7 +899,6 @@ public:
         FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizmutationstates").CompareFiles();
         FileComparison(results_dir + "results.vizcellphases", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizcellphases").CompareFiles();
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/results.vizcelltypes").CompareFiles();
-        FileComparison(results_dir + "cellvariables.dat", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/cellvariables.dat").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/cellareas.dat").CompareFiles();
 
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestVertexBasedCellPopulationWriteResultsToFile/cellmutationstates.dat").CompareFiles();

@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesWriter.hpp"
 #include "CellProliferativePhasesWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
-#include "CellVariablesWriter.hpp"
+#include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
@@ -871,7 +871,7 @@ public:
         }
     }
 
-    void TestCellVariablesWriter() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriter() throw (Exception)
     {
         EXIT_IF_PARALLEL;
 
@@ -907,12 +907,12 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create output directory
-        std::string output_directory = "TestCellVariablesWriter";
+        std::string output_directory = "TestCellCycleModelProteinConcentrationsWriter";
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellVariablesWriter<2,2> cell_writer;
+        CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -924,14 +924,14 @@ public:
         cell_writer.CloseFile();
 
         // Test that the data are output correctly
-        FileComparison(results_dir + "cellvariables.dat", "cell_based/test/data/TestCellWriters/cellvariables.dat").CompareFiles();
+        FileComparison(results_dir + "proteinconcentrations.dat", "cell_based/test/data/TestCellWriters/proteinconcentrations.dat").CompareFiles();
 
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
         TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
 
         // Test GetVtkCellDataName() method
-        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell variables");
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Protein concentrations");
 
         // Avoid memory leak
         for (unsigned i=0; i<nodes.size(); i++)
@@ -940,14 +940,65 @@ public:
         }
     }
 
-    void TestCellVariablesWriterArchiving() throw (Exception)
+    void TestCellCycleModelProteinConcentrationsWriterException() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a simple node-based cell population
+        std::vector<Node<2>* > nodes;
+        nodes.push_back(new Node<2>(0, false,  1.4));
+        nodes.push_back(new Node<2>(1, false,  2.3));
+        nodes.push_back(new Node<2>(2, false, -6.1));
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::vector<CellPtr> cells;
+        for (unsigned i=0; i<3; i++)
+        {
+            FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
+            CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
+            p_cell->SetCellProliferativeType(p_type);
+            p_cell->InitialiseCellCycleModel();
+            cells.push_back(p_cell);
+        }
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Create output directory
+        std::string output_directory = "TestCellCycleModelProteinConcentrationsWriterException";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_file_handler);
+        cell_writer.WriteTimeStamp();
+        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+
+        TS_ASSERT_THROWS_THIS(cell_writer.VisitCell(*cell_iter, &cell_population),
+            "CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from AbstractOdeBasedCellCycleModel");
+
+        // Avoid memory leak
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestCellCycleModelProteinConcentrationsWriterArchiving() throw (Exception)
     {
         // The purpose of this test is to check that archiving can be done for this class
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellVariablesWriter.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellCycleModelProteinConcentrationsWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellVariablesWriter<2,2>();
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellCycleModelProteinConcentrationsWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
