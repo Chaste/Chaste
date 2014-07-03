@@ -255,7 +255,7 @@ protected:
         archive & mCheckForInternalIntersections;
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
-        ///todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
+        ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
 
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
