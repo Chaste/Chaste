@@ -95,6 +95,15 @@ void AbstractTargetAreaModifier<DIM>::SetReferenceTargetArea(double referenceTar
     mReferenceTargetArea = referenceTargetArea;
 }
 
+template<unsigned DIM>
+void AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    *rParamsFile << "\t\t\t<ReferenceTargetArea>" << mReferenceTargetArea << "</ReferenceTargetArea>\n";
+
+    // Next, call method on direct parent class
+    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+}
+
 // Explicit instantiation
 template class AbstractTargetAreaModifier<1>;
 template class AbstractTargetAreaModifier<2>;

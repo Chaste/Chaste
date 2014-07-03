@@ -99,26 +99,25 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         // Get the set of neighbouring location indices
         std::set<unsigned> neighbour_indices;
 
-        if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
+        if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
         {
             MeshBasedCellPopulationWithGhostNodes<DIM> * p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
 
             neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
 
             // Remove ghost nodes from the neighbour indices
-            for(std::set<unsigned>::iterator iter = neighbour_indices.begin();
+            for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
                     iter != neighbour_indices.end();)
             {
-               if(p_cell_population->IsGhostNode(*iter))
-               {
-                   neighbour_indices.erase(iter++);
-               }
-               else
-               {
-                  ++iter;
-               }
+                if (p_cell_population->IsGhostNode(*iter))
+                {
+                    neighbour_indices.erase(iter++);
+                }
+                else
+                {
+                    ++iter;
+                }
             }
-
         }
         else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation))
         {
@@ -128,7 +127,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         {
             neighbour_indices = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetNeighbouringElementIndices(index);
         }
-        else if(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+        else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
         {
             neighbour_indices = static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetNeighbouringElementIndices(index);
         }
@@ -158,6 +157,13 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
             NEVER_REACHED;
         }
     }
+}
+
+template<unsigned DIM>
+void DeltaNotchTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    // No parameters to output, so just call method on direct parent class
+    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation

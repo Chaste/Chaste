@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellIdWriter.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
+#include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 class TestDeltaNotchModifier : public AbstractCellBasedTestSuite
@@ -598,6 +599,29 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
         Warnings::QuietDestroy();
+    }
+
+    void TestDeltaNotchModifierOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        std::string output_directory = "TestDeltaNotchModifierOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "DeltaNotchTrackingModifier-2");
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("DeltaNotchTrackingModifier.parameters");
+        p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
+        modifier_parameter_file->close();
+
+        {
+            // Compare the generated file in test output with a reference copy in the source code
+            FileFinder generated = output_file_handler.FindFile("DeltaNotchTrackingModifier.parameters");
+            FileFinder reference("cell_based/test/data/TestSimulationModifierOutputParameters/DeltaNotchTrackingModifier.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 };
 

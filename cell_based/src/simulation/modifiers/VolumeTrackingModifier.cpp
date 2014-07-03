@@ -63,7 +63,6 @@ void VolumeTrackingModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rC
     UpdateCellData(rCellPopulation);
 }
 
-
 template<unsigned DIM>
 void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
@@ -95,6 +94,13 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
         // Store the cell's volume in CellData
         cell_iter->GetCellData()->SetItem("volume", cell_volume);
     }
+}
+
+template<unsigned DIM>
+void VolumeTrackingModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    // No parameters to output, so just call method on direct parent class
+    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation

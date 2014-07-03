@@ -50,7 +50,14 @@ void AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulati
 {
     std::string modifier_type = GetIdentifier();
     *rParamsFile << "\t\t<" << modifier_type << ">\n";
+    OutputSimulationModifierParameters(rParamsFile);
     *rParamsFile << "\t\t</" << modifier_type << ">\n";
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    // No parameters to output
 }
 
 // Explicit instantiation

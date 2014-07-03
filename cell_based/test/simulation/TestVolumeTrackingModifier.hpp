@@ -65,6 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 #include "CellVolumesWriter.hpp"
+#include "FileComparison.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -461,6 +462,29 @@ public:
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
         Warnings::QuietDestroy();
+    }
+
+    void TestVolumeTrackingModifierOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        std::string output_directory = "TestVolumeTrackingModifierOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "VolumeTrackingModifier-2");
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("VolumeTrackingModifier.parameters");
+        p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
+        modifier_parameter_file->close();
+
+        {
+            // Compare the generated file in test output with a reference copy in the source code
+            FileFinder generated = output_file_handler.FindFile("VolumeTrackingModifier.parameters");
+            FileFinder reference("cell_based/test/data/TestSimulationModifierOutputParameters/VolumeTrackingModifier.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
     }
 };
 

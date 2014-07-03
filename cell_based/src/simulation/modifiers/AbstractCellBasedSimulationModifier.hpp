@@ -110,11 +110,22 @@ public:
     }
 
     /**
-     * Output modifiers used in the simulation to file.
+     * Output the modifier type used in the simulation to file and then call
+     * OutputSimulationModifierParameters() to output all relevant parameters.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputSimulationModifierInfo(out_stream& rParamsFile);
+
+    /**
+     * Output any simulation modifier parameters to file.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    virtual void OutputSimulationModifierParameters(out_stream& rParamsFile)=0;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellBasedSimulationModifier)

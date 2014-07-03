@@ -56,6 +56,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "NagaiHondaForce.hpp"
 #include "CellBasedEventHandler.hpp"
+#include "FileComparison.hpp"
+
 // This test is only run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -311,36 +313,58 @@ public:
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
-            p_growth_modifier->SetReferenceTargetArea(14.3);
+            SimpleTargetAreaModifier<2> modifier;
+            modifier.SetReferenceTargetArea(14.3);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Write the growth modifier to the archive
-            boost::shared_ptr<AbstractCellBasedSimulationModifier<2,2> > p_abstract_simulation_modifier = p_growth_modifier;
-            output_arch << p_abstract_simulation_modifier;
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
+            output_arch << p_modifier;
         }
 
         // Separate scope to read the archive
         {
-            boost::shared_ptr<AbstractCellBasedSimulationModifier<2,2> > p_growth_modifier(new AbstractCellBasedSimulationModifier<2,2>);
+            AbstractCellBasedSimulationModifier<2,2>* p_modifier;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> p_growth_modifier;
+            input_arch >> p_modifier;
 
             // Get a pointer of type growth modifier
-            boost::shared_ptr<SimpleTargetAreaModifier<2> > p_real_growth_modifier =
-                    boost::dynamic_pointer_cast<SimpleTargetAreaModifier<2> >(p_growth_modifier);
-            TS_ASSERT(p_real_growth_modifier != NULL);
+            SimpleTargetAreaModifier<2>* p_dynamic_modifier = dynamic_cast<SimpleTargetAreaModifier<2>*>(p_modifier);
+            TS_ASSERT(p_dynamic_modifier != NULL);
 
             // See whether we read out the correct target area
-            double mature_target_area = p_real_growth_modifier->GetReferenceTargetArea();
+            double mature_target_area = p_dynamic_modifier->GetReferenceTargetArea();
             TS_ASSERT_DELTA(mature_target_area, 14.3, 1e-9);
+        }
+    }
+
+    void TestSimpleTargetAreaModifierOutputParameters()
+    {
+        EXIT_IF_PARALLEL;
+        std::string output_directory = "TestSimpleTargetAreaModifierOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_modifier);
+        TS_ASSERT_EQUALS(p_modifier->GetIdentifier(), "SimpleTargetAreaModifier-2");
+
+        out_stream modifier_parameter_file = output_file_handler.OpenOutputFile("SimpleTargetAreaModifier.parameters");
+        p_modifier->OutputSimulationModifierParameters(modifier_parameter_file);
+        modifier_parameter_file->close();
+
+        {
+            // Compare the generated file in test output with a reference copy in the source code
+            FileFinder generated = output_file_handler.FindFile("SimpleTargetAreaModifier.parameters");
+            FileFinder reference("cell_based/test/data/TestSimulationModifierOutputParameters/SimpleTargetAreaModifier.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
         }
     }
 };

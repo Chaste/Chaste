@@ -101,6 +101,14 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

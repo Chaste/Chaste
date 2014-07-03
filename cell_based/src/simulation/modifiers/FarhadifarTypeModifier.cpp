@@ -96,6 +96,13 @@ void FarhadifarTypeModifier<DIM>::UpdateTargetAreaOfCell(CellPtr pCell)
     pCell->GetCellData()->SetItem("target area", cell_target_area);
 }
 
+template<unsigned DIM>
+void FarhadifarTypeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    // No parameters to output, so just call method on direct parent class
+    AbstractTargetAreaModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+}
+
 // Explicit instantiation
 template class FarhadifarTypeModifier<1>;
 template class FarhadifarTypeModifier<2>;

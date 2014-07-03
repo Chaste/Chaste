@@ -82,6 +82,14 @@ public:
      * @param pCell pointer to the cell
      */
     virtual void UpdateTargetAreaOfCell(const CellPtr pCell);
+
+    /**
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"

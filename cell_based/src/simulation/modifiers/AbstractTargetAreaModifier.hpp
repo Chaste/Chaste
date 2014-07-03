@@ -130,6 +130,14 @@ public:
      * @param pCell pointer to the cell
      */
     virtual void UpdateTargetAreaOfCell(const CellPtr pCell)=0;
+
+    /**
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    virtual void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractTargetAreaModifier)
