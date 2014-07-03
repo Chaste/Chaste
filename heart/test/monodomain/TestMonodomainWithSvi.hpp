@@ -53,6 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991Cvode.hpp"
 #include "TenTusscher2006Epi.hpp"
 #include "Mahajan2008.hpp"
+#include "PlaneStimulusCellFactory.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 // stimulate a block of cells (an interval in 1d, a block in a corner in 2d)
@@ -522,6 +523,44 @@ public:
             delete p_monodomain_problem;
         }
     }
+    // Solve with a space step of 0.5mm.
+    //
+    // Note that this space step ought to be too big!
+    //
+    // NOTE: This test uses NON-PHYSIOLOGICAL parameters values (conductivities,
+    // surface-area-to-volume ratio, capacitance, stimulus amplitude). Essentially,
+    // the equations have been divided through by the surface-area-to-volume ratio.
+    // (Historical reasons...)
+    void TestMonodomainFailing()
+    {
+        HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
+        HeartConfig::Instance()->SetSimulationDuration(1); //ms
+//        HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_20_elements");
+//        HeartConfig::Instance()->SetSpaceDimension(1);
+//        HeartConfig::Instance()->SetFibreLength(1.0, 1.0/20.0);
+        HeartConfig::Instance()->SetSpaceDimension(3);
+        HeartConfig::Instance()->SetSlabDimensions(0.2, 0.1, 0.1, 0.05);
+        HeartConfig::Instance()->SetOutputDirectory("MonoFailing");
+        HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_SVI");
+        HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
+
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory;
+        MonodomainProblem<3> monodomain_problem(&cell_factory);
+
+        monodomain_problem.Initialise();
+
+        HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
+//        HeartConfig::Instance()->SetCapacitance(1.0);
+
+        // the mesh is too coarse, and this simulation will result in cell gating
+        // variables going out of range. An exception should be thrown in the
+        // EvaluateYDerivatives() method of the cell model
+
+        TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Solve(),
+                "State variable fast_sodium_current_m_gate__m has gone out of range. "
+                "Check numerical parameters, for example time and space stepsizes");
+    }
+
 };
 
 #endif /*TESTMONODOMAINWITHSVI_HPP_*/
