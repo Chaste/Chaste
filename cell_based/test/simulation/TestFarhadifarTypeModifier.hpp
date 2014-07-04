@@ -85,14 +85,12 @@ public:
         // Test that the correct exception is thrown if we try to call UpdateTargetAreas() on the population
         TS_ASSERT_THROWS_THIS(p_modifier->SetupSolve(population, "unused_argument"),
                 "AbstractTargetAreaModifiers are to be used with a VertexBasedCellPopulation only");
-        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above.
-
+        CellBasedEventHandler::Reset(); // Otherwise logging has been started but not stopped due to exception above
     }
 
-   void TestFarhadifarTypeModifierMethods() throw (Exception)
+    void TestFarhadifarTypeModifierMethods() throw (Exception)
     {
-
-        // create our modifier
+        // Create a modifier
         MAKE_PTR(FarhadifarTypeModifier<2>,p_growth_modifier);
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -104,14 +102,10 @@ public:
 
         // Create cells
         std::vector<CellPtr> cells;
-        //MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
-//        cells[0]->SetCellProliferativeType(p_diff_type);
-//        cells[4]->SetCellProliferativeType(p_diff_type);
-
-        // the cells have varying ages
+        // The cells have varying ages
         for (unsigned i=0; i<cells.size(); i++)
         {
             double birth_time;
@@ -127,25 +121,23 @@ public:
         }
 
         // Create a cell population
-
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.InitialiseCells(); // this method must be called explicitly as there is no simulation
 
         // Check UpdateTargetAreaOfCell() method
         for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
-                iter != p_mesh->GetElementIteratorEnd();
-                ++iter)
+             iter != p_mesh->GetElementIteratorEnd();
+             ++iter)
         {
             unsigned elem_index = iter->GetIndex();
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
 
-            // get the mature cell target area
+            // Get the mature cell target area
             double expected_area = p_growth_modifier->GetReferenceTargetArea();
 
-            // have the growth modifier update the cell target area
+            // Have the growth modifier update the cell target area
             p_growth_modifier->UpdateTargetAreaOfCell(p_cell);
-
-            if (elem_index>3)
+            if (elem_index > 3)
             {
                 expected_area *= (1 + (0.8*(elem_index-4.))/4.0);
             }
@@ -155,9 +147,7 @@ public:
             TS_ASSERT_DELTA(actual_area, expected_area, 1e-12);
         }
 
-        // check that the growth rule for individual cells works together
-        // with the UpdateTargetAreas method
-
+        // Check the growth rule for individual cells works with UpdateTargetAreas()
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
         CellPtr p_cell_1 = cell_population.GetCellUsingLocationIndex(1);
         CellPtr p_cell_3 = cell_population.GetCellUsingLocationIndex(3);
@@ -166,7 +156,7 @@ public:
         p_cell_1->StartApoptosis();
         p_cell_3->StartApoptosis();
 
-        // update the target areas
+        // Update the target areas
         p_growth_modifier->UpdateTargetAreas(cell_population);
 
         double actual_area_0 = p_cell_0->GetCellData()->GetItem("target area");
@@ -237,7 +227,7 @@ public:
         HoneycombVertexMeshGenerator generator(1, 1);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        // Set up cell.
+        // Set up cell
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -263,16 +253,16 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // The FarhadifarTypeModifier
+        // Create modifier
         MAKE_PTR(FarhadifarTypeModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
-        // Run simulation
 
+        // Run simulation
         simulator.Solve();
 
-        unsigned num_cells_before_division = simulator.rGetCellPopulation().GetNumRealCells();
         // We should only have one cell now
-        TS_ASSERT_EQUALS(num_cells_before_division,1u);
+        unsigned num_cells_before_division = simulator.rGetCellPopulation().GetNumRealCells();
+        TS_ASSERT_EQUALS(num_cells_before_division, 1u);
 
         // This is the cell from before, let's see what its target area is
         double target_area_before_division = p_cell->GetCellData()->GetItem("target area");
@@ -284,14 +274,14 @@ public:
         simulator.SetEndTime(1.001);
         simulator.Solve();
 
-        unsigned num_cells_at_division = simulator.rGetCellPopulation().GetNumRealCells();
         // We should have two cells now
-        TS_ASSERT_EQUALS(num_cells_at_division,2u);
+        unsigned num_cells_at_division = simulator.rGetCellPopulation().GetNumRealCells();
+        TS_ASSERT_EQUALS(num_cells_at_division, 2u);
 
         // Iterate over the cells, checking their target areas
         for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
             double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
             TS_ASSERT_DELTA(target_area_at_division,1.0,1e-9);
@@ -301,17 +291,15 @@ public:
         simulator.SetEndTime(1.003);
         simulator.Solve();
 
-        unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
-
         // We should still have two cells
-        TS_ASSERT_EQUALS(num_cells_after_division,2u);
+        unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
+        TS_ASSERT_EQUALS(num_cells_after_division, 2u);
 
         for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+             cell_iter != cell_population.End();
+             ++cell_iter)
         {
             double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
-
             TS_ASSERT_DELTA(target_area_after_division,1.0,1e-9);
         }
     }
@@ -320,40 +308,38 @@ public:
     {
         // Create a file for archiving
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "growth_modifier.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "FarhadifarTypeModifier.arch";
 
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            FarhadifarTypeModifier<2> modifier;
-            modifier.SetReferenceTargetArea(14.3);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new FarhadifarTypeModifier<2>();
+            (static_cast<FarhadifarTypeModifier<2>*>(p_modifier))->SetReferenceTargetArea(14.3);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
             output_arch << p_modifier;
+            delete p_modifier;
         }
 
         // Separate scope to read the archive
         {
-            AbstractCellBasedSimulationModifier<2,2>* p_modifier;
+            AbstractCellBasedSimulationModifier<2,2>* p_modifier2;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> p_modifier;
-
-            // Get a pointer of type growth modifier
-            FarhadifarTypeModifier<2>* p_dynamic_modifier = dynamic_cast<FarhadifarTypeModifier<2>*>(p_modifier);
-            TS_ASSERT(p_dynamic_modifier != NULL);
+            input_arch >> p_modifier2;
 
             // See whether we read out the correct target area
-            double mature_target_area = p_dynamic_modifier->GetReferenceTargetArea();
+            double mature_target_area = (static_cast<FarhadifarTypeModifier<2>*>(p_modifier2))->GetReferenceTargetArea();
             TS_ASSERT_DELTA(mature_target_area, 14.3, 1e-9);
+
+            delete p_modifier2;
         }
     }
 

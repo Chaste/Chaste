@@ -313,35 +313,33 @@ public:
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            SimpleTargetAreaModifier<2> modifier;
-            modifier.SetReferenceTargetArea(14.3);
+            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new SimpleTargetAreaModifier<2>();
+            (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier))->SetReferenceTargetArea(14.3);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            // Write the growth modifier to the archive
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
+            // Serialize via pointer
             output_arch << p_modifier;
+            delete p_modifier;
         }
 
         // Separate scope to read the archive
         {
-            AbstractCellBasedSimulationModifier<2,2>* p_modifier;
+            AbstractCellBasedSimulationModifier<2,2>* p_modifier2;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> p_modifier;
-
-            // Get a pointer of type growth modifier
-            SimpleTargetAreaModifier<2>* p_dynamic_modifier = dynamic_cast<SimpleTargetAreaModifier<2>*>(p_modifier);
-            TS_ASSERT(p_dynamic_modifier != NULL);
+            input_arch >> p_modifier2;
 
             // See whether we read out the correct target area
-            double mature_target_area = p_dynamic_modifier->GetReferenceTargetArea();
+            double mature_target_area = (static_cast<SimpleTargetAreaModifier<2>*>(p_modifier2))->GetReferenceTargetArea();
             TS_ASSERT_DELTA(mature_target_area, 14.3, 1e-9);
+
+            delete p_modifier2;
         }
     }
 
