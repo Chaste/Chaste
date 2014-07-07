@@ -1077,9 +1077,7 @@ void Hdf5DataWriter::PossiblyExtend()
     {
 #if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         H5Dset_extent( mVariablesDatasetId, mDatasetDims );
-        H5Dget_space( mVariablesDatasetId );
         H5Dset_extent( mUnlimitedDatasetId, &mDatasetDims[0] );
-        H5Dget_space( mUnlimitedDatasetId );
 #else // Deprecated
         H5Dextend( mVariablesDatasetId, mDatasetDims );
         H5Dextend( mUnlimitedDatasetId, mDatasetDims );
