@@ -53,7 +53,7 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
         {
             unsigned element_index = r_element.GetIndex();
             // If bath element, don't try to use SVI
-            if ( HeartRegionCode::IsRegionBath(r_element.GetAttribute()) )
+            if ( HeartRegionCode::IsRegionBath(r_element.GetUnsignedAttribute()) )
             {
                 mElementsCanDoSvi[element_index] = false;
                 continue;
