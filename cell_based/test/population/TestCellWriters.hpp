@@ -973,7 +973,6 @@ public:
         // Create output directory
         std::string output_directory = "TestCellCycleModelProteinConcentrationsWriterException";
         OutputFileHandler output_file_handler(output_directory, false);
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
         CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
