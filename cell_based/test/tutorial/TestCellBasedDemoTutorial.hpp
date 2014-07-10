@@ -91,6 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TysonNovakCellCycleModel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
+#include "VoronoiDataWriter.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -203,8 +204,7 @@ public:
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type); //**Changed**//
 
-        /* This time we create a {{{NodeBasedCellPopulation}}} as we are using a {{{NodesOnlyMesh}}}.
-         * We also set a cut off length to speed up simulations. This defines a radius of interaction for the cells.*/
+        /* This time we create a {{{NodeBasedCellPopulation}}} as we are using a {{{NodesOnlyMesh}}}.*/
         NodeBasedCellPopulation<2> cell_population(mesh, cells);//**Changed**//
 
         /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory
@@ -265,6 +265,13 @@ public:
         /* This time we create a {{{MeshBasedCellPopulation}}} as we are using a {{{MutableMesh}}}.*/
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells); //**Changed**//
 
+        /* To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
+        * generate the required .vtu files. This is detailed in the [wiki:UserTutorials/VisualizingWithParaview] tutorial.
+        * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
+        * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
+        * 'ghost nodes', as shown in the next test. */
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+
         /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory.*/
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo3"); //**Changed**//
@@ -291,8 +298,6 @@ public:
     /*
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo2}}} to {{{CellBasedDemo3}}}.
-     * To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
-     * generate the required .vtu files. This is detailed in the UserTutorials/VisualizingWithParaview tutorial.
      *
      * == Test 4 - basic mesh-based simulation with ghost nodes ==
      *
@@ -321,6 +326,8 @@ public:
          * We also need to pass the indices of non ghost nodes as an extra argument.*/
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
 
+
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
         /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory and the end time.
          * The Tyson Novak model is for yeast cells and therefore cells proliferate much more often and so we run the simulation for
          * less time to keep cell numbers relatively small for this demo.

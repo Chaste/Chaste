@@ -121,7 +121,7 @@ public:
          */
         NodesOnlyMesh<2> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
-         * {{{ConstructNodesWithoutMesh}}}, which defines the connectivity of the nodes by defining
+         * {{{ConstructNodesWithoutMesh}}}), which defines the connectivity of the nodes by defining
          * a radius of interaction. */
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -202,7 +202,7 @@ public:
          * the {{{ConstructNodesWithoutMesh}}} method. */
         NodesOnlyMesh<3> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
-         * ConstructNodesWithoutMesh, which defines the connectivity of the nodes by defining
+         * {{{ConstructNodesWithoutMesh}}}), which defines the connectivity of the nodes by defining
          * a radius of interaction. */
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
@@ -279,7 +279,7 @@ public:
         nodes.push_back(new Node<3>(3u,  false,  0.0, -0.5, 0.0));
         NodesOnlyMesh<3> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
-         * {{{ConstructNodesWithoutMesh}}}, which defines the connectivity of the nodes by defining
+         * {{{ConstructNodesWithoutMesh}}}), which defines the connectivity of the nodes by defining
          * a radius of interaction. */
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
