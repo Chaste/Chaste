@@ -167,7 +167,7 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateWeightedDirect
 
     if (rJacobianDeterminant < DBL_EPSILON)
     {
-    	EXCEPTION("Jacobian determinant is zero");
+        EXCEPTION("Jacobian determinant is zero");
     }
 }
 

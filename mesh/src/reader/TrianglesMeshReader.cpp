@@ -696,7 +696,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     }
     else
     {
-    	// Note that .face files don't have the number of nodes in a face element in the header (its element dim +1)
+        // Note that .face files don't have the number of nodes in a face element in the header (its element dim +1)
         element_header_line >> mNumElements >> mNumFaceAttributes;
 
         extra_attributes = mNumFaceAttributes;
