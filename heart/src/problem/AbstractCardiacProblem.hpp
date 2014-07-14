@@ -456,7 +456,7 @@ protected:
      *
      * \todo #2570 Allow these to be archived
      */
-    std::vector<AbstractOutputModifier*> mOutputModifiers;
+    std::vector<boost::shared_ptr<AbstractOutputModifier> > mOutputModifiers;
 
 public:
     /**
@@ -741,7 +741,7 @@ public:
      * The modifier should not be destroyed before the solve loop has completed
      * @param pOutputModifier  Pointer to the modifier to be added
      */
-    void AddOutputModifier(AbstractOutputModifier* pOutputModifier)
+    void AddOutputModifier( boost::shared_ptr<AbstractOutputModifier> pOutputModifier)
     {
         mOutputModifiers.push_back(pOutputModifier);
     }
