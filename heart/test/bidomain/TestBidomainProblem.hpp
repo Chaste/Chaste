@@ -588,8 +588,6 @@ public:
 
         // Extra trace data
         OutputFileHandler handler("Bidomain1d", false);
-        std::string file1=handler.GetOutputDirectoryFullPath()+ "/BidomainLR91_1d_V.dat";
-        std::string file2="heart/test/data/BidomainUnpermuted1d/BidomainLR91_1d_V.dat";
         NumericFileComparison comp(handler.GetOutputDirectoryFullPath()+ "trace_5.txt", "heart/test/data/Bidomain1d/trace_5.txt");
         TS_ASSERT(comp.CompareFiles(5e-4));
 

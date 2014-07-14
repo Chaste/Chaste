@@ -49,7 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckMonoLr91Vars.hpp"
 #include "PlaneStimulusCellFactory.hpp"
 #include "LuoRudy1991.hpp"
-
+#include "ActivationOutputModifier.hpp"
+#include "NumericFileComparison.hpp"
 
 class TestMonodomainConductionVelocity : public CxxTest::TestSuite
 {
@@ -85,8 +86,20 @@ public:
 
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
         HeartConfig::Instance()->SetCapacitance(1.0);
+        boost::shared_ptr<ActivationOutputModifier> activation_map_0(new ActivationOutputModifier("activation_map_0.0.txt", 0.0));
+        boost::shared_ptr<ActivationOutputModifier> activation_map_minus70(new ActivationOutputModifier("activation_map_-70.0.txt", -70.0));
+        monodomain_problem.AddOutputModifier(activation_map_0);
+        monodomain_problem.AddOutputModifier(activation_map_minus70);
 
         monodomain_problem.Solve();
+
+        // Extra activation map data
+        OutputFileHandler handler("MonoConductionVel", false);
+        NumericFileComparison comp_0(handler.GetOutputDirectoryFullPath()+ "activation_map_0.0.txt", "heart/test/data/MonoConductionVel/activation_map_0.0.txt");
+        TS_ASSERT(comp_0.CompareFiles());
+        NumericFileComparison comp_minus_70(handler.GetOutputDirectoryFullPath()+ "activation_map_-70.0.txt", "heart/test/data/MonoConductionVel/activation_map_-70.0.txt");
+        TS_ASSERT(comp_minus_70.CompareFiles());
+
 
         // test whether voltages and gating variables are in correct ranges
         CheckMonoLr91Vars<1>(monodomain_problem);
@@ -119,7 +132,7 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005));
         HeartConfig::Instance()->SetSimulationDuration(1); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_20_elements");
-        HeartConfig::Instance()->SetOutputDirectory("MonoConductionVel");
+        HeartConfig::Instance()->SetOutputDirectory("MonoConductionVelThrows");
         HeartConfig::Instance()->SetOutputFilenamePrefix("MonodomainLR91_1d");
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
