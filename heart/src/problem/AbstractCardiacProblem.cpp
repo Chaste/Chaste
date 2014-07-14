@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToCmguiConverter.hpp"
 #include "Hdf5ToVtkConverter.hpp"
 
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCardiacProblem(
             AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
@@ -455,6 +456,11 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
     {
         progress_reporter_dir = ""; // progress printed to CHASTE_TEST_OUTPUT
     }
+    BOOST_FOREACH(AbstractOutputModifier* p_output_modifier, mOutputModifiers)
+    {
+        p_output_modifier->InitialiseAtStart(this->mpMesh->GetDistributedVectorFactory());
+    }
+
 
     /*
      * Create a progress reporter so users can track how much has gone and
@@ -542,6 +548,10 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
             HeartEventHandler::EndEvent(HeartEventHandler::WRITE_OUTPUT);
         }
 
+        BOOST_FOREACH(AbstractOutputModifier* p_output_modifier, mOutputModifiers)
+        {
+            p_output_modifier->ProcessSolutionAtTimeStep(stepper.GetTime(), mSolution, PROBLEM_DIM);
+        }
         if (mPrintOutput)
         {
             // Writing data out to the file <FilenamePrefix>.dat
@@ -564,6 +574,10 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Solve()
 
     // Close the file that stores voltage values
     progress_reporter.PrintFinalising();
+    BOOST_FOREACH(AbstractOutputModifier* p_output_modifier, mOutputModifiers)
+    {
+        p_output_modifier->FinaliseAtEnd();
+    }
     CloseFilesAndPostProcess();
     HeartEventHandler::EndEvent(HeartEventHandler::EVERYTHING);
 }

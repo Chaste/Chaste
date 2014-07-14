@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Electrodes.hpp"
 #include "SimpleBathProblemSetup.hpp"
 #include "FileComparison.hpp"
+#include "SingleTraceOutputModifier.hpp"
 
 #ifdef CHASTE_VTK
 #define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
@@ -575,11 +576,22 @@ public:
         nodes_to_be_output.push_back(10);
         p_bidomain_problem->SetOutputNodes(nodes_to_be_output);
 
+        //Duplicate this with a single trace at node 5
+        SingleTraceOutputModifier trace_5("trace_5.txt", 5);
+        p_bidomain_problem->AddOutputModifier(&trace_5);
+
         // for coverage:
         p_bidomain_problem->SetWriteInfo();
 
         p_bidomain_problem->Initialise();
         p_bidomain_problem->Solve();
+
+        // Extra trace data
+        OutputFileHandler handler("Bidomain1d", false);
+        std::string file1=handler.GetOutputDirectoryFullPath()+ "/BidomainLR91_1d_V.dat";
+        std::string file2="heart/test/data/BidomainUnpermuted1d/BidomainLR91_1d_V.dat";
+        NumericFileComparison comp(handler.GetOutputDirectoryFullPath()+ "trace_5.txt", "heart/test/data/Bidomain1d/trace_5.txt");
+        TS_ASSERT(comp.CompareFiles(5e-4));
 
         // read data entries for the time file and check correct
         Hdf5DataReader data_reader1=p_bidomain_problem->GetDataReader();
@@ -673,7 +685,7 @@ public:
         TS_ASSERT_DELTA( times[21],    0, 1e-12);//For hdf5 writer allocated up to 30 slots
 
         // Test for post-processed output (and don't wipe the directory!)
-        OutputFileHandler handler("BidomainFallsOver/output",false);
+        OutputFileHandler handler("BidomainFallsOver/output", false);
 
         std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};

@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5DataReader.hpp"
 #include "Hdf5DataWriter.hpp"
 #include "Warnings.hpp"
-
+#include "AbstractOutputModifier.hpp"
 /*
  * Archiving extravaganza:
  *
@@ -451,6 +451,13 @@ protected:
      */
     Hdf5DataWriter* mpWriter;
 
+    /**
+     * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
+     *
+     * \todo #2570 Allow these to be archived
+     */
+    std::vector<AbstractOutputModifier*> mOutputModifiers;
+
 public:
     /**
      * Constructor
@@ -728,6 +735,16 @@ public:
      *  valid if there is a bath.
      */
     virtual void SetElectrodes();
+
+    /**
+     * Add an output modifier onto a list of such objects.  These will be processed in the order in which they have been given.
+     * The modifier should not be destroyed before the solve loop has completed
+     * @param pOutputModifier  Pointer to the modifier to be added
+     */
+    void AddOutputModifier(AbstractOutputModifier* pOutputModifier)
+    {
+        mOutputModifiers.push_back(pOutputModifier);
+    }
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_3_UNSIGNED(AbstractCardiacProblem)
