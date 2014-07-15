@@ -226,6 +226,7 @@ comp_deps = {'cell_based': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'notforrelease': ['heart'],
              'notforrelease_cell_based': ['crypt', 'cell_based'],
              'notforrelease_lung': ['heart', 'continuum_mechanics'],
+             'lung': ['continuum_mechanics'],
              'heart': ['continuum_mechanics', 'pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'continuum_mechanics': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'pde': ['ode', 'mesh', 'linalg', 'io', 'global'],
@@ -237,7 +238,7 @@ comp_deps = {'cell_based': ['pde', 'ode', 'mesh', 'linalg', 'io', 'global'],
              'python': []
              }
 components = ['python', 'global', 'io', 'linalg', 'mesh', 'ode', 'pde', 'continuum_mechanics',
-              'heart', 'cell_based', 'crypt', 
+              'heart', 'cell_based', 'crypt', 'lung',
               'notforrelease', 'notforrelease_cell_based', 'notforrelease_lung']
 # Ignore non-existent components, e.g. notforrelease wont appear in a release version
 for comp in components[:]:
