@@ -65,7 +65,7 @@ public:
      *
      * @param rFilename  The file which is eventually produced by this modifier
      * @param threshold  The transmembrane voltage threshold (in mV) at which activation is deemed to have been trigged.
-     *                   This is also used for calculing relaxation time (this is not so sophisticated as an APD90 calculation).
+     *                   This is also used for calculating relaxation time (this is not so sophisticated as an APD90 calculation).
      *
      */
     ActivationOutputModifier(const std::string& rFilename, double threshold)
