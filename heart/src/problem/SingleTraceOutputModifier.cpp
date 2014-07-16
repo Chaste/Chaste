@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SingleTraceOutputModifier.hpp"
 #include "HeartConfig.hpp"
+#include "MathsCustomFunctions.hpp"
 
 void
 SingleTraceOutputModifier::InitialiseAtStart(DistributedVectorFactory* pVectorFactory)
@@ -70,6 +71,11 @@ SingleTraceOutputModifier::ProcessSolutionAtTimeStep(double time, Vec solution, 
         double* p_solution;
         VecGetArray(solution, &p_solution);  //This does not need to be collective
         (*mFileStream) << time <<"\t"<< p_solution[mLocalIndex*problemDim]<<"\n";
+        if (Divides(1.0, time))
+        {
+            // Flush every millisecond so that we can tell the simulation is alive
+            mFileStream->flush();
+        }
         VecRestoreArray(solution, &p_solution);
     }
 }
