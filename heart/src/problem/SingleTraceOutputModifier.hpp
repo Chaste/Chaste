@@ -35,6 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef SINGLETRACEOUTPUTMODIFIER_HPP_
 #define SINGLETRACEOUTPUTMODIFIER_HPP_
+
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
+
 #include "AbstractOutputModifier.hpp"
 #include "OutputFileHandler.hpp"
 
@@ -45,9 +49,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class SingleTraceOutputModifier : public AbstractOutputModifier
 {
 private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+
     unsigned mGlobalIndex; /**< The global index of the node for which the trace is to be made.*/
     unsigned mLocalIndex; /**< The local index of the node for which the trace is to be made - set to UINT_MAX if the node is not local to the process*/
     out_stream mFileStream; /**< Output file stream (remains open during solve).*/
+
+    friend class TestOutputModifiers;
+
+    /**
+     * Archive the output modifier, never used directly - boost uses this.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // This calls serialize on the base class.
+        archive & boost::serialization::base_object<AbstractOutputModifier>(*this);
+        archive & mGlobalIndex;
+        archive & mLocalIndex;
+    }
+
+    /** Private constructor that does nothing, for archiving */
+    SingleTraceOutputModifier(){};
+
 public:
     /**
      * Constructor
@@ -86,5 +114,8 @@ public:
      */
     virtual void ProcessSolutionAtTimeStep(double time, Vec solution, unsigned problemDim);
 };
+
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(SingleTraceOutputModifier)
 
 #endif // SINGLETRACEOUTPUTMODIFIER_HPP_

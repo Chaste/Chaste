@@ -79,3 +79,6 @@ SingleTraceOutputModifier::ProcessSolutionAtTimeStep(double time, Vec solution, 
         VecRestoreArray(solution, &p_solution);
     }
 }
+
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(SingleTraceOutputModifier)

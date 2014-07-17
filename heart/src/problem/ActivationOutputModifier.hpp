@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ACTIVATIONOUTPUTMODIFIER_HPP_
 
 #include "AbstractOutputModifier.hpp"
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 
 /**
  * Specialised class for on-the-fly calculation of activation and recovery times.
@@ -59,6 +61,28 @@ private:
     std::vector<double> mFirstRecoveryTimes; /**< The first recovery (first time subsequent time below threshold) for all local nodes on this process*/
     std::vector<double> mSecondActivitationTimes; /**< The second activation time for local nodes */
     std::vector<double> mSecondRecoveryTimes; /**< The second recovery time for local nodes */
+
+    friend class TestOutputModifiers;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // This calls serialize on the base class.
+        archive & boost::serialization::base_object<AbstractOutputModifier>(*this);
+        archive & mThreshold;
+        archive & mLocalSize;
+        archive & mFirstActivitationTimes;
+        archive & mFirstRecoveryTimes;
+        archive & mSecondActivitationTimes;
+        archive & mSecondRecoveryTimes;
+    }
+
+    /** Private constructor that does nothing, for archiving */
+    ActivationOutputModifier(){};
+
 public:
     /**
      * Constructor
@@ -95,5 +119,8 @@ public:
      */
     virtual void ProcessSolutionAtTimeStep(double time, Vec solution, unsigned problemDim);
 };
+
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(ActivationOutputModifier)
 
 #endif /* ACTIVATIONOUTPUTMODIFIER_HPP_ */

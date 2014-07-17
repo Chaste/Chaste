@@ -37,6 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTOUTPUTMODIFIER_HPP_
 #define ABSTRACTOUTPUTMODIFIER_HPP_
 
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/string.hpp>
+#include "ClassIsAbstract.hpp"
+
 #include <string>
 #include "Hdf5DataWriter.hpp"
 //#include "AbstractCardiacProblem.hpp"
@@ -46,8 +50,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class AbstractOutputModifier
 {
+private:
+    /** For testing */
+    friend class TestOutputModifiers;
+
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive this modifier.  Just calls the base class version.
+     *
+     * @param archive the archive
+     * @param version the current version of this class
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & mFilename;
+    }
+
 protected:
+    /** Constructor that does nothing, for archiving */
+    AbstractOutputModifier(){};
+
     std::string mFilename; /**<The file which is eventually produced by this modifier*/
+
 public:
     /**
      * Standard construction method contains only the name of the file which this simulation modifier should produce.
@@ -94,6 +120,6 @@ public:
     virtual void ProcessSolutionAtTimeStep(double time, Vec solution, unsigned problemDim)=0;
 };
 
-
+CLASS_IS_ABSTRACT(AbstractOutputModifier)
 
 #endif /* ABSTRACTOUTPUTMODIFIER_HPP_ */

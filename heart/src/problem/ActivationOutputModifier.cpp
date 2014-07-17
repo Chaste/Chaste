@@ -103,3 +103,6 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
     }
     VecRestoreArray(solution, &p_solution);
 }
+
+#include "SerializationExportWrapperForCpp.hpp"
+CHASTE_CLASS_EXPORT(ActivationOutputModifier)
