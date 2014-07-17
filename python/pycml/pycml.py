@@ -1514,7 +1514,7 @@ class cellml_component(element_base):
         element_base.__init__(self)
         self._cml_parents = {}
         self._cml_children = {}
-        self._cml_units = {}
+        self._cml_units = None
         self._cml_created_by_pe = False
     
     @property
@@ -1575,6 +1575,7 @@ class cellml_component(element_base):
 
     def _build_units_dictionary(self):
         """Create a dictionary mapping units names to objects, for all units definitions in this element."""
+        self._cml_units = {}
         for units in getattr(self, u'units', []):
             if units.name in self._cml_units:
                 self.validation_error("Units names must be unique within the parent component (5.4.1.2)."
@@ -1591,7 +1592,7 @@ class cellml_component(element_base):
             self.xml_parent._add_units_obj(units)
     def get_units_by_name(self, uname):
         """Return an object representing the element that defines the units named `uname'."""
-        if not self._cml_units:
+        if self._cml_units is None:
             self._build_units_dictionary()
         if uname in self._cml_units:
             # Units are defined in this component
@@ -1601,7 +1602,7 @@ class cellml_component(element_base):
             return self.xml_parent.get_units_by_name(uname)
     def add_units(self, name, units):
         """Add an entry in our units dictionary for units named `name' with element object `units'."""
-        if not self._cml_units:
+        if self._cml_units is None:
             self._build_units_dictionary()
         self._cml_units[name] = units
         self.xml_parent._add_units_obj(units)
@@ -1609,7 +1610,7 @@ class cellml_component(element_base):
 
     def get_all_units(self):
         """Get a list of all units objects defined in this component."""
-        if not self._cml_units:
+        if self._cml_units is None:
             self._build_units_dictionary()
         return self._cml_units.values()
 
