@@ -277,7 +277,7 @@ private:
         {
             double v = p_cell->GetVoltage();
             p_cell->SetVoltage(tableTestV);
-            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "membrane_voltage outside lookup table range");
+            TS_ASSERT_THROWS_CONTAINS(p_cell->GetIIonic(), "outside lookup table range");
             p_cell->SetVoltage(v);
         }
         Simulate(rOutputDirName, rModelName, p_cell);

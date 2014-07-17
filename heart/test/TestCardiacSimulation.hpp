@@ -273,7 +273,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT(CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "save_bidomain_short_results", false,
-                                                foldername, "SimulationResults", true, 1e-6));
+                                                foldername, "SimulationResults", true, 1e-5));
 
         FileFinder file(foldername + "_checkpoints/0.2ms/" + foldername + "_0.2ms/archive.arch.0",
                         RelativeTo::ChasteTestOutput);
@@ -298,7 +298,7 @@ public:
 
         // compare the files, using the CompareFilesViaHdf5DataReader() method
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "resume_bidomain_short_results", false,
-                                                 foldername, "SimulationResults", true, 1e-6));
+                                                 foldername, "SimulationResults", true, 1e-5));
         //assert(0);
     }
 
@@ -411,7 +411,7 @@ public:
 
         // Compare results
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "resume_bidomain_short_results", false,
-                                                 "SaveBidomainShort", "SimulationResults", true, 1e-6));
+                                                 "SaveBidomainShort", "SimulationResults", true, 1e-5));
     }
 
     void runSimulation(const std::string& rParametersFileName)

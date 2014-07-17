@@ -974,6 +974,7 @@ class CellMLTranslator(object):
             var = var.get_source_variable(recurse=True)
             key = (expr.min, expr.max, expr.step, var)
             if not key in doc.lookup_table_indexes:
+                var._cml_modifiable = True # Table index variables shouldn't be const, in case we constrain to table bounds
                 if hasattr(expr, u'table_index'):
                     doc.lookup_table_indexes[key] = expr.table_index
                 else:
@@ -1218,14 +1219,26 @@ class CellMLTranslator(object):
         
         If nodeset is given, then filter the table indices calculated so
         that only those needed to compute the nodes in nodeset are defined.
+        
+        A nodeset is required if any table indices are computed variables rather than state variables.
+        In this case, we use the equations within nodeset to calculate the values of the indices, and
+        return a set containing just those nodes used, so we can avoid recalculating them later.
         """
         tables_to_index = set()
+        nodes_used = set()
         for node in nodeset:
             tables_to_index.update(self.contained_table_indices(node))
         if tables_to_index or not nodeset:
             self.output_comment('Lookup table indexing')
         for key, idx in self.doc.lookup_table_indexes.iteritems():
             if not nodeset or idx in tables_to_index:
+                var = key[-1]
+                if var.get_type() is VarTypes.Computed:
+                    if not nodeset:
+                        raise TranslationError('Unable to generate lookup table indexed on', var, 'as it is a computed variable')
+                    var_nodes = self.calculate_extended_dependencies([var]) & nodeset
+                    self.output_equations(var_nodes)
+                    nodes_used.update(var_nodes)
                 self.output_table_index_checking(key, idx)
                 if self.config.options.check_lt_bounds:
                     self.writeln('#define COVERAGE_IGNORE', indent=False)
@@ -1235,6 +1248,7 @@ class CellMLTranslator(object):
                     self.writeln('#undef COVERAGE_IGNORE', indent=False)
                 self.output_table_index_generation_code(key, idx)
         self.writeln()
+        return nodes_used
         
     def output_table_index_checking(self, key, idx):
         """Check whether a table index is out of bounds."""
@@ -1480,17 +1494,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # State variable inputs
             self.output_state_assignments(assign_rY=False, nodeset=nodeset)
             self.writeln()
-            if self.use_lookup_tables:
-                self.output_table_index_generation(nodeset=nodeset)
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
             # Output equations
             self.output_comment('Mathematics')
-            self.output_equations(nodeset)
+            self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Assign to results vector
             self.writeln(self.vector_create('dqs', len(dqs)))
             for i, var in enumerate(dqs):
-                self.writeln(self.vector_index('dqs', i), self.EQ_ASSIGN,
-                             self.code_name(var), self.STMT_END)
+                self.writeln(self.vector_index('dqs', i), self.EQ_ASSIGN, self.code_name(var), self.STMT_END)
             self.writeln('return dqs', self.STMT_END)
             self.close_block(blank_line=True)
     
@@ -2082,12 +2094,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Hack: avoid unused variable warning
             self.writeln('double _unused = ', self.code_name(self.config.dt_variable), ';')
             self.writeln('_unused = _unused;\n')
-        for i, idx in enumerate(self.doc.lookup_table_indexes.itervalues()):
-            self.writeln('if (mNeedsRegeneration[', i, '])')
+        for idx in self.doc.lookup_table_indexes.itervalues():
+            self.writeln('if (mNeedsRegeneration[', idx, '])')
             self.open_block()
             self.output_lut_deletion(only_index=idx)
             self.output_lut_generation(only_index=idx)
-            self.writeln('mNeedsRegeneration[', i, '] = false;')
+            self.writeln('mNeedsRegeneration[', idx, '] = false;')
             self.close_block(blank_line=True)
         self.writeln(event_handler, 'EndEvent(', event_handler, 'GENERATE_TABLES);')
         self.close_block()
@@ -2283,6 +2295,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
                        and not assigned_var.is_derived_quantity and not has_modifier))
         if clear_type:
             self.TYPE_DOUBLE = self.TYPE_CONST_DOUBLE = ''
+        elif getattr(assigned_var, '_cml_modifiable', False):
+            # Override const-ness, e.g. for a lookup table index
+            self.TYPE_CONST_DOUBLE = self.TYPE_DOUBLE
         if (assigned_var and self.use_modifiers and assigned_var in self.modifier_vars
             and assigned_var.get_type() != VarTypes.State):
             # "Constant" oxmeta-annotated parameters may be modified at run-time
@@ -2313,6 +2328,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         if clear_type:
             # Remove the instance attributes, thus reverting to the class members
             del self.TYPE_DOUBLE
+            del self.TYPE_CONST_DOUBLE
+        elif getattr(assigned_var, '_cml_modifiable', False):
             del self.TYPE_CONST_DOUBLE
         return
 
@@ -2351,6 +2368,17 @@ class CellMLToChasteTranslator(CellMLTranslator):
         else:
             self.output_evaluate_y_derivatives()
         self.output_derived_quantities()
+    
+    def calculate_lookup_table_indices(self, nodeset):
+        """Output the lookup table index calculations needed for the given equations, if tables are enabled.
+        
+        Returns the subset of nodeset used in calculating the indices.
+        """
+        if self.use_lookup_tables:
+            nodes_used = self.output_table_index_generation(nodeset=nodeset)
+        else:
+            nodes_used = set()
+        return nodes_used
 
     def output_get_i_ionic(self):
         """Output the GetIIonic method."""
@@ -2372,9 +2400,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
             #print filter(lambda p: p[2]>0, map(debugexpr, nodeset))
             # Output main part of maths
             self.output_state_assignments(nodeset=nodeset, pointer='pStateVariables')
-            if self.use_lookup_tables:
-                self.output_table_index_generation(nodeset=nodeset)
-            self.output_equations(nodeset, zero_stimulus=True)
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+            self.output_equations(nodeset - table_index_nodes_used, zero_stimulus=True)
             self.writeln()
             # Assign the total current to a temporary so we can check for NaN
             self.writeln(self.TYPE_CONST_DOUBLE, 'i_ionic', self.EQ_ASSIGN, nl=False)
@@ -2448,14 +2475,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
         all_nodes = nonv_nodeset|v_nodeset
         self.output_state_assignments(assign_rY=assign_rY, nodeset=all_nodes)
         self.writeln()
-        if self.use_lookup_tables:
-            self.output_table_index_generation(nodeset=all_nodes|extra_table_nodes)
+        table_index_nodes_used = self.calculate_lookup_table_indices(all_nodes|extra_table_nodes)
         self.output_comment('Mathematics')
         #907: Declare dV/dt
         if dvdt:
             self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
         # Output mathematics required for non-dV/dt derivatives (which may include dV/dt)
-        self.output_equations(nonv_nodeset)
+        self.output_equations(nonv_nodeset - table_index_nodes_used)
         self.writeln()
         #907: Calculation of dV/dt
         if dvdt:
@@ -2465,7 +2491,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.close_block(blank_line=False)
             self.writeln('else')
             self.open_block()
-            self.output_equations(v_nodeset)
+            self.output_equations(v_nodeset - table_index_nodes_used)
             self.close_block()
 
     def output_backward_euler_mathematics(self):
@@ -2491,9 +2517,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
-            if self.use_lookup_tables:
-                self.output_table_index_generation(nodeset=nodeset)
-            self.output_equations(nodeset)
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+            self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Fill in residual
             for i, var in enumerate(self.state_vars):
@@ -2522,10 +2547,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
             self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
-                         dt_name, self.STMT_END, '\n');
-            if self.use_lookup_tables:
-                self.output_table_index_generation(nodeset=nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
-            self.output_equations(nodeset)
+                         dt_name, self.STMT_END, '\n')
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
+            self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Jacobian entries
             for entry in self.model.solver_info.jacobian.entry:
@@ -2560,9 +2584,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         nodes = [(self.state_vars[self.v_index], self.free_vars[0])]
         nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
         self.output_state_assignments(nodeset=nodeset)
-        if self.use_lookup_tables:
-            self.output_table_index_generation(nodeset=nodeset)
-        self.output_equations(nodeset)
+        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+        self.output_equations(nodeset - table_index_nodes_used)
         # Update V
         self.writeln()
         self.writeln('rY[', self.v_index, '] += ', dt_name, '*',
@@ -2594,10 +2617,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.output_state_assignments(nodeset=nodeset)
         if self.config.dt_variable in nodeset:
             self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
-                         dt_name, self.STMT_END, '\n');
-        if self.use_lookup_tables:
-            self.output_table_index_generation(nodeset=nodeset)
-        self.output_equations(nodeset)
+                         dt_name, self.STMT_END, '\n')
+        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+        self.output_equations(nodeset - table_index_nodes_used)
         # Update state variables:
         #   rY[i] = (rY[i] + _g_j*dt) / (1 - _h_j*dt)
         self.writeln()
@@ -3425,9 +3447,8 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
             used_vars.update(self._vars_in(entry.math))
         nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
         self.output_state_assignments(nodeset=nodeset, assign_rY=False)
-        if self.use_lookup_tables:
-            self.output_table_index_generation(nodeset=nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
-        self.output_equations(nodeset)
+        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
+        self.output_equations(nodeset - table_index_nodes_used)
         self.writeln()
         # Jacobian entries, sorted by index with rows varying fastest
         self.output_comment('Matrix entries')
@@ -5405,6 +5426,8 @@ class ConfigurationStore(object):
         self.doc = doc
         doc._cml_config = self
         self.options = options
+        self.unit_definitions = cellml_component.create_new(doc.model, '*lookup_table_units*')
+        self.unit_definitions.xml_parent = doc.model # Needed for looking up standard units
         # Transmembrane potential
         self.V_definitions = [u'membrane,V']
         self.V_variable = None
@@ -5413,7 +5436,6 @@ class ConfigurationStore(object):
         self.Cm_variable = None
         # Lookup table configuration
         self.lut_config = {}
-        self.lut_config_keys = []
         # Ionic currents configuration
         self.i_stim_definitions = [u'membrane,i_Stim']
         self.i_stim_var = None
@@ -5493,15 +5515,20 @@ class ConfigurationStore(object):
         Within any element that specifies a variable, a list of <var> elements can be
         provided.  Each will be tried in turn to see if a match can be found in the model,
         and the first match wins.
-        Alternatively these elements may have text content which must be of the form
-        'component_name,variable_name'.
 
         Some items are overridden if oxmeta annotations are present in the model, with
         the annotated variable taking precedence over the config file specification.
         """
         DEBUG('config', "Reading configuration from ", config_file)
+        binder = amara.bindery.binder()
+        binder.set_binding_class(None, "units", cellml_units)
+        binder.set_binding_class(None, "unit", cellml_unit)
         rules = [bt.ws_strip_element_rule(u'*')]
-        config_doc = amara_parse(config_file, rules=rules)
+        config_doc = amara_parse(config_file, rules=rules, binderobj=binder)
+        # Store extra units definitions
+        for defn in config_doc.xml_xpath(u'/*/units'):
+            defn.xml_parent = self.unit_definitions # Needed for looking up the units this definition is derived from
+            self.unit_definitions.add_units(defn.name, defn)
         # Overrides for command-line options
         if self.options and hasattr(config_doc.pycml_config, 'command_line_args'):
             args = map(str, config_doc.pycml_config.command_line_args.arg)
@@ -5537,11 +5564,10 @@ class ConfigurationStore(object):
     def finalize_config(self):
         """Having read all the configuration files, apply to the model."""
         # If no LT options given, add defaults
-        if not self.lut_config_keys:
+        if not self.lut_config:
             config_key = ('config-name', 'transmembrane_potential')
             self.lut_config[config_key] = {}
             self._set_lut_defaults(self.lut_config[config_key])
-            self.lut_config_keys.append(config_key)
         # Identify the variables in the model
         self.find_transmembrane_potential()
         self.find_membrane_capacitance()
@@ -5897,11 +5923,16 @@ class ConfigurationStore(object):
             if not config_key in self.lut_config:
                 self.lut_config[config_key] = {}
                 self._set_lut_defaults(self.lut_config[config_key])
-                self.lut_config_keys.append(config_key)
-            for elt in [e for e in lt.xml_children
-                        if isinstance(e, amara.bindery.element_base)
-                        and e.localName != u'var']:
-                self.lut_config[config_key]['table_' + elt.localName] = unicode(elt).strip()
+            for elt in lt.xml_element_children():
+                if elt.localName != u'var':
+                    self.lut_config[config_key]['table_' + elt.localName] = unicode(elt).strip()
+            if hasattr(lt, u'units'):
+                try:
+                    units = self.unit_definitions.get_units_by_name(lt.units)
+                except KeyError:
+                    raise ConfigurationError('The units "%s" referenced by the lookup table for "%s" do not exist'
+                                             % (lt.units, var_name))
+                self.lut_config[config_key]['table_units'] = units
         return
 
     def _set_lut_defaults(self, lut_dict):
@@ -5910,6 +5941,7 @@ class ConfigurationStore(object):
         for k, v in def_dict.iteritems():
             if k != 'table_var':
                 lut_dict[k] = v
+        lut_dict['table_units'] = None
         return
 
     def annotate_currents_for_pe(self):
@@ -5981,21 +6013,42 @@ class ConfigurationStore(object):
         in the document, and then uses those objects as keys in our lut_config dictionary.
         The ultimate source variable for the variable specified is used, in order to avoid
         complications caused by intermediaries being removed (e.g. by PE).
+
+        The table settings are also units-converted to match the units of the key variable.
         """
         new_config = {}
-        for key in self.lut_config_keys:
+        for key in self.lut_config:
             defn_type, content = key
             defn = self._create_var_def(content, defn_type)
             var = self._find_variable(defn)
             if not var:
                 # Variable doesn't exist, so we can't index on it
-                LOG('lookup-tables', logging.WARNING, 'Variable', content,
-                    'not found, so not using as table index.')
+                LOG('lookup-tables', logging.WARNING, 'Variable', content, 'not found, so not using as table index.')
             else:
                 var = var.get_source_variable(recurse=True)
                 if not var in new_config:
                     new_config[var] = {}
                 new_config[var].update(self.lut_config[key])
+                # Apply units conversions to the table settings if required
+                table_units = new_config[var]['table_units']
+                if table_units:
+                    var_units = var.get_units()
+                    if not table_units.dimensionally_equivalent(var_units):
+                        LOG('lookup-tables', logging.WARNING, 'Variable', content, 'is in units', var_units.description(),
+                            'which are incompatible with', table_units.description(), 'so not using as table index.')
+                    elif not table_units.equals(var_units):
+                        # New setting[var_units] = m[var_units/table_units]*(setting-o1[table_units]) + o2[var_units]
+                        # c.f. mathml_units_mixin._add_units_conversion
+                        print 'LT conversion:', table_units.description(), 'to', var_units.description(), 'equal?', table_units.equals(var_units)
+                        m = table_units.get_multiplicative_factor() / var_units.get_multiplicative_factor()
+                        for setting in new_config[var]:
+                            try:
+                                old_value = float(new_config[var][setting])
+                                new_value = m * (old_value - table_units.get_offset()) + var_units.get_offset()
+                                new_config[var][setting] = unicode(new_value)
+                                print 'LT conversion', setting, old_value, new_value
+                            except (ValueError, TypeError):
+                                pass
         self.lut_config = new_config
         DEBUG('config', 'Lookup tables configuration:', new_config)
         return

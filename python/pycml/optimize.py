@@ -461,8 +461,7 @@ class LookupTableAnalyser(object):
             val = getattr(self, param_name)
         return val
 
-    # One of these functions is required for a lookup table to be
-    # worthwhile
+    # One of these functions is required for a lookup table to be worthwhile
     lut_expensive_funcs = frozenset(('exp', 'log', 'ln', 'root',
                                      'sin', 'cos', 'tan',
                                      'sec', 'csc', 'cot',
@@ -499,6 +498,11 @@ class LookupTableAnalyser(object):
             self.bad_vars.update(res.bad_vars)
             self.has_func = self.has_func or res.has_func
             self.table_var = self.table_var or res.table_var
+            if not self.has_var and self.table_var:
+                # Two sub-expressions have different keying variables, so consider them as bad variables
+                self.bad_vars.add(self.table_var.name)
+                self.bad_vars.add(res.table_var.name)
+                self.table_var = None
 
         def suitable(self):
             """Return True iff this state indicates a suitable expression for replacement with a lookup table."""
@@ -584,6 +588,7 @@ class LookupTableAnalyser(object):
                 if var_checker_fn(expr.variable):
                     # Could be a permitted var that isn't a keying var
                     if self.is_keying_var(expr.variable):
+                        assert state.table_var is None # Sanity check
                         state.has_var = True
                         state.table_var = expr.variable
                 else:

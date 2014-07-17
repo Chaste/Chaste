@@ -598,22 +598,22 @@ public:
                   << "\n\tOptimised: " << opt << std::endl;
 
         CheckCellModelResults("FR2000DelayedStim");
-        CompareCellModelResults("FR2000DelayedStim", "FR2000DelayedStimOpt", 1e-4);
+        CompareCellModelResults("FR2000DelayedStim", "FR2000DelayedStimOpt", 2e-3);
 
-        // test GetIionic: (the GetIionic method was first manually tested
+        // test GetIionic: the GetIionic method was first manually tested
         // by changing the EvaluateYDerivatives() code to call it, this verified
         // that GetIionic has no errors, therefore we can test here against
         // a hardcoded result
         TS_ASSERT_DELTA(fr2000_ode_system.GetIIonic(), 0.0002, 1e-4);
         TS_ASSERT_DELTA(fr2000_ode_system_opt.GetIIonic(), 0.0002, 1e-4);
 
-        //Check that ComputeExceptVoltage does the correct thing (doesn't change the voltage)
-        double voltage=fr2000_ode_system.GetVoltage();
+        // Check that ComputeExceptVoltage does the correct thing (doesn't change the voltage)
+        double voltage = fr2000_ode_system.GetVoltage();
         fr2000_ode_system.ComputeExceptVoltage(end_time, end_time+0.001);
-        TS_ASSERT_DELTA(fr2000_ode_system.GetVoltage(), voltage, 1e-5);
-        voltage=fr2000_ode_system.GetVoltage();
+        TS_ASSERT_DELTA(fr2000_ode_system.GetVoltage(), voltage, 1e-10);
+        voltage = fr2000_ode_system_opt.GetVoltage();
         fr2000_ode_system_opt.ComputeExceptVoltage(end_time, end_time+0.001);
-        TS_ASSERT_DELTA(fr2000_ode_system_opt.GetVoltage(), voltage, 1e-5);
+        TS_ASSERT_DELTA(fr2000_ode_system_opt.GetVoltage(), voltage, 1e-10);
 
     }
 
@@ -679,10 +679,7 @@ public:
         double duration  = 1.0 ;  // ms
         double start = 50.0; // ms
         double period = 500; // ms
-        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude,
-                                                                          duration,
-                                                                          period,
-                                                                          start));
+        boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(magnitude, duration, period, start));
 
         double end_time = 200.0;  // milliseconds
 
@@ -695,9 +692,7 @@ public:
         CellFoxModel2002FromCellMLBackwardEuler backward_system(p_solver, p_stimulus); // solver ignored
 
         // Mainly for coverage, and to test consistency of GetIIonic
-        TS_ASSERT_DELTA(fox_ode_system.GetIIonic(),
-                        backward_system.GetIIonic(),
-                        1e-6);
+        TS_ASSERT_DELTA(fox_ode_system.GetIIonic(), backward_system.GetIIonic(), 1e-4);
 
         // Solve and write to file
         ck_start = clock();
