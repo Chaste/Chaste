@@ -201,6 +201,11 @@ private:
         // Save boundary conditions
         SaveBoundaryConditions(archive, mpMesh, mpBoundaryConditionsContainer);
         SaveBoundaryConditions(archive, mpMesh, mpDefaultBoundaryConditionsContainer);
+
+        if (version>= 3)
+        {
+            archive & mOutputModifiers;
+        }
     }
 
     /**
@@ -315,6 +320,11 @@ private:
         // Load boundary conditions
         mpBoundaryConditionsContainer = LoadBoundaryConditions(archive, mpMesh);
         mpDefaultBoundaryConditionsContainer = LoadBoundaryConditions(archive, mpMesh);
+
+        if (version>= 3)
+        {
+            archive & mOutputModifiers;
+        }
     }
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -834,7 +844,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM,  unsigned PROBLEM_DIM>
 struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost
-    CHASTE_VERSION_CONTENT(2);
+    CHASTE_VERSION_CONTENT(3);
 };
 } // namespace serialization
 } // namespace boost

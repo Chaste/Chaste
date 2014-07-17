@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2012, University of Oxford.
+Copyright (c) 2005-2014, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,7 +48,7 @@ class TestOutputModifiers : public CxxTest::TestSuite
 {
 public:
 
-    void DontTestArchivingOfSingleTraceOutputModifier() throw(Exception)
+    void TestArchivingOfSingleTraceOutputModifier() throw(Exception)
     {
         OutputFileHandler handler("TestArchivingOfSingleTraceOutputModifier", false);
         // The next two lines ensure that different processes read/write different archive files when running in parallel
