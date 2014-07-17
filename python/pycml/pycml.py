@@ -1408,8 +1408,7 @@ class cellml_model(element_base):
                                  node.eq.lhs.variable in prune):
                 continue
             if type(node) == tuple:
-                # This is an ODE dependency, so get the defining expression
-                # instead.
+                # This is an ODE dependency, so get the defining expression instead.
                 ode = True
                 orig_node = node
                 node = node[0].get_ode_dependency(node[1])
@@ -1601,10 +1600,7 @@ class cellml_component(element_base):
             # Look up units in model element instead
             return self.xml_parent.get_units_by_name(uname)
     def add_units(self, name, units):
-        """
-        Add an entry in our units dictionary for units named `name' with
-        element object `units'.
-        """
+        """Add an entry in our units dictionary for units named `name' with element object `units'."""
         if not self._cml_units:
             self._build_units_dictionary()
         self._cml_units[name] = units
@@ -1618,9 +1614,7 @@ class cellml_component(element_base):
         return self._cml_units.values()
 
     def get_variable_by_name(self, varname):
-        """
-        Return the variable object with name `varname' in this component.
-        """
+        """Return the variable object with name `varname' in this component."""
         return self.xml_parent.get_variable_by_name(self.name, varname)
 
     def _add_variable(self, var):
@@ -2546,9 +2540,8 @@ class cellml_units(Colourable, element_base):
     def uniquify_tuple(self):
         """For avoiding duplicate identical units definitions.
 
-        Based on description(cellml=True), since that is what we
-        really want to be unique.  Also includes offset information,
-        since that is omitted in the name given by description.
+        Based on description(cellml=True), since that is what we really want to be unique.
+        Also includes offset information, since that is omitted in the name given by description.
         """
         l = [self.description(cellml=True)]
         if self.is_simple():
@@ -2598,9 +2591,8 @@ class cellml_units(Colourable, element_base):
     def equals(self, other):
         """Compare 2 units elements for equality.
 
-        Two units are deemed equal if they are both dimensionally
-        equivalent and have the same multiplicative factor (to
-        within a relative tolerance of 10^-6).
+        Two units are deemed equal if they are both dimensionally equivalent and have the same
+        multiplicative factor (to within a relative tolerance of 10^-6).
         
         If both are simple units, they must also have the same offset.
         """
@@ -2628,22 +2620,18 @@ class cellml_units(Colourable, element_base):
     def copy(self):
         """Return a new UnitsSet containing this cellml_units object.
 
-        Used for interface compatibility with UnitsSet, where the method performs
-        a shallow copy.
+        Used for interface compatibility with UnitsSet, where the method performs a shallow copy.
         """
         return UnitsSet([self])
 
     def description(self, force=False, cellml=False):
         """Return a human-readable name for these units.
         
-        The name will be descriptive and based on the consituent
-        <unit> elements, e.g. 'volt per second^2'
+        The name will be descriptive and based on the consituent <unit> elements, e.g. 'volt per second^2'
 
-        By default, if these are user-defined units, then return
-        self.name.  Set force to True to override this behaviour.
+        By default, if these are user-defined units, then return self.name.  Set force to True to override this behaviour.
 
-        Set cellml to True to get a description that is also a valid
-        CellML identifier.
+        Set cellml to True to get a description that is also a valid CellML identifier.
         """
         if self.is_base_unit():
             desc = self.name
@@ -2700,8 +2688,7 @@ class cellml_units(Colourable, element_base):
     def expand(self):
         """Expand to a product of powers of base units.
         
-        Expand this units definition according to the algorithm given in
-        appendix C.3.4 of the CellML spec.
+        Expand this units definition according to the algorithm given in appendix C.3.4 of the CellML spec.
         
         Caches and returns the resulting <units> object, which will be
         newly created if there are any changes made, or this object if not.
@@ -3159,8 +3146,7 @@ class cellml_units(Colourable, element_base):
         As per appendix C.2.2, two units definitions have dimensional
         equivalence if, when each is recursively expanded and
         simplified into a product of base units, each has the same set
-        of base units with the same exponent on corresponding base
-        units.
+        of base units with the same exponent on corresponding base units.
         """
         u1 = self.expand().simplify()
         if isinstance(other_units, UnitsSet):
@@ -3237,8 +3223,7 @@ class cellml_unit(element_base):
 
     def get_units_element(self):
         """
-        Return the object representing the <units> element
-        that this <unit> element references.
+        Return the object representing the <units> element that this <unit> element references.
         """
         if self._cml_units_obj is None:
             # Chase the reference and cache it
@@ -3246,8 +3231,7 @@ class cellml_unit(element_base):
         return self._cml_units_obj
     def _set_units_element(self, obj, override=False):
         """
-        Set the object representing the <units> element
-        that this <unit> element references.
+        Set the object representing the <units> element that this <unit> element references.
         
         Don't use unless you know what you're doing.
         """
@@ -3451,10 +3435,8 @@ class mathml_units_mixin(object):
         defn_units_exp = defn_units.expand().simplify()
         to_units_exp = to_units.expand().simplify()
         # Conversion factor
-        m = (defn_units_exp.get_multiplicative_factor() /
-             to_units_exp.get_multiplicative_factor())
-        # Replace expr by
-        # m[to_units/defn_units]*(expr-o1[defn_units]) + o2[to_units]
+        m = (defn_units_exp.get_multiplicative_factor() / to_units_exp.get_multiplicative_factor())
+        # Replace expr by  m[to_units/defn_units]*(expr-o1[defn_units]) + o2[to_units]
         orig_expr, parent = expr, expr.xml_parent
         dummy = expr.xml_create_element(u'dummy', NSS[u'm'])
         model = expr.model # So we still have a reference after the next line
@@ -3501,16 +3483,14 @@ class mathml_units_mixin(object):
             if boolean is not units:
                 # TODO: *blink* this should never happen
                 self._add_units_conversion(elt, boolean, units, no_act)
-        elif elt.localName in [u'notanumber', u'pi', u'infinity',
-                               u'exponentiale']:
+        elif elt.localName in [u'notanumber', u'pi', u'infinity', u'exponentiale']:
             dimensionless = self.component.get_units_by_name('dimensionless')
             if dimensionless is not units:
                 # TODO: *blink* this should never happen
                 self._add_units_conversion(elt, dimensionless, units, no_act)
         else:
             DEBUG('validator',
-                  'Cannot set units (to', units.description(),
-                  ') for element', elt.localName)
+                  'Cannot set units (to', units.description(), ') for element', elt.localName)
         return
 
 class mathml_units_mixin_tokens(mathml_units_mixin):

@@ -396,12 +396,9 @@ class LookupTableAnalyser(object):
         return getattr(self.doc, '_cml_config', None)
 
     def var_is_membrane_potential(self, var):
-        """
-        Determine if the given variable represents the
-        transmembrane potential.
+        """Determine if the given variable represents the transmembrane potential.
 
-        This method takes an instance of cellml_variable and returns
-        a boolean.
+        This method takes an instance of cellml_variable and returns a boolean.
         """
         return (var.name in [u'V', u'membrane__V'] and
                 var.get_type(follow_maps=True) == VarTypes.State)
@@ -409,8 +406,7 @@ class LookupTableAnalyser(object):
     def is_allowed_variable(self, var):
         """Return True iff the given variable is allowed in a lookup table.
 
-        This method uses the config store in the document to check the
-        variable object.
+        This method uses the config store in the document to check the variable object.
         """
         var = var.get_source_variable(recurse=True)
         allowed = (var in self.config.lut_config or
@@ -421,8 +417,7 @@ class LookupTableAnalyser(object):
     def is_keying_var(self, var):
         """Return True iff the given variable can be used as a table key.
 
-        Will check the config store if it exists.  If not, the variable
-        name must match self.table_var.
+        Will check the config store if it exists.  If not, the variable name must match self.table_var.
         """
         if self.config:
             return var.get_source_variable(recurse=True) in self.config.lut_config
@@ -441,8 +436,7 @@ class LookupTableAnalyser(object):
         table_min - minimum table entry (unicode) -> lut:min
         table_max - maximum table entry (unicode) -> lut:max
         table_step - table step size (unicode) -> lut:step
-        table_var - the name of the variable indexing the table (unicode)
-                  -> lut:var
+        table_var - the name of the variable indexing the table (unicode) -> lut:var
         """
         defaults = self._LT_DEFAULTS
         for attr in defaults:
@@ -494,24 +488,20 @@ class LookupTableAnalyser(object):
         def update(self, res):
             """Update the state with the results of a recursive call.
 
-            res is the result of checking a sub-expression for
-            suitability, and should be another instance of this class.
+            res is the result of checking a sub-expression for suitability,
+            and should be another instance of this class.
             """
             self.has_var = (self.has_var or res.has_var) and \
                            (not (self.table_var and res.table_var) or
                             self.table_var.get_source_variable(recurse=True) is
                              res.table_var.get_source_variable(recurse=True))
-            # The second condition above specifies that the keying variables
-            # must be the same if they both exist
+            # The second condition above specifies that the keying variables must be the same if they both exist
             self.bad_vars.update(res.bad_vars)
             self.has_func = self.has_func or res.has_func
             self.table_var = self.table_var or res.table_var
 
         def suitable(self):
-            """
-            Return True iff this state indicates a suitable expression
-            for replacement with a lookup table.
-            """
+            """Return True iff this state indicates a suitable expression for replacement with a lookup table."""
             return (self.has_var and
                     not self.bad_vars and
                     self.has_func)
@@ -576,8 +566,7 @@ class LookupTableAnalyser(object):
         outermost qualifying expression, rather than also annotating
         qualifying subexpressions.
         """
-        # If this is a cloned expression, then just copy any annotations
-        # on the original.
+        # If this is a cloned expression, then just copy any annotations on the original.
         if isinstance(expr, mathml):
             source_expr = expr.get_original_of_clone()
         else:

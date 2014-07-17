@@ -999,8 +999,7 @@ class CellMLTranslator(object):
             tidx += 1
         # Make sure each lookup table is only listed once in doc.lookup_tables,
         # so we don't get 2 tables for the same expression!
-        # Also re-number table names so they are contiguous starting from 0
-        # for each table index.
+        # Also re-number table names so they are contiguous starting from 0 for each table index.
         candidates = doc.lookup_tables[:]
         doc.lookup_tables = []
         listed = set()
@@ -2348,7 +2347,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         elif self.options.grl1:
             self.output_grl1_mathematics()
         elif self.options.grl2:
-            self.output_grl2_mathematics()        
+            self.output_grl2_mathematics()
         else:
             self.output_evaluate_y_derivatives()
         self.output_derived_quantities()
@@ -3265,7 +3264,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Backward Euler code generation requires access to the time step
             model_dt = solver_info.create_dt(generator, t.component, t.get_units())
             config.dt_variable = generator.add_input(model_dt, ms)
-        elif doc.model.get_option('maple_output'): 
+        elif doc.model.get_option('maple_output'):
             # CVODE Jacobians need to be able to scale for time too 
             fake_dt = generator.add_variable(t.component, 'fake_dt', ms, initial_value='1.0')
             fake_dt._set_type(VarTypes.Constant)
@@ -5399,11 +5398,9 @@ class ConfigurationStore(object):
     def __init__(self, doc, options=None):
         """Create a new store.
 
-        doc specifies a CellML document, the processing of which this
-        configuration store will affect.
+        doc specifies a CellML document, the processing of which this configuration store will affect.
 
-        If given, options should be an optparse.Values instance
-        containing command-line options.
+        If given, options should be an optparse.Values instance containing command-line options.
         """
         self.doc = doc
         doc._cml_config = self
