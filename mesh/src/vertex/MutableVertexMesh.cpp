@@ -1820,6 +1820,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
     if (pNode->GetNumContainingElements() == 1)
     {
+
         // Get the index of the element containing the intersecting node
         unsigned intersecting_element_index = *elements_containing_intersecting_node.begin();
 
@@ -1923,6 +1924,50 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
 
                 // Check the nodes are updated correctly
                 assert(pNode->GetNumContainingElements() == 2);
+            }
+            else if (num_common_vertices == 4)
+            {
+            	/*
+                 * The two elements share edges CA and BD due to previous swaps but not the edge AB
+                 *
+                 *  From          To
+                 *  D___         D___
+                 *    |            |
+                 *   B|\           |
+                 *    | \          |
+                 *    | /          |
+                 *   A|/           |
+                 *  C_|__        C_|__
+                 *
+                 *  We just remove the intersecting node as well as vertices A and B.
+                 */
+
+            	// Delete node A and B in the intersected element
+                this->GetElement(elementIndex)->DeleteNode(node_A_local_index);
+                unsigned node_B_local_index = this->
+                		GetElement(elementIndex)->GetNodeLocalIndex(vertexB_index);
+                this->GetElement(elementIndex)->DeleteNode(node_B_local_index);
+
+                // Delete nodes A and B in the intersecting element
+                unsigned node_A_local_index_intersecting_element = this->
+                		GetElement(intersecting_element_index)->GetNodeLocalIndex(vertexA_index);
+                this->GetElement(intersecting_element_index)->DeleteNode(node_A_local_index_intersecting_element);
+                unsigned node_B_local_index_intersecting_element = this->
+                		GetElement(intersecting_element_index)->GetNodeLocalIndex(vertexB_index);
+                this->GetElement(intersecting_element_index)->DeleteNode(node_B_local_index_intersecting_element);
+
+                // Delete pNode in the intersecting element
+                unsigned p_node_local_index = this->
+                		GetElement(intersecting_element_index)->GetNodeLocalIndex(pNode->GetIndex());
+                this->GetElement(intersecting_element_index)->DeleteNode(p_node_local_index);
+
+                // Mark all three nodes as deleted
+                pNode->MarkAsDeleted();
+                mDeletedNodeIndices.push_back(pNode->GetIndex());
+                this->mNodes[vertexA_index]->MarkAsDeleted();
+                mDeletedNodeIndices.push_back(vertexA_index);
+                this->mNodes[vertexB_index]->MarkAsDeleted();
+                mDeletedNodeIndices.push_back(vertexB_index);
             }
             else
             {

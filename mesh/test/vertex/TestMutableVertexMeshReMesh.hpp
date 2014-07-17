@@ -1793,6 +1793,123 @@ public:
         }
     }
 
+    void TestResolveTriangularOverlapAfterConsecutiveT3Swaps()
+    {
+    	/*
+         *  Create a mesh with an overlap as shown below.
+         *
+         *  \           1             /
+         *   \ A____________B        /
+         *    /              \      /
+         *   / \______________\____/
+         *  /  C       0       \
+         *
+         *  The overlapping node A will be merged onto the left slanted edge,
+         *  whereas the overlapping B node will be merged onto the lower horizontal edge.
+         *  This leaves node C only belonging to element 1 but not to element 2 and overlapping
+         *  element one, like this
+         *
+         *  \      1       /
+         *  E\____________/F
+         *   /    \/      \
+         *  /      C  0    \
+         *
+         * In this situation we would like the mesh to connect nodes E and F and delete all nodes in between
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.1));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.1));
+        nodes.push_back(new Node<2>(2, true, 2.0, -2.0));
+        nodes.push_back(new Node<2>(3, true, -2.0, -2.0));
+        nodes.push_back(new Node<2>(4, true, -2.0, 2.0));
+        nodes.push_back(new Node<2>(5, true, 2.0, 2.0));
+        nodes.push_back(new Node<2>(6, true, 2.0, 0.0));
+        nodes.push_back(new Node<2>(7, true, 0.0, 0.0));
+
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1;
+        unsigned node_indices_element_0[4] = {0, 3, 2, 1};
+        unsigned node_indices_element_1[4] = {7, 6, 5, 4};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+            nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+        }
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+
+        // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.15);
+
+        // Node 6 and 7 are overlapping an edge of element 0
+        TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(0)->rGetLocation(), 1), true);
+        TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(1)->rGetLocation(), 1), true);
+
+        // Check for and perform intersections - should return true!
+        TS_ASSERT(vertex_mesh.CheckForIntersections());
+
+        // Check that node 0 has been moved onto the edge a new node has been created and added to both elements
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
+
+        // Node 1 now has 2 elements whereas nodes 1 and 7 have only one element
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->GetNumContainingElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->GetNumContainingElements(), 1u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->GetNumContainingElements(), 1u);
+
+        // We perform the next swap:
+        TS_ASSERT(vertex_mesh.CheckForIntersections());
+
+        // We made another node
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 10u);
+
+        // and now node 1 also has two elements whereas node 7 still doesn't
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(0)->GetNumContainingElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(1)->GetNumContainingElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->GetNumContainingElements(), 1u);
+
+        // The two elements should have 4 nodes in common and all the common nodes are boundary nodes
+        unsigned num_common_vertices = 0;
+        for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        {
+        	for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+        	{
+        		if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+        		{
+        			num_common_vertices++;
+        			TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
+        		}
+        	}
+        }
+        TS_ASSERT_EQUALS(num_common_vertices, 4u);
+
+        // Perform the next swap
+        TS_ASSERT(vertex_mesh.CheckForIntersections());
+
+        // The mesh should now have 7 nodes and the other nodes should be deleted
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 7u);
+
+        // The two elements should now only have 2 nodes in common and all the common nodes are boundary nodes
+        num_common_vertices = 0;
+        for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        {
+        	for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+        	{
+        		if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+        		{
+        			num_common_vertices++;
+        			TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
+        		}
+        	}
+        }
+        TS_ASSERT_EQUALS(num_common_vertices, 2u);
+    }
+
     void TestT3SwapForNeighbouringElementsWithTwoCommonNodes()
     {
         /*
