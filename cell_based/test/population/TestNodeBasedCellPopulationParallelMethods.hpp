@@ -375,16 +375,15 @@ public:
         node_based_cell_population.AddCellWriter<CellAncestorWriter>();
         TS_ASSERT(node_based_cell_population.HasWriter<CellAncestorWriter>());
 
-
         // Test set methods
         std::string output_directory = "TestNodeBasedCellPopulationWritersParallel";
         OutputFileHandler output_file_handler(output_directory, false);
 
         node_based_cell_population.OpenWritersFiles(output_file_handler);
+
         // Write out the files here
         node_based_cell_population.WriteResultsToFiles(output_directory);
-        node_based_cell_population.CloseOutputFiles();
-
+        node_based_cell_population.CloseWritersFiles();
 
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
@@ -401,7 +400,6 @@ public:
             FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
             FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWritersParallel/cellareas.dat").CompareFiles();
         }
-
 
 #ifdef CHASTE_VTK
         if (PetscTools::IsParallel())

@@ -884,7 +884,8 @@ public:
         cell_population.Update();
         cell_population.WriteResultsToFiles(output_directory);
 
-        cell_population.CloseOutputFiles();
+        cell_population.CloseWritersFiles();
+
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 

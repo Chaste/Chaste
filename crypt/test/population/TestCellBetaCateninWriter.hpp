@@ -137,6 +137,56 @@ public:
             delete p_cell_writer_2;
        }
     }
+
+    ///\todo #2441 This test fails at present
+    void DONOTTestUseInPopulationWriteResultsToFile()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.InitialiseCells();
+
+        // Create an instance of a Wnt concentration
+        WntConcentration<2>::Instance()->SetType(LINEAR);
+        WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
+        WntConcentration<2>::Instance()->SetCryptLength(1.0);
+
+        // This is where we add the writer
+        cell_population.AddCellWriter<CellBetaCateninWriter>();
+
+        // This method is usually called by Update()
+        cell_population.CreateVoronoiTessellation();
+
+        std::string output_directory = "TestUseInPopulationWriteResultsToFile";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+        cell_population.WriteResultsToFiles(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+
+        cell_population.WriteResultsToFiles(output_directory);
+        cell_population.CloseWritersFiles();
+
+        // Compare output with saved file of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        FileComparison comparer(results_dir + "results.vizbetacatenin","crypt/test/data/TestCellBetaCateninWriter/results2.vizbetacatenin");
+        TS_ASSERT(comparer.CompareFiles());
+    }
 };
 
 #endif /* TESTCELLBETACATENINWRITER_HPP_ */

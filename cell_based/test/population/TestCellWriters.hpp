@@ -75,39 +75,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
+// Note that high level tests of all cell writers can be found in the
+// TestMeshBasedCellPopulation::TestMeshBasedCellPopulationWriteResultsToFile
+
 class TestCellWriters : public AbstractCellBasedTestSuite
 {
 public:
-
-    void TestAddCellWriterToAPopulation() throw (Exception)
-    {
-        EXIT_IF_PARALLEL;
-
-        // Create a 3D NodeBasedCellPopulation
-        std::vector<Node<3>* > nodes;
-        nodes.push_back(new Node<3>(0, false));
-        nodes.push_back(new Node<3>(1, false, 1.0, 1.0, 1.0));
-
-        NodesOnlyMesh<3> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 3> generator;
-        generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        NodeBasedCellPopulation<3> cell_population(mesh, cells);
-
-        // Create a cell writer and test that it is correctly added to the cell population
-        cell_population.AddCellWriter<CellIdWriter>();
-
-        ///\todo test something here (#2404, #2441)
-
-        // Avoid memory leaks (note that the writers are deleted by the population destructor)
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
 
     void TestCellAgesWriter() throw (Exception)
     {
@@ -300,6 +273,7 @@ public:
 
     void TestCellIdWriter() throw (Exception)
     {
+
         EXIT_IF_PARALLEL;
 
         // Resetting the maximum cell ID to zero (to account for previous tests)

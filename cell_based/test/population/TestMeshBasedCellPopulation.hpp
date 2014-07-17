@@ -903,7 +903,6 @@ public:
         std::string output_directory = "TestMeshBasedCellPopulationWriteResultsToFile";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        ///\todo #2441 We shouldn't need to call open/close since the following call is responsible for that.
         cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
 
@@ -911,7 +910,7 @@ public:
         cell_population.Update();
 
         cell_population.WriteResultsToFiles(output_directory);
-        cell_population.CloseOutputFiles();
+        cell_population.CloseWritersFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();
@@ -1048,7 +1047,7 @@ public:
 
         cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
-        cell_population.CloseOutputFiles();
+        cell_population.CloseWritersFiles();
 
         // Test the GetCellMutationStateCount function
         std::vector<unsigned> cell_mutation_states = cell_population.GetCellMutationStateCount();

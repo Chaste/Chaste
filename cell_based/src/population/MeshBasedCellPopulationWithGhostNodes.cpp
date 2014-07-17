@@ -355,7 +355,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         }
 
         // Next, record which nodes are ghost nodes
-        ///\todo #2441 - make use of the cell writer hierarchy to do this
+        // Note that the cell writer hierarchy can not be used to do this as ghost nodes don't have corresponding cells.
         std::vector<double> ghosts(num_vtk_cells);
         for (typename VertexMesh<DIM, DIM>::VertexElementIterator elem_iter = this->mpVoronoiTessellation->GetElementIteratorBegin();
              elem_iter != this->mpVoronoiTessellation->GetElementIteratorEnd();

@@ -405,7 +405,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data(num_cells);
 
-        // Iterate over vertex elements ///\todo #2441 - replace with loop over cells
+        // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
         for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
              elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
              ++elem_iter)
@@ -435,7 +435,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
         cell_data.push_back(cell_data_var);
     }
 
-    // Loop over vertex elements ///\todo #2441 - replace with loop over cells
+    // Loop over vertex elements ///\todo #2512 - replace with loop over cells
     for (typename VertexMesh<DIM,DIM>::VertexElementIterator elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
          elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
          ++elem_iter)

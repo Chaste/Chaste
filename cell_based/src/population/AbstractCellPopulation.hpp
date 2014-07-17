@@ -110,6 +110,25 @@ private:
         archive & mCellPopulationCountWriters;
     }
 
+    /**
+     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
+     *
+     * Files in mCellPopulationCountWriters are NOT opened in this call since they are not written in
+     * a round-robin fashion.
+     *
+     * @param rOutputFileHandler handler for the directory in which to open this file.
+     */
+    void OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
+
+    /**
+     * Close all files in mCellPopulationWriters and mCellWriters.
+     *
+     * Files in mCellPopulationCountWriters are NOT closed in this call since they are not written in
+     * a round-robin fashion
+     *
+     */
+    void CloseRoundRobinWritersFiles();
+
 protected:
 
     /** Map location (node or VertexElement) indices back to cells. */
@@ -502,34 +521,28 @@ public:
      */
     virtual void UpdateCellProcessLocation();
 
-///\todo #2441 private:
     /**
-     * Open all files in mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters for writing (not appending).
+     * Open output files (and, if required, write headers) for any writers in the members
+     * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
+     *
+     * The method also writes the header for the .pvd output file if VTK is available.
+     *
+     * Before doing this, the method also creates appropriate writer objects if
+     * mOutputResultsForChasteVisualizer is set to true.
+     *
+     * This method is public because it is called by the simulation class at the start of the Solve() call.
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
-private:
     /**
-     * Open all files in mCellPopulationWriters and mCellWriters in append mode for writing.
+     * Close output files associated with any writers in the members
+     * mCellPopulationCountWriters, mCellPopulationWriters and mCellWriters.
      *
-     * Files in mCellPopulationCountWriters are NOT opened in this call since they are not written in
-     * a round-robin fashion
-     *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * The method also closes the .pvd output file if VTK is available.
      */
-    void OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler);
-    /**
-     * Clos all files in mCellPopulationWriters and mCellWriters.
-     *
-     * Files in mCellPopulationCountWriters are NOT closed in this call since they are not written in
-     * a round-robin fashion
-     *
-     */
-    void CloseRoundRobinWritersFiles();
-
-public:
+    void CloseWritersFiles();
 
     /**
      * Write results from the current cell population state to output files.
@@ -562,12 +575,6 @@ public:
      * @param pCell the cell whose data is being written.
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell)=0;
-
-///\todo #2441 make private: since this is only called by the simulation class (and doesn't need to be)?
-    /**
-     * Close any output files.
-     */
-    void CloseOutputFiles();
 
     /**
      * Outputs CellPopulation used in the simulation to file and then calls OutputCellPopulationParameters to output all relevant parameters.
