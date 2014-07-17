@@ -67,11 +67,17 @@ template<typename VECTOR>
 std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::string& message, VECTOR Y)
 {
     std::stringstream res;
-    res << message << "\nState:\n";
+    res << message << std::endl << "State:" << std::endl;
     assert(rGetStateVariableNames().size()==GetVectorSize(Y));
+    const std::vector<std::string>& r_units = rGetStateVariableUnits();
     for (unsigned i=0; i<GetVectorSize(Y); i++)
     {
-        res << "\t" << rGetStateVariableNames()[i] << ":" << GetVectorComponent(Y, i) << "\n";
+        res << "\t" << rGetStateVariableNames()[i] << ":" << GetVectorComponent(Y, i);
+        if (!r_units.empty())
+        {
+            res << " " << r_units[i];
+        }
+        res << std::endl;
     }
     return res.str();
 }
