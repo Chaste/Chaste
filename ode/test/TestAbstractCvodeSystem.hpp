@@ -312,7 +312,7 @@ public:
 
         // Dump the state variables
         std::string state = ode_system.DumpState("This is a test.");
-        TS_ASSERT_EQUALS(state, "This is a test.\nState:\n\tVariable_1:1\n\tVariable_2:2\n");
+        TS_ASSERT_EQUALS(state, "This is a test.\nState:\n\tVariable_1:1 dimensionless\n\tVariable_2:2 dimensionless\n");
 
         // Dump user-supplied values
         N_Vector rY = NULL;
@@ -321,7 +321,7 @@ public:
         SetVectorComponent(rY, 1, 1.0);
 
         state = ode_system.DumpState("Test 2.", rY);
-        TS_ASSERT_EQUALS(state, "Test 2.\nState:\n\tVariable_1:0\n\tVariable_2:1\n");
+        TS_ASSERT_EQUALS(state, "Test 2.\nState:\n\tVariable_1:0 dimensionless\n\tVariable_2:1 dimensionless\n");
 
         DeleteVector(rY);
 
