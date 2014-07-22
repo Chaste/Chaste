@@ -603,7 +603,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
 
         node_file = new File(args[0]+"/results.viznodes");
         cell_type_file = new File(args[0]+"/results.vizcelltypes");
-        location_file = new File(args[0]+"/results.vizlocations");
+        location_file = new File(args[0]+"/results.vizlocationindices");
         element_file = new File(args[0]+"/results.vizelements");
         pde_solution_file = new File(args[0]+"/results.vizpdesolution");
         beta_catenin_file = new File(args[0]+"/results.vizbetacatenin");
