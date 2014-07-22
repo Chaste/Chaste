@@ -1771,6 +1771,39 @@ public:
         test_point9[0] = 1.0;
         test_point9[1] = 1.0;
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point9, 0), false);
+        unsigned edge_closest_to_point_9 = mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point9,0);
+        TS_ASSERT(edge_closest_to_point_9 == 1u || edge_closest_to_point_9 == 2u);
+
+    }
+    void TestGetLocalIndexForElementEdgeClosestToPointWithinDoubleEpsilon()
+    {
+        /*
+         * Create a simple mesh comprising four nodes contained in a square element.
+         * We will test the GetLocalIndexForElementEdgeClosestToPoint method for a point
+         * which is within DBL_EPSILON distance of but not exactly at one of the nodes.
+         */
+
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, false, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, false, 0.0, 0.1));
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+
+        // Create a point within DBL_EPSILON of node 2
+        c_vector<double, 2> test_point1;
+        test_point1[0] = 0.1+2e-16;
+        test_point1[1] = 0.1+1e-16;
+        TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point1, 0), false);
+
+        // Since the point is basically at node 2 we are happy with the method returning either edge 1
+        // or edge 2.  The closest edge is not well defined in this situation.
+        unsigned edge_closest_to_point1 = mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point1,0);
+        TS_ASSERT(edge_closest_to_point1 == 1u || edge_closest_to_point1 == 2u);
     }
 };
 

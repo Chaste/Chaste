@@ -1265,6 +1265,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 
         c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, rTestPoint);
         c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+        double distance_a_to_b = norm_2(vector_a_to_b);
 
         c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
         double distance_parallel_to_edge = inner_prod(vector_a_to_point, edge_ab_unit_vector);
@@ -1277,10 +1278,22 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
         {
             squared_distance_normal_to_edge = 0.0;
         }
+
+        // Same argument for the point being at the same position as a point in the vertex element
+        if (fabs(distance_parallel_to_edge) < DBL_EPSILON)
+        {
+        	distance_parallel_to_edge = 0.0;
+        }
+
+        if (fabs(distance_parallel_to_edge-distance_a_to_b) < DBL_EPSILON)
+        {
+        	distance_parallel_to_edge = distance_a_to_b;
+        }
+
         // Make sure node is within the confines of the edge and is the nearest edge to the node \this breaks for convex elements
         if (squared_distance_normal_to_edge < min_squared_normal_distance &&
             distance_parallel_to_edge >=0 &&
-            distance_parallel_to_edge <= norm_2(vector_a_to_b))
+            distance_parallel_to_edge <= distance_a_to_b)
         {
             min_squared_normal_distance = squared_distance_normal_to_edge;
             min_distance_edge_index = local_index;
