@@ -232,6 +232,20 @@ protected:
      */
     void PerformVoidRemoval(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, Node<SPACE_DIM>* pNodeC);
 
+    /**
+     * Helper method for ReMesh(), called by PerformT3Swap(). During T3 swaps nodes are merged onto edges. This
+     * method checks if the edge is too short and moves its vertices apart if necessary in order to prevent T1 swaps
+     * from happening right away. The method also checks that the location where the merged node is going to end up at
+     * is not too close to one of the neighbouring vertices and moves it if necessary to prevent T1 swaps.
+     *
+     * @param indexA  index of one of the nodes on the short edge
+     * @param indexB  index of the other node on the short edge
+     * @param intersection  the intersection location, i.e. the location where we are planning to put the merged node
+     *
+     * @return intersection, the corrected location of where we are planning to put the merged node
+     */
+    c_vector<double, 2> WidenEdgeOrCorrectIntersectionLocationIfNecessary(unsigned indexA, unsigned indexB, c_vector<double,2> intersection);
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 

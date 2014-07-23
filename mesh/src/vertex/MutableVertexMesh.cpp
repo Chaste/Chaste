@@ -1768,55 +1768,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
     // Store the location of the T3 swap, the location of the intersection with the edge
+    // \todo the intersection location is sometimes overwritten when WidenEdgeOrCorrectIntersectionLocationIfNecessary
+    // is called (see #2401) - we should correct this in these cases!
+
     mLocationsOfT3Swaps.push_back(intersection);
-
-    /**
-     * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearrangementThreshold move vertexA and vertexB
-     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart.
-     * \todo investigate if moving A and B causes other issues with nearby nodes (see #2401)
-     *
-     * Note: this distance so that there is always enough room for new nodes (if necessary)
-     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases
-     *       (see #1399 and #2401)
-     */
-    if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
-    {
-        WARNING("Trying to merge a node onto an edge which is too small.");
-
-        c_vector<double, SPACE_DIM> centre_a_and_b = vertexA + 0.5*vector_a_to_b;
-
-        vertexA = centre_a_and_b  - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
-        ChastePoint<SPACE_DIM> vertex_A_point(vertexA);
-        SetNode(p_element->GetNodeGlobalIndex(node_A_local_index), vertex_A_point);
-
-        vertexB = centre_a_and_b  + 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
-        ChastePoint<SPACE_DIM> vertex_B_point(vertexB);
-        SetNode(p_element->GetNodeGlobalIndex((node_A_local_index+1)%num_nodes), vertex_B_point);
-
-        // Reset distances
-        vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
-        edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
-
-        // Reset the intersection to the middle to allow enough room for new nodes
-        intersection = centre_a_and_b;
-    }
-
-    /**
-     * If the intersection is within mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or vertexB move it
-     * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
-     *
-     * Note: this distance so that there is always enough room for new nodes (if necessary).
-     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases
-     *       (see #2401)
-     */
-    if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
-    {
-        intersection = vertexA + 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
-    }
-    if (norm_2(intersection - vertexB) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
-    {
-        intersection = vertexB - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
-    }
 
     if (pNode->GetNumContainingElements() == 1)
     {
@@ -1853,8 +1808,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             it++;
             VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_common_2 = this->GetElement(*it);
 
-            // Calculate the number of common vertices between element_1 and element_2
+            // Find the number and indices of common vertices between element_1 and element_2
             unsigned num_common_vertices = 0;
+            std::vector<unsigned> common_vertex_indices;
             for (unsigned i=0; i<p_element_common_1->GetNumNodes(); i++)
             {
                 for (unsigned j=0; j<p_element_common_2->GetNumNodes(); j++)
@@ -1862,6 +1818,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     if (p_element_common_1->GetNodeGlobalIndex(i)==p_element_common_2->GetNodeGlobalIndex(j))
                     {
                         num_common_vertices++;
+                        common_vertex_indices.push_back(p_element_common_1->GetNodeGlobalIndex(i));
                     }
                 }
             }
@@ -1881,6 +1838,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                  * The edge goes from vertexA--vertexB to vertexA--pNode--vertexB
                  */
 
+            	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+            	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+
                 // Move original node
                 pNode->rGetModifiableLocation() = intersection;
 
@@ -1892,38 +1852,74 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             }
             else if (num_common_vertices == 2)
             {
-                /*
-                 * This is the situation here.
-                 *
-                 * C is common_vertex D is the other one.
-                 *
-                 *  From          To
-                 *   _ D          _
-                 *    | <---       |
-                 *    | /\         |\
-                 *   C|/  \        | \
-                 *   _|____\      _|__\
-                 *
-                 *  The edge goes from vertexC--vertexB to vertexC--pNode--vertexD
-                 *  then vertex B is removed as it is no longer needed.
-                 */
+            	// The two elements must have an edge in common.  Find whether the common edge is the same as the
+            	// edge that is merged onto.
 
-                // Move original node
-                pNode->rGetModifiableLocation() = intersection;
+            	if ( ( common_vertex_indices[0]==vertexA_index && common_vertex_indices[1]==vertexB_index ) ||
+            			( common_vertex_indices[1]==vertexA_index && common_vertex_indices[0]==vertexB_index ) )
+            	{
+            		/*
+            		 * Due to a previous T3 swap the situation looks like this.
+            		 *
+            		 *              pNode
+            		 *     \         |\    /
+            		 *      \        | \  /
+            		 *       \_______|__\/
+            		 *       /A      |     B
+            		 *      /         \
+            		 *
+            		 * A T3 Swap would merge pNode onto an edge of its own element.
+            		 * We prevent this by just removing pNode. By doing this we also avoid the
+            		 * intersecting element to be concave.
+            		 */
 
-                // Replace common_vertex with the the moved node (this also updates the nodes)
-                this->GetElement(elementIndex)->ReplaceNode(this->mNodes[common_vertex_index], pNode);
+            		// Delete pNode in the intersecting element
+            		unsigned p_node_local_index = this->
+            				GetElement(intersecting_element_index)->GetNodeLocalIndex(pNode->GetIndex());
+            		this->GetElement(intersecting_element_index)->DeleteNode(p_node_local_index);
 
-                // Remove common_vertex
-                unsigned common_vertex_local_index = this->GetElement(intersecting_element_index)->GetNodeLocalIndex(common_vertex_index);
-                this->GetElement(intersecting_element_index)->DeleteNode(common_vertex_local_index);
-                assert(this->mNodes[common_vertex_index]->GetNumContainingElements() == 0);
+            		// Mark all three nodes as deleted
+            		pNode->MarkAsDeleted();
+            		mDeletedNodeIndices.push_back(pNode->GetIndex());
+            	}
+            	else{
 
-                this->mNodes[common_vertex_index]->MarkAsDeleted();
-                mDeletedNodeIndices.push_back(common_vertex_index);
+            		/*
+            		 * This is the situation here.
+            		 *
+            		 * C is common_vertex D is the other one.
+            		 *
+            		 *  From          To
+            		 *   _ D          _
+            		 *    | <---       |
+            		 *    | /\         |\
+            		 *   C|/  \        | \
+            		 *   _|____\      _|__\
+            		 *
+            		 *  The edge goes from vertexC--vertexB to vertexC--pNode--vertexD
+            		 *  then vertex B is removed as it is no longer needed.
+            		 */
 
-                // Check the nodes are updated correctly
-                assert(pNode->GetNumContainingElements() == 2);
+            		// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+            		intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+
+            		// Move original node
+            		pNode->rGetModifiableLocation() = intersection;
+
+            		// Replace common_vertex with the the moved node (this also updates the nodes)
+            		this->GetElement(elementIndex)->ReplaceNode(this->mNodes[common_vertex_index], pNode);
+
+            		// Remove common_vertex
+            		unsigned common_vertex_local_index = this->GetElement(intersecting_element_index)->GetNodeLocalIndex(common_vertex_index);
+            		this->GetElement(intersecting_element_index)->DeleteNode(common_vertex_local_index);
+            		assert(this->mNodes[common_vertex_index]->GetNumContainingElements() == 0);
+
+            		this->mNodes[common_vertex_index]->MarkAsDeleted();
+            		mDeletedNodeIndices.push_back(common_vertex_index);
+
+            		// Check the nodes are updated correctly
+            		assert(pNode->GetNumContainingElements() == 2);
+            	}
             }
             else if (num_common_vertices == 4)
             {
@@ -1987,6 +1983,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
              *  The edge goes from vertexA--vertexB to vertexA--new_node--pNode--vertexB
              */
 
+        	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+        	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+        	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
+
             // Move original node
             pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
 
@@ -2011,6 +2011,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     }
     else if (pNode->GetNumContainingElements() == 2)
     {
+
         // Find the nodes contained in elements containing the intersecting node
         std::set<unsigned>::const_iterator it = elements_containing_intersecting_node.begin();
 
@@ -2047,6 +2048,11 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
              *
              * Move p_node to the intersection on A B and merge AB and p_node
              */
+
+        	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+        	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+        	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
+
 
             // Check they are all boundary nodes
             assert(pNode->IsBoundaryNode());
@@ -2130,6 +2136,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                      * The edge goes from vertexA--vertexB to vertexA--pNode--new_node--vertexB
                      */
 
+                	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+                	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+                	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
+
                     // Move original node and change to non-boundary node
                     pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
@@ -2176,6 +2186,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                      * The edge goes from vertexA--vertexB to vertexA--pNode--new_node--vertexB
                      * then vertexA is removed
                      */
+
+                	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+                	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+                	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
 
                     // Move original node and change to non-boundary node
                     pNode->rGetModifiableLocation() = intersection - 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
@@ -2263,6 +2277,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                      * The edge goes from vertexA--vertexB to vertexA--new_node--pNode--vertexB
                      */
 
+                	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+                	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+                	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
+
                     // Move original node and change to non-boundary node
                     pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
                     pNode->SetAsBoundaryNode(false);
@@ -2308,6 +2326,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                      * The edge goes from vertexA--vertexB to vertexA--new_node--pNode--vertexB
                      * then vertexB is removed
                      */
+
+                	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+                	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+                	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
 
                     // Move original node and change to non-boundary node
                     pNode->rGetModifiableLocation() = intersection + 0.5*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
@@ -2365,6 +2387,10 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                  *
                  * The edge goes from vertexA--vertexB to vertexA--new_node_1--pNode--new_node_2--vertexB
                  */
+
+            	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+            	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+            	edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
 
                 // Move original node and change to non-boundary node
                 pNode->rGetModifiableLocation() = intersection;
@@ -2435,6 +2461,65 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
 
     // Remove the deleted nodes and re-index
     RemoveDeletedNodes();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrectIntersectionLocationIfNecessary(
+        unsigned indexA, unsigned indexB, c_vector<double,2> intersection)
+{
+    /**
+     * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearrangementThreshold move vertexA and vertexB
+     * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart.
+     * \todo investigate if moving A and B causes other issues with nearby nodes (see #2401)
+     *
+     * Note: this distance is so that there is always enough room for new nodes (if necessary)
+     * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases
+     *       (see #1399 and #2401)
+     */
+    c_vector<double, SPACE_DIM> vertexA = this->GetNode(indexA)->rGetLocation();
+    c_vector<double, SPACE_DIM> vertexB = this->GetNode(indexB)->rGetLocation();
+    c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+
+    if (norm_2(vector_a_to_b) < 4.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+    	WARNING("Trying to merge a node onto an edge which is too small.");
+
+    	c_vector<double, SPACE_DIM> centre_a_and_b = vertexA + 0.5*vector_a_to_b;
+
+    	vertexA = centre_a_and_b  - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
+    	ChastePoint<SPACE_DIM> vertex_A_point(vertexA);
+    	SetNode(indexA, vertex_A_point);
+
+    	vertexB = centre_a_and_b  + 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*vector_a_to_b/norm_2(vector_a_to_b);
+    	ChastePoint<SPACE_DIM> vertex_B_point(vertexB);
+    	SetNode(indexB, vertex_B_point);
+
+    	intersection = centre_a_and_b;
+
+    }
+
+    // Reset distances
+    vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+    c_vector<double,2> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
+
+    // Reset the intersection away from vertices A and B to allow enough room for new nodes
+    /**
+     * If the intersection is within mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or vertexB move it
+     * mCellRearrangementRatio^2*mCellRearrangementThreshold away.
+     *
+     * Note: this distance so that there is always enough room for new nodes (if necessary).
+     * \todo currently this assumes a worst case scenario of 3 nodes between A and B; could be less movement for other cases
+     *       (see #2401)
+     */
+    if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+    	intersection = vertexA + 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+    }
+    if (norm_2(intersection - vertexB) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)
+    {
+    	intersection = vertexB - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
+    }
+    return intersection;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -1672,6 +1672,137 @@ public:
         }
     }
 
+    void TestConsecutiveT3SwapsForSmallEdges()
+    {
+    	/*
+    	 * We create a mesh like this:
+    	 *
+    	 *        0     /\
+    	 *   \         /  \            /
+    	 *    \_______|____\__________/
+    	 *            |     \
+    	 *            |  1   \
+    	 *
+    	 * Two nodes that are very close to each other overlap with element 0.
+    	 * After the first T3 swap we expect a situation like this:
+    	 *
+    	 *                C
+    	 *                |\
+    	 *   \            | \          /    (Note: in the test below the image is
+    	 *    \___________|__\________/            flipped, i.e. Node B would be on the left.)
+    	 *         A|     |   B
+    	 *          |      \
+    	 *
+    	 * A further T3 Swap would merge node C onto edge AB, which is an edge of
+    	 * its own element. We prevent this by just removing node C.  By doing this we
+    	 * also avoid element 1 to be concave.
+    	 *
+    	 * After deleting Node C we should end up with something like this,
+    	 *
+    	 *   \                         /
+    	 *    \_______________B_______/
+    	 *         A|          \
+    	 *          |           \
+    	 *
+    	 * i.e. the two overlapping nodes were effectively merged onto the closest edge and the
+    	 * new vertices are only slightly more than the cell rearrangement threshold distance apart.
+    	 */
+
+    	// We start by creating nodes and from them a mesh.
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, -1.0, 1.0));
+        nodes.push_back(new Node<2>(4, true, -2.0, -2.0));
+        nodes.push_back(new Node<2>(5, true, 2.0, -2.0));
+        nodes.push_back(new Node<2>(6, true, 0.55, 0.11));
+        nodes.push_back(new Node<2>(7, true, 0.5, 0.01));
+
+        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1;
+        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
+        unsigned node_indices_element_1[4] = {4, 5, 6, 7};
+        for (unsigned i=0; i<4; i++)
+        {
+            nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
+            nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
+        }
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+
+        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+
+        // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations.
+        vertex_mesh.SetCellRearrangementThreshold(0.2);
+
+        // Node 6 and 7 are overlapping an edge of element 0
+        TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(6)->rGetLocation(), 0), true);
+        TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0), true);
+
+        // Check for and perform intersections - should return true!
+        TS_ASSERT(vertex_mesh.CheckForIntersections());
+
+        // Check that node 6 has been moved onto the edge and a new node has been created and added to both elements
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
+
+        // Node 6 now has 2 elements whereas node 7 has only one element
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->GetNumContainingElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(7)->GetNumContainingElements(), 1u);
+
+        // Element 0 should have 6 nodes and element 1 should have 5 nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 5u);
+
+        // Node 7 should be intersecting element 0
+        TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0), true);
+
+        // Node 8 should be the starting point of the edge that 7 is closest to. This means that the point would be merged
+        // back onto the freshly created edge from the previous swap if the ReMesh method doesn't check whether this is happening.
+        unsigned edge_closest_to_7_local_index =
+        		vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0);
+        unsigned edge_closest_to_7_global_index = vertex_mesh.GetElement(0)->GetNode(edge_closest_to_7_local_index)->GetIndex();
+        TS_ASSERT_EQUALS(edge_closest_to_7_global_index, 8u);
+
+        c_vector<double,2> location_node_6_before_swap = vertex_mesh.GetNode(6)->rGetLocation();
+        c_vector<double,2> location_node_8_before_swap = vertex_mesh.GetNode(8)->rGetLocation();
+
+        // We perform the next swap:
+        TS_ASSERT(vertex_mesh.CheckForIntersections());
+
+        // We should now have lost one node, i.e. having 8 nodes now (node 7 should be marked as deleted)
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
+
+        // Element 0 should have 6 nodes and element 1 should have 4 nodes
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 6u);
+        TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
+
+        // The locations of node 6 and 8 should not be changed!
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetLocation()[0],location_node_6_before_swap[0]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetLocation()[1],location_node_6_before_swap[1]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(8)->rGetLocation()[0],location_node_8_before_swap[0]);
+        TS_ASSERT_EQUALS(vertex_mesh.GetNode(8)->rGetLocation()[1],location_node_8_before_swap[1]);
+
+        // The two elements should have 2 nodes in common and they should both be boundary nodes
+        unsigned num_common_vertices = 0;
+        for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        {
+        	for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+        	{
+        		if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+        		{
+        			num_common_vertices++;
+        			TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
+        		}
+        	}
+        }
+        TS_ASSERT_EQUALS(num_common_vertices, 2u);
+
+    }
+
     void TestT3SwapForNeighbouringElements()
     {
         /*
@@ -1844,7 +1975,7 @@ public:
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.15);
 
-        // Node 6 and 7 are overlapping an edge of element 0
+        // Node 0 and 1 are overlapping an edge of element 0
         TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(0)->rGetLocation(), 1), true);
         TS_ASSERT_EQUALS(vertex_mesh.ElementIncludesPoint(vertex_mesh.GetNode(1)->rGetLocation(), 1), true);
 

@@ -1284,8 +1284,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
         {
         	distance_parallel_to_edge = 0.0;
         }
-
-        if (fabs(distance_parallel_to_edge-distance_a_to_b) < DBL_EPSILON)
+        else if (fabs(distance_parallel_to_edge-distance_a_to_b) < DBL_EPSILON)
         {
         	distance_parallel_to_edge = distance_a_to_b;
         }
