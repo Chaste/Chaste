@@ -394,6 +394,11 @@ public:
     void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
+     * Method to return a pointer to the modifiers
+     */
+    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
+
+    /**
      * Main Solve() method, used to evolve the cell population. Note that prior to calling Solve()
      * we must have called SetEndTime(). We may also have optionally called SetDt(); if not, then
      * a default time step is used.

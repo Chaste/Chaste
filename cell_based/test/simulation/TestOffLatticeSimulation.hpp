@@ -64,6 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "CellIdWriter.hpp"
+#include "VolumeTrackingModifier.hpp"
 #include "CellBasedSimulationArchiver.hpp"
 
 // Cell population writers
@@ -410,7 +411,7 @@ public:
     }
 
     /**
-     * Test a cell-based simulation with multiple forces.
+     * Test a cell-based simulation with variabe rest lengths forces.
      */
     void TestOffLatticeSimulationWithVariableRestLengths() throw (Exception)
     {
@@ -1116,6 +1117,63 @@ public:
         TS_ASSERT_EQUALS(prolif_type_count_after_solve[1], 0u);
         TS_ASSERT_EQUALS(prolif_type_count_after_solve[2], 0u);
         TS_ASSERT_EQUALS(prolif_type_count_after_solve[3], 0u);
+    }
+
+    /**
+     * Test a cell-based simulation with modifiers.
+     *
+     * Test to check we can add and remove them
+     */
+    void TestOffLatticeSimulationWithModifiers() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
+
+        // Create a simple 2D MeshBasedCellPopulation
+        int num_cells_depth = 5;
+        int num_cells_width = 5;
+        HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes());
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestOffLatticeSimulationWithModifiers");
+        simulator.SetEndTime(0.5);
+
+        // Create a force law and pass them to the simulation
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        simulator.AddForce(p_linear_force);
+
+        // Add a modifier
+        MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
+
+        // Check there is a modifier and its the correct type
+        std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
+       	TS_ASSERT(boost::static_pointer_cast<VolumeTrackingModifier<2> >(*iter));
+       	TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),1u);
+
+        simulator.Solve();
+
+        // Check that the number of nodes is equal to the number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+
+        // Now remove this modifier and check nothing goes wrong
+        //Note that the VTK output goes wrong when you uncomment this.
+
+//        simulator.GetSimulationModifiers()->pop_back();
+//        TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),0u);
+//
+//        simulator.SetEndTime(1.0);
+//        simulator.Solve();
+//
+//        // Check that the number of nodes is equal to the number of cells
+//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
     }
 };
 
