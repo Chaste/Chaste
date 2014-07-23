@@ -598,6 +598,8 @@ public:
         TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
+
+        delete p_simulator;
     }
 
     /**
