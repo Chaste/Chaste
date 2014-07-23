@@ -63,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
+#include "CellIdWriter.hpp"
 #include "CellBasedSimulationArchiver.hpp"
 
 // Cell population writers
@@ -568,6 +569,8 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
         cell_population.SetWriteVtkAsPoints(true);
+		//Add a writer
+		cell_population.AddCellWriter<CellIdWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2,3> simulator(cell_population);
