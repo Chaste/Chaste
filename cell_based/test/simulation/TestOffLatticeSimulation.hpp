@@ -1162,18 +1162,6 @@ public:
 
         // Check that the number of nodes is equal to the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
-
-        // Now remove this modifier and check nothing goes wrong
-        //Note that the VTK output goes wrong when you uncomment this.
-
-//        simulator.GetSimulationModifiers()->pop_back();
-//        TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),0u);
-//
-//        simulator.SetEndTime(1.0);
-//        simulator.Solve();
-//
-//        // Check that the number of nodes is equal to the number of cells
-//        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
     }
 };
 
