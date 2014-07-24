@@ -248,6 +248,10 @@
     rdfs:label "Leakage current" ;
     rdfs:comment "Historial metadata - only for early models lacking components." .
 
+:leakage_current_conductance
+    a :Annotation ;
+    rdfs:label "Leakage current conductance" ;
+    rdfs:comment "Historial metadata - only for early models lacking components." .
 
 # Following entries are MODERN metadata - labels all new models should be able to use.
 
