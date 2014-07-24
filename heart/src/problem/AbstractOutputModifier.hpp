@@ -52,7 +52,7 @@ class AbstractOutputModifier
 {
 private:
     /** For testing */
-    friend class TestOutputModifiers;
+    friend class TestMonodomainProblem;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;

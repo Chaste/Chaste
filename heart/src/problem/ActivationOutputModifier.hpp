@@ -73,11 +73,7 @@ private:
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<AbstractOutputModifier>(*this);
         archive & mThreshold;
-        archive & mLocalSize;
-        archive & mFirstActivitationTimes;
-        archive & mFirstRecoveryTimes;
-        archive & mSecondActivitationTimes;
-        archive & mSecondRecoveryTimes;
+        // Other private data are re-initialised in a process-specific manner
     }
 
     /** Private constructor that does nothing, for archiving */

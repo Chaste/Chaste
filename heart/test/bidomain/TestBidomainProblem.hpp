@@ -576,7 +576,7 @@ public:
         nodes_to_be_output.push_back(10);
         p_bidomain_problem->SetOutputNodes(nodes_to_be_output);
 
-        //Duplicate this with a single trace at node 5
+        // Duplicate this with a single trace at node 5
         boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5));
         p_bidomain_problem->AddOutputModifier(trace_5);
 

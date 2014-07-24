@@ -64,6 +64,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "Warnings.hpp"
 #include "ChasteSyscalls.hpp"
+#include "ActivationOutputModifier.hpp"
+#include "SingleTraceOutputModifier.hpp"
 #include "CardiacSimulationArchiver.hpp"
 
 /*
@@ -1426,8 +1428,58 @@ public:
         std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
 #endif // CHASTE_CVODE
     }
+
+    void TestArchivingOfSingleTraceOutputModifier() throw(Exception)
+    {
+        OutputFileHandler handler("TestArchivingOfSingleTraceOutputModifier", false);
+        // The next two lines ensure that different processes read/write different archive files when running in parallel
+        ArchiveLocationInfo::SetArchiveDirectory(handler.FindFile(""));
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("SingleTraceOutputModifier.arch");
+
+        // Create data structures to store variables to test for equality here
+
+        // Save
+        {
+            AbstractOutputModifier* const p_abstract_class = new SingleTraceOutputModifier("SomeFileName", 123);
+
+            // Create an output file
+            std::ofstream ofs(archive_filename.c_str());
+            // And create a boost output archive that goes to this file
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Record values to test into data structures
+            // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class)
+            // (if your abstract class doesn't contain the necessary variables and methods)
+
+            output_arch << p_abstract_class;
+            delete p_abstract_class;
+        }
+
+        // Load
+        {
+            AbstractOutputModifier* p_abstract_class_2;
+
+            // Read from this input file
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            // And choose a boost input_archive object to translate this file
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // restore from the archive
+            input_arch >> p_abstract_class_2;
+
+            // Check things in the data structures with TS_ASSERTS here.
+            // If necessary you can use static_cast<ConcreteClass*>(p_abstract_class_2)
+            // (if your abstract class doesn't contain the necessary variables and methods)
+
+            TS_ASSERT_EQUALS(p_abstract_class_2->mFilename, "SomeFileName");
+
+            delete p_abstract_class_2;
+
+        }
+    }
     void TestMonodomainProblem2DWithArchiving() throw(Exception)
     {
+
         // Names of output and archive directories
         std::string output_dir = "MonodomainProblem2DWithArchiving_Parallel";
         std::string archive_location_1 = output_dir+"/"+"monodomain_2d_archive_1";
@@ -1459,6 +1511,16 @@ public:
             HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
             HeartConfig::Instance()->SetCapacitance(1.0);
 
+            { // Add output modifiers
+                boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", 5));
+                boost::shared_ptr<ActivationOutputModifier> activation(new ActivationOutputModifier("activation.txt", 0.0));
+                TS_ASSERT_EQUALS(monodomain_problem.mOutputModifiers.size(), 0u);
+                monodomain_problem.AddOutputModifier(trace_5);
+                monodomain_problem.AddOutputModifier(activation);
+                TS_ASSERT_EQUALS(monodomain_problem.mOutputModifiers.size(), 2u);
+                TS_ASSERT_EQUALS(monodomain_problem.mOutputModifiers[0]->mFilename, "trace_5.txt");
+                TS_ASSERT_EQUALS(monodomain_problem.mOutputModifiers[1]->mFilename, "activation.txt");
+            }
 
             // Solve and save
             monodomain_problem.Solve();
@@ -1480,6 +1542,11 @@ public:
             MonodomainProblem<2> *p_monodomain_problem = CardiacSimulationArchiver<MonodomainProblem<2> >::Load(archive_location_2);
             HeartConfig::Instance()->SetSimulationDuration(1.5); //ms
             p_monodomain_problem->Solve();
+            { // Check that the modifiers are still there
+                TS_ASSERT_EQUALS(p_monodomain_problem->mOutputModifiers.size(), 2u);
+                TS_ASSERT_EQUALS(p_monodomain_problem->mOutputModifiers[0]->mFilename, "trace_5.txt");
+                TS_ASSERT_EQUALS(p_monodomain_problem->mOutputModifiers[1]->mFilename, "activation.txt");
+            }
             CardiacSimulationArchiver<MonodomainProblem<2> >::Save(*p_monodomain_problem, archive_location_3);
             delete p_monodomain_problem;
         }

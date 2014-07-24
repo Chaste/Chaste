@@ -70,17 +70,18 @@ private:
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<AbstractOutputModifier>(*this);
         archive & mGlobalIndex;
-        archive & mLocalIndex;
+        // This one need re-calculating... archive & mLocalIndex;
     }
 
-    /** Private constructor that does nothing, for archiving */
-    SingleTraceOutputModifier(){};
+    /** Private constructor that resets process-specific data, for archiving */
+    SingleTraceOutputModifier()
+        :mLocalIndex(UINT_MAX),
+         mFileStream(NULL){};
 
 public:
     /**
      * Constructor
      *
-     * \todo #2570 allow for the user to give a location instead?
      * @param globalIndex The global index of the node which is to be output (assumes no permutation)
      * @param rFilename  The file which is eventually produced by this modifier
      *

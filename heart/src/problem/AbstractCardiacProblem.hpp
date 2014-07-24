@@ -115,6 +115,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 class AbstractCardiacProblem : public AbstractUntemplatedCardiacProblem
 {
     friend class TestBidomainWithBath;
+    friend class TestMonodomainProblem;
     friend class TestCardiacSimulationArchiver;
 
     /** To save typing */

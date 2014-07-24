@@ -71,9 +71,9 @@ SingleTraceOutputModifier::ProcessSolutionAtTimeStep(double time, Vec solution, 
         double* p_solution;
         VecGetArray(solution, &p_solution);  //This does not need to be collective
         (*mFileStream) << time <<"\t"<< p_solution[mLocalIndex*problemDim]<<"\n";
-        if (Divides(1.0, time))
+        if (Divides(0.2, time))
         {
-            // Flush every millisecond so that we can tell the simulation is alive
+            // Flush every 0.2ms so that we can tell the simulation is alive
             mFileStream->flush();
         }
         VecRestoreArray(solution, &p_solution);
