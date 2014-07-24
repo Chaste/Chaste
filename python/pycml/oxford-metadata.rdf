@@ -178,6 +178,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <rdfs:comment>Historial metadata - only for early models lacking components.</rdfs:comment>
     <rdfs:label>Leakage current</rdfs:label>
   </rdf:Description>
+  <rdf:Description rdf:about="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#leakage_current_conductance">
+    <rdf:type rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#Annotation"/>
+    <rdfs:comment>Historial metadata - only for early models lacking components.</rdfs:comment>
+    <rdfs:label>Leakage current conductance</rdfs:label>
+  </rdf:Description>
   <rdf:Description rdf:about="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_ultrarapid_delayed_rectifier_potassium_current">
     <rdfs:label>Membrane ultrarapid delayed rectifier potassium current</rdfs:label>
     <rdf:type rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#Annotation"/>
