@@ -96,7 +96,7 @@ public:
          *
          * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500));}}}
          *
-         * the parameters are magnitude, duration, start time, and period of stimulus.
+         * the parameters are magnitude, duration, period, and start time of stimulus.
          */
         boost::shared_ptr<RegularStimulus> p_stimulus;
         boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
