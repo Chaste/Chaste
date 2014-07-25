@@ -83,7 +83,6 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellBetaCateninWriter and test that the correct output is generated
-        ///\todo #2441 This should add the writer into the population and not call visit directly
         CellBetaCateninWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
@@ -103,7 +102,7 @@ public:
 
         // Test the correct data are returned for VTK output for the first cell
         double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        TS_ASSERT_DELTA(vtk_data, 0.0, 1e-6);
+        TS_ASSERT_DELTA(vtk_data, 14.6088, 1e-4);
 
         // Avoid memory leak
         WntConcentration<2>::Destroy();
@@ -138,8 +137,7 @@ public:
        }
     }
 
-    ///\todo #2441 This test fails at present
-    void DONOTTestUseInPopulationWriteResultsToFile()
+    void TestUseInPopulationWriteResultsToFile()
     {
         EXIT_IF_PARALLEL;
 
@@ -156,12 +154,13 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.InitialiseCells();
 
         // Create an instance of a Wnt concentration
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
         WntConcentration<2>::Instance()->SetCryptLength(1.0);
+
+        cell_population.InitialiseCells();
 
         // This is where we add the writer
         cell_population.AddCellWriter<CellBetaCateninWriter>();

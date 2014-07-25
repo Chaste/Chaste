@@ -49,7 +49,12 @@ template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 
 /**
- * Abstract class for a writer that takes data from an AbstractCellPopulation and writes it to file.
+ * Abstract class for a writer that takes information from an AbstractCellPopulation and writes it to file.
+ *
+ * The key difference between this class and AbstractCellPopulationCountWriter is that writers inheriting
+ * from this class ARE compatible with a RoundRobin loop. For such writers, each process can write its part
+ * of the information without knowing anything about the other processes as long as they are not interfering
+ * with the writing itself.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractCellPopulationWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>

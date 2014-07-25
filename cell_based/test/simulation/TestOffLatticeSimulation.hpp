@@ -543,7 +543,7 @@ public:
 
         simulator.Solve();
 
-        //Check that nodes are all sat at resting length  (1.0) apart.
+        // Check that nodes are all sat at resting length  (1.0) apart.
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(2)->rGetLocation()-simulator.rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
@@ -570,7 +570,7 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
         cell_population.SetWriteVtkAsPoints(true);
-		//Add a writer
+		// Add a writer
 		cell_population.AddCellWriter<CellIdWriter>();
 
         // Set up cell-based simulation
@@ -595,11 +595,12 @@ public:
 
         p_simulator->Solve();
 
-        //Check that nodes are all sat at resting length  (1.0) apart.
+        // Check that nodes are all sat at resting length  (1.0) apart.
         TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
 
+        // Avoid memory leak
         delete p_simulator;
     }
 

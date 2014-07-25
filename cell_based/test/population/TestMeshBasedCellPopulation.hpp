@@ -1196,7 +1196,7 @@ public:
             // Create the cell population
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
 
-            //Add cell data
+            // Add cell data
             p_cell_population->SetDataOnAllCells("nothing", DOUBLE_UNSET);
 
             TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem("nothing"),

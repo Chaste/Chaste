@@ -46,8 +46,10 @@ CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::CellBetaCateninWriter()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    ///\todo #2441 - implement this method
-    return 0.0;
+    AbstractVanLeeuwen2009WntSwatCellCycleModel* p_model = dynamic_cast<AbstractVanLeeuwen2009WntSwatCellCycleModel*>(pCell->GetCellCycleModel());
+    double b_cat_cytoplasm = p_model->GetCytoplasmicBetaCateninLevel();
+
+    return b_cat_cytoplasm;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

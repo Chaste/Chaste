@@ -497,6 +497,8 @@ void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rPar
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
+///\todo #2441 - change this method to make use of the CellWriter functionality
+///(see MeshBasedCellPopulation::WriteVtkResultsToFile, for example)
 #ifdef CHASTE_VTK
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;

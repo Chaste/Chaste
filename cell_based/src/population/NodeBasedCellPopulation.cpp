@@ -519,6 +519,8 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
+///\todo #2441 - change this method to make use of the CellWriter functionality
+///(see MeshBasedCellPopulation::WriteVtkResultsToFile, for example)
 #ifdef CHASTE_VTK
     std::stringstream time;
     time << SimulationTime::Instance()->GetTimeStepsElapsed();

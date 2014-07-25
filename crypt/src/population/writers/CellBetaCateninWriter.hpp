@@ -73,6 +73,13 @@ public:
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
      *
+     * In this overridden method, since we are only able to output one double
+     * for each cell, we choose to output the cytoplasmic beta catenin
+     * concentration. Thus, at present, the membrane-bound and nuclear beta
+     * catenin concentrations cannot be visualized as VTK output. If this
+     * were required, it would be straightforward to implement within the
+     * current framework, for example by defined two new writer classes.
+     *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
      *
