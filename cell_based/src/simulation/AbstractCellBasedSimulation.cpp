@@ -296,8 +296,6 @@ std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, S
     return &mSimulationModifiers;
 }
 
-
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNodeLocation(const unsigned& rNodeIndex)
 {

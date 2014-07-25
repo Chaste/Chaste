@@ -382,7 +382,7 @@ public:
     void AddCellKiller(boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller);
 
     /**
-     * Method to remove all the cell killers
+     * Method to remove all the cell killers.
      */
     void RemoveAllCellKillers();
 
@@ -394,7 +394,7 @@ public:
     void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
-     * Method to return a pointer to the modifiers
+     * @return a pointer to the vector of SimulationModifiers used in this simulation.
      */
     std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
 
