@@ -130,7 +130,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::DoCellBirth()
 
                     // If required, output this location to file
                     /**
-                     * \todo (#2441)
+                     * \todo (#2578)
                      *
                      * For consistency with the rest of the output code, consider removing the
                      * AbstractCellBasedSimulation member mOutputDivisionLocations, adding a new
