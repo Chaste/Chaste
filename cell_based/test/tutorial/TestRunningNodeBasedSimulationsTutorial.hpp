@@ -174,9 +174,14 @@ public:
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.
      *
+     * Alternatively to view in Paraview
+     * Load the file {{{/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd}}},
+     * and add glyphs to represent cells.  An option is to use 3D spherical glyphs and then make a planar cut.
+     *
+     *
      * EMPTYLINE
      *
-     * == Test 2 - a basic node-based simulation in 3d ==
+     * == Test 2 - a basic node-based simulation in 3D ==
      *
      * EMPTYLINE
      *
@@ -248,7 +253,8 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * Note that you '''cannot view the results of a 3D simulation using the Java visualiser''' but
+     * to visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
      *
      * Load the file {{{/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd}}},
      * and add spherical glyphs to represent cells.
