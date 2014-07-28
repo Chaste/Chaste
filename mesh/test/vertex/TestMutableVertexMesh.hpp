@@ -1773,8 +1773,8 @@ public:
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(test_point9, 0), false);
         unsigned edge_closest_to_point_9 = mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point9,0);
         TS_ASSERT(edge_closest_to_point_9 == 1u || edge_closest_to_point_9 == 2u);
-
     }
+
     void TestGetLocalIndexForElementEdgeClosestToPointWithinDoubleEpsilon()
     {
         /*
@@ -1782,7 +1782,6 @@ public:
          * We will test the GetLocalIndexForElementEdgeClosestToPoint method for a point
          * which is within DBL_EPSILON distance of but not exactly at one of the nodes.
          */
-
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 0.1, 0.0));

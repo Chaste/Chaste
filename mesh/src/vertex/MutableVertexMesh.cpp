@@ -1768,14 +1768,13 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     c_vector<double, SPACE_DIM> intersection = vertexA + edge_ab_unit_vector*inner_prod(vector_a_to_point, edge_ab_unit_vector);
 
     // Store the location of the T3 swap, the location of the intersection with the edge
-    // \todo the intersection location is sometimes overwritten when WidenEdgeOrCorrectIntersectionLocationIfNecessary
+    ///\todo the intersection location is sometimes overwritten when WidenEdgeOrCorrectIntersectionLocationIfNecessary
     // is called (see #2401) - we should correct this in these cases!
 
     mLocationsOfT3Swaps.push_back(intersection);
 
     if (pNode->GetNumContainingElements() == 1)
     {
-
         // Get the index of the element containing the intersecting node
         unsigned intersecting_element_index = *elements_containing_intersecting_node.begin();
 
@@ -1882,8 +1881,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     pNode->MarkAsDeleted();
                     mDeletedNodeIndices.push_back(pNode->GetIndex());
                 }
-                else{
-
+                else
+                {
                     /*
                      * This is the situation here.
                      *
@@ -2011,7 +2010,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
     }
     else if (pNode->GetNumContainingElements() == 2)
     {
-
         // Find the nodes contained in elements containing the intersecting node
         std::set<unsigned>::const_iterator it = elements_containing_intersecting_node.begin();
 
@@ -2053,7 +2051,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
             edge_ab_unit_vector = this->GetPreviousEdgeGradientOfElementAtNode(p_element, (node_A_local_index+1)%num_nodes);
 
-
             // Check they are all boundary nodes
             assert(pNode->IsBoundaryNode());
             assert(this->mNodes[vertexA_index]->IsBoundaryNode());
@@ -2083,8 +2080,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
             // Remove vertex B from elements
             std::set<unsigned> elements_containing_vertex_B = this->mNodes[vertexB_index]->rGetContainingElementIndices();
             for (std::set<unsigned>::const_iterator iter = elements_containing_vertex_B.begin();
-                    iter != elements_containing_vertex_B.end();
-                    iter++)
+                 iter != elements_containing_vertex_B.end();
+                 iter++)
             {
                 this->GetElement(*iter)->DeleteNode(this->GetElement(*iter)->GetNodeLocalIndex(vertexB_index));
             }
@@ -2235,7 +2232,6 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                     // This can't happen as nodes can't be on the internal edge of two elements
                     NEVER_REACHED;
                 }
-
             }
             else if (next_node_1 == vertexB_index || previous_node_1 == vertexB_index || next_node_2 == vertexB_index || previous_node_2 == vertexB_index)
             {
@@ -2466,7 +2462,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrectIntersectionLocationIfNecessary(
         unsigned indexA, unsigned indexB, c_vector<double,2> intersection)
-        {
+{
     /**
      * If the edge is shorter than 4.0*mCellRearrangementRatio*mCellRearrangementThreshold move vertexA and vertexB
      * 4.0*mCellRearrangementRatio*mCellRearrangementThreshold apart.
@@ -2495,7 +2491,6 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
         SetNode(indexB, vertex_B_point);
 
         intersection = centre_a_and_b;
-
     }
 
     // Reset distances
@@ -2520,12 +2515,9 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
         intersection = vertexB - 2.0*mCellRearrangementRatio*mCellRearrangementThreshold*edge_ab_unit_vector;
     }
     return intersection;
-        }
+}
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class MutableVertexMesh<1,1>;
 template class MutableVertexMesh<1,2>;
 template class MutableVertexMesh<1,3>;

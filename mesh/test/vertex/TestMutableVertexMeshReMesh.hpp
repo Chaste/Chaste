@@ -1800,7 +1800,6 @@ public:
             }
         }
         TS_ASSERT_EQUALS(num_common_vertices, 2u);
-
     }
 
     void TestT3SwapForNeighbouringElements()

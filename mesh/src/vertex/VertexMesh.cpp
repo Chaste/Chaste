@@ -496,7 +496,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::SolveElementMapping(unsigned index)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::SolveBoundaryElementMapping(unsigned index) const
 {
-    /// \todo sort out boundary elements in a vertex mesh (#1263)
+    ///\todo sort out boundary elements in a vertex mesh (#1263)
 //    assert(index < this->mBoundaryElements.size() );
     return index;
 }
@@ -1272,14 +1272,17 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
 
         double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
 
-        // If the point lies almost bang on the supporting line of the edge, then snap to the line
-        // This allows us to do floating point tie-breaks when line is exactly at a node
+        /*
+         * If the point lies almost bang on the supporting line of the edge, then snap to the line.
+         * This allows us to do floating point tie-breaks when line is exactly at a node.
+         * We adopt a similar approach if the point is at the same position as a point in the
+         * element.
+         */
         if (squared_distance_normal_to_edge < DBL_EPSILON)
         {
             squared_distance_normal_to_edge = 0.0;
         }
 
-        // Same argument for the point being at the same position as a point in the vertex element
         if (fabs(distance_parallel_to_edge) < DBL_EPSILON)
         {
             distance_parallel_to_edge = 0.0;
