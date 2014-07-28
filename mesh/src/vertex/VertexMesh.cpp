@@ -1282,17 +1282,17 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestT
         // Same argument for the point being at the same position as a point in the vertex element
         if (fabs(distance_parallel_to_edge) < DBL_EPSILON)
         {
-        	distance_parallel_to_edge = 0.0;
+            distance_parallel_to_edge = 0.0;
         }
         else if (fabs(distance_parallel_to_edge-distance_a_to_b) < DBL_EPSILON)
         {
-        	distance_parallel_to_edge = distance_a_to_b;
+            distance_parallel_to_edge = distance_a_to_b;
         }
 
         // Make sure node is within the confines of the edge and is the nearest edge to the node \this breaks for convex elements
         if (squared_distance_normal_to_edge < min_squared_normal_distance &&
-            distance_parallel_to_edge >=0 &&
-            distance_parallel_to_edge <= distance_a_to_b)
+                distance_parallel_to_edge >=0 &&
+                distance_parallel_to_edge <= distance_a_to_b)
         {
             min_squared_normal_distance = squared_distance_normal_to_edge;
             min_distance_edge_index = local_index;

@@ -1674,41 +1674,41 @@ public:
 
     void TestConsecutiveT3SwapsForSmallEdges()
     {
-    	/*
-    	 * We create a mesh like this:
-    	 *
-    	 *        0     /\
-    	 *   \         /  \            /
-    	 *    \_______|____\__________/
-    	 *            |     \
-    	 *            |  1   \
-    	 *
-    	 * Two nodes that are very close to each other overlap with element 0.
-    	 * After the first T3 swap we expect a situation like this:
-    	 *
-    	 *                C
-    	 *                |\
-    	 *   \            | \          /    (Note: in the test below the image is
-    	 *    \___________|__\________/            flipped, i.e. Node B would be on the left.)
-    	 *         A|     |   B
-    	 *          |      \
-    	 *
-    	 * A further T3 Swap would merge node C onto edge AB, which is an edge of
-    	 * its own element. We prevent this by just removing node C.  By doing this we
-    	 * also avoid element 1 to be concave.
-    	 *
-    	 * After deleting Node C we should end up with something like this,
-    	 *
-    	 *   \                         /
-    	 *    \_______________B_______/
-    	 *         A|          \
-    	 *          |           \
-    	 *
-    	 * i.e. the two overlapping nodes were effectively merged onto the closest edge and the
-    	 * new vertices are only slightly more than the cell rearrangement threshold distance apart.
-    	 */
+        /*
+         * We create a mesh like this:
+         *
+         *        0     /\
+         *   \         /  \            /
+         *    \_______|____\__________/
+         *            |     \
+         *            |  1   \
+         *
+         * Two nodes that are very close to each other overlap with element 0.
+         * After the first T3 swap we expect a situation like this:
+         *
+         *                C
+         *                |\
+         *   \            | \          /    (Note: in the test below the image is
+         *    \___________|__\________/            flipped, i.e. Node B would be on the left.)
+         *         A|     |   B
+         *          |      \
+         *
+         * A further T3 Swap would merge node C onto edge AB, which is an edge of
+         * its own element. We prevent this by just removing node C.  By doing this we
+         * also avoid element 1 to be concave.
+         *
+         * After deleting Node C we should end up with something like this,
+         *
+         *   \                         /
+         *    \_______________B_______/
+         *         A|          \
+         *          |           \
+         *
+         * i.e. the two overlapping nodes were effectively merged onto the closest edge and the
+         * new vertices are only slightly more than the cell rearrangement threshold distance apart.
+         */
 
-    	// We start by creating nodes and from them a mesh.
+        // We start by creating nodes and from them a mesh.
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
@@ -1762,7 +1762,7 @@ public:
         // Node 8 should be the starting point of the edge that 7 is closest to. This means that the point would be merged
         // back onto the freshly created edge from the previous swap if the ReMesh method doesn't check whether this is happening.
         unsigned edge_closest_to_7_local_index =
-        		vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0);
+                vertex_mesh.GetLocalIndexForElementEdgeClosestToPoint(vertex_mesh.GetNode(7)->rGetLocation(), 0);
         unsigned edge_closest_to_7_global_index = vertex_mesh.GetElement(0)->GetNode(edge_closest_to_7_local_index)->GetIndex();
         TS_ASSERT_EQUALS(edge_closest_to_7_global_index, 8u);
 
@@ -1790,14 +1790,14 @@ public:
         unsigned num_common_vertices = 0;
         for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
         {
-        	for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
-        	{
-        		if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
-        		{
-        			num_common_vertices++;
-        			TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
-        		}
-        	}
+            for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            {
+                if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+                {
+                    num_common_vertices++;
+                    TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
+                }
+            }
         }
         TS_ASSERT_EQUALS(num_common_vertices, 2u);
 
@@ -1926,7 +1926,7 @@ public:
 
     void TestResolveTriangularOverlapAfterConsecutiveT3Swaps()
     {
-    	/*
+        /*
          *  Create a mesh with an overlap as shown below.
          *
          *  \           1             /
@@ -2007,14 +2007,14 @@ public:
         unsigned num_common_vertices = 0;
         for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
         {
-        	for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
-        	{
-        		if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
-        		{
-        			num_common_vertices++;
-        			TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
-        		}
-        	}
+            for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            {
+                if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+                {
+                    num_common_vertices++;
+                    TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
+                }
+            }
         }
         TS_ASSERT_EQUALS(num_common_vertices, 4u);
 
@@ -2029,14 +2029,14 @@ public:
         num_common_vertices = 0;
         for (unsigned i=0; i<vertex_mesh.GetElement(0)->GetNumNodes(); i++)
         {
-        	for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
-        	{
-        		if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
-        		{
-        			num_common_vertices++;
-        			TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
-        		}
-        	}
+            for (unsigned j=0; j<vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            {
+                if ( (vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
+                {
+                    num_common_vertices++;
+                    TS_ASSERT(vertex_mesh.GetNode(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i))->IsBoundaryNode());
+                }
+            }
         }
         TS_ASSERT_EQUALS(num_common_vertices, 2u);
     }
