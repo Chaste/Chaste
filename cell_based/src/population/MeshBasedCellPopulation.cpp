@@ -550,10 +550,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
+    // Store the present time as a string
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
     time << num_timesteps;
 
+    // Store the number of cells for which to output data to VTK
     unsigned num_cells_from_mesh = GetNumNodes();
     if (!mWriteVtkAsPoints && (mpVoronoiTessellation != NULL))
     {

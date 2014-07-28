@@ -381,7 +381,7 @@ public:
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestCaBasedCellPopulationWriters/results.parameters").CompareFiles();
 
         // Test VTK output
-        ///\todo check all properties, not just mutations
+        ///\todo #2441 - check all properties, not just mutations
 #ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 

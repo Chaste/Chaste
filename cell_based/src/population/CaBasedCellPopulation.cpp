@@ -497,23 +497,14 @@ void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rPar
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-///\todo #2441 - change this method to make use of the CellWriter functionality
-///(see MeshBasedCellPopulation::WriteVtkResultsToFile, for example)
 #ifdef CHASTE_VTK
+    // Store the present time as a string
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
     time << num_timesteps;
 
-    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
-
+    // Store the number of cells for which to output data to VTK
     unsigned num_cells = this->GetNumRealCells();
-    std::vector<double> cell_types(num_cells, -1.0);
-    std::vector<double> cell_mutation_states(num_cells, -1.0);
-    std::vector<double> cell_ids(num_cells, -1.0);
-    std::vector<double> cell_ancestors(num_cells, -1.0);
-    std::vector<double> cell_ages(num_cells, -1.0);
-    std::vector<double> cell_cycle_phases(num_cells, -1.0);
-    std::vector<Node<DIM>*> nodes;
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
@@ -526,9 +517,10 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         cell_data.push_back(cell_data_var);
     }
 
-    unsigned cell = 0;
+    // Create mesh writer for VTK output
+    VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
 
-    // Counter to keep track of how many cells are at a lattice site
+    // Create a counter to keep track of how many cells are at a lattice site
     unsigned num_sites = this->mrMesh.GetNumNodes();
     boost::scoped_array<unsigned> number_of_cells_at_site(new unsigned[num_sites]);
     for (unsigned i=0; i<num_sites; i++)
@@ -536,23 +528,23 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         number_of_cells_at_site[i] = 0;
     }
 
-    for (std::list<CellPtr>::iterator iter = this->mCells.begin();
-         iter != this->mCells.end();
-         ++iter)
+    // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
+    std::vector<Node<DIM>*> nodes;
+    unsigned cell = 0;
+    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+         cell_iter != this->mCells.end();
+         ++cell_iter)
     {
-        CellPtr cell_ptr = *iter;
-        cell_ids[cell] = cell_ptr->GetCellId();
-
-        unsigned location_index = this->GetLocationIndexUsingCell(*iter);
-
+        // Get the location index of this cell and update the counter number_of_cells_at_site
+        unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
         number_of_cells_at_site[location_index]++;
-        assert(number_of_cells_at_site[location_index]<=mLatticeCarryingCapacity);
+        assert(number_of_cells_at_site[location_index] <= mLatticeCarryingCapacity);
 
         // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
         c_vector<double, DIM> coords;
         coords = this->mrMesh.GetNode(location_index)->rGetLocation();
 
-        // Move the coordinate slightly so that we can visualise all cells in a lattice site if there is more than one per site
+        // Move the coordinates slightly so that we can visualise all cells in a lattice site if there is more than one per site
         if (mLatticeCarryingCapacity > 1)
         {
             c_vector<double, DIM> offset;
@@ -566,10 +558,9 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
             else
             {
                 RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
                 for (unsigned i=0; i<DIM; i++)
                 {
-                    offset[i] = p_gen->ranf(); // This assumes that all sites are 1 apart
+                    offset[i] = p_gen->ranf(); // This assumes that all sites are 1 unit apart
                 }
             }
 
@@ -580,76 +571,30 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         }
 
         nodes.push_back(new Node<DIM>(cell, coords, false));
-
-        if (this-> template HasWriter<CellAncestorWriter>())
-        {
-            double ancestor_index = (cell_ptr->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_ptr->GetAncestor();
-            cell_ancestors[cell] = ancestor_index;
-        }
-        if (this-> template HasWriter<CellProliferativeTypesWriter>())
-        {
-            cell_types[cell] = cell_ptr->GetCellProliferativeType()->GetColour();
-        }
-        if (this-> template HasWriter<CellMutationStatesWriter>())
-        {
-            cell_mutation_states[cell] = cell_ptr->GetMutationState()->GetColour();
-
-            ///\todo split these all off as cell label not mutation states (see #2534)
-            CellPropertyCollection collection = cell_ptr->rGetCellPropertyCollection();
-            CellPropertyCollection label_collection = collection.GetProperties<CellLabel>();
-
-            if (label_collection.GetSize() == 1)
-            {
-                boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
-                cell_mutation_states[cell] = p_label->GetColour();
-            }
-
-        }
-        if (this-> template HasWriter<CellAgesWriter>())
-        {
-            cell_ages[cell] = cell_ptr->GetAge();
-        }
-        if (this-> template HasWriter<CellProliferativePhasesWriter>())
-        {
-            cell_cycle_phases[cell] = cell_ptr->GetCellCycleModel()->GetCurrentCellCyclePhase();
-        }
-        for (unsigned var=0; var<num_cell_data_items; var++)
-        {
-            cell_data[var][cell] = cell_ptr->GetCellData()->GetItem(cell_data_names[var]);
-        }
-
-        cell ++;
+        cell++;
     }
 
-    // Cell IDs can be used to threshold out the empty lattice sites (which have ID=-1)
-    mesh_writer.AddPointData("Cell ids", cell_ids);
+    // Iterate over any cell writers that are present
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+         cell_writer_iter != this->mCellWriters.end();
+         ++cell_writer_iter)
+    {
+        // Create vector to store VTK cell data
+        // (using a default value of -1 to correspond to an empty lattice site)
+        std::vector<double> vtk_cell_data(num_cells, -1.0);
 
-    if (this-> template HasWriter<CellProliferativeTypesWriter>())
-    {
-        mesh_writer.AddPointData("Cell types", cell_types);
-    }
-    if (this-> template HasWriter<CellMutationStatesWriter>())
-    {
-        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
-    }
-    if (this-> template HasWriter<CellAncestorWriter>())
-    {
-        mesh_writer.AddPointData("Ancestors", cell_ancestors);
-    }
-    if (this-> template HasWriter<CellAgesWriter>())
-    {
-        mesh_writer.AddPointData("Ages", cell_ages);
-    }
-    if (this-> template HasWriter<CellProliferativePhasesWriter>())
-    {
-        mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
-    }
-    if (num_cell_data_items > 0)
-    {
-        for (unsigned var=0; var<cell_data.size(); var++)
+        // Loop over cells
+        unsigned cell = 0;
+        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+             cell_iter != this->mCells.end();
+             ++cell_iter)
         {
-            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
+            // Populate the vector of VTK cell data
+            vtk_cell_data[cell] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
+            cell++;
         }
+
+        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
     }
 
     /*
