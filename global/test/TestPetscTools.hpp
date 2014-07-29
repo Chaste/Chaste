@@ -215,20 +215,25 @@ public:
         TS_ASSERT_EQUALS(PetscTools::GetWorld(), PETSC_COMM_WORLD); // No isolation at first
         TS_ASSERT(!PetscTools::IsIsolated());
         bool really_parallel = PetscTools::IsParallel();
+        unsigned my_rank = PetscTools::GetMyRank();
+        unsigned num_procs = PetscTools::GetNumProcs();
         PetscTools::IsolateProcesses();
         TS_ASSERT_EQUALS(PetscTools::GetWorld(), PETSC_COMM_SELF); // Each process is its own world
         TS_ASSERT(PetscTools::IsIsolated());
-        TS_ASSERT(PetscTools::AmMaster()); // All processes are masters
+        TS_ASSERT(PetscTools::AmMaster());  // All processes are masters
+        TS_ASSERT(PetscTools::AmTopMost()); // All processes are top
+        TS_ASSERT_EQUALS(PetscTools::GetMyRank(), my_rank); // Rank and process count are still accurate though
+        TS_ASSERT_EQUALS(PetscTools::GetNumProcs(), num_procs);
         // Note: this will deadlock in parallel if IsolateProcesses doesn't work
-        if (PetscTools::AmTopMost())
+        if (PetscTools::GetMyRank() == 0u)
         {
-            // Only the top process does this
+            // Only the rank 0 process does this
             PetscTools::Barrier("TestProcessIsolation");
         }
-        bool am_top = PetscTools::AmTopMost();
+        bool am_top = (PetscTools::GetMyRank() == PetscTools::GetNumProcs() - 1);
         bool any_is_top = PetscTools::ReplicateBool(am_top); // Replication is a no-op
         TS_ASSERT_EQUALS(am_top, any_is_top);
-        if (PetscTools::AmTopMost())
+        if (PetscTools::GetMyRank() == 0u)
         {
             TS_ASSERT_THROWS_NOTHING(PetscTools::ReplicateException(true));
         }
