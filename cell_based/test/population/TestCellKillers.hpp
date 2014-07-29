@@ -714,7 +714,7 @@ public:
         // Set up singleton classes
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "isolated_killer.arch";
-        ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
+        ArchiveLocationInfo::SetMeshFilename("vertex_mesh_isolated");
 
         {
             HoneycombVertexMeshGenerator generator(4,4);

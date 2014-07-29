@@ -773,7 +773,7 @@ public:
         // Set up singleton classes
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "T2swap_cell_killer.arch";
-        ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
+        ArchiveLocationInfo::SetMeshFilename("vertex_mesh_T2swap");
 
         {
             HoneycombVertexMeshGenerator generator(4,4);

@@ -1168,7 +1168,7 @@ public:
         std::string archive_file = "vertex_cell_population_3d.arch";
         // The following line is required because the loading of a cell population
         // is usually called by the method CellBasedSimulation::Load()
-        ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
+        ArchiveLocationInfo::SetMeshFilename("vertex_mesh_population_3d");
 
         // Archive cell population
         {
