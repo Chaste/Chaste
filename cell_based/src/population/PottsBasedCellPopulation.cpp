@@ -584,8 +584,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     }
 
     /*
-     * The current VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter.
-     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK then visualized as glyphs.
+     * At present, the VTK writer can only write things which inherit from AbstractTetrahedralMeshWriter.
+     * For now, we do an explicit conversion to NodesOnlyMesh. This can be written to VTK, then visualized
+     * as glyphs in Paraview.
      */
     NodesOnlyMesh<DIM> temp_mesh;
     temp_mesh.ConstructNodesWithoutMesh(*mpPottsMesh, 1.5); // This cut-off is arbitrary, as node connectivity is not used here
