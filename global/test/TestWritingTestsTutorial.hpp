@@ -83,8 +83,10 @@ public:
     }
 /*
  * This second test shows some of the other {{{TS_ASSERT}}} macros that are available.
+ * The {{{throw (Exception)}} part of the signature is there to make sure that full details of any
+ * uncaught exceptions are reported.
  */
-    void TestSomeOtherStuff()
+    void TestSomeOtherStuff() throw (Exception)
     {
         TS_ASSERT(1==1); // however, it is better to use TS_ASSERT_EQUALS, below
         TS_ASSERT_EQUALS((true||false), true);
@@ -93,8 +95,10 @@ public:
         TS_ASSERT_LESS_THAN_EQUALS(-1e100, 1e100);
         TS_ASSERT_THROWS_ANYTHING(throw 0;); // normally you would put a function call inside the brackets
 
-//        double x;
-//        TS_ASSERT_THROWS_NOTHING(x=1;);  // normally you would put a function call inside the brackets
+        unsigned x;
+        // The following TS_ASSERT_THROWS_NOTHING may be useful if you want to be certain that there are no uncaught exceptions
+        TS_ASSERT_THROWS_NOTHING(x=1;);  // normally you would put a function call inside the brackets
+        TS_ASSERT_EQUALS(x, 1u); //Note that x and 1u are of the same type: unsigned integer
     }
 
 /* Other useful macros include `TS_ASSERT_THROWS_THIS` and `TS_ASSERT_THROWS_CONTAINS` for testing exception
@@ -105,7 +109,9 @@ public:
  */
     void donotTestThis()
     {
-        TS_ASSERT_EQUALS(1,2);
+        TS_ASSERT_EQUALS(1,   2);
+        TS_ASSERT_EQUALS(1u,  2u);
+        TS_ASSERT_EQUALS(1.0, 2.0);
     }
 };
 /*
@@ -114,7 +120,7 @@ public:
  * and run, either by running
 {{{
 #!sh
-scons test_suite=global/test/TestWritingTests.hpp
+scons global/test/TestWritingTests.hpp
 }}}
  * from the command line, or by creating a new "Make Target" in Eclipse using the above command.
  */
