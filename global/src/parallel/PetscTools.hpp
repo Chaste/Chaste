@@ -203,6 +203,10 @@ public:
 
     /**
      * Call at the start of a block of code that should be executed by each process in turn.
+     *
+     * Note that this is not reliable for printing output to stdout in an ordered fashion, since on some systems each
+     * process may have a separate stdout buffer, and there's no way to force a flush to the underlying output stream.
+     * See e.g. http://stackoverflow.com/questions/5182045/openmpi-mpi-barrier-problems for more info.
      */
     static void BeginRoundRobin();
 
