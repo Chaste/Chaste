@@ -508,7 +508,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    // Not used here: std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
     std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
@@ -530,7 +530,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
     // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
     std::vector<Node<DIM>*> nodes;
-    unsigned cell = 0;
+    unsigned node_index = 0;
     for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
@@ -570,8 +570,8 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
             }
         }
 
-        nodes.push_back(new Node<DIM>(cell, coords, false));
-        cell++;
+        nodes.push_back(new Node<DIM>(node_index, coords, false));
+        node_index++;
     }
 
     // Iterate over any cell writers that are present
@@ -584,14 +584,14 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         std::vector<double> vtk_cell_data(num_cells, -1.0);
 
         // Loop over cells
-        unsigned cell = 0;
+        unsigned cell_index = 0;
         for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
              cell_iter != this->mCells.end();
              ++cell_iter)
         {
             // Populate the vector of VTK cell data
-            vtk_cell_data[cell] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
-            cell++;
+            vtk_cell_data[cell_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
+            cell_index++;
         }
 
         mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
