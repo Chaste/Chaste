@@ -123,7 +123,7 @@ void VentilationProblem::SolveDirectFromFlux()
 {
     /* Work back through the node iterator looking for internal nodes: bifurcations or joints
      *
-     * Each parent flux is equal to the sum of it's children
+     * Each parent flux is equal to the sum of its children
      * Note that we can't iterate all the way back to the root node, but that's okay
      * because the root is not a bifurcation.  Also note that we can't use a NodeIterator
      * because it does not have operator--
@@ -134,6 +134,8 @@ void VentilationProblem::SolveDirectFromFlux()
         if (p_node->IsBoundaryNode() == false)
         {
             Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
+            // This assertion will trip if a node is not actually in the airway tree and will prevent operator++ from hanging
+            assert(element_iterator != p_node->ContainingElementsEnd());
             unsigned parent_index = *element_iterator;
             ++element_iterator;
 
