@@ -237,7 +237,6 @@ public:
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
 
         // Check that there are the correct number of everything
@@ -288,7 +287,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up-1);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u);  // No boundary elements now the halo nodes are removed
 
-        TS_ASSERT_EQUALS(map.Size(), num_old_nodes);
+        TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(15), true);
 
         for (unsigned i=0; i<num_old_nodes; i++)
@@ -480,7 +479,6 @@ public:
 
         p_mesh->ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), p_mesh->GetNumNodes());
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
 
         // Check that there are the correct number of everything

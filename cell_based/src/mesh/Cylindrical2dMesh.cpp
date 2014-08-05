@@ -295,7 +295,7 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
      * Go through the reindex map and use it to populate the original NodeMap
      * (the one that is returned to the user).
      */
-    for (unsigned i=0; i<rMap.Size(); i++) // only going up to be size of map, not size of reindex_map
+    for (unsigned i=0; i<rMap.GetSize(); i++) // only going up to be size of map, not size of reindex_map
     {
         if (reindex_map.IsDeleted(i))
         {

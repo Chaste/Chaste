@@ -1034,7 +1034,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes-2));
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes-2));
 
-        TS_ASSERT_EQUALS(map.Size(), num_old_nodes);
+        TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(50), true);
         TS_ASSERT_EQUALS(map.IsDeleted(0), true);
 
@@ -1069,7 +1069,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes-2));
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes-2));
 
-        TS_ASSERT_EQUALS(map.Size(), num_old_nodes);
+        TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(50), true);
         TS_ASSERT_EQUALS(map.IsDeleted(0), true);
 
@@ -1148,7 +1148,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), (unsigned)(num_old_eles - 7));
         TS_ASSERT_EQUALS(mesh.GetNumAllElements(), (unsigned)(num_old_eles - 7));
 
-        TS_ASSERT_EQUALS(map.Size(), num_old_nodes);
+        TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(241), true);
     }
 

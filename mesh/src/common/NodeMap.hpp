@@ -47,8 +47,13 @@ class NodeMap
 {
 private:
 
-    /** The map is stored as an ordered vector of node indices. */
+    /** The map is stored as an ordered vector of node indices.
+     *  Note that a vector is more efficient than std::map in this case where
+     *  we know the exact size of the map and can benefit from O(1) lookup*/
     std::vector<unsigned> mMap;
+    /** Redundant data to provide a shortcut when the map is empty or the identity.
+     *  This is initialised to true, since an empty map is equivalent to the identity. */
+    bool mIsIdentity;
 
 public:
 
@@ -109,7 +114,7 @@ public:
     /**
      * @return the size of the NodeMap.
      */
-    unsigned Size();
+    unsigned GetSize();
 
 };
 

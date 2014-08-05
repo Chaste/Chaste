@@ -100,7 +100,7 @@ public:
         NodeMap map(mesh.GetNumNodes());
         mesh.ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes());
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes());
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), old_mesh.GetNumNodes());
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), old_mesh.GetNumBoundaryNodes());
@@ -177,7 +177,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(1), elem_index+1);
         }
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes()+1); // one node removed during remesh
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1); // one node removed during remesh
         for (unsigned i=0; i<7; i++)
         {
             // These are unchanged
@@ -186,7 +186,7 @@ public:
         // This one has gone
         TS_ASSERT(map.IsDeleted(7));
         TS_ASSERT_THROWS_THIS(map.GetNewIndex(7),"Node has been deleted");
-        for (unsigned i=8; i<map.Size(); i++)
+        for (unsigned i=8; i<map.GetSize(); i++)
         {
             // These have shuffled down
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i-1);
@@ -310,7 +310,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes()+1);//one node removed during remesh
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1);//one node removed during remesh
         for (unsigned i=0; i<431; i++)
         {
             // These are unchanged
@@ -319,7 +319,7 @@ public:
         // This one has gone
         TS_ASSERT(map.IsDeleted(432));
         TS_ASSERT_THROWS_THIS(map.GetNewIndex(432),"Node has been deleted");
-        for (unsigned i=433; i<map.Size(); i++)
+        for (unsigned i=433; i<map.GetSize(); i++)
         {
             // These have shuffled down
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i-1);
@@ -359,7 +359,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes()+1);//one node removed during remesh
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1);//one node removed during remesh
 
         TS_ASSERT_EQUALS(mesh.GetNumAllElements(), mesh.GetNumElements());
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(),mesh.GetNumNodes());
@@ -377,7 +377,9 @@ public:
     void TestNodeMap()
     {
         NodeMap map(10);
-        TS_ASSERT_EQUALS(map.Size(), 10u);
+        TS_ASSERT_EQUALS(map.GetSize(), 10u);
+        TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
+        TS_ASSERT_EQUALS(map.GetNewIndex(1u), 1u); // This is unsafe since the contents of the map have not been set
 
         map.ResetToIdentity();
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
@@ -582,7 +584,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes());
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes());
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 10.0, 1e-6);
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 22.0, 1e-6);
@@ -617,7 +619,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes()+1); //one node removed during remesh
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1); //one node removed during remesh
 
         TS_ASSERT_EQUALS(mesh.GetNumAllElements(), mesh.GetNumElements());
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), mesh.GetNumNodes());
@@ -653,7 +655,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        TS_ASSERT_EQUALS(map.Size(), mesh.GetNumNodes()+1); //one node removed during remesh
+        TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1); //one node removed during remesh
 
         TS_ASSERT_EQUALS(mesh.GetNumAllElements(), mesh.GetNumElements());
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), mesh.GetNumNodes());

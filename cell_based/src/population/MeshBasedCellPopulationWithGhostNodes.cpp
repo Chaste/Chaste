@@ -269,7 +269,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(Nod
     mIsGhostNode.resize(this->GetNumNodes());
 
     // Update mIsGhostNode using the node map
-    for (unsigned old_index=0; old_index<rMap.Size(); old_index++)
+    for (unsigned old_index=0; old_index<rMap.GetSize(); old_index++)
     {
         if (!rMap.IsDeleted(old_index))
         {

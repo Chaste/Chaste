@@ -44,10 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 NodeMap::NodeMap(unsigned size)
+    : mIsIdentity(true)
 {
-    // this used to be reserve, but this acts oddly:
-    // eg: mMap.reserve(2); mMap[0]=1;
-    // runs and mMap[0] returns 1, but mMap.size() returns 0
     mMap.resize(size);
 }
 
@@ -58,20 +56,26 @@ void NodeMap::Resize(unsigned size)
 
 void NodeMap::ResetToIdentity()
 {
-    for (unsigned oldIndex=0; oldIndex<mMap.size(); oldIndex++)
+    for (unsigned index=0; index<mMap.size(); index++)
     {
-        mMap[oldIndex] = oldIndex;
+        mMap[index] = index;  // This is needed if we later diverge from identity (e.g. delete nodes)
     }
+    mIsIdentity = true;
 }
 
 void NodeMap::SetNewIndex(unsigned oldIndex, unsigned newIndex)
 {
     mMap[oldIndex] = newIndex;
+    if (mIsIdentity && (oldIndex != newIndex))
+    {
+        mIsIdentity = false;
+    }
 }
 
 void NodeMap::SetDeleted(unsigned index)
 {
     mMap[index] = UINT_MAX;
+    mIsIdentity = false;
 }
 
 bool NodeMap::IsDeleted(unsigned index)
@@ -81,26 +85,23 @@ bool NodeMap::IsDeleted(unsigned index)
 
 unsigned NodeMap::GetNewIndex(unsigned oldIndex) const
 {
+    if (mIsIdentity)
+    {
+        return oldIndex;
+    }
     if (mMap[oldIndex] == UINT_MAX)
     {
         EXCEPTION("Node has been deleted");
     }
-    return (unsigned) mMap[oldIndex];
+    return mMap[oldIndex];
 }
 
 bool NodeMap::IsIdentityMap()
 {
-    for (unsigned i=0; i<mMap.size(); i++)
-    {
-        if (mMap[i] != i)
-        {
-            return false;
-        }
-    }
-    return true;
+    return mIsIdentity;
 }
 
-unsigned NodeMap::Size()
+unsigned NodeMap::GetSize()
 {
     return mMap.size();
 }
