@@ -113,7 +113,13 @@ http://www.cellml.org/
    </component>
    <component name="sodium_channel">
       <variable name="i_Na" units="microA_per_cm2" public_interface="out"/>
-      <variable name="g_Na" units="milliS_per_cm2" initial_value="120"/>
+      <variable name="g_Na" units="milliS_per_cm2" initial_value="120" cmeta:id="membrane_fast_sodium_current_conductance">
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#membrane_fast_sodium_current_conductance">
+                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_fast_sodium_current_conductance"/>
+            </rdf:Description>
+         </rdf:RDF>
+      </variable>
       <variable name="E_Na" units="millivolt"/>
       <variable name="time" units="millisecond" public_interface="in" private_interface="out"/>
       <variable name="V" units="millivolt" public_interface="in" private_interface="out"/>
