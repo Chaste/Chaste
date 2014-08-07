@@ -132,7 +132,9 @@ private:
         double sampling_interval = 1.0; // ms; used as max dt for CVODE too
         Timer::Reset();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
-        Timer::Print("Model " << rModelName << " writing to " << rOutputDirName << " took ");
+        std::stringsteam message;
+        message << "Model " << rModelName << " writing to " << rOutputDirName << " took ";
+        Timer::Print(message.str());
 
         const unsigned output_freq = 10; // Only output every N samples
         solution.WriteToFile(rOutputDirName, rModelName, "ms", output_freq, false);
