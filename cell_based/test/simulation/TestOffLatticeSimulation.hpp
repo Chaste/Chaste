@@ -570,8 +570,8 @@ public:
         // Create a cell population
         MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
         cell_population.SetWriteVtkAsPoints(true);
-		// Add a writer
-		cell_population.AddCellWriter<CellIdWriter>();
+        // Add a writer
+        cell_population.AddCellWriter<CellIdWriter>();
 
         // Set up cell-based simulation
         OffLatticeSimulation<2,3> simulator(cell_population);
@@ -1156,8 +1156,8 @@ public:
 
         // Check there is a modifier and its the correct type
         std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
-       	TS_ASSERT(boost::static_pointer_cast<VolumeTrackingModifier<2> >(*iter));
-       	TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),1u);
+        TS_ASSERT(boost::static_pointer_cast<VolumeTrackingModifier<2> >(*iter));
+        TS_ASSERT_EQUALS(simulator.GetSimulationModifiers()->size(),1u);
 
         simulator.Solve();
 

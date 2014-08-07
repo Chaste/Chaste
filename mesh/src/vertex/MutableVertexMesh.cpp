@@ -1837,8 +1837,8 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(Node<SPACE_DIM>* p
                  * The edge goes from vertexA--vertexB to vertexA--pNode--vertexB
                  */
 
-            	// Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
-            	intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
+                // Check whether the intersection location fits into the edge and update distances and vertex positions afterwards.
+                intersection = this->WidenEdgeOrCorrectIntersectionLocationIfNecessary(vertexA_index, vertexB_index, intersection);
 
                 // Move original node
                 pNode->rGetModifiableLocation() = intersection;
