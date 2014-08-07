@@ -62,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StimulusBoundaryCondition.hpp"
 
 #include "Warnings.hpp"
+#include "Timer.hpp"
 
 typedef enum StimulusType_
 {
@@ -417,7 +418,7 @@ public:
             }
 
             DisplayRun();
-            double time_before=MPI_Wtime();
+            Timer::Reset();
             //// use this to get some info printed out
             //cardiac_problem.SetWriteInfo();
 
@@ -433,7 +434,7 @@ public:
 
             if (PetscTools::AmMaster())
             {
-                std::cout << "Time to solve = " << MPI_Wtime()-time_before << " seconds\n";
+                std::cout << "Time to solve = " << Timer::GetElapsedTime() << " seconds\n";
             }
 
             OutputFileHandler results_handler("Convergence"+nameOfTest, false);

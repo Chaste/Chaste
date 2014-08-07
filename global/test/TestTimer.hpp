@@ -47,6 +47,8 @@ public:
     // Can't really test the timer, this is just for coverage and to illustrate usage
     void TestIt()
     {
+    	Timer::Print("What time is it?");
+
         Timer::Reset();
 
         // Run simulation which shows **** cures cancer
@@ -54,6 +56,12 @@ public:
 
         // Run simulation which shows **** cures heart disease
         Timer::Print("Cure heart disease");
+
+        double elapsed_time = Timer::GetElapsedTime();
+        TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
+
+        double current_time = Timer::GetWallTime();
+        TS_ASSERT_LESS_THAN(1.4e9, current_time);
     }
 };
 

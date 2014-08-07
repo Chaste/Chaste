@@ -356,13 +356,13 @@ PetscErrorCode PCLDUFactorisationApply(void* pc_context, Vec x, Vec y)
      * Split vector x into two. x = [x1 x2]'
      */
 #ifdef TRACE_KSP
-    double init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
 
     PetscVecTools::DoInterleavedVecScatter(x, block_diag_context->A11_scatter_ctx, block_diag_context->x1_subvector, block_diag_context->A22_scatter_ctx, block_diag_context->x2_subvector);
 
 #ifdef TRACE_KSP
-    block_diag_context->mScatterTime += MPI_Wtime() - init_time;
+    block_diag_context->mScatterTime += Timer::GetElapsedTime();
 #endif
 
     /*
@@ -373,17 +373,17 @@ PetscErrorCode PCLDUFactorisationApply(void* pc_context, Vec x, Vec y)
      *    y1 = z - inv(A11)(B*y2)
      */
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     //z  = inv(A11)*x1
     PCApply(block_diag_context->PC_amg_A11, block_diag_context->x1_subvector, block_diag_context->z);
 #ifdef TRACE_KSP
-    block_diag_context->mA1PreconditionerTime += MPI_Wtime() - init_time;
+    block_diag_context->mA1PreconditionerTime += Timer::GetElapsedTime();
 #endif
 
     //y2 = inv(A22)*(x2 - B*z)
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     MatMult(block_diag_context->B_matrix_subblock,block_diag_context->z,block_diag_context->temp); //temp = B*z
     double minus_one = -1.0;
@@ -393,36 +393,36 @@ PetscErrorCode PCLDUFactorisationApply(void* pc_context, Vec x, Vec y)
     VecAYPX(block_diag_context->temp, minus_one, block_diag_context->x2_subvector); // temp <-- x2 - temp
 #endif
 #ifdef TRACE_KSP
-    block_diag_context->mExtraLAOperations += MPI_Wtime() - init_time;
+    block_diag_context->mExtraLAOperations += Timer::GetElapsedTime();
 #endif
 
 
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     PCApply(block_diag_context->PC_amg_A22, block_diag_context->temp, block_diag_context->y2_subvector); // y2 = inv(A22)*temp
 #ifdef TRACE_KSP
-    block_diag_context->mA2PreconditionerTime += MPI_Wtime() - init_time;
+    block_diag_context->mA2PreconditionerTime += Timer::GetElapsedTime();
 #endif
 
     // y1 = z - inv(A11)(B*y2)
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     MatMult(block_diag_context->B_matrix_subblock,block_diag_context->y2_subvector,block_diag_context->temp); //temp = B*y2
 #ifdef TRACE_KSP
-    block_diag_context->mExtraLAOperations += MPI_Wtime() - init_time;
+    block_diag_context->mExtraLAOperations += Timer::GetElapsedTime();
 #endif
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     PCApply(block_diag_context->PC_amg_A11, block_diag_context->temp, block_diag_context->y1_subvector); // y1 = inv(A11)*temp
 #ifdef TRACE_KSP
-    block_diag_context->mA1PreconditionerTime += MPI_Wtime() - init_time;
+    block_diag_context->mA1PreconditionerTime += Timer::GetElapsedTime();
 #endif
 
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
     VecAYPX(&minus_one, block_diag_context->z, block_diag_context->y1_subvector); // y1 <-- z - y1
@@ -430,20 +430,20 @@ PetscErrorCode PCLDUFactorisationApply(void* pc_context, Vec x, Vec y)
     VecAYPX(block_diag_context->y1_subvector, minus_one, block_diag_context->z); // y1 <-- z - y1
 #endif
 #ifdef TRACE_KSP
-    block_diag_context->mExtraLAOperations += MPI_Wtime() - init_time;
+    block_diag_context->mExtraLAOperations += Timer::GetElapsedTime();
 #endif
 
     /*
      * Gather vectors y1 and y2. y = [y1 y2]'
      */
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
 
     PetscVecTools::DoInterleavedVecGather(y, block_diag_context->A11_scatter_ctx, block_diag_context->y1_subvector, block_diag_context->A22_scatter_ctx, block_diag_context->y2_subvector);
 
 #ifdef TRACE_KSP
-    block_diag_context->mGatherTime += MPI_Wtime() - init_time;
+    block_diag_context->mGatherTime += Timer::GetElapsedTime();
 #endif
 
     return 0;

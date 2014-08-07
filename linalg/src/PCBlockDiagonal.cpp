@@ -300,13 +300,13 @@ PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y)
      * Scatter x = [x1 x2]'
      */
 #ifdef TRACE_KSP
-    double init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
 
     PetscVecTools::DoInterleavedVecScatter(x, block_diag_context->A11_scatter_ctx, block_diag_context->x1_subvector, block_diag_context->A22_scatter_ctx, block_diag_context->x2_subvector);
 
 #ifdef TRACE_KSP
-    block_diag_context->mScatterTime += MPI_Wtime() - init_time;
+    block_diag_context->mScatterTime += Timer::GetElapsedTime();
 #endif
 
     /*
@@ -314,19 +314,19 @@ PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y)
      * y2 = AMG(A22)*x2
      */
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     PCApply(block_diag_context->PC_amg_A11, block_diag_context->x1_subvector, block_diag_context->y1_subvector);
 #ifdef TRACE_KSP
-    block_diag_context->mA1PreconditionerTime += MPI_Wtime() - init_time;
+    block_diag_context->mA1PreconditionerTime += Timer::GetElapsedTime();
 #endif
 
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
     PCApply(block_diag_context->PC_amg_A22, block_diag_context->x2_subvector, block_diag_context->y2_subvector);
 #ifdef TRACE_KSP
-    block_diag_context->mA2PreconditionerTime += MPI_Wtime() - init_time;
+    block_diag_context->mA2PreconditionerTime += Timer::GetElapsedTime();
 #endif
 
     /*
@@ -334,13 +334,13 @@ PetscErrorCode PCBlockDiagonalApply(void* pc_context, Vec x, Vec y)
      */
 //PETSc-3.x.x or PETSc-2.3.3
 #ifdef TRACE_KSP
-    init_time = MPI_Wtime();
+    Timer::Reset();
 #endif
 
     PetscVecTools::DoInterleavedVecGather(y, block_diag_context->A11_scatter_ctx, block_diag_context->y1_subvector, block_diag_context->A22_scatter_ctx, block_diag_context->y2_subvector);
 
 #ifdef TRACE_KSP
-    block_diag_context->mGatherTime += MPI_Wtime() - init_time;
+    block_diag_context->mGatherTime += Timer::GetElapsedTime();
 #endif
     return 0;
 }

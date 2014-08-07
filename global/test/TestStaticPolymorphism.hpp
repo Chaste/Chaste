@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "PetscSetupAndFinalize.hpp"
 
+#include "Timer.hpp"
+
 // Single class. Method() not virtual.
 class SingleClass
 {
@@ -158,29 +160,29 @@ public:
     void TestDynamicPolymorphism()
     {
         SingleClass single_class;
-        double start_time = MPI_Wtime();
+        Timer::Reset();
         single_class.Run();
-        std::cout << "Single class: " << MPI_Wtime()-start_time << std::endl;
+        std::cout << "Single class: " << Timer::GetElapsedTime() << std::endl;
 
         DynamicBaseclass baseclass;
-        start_time = MPI_Wtime();
+        Timer::Reset();
         baseclass.Run();
-        std::cout << "Dynamic baseclass: " << MPI_Wtime()-start_time << std::endl;
+        std::cout << "Dynamic baseclass: " << Timer::GetElapsedTime() << std::endl;
 
         DynamicSubclass subclass;
-        start_time = MPI_Wtime();
+        Timer::Reset();
         subclass.Run();
-        std::cout << "Dynamic subclass: " << MPI_Wtime()-start_time << std::endl;
+        std::cout << "Dynamic subclass: " << Timer::GetElapsedTime() << std::endl;
 
         DynamicSubsubsubclass subsubsubclass;
-        start_time = MPI_Wtime();
+        Timer::Reset();
         subsubsubclass.Run();
-        std::cout << "Dynamic subsubsubclass: " << MPI_Wtime()-start_time << std::endl;
+        std::cout << "Dynamic subsubsubclass: " << Timer::GetElapsedTime() << std::endl;
 
         StaticSubclass static_subclass;
-        start_time = MPI_Wtime();
+        Timer::Reset();
         static_subclass.Run();
-        std::cout << "Static subclass: " << MPI_Wtime()-start_time << std::endl;
+        std::cout << "Static subclass: " << Timer::GetElapsedTime() << std::endl;
     }
 };
 

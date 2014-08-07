@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 #include "PetscTools.hpp"
+#include "Timer.hpp"
 
 /**
  * A generic base class providing the functionality for timing various events.
@@ -77,9 +78,8 @@ private:
      */
     static inline void MilliSleep(unsigned milliseconds)
     {
-        double start = MPI_Wtime();
-        double min_Wtime = milliseconds/1000.0 + start;
-        while (MPI_Wtime() < min_Wtime)
+        double min_Wtime = milliseconds/1000.0 + Timer::GetElapsedTime();
+        while (Timer::GetElapsedTime() < min_Wtime)
         {
             //pause;
         }

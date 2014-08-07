@@ -39,16 +39,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "PetscTools.hpp"
 
-double Timer::msStartTime = 0.0; //In case user forgets to Reset() before printing.
+double Timer::msStartTime = 0.0; // In case user forgets to Reset() before printing.
 
 void Timer::Reset()
 {
-    msStartTime = MPI_Wtime(); //Arbitrary start time in seconds
+    msStartTime = GetWallTime(); // Arbitrary start time in seconds
+}
+
+double Timer::GetWallTime()
+{
+	return MPI_Wtime();
+}
+
+double Timer::GetElapsedTime()
+{
+	return GetWallTime() - msStartTime;
 }
 
 void Timer::Print(std::string message)
 {
-    double time = MPI_Wtime() - msStartTime;
+    double time = GetElapsedTime();
     if (PetscTools::IsParallel())
     {
         std::cout << "proc " << PetscTools::GetMyRank() << ": ";

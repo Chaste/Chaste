@@ -78,6 +78,19 @@ public:
     static void Print(std::string message);
 
     /**
+     * Get the elapsed wall-clock time since since midnight of January 1, 1970,
+     * or since Reset() was called.
+     *
+     * @return The elapsed time, in seconds.
+     */
+    static double GetElapsedTime();
+
+    /**
+     * @return The time since since midnight of January 1, 1970 in seconds.
+     */
+    static double GetWallTime();
+
+    /**
      * Print the elapsed wall-clock time (to std::cout and the Log file (under logging-level 2))
      * preceded by the message provided, and also reset the timer.
      *
