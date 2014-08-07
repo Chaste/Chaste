@@ -36,8 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTARCHIVING_HPP_
 #define TESTARCHIVING_HPP_
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
 
 #include <fstream>
 #include <cxxtest/TestSuite.h>
@@ -54,7 +53,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
+/**
+ * Contains some good examples of how to checkpoint things.
+ * Most of these would need changing to work in parallel, we have some easy ways of doing this:
+ * see https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/BoostSerialization for details.
+ */
 class TestArchiving : public CxxTest::TestSuite
 {
 public:
@@ -382,6 +385,55 @@ public:
             TS_ASSERT(dynamic_cast<SubChildClass*>(p_base.get()));
         }
     }
+
+    /**
+     * HOW_TO_TAG General/Archiving
+     * * Use a binary rather than ascii boost archive format, for speed and smaller file sizes.
+     *
+     * (NB this file is actually larger, but when there's lots of data it should be smaller!)
+     *
+     * Note that a binary archive could become machine architecture-specific.
+     * But it can be helpful to use them for speed. In this case we have had
+     * success in storing an ascii one, loading and re-saving as binary.
+     * Loading code could then look for the binary one, and revert to ascii if
+     * it is not there.
+     *
+     * The test below is identical to the one above, apart from the two lines indicated.
+     */
+    void TestUsingABinaryArchive() throw (Exception)
+	{
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename;
+        archive_filename = handler.GetOutputDirectoryFullPath() + "subchild_binary.arch";
+
+        // Save
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::binary_oarchive output_arch(ofs); // LINE CHANGED!
+
+            boost::shared_ptr<BaseClass> p_base(new SubChildClass());
+
+            p_base->mTagInBaseClass = 6;
+
+            output_arch << p_base;
+        }
+
+        // Load
+        {
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::binary_iarchive input_arch(ifs); // LINE CHANGED!
+
+            boost::shared_ptr<BaseClass> p_base;
+
+            input_arch >> p_base;
+
+            TS_ASSERT_EQUALS(p_base->mTagInBaseClass, 6u);
+            TS_ASSERT(dynamic_cast<ChildClass*>(p_base.get()));
+            TS_ASSERT(dynamic_cast<SubChildClass*>(p_base.get()));
+        }
+	}
 };
 
 #endif /*TESTARCHIVING_HPP_*/

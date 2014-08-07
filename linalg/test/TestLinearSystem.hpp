@@ -952,7 +952,7 @@ public:
     void TestPetscSaveAndLoad()
     {
         // Archive
-        OutputFileHandler handler("Archive", false);
+        OutputFileHandler handler("archive", false);
         std::string archive_filename_lhs, archive_filename_rhs;
         archive_filename_lhs = handler.GetOutputDirectoryFullPath() + "direct_lhs.mat";
         archive_filename_rhs = handler.GetOutputDirectoryFullPath() + "direct_rhs.vec";
@@ -1074,7 +1074,7 @@ public:
     void TestSaveAndLoadLinearSystem()
     {
         // Archive
-        OutputFileHandler handler("Archive", false);
+        OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "linear_system.arch";
