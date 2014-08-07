@@ -64,6 +64,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class TestCryptSimulation2dNightly : public AbstractCellBasedWithTimingsTestSuite
 {
+private:
+    void setUp()
+    {
+    	CellBasedEventHandler::Disable(); // these tests fail with event-handling on
+    	AbstractCellBasedWithTimingsTestSuite::setUp();
+    }
+
 public:
 ///////// NON-PERIODIC TESTS - these test the spring system and cell birth etc. /////////
 
