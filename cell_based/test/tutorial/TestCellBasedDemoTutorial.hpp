@@ -450,65 +450,65 @@ public:
      * In the final test we show how to modify the earlier tests (using off lattice models) to implement a 'Potts-based' simulation,
      * in which cells are represented by collections of sites on a fixed lattice.
      */
-   void TestPottsBasedMonolayer() throw (Exception)
-   {
-       /* In common with the off lattice simulations we begin by creating a mesh. Here we use the {{{PottsMeshGenerator}}}
-        * class to generate a {{{PottsMesh}}} each element in the mesh is a collection of lattice sites (represented by nodes at their centres).
-        * All the connectivity between lattice sites is defined by the {{{PottsMeshGenerator}}},
-        * and there are arguments to make the domains periodic.
-        */
-       PottsMeshGenerator<2> generator(20, 2, 4, 20, 2, 4); //**Changed**//
-       PottsMesh<2>* p_mesh = generator.GetMesh(); //**Changed**//
+    void TestPottsBasedMonolayer() throw (Exception)
+    {
+        /* In common with the off lattice simulations we begin by creating a mesh. Here we use the {{{PottsMeshGenerator}}}
+         * class to generate a {{{PottsMesh}}} each element in the mesh is a collection of lattice sites (represented by nodes at their centres).
+         * All the connectivity between lattice sites is defined by the {{{PottsMeshGenerator}}},
+         * and there are arguments to make the domains periodic.
+         */
+        PottsMeshGenerator<2> generator(20, 2, 4, 20, 2, 4); //**Changed**//
+        PottsMesh<2>* p_mesh = generator.GetMesh(); //**Changed**//
 
-       /* We generate one cell for each element as in vertex based simulations.*/
-       std::vector<CellPtr> cells;
-       MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-       CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-       cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+        /* We generate one cell for each element as in vertex based simulations.*/
+        std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
-       /* As we have a {{{PottsMesh}}} we use a {{{PottsBasedCellPopulation}}}. Note here we also change the
-        * "temperature" of the Potts simulation to make cells more motile.*/
-       PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);//**Changed**//
-       cell_population.SetTemperature(1.0);
+        /* As we have a {{{PottsMesh}}} we use a {{{PottsBasedCellPopulation}}}. Note here we also change the
+         * "temperature" of the Potts simulation to make cells more motile.*/
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);//**Changed**//
+        cell_population.SetTemperature(1.0);
 
-       /* As a Potts simulation is restricted to a lattice we create a {{{OnSimulation}}} object and pass in the {{{CellPopulation}}} in much the same
-        * way as an {{{OffLatticeSimulation}}} in the above examples. We also set some
-        * options on the simulation like output directory and end time.
-        */
-       OnLatticeSimulation<2> simulator(cell_population);//**Changed**//
-       simulator.SetOutputDirectory("CellBasedDemo7"); //**Changed**//
-       simulator.SetEndTime(20.0);
+        /* As a Potts simulation is restricted to a lattice we create a {{{OnSimulation}}} object and pass in the {{{CellPopulation}}} in much the same
+         * way as an {{{OffLatticeSimulation}}} in the above examples. We also set some
+         * options on the simulation like output directory and end time.
+         */
+        OnLatticeSimulation<2> simulator(cell_population);//**Changed**//
+        simulator.SetOutputDirectory("CellBasedDemo7"); //**Changed**//
+        simulator.SetEndTime(20.0);
 
-       /* In order to specify how cells move around we create "shared pointer"s to
-        * {{{UpdateRule}}} objects and pass them to the {{{OnLatticeSimulation}}}.
-        * This is analogous to {{{Forces}}} in earlier examples.
-        */
-       MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule); //**Changed**//
-       simulator.AddPottsUpdateRule(p_volume_constraint_update_rule); //**Changed**//
-       MAKE_PTR(SurfaceAreaConstraintPottsUpdateRule<2>, p_surface_area_update_rule); //**Changed**//
-       simulator.AddPottsUpdateRule(p_surface_area_update_rule); //**Changed**//
-       MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule); //**Changed**//
-       simulator.AddPottsUpdateRule(p_adhesion_update_rule); //**Changed**//
+        /* In order to specify how cells move around we create "shared pointer"s to
+         * {{{UpdateRule}}} objects and pass them to the {{{OnLatticeSimulation}}}.
+         * This is analogous to {{{Forces}}} in earlier examples.
+         */
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule); //**Changed**//
+        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule); //**Changed**//
+        MAKE_PTR(SurfaceAreaConstraintPottsUpdateRule<2>, p_surface_area_update_rule); //**Changed**//
+        simulator.AddPottsUpdateRule(p_surface_area_update_rule); //**Changed**//
+        MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule); //**Changed**//
+        simulator.AddPottsUpdateRule(p_adhesion_update_rule); //**Changed**//
 
-       /* We can add {{{CellKillers}}} as before.*/
-       MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));
-       simulator.AddCellKiller(p_cell_killer);
+        /* We can add {{{CellKillers}}} as before.*/
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_cell_killer, (&cell_population, 0.01));
+        simulator.AddCellKiller(p_cell_killer);
 
-       /* Again we run the simulation by calling the {{{Solve}}} method.*/
-       simulator.Solve();
+        /* Again we run the simulation by calling the {{{Solve}}} method.*/
+        simulator.Solve();
 
-       /* The next two lines are for test purposes only and are not part of this tutorial.
-        */
-       TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
-       TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
-   }
-   /*
-    * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-    * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0}}}.
-    * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
-    * java executable.
-    *
-    */
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
+    }
+    /*
+     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
+     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0}}}.
+     * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
+     * java executable.
+     *
+     */
 };
 
 #endif /*TESTCELLBASEDDEMOTUTORIAL_HPP_*/
