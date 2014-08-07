@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include <cstdio>
-#include <ctime>
 #include <cmath>
 
 #include "CheckpointArchiveTypes.hpp"
@@ -53,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
 #include "RandomCellKiller.hpp"
 #include "RadialSloughingCellKiller.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
@@ -73,24 +72,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestOffLatticeCryptProjectionSimulation : public AbstractCellBasedTestSuite
+class TestOffLatticeCryptProjectionSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     void TestOutputStatistics() throw(Exception)

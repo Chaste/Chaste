@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBasedCellKiller.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "LogFile.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "PlaneBoundaryCondition.hpp"
@@ -65,24 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestOffLatticeSimulationWithNodeBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     /**

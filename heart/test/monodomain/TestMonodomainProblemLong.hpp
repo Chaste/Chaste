@@ -52,8 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckMonoLr91Vars.hpp"
 #include "SimpleStimulus.hpp"
 
-#include <ctime>
-
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:

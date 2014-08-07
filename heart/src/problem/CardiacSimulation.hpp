@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CARDIACSIMULATION_HPP_
 
 #include <vector>
-#include <ctime>
 #include <memory>
 
 #include "UblasIncludes.hpp"

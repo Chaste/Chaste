@@ -33,50 +33,44 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTCELLBASEDTESTSUITE_HPP_
-#define ABSTRACTCELLBASEDTESTSUITE_HPP_
+#ifndef ABSTRACTCELLBASEDWITHTIMINGSTESTSUITE_HPP_
+#define ABSTRACTCELLBASEDWITHTIMINGSTESTSUITE_HPP_
 
 #define CXXTEST_ABORT_TEST_ON_FAIL
 
-#include <cxxtest/TestSuite.h>
-
-#include "SimulationTime.hpp"
-#include "RandomNumberGenerator.hpp"
-#include "CellPropertyRegistry.hpp"
-#include "CellId.hpp"
+#include "AbstractCellBasedTestSuite.hpp"
+#include "Timer.hpp"
 
 /**
- * This class provides setUp and tearDown methods that are common to
- * many cell_based test suites.  Such suites may inherit from this class
- * to avoid having to redefine them.
+ * This class provides setUp and tearDown methods that time each test,
+ * and then do all the regular singleton cleaning via AbstractCellBasedTestSuite.
  *
  * Note that the subclasses of CxxTest::TestSuite need to have names that
  * end with the characters "TestSuite", due to our hack of cxxtest
  * (see r3168 and #593).
  *
  */
-class AbstractCellBasedTestSuite : public CxxTest::TestSuite
+class AbstractCellBasedWithTimingsTestSuite : public AbstractCellBasedTestSuite
 {
 protected:
     /**
-     * Overridden setUp() method. Initialises singleton classes.
+     * Overridden setUp() method. Resets the timer and calls method on parent class.
      */
     void setUp()
     {
-        SimulationTime::Instance()->SetStartTime(0.0);
-        RandomNumberGenerator::Instance()->Reseed(0);
-        CellPropertyRegistry::Instance()->Clear();
-        CellId::ResetMaxCellId();
+        Timer::Reset();
+        AbstractCellBasedTestSuite::setUp();
     }
 
     /**
-     * Overridden teardown() method. Clears up singleton classes.
+     * Overridden teardown() method. Prints the amount of time the test took, and calls method on parent class.
      */
     void tearDown()
     {
-        SimulationTime::Destroy();
-        RandomNumberGenerator::Destroy();
+        Timer::Print("Test elapsed");
+        AbstractCellBasedTestSuite::tearDown();
     }
+
 };
 
-#endif /*ABSTRACTCELLBASEDTESTSUITE_HPP_*/
+#endif /*ABSTRACTCELLBASEDWITHTIMINGSTESTSUITE_HPP_*/

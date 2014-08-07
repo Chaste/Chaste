@@ -63,28 +63,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OnLatticeSimulation.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "Warnings.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "DiffusionCaUpdateRule.hpp"
 
-class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
     void RandomlyLabelCells(std::vector<CellPtr>& rCells, boost::shared_ptr<AbstractCellProperty> pLabel, double labelledRatio)
     {
         for (unsigned i = 0; i<rCells.size(); i++)

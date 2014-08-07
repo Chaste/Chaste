@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GENERICEVENTHANDLER_HPP_
 
 #include <cassert>
-#include <ctime>
 #include <iostream>
 
 #include "Exception.hpp"

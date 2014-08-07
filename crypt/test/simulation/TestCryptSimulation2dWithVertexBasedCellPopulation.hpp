@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "Warnings.hpp"
 #include "SmartPointers.hpp"
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestCryptSimulation2dWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCryptSimulation2dWithVertexBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
 
@@ -105,20 +105,6 @@ private:
                 TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
             }
         }
-    }
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
     }
 
 public:

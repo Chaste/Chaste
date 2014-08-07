@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourcePde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "ReplicatableVector.hpp"
 #include "NumericFileComparison.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -102,25 +102,9 @@ double bc_func(const ChastePoint<2>& p)
     return value;
 }
 
-class TestOnLatticeSimulationWithPdes : public AbstractCellBasedTestSuite
+class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
-public:
+  public:
 
     void TestPottsBasedWithoutCoarseMeshThrowsException() throw(Exception)
     {

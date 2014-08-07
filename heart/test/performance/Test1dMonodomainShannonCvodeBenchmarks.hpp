@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartConfig.hpp"
 #include "CvodeAdaptor.hpp"
 #include "EulerIvpOdeSolver.hpp"
+#include "Timer.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -249,11 +250,13 @@ public:
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
-            double start_time = (double) std::clock();
+
+            std::stringstream message;
+            message << "1. Forward Euler for " << duration << " ms took";
+
+            Timer::Reset();
             monodomain_problem.Solve();
-            double end_time = (double) std::clock();
-            double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-            std::cout << "1. Forward Euler elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
+            Timer::Print(message.str());
 
             Hdf5DataReader data_reader = monodomain_problem.GetDataReader();
             times = data_reader.GetUnlimitedDimensionValues();
@@ -280,11 +283,13 @@ public:
 //            MonodomainProblem<1> monodomain_problem( &cell_factory );
 //
 //            monodomain_problem.Initialise();
-//            double start_time = std::clock();
+//
+//            std::stringstream message;
+//            message << "2. Backward Euler for " << duration << " ms took";
+//
+//            Timer::Reset();
 //            monodomain_problem.Solve();
-//            double end_time = std::clock();
-//            double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-//            std::cout << "1b. Backward Euler elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
+//            Timer::Print(message.str());
 //
 //            Hdf5DataReader data_reader = monodomain_problem.GetDataReader();
 //            std::vector<double> be_node_0 = data_reader.GetVariableOverTime("V", 0);
@@ -305,13 +310,12 @@ public:
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
-            double start_time = (double) std::clock();
-            //std::cout << "Start clock\n";
+
+            std::stringstream message;
+            message << "2. CVODE adaptor for " << duration << " ms took";
+            Timer::Reset();
             monodomain_problem.Solve();
-            //std::cout << "Stop clock\n";
-            double end_time = (double) std::clock();
-            double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-            std::cout << "2. CVODE adaptor elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
+            Timer::Print(message.str());
 
             Hdf5DataReader data_reader = monodomain_problem.GetDataReader();
             std::vector<double> cvode_node_0 = data_reader.GetVariableOverTime("V", 0);
@@ -332,13 +336,13 @@ public:
             MonodomainProblem<1> monodomain_problem( &cell_factory );
 
             monodomain_problem.Initialise();
-            double start_time = (double) std::clock();
-            //std::cout << "Start clock\n";
+
+            std::stringstream message;
+            message << "3. CVODE native for " << duration << " ms took";
+
+            Timer::Reset();
             monodomain_problem.Solve();
-            //std::cout << "Stop clock\n";
-            double end_time = (double) std::clock();
-            double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-            std::cout << "3. CVODE native elapsed time = " << elapsed_time << " secs for " << duration << " ms\n";
+            Timer::Print(message.str());
 
             Hdf5DataReader data_reader = monodomain_problem.GetDataReader();
             std::vector<double> cvode_node_0 = data_reader.GetVariableOverTime("V", 0);

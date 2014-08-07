@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vector>
 #include <string>
-#include <ctime>
 
 #include "CheckpointArchiveTypes.hpp" // Needed to avoid segfault on older Boosts...
 

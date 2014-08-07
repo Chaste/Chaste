@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include <cstdio>
-#include <ctime>
 #include <cmath>
 
 #include "CheckpointArchiveTypes.hpp"
@@ -53,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
 #include "PlaneBoundaryCondition.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "NumericFileComparison.hpp"
 #include "CellBasedEventHandler.hpp"
@@ -75,24 +74,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-class TestOffLatticeSimulation : public AbstractCellBasedTestSuite
+class TestOffLatticeSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     void TestOutputNodeAndCellVelocitiesAndDivisionLocations() throw(Exception)

@@ -66,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleWntCellCycleModel.hpp"
 #include "FileComparison.hpp"
 #include "NumericFileComparison.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
 // Cell writers
 #include "CellAgesWriter.hpp"
@@ -84,7 +85,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-class TestCryptSimulation2dWithMeshBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestCryptSimulation2dWithMeshBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
 
@@ -129,20 +130,6 @@ private:
                 TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
             }
         }
-    }
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
     }
 
 public:

@@ -59,32 +59,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "VoronoiDataWriter.hpp"
 
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "FakePetscSetup.hpp"
 
-class TestCryptSimulation2dNightly : public AbstractCellBasedTestSuite
+class TestCryptSimulation2dNightly : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        CellBasedEventHandler::Disable(); // these tests fail with event-handling on
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        CellBasedEventHandler::Reset();
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
-
 ///////// NON-PERIODIC TESTS - these test the spring system and cell birth etc. /////////
 
     /**

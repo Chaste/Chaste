@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <ctime>
+#include "Timer.hpp"
 #include "PdeAndBoundaryConditions.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "SimpleUniformSourcePde.hpp"
@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "VolumeDependentAveragedSourcePde.hpp"
 
@@ -116,24 +116,8 @@ double bc_func2(const ChastePoint<2>& p)
     return value;
 }
 
-class TestPdeAndBoundaryConditions : public AbstractCellBasedTestSuite
+class TestPdeAndBoundaryConditions : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     void TestMethods() throw(Exception)

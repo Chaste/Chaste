@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <ctime>
 #include <vector>
 #include <iostream>
 
@@ -51,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RungeKuttaFehlbergIvpOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "CvodeAdaptor.hpp"
+#include "Timer.hpp"
 
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -73,11 +73,9 @@ public:
         TS_ASSERT_DELTA(initial_conditions[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(initial_conditions[1], 1.0, 1e-6);
 
-        double start_time = (double) std::clock();
+        Timer::Reset();
         solutions = cvode_solver.Solve(&ode_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        double end_time = (double) std::clock();
-        double elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout <<  "1. Cvode Elapsed time = " << elapsed_time << " secs for 100 hours\n";
+        Timer::Print("1. Cvode for 100 hours");
 
         // Test solutions are OK for a small time increase...
         int end = solutions.rGetSolutions().size() - 1;

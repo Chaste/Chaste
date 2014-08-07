@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "LogFile.hpp"
 #include "SmartPointers.hpp"
 #include "SphereGeometryBoundaryCondition.hpp"
@@ -60,24 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractCellBasedTestSuite
+class TestOffLatticeSimulationWithNodeBasedCellPopulationIn3d : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     void Test3dNodeBasedRestrictedToSphere() throw (Exception)

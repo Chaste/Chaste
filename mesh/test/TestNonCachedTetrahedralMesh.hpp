@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <ctime>
 #include "ChasteSyscalls.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "NonCachedTetrahedralMesh.hpp"
@@ -88,29 +87,27 @@ public:
     {
         // TetrahedralMesh with Jacobian caching
         unsigned cached_mem_usage;
-        time_t cached_start = std::clock();
+        Timer::Reset();
         {
             TetrahedralMesh<3,3> mesh;
             mesh.ConstructCuboid(30,30,30);
             cached_mem_usage = GetMemoryUsage();
         }
-        time_t cached_finish = std::clock();
-        unsigned cached_construction_time = (cached_finish-cached_start);
+        double cached_construction_time = Timer::GetElapsedTime();
 
         // No caching
         unsigned non_cached_mem_usage;
-        time_t non_cached_start = std::clock();
+        Timer::Reset();
         {
             NonCachedTetrahedralMesh<3,3> mesh;
             mesh.ConstructCuboid(30,30,30);
             non_cached_mem_usage = GetMemoryUsage();
         }
-        time_t non_cached_finish = std::clock();
-        unsigned non_cached_construction_time = (non_cached_finish-non_cached_start);
+        unsigned non_cached_construction_time = Timer::GetElapsedTime();
 
         // Constructing the non cached object should be quicker
         // Note: this does occasionally fail, due to other activity on the machine
-        TS_ASSERT_LESS_THAN( (double) non_cached_construction_time/CLOCKS_PER_SEC, (double) cached_construction_time/CLOCKS_PER_SEC );
+        TS_ASSERT_LESS_THAN( non_cached_construction_time, cached_construction_time );
 
         // compare mem usage
         TS_ASSERT( cached_mem_usage >= non_cached_mem_usage );
@@ -157,7 +154,7 @@ public:
         }
 
         //Check timings
-        time_t cached_start = std::clock();
+        Timer::Reset();
         for (unsigned element_index = 0; element_index < cached_mesh.GetNumElements(); element_index++)
         {
             c_matrix<double, 3, 3> j_cached;
@@ -165,9 +162,9 @@ public:
             double det_cached;
             cached_mesh.GetInverseJacobianForElement(element_index, j_cached,det_cached,ij_cached);
         }
-        unsigned cached_access_time = (std::clock()-cached_start);
+        double cached_access_time = Timer::GetElapsedTime();
 
-        time_t non_cached_start = std::clock();
+        Timer::Reset();
         for (unsigned element_index = 0; element_index < non_cached_mesh.GetNumElements(); element_index++)
         {
             c_matrix<double, 3, 3> j_non_cached;
@@ -175,11 +172,11 @@ public:
             double det_non_cached;
             non_cached_mesh.GetInverseJacobianForElement(element_index, j_non_cached,det_non_cached,ij_non_cached);
         }
-        unsigned non_cached_access_time = (std::clock()-non_cached_start);
+        double non_cached_access_time = Timer::GetElapsedTime();
 
         // Retrieving the cached jacobians should be quicker
         // Note: this does occasionally fail, due to other activity on the machine
-        TS_ASSERT_LESS_THAN((double) cached_access_time/CLOCKS_PER_SEC, (double) non_cached_access_time/CLOCKS_PER_SEC);
+        TS_ASSERT_LESS_THAN(cached_access_time, non_cached_access_time);
 
         /*
          *  Check boundary element Jacobian data is consistent

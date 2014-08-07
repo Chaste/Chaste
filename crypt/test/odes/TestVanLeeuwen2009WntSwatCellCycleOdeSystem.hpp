@@ -424,12 +424,9 @@ public:
 
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
 
-        double start_time, end_time, elapsed_time = 0.0;
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions = rk4_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        end_time = (double ) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Runge-Kutta Elapsed time = " << elapsed_time << "\n";
+        Timer::Print("1. Runge-Kutta");
 
         // Test solutions are correct for a small time increase
         int end = solutions.rGetSolutions().size() - 1;

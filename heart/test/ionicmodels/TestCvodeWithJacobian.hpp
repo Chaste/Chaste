@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCVODEWITHJACOBIAN_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include "Timer.hpp"
 
 #include "CvodeAdaptor.hpp"
 #include "EulerIvpOdeSolver.hpp"
@@ -76,7 +77,6 @@ public:
         boost::shared_ptr<AbstractStimulusFunction> p_stimulus(new RegularStimulus(-25,5,1000,1));
         double simulation_duration = 10000; // This increased to 1e6 to give the timings shown on #1795.
         double max_time_step = 1.0;
-        double start_time, end_time, elapsed_time = 0.0;
 
         for (unsigned i=0; i<10; i++)
         {
@@ -165,12 +165,9 @@ public:
             p_cvode_adaptor->SetMaxSteps(0xffffffff);
             p_cell_cvode_adaptor->SetTimestep(max_time_step);
 
-            start_time = (double) std::clock();
+            Timer::Reset();
             p_cell_cvode_adaptor->SolveAndUpdateState(0, simulation_duration);
-            end_time = (double) std::clock();
-
-            elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-            std::cout << " 1. CVODE adaptor (numeric Jacobian), elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
+            Timer::Print(" 1. CVODE adaptor (numeric Jacobian)");
 
             // A standard native CVODE solve
             p_cell_cvode->SetMaxSteps(0xffffffff);
@@ -178,24 +175,18 @@ public:
             p_cell_cvode->ForceUseOfNumericalJacobian(true);
             TS_ASSERT(!p_cell_cvode->GetUseAnalyticJacobian());
 
-            start_time = (double) std::clock();
+            Timer::Reset();
             p_cell_cvode->SolveAndUpdateState(0, simulation_duration);
-            end_time = (double) std::clock();
-
-            elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-            std::cout << " 2. CVODE native with Numeric Jacobian, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n";
+            Timer::Print(" 2. CVODE native with Numeric Jacobian");
 
             // A jacobian native CVODE solve
             p_cell_cvode->ResetToInitialConditions();
             p_cell_cvode->ForceUseOfNumericalJacobian(false);
             TS_ASSERT(p_cell_cvode->GetUseAnalyticJacobian());
 
-            start_time = (double) std::clock();
+            Timer::Reset();
             p_cell_cvode->SolveAndUpdateState(0, simulation_duration);
-            end_time = (double) std::clock();
-
-            elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-            std::cout << " 3. CVODE native with Analytic Jacobian, elapsed time = " << elapsed_time << " secs for " << simulation_duration << " ms\n\n" << std::flush;
+            Timer::Print(" 3. CVODE native with Analytic Jacobian");
         }
 #else
         std::cout << "CVODE is not installed or Chaste hostconfig is not using it." << std::endl;

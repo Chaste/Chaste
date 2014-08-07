@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WelikyOsterForce.hpp"
 #include "AbstractCellKiller.hpp"
 #include "TargetedCellKiller.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "VertexMeshWriter.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -64,24 +64,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMutationStatesCountWriter.hpp"
 #include "FakePetscSetup.hpp"
 
-class TestOffLatticeSimulationWithVertexBasedCellPopulation : public AbstractCellBasedTestSuite
+class TestOffLatticeSimulationWithVertexBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     void TestSingleCellRelaxationNagaiHonda() throw (Exception)

@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GeneralisedLinearSpringForce.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "SmartPointers.hpp"
 #include "CellVolumesWriter.hpp"
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestOffLatticeSimulation3d : public AbstractCellBasedTestSuite
+class TestOffLatticeSimulation3d : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
     double mLocationGhosts;
@@ -75,20 +75,6 @@ private:
         mesh_writer.WriteFilesUsingMesh(*p_mesh);
 
         return p_mesh;
-    }
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
     }
 
 public:

@@ -41,11 +41,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <ctime>
 #include <vector>
 #include <iostream>
 
 #include "OutputFileHandler.hpp"
+#include "Timer.hpp"
 
 #include "WntCellCycleOdeSystem.hpp"
 #include "RungeKutta4IvpOdeSolver.hpp"
@@ -206,32 +206,25 @@ public:
 
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
 
-        double start_time, end_time, elapsed_time = 0.0;
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions_rk4 = rk4_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value_rk4, h_value_rk4);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Runge-Kutta Elapsed time = " << elapsed_time << "\n";
+        Timer::Print("1. Runge-Kutta");
 
         double h_value_rkf = 0.1;
 
         initial_conditions = wnt_system.GetInitialConditions();
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions_rkf = rkf_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value_rkf, 1e-4);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "2. Runge-Kutta-Fehlberg Elapsed time = " << elapsed_time << "\n";
+        Timer::Print("2. Runge-Kutta-Fehlberg");
 
 //        WntCellCycleOdeSystem wnt_system_2(wnt_level);
 //        initial_conditions = wnt_system.GetInitialConditions();
 //
 //        h_value = 0.001;
 //
-//        start_time = std::clock();
+//        Timer::Reset();
 //        solutions = back_solver.Solve(&wnt_system_2, initial_conditions, 0.0, 100.0, h_value, h_value);
-//        end_time = std::clock();
-//        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-//        std::cout << "1. BackwardEuler Elapsed time = " << elapsed_time << "\n";
+//        Timer::Print("1. Backward Euler");
 
 
         // Testing RK4 solution
@@ -322,12 +315,9 @@ public:
 
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
 
-        //double start_time, end_time, elapsed_time = 0.0;
-        //start_time = std::clock();
+        //Timer::Reset();
         solutions = rk4_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        //end_time = std::clock();
-        //elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        //std::cout << "1. Runge-Kutta Elapsed time = " << elapsed_time << "\n";
+        //Timer::Print("1. Runge-Kutta");
 
         // Test solutions are OK for a small time increase...
         int end = solutions.rGetSolutions().size() - 1;

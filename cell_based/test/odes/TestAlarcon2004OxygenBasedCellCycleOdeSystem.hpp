@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include <stdio.h>
-#include <ctime>
 #include <vector>
 #include <iostream>
 
@@ -52,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RungeKutta4IvpOdeSolver.hpp"
 #include "RungeKuttaFehlbergIvpOdeSolver.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
+#include "Timer.hpp"
 
 #include "FakePetscSetup.hpp"
 
@@ -162,28 +162,21 @@ public:
         // Set up for solver
         OdeSolution solutions;
         std::vector<double> initial_conditions = alarcon_system.GetInitialConditions();
-        double start_time = 0.0;
-        double end_time = 0.0;
-        double elapsed_time = 0.0;
         double h_value = 1e-4; // maximum tolerance
 
         // Solve the ODE system using a Runge Kutta fourth order solver
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions = rk4_solver.Solve(&alarcon_system, initial_conditions, 0.0, 10.0, h_value, h_value);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Runge-Kutta Elapsed time = " << elapsed_time << "\n";
+        Timer::Print("1. Runge-Kutta");
 
         // Reset maximum tolerance for Runge Kutta Fehlber solver
         h_value = 1e-1;
 
         // Solve the ODE system using a Runge Kutta Fehlber solver
         initial_conditions = alarcon_system.GetInitialConditions();
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions = rkf_solver.Solve(&alarcon_system, initial_conditions, 0.0, 10.0, h_value, 1e-4);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "2. Runge-Kutta-Fehlberg Elapsed time = " << elapsed_time << "\n";
+        Timer::Print("1. Runge-Kutta-Fehlberg");
 
         // Test that solutions are accurate for a small time increase
         int end = solutions.rGetSolutions().size() - 1;

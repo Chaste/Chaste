@@ -41,8 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
-#include <ctime>
-
 #include "DeltaNotchCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -56,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "OnLatticeSimulation.hpp"
 #include "DeltaNotchTrackingModifier.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "SimpleTargetAreaModifier.hpp"
@@ -67,22 +65,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-class TestDeltaNotchModifier : public AbstractCellBasedTestSuite
+class TestDeltaNotchModifier : public AbstractCellBasedWithTimingsTestSuite
 {
-private:
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = (double) std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = (double) std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
 public:
 
     void TestUpdateAtEndOfTimeStepNodeBased() throw(Exception)

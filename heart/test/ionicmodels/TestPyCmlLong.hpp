@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <ctime>
 #include <boost/assign/list_of.hpp>
 #include <boost/foreach.hpp>
 
@@ -50,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCvodeCell.hpp"
 #include "AbstractRushLarsenCardiacCell.hpp"
 #include "AbstractGeneralizedRushLarsenCardiacCell.hpp"
+#include "Timer.hpp"
 
 #include "DynamicLoadingHelperFunctions.hpp"
 
@@ -130,11 +130,10 @@ private:
         }
 #endif
         double sampling_interval = 1.0; // ms; used as max dt for CVODE too
-        double start_cpu_time = (double) std::clock();
+        Timer::Reset();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
-        double end_cpu_time = (double) std::clock();
-        double elapsed_secs = (end_cpu_time - start_cpu_time)/(CLOCKS_PER_SEC);
-        std::cout << "Model " << rModelName << " writing to " << rOutputDirName << " took " << elapsed_secs << "s." << std::endl;
+        Timer::Print("Model " << rModelName << " writing to " << rOutputDirName << " took ");
+
         const unsigned output_freq = 10; // Only output every N samples
         solution.WriteToFile(rOutputDirName, rModelName, "ms", output_freq, false);
         // Check an AP was produced

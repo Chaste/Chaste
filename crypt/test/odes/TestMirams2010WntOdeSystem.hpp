@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 
 #include <fstream>
-#include <ctime>
 
 #include "OutputFileHandler.hpp"
 #include "Mirams2010WntOdeSystem.hpp"
@@ -51,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcTwoHitCellMutationState.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
+#include "Timer.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -75,13 +75,10 @@ public:
         //OdeSolution solutions2;
 
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
-
-        double start_time, end_time, elapsed_time = 0.0;
-        start_time = (double) std::clock();
+        std::cout << "Timings for 100 hours\n";
+        Timer::Reset();
         solutions = cvode_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Cvode Elapsed time = " << elapsed_time << " secs for 100 hours\n";
+        Timer::Print("1. Cvode");
 
         // Test solutions are OK for a small time increase...
         int end = solutions.rGetSolutions().size() - 1;
@@ -112,12 +109,9 @@ public:
         OdeSolution solutions;
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
 
-        double start_time, end_time, elapsed_time = 0.0;
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions = cvode_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Cvode Elapsed time = " << elapsed_time << " secs for 100 hours\n";
+        Timer::Print("1. Cvode");
 
         // Test solutions are OK for a small time increase
         int end = solutions.rGetSolutions().size() - 1;
@@ -149,12 +143,9 @@ public:
         OdeSolution solutions;
         std::vector<double> initial_conditions = wnt_system.GetInitialConditions();
 
-        double start_time, end_time, elapsed_time = 0.0;
-        start_time = (double) std::clock();
+        Timer::Reset();
         solutions = cvode_solver.Solve(&wnt_system, initial_conditions, 0.0, 100.0, h_value, h_value);
-        end_time = (double) std::clock();
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Cvode Elapsed time = " << elapsed_time << " secs for 100 hours\n";
+        Timer::Print("1. Cvode");
 
         // Test solutions are OK for a small time increase
         int end = solutions.rGetSolutions().size() - 1;

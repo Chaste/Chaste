@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vector>
 #include <string>
-#include <ctime>
 
 #include "HeartConfig.hpp"
 #include "SimpleStimulus.hpp"

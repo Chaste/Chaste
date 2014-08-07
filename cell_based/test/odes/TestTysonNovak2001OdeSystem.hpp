@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <ctime>
 #include <vector>
 #include <iostream>
 
@@ -50,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EulerIvpOdeSolver.hpp"
 #include "RungeKutta4IvpOdeSolver.hpp"
 #include "ColumnDataWriter.hpp"
+#include "Timer.hpp"
 
 #include "PetscTools.hpp"
 #include "PetscSetupAndFinalize.hpp"
@@ -97,20 +97,11 @@ public:
         //Euler solver solution worked out
         BackwardEulerIvpOdeSolver backward_euler_solver(6);
 
-        OdeSolution solutions;
-
         std::vector<double> state_variables = tyson_novak_system.GetInitialConditions();
 
-        double start_time, end_time, elapsed_time = 0.0;
-
-        state_variables = tyson_novak_system.GetInitialConditions();
-
-        start_time = (double) std::clock();
-        solutions = backward_euler_solver.Solve(&tyson_novak_system, state_variables, 0.0, 75.8350/60.0, dt, dt);
-        end_time = (double) std::clock();
-
-        elapsed_time = (end_time - start_time)/(CLOCKS_PER_SEC);
-        std::cout << "1. Elapsed time = " << elapsed_time << "\n";
+        Timer::Reset();
+        OdeSolution solutions = backward_euler_solver.Solve(&tyson_novak_system, state_variables, 0.0, 75.8350/60.0, dt, dt);
+        Timer::Print("1. Tyson Novak Backward Euler");
 
         // If you run it up to about 75min the ODE will stop, anything less and it will not and this test will fail
         TS_ASSERT_EQUALS(backward_euler_solver.StoppingEventOccurred(), true);
