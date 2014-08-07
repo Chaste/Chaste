@@ -132,7 +132,7 @@ private:
         double sampling_interval = 1.0; // ms; used as max dt for CVODE too
         Timer::Reset();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
-        std::stringsteam message;
+        std::stringstream message;
         message << "Model " << rModelName << " writing to " << rOutputDirName << " took ";
         Timer::Print(message.str());
 
