@@ -74,7 +74,7 @@ private:
      * Used in testing.
      * Ought to be more portable than sleep() or usleep().
      *
-     * @param milliseconds  minimim number of milliseconds for which to sleep (ought to be a multiple of 10)
+     * @param milliseconds  minimum number of milliseconds for which to sleep (ought to be a multiple of 10)
      */
     static inline void MilliSleep(unsigned milliseconds)
     {
@@ -83,12 +83,6 @@ private:
         {
             //pause;
         }
-    }
-
-    /** Helper function - @return the current wall clock time. */
-    inline double GetWallTime()
-    {
-        return MPI_Wtime();
     }
 
     /**
@@ -271,7 +265,7 @@ private:
             Disable();
             return;
         }
-        mWallTime[event] -= GetWallTime();
+        mWallTime[event] -= Timer::GetWallTime();
         mHasBegun[event] = true;
         //std::cout << PetscTools::GetMyRank()<<": Beginning " << EVENT_NAME[event] << " @ " << (clock()/1000) << std::endl;
     }
@@ -299,7 +293,7 @@ private:
             msg += "' had not begun when EndEvent was called.";
             EXCEPTION(msg);
         }
-        mWallTime[event] += GetWallTime();
+        mWallTime[event] += Timer::GetWallTime();
         mHasBegun[event] = false;
         //std::cout << PetscTools::GetMyRank()<<": Ending " << EVENT_NAME[event] << " @ " << (clock()/1000) << std::endl;
     }
@@ -321,7 +315,7 @@ private:
         double time;
         if (mHasBegun[event])
         {
-            time =  mWallTime[event] + GetWallTime();
+            time =  mWallTime[event] + Timer::GetWallTime();
         }
         else
         {
