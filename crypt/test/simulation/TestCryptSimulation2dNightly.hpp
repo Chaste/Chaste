@@ -67,8 +67,8 @@ class TestCryptSimulation2dNightly : public AbstractCellBasedWithTimingsTestSuit
 private:
     void setUp()
     {
-    	CellBasedEventHandler::Disable(); // these tests fail with event-handling on
-    	AbstractCellBasedWithTimingsTestSuite::setUp();
+        CellBasedEventHandler::Disable(); // these tests fail with event-handling on
+        AbstractCellBasedWithTimingsTestSuite::setUp();
     }
 
 public:

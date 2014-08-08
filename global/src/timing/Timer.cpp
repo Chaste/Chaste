@@ -48,12 +48,12 @@ void Timer::Reset()
 
 double Timer::GetWallTime()
 {
-	return MPI_Wtime();
+    return MPI_Wtime();
 }
 
 double Timer::GetElapsedTime()
 {
-	return GetWallTime() - msStartTime;
+    return GetWallTime() - msStartTime;
 }
 
 void Timer::Print(std::string message)

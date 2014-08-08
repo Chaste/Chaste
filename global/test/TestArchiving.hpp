@@ -401,7 +401,7 @@ public:
      * The test below is identical to the one above, apart from the two lines indicated.
      */
     void TestUsingABinaryArchive() throw (Exception)
-	{
+    {
         OutputFileHandler handler("archive", false);
         std::string archive_filename;
         archive_filename = handler.GetOutputDirectoryFullPath() + "subchild_binary.arch";
@@ -433,7 +433,7 @@ public:
             TS_ASSERT(dynamic_cast<ChildClass*>(p_base.get()));
             TS_ASSERT(dynamic_cast<SubChildClass*>(p_base.get()));
         }
-	}
+    }
 };
 
 #endif /*TESTARCHIVING_HPP_*/

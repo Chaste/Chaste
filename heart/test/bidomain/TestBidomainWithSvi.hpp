@@ -265,7 +265,7 @@ public:
 
             HeartConfig::Instance()->SetOutputDirectory("BidomainIci2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            
+
             HeartConfig::Instance()->SetUseStateVariableInterpolation(false);
 
             BlockCellFactory<2> cell_factory;
@@ -284,7 +284,7 @@ public:
 
             HeartConfig::Instance()->SetOutputDirectory("BidomainSvi2d");
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
-            
+
             HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
 
             BlockCellFactory<2> cell_factory;

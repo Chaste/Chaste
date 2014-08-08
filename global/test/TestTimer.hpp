@@ -47,7 +47,7 @@ public:
     // Can't really test the timer, this is just for coverage and to illustrate usage
     void TestIt()
     {
-    	Timer::Print("What time is it?");
+        Timer::Print("What time is it?");
 
         Timer::Reset();
 
