@@ -103,7 +103,7 @@ public:
             mesh.ConstructCuboid(30,30,30);
             non_cached_mem_usage = GetMemoryUsage();
         }
-        unsigned non_cached_construction_time = Timer::GetElapsedTime();
+        double non_cached_construction_time = Timer::GetElapsedTime();
 
         // Constructing the non cached object should be quicker
         // Note: this does occasionally fail, due to other activity on the machine
