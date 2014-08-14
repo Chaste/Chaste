@@ -228,6 +228,17 @@ std::string OutputFileHandler::GetOutputDirectoryFullPath() const
     return mDirectory;
 }
 
+std::string OutputFileHandler::GetRelativePath() const
+{
+    FileFinder output_root("", RelativeTo::ChasteTestOutput);
+    std::string relative_path = FindFile("").GetRelativePath(output_root);
+    if (!relative_path.empty() && *relative_path.rbegin() == '/')
+    {
+        relative_path.erase(--relative_path.end()); // Remove trailing slash
+    }
+    return relative_path;
+}
+
 out_stream OutputFileHandler::OpenOutputFile(const std::string& rFileName,
                                              std::ios_base::openmode mode) const
 {

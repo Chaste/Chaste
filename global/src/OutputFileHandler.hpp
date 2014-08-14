@@ -105,6 +105,11 @@ public:
     std::string GetOutputDirectoryFullPath() const;
 
     /**
+     * @return the path to this output directory, relative to the Chaste root output folder.
+     */
+    std::string GetRelativePath() const;
+
+    /**
      * Helper method to set up ArchiveLocationInfo.
      */
     void SetArchiveDirectory() const;

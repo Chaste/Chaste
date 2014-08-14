@@ -66,6 +66,7 @@ public:
         const std::string handler_path(handler.GetOutputDirectoryFullPath());
         TS_ASSERT(handler_path.length() > 0);
         TS_ASSERT_EQUALS(handler_path, handler.GetChasteTestOutputDirectory());
+        TS_ASSERT_EQUALS(handler.GetRelativePath(), "");
 
         // Test that CHASTE_TEST_OUTPUT always has a trailing slash
         TS_ASSERT_EQUALS( *(handler_path.end()-1), '/');
@@ -76,12 +77,14 @@ public:
         std::string full_dir = handler2.GetOutputDirectoryFullPath();
         TS_ASSERT_EQUALS(full_dir.substr(full_dir.length()-dir.length()-1), dir+"/");
         TS_ASSERT_EQUALS(full_dir.substr(0, full_dir.length()-dir.length()-1), handler_path);
+        TS_ASSERT_EQUALS(handler2.GetRelativePath(), dir);
 
         // We can also create handlers from a FileFinder (provided it points to a location in CHASTE_TEST_OUTPUT)
         OutputFileHandler handler3(handler.FindFile("testhandler2"));
         full_dir = handler3.GetOutputDirectoryFullPath();
         TS_ASSERT_EQUALS(full_dir.substr(full_dir.length()-dir.length()-2), dir+"2/");
         TS_ASSERT_EQUALS(full_dir.substr(0, full_dir.length()-dir.length()-2), handler_path);
+        TS_ASSERT_EQUALS(handler3.GetRelativePath(), "testhandler2");
 
         // Check that all three handlers can create files
         out_stream p_file_stream;
