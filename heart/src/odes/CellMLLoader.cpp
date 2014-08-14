@@ -71,6 +71,12 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
         // Create an options file and put it in the output directory with the CellML file
         mpConverter->CreateOptionsFile(mOutputFileHandler, model_name, mOptions);
         mOutputFileHandler.CopyFileTo(mCellMLFile);
+        // Copy a .out file also if present
+        FileFinder out_file(model_name + ".out", mCellMLFile);
+        if (out_file.Exists())
+        {
+        	mOutputFileHandler.CopyFileTo(out_file);
+        }
     }
     // If however we've made a cell before, check that we're making the same type this time
     else if (makeCvodeCell != mUseCvode)
