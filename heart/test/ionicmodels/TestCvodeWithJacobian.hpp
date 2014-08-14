@@ -81,6 +81,7 @@ public:
         for (unsigned i=0; i<10; i++)
         {
             boost::shared_ptr<CvodeAdaptor> p_cvode_adaptor(new CvodeAdaptor()); // moving this outside the loop causes seg-faults!
+            p_cvode_adaptor->SetTolerances(1e-5, 1e-7); // Match AbstractCvodeCell
             boost::shared_ptr<AbstractCardiacCell> p_cell_cvode_adaptor;
             boost::shared_ptr<AbstractCvodeCell> p_cell_cvode;
             switch (i)
