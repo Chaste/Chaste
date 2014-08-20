@@ -139,6 +139,11 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
 {
     double damping_multiplier = AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(nodeIndex);
 
+    /*
+     * The next code block computes the area-dependent damping constant as given by equation
+     * (5) in the following reference: van Leeuwen et al. 2009. An integrative computational model
+     * for intestinal tissue renewal. Cell Prolif. 42(5):617-636. doi:10.1111/j.1365-2184.2009.00627.x
+     */
     if (mUseAreaBasedDampingConstant)
     {
         /**

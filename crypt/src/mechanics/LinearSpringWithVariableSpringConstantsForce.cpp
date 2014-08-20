@@ -102,6 +102,11 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
     CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
     CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
 
+    /*
+     * The next code block computes the edge-dependent spring constant as given by equation
+     * (3) in the following reference: van Leeuwen et al. 2009. An integrative computational model
+     * for intestinal tissue renewal. Cell Prolif. 42(5):617-636. doi:10.1111/j.1365-2184.2009.00627.x
+     */
     if (mUseEdgeBasedSpringConstant)
     {
         assert(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation));
@@ -141,6 +146,11 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
         }
     }
 
+    /*
+     * The next code block computes the beta-catenin dependent spring constant as given by equation
+     * (4) in the following reference: van Leeuwen et al. 2009. An integrative computational model
+     * for intestinal tissue renewal. Cell Prolif. 42(5):617-636. doi:10.1111/j.1365-2184.2009.00627.x
+     */
     if (mUseBCatSprings)
     {
         assert(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation));
