@@ -75,7 +75,7 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
         FileFinder out_file(model_name + ".out", mCellMLFile);
         if (out_file.Exists())
         {
-        	mOutputFileHandler.CopyFileTo(out_file);
+            mOutputFileHandler.CopyFileTo(out_file);
         }
     }
     // If however we've made a cell before, check that we're making the same type this time
