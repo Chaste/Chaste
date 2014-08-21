@@ -106,13 +106,21 @@ public:
                 magnitude_stimulus,
                 duration_stimulus,
                 start_stimulus));
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        boost::shared_ptr<EulerIvpOdeSolver> p_solver; // No solver set yet
         double time_step = 0.01;
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(time_step, time_step, time_step);
 
-        //Check Standard
         CellNobleVargheseKohlNoble1998aFromCellML n98_ode_system(p_solver, p_stimulus);
+
+        // Set solver after model creation, for coverage
+        TS_ASSERT(!p_solver);
+        TS_ASSERT(!n98_ode_system.GetSolver());
+        TS_ASSERT(n98_ode_system.GetSolver() == p_solver);
+        p_solver.reset(new EulerIvpOdeSolver);
+        n98_ode_system.SetSolver(p_solver);
+        TS_ASSERT(n98_ode_system.GetSolver());
+        TS_ASSERT(n98_ode_system.GetSolver() == p_solver);
 
         // Solve and write to file
         ck_start = clock();

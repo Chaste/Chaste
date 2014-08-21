@@ -370,6 +370,15 @@ public:
     const boost::shared_ptr<AbstractIvpOdeSolver> GetSolver() const;
 
     /**
+     * Change the ODE solver used by this cell.
+     * Note that this will only work for cell models which do not have a solver built-in
+     * (e.g. it will NOT work for AbstractCvodeCell derivatives).
+     *
+     * @param pSolver  the new solver to use
+     */
+    void SetSolver(boost::shared_ptr<AbstractIvpOdeSolver> pSolver);
+
+    /**
      * Set whether to clamp the voltage by setting its derivative to zero.
      * @param clamp whether to clamp
      */
