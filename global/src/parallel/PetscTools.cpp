@@ -47,8 +47,13 @@ unsigned PetscTools::mRank = 0;
 bool PetscTools::mIsolateProcesses = false;
 //unsigned PetscTools::mMaxNumNonzerosIfMatMpiAij = 54;
 
+#ifndef NDEBUG
+// Uncomment this to trace calls to PetscTools::Barrier
+//#define DEBUG_BARRIERS
+#endif
+
 #ifdef DEBUG_BARRIERS
-unsigned PetscTools::mNumBarriers = 0u;
+static unsigned mNumBarriers = 0u;
 #endif
 
 void PetscTools::ResetCache()

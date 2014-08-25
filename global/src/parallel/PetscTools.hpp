@@ -54,11 +54,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** For use in tests that should ONLY be run in parallel. */
 #define EXIT_IF_SEQUENTIAL if(PetscTools::IsSequential()){TS_TRACE("This test is not meant to be executed in sequential.");return;}
 
-#ifndef NDEBUG
-// Uncomment this to trace calls to PetscTools::Barrier
-//#define DEBUG_BARRIERS
-#endif
-
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
 typedef PetscBool PetscTruth;
 /**
@@ -118,11 +113,6 @@ private:
 
     /** The total number of processors. */
     static unsigned mNumProcessors;
-
-#ifdef DEBUG_BARRIERS
-    /** Used to debug number of barriers. */
-    static unsigned mNumBarriers;
-#endif
 
     /** Which processors we are. */
     static unsigned mRank;
