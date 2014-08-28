@@ -49,16 +49,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * If your want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
  *  (ii) use scons to compile but not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
- *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter
+ *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
+ *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see ChasteGuides/RunningBinariesFromCommandLine)
  *
- *  Eg:
- *  scons co=1 ts=projects/you/TestBlah.hpp
+ *
+ *  For example:
+ *  scons co=1 projects/you/TestBlah.hpp
  *  ./projects/you/build/debug/TestBlahRunner -myparam 10.4
+ *
+ *  Alternatively, you can add the arguments to SCons so that you can compile and run in one go:
+ *  scons run_time_flags="--verbose true" global/test/TestCommandLineArguments.hpp
+ *  This should produce "You have successfully set --verbose to take the value 1." for this test suite.
  *
  * Note: error messages such as
  *   WARNING! There are options you set that were not used!
  *   WARNING! could be spelling mistake, etc!
- * are due to Petsc thinking the parameter must have been for it.
+ * are due to PETSc thinking the parameter must have been for it.
  *
  */
 class TestCommandLineArguments : public CxxTest::TestSuite
@@ -287,6 +293,18 @@ public:
         TS_ASSERT_EQUALS("TestCommandLineArgumentsRunner", final_part_of_string);
 #endif
     }
+
+    /* A test which a user can run in order to check that they are passing command line arguments correctly*/
+    void TestCommandLineArgumentsParrotting() throw(Exception)
+    {
+        std::string verb = "--verbose";
+        if ( CommandLineArguments::Instance()->OptionExists(verb) )
+        {
+            bool is_verbose = CommandLineArguments::Instance()->GetBoolCorrespondingToOption(verb);
+            std::cout << "You have successfully set "<< verb << " to take the value "<< is_verbose<<".\n";
+        }
+    }
+
 };
 
 #endif /*TESTCOMMANDLINEARGUMENTS_HPP_*/
