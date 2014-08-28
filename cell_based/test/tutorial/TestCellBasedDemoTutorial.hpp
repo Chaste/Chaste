@@ -68,7 +68,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
-
 #include "AdhesionPottsUpdateRule.hpp"
 #include "CellsGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
@@ -278,11 +277,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
 
-        /* We use a different {{{Force}}} which is suitable for mesh based simulations.
-         * Note we could of used the same one as before as node based and mesh based simulations
-         * share many of the same forces the only difference between the two models is in how cell-cell interactions
-         * are specified.
-         */
+        /* We use a different {{{Force}}} which is suitable for mesh based simulations.*/
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force); //**Changed**//
         simulator.AddForce(p_force);
 
@@ -326,12 +321,12 @@ public:
          * We also need to pass the indices of non ghost nodes as an extra argument.*/
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
 
-
+        /* Again Paraview output is explicitly requested.*/
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
+
         /* We create an {{{OffLatticeSimulation}}} object as before, all we change is the output directory and the end time.
          * The Tyson Novak model is for yeast cells and therefore cells proliferate much more often and so we run the simulation for
          * less time to keep cell numbers relatively small for this demo.
-         *
          */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo4"); //**Changed**//
@@ -341,7 +336,6 @@ public:
         /* We use the same {{{Force}}} as before and run the simulation in the same way.*/
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
-
         simulator.Solve();
 
         /* The next two lines are for test purposes only and are not part of this tutorial.
@@ -375,6 +369,9 @@ public:
 
         /* We use the same {{{CellPopulation}}}, {{{CellBasedSimulation}}} (only changing the output directory and end time) and {{{Force}}} as before and run the simulation.*/
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+
+        /* Again Paraview output is explicitly requested.*/
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo5"); //**Changed**//
@@ -415,6 +412,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_stem_type);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("CellBasedDemo6"); //**Changed**//
@@ -423,7 +421,6 @@ public:
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
-
 
         /* We now want to impose the condition y>0 on the cells. To do this we create a "shared pointer" to a {{{PlaneBoundaryCondition}}}.
          * Much like the {{{RandomCellKiller}}} earlier we pass arguments to the constructor (a point (0,0) on the plane (line in 2D) and an outward pointing normal to the plane (0,-1) ) using the {{{MAKE_PTR_ARGS}}} macro.*/
@@ -479,7 +476,7 @@ public:
         simulator.SetOutputDirectory("CellBasedDemo7"); //**Changed**//
         simulator.SetEndTime(20.0);
 
-        /* In order to specify how cells move around we create "shared pointer"s to
+        /* In order to specify how cells move around we create "shared pointers" to
          * {{{UpdateRule}}} objects and pass them to the {{{OnLatticeSimulation}}}.
          * This is analogous to {{{Forces}}} in earlier examples.
          */

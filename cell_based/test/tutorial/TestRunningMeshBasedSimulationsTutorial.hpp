@@ -92,6 +92,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between neighbouring cells in the cell population.
  */
 #include "GeneralisedLinearSpringForce.hpp"
+/* The next header file defines a class for writing output that can be visualized in Paraview. */
+#include "VoronoiDataWriter.hpp"
 /* Finally the following header ensures that the test never runs in parallel. */
 #include "FakePetscSetup.hpp"
 /* Next, we define the test class.
@@ -140,6 +142,13 @@ public:
          * cell population called a {{{MeshBasedCellPopulation}}}.
          */
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        /* To view the results of this and the next test in Paraview it is necessary to explicitly
+        * generate the required .vtu files. This is detailed in the [wiki:UserTutorials/VisualizingWithParaview] tutorial.
+        * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
+        * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
+        * 'ghost nodes', as shown in the next test. */
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory and end time. */
@@ -245,6 +254,9 @@ public:
          * same length as the vector of cell pointers.
          */
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices); //**Changed**//
+
+        /* Again Paraview output is explicitly requested.*/
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory, output multiple and end time. */
