@@ -178,7 +178,7 @@ public:
          */
         p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
         /*
-         * You can also vary the deformatuion energy parameter. The larger the parameter
+         * You can also vary the deformation energy parameter. The larger the parameter
          * the more cells will try to maintain target volume. Here we use the default value of 0.2.
          */
         p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
@@ -195,8 +195,8 @@ public:
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
 
-        /* The next two lines are for test purposes only and are not part of this tutorial.
-         */
+        /* The next two lines are for test purposes only and are not part of this tutorial. If different simulation input parameters are being explored
+         * the lines should be removed.*/
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 50.0, 1e-10);
     }
@@ -327,7 +327,7 @@ public:
          * elements. The second set of three arguments specify the domain height; the number of elements up; and
          * the height of individual elements.  The third set of three arguments specify the domain depth; the number of elements deep; and
          * the depth of individual elements.
-         * We have chosen an 4 by 4 by 4 ( = 32) block of elements each consisting of 2 by 2 by 2 ( = 8) lattice sites.
+         * We have chosen an 4 by 4 by 4 ( = 64) block of elements each consisting of 2 by 2 by 2 ( = 8) lattice sites.
          */
         PottsMeshGenerator<3> generator(10, 4, 2, 10, 4, 2, 10, 4, 2);  // Parameters are: lattice sites across; num elements across; element width; lattice sites up; num elements up; and element height; lattice sites deep; num elements deep; and element depth
         PottsMesh<3>* p_mesh = generator.GetMesh();

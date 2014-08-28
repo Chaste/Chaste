@@ -157,6 +157,14 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         * We are checking that we reached the end time of the simulation
+         * with the correct number of cells. If different simulation input parameters are being explored
+         * the lines should be removed.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 102u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 
     /*
@@ -222,6 +230,12 @@ public:
         simulator.AddForce(p_linear_force);
 
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         * We are checking that we reached the end time of the simulation
+         * with the correct number of cells. */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 100u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
 
     /*
@@ -275,6 +289,12 @@ public:
 
         /* To run the simulation, we call {{{Solve()}}}. */
         simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         * We are checking that we reached the end time of the simulation
+         * with the correct number of cells. */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 84u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-10);
     }
     /*
     * EMPTYLINE
