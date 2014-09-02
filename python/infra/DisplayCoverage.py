@@ -201,8 +201,10 @@ for src_file in src_files:
                 # similar.  Or it may be because it's within a templated method that hasn't
                 # been instantiated in this particular execution, but it might be in another.
                 maybe_not_code = True
-            elif count == '#####':
-                # The line was really uncovered here, so it must be code
+            elif count == '#####' or count == '=====':
+                # The line was really uncovered here, so it must be code.
+                # From gcov documentation, # indicates reachable by non-exceptional paths;
+                # = only by an exceptional path (e.g. catch block).
                 really_uncovered = True
             else:
                 aggregated_count += int(count)
