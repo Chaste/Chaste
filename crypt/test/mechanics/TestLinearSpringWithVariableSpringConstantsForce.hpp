@@ -608,6 +608,8 @@ public:
 
     void TestForceOutputParameters()
     {
+        EXIT_IF_PARALLEL; // Avoid race conditions
+
         std::string output_directory = "TestForcesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
@@ -626,6 +628,8 @@ public:
 
     void TestLinearSpringWithVariableSpringConstantsForceArchiving() throw (Exception)
     {
+        EXIT_IF_PARALLEL; // Avoid race conditions
+
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "meineke_spring_system.arch";
 
