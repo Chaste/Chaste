@@ -1639,7 +1639,11 @@ void AbstractNonlinearElasticitySolver<DIM>::SetKspSolverAndPcType(KSP solver)
                 // PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
 
                 PCSetType(pc, PCHYPRE);
-                KSPSetPreconditionerSide(solver, PC_RIGHT);
+                #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >=2) //PETSc 3.2 or later
+                    KSPSetPCSide(solver, PC_RIGHT);
+                #else
+                    KSPSetPreconditionerSide(solver, PC_RIGHT);
+                #endif
 
                 // other possible preconditioners..
                 //PCBlockDiagonalMechanics* p_custom_pc = new PCBlockDiagonalMechanics(solver, this->mPreconditionMatrix, mBlock1Size, mBlock2Size);
