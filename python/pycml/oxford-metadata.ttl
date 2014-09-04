@@ -193,6 +193,16 @@
     rdfs:label "Membrane potassium current conductance" ;
     rdfs:comment "Historial metadata - only for early models lacking components." .
 
+:membrane_plateau_potassium_current
+    a :Annotation ;
+    rdfs:label "Membrane plateau potassium current" ;
+    rdfs:comment "Historial metadata - only for early models lacking components." .
+
+:membrane_plateau_potassium_current_conductance
+    a :Annotation ;
+    rdfs:label "Membrane plateau potassium current conductance" ;
+    rdfs:comment "Historial metadata - only for early models lacking components." .
+
 :potassium_channel_n_gate
     a :Annotation ;
     rdfs:label "Potassium channel n gate" ;
