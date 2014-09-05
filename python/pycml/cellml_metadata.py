@@ -94,13 +94,14 @@ class RdfProcessor(object):
         pycml.DEBUG('cellml-metadata', *args)
 
     def _load_ontology(self):
-        """Load the Oxford metadata ontology the first time its needed."""
+        """Load the Oxford metadata ontology the first time it's needed."""
         pycml_path = os.path.dirname(os.path.realpath(__file__))
         oxmeta_ttl = os.path.join(pycml_path, 'oxford-metadata.ttl')
         oxmeta_rdf = os.path.join(pycml_path, 'oxford-metadata.rdf')
 
         g = self.Graph()
-        if os.stat(oxmeta_ttl).st_mtime > os.stat(oxmeta_rdf).st_mtime:
+        # We allow a difference in modification time of 10s, so we don't get confused when checking out!
+        if os.stat(oxmeta_ttl).st_mtime > os.stat(oxmeta_rdf).st_mtime + 10.0:
             # Try to regenerate RDF/XML version of ontology
             try:
                 g.parse(oxmeta_ttl, format='turtle')
