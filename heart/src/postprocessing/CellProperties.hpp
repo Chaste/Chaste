@@ -55,9 +55,9 @@ class CellProperties
 {
 private:
     /**  The simulation results to process, voltage */
-    std::vector<double>& mrVoltage;
+    const std::vector<double>& mrVoltage;
     /**  The simulation results to process, time */
-    std::vector<double>& mrTime;
+    const std::vector<double>& mrTime;
 
     /**
      * Whether we have any unfinished action potentials
@@ -129,7 +129,9 @@ public:
      * @param threshold is the threshold for determining if an AP started, defaults to -30
      *
      */
-    CellProperties(std::vector<double> &rVoltage, std::vector<double> &rTime,  double threshold=-30.0)
+    CellProperties(const std::vector<double> &rVoltage,
+                   const std::vector<double> &rTime,
+                   double threshold=-30.0)
         : mrVoltage(rVoltage),
           mrTime(rTime),
           mUnfinishedActionPotentials(false),
