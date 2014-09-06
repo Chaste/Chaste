@@ -215,14 +215,28 @@ public:
     double GetLastCompletePeakPotential();
 
     /**
-     * Returns the resting potentials before each AP.
+     * Returns the minimum resting potential BEFORE each AP.
+     *
      * These are calculated as the point where the derivative
      * of the potential is lowest, i.e. when the profile
      * is flattest in between two APs.
      *
+     * Or just the minimum voltage before an upstroke
+     * if we can't find a flat bit.
+     *
+     * So this vector should be the same length as the other AP property vectors.
+     *
      * @return a vector containing the resting potentials for all APs
      */
     std::vector<double> GetRestingPotentials();
+
+    /**
+     * Returns the last resting potential
+     * (that would be the last entry of vector returned by #GetRestingPotentials())
+     *
+     * @return the resting potential BEFORE the last upstroke.
+     */
+    double GetLastRestingPotential();
 
     /**
      * Returns all the action potentials durations

@@ -427,9 +427,8 @@ double CellProperties::GetTimeAtLastCompleteMaxUpstrokeVelocity()
 
 double CellProperties::GetLastActionPotentialDuration(const double percentage)
 {
-    std::vector<double> apds = CalculateActionPotentialDurations(percentage);
     // We tested this returns a non-empty vector in the method.
-    return apds.back();
+    return CalculateActionPotentialDurations(percentage).back();
 }
 
 unsigned CellProperties::GetNumberOfAboveThresholdDepolarisationsForLastAp()
@@ -437,4 +436,8 @@ unsigned CellProperties::GetNumberOfAboveThresholdDepolarisationsForLastAp()
     return mCounterOfPlateauDepolarisations.back();
 }
 
-
+double CellProperties::GetLastRestingPotential()
+{
+    // We tested something sensible has happened in the vector returning method.
+    return GetRestingPotentials().back();
+}

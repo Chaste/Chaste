@@ -263,12 +263,17 @@ public:
         CellProperties cell_properties(voltages, times); // Use default threshold
         std::vector<double> apds = cell_properties.GetAllActionPotentialDurations(50);
         unsigned size = apds.size();
+        TS_ASSERT_EQUALS(size, 10u);
 
         //First check that the "GetPropertyAtLastAP" actually returns a value equal to
         // the last element of the "GetAllOfThem" vector
         TS_ASSERT_EQUALS(apds[size-1],cell_properties.GetLastActionPotentialDuration(50));
-        TS_ASSERT_EQUALS(cell_properties.GetTimesAtMaxUpstrokeVelocity()[size-1], cell_properties.GetTimeAtLastMaxUpstrokeVelocity());
-        TS_ASSERT_EQUALS(cell_properties.GetMaxUpstrokeVelocities()[size-1], cell_properties.GetLastMaxUpstrokeVelocity() );
+
+        TS_ASSERT_EQUALS(cell_properties.GetTimesAtMaxUpstrokeVelocity()[size-1],
+                         cell_properties.GetTimeAtLastMaxUpstrokeVelocity());
+
+        TS_ASSERT_EQUALS(cell_properties.GetMaxUpstrokeVelocities()[size-1],
+                         cell_properties.GetLastMaxUpstrokeVelocity() );
 
         // Then check against hardcoded values (checked manually from the file)
         double timestep = times[1] - times[0];
@@ -286,6 +291,7 @@ public:
         // Check against hardcoded resting values (checked manually from the file)
         std::vector<double> resting_values = cell_properties.GetRestingPotentials();
         size = resting_values.size();
+        TS_ASSERT_EQUALS(size, 10u);
 
         TS_ASSERT_DELTA(resting_values[0], -84.6, 0.1);
         TS_ASSERT_DELTA(resting_values[1], -84.6, 0.1);
@@ -296,7 +302,10 @@ public:
         TS_ASSERT_DELTA(resting_values[6], -85.0, 0.1);
         TS_ASSERT_DELTA(resting_values[7], -85.1, 0.1);
         TS_ASSERT_DELTA(resting_values[8], -85.1, 0.1);
-        TS_ASSERT_DELTA(resting_values[size-1], -85.2, 0.1);
+        TS_ASSERT_DELTA(resting_values[9], -85.2, 0.1);
+
+        double last_resting_value = cell_properties.GetLastRestingPotential();
+        TS_ASSERT_DELTA(resting_values[9], last_resting_value, 1e-12);
 
         //This file comes from a frequency drop tissue simulation.
         //First five beats at 500 bcl and last five at 2500 bcl
