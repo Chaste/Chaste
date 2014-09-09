@@ -2734,11 +2734,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
     #the National Science and Engineering Research 
     #Council (NSERC) of Canada and the MITACS/Mprime 
     #Canadian Network of Centres of Excellence.
-    def output_derivative_calculations_grl(self, var, assign_rY=False, extra_nodes=set(),
-                                           extra_table_nodes=set()):
-        """
-        This is used by self.output_grl1_mathematics to get equations for each variable separately.
-        """
+    def output_derivative_calculations_grl(self, var, assign_rY=False, extra_nodes=set(), extra_table_nodes=set()):
+        """This is used by self.output_grl?_mathematics to get equations for each variable separately."""
         # Work out what equations are needed to compute the derivative of var
         if var in self.state_vars:
             dvardt = (var, self.free_vars[0])
@@ -2748,8 +2745,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # State variable inputs
         self.output_state_assignments(nodeset=var_nodeset, assign_rY=assign_rY)
         self.writeln()
+        table_index_nodes_used = self.calculate_lookup_table_indices(var_nodeset)
         self.output_comment('Mathematics')
-        self.output_equations(var_nodeset)
+        self.output_equations(var_nodeset - table_index_nodes_used)
 
     #Megan E. Marsh, Raymond J. Spiteri 
     #Numerical Simulation Laboratory 
@@ -2776,11 +2774,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('unsigned v_index = GetVoltageIndex();')
         self.writeln('const double delta = 1e-8;')
         self.writeln('const double V_m_save = rY[v_index];')
-        self.writeln('')    
+        self.writeln()
         # Compute partial derivative of dV wrt V
         self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
-        self.output_derivative_calculations_grl(self.v_variable)       
-        self.writeln('')
+        self.output_derivative_calculations_grl(self.v_variable)
+        self.writeln()
         self.writeln('double evalF = ', self.code_name(self.v_variable, ode=True), self.STMT_END)
         self.writeln('rY[v_index] += delta;')
         self.writeln('double temp = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
@@ -2804,14 +2802,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Set up variables
         self.writeln('std::vector<double>& rY = rGetStateVariables();')
         self.writeln('const double delta = 1e-8;')
-        self.writeln('')
-        
+        self.writeln()
+
         # Evaluate RHS of equations (except dV/dt)
         non_v_vars = self.state_vars[:]
         if self.v_variable in non_v_vars:
             non_v_vars.remove(self.v_variable)
         self.output_derivative_calculations(non_v_vars)
-        
+
         # Compute partial derivatives (for non-V)
         for i, var in enumerate(self.state_vars):
             if var is not self.v_variable:
@@ -2822,7 +2820,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.writeln('mPartialF[', i, '] = (temp - ', self.code_name(var, True), ')/delta;')
                 self.writeln('rY[', i, '] = y_save;')
                 self.close_block()
-        
+
         # Do the GRL updates
         for i, var in enumerate(self.state_vars):
             if var is not self.v_variable:
@@ -2848,10 +2846,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.open_block()
             if var is self.v_variable:
                 self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
-            self.output_derivative_calculations_grl(var)       
+            self.output_derivative_calculations_grl(var)
             self.writeln()
-            self.writeln('return ', self.code_name(var, True), ';') 
-            self.close_block()                    
+            self.writeln('return ', self.code_name(var, True), ';')
+            self.close_block()
 
     #Megan E. Marsh, Raymond J. Spiteri 
     #Numerical Simulation Laboratory 
@@ -2867,7 +2865,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         We generate:
          * Update TransmembranePotential update V_m
          * ComputeOneStepExceptVoltage  does a GRL2 update for variables except voltage
-         * EvaluateYDerivativeI for each variable I  
+         * EvaluateYDerivativeI for each variable I
         """
         ########################################################UpdateTransmembranePotential
         self.output_method_start('UpdateTransmembranePotential',
@@ -2879,12 +2877,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('const double delta = 1e-8;')
         self.writeln('const double yinit = rY[v_index];')
         self.writeln('double V_m_save = rY[v_index];')
-        self.writeln('')    
+        self.writeln()
     
         # Do the first half step
-        self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)    
-        self.output_derivative_calculations_grl(self.v_variable)       
-        self.writeln('')
+        self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
+        self.output_derivative_calculations_grl(self.v_variable)
+        self.writeln()
         self.writeln('double evalF = ', self.code_name(self.v_variable, ode=True), self.STMT_END)
         self.writeln('rY[v_index] += delta;')
         self.writeln('double temp = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
@@ -2903,7 +2901,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('V_m_save = rY[v_index];')
         self.writeln('rY[v_index] = yinit;')
         self.writeln('evalF = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
-        self.writeln('')
+        self.writeln()
         self.writeln('rY[v_index] += delta;')
         self.writeln('temp = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
         self.writeln('partialF = (temp-evalF)/delta;')
@@ -2928,13 +2926,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('const unsigned size = GetNumberOfStateVariables();')
         self.writeln('mYInit = rY;')
         self.writeln('double y_save, temp;')
-        self.writeln('')
+        self.writeln()
     
         # Calculate partial derivatives
         self.output_derivative_calculations(self.state_vars)
         for i, var in enumerate(self.state_vars):
             self.writeln(self.vector_index('mEvalF', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
-            self.writeln('')
+            self.writeln()
         for i, var in enumerate(self.state_vars):
             if var is not self.v_variable:
                 self.writeln('')
@@ -2958,18 +2956,18 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.open_block()
         self.writeln('rY[var] = mYInit[var] + (mEvalF[var]/mPartialF[var])*(exp(mPartialF[var]*0.5*mDt)-1.0);')
         self.close_block()
-        self.close_block()       
-        self.writeln('')   
+        self.close_block()
+        self.writeln()
 
         # Determine new partial derivatives
         for i, var in enumerate(self.state_vars):
             if var is not self.v_variable:
-                self.writeln('')
+                self.writeln()
                 self.writeln('y_save = rY[', i, '];')
                 self.writeln('rY[', i, '] = mYInit[', i, '];')
                 self.writeln('mEvalF[', i, '] = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
                 self.writeln('rY[', i, '] += delta;')
-                self.writeln('')
+                self.writeln()
                 # Evaluate RHS again
                 self.writeln('temp = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
                 self.writeln('mPartialF[', i, '] = (temp-mEvalF[', i, '])/delta;')
@@ -2988,7 +2986,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('rY[var] = mYInit[var] + (mEvalF[var]/mPartialF[var])*(exp(mPartialF[var]*mDt)-1.0);')
         self.close_block()
         self.close_block()
-        self.writeln('')
+        self.writeln()
         self.close_block()
     
         #########################################################Evaluate each equation
@@ -3000,12 +2998,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.open_block()
             if var is self.v_variable:
                 self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
-            self.output_derivative_calculations_grl(var)       
+            self.output_derivative_calculations_grl(var)
             self.writeln()
-            self.writeln('return '+self.code_name(var, True)+';') 
+            self.writeln('return '+self.code_name(var, True)+';')
             self.close_block()
 
-    
+
     def output_model_attributes(self):
         """Output any named model attributes defined in metadata.
         

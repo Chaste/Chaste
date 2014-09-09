@@ -472,12 +472,41 @@ public:
         RunTests(dirname, models, args, false, 0, false);
     }
 
+    void TestGeneralizedRushLarsen1CellsOpt() throw (Exception)
+    {
+        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--grl1");
+        args.push_back("--opt");
+        std::vector<std::string> models;
+        AddAllModels(models);
+        models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
+        // Winslow model needs a smaller timestep
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, models, args, false, 0, false);
+    }
+
     void TestGeneralizedRushLarsen2Cells() throw (Exception)
     {
         std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl2");
+        std::vector<std::string> models;
+        AddAllModels(models);
+        // Winslow model needs a smaller timestep
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
+        RunTests(dirname, models, args, false, 0, false);
+    }
+
+    void TestGeneralizedRushLarsen2CellsOpt() throw (Exception)
+    {
+        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
+        std::vector<std::string> args;
+        args.push_back("--Wu");
+        args.push_back("--grl2");
+        args.push_back("--opt");
         std::vector<std::string> models;
         AddAllModels(models);
         // Winslow model needs a smaller timestep
