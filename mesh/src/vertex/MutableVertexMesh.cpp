@@ -200,9 +200,9 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocationsOfT2Swaps()
+c_vector<double, SPACE_DIM> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLastT2SwapLocation()
 {
-    return mLocationsOfT2Swaps;
+    return mLastT2SwapLocation;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -215,12 +215,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT1Swaps()
 {
     mLocationsOfT1Swaps.clear();
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ClearLocationsOfT2Swaps()
-{
-    mLocationsOfT2Swaps.clear();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1663,7 +1657,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap(VertexElement<ELEM
     // Note that we define this vector before setting it, as otherwise the profiling build will break (see #2367)
     c_vector<double, SPACE_DIM> new_node_location;
     new_node_location = this->GetCentroidOfElement(rElement.GetIndex());
-    mLocationsOfT2Swaps.push_back(new_node_location);
+    mLastT2SwapLocation = new_node_location;
 
     // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
     bool is_node_on_boundary = false;

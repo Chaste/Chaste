@@ -139,6 +139,11 @@ ChastePoint<SPACE_DIM> Node<SPACE_DIM>::GetPoint() const
 template<unsigned SPACE_DIM>
 const c_vector<double, SPACE_DIM>& Node<SPACE_DIM>::rGetLocation() const
 {
+    // This assert statement is a useful warning: when new nodes are created we overwrite previously deleted nodes if there are any.
+    // This means that we can not use this method to interrogate deleted nodes about their position before deletion because we can't
+    // guarantee that the node has not been overwritten already. Hence, when implementing new functionality we need to make sure
+    // that this functionality does not rely on being able to interrogate deleted nodes for their location.
+    // \todo #2401: make this an exception.
     assert(!mIsDeleted);
     return mLocation;
 }

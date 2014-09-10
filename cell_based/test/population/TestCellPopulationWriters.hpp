@@ -685,7 +685,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-        // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
+        // Create a VertexT2SwapLocationsWriter and test that the correct output is generated
         VertexT2SwapLocationsWriter<2,2> t2_swaps_writer;
         t2_swaps_writer.OpenOutputFile(output_file_handler);
         t2_swaps_writer.WriteTimeStamp();

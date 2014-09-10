@@ -812,6 +812,7 @@ public:
 
         // Perform a T2 swap on the central triangle element
         VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+        c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
@@ -835,14 +836,14 @@ public:
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 
-        // Test T2 swap location tracking
-        std::vector< c_vector<double, 2> > t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
-        TS_ASSERT_EQUALS(t2_locations.size(), 1u);
+        // Test the location of the new node:
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
 
-        // Test T1 swap location clearing
-        vertex_mesh.ClearLocationsOfT2Swaps();
-        t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
-        TS_ASSERT_EQUALS(t2_locations.size(), 0u);
+        // Test the tracking of the T2 swap location:
+        TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
+
     }
 
     void TestPerformT2SwapWithBoundaryNodes() throw(Exception)

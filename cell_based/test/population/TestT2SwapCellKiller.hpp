@@ -152,15 +152,20 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], 0.2496, 1e-3);
 
         // Test tracking of T2 swaps
-        std::vector< c_vector<double, 2> > t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
+        std::vector< c_vector<double, 2> > t2_locations = cell_population.GetLocationsOfT2Swaps();
+        std::vector< unsigned > t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
         TS_ASSERT_EQUALS(t2_locations.size(), 1u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 1u);
+        TS_ASSERT_EQUALS(t2_cell_ids[0], 0u);
         TS_ASSERT_DELTA(t2_locations[0][0], 0.4999, 1e-3);
         TS_ASSERT_DELTA(t2_locations[0][1], 0.2496, 1e-3);
 
         // Test T2 swap Location clearing
-        vertex_mesh.ClearLocationsOfT2Swaps();
-        t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
+        cell_population.ClearLocationsAndCellIdsOfT2Swaps();
+        t2_locations = cell_population.GetLocationsOfT2Swaps();
+        t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
         TS_ASSERT_EQUALS(t2_locations.size(), 0u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 0u);
 
         // Test that each element contains the correct number of nodes following the rearrangement
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 3u);
@@ -418,17 +423,23 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetNode(6)->rGetLocation()[1], 0.5, 1e-3);
 
         // Test tracking of T2 swaps
-        std::vector< c_vector<double, 2> > t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
+        std::vector< c_vector<double, 2> > t2_locations = cell_population.GetLocationsOfT2Swaps();
+        std::vector< unsigned > t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
         TS_ASSERT_EQUALS(t2_locations.size(), 2u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 2u);
+        TS_ASSERT_EQUALS(t2_cell_ids[0], 4u);
+        TS_ASSERT_EQUALS(t2_cell_ids[1], 5u);
         TS_ASSERT_DELTA(t2_locations[0][0], 1.0/3.0, 1e-3);
         TS_ASSERT_DELTA(t2_locations[0][1], 0.5, 1e-3);
         TS_ASSERT_DELTA(t2_locations[1][0], 2.0/3.0, 1e-3);
         TS_ASSERT_DELTA(t2_locations[1][1], 0.5, 1e-3);
 
         // Test T2 swap Location clearing
-        vertex_mesh.ClearLocationsOfT2Swaps();
-        t2_locations = vertex_mesh.GetLocationsOfT2Swaps();
+        cell_population.ClearLocationsAndCellIdsOfT2Swaps();
+        t2_locations = cell_population.GetLocationsOfT2Swaps();
+        t2_cell_ids = cell_population.GetCellIdsOfT2Swaps();
         TS_ASSERT_EQUALS(t2_locations.size(), 0u);
+        TS_ASSERT_EQUALS(t2_cell_ids.size(), 0u);
 
         // Test that after remeshing, each element contains the correct nodes
         unsigned node_indices_element_0[4] = {0, 1, 6, 10};

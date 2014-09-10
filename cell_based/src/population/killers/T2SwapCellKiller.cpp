@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "T2SwapCellKiller.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 T2SwapCellKiller<DIM>::T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopulation)
@@ -58,6 +59,7 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
      * The static_cast will work since we already know it's a VertexBasedCellPopulation.
      */
     MutableVertexMesh<DIM,DIM>& mesh = static_cast<MutableVertexMesh<DIM,DIM>&>(this->mpCellPopulation->rGetMesh());
+    VertexBasedCellPopulation<DIM>* p_vertex_population = static_cast<VertexBasedCellPopulation<DIM>*>(this->mpCellPopulation);
     VertexElementMap element_map(mesh.GetNumAllElements());
 
     bool recheck_mesh = true;
@@ -65,21 +67,26 @@ void T2SwapCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     {
         // Note that whenever we call CheckForT2Swaps(), the element indices must run from zero up to mElements.size()-1
         recheck_mesh = mesh.CheckForT2Swaps(element_map);
-    }
-
-    /*
-     * In the T2 swaps that happened above, vertex elements were removed from the
-     * mesh but the associated cells are still there. Here we check which cells
-     * underwent a T2 swap and label them as dead.
-     */
-    for (unsigned elem_index = 0; elem_index < element_map.Size(); elem_index++)
-    {
-        CellPtr p_cell = this->mpCellPopulation->GetCellUsingLocationIndex(elem_index);
-        if (element_map.IsDeleted(elem_index))
+        /*
+         * There might have maximally one T2 swap happened above, where a vertex element was removed from the
+         * mesh but the associated cell is still there. Here we check whether a new cell
+         * underwent a T2 swap and label it as dead as well as record its location and ID.
+         */
+        for (unsigned elem_index = 0; elem_index < element_map.Size(); elem_index++)
         {
-            p_cell->Kill();
+            CellPtr p_cell = this->mpCellPopulation->GetCellUsingLocationIndex(elem_index);
+            if (element_map.IsDeleted(elem_index) && !(p_cell->IsDead()))
+            {
+                p_vertex_population->AddLocationOfT2Swap(mesh.GetLastT2SwapLocation());
+                p_vertex_population->AddCellIdOfT2Swap(p_cell->GetCellId());
+                p_cell->Kill();
+
+                // There can't have been more than one new cell death, so leave the for loop here.
+                break;
+            }
         }
     }
+
 }
 
 template<unsigned DIM>

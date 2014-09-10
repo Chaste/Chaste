@@ -87,6 +87,18 @@ private:
     boost::shared_ptr<AbstractVertexBasedDivisionRule<DIM> > mpVertexBasedDivisionRule;
 
     /**
+     * Locations of T2 swaps (the centre of the removed triangle), stored so they can be accessed and output by the cell killer and
+     * population writer classes. The locations are stored until they are cleared by ClearLocationsAndCellIdsOfT2Swaps().
+     */
+    std::vector< c_vector<double, DIM> > mLocationsOfT2Swaps;
+
+    /**
+     * The Ids of cells that have undergone T2 swaps, stored so they can be accessed and output by the cell killer and population
+     * writer classes. The Ids are stored until they are cleared by ClearLocationsAndCellIdsOfT2Swaps().
+     */
+    std::vector< unsigned > mCellIdsOfT2Swaps;
+
+    /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
@@ -333,6 +345,39 @@ public:
      * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
+
+    /**
+     * Return all locations of T2 Swaps since the last sampling time step.
+     *
+     * @return mLocationsOfT2Swaps
+     */
+    std::vector< c_vector< double, DIM > > GetLocationsOfT2Swaps();
+
+     /**
+     * Return all IDs of cells undergoing T2 Swaps since the last sampling time step.
+     *
+     * @return mLocationsOfT2Swaps
+     */
+    std::vector< unsigned > GetCellIdsOfT2Swaps();
+
+    /**
+     * Add location of T2 Swap.
+     *
+     * @param locationOfT2Swap  Location of the T2 swap
+     */
+    void AddLocationOfT2Swap(c_vector< double, DIM> locationOfT2Swap);
+
+    /**
+     * Add ID of T2 Swap.
+     *
+     * @param locationOfT2Swap  Location of the T2 swap
+     */
+    void AddCellIdOfT2Swap(unsigned idOfT2Swap);
+
+    /**
+     * Clear the locations and IDs of cells undergoing T2 Swaps.
+     */
+    void ClearLocationsAndCellIdsOfT2Swaps();
 
     /**
      * @return mOutputCellRearrangementLocations

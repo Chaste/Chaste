@@ -71,18 +71,22 @@ void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPo
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    std::vector< c_vector<double, SPACE_DIM> > t2_swap_locations = pCellPopulation->rGetMesh().GetLocationsOfT2Swaps();
+    std::vector< c_vector<double, SPACE_DIM> > t2_swap_locations = pCellPopulation->GetLocationsOfT2Swaps();
+    std::vector< unsigned > t2_swap_ids = pCellPopulation->GetCellIdsOfT2Swaps();
 
     *this->mpOutStream << t2_swap_locations.size() << "\t";
+    assert( t2_swap_locations.size() == t2_swap_ids.size());
+
     for (unsigned index = 0;  index < t2_swap_locations.size(); index++)
     {
+        *this->mpOutStream << t2_swap_ids[index] << "\t";
         for (unsigned i=0; i<SPACE_DIM; i++)
         {
             *this->mpOutStream << t2_swap_locations[index][i] << "\t";
         }
     }
 
-    pCellPopulation->rGetMesh().ClearLocationsOfT2Swaps();
+    pCellPopulation->ClearLocationsAndCellIdsOfT2Swaps();
 }
 
 // Explicit instantiation
