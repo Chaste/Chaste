@@ -1429,6 +1429,38 @@ public:
 #endif // CHASTE_CVODE
     }
 
+    /*
+     * This test is to try to trigger a CVODE error by changing voltage too much
+     * at the start of its solve, so that it fails to find an ODE solution that is
+     * sufficiently converged.
+     *
+     * It covers code that we have introduced for #2594, see that for more details.
+     */
+    void TestCvodeErrorHandling() throw(Exception)
+    {
+#ifdef CHASTE_CVODE
+        std::cout << "Don't worry about a few errors below here, we are testing that we can recover from them!" << std::endl;
+        const double mesh_spacing = 0.1;
+        const double x_size = 1.0;
+        DistributedTetrahedralMesh<1,1> mesh;
+        mesh.ConstructRegularSlabMesh(mesh_spacing, x_size);
+
+        Cvode1dCellFactory cell_factory;
+
+        double all_steps = 1.0;
+        HeartConfig::Instance()->SetSimulationDuration(3); //ms
+        HeartConfig::Instance()->SetOutputDirectory("TestCvodeInTissueErrorHandling");
+        HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(all_steps, all_steps, all_steps);
+
+        MonodomainProblem<1> monodomain_problem( &cell_factory );
+        monodomain_problem.SetMesh(&mesh);
+        monodomain_problem.Initialise();
+        monodomain_problem.Solve();
+#else
+        std::cout << "Chaste is not configured to use CVODE on this machine, check your hostconfig settings if required.\n";
+#endif // CHASTE_CVODE
+    }
+
     void TestArchivingOfSingleTraceOutputModifier() throw(Exception)
     {
         OutputFileHandler handler("TestArchivingOfSingleTraceOutputModifier", false);

@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HeartEventHandler.hpp"
 #include "PetscTools.hpp"
 #include "PetscVecTools.hpp"
+#include "AbstractCvodeCell.hpp"
 #include "Warnings.hpp"
 
 template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
@@ -492,9 +493,36 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
             {
                 if (!updateVoltage)
                 {
-                    // solve
+                    // solve ODE system at this node.
                     // Note: Voltage is not being updated. The voltage is updated in the PDE solve.
+#ifndef CHASTE_CVODE
                     mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
+#else
+                    // If CVODE is enabled, and this is a CVODE cell
+                    // there's a chance we can recover this by doing a reset so put the above call in a try...catch.
+                    try
+                    {
+                        mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
+                    }
+                    catch (Exception &e)
+                    {
+                        // Try an 'emergency' reset if this is a CVODE cell.
+                        // See #2594 for why we think this may be necessary.
+                        if(dynamic_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local]))
+                        {
+                            // Reset the CVODE cell, this leads to a call to CVodeReInit.
+                            static_cast<AbstractCvodeCell*>(mCellsDistributed[index.Local])->ResetSolver();
+                            mCellsDistributed[index.Local]->ComputeExceptVoltage(time, nextTime);
+                            WARNING("Global node " << index.Global << " had an ODE solving problem in t = [" << time <<
+                                    ", " << nextTime << "] ms. This was fixed by a reset of CVODE, but may suggest PDE time"
+                                    " step should be reduced, or CVODE tolerances relaxed.");
+                        }
+                        else
+                        {
+                            throw e;
+                        }
+                    }
+#endif // CHASTE_CVODE
                 }
                 else
                 {
@@ -527,9 +555,9 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                     std::cout << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << "\n";
                 }
                 std::cout << std::flush;
+
                 throw e;
             }
-
             // update the Iionic and stimulus caches
             UpdateCaches(index.Global, index.Local, nextTime);
         }
