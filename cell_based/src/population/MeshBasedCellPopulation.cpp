@@ -758,8 +758,8 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
         assert(p_node->rGetContainingElementIndices().size()>0);
 
         for (typename Node<SPACE_DIM>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
-                elem_iter != p_node->ContainingElementsEnd();
-                ++elem_iter)
+             elem_iter != p_node->ContainingElementsEnd();
+             ++elem_iter)
         {
             Element<ELEMENT_DIM,SPACE_DIM>* p_element = rGetMesh().GetElement(*elem_iter);
 

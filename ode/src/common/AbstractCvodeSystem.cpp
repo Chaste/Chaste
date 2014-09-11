@@ -164,13 +164,6 @@ AbstractCvodeSystem::~AbstractCvodeSystem()
 //    bool stop = CalculateStoppingEvent(time, rY);
 //    return stop ? 0.0 : 1.0;
 //}
-//
-//bool AbstractCvodeSystem::GetUseAnalyticJacobian()
-//{
-//    return mUseAnalyticJacobian;
-//}
-
-
 
 OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
                                        realtype tEnd,

@@ -329,7 +329,7 @@ public:
 
     /**
      * Set whether to reduce the checking done when guessing when re-initialisation
-     * is needed, so it ignores changes in the state variables.  If call with true
+     * is needed, so it ignores changes in the state variables. If called with true
      * argument, will call SetForceReset(false).
      * You can safely change parameters between solve calls with or without resets.
      *
