@@ -738,15 +738,15 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
         // Try to get the element index of the Voronoi tessellation corresponding to this node index
         try
         {
-               unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
+            unsigned element_index = mpVoronoiTessellation->GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(node_index);
 
-               // Get the cell's volume from the Voronoi tessellation
-                cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
-            }
-            catch (Exception&)
-            {
-             // If it doesn't exist this must be a boundary cell, so return infinite volume.
-             cell_volume = DBL_MAX;
+            // Get the cell's volume from the Voronoi tessellation
+            cell_volume = mpVoronoiTessellation->GetVolumeOfElement(element_index);
+        }
+        catch (Exception&)
+        {
+            // If it doesn't exist this must be a boundary cell, so return infinite volume.
+            cell_volume = DBL_MAX;
         }
     }
     else if (SPACE_DIM==3 && ELEMENT_DIM==2)
@@ -758,8 +758,8 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVolumeOfCell(CellPtr p
         assert(p_node->rGetContainingElementIndices().size()>0);
 
         for (typename Node<SPACE_DIM>::ContainingElementIterator elem_iter = p_node->ContainingElementsBegin();
-             elem_iter != p_node->ContainingElementsEnd();
-             ++elem_iter)
+                elem_iter != p_node->ContainingElementsEnd();
+                ++elem_iter)
         {
             Element<ELEMENT_DIM,SPACE_DIM>* p_element = rGetMesh().GetElement(*elem_iter);
 
