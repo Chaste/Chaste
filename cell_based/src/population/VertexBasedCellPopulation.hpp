@@ -370,7 +370,7 @@ public:
     /**
      * Add ID of T2 Swap.
      *
-     * @param locationOfT2Swap  Location of the T2 swap
+     * @param idOfT2Swap ID of the cell undergoing a T2 swap
      */
     void AddCellIdOfT2Swap(unsigned idOfT2Swap);
 
