@@ -3418,6 +3418,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         """Tell the base class if we have an analytic Jacobian."""
         if self.use_analytic_jacobian:
             self.writeln('mUseAnalyticJacobian = true;')
+            self.writeln('mHasAnalyticJacobian = true;')
     
     def _count_operators(self, exprs, result=None):
         if result is None: result = {}

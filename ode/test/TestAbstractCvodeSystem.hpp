@@ -93,7 +93,8 @@ public:
                 "Index is greater than the number of state variables.");
         TS_ASSERT_THROWS_THIS(ode.SetStateVariables(v),
                 "The size of the passed in vector must be that of the number of state variables.");
-
+        TS_ASSERT_THROWS_THIS(ode.ForceUseOfNumericalJacobian(false),
+                "Analytic Jacobian requested, but this ODE system doesn't have one. You can check this with HasAnalyticJacobian().");
 
 
         DeleteVector(v);
@@ -154,6 +155,7 @@ public:
         ode.SetAnyVariable("y", y);
         TS_ASSERT_EQUALS(ode.GetStateVariable("y"), y);
 
+        TS_ASSERT_EQUALS(ode.HasAnalyticJacobian(), false);
 
         TS_ASSERT_EQUALS(ode.HasAnyVariable("y"), true);
         TS_ASSERT_EQUALS(ode.HasAnyVariable("a"), true);

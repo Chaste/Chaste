@@ -130,6 +130,7 @@ AbstractCvodeSystem::AbstractCvodeSystem(unsigned numberOfStateVariables)
       mForceReset(true),
 #endif
       mForceMinimalReset(false),
+      mHasAnalyticJacobian(false),
       mUseAnalyticJacobian(false),
       mpCvodeMem(NULL),
       mMaxSteps(0),
@@ -471,8 +472,12 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg)
     EXCEPTION(err.str());
 }
 
+bool AbstractCvodeSystem::HasAnalyticJacobian() const
+{
+    return mHasAnalyticJacobian;
+}
 
-bool AbstractCvodeSystem::GetUseAnalyticJacobian()
+bool AbstractCvodeSystem::GetUseAnalyticJacobian() const
 {
     return mUseAnalyticJacobian;
 }
@@ -480,6 +485,11 @@ bool AbstractCvodeSystem::GetUseAnalyticJacobian()
 
 void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 {
+    if (!useNumericalJacobian && !mHasAnalyticJacobian)
+    {
+        EXCEPTION("Analytic Jacobian requested, but this ODE system doesn't have one. You can check this with HasAnalyticJacobian().");
+    }
+
     if (mUseAnalyticJacobian == useNumericalJacobian)
     {
         mUseAnalyticJacobian = !useNumericalJacobian;

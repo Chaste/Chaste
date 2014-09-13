@@ -137,6 +137,11 @@ private:
         archive & mNumberOfStateVariables;
         archive & mUseAnalyticJacobian;
 
+        if (version >= 1u)
+        {
+            archive & mHasAnalyticJacobian;
+        }
+
         // Convert from N_Vector to std::vector for serialization
         const std::vector<double> state_vars = MakeStdVec(mStateVariables);
         archive & state_vars;
@@ -171,6 +176,16 @@ private:
     {
         archive & mNumberOfStateVariables;
         archive & mUseAnalyticJacobian;
+
+        if (version >= 1u)
+        {
+            archive & mHasAnalyticJacobian;
+        }
+        else
+        {
+            // This is pretty much what the code was saying before.
+            mHasAnalyticJacobian = mUseAnalyticJacobian;
+        }
 
         std::vector<double> state_vars;
         archive & state_vars;
@@ -238,6 +253,9 @@ private:
     bool mForceMinimalReset;
 
 protected:
+
+    /** Whether we have an analytic Jacobian. */
+    bool mHasAnalyticJacobian;
 
     /** Whether to use an analytic Jacobian. */
     bool mUseAnalyticJacobian;
@@ -445,9 +463,14 @@ public:
 //    virtual double CalculateRootFunction(double time, const std::vector<double>& rY);
 
     /**
-     * @return whether an analytic Jacobian is used (#mUseAnalyticJacobian)
+     * @return whether an analytic Jacobian is used (#mUseAnalyticJacobian).
      */
-    bool GetUseAnalyticJacobian();
+    bool GetUseAnalyticJacobian() const;
+
+    /**
+     * @return whether the ODE system has an analytic Jacobian (#mHasAnalyticJacobian).
+     */
+    bool HasAnalyticJacobian() const;
 
     /**
      * Force the use of a numerical Jacobian, even if an analytic form is provided.
@@ -477,6 +500,7 @@ public:
 };
 
 CLASS_IS_ABSTRACT(AbstractCvodeSystem)
+ BOOST_CLASS_VERSION(AbstractCvodeSystem, 1u)
 
 #endif //_ABSTRACTCVODESYSTEM_HPP_
 #endif // CHASTE_CVODE
