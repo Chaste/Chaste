@@ -120,6 +120,12 @@ public:
             }
         }
 
+        /*
+         * HOW_TO_TAG Cardiac/Output
+         * Collect and print timings to benchmark different parts of the cardiac code.
+         *
+         * N.B. You may also want to use HeartEventHandler::Reset() if you call these again.
+         */
         HeartEventHandler::Headings();
         HeartEventHandler::Report();
     }
