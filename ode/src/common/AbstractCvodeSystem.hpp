@@ -177,14 +177,11 @@ private:
         archive & mNumberOfStateVariables;
         archive & mUseAnalyticJacobian;
 
+        // This is pretty much what the code was saying before.
+        mHasAnalyticJacobian = mUseAnalyticJacobian;
         if (version >= 1u)
-        {
+        {   // Overwrite if it has been archived though
             archive & mHasAnalyticJacobian;
-        }
-        else
-        {
-            // This is pretty much what the code was saying before.
-            mHasAnalyticJacobian = mUseAnalyticJacobian;
         }
 
         std::vector<double> state_vars;
