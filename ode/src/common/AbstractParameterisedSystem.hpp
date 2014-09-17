@@ -98,12 +98,13 @@ protected:
     /**
      * Used to include extra debugging information in exception messages.
      * For example,
-     *      EXCEPTION(DumpState("Gating variable out of range", state_variables));
+     *      EXCEPTION(DumpState("Gating variable out of range", state_variables, time));
      *
      * @param rMessage  the exception message
      * @param Y  the values of the state variables
      * @param time  the independent variable (usually time).
-     * @return an augmented message which includes the values of the state variables from Y
+     *
+     * @return an augmented message which includes the values of the state variables from Y and the time.
      */
     std::string DumpState(const std::string& rMessage,
                           VECTOR Y,
