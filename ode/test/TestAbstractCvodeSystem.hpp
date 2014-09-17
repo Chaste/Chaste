@@ -325,6 +325,9 @@ public:
         state = ode_system.DumpState("Test 2.", rY);
         TS_ASSERT_EQUALS(state, "Test 2.\nState:\n\tVariable_1:0 dimensionless\n\tVariable_2:1 dimensionless\n");
 
+        state = ode_system.DumpState("Test 2.", rY, 12);
+        TS_ASSERT_EQUALS(state, "Test 2.\nAt independent variable (usually time) = 12\nState:\n\tVariable_1:0 dimensionless\n\tVariable_2:1 dimensionless\n");
+
         DeleteVector(rY);
 
         // For coverage of a vector helper function that makes an N_Vector from a std::vector.

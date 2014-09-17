@@ -500,6 +500,9 @@ public:
         std::vector<double> rY(2);
         rY[0] = 0.0;
         rY[1] = 1.0;
+        state = ode_system.DumpState("Test 2.", rY, 0);
+        TS_ASSERT_EQUALS(state, "Test 2.\nAt independent variable (usually time) = 0\nState:\n\tx:0 m\n\tv:1 m/s\n");
+
         state = ode_system.DumpState("Test 2.", rY);
         TS_ASSERT_EQUALS(state, "Test 2.\nState:\n\tx:0 m\n\tv:1 m/s\n");
     }

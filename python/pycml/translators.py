@@ -1214,7 +1214,7 @@ class CellMLTranslator(object):
                        '(_table_index_', i, self.lut_factor(i, include_comma=True), ')')
         return
 
-    def output_table_index_generation(self, nodeset=set()):
+    def output_table_index_generation(self, time_name, nodeset=set()):
         """Output code to calculate indexes into any lookup tables.
         
         If nodeset is given, then filter the table indices calculated so
@@ -1243,8 +1243,12 @@ class CellMLTranslator(object):
                 if self.config.options.check_lt_bounds:
                     self.writeln('#define COVERAGE_IGNORE', indent=False)
                     self.writeln('if (_oob_', idx, ')')
+                    if time_name is None:
+                        dump_state_args = 'rY'
+                    else:
+                        dump_state_args = 'rY, ' + time_name
                     self.writeln('EXCEPTION(DumpState("', self.var_display_name(key[-1]),
-                                 ' outside lookup table range", rY));', indent_offset=1)
+                                 ' outside lookup table range", ', dump_state_args,'));', indent_offset=1)
                     self.writeln('#undef COVERAGE_IGNORE', indent=False)
                 self.output_table_index_generation_code(key, idx)
         self.writeln()
@@ -1494,7 +1498,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # State variable inputs
             self.output_state_assignments(assign_rY=False, nodeset=nodeset)
             self.writeln()
-            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
             # Output equations
             self.output_comment('Mathematics')
             self.output_equations(nodeset - table_index_nodes_used)
@@ -2369,13 +2373,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_evaluate_y_derivatives()
         self.output_derived_quantities()
     
-    def calculate_lookup_table_indices(self, nodeset):
+    def calculate_lookup_table_indices(self, nodeset, timeName=None):
         """Output the lookup table index calculations needed for the given equations, if tables are enabled.
         
         Returns the subset of nodeset used in calculating the indices.
         """
         if self.use_lookup_tables:
-            nodes_used = self.output_table_index_generation(nodeset=nodeset)
+            nodes_used = self.output_table_index_generation(timeName, nodeset=nodeset)
         else:
             nodes_used = set()
         return nodes_used
@@ -2475,7 +2479,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         all_nodes = nonv_nodeset|v_nodeset
         self.output_state_assignments(assign_rY=assign_rY, nodeset=all_nodes)
         self.writeln()
-        table_index_nodes_used = self.calculate_lookup_table_indices(all_nodes|extra_table_nodes)
+        table_index_nodes_used = self.calculate_lookup_table_indices(all_nodes|extra_table_nodes, self.code_name(self.free_vars[0]))
         self.output_comment('Mathematics')
         #907: Declare dV/dt
         if dvdt:
@@ -2517,7 +2521,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
-            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
             self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Fill in residual
@@ -2548,7 +2552,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_nonlinear_state_assignments(nodeset=nodeset)
             self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
                          dt_name, self.STMT_END, '\n')
-            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)), self.code_name(self.free_vars[0]))
             self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
             # Jacobian entries
@@ -2584,7 +2588,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         nodes = [(self.state_vars[self.v_index], self.free_vars[0])]
         nodeset = self.calculate_extended_dependencies(nodes, prune_deps=[self.doc._cml_config.i_stim_var])
         self.output_state_assignments(nodeset=nodeset)
-        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
         self.output_equations(nodeset - table_index_nodes_used)
         # Update V
         self.writeln()
@@ -2618,7 +2622,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         if self.config.dt_variable in nodeset:
             self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
                          dt_name, self.STMT_END, '\n')
-        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset)
+        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset, self.code_name(self.free_vars[0]))
         self.output_equations(nodeset - table_index_nodes_used)
         # Update state variables:
         #   rY[i] = (rY[i] + _g_j*dt) / (1 - _h_j*dt)
@@ -3446,7 +3450,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
             used_vars.update(self._vars_in(entry.math))
         nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
         self.output_state_assignments(nodeset=nodeset, assign_rY=False)
-        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)))
+        table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)), self.code_name(self.free_vars[0]))
         self.output_equations(nodeset - table_index_nodes_used)
         self.writeln()
         # Jacobian entries, sorted by index with rows varying fastest

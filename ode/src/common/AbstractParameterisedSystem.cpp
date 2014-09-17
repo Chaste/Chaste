@@ -64,6 +64,17 @@ std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& me
 }
 
 template<typename VECTOR>
+std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& message,
+                                                           VECTOR Y,
+                                                           double time)
+{
+    std::stringstream extra_message;
+    extra_message << std::endl << "At independent variable (usually time) = " << time;
+    std::string new_message = message + extra_message.str();
+    return GetStateMessage(new_message, Y);
+}
+
+template<typename VECTOR>
 std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::string& message, VECTOR Y)
 {
     std::stringstream res;

@@ -96,6 +96,20 @@ protected:
                           VECTOR Y);
 
     /**
+     * Used to include extra debugging information in exception messages.
+     * For example,
+     *      EXCEPTION(DumpState("Gating variable out of range", state_variables));
+     *
+     * @param rMessage  the exception message
+     * @param Y  the values of the state variables
+     * @param time  the independent variable (usually time).
+     * @return an augmented message which includes the values of the state variables from Y
+     */
+    std::string DumpState(const std::string& rMessage,
+                          VECTOR Y,
+                          double time);
+
+    /**
      * This method is called by subclasses on completion of the load method of serialization.
      *
      * It checks that the parameters that were loaded match those that should be in the class, and fills in

@@ -543,7 +543,7 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 //            {
 //                EXCEPTION("Analytic Jacobian appears dodgy at time " << time << " entry (" << i << "," << j << ").\n"
 //                          << "Analytic=" << p_analytic_jth_col[i] << "; numeric=" << p_numeric_jth_col[i] << "."
-//                          << DumpState("", y));
+//                          << DumpState("", y, time));
 //            }
 //        }
 //    }
