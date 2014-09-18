@@ -1217,6 +1217,10 @@ class CellMLTranslator(object):
     def output_table_index_generation(self, time_name, nodeset=set()):
         """Output code to calculate indexes into any lookup tables.
         
+        If time_name is given and table bounds are being checked, the time value will be included in the
+        error message.  Note that we need to pass it in, since in some contexts the free variable is not
+        defined.
+        
         If nodeset is given, then filter the table indices calculated so
         that only those needed to compute the nodes in nodeset are defined.
         
@@ -2373,13 +2377,16 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.output_evaluate_y_derivatives()
         self.output_derived_quantities()
     
-    def calculate_lookup_table_indices(self, nodeset, timeName=None):
+    def calculate_lookup_table_indices(self, nodeset, time_name=None):
         """Output the lookup table index calculations needed for the given equations, if tables are enabled.
+        
+        If time_name is given, it may be used in exception messages for tables out of bounds.
+        Note that it is needed to be passed in, since GetIIonic does not know the time.
         
         Returns the subset of nodeset used in calculating the indices.
         """
         if self.use_lookup_tables:
-            nodes_used = self.output_table_index_generation(timeName, nodeset=nodeset)
+            nodes_used = self.output_table_index_generation(time_name, nodeset=nodeset)
         else:
             nodes_used = set()
         return nodes_used
@@ -2550,8 +2557,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             nodeset = self.calculate_extended_dependencies(used_vars, prune_deps=[self.doc._cml_config.i_stim_var])
             self.output_state_assignments(exclude_nonlinear=True, nodeset=nodeset)
             self.output_nonlinear_state_assignments(nodeset=nodeset)
-            self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN,
-                         dt_name, self.STMT_END, '\n')
+            self.writeln(self.TYPE_CONST_DOUBLE, self.code_name(self.config.dt_variable), self.EQ_ASSIGN, dt_name, self.STMT_END, '\n')
             table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set(map(lambda e: e.math, self.model.solver_info.jacobian.entry)), self.code_name(self.free_vars[0]))
             self.output_equations(nodeset - table_index_nodes_used)
             self.writeln()
@@ -2749,7 +2755,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # State variable inputs
         self.output_state_assignments(nodeset=var_nodeset, assign_rY=assign_rY)
         self.writeln()
-        table_index_nodes_used = self.calculate_lookup_table_indices(var_nodeset)
+        table_index_nodes_used = self.calculate_lookup_table_indices(var_nodeset, self.code_name(self.free_vars[0]))
         self.output_comment('Mathematics')
         self.output_equations(var_nodeset - table_index_nodes_used)
 
