@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <algorithm> //For max_element of vector
+
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
@@ -549,6 +551,21 @@ public:
         // Final file
         FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
+
+        ///\todo #2441 Fix the "no element ids" bug - idea for a failing test.
+        // Check that the second VTK file for Potts specific data (element IDs)
+//        VtkMeshReader<3,3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
+//        std::vector<double> cell_types;
+//        vtk_reader.GetPointData("Cell types", cell_types);
+//        TS_ASSERT_EQUALS(cell_types.size(), 900u);
+        // The cell types are between -1 and 5.  Check the maximum
+//        TS_ASSERT_DELTA( *max_element(cell_types.begin(), cell_types.end()), 5.0, 1e-12);
+
+//        std::vector<double> element_ids;
+//        vtk_reader.GetPointData("Element index", element_ids);
+//        TS_ASSERT_EQUALS(element_ids.size(), 900u);
+//        //Now test for max and min
+
  #endif //CHASTE_VTK
     }
 
