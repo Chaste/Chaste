@@ -154,7 +154,7 @@ public:
         /* The results can now be visualised - the effect of the fibres changing direction at x=0.05
          * on the wave should be very clear.
          *
-         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
+         * Please see ChasteGuides/VisualisationGuides for details of using !Meshalyzer/Cmgui/Paraview.
          *
          * We described in the previous tutorial how to access the latest voltage vector using
          * `ReplicatableVector`, here we illustrate how to access the voltage values using the

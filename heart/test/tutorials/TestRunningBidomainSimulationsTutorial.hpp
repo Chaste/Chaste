@@ -254,7 +254,7 @@ public:
          *  * `/tmp/$USER/testoutput/BidomainTutorial/vtk_output` for Paraview (VTK)
          * where you should find the geometric mesh data and simulation output.
          *
-         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
+         * Please see ChasteGuides/VisualisationGuides for details of using !Meshalyzer/Cmgui/Paraview.
          *
          * Note: the easiest way to look at the resultant voltage values from the code
          * (for the last timestep - the data for the previous timesteps is written to file
