@@ -43,13 +43,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBIDOMAINWITHCONDUCTIVITYMODIFIERTUTORIAL_HPP_
 #define TESTBIDOMAINWITHCONDUCTIVITYMODIFIERTUTORIAL_HPP_
 /*
- * = We now show how to run a bidomain simulation using conductivity modifiers. =
+ * = A bidomain simulation with spatially varying conductivities. =
  *
- * In this tutorial we run another bidomain simulation,
- * showing (i) an example using one of the source cell factories,
- * (ii) an example of using a conductivity modifier.
+ * Tissue conductivity can be altered in simple (cuboid and ellipsoid) regions using
+ * the `HeartConfig` `SetConductivityHeterogeneities` methods. This tutorial describes a
+ * much more powerful way which lets us change the conductivity of any element arbitrarily
+ * by exploiting the machinery in `AbstractConductivityModifier` (which is normally
+ * used in mechanics simulations for stretch-dependence).
  *
- * The first thing to do is to include the headers as before.
+ * In this example we have cooked up a modifier that:
+ * * for most elements returns the original conductivity tensor (from `HeartConfig`)
+ *   scaled by some factor, which is different for intracellular or extracellular
+ *   conductivities,
+ * * but for one particular element returns some constant matrix.
+ *
+ * The first thing to do is include the usual headers, plus ones for the conductivity
+ * modifier and an example cell factory (not needed if you're using a custom one).
  */
 #include <cxxtest/TestSuite.h>
 #include "BidomainProblem.hpp"
@@ -66,25 +75,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
 {
-
     /*
-     * mTensor is "working memory" to hold the returned modified tensor.
-     * This is needed because we return by reference to the problem class, so we need
-     * to make sure the memory isn't overwritten before it's done with.
+     * We'll use a c_matrix called mTensor as "working memory" to hold the returned
+     * modified tensor. This is needed because we return by reference to the problem class,
+     * so we need to make sure the memory isn't overwritten before it's done with.
      *
-     * Most of the time, we will modify the original conductivity tensor,
-     * but sometimes we want to return some "constant" matrix.
+     * mSpecialMatrix will be some constant one.
      */
 private:
 
     c_matrix<double,2,2> mTensor;
     c_matrix<double,2,2> mSpecialMatrix;
 
-
 public:
      /*
-      * Constructor. In Chaste, all conductivity tensors are diagonal, so we initialise our "constant matrix"
-      * to zero so that we only need to set the diagonal entries in the constructor.
+      * The constructor.
+      *
+      * In Chaste, all conductivity tensors are diagonal, so if we initialise our "constant
+      * matrix" to zero then we only need to set the diagonal entries in the constructor.
+      * Strange things will happen if the off-diagonal entries aren't zeroed!
       */
     SimpleConductivityModifier()
         : AbstractConductivityModifier<2,2>(),
@@ -102,20 +111,19 @@ public:
 
         if ( elementIndex == 0 )
         {
-            // For element 0 let's return the "special matrix", regardless of intra/extra-cellular.
+            // For element 0 let's return the "special matrix", regardless of intra/extracellular.
             return mSpecialMatrix;
         }
 
-
-        // Otherwise, we change the behaviour depending on the `domainIndex` (intra/extra-cellular).
+        // Otherwise, we change the behaviour depending on the `domainIndex` (intra/extracellular).
         double domain_scaling;
         if ( domainIndex == 0 )
         {
-            domain_scaling = 1.0; // Intracellular, domainIndex==0
+            domain_scaling = 1.0; // domainIndex==0 implies intracellular
         }
         else
         {
-            domain_scaling = 1.5; // Extracellular, domainIndex==1
+            domain_scaling = 1.5; // domainIndex==1 implies extracellular
         }
 
         // Modify the current conductivity according to some expression by running along the diagonal,
@@ -129,8 +137,8 @@ public:
 };
 
 
-/* Now we define the test class, which must inherit from {{{CxxTest::TestSuite}}}
- * as usual, and the (public) test method
+/*
+ * Now the usual test structure.
  */
 class TestBidomainWithConductivityModifierTutorial : public CxxTest::TestSuite
 {
@@ -138,22 +146,22 @@ public:
     void TestConductivityModifier() throw(Exception)
     {
         /*
-         * Generate the mesh.
+         * Generate a mesh.
          */
         DistributedTetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0, 0.5); // Mesh has 4 elements
 
         /*
-         * Usually you'll provide your own cell factory, here we use a trivial one for simplicity.
-         * Then we set up the problem with the factory as usual.
+         * Here we're using a trivial cell factory for simplicity, but usually you'll provide your own one.
+         * Set up the problem with the factory as usual.
          */
         ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory;
         BidomainProblem<2> bidomain_problem( &cell_factory );
         bidomain_problem.SetMesh( &mesh );
 
         /*
-         * The problem generates the `BidomainTissue`, but only after `Initialise()`, so do that now and get
-         * the tissue so we can apply the modifier later.
+         * We need to apply the modifier directly to the tissue, which comes from the problem, but is only
+         * accessible after `Initialise()`, so let's do that now.
          */
         bidomain_problem.Initialise();
         BidomainTissue<2>* p_bidomain_tissue = bidomain_problem.GetBidomainTissue();
@@ -185,14 +193,14 @@ public:
         }
 
         /*
-         * Now we make the modifier object and set it on the tissue using `SetConductivityModifier`.
+         * Now we can make the modifier and apply it to the tissue using `SetConductivityModifier`.
          */
         SimpleConductivityModifier modifier;
         p_bidomain_tissue->SetConductivityModifier( &modifier );
 
         /*
-         * Check that the conductivities have changed! We iterate over all elements owned by this process
-         * and check their conductivity.
+         * To confirm that the conductivities have changed, let's iterate over all elements owned by this process
+         * and check their conductivity against what we expect.
          */
         for (AbstractTetrahedralMesh<2,2>::ElementIterator elt_iter=mesh.GetElementIteratorBegin();
              elt_iter!=mesh.GetElementIteratorEnd();
