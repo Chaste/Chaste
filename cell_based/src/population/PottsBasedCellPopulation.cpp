@@ -42,8 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
-// Cell population writers
+// Cell writers
 #include "CellPopulationElementWriter.hpp"
+#include "CellIdWriter.hpp"
 
 template<unsigned DIM>
 void PottsBasedCellPopulation<DIM>::Validate()
@@ -336,6 +337,8 @@ void PottsBasedCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputF
             this-> template AddPopulationWriter<CellPopulationElementWriter>();
         }
     }
+    // Add a CellID writer so that a VTK file will contain IDs for visualisation.  (It will also dump a "loggedcell.dat" file as a side-effect.)
+    this-> template AddCellWriter<CellIdWriter>();
 
     AbstractCellPopulation<DIM>::OpenWritersFiles(rOutputFileHandler);
 }

@@ -554,17 +554,20 @@ public:
 
         ///\todo #2441 Fix the "no element ids" bug - idea for a failing test.
         // Check that the second VTK file for Potts specific data (element IDs)
-//        VtkMeshReader<3,3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
-//        std::vector<double> cell_types;
-//        vtk_reader.GetPointData("Cell types", cell_types);
-//        TS_ASSERT_EQUALS(cell_types.size(), 900u);
+        VtkMeshReader<3,3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
+        std::vector<double> cell_types;
+        vtk_reader.GetPointData("Cell types", cell_types);
+        TS_ASSERT_EQUALS(cell_types.size(), 1000u);
         // The cell types are between -1 and 5.  Check the maximum
-//        TS_ASSERT_DELTA( *max_element(cell_types.begin(), cell_types.end()), 5.0, 1e-12);
+        TS_ASSERT_DELTA( *max_element(cell_types.begin(), cell_types.end()), 5.0, 1e-12);
 
-//        std::vector<double> element_ids;
-//        vtk_reader.GetPointData("Element index", element_ids);
-//        TS_ASSERT_EQUALS(element_ids.size(), 900u);
-//        //Now test for max and min
+        std::vector<double> cell_ids;
+        vtk_reader.GetPointData("Cell IDs", cell_ids);
+        // Prior to release 3.2 this was called "Element index". It is changed to cell_id as this is preferable for VTK
+        // output.
+        //vtk_reader.GetPointData("Element index", cell_ids);
+        TS_ASSERT_EQUALS(cell_ids.size(), 1000u);
+        TS_ASSERT_DELTA( *max_element(cell_ids.begin(), cell_ids.end()), 63.0, 1e-12);
 
  #endif //CHASTE_VTK
     }

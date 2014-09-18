@@ -406,7 +406,7 @@ public:
      *
      * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply
      *
-     * Add box "Glyphs" to represent lattice sites (you will need to adjust the size so they don't overlap).
+     * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
      *
      * Select the "Display" tab and select "color by" cell label. (you can also "color by" cell index to see individual cells)
      *
