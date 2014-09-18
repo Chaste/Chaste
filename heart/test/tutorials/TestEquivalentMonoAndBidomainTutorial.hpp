@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <cxxtest/TestSuite.h>
-/* The main classes to be used for running simulations. */
+// The main classes to be used for running simulations.
 #include "BidomainProblem.hpp"
 #include "MonodomainProblem.hpp"
 ///* All tests which run cardiac simulations (which use Petsc) should include
@@ -188,6 +188,9 @@ public:
         // Next, we have to create a cell factory of the type we defined above.
         PointStimulus2dCellFactory cell_factory;
 
+        /*
+         * == Setting Bidomain Conductivities ==
+         */
         c_vector<double,2> intracellular_conductivities = Create_c_vector(1.75, 0.19);
         c_vector<double,2> extracellular_conductivities = Create_c_vector(7, 0.76);
 
@@ -199,14 +202,19 @@ public:
             // Now we create a problem class using (a pointer to) the cell factory.
             BidomainProblem<2> bidomain_problem( &cell_factory );
 
-            /* == Monodomain Reduction ==
-             *
-             * If we have conductivities that can be expressed as sigma_i = scalar * sigma_e.
+            /*
+             * Here we have conductivities that can be expressed as sigma_i = scalar * sigma_e.
              *
              * Then this is a special case, in which the bidomain equations can be reduced to the monodomain
              * equation. They are exactly equivalent.
              *
              * In this test we check that Chaste says this too when doing both simulations.
+             *
+             * This is how we set intracellular and extracellular conductivity directions.
+             * Note that the extracellular is a constant scaling (4x) of the intracellular,
+             * and hence a reduction to the monodomain equation can be made.
+             *
+             * For more information on this see e.g. Keener & Sneyd, Mathematical Physiology textbook.
              */
             HeartConfig::Instance()->SetIntracellularConductivities(intracellular_conductivities);
             HeartConfig::Instance()->SetExtracellularConductivities(extracellular_conductivities);
@@ -216,8 +224,7 @@ public:
             bidomain_problem.Solve();
 
             /*
-             * == Examining the output ==
-             * Note: the easiest way to look at the resultant voltage values from the code
+             * NB: the easiest way to look at the resultant voltage values from the code
              * (for the last timestep - the data for the previous timesteps is written to file
              * but not retained) is to use a {{{ReplicatableVector}}}.
              * {{{bidomain_problem.GetSolution())}}} returns a !PetSc vector
@@ -237,7 +244,7 @@ public:
              */
 
             /*
-             * == Working out the equivalent conductivity to use ==
+             * == Reduction to Monodomain  ==
              *
              * We now work out the equivalent conductivity to use in the monodomain. Note that
              * we set this with the `SetIntracellularConductivities()` method. Which is perhaps
@@ -274,7 +281,7 @@ public:
         /* The bidomain solution includes extracellular (phi_e) so should be twice as big as monodomain solution.*/
         TS_ASSERT_EQUALS(p_bidomain_results->GetSize(),2*p_monodomain_results->GetSize());
 
-        /* We now check that the voltage at each node at the end of the simulation is the same
+        /* We then check that the voltage at each node at the end of the simulation is the same
          * whether we did a bidomain simulation, or the equivalent monodomain simulation.*/
         for (unsigned i=0; i<p_monodomain_results->GetSize(); i++)
         {
