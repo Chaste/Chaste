@@ -268,12 +268,11 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
     The locations vary depending on the version of PETSc, and possibly
     whether optimised libraries are to be used.
 
-    The version can be given as 2.2, 2.3 or 3.0 to choose PETSc version.
-    If a host doesn't support 3.0 we attempt to use 2.3 or 2.2 respectively.
-    A ValueError is raised if 2.2 isn't present when asked for.
+    The version can be given as 2.2, 2.3, or 3.0 etc. to choose PETSc version.
+    If a host doesn't support the requested version we try older ones.
+    A ValueError is raised if no suitable version is present.
 
-    Set optimised to True to use optimised builds of the libraries rather
-    than debug builds.
+    Set optimised to True to use optimised builds of the libraries rather than debug builds.
     Set profile to True to use profile builds of PETSc.
     """
     if os.environ.get('CHASTE_LOAD_ENV', ''):
@@ -284,20 +283,8 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
     conf.petsc_3_0_path = getattr(conf, 'petsc_3_0_path', None)
     conf.petsc_path = getattr(conf, 'petsc_path', None)
     requested_version = version
-    if version == '3.4' and (conf.petsc_path is None or
-                             not os.path.isdir(conf.petsc_path)):
-        # Use 3.3 instead
-        version = '3.3'
-    if version == '3.3' and (conf.petsc_path is None or
-                             not os.path.isdir(conf.petsc_path)):
-        # Use 3.2 instead
-        version = '3.2'
-    if version == '3.2' and (conf.petsc_path is None or
-                             not os.path.isdir(conf.petsc_path)):
-        # Use 3.1 instead
-        version = '3.1'
-    if version == '3.1' and (conf.petsc_path is None or
-                             not os.path.isdir(conf.petsc_path)):
+    version_number = map(int, version.split('.'))
+    if version_number > [3,0] and (conf.petsc_path is None or not os.path.isdir(conf.petsc_path)):
         # Use 3.0 instead
         version = '3.0'
     if version == '3.0' and (conf.petsc_3_0_path is None or 
@@ -312,6 +299,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
                              not os.path.isdir(conf.petsc_2_2_path)):
         # Raise a friendly error
         ConfigError('PETSc %s requested, but no path for this or an earlier version given in the host config.' % requested_version)
+    version_number = map(int, version.split('.')) # The actual version being used, now
     
     def GetBuildNameList():
         build_names = []
@@ -347,7 +335,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
             libpath = os.path.join(petsc_base, 'lib', build_name)
             if os.path.isdir(libpath): break
         incpaths.append(os.path.join(petsc_base, 'bmake', build_name))
-    elif version in ['3.0', '3.1', '3.2', '3.3', '3.4']:
+    elif version_number >= [3,0]:
         if version == '3.0':
             petsc_base = os.path.abspath(conf.petsc_3_0_path)
         else:
@@ -375,7 +363,7 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
         if not os.path.isdir(libpath):
             ConfigError('PETSc libraries directory %s not found.' % libpath)
         libpaths.append(libpath)
-        if version in ['3.1', '3.2', '3.3', '3.4']:
+        if version_number >= [3,1]:
             libraries.append('petsc')
         else:
             libraries.extend(['petscts', 'petscsnes', 'petscksp', 'petscdm', 
