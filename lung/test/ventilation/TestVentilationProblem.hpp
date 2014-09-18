@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <queue>
 
+#include "AbstractAcinarUnitFactory.hpp"
 #include "TetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "LinearSystem.hpp"
@@ -109,6 +110,25 @@ void SwanAcinarUnitsBC(VentilationProblem* pProblem, TimeStepper& rTimeStepper, 
         pProblem->SetFluxAtBoundaryNode(rNode, -p_acinus->GetFlow());
     }
 }
+
+
+class SwanAcinarUnitFactory : public AbstractAcinarUnitFactory
+{
+public:
+    virtual AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode)
+    {
+        AbstractAcinarUnit* p_acinus = new Swan2012AcinarUnit;
+        double acinus_volume = 1.2e6/31000; //Assumes a residual capacity of 1.2l (x10^6 in mm^3)
+
+        p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
+        p_acinus->SetUndeformedVolume(acinus_volume);
+        p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
+        p_acinus->SetAirwayPressure(0.0);
+
+        return p_acinus;
+    }
+};
+
 
 class TestVentilationProblem : public CxxTest::TestSuite
 {
@@ -395,8 +415,8 @@ public:
 
     void TestSwanThreeBifurcations() throw (Exception)
     {
-         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
-//        VentilationProblem problem("continuum_mechanics/test/data/all_of_tree", 0u);
+         SwanAcinarUnitFactory swan_factory;
+         VentilationProblem problem(&swan_factory, "continuum_mechanics/test/data/three_bifurcations", 0u);
 
          //The three_bifurcation mesh has very small radii leading to instability, we adjust them to the physiological range.
          ///\todo This is partially ignored by the solver, which calculates the resistance of the acinar ducts in the constructor
@@ -413,9 +433,6 @@ public:
 
          TimeStepper stepper(0.0, 1.0, 0.005);
          problem.Solve(stepper, &SwanAcinarUnitsBC, "TestVentilation", "swan_three_bifurcations");
-
-         ///\todo The above runs and looks plausible, although the acinar don't expand as much as they should.
-         //Further tests are needed, at a minimum compare total inspired volume against change in acinar volume
     }
 
     /*

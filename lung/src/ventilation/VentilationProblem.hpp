@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VENTILATIONPROBLEM_HPP_
 
 #include <map>
+#include "AbstractAcinarUnitFactory.hpp"
 #include "TetrahedralMesh.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
@@ -56,10 +57,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class VentilationProblem
 {
 private:
-    TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
-    unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
-    bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
-    bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
+    /**< The 1d in 3d branching tree mesh */
+    TetrahedralMesh<1,3> mMesh;
+
+    /**< The outlet node is the root of the branching tree structure */
+    unsigned mOutletNodeIndex;
+
+    /**< Use dynamic (flux related) resistance and a nonlinear solver */
+    bool mDynamicResistance;
+
+    /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
+    bool mRadiusOnEdge;
 
     /** (Dynamic) viscosity in kg/(mm*second).
      * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
@@ -82,11 +90,20 @@ private:
      */
     double mDensity;
 
-    std::map<unsigned, AbstractAcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. */
-    std::vector<double> mFlux; /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
-    std::vector<double> mPressure; /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
-    std::map<unsigned, double> mPressureCondition; /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
-    bool mFluxGivenAtInflow; /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
+    /**< One acinar unit for each terminal node. */
+    std::map<unsigned, AbstractAcinarUnit*> mAcinarUnits;
+
+    /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
+    std::vector<double> mFlux;
+
+    /**< Used to hold the pressure solution (and outlet boundary pressure) in node index ordering). */
+    std::vector<double> mPressure;
+
+    /**< Pressure boundary conditions at terminal nodes. \todo This could be a vector and/or share a map with the acinar units. */
+    std::map<unsigned, double> mPressureCondition;
+
+    /**< Used to switch solution methods.  If the flux is given at the boundary then the entire system can be solved directly by back substitution. */
+    bool mFluxGivenAtInflow;
 
     /**
      * The symmetric matrix is an estimate of the dense matrix system which determines how flux changes at terminal
@@ -97,12 +114,24 @@ private:
      * In order to iteratively match pressure conditions we must invert this equation.
      */
     Mat mTerminalInteractionMatrix;
-    std::map<unsigned, unsigned> mTerminalToNodeIndex; /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh node indexing */
-    std::map<unsigned, unsigned> mTerminalToEdgeIndex; /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh element indexing */
 
-    Vec mTerminalFluxChangeVector; /**< Used as the output of the mTerminalInteractionMatrix terminal pressure to flux solver*/
-    Vec mTerminalPressureChangeVector; /**< Used as the input of the mTerminalInteractionMatrix terminal pressure to flux solver*/
-    KSP mTerminalKspSolver; /**< The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh node indexing */
+    std::map<unsigned, unsigned> mTerminalToNodeIndex;
+
+    /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh element indexing */
+    std::map<unsigned, unsigned> mTerminalToEdgeIndex;
+
+    /**< Used as the output of the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    Vec mTerminalFluxChangeVector;
+
+    /**< Used as the input of the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    Vec mTerminalPressureChangeVector;
+
+    /**< The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    KSP mTerminalKspSolver;
+
+    /** The acinar unit factory creates an acinar unit for each distal node in the tree. */
+    AbstractAcinarUnitFactory* mpAcinarUnitFactory;
 
     /**
      * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.
@@ -120,6 +149,7 @@ private:
      * This creates and fills a PETSc Mat.  It also creates two PETSc Vecs and a KSP solver.
      */
     void SetupIterativeSolver();
+
     /**
      * Use pressure boundary conditions at leaves (and pressure condition at root) to perform
      * convert to flux boundary conditions (assuming Poiseuille flow) and then perform a direct solve
@@ -144,15 +174,18 @@ private:
      */
     double CalculateResistance(Element<1,3>& rElement, bool usePedley=false, double flux=DBL_MAX);
 
+    /**
+     * Common code from constructors
+     *
+     * @param rMeshDirFilePath the path and root name of the .node and .edge files for the mesh
+     */
+    void Initialise(const std::string& rMeshDirFilePath);
 
 public:
     /** Default constructor
      * Attempts to read all parameters from a hard-coded file
      * Loads a mesh from file(s)
      * Identifies the outlet node (a.k.a root of tree or the mouth end)
-     *   A check is made that it is a boundary node.  We could also check that
-     *   on trees with more than one bifurcation there are no boundary nodes in
-     *   its 2nd generation successors.
      * Creates a linear system of the appropriate size to match the mesh
      */
     VentilationProblem();
@@ -160,14 +193,29 @@ public:
     /** Constructor
      * Loads a mesh from file(s)
      * Identifies the outlet node (a.k.a root of tree or the mouth end)
-     *   A check is made that it is a boundary node.  We could also check that
-     *   on trees with more than one bifurcation there are no boundary nodes in
-     *   its 2nd generation successors.
+     *   A check is made that it is a boundary node.
      * Creates a linear system of the appropriate size to match the mesh
+     *
      * @param rMeshDirFilePath  the path and root name of the .node and .edge files for the mesh
      * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
      */
     VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex=0u);
+
+    /** Constructor
+     * Loads a mesh from file(s)
+     * Creates acinar units for the ends of the tree.
+     * Identifies the outlet node (a.k.a root of tree or the mouth end)
+     *   A check is made that it is a boundary node.
+     * Creates a linear system of the appropriate size to match the mesh
+     *
+     * @param pAcinarUnitFactory A factory to create acinar units with.
+     * @param rMeshDirFilePath  the path and root name of the .node and .edge files for the mesh
+     * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
+     */
+    VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFactory,
+                       const std::string& rMeshDirFilePath,
+                       unsigned rootIndex=0u);
+
     /** Destructor
      *  destroys the linear system
      */
@@ -215,6 +263,7 @@ public:
      *  @return The flux at outflow.
      */
     double GetFluxAtOutflow();
+
     /**
      * Sets a Dirichlet flux boundary condition for a given node.
      *
