@@ -464,8 +464,6 @@ protected:
 
     /**
      * A vector of user-defined output modifiers which may be used to produce lightweight on the fly output
-     *
-     * \todo #2570 Allow these to be archived
      */
     std::vector<boost::shared_ptr<AbstractOutputModifier> > mOutputModifiers;
 
