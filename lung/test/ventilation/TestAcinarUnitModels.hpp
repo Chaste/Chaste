@@ -75,7 +75,7 @@ public:
         double gamma = (3.0/4.0)*(3*0.433 + 0.611)*(lambda*lambda - 1)*(lambda*lambda - 1);
         TS_ASSERT_DELTA(acinus.CalculateGamma(), gamma, 1e-6);
 
-        double xi = 2.5;
+        double xi = 2500;
         double dPedLambda = (3.0*xi/2.0)*(3*0.433 + 0.611)*(3*0.433 + 0.611)*(lambda*lambda - 1)*(lambda*lambda - 1)*std::exp(gamma) +
                              (xi/2.0)*(3*0.433 + 0.611)*(lambda*lambda + 1)*std::exp(gamma)/(lambda*lambda);
 
@@ -143,8 +143,6 @@ public:
                 old_pressure = airway_pressure;
             }
             time_stepper.AdvanceOneTimeStep();
-
-            std::cout << acinus.GetVolume() << std::endl;
         }
     }
 };
