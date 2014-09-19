@@ -284,7 +284,11 @@ LinearSystem::~LinearSystem()
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
     if (mpConvergenceTestContext)
     {
+#if ( PETSC_VERSION_MINOR>=5 )
+        KSPConvergedDefaultDestroy(mpConvergenceTestContext);
+#else
         KSPDefaultConvergedDestroy(mpConvergenceTestContext);
+#endif
     }
 #endif
 
@@ -680,15 +684,17 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 
         KSPCreate(PETSC_COMM_WORLD, &mKspSolver);
 
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+        if (mMatrixIsConstant)
+        {
+            // Attempt to emulate SAME_PRECONDITIONER below
+            KSPSetReusePreconditioner(mKspSolver, PETSC_TRUE);
+        }
+#else
         /*
-         * See
-         *
-         * http://www-unix.mcs.anl.gov/petsc/petsc-2/snapshots/petsc-current/docs/manualpages/KSP/KSPSetOperators.html
-         *
          * The preconditioner flag (last argument) in the following calls says
          * how to reuse the preconditioner on subsequent iterations.
          */
-
         MatStructure preconditioner_over_successive_calls;
 
         if (mMatrixIsConstant)
@@ -699,14 +705,23 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         {
             preconditioner_over_successive_calls = SAME_NONZERO_PATTERN;
         }
+#endif
 
         if (mPrecondMatrixIsNotLhs)
         {
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+            KSPSetOperators(mKspSolver, mLhsMatrix, mPrecondMatrix);
+#else
             KSPSetOperators(mKspSolver, mLhsMatrix, mPrecondMatrix, preconditioner_over_successive_calls);
+#endif
         }
         else
         {
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+            KSPSetOperators(mKspSolver, mLhsMatrix, mLhsMatrix);
+#else
             KSPSetOperators(mKspSolver, mLhsMatrix, mLhsMatrix, preconditioner_over_successive_calls);
+#endif
         }
 
         // Set either absolute or relative tolerance of the KSP solver.
@@ -1016,9 +1031,19 @@ Vec LinearSystem::Solve(Vec lhsGuess)
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
             if (!mpConvergenceTestContext)
             {
+    #if ( PETSC_VERSION_MINOR>=5 )
+                KSPConvergedDefaultCreate(&mpConvergenceTestContext);
+    #else
                 KSPDefaultConvergedCreate(&mpConvergenceTestContext);
+    #endif
             }
+	#if ( PETSC_VERSION_MINOR>=5 )
+            // From PETSc 3.5, KSPDefaultConverged became KSPConvergedDefault.
+            KSPSetConvergenceTest(mKspSolver, KSPConvergedDefault, &mpConvergenceTestContext, PETSC_NULL);
+	#else
             KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, &mpConvergenceTestContext, PETSC_NULL);
+	#endif
+
 #else
             KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, PETSC_NULL);
 #endif

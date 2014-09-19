@@ -95,6 +95,26 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
                                                                  Vec residualVector,
                                                                  void* pContext);
 
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    /**
+     *  Global function that will be called by the SNES solver
+     *
+     *  Note - this changed in PETSC 3.5.
+     *
+     *  @param snes snes solver
+     *  @param currentGuess current guess
+     *  @param globalJacobian jacobian matrix to be computed
+     *  @param preconditioner preconditioner matrix to be computed
+     *  @param pContext this pointer can be converted to a ptr to the original caller, ie the
+     *  AbstractNonlinearElasticitySolver class
+     */
+    template<unsigned DIM>
+    PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+                                                                     Vec currentGuess,
+                                                                     Mat globalJacobian,
+                                                                     Mat preconditioner,
+                                                                     void* pContext);
+#else
 /**
  *  Global function that will be called by the SNES solver
  *
@@ -102,6 +122,7 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
  *  @param currentGuess current guess
  *  @param pGlobalJacobian jacobian matrix to be computed
  *  @param pPreconditioner preconditioner matrix to be computed
+ *  @param pMatStructure  The PETSc matrix structure description.
  *  @param pContext this pointer can be converted to a ptr to the original caller, ie the
  *  AbstractNonlinearElasticitySolver class
  */
@@ -112,6 +133,8 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
                                                                  Mat* pPreconditioner,
                                                                  MatStructure* pMatStructure,
                                                                  void* pContext);
+#endif
+
 template <unsigned DIM>
 class  AbstractNonlinearElasticitySolver; //Forward declaration
 
@@ -1743,7 +1766,11 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
 
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    KSPSetOperators(solver, mrJacobianMatrix, this->mPreconditionMatrix);
+#else
     KSPSetOperators(solver, mrJacobianMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
+#endif
 
     // Set the type of KSP solver (CG, GMRES etc) and preconditioner (ILU, HYPRE, etc)
     SetKspSolverAndPcType(solver);
@@ -2287,18 +2314,32 @@ PetscErrorCode AbstractNonlinearElasticitySolver_ComputeResidual(SNES snes,
 }
 
 template<unsigned DIM>
-PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
-                                                                 Vec currentGuess,
-                                                                 Mat* pGlobalJacobian,
-                                                                 Mat* pPreconditioner,
-                                                                 MatStructure* pMatStructure,
-                                                                 void* pContext)
-{
-    // Extract the solver from the void*
-    AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
-    p_solver->ComputeJacobian(currentGuess, pGlobalJacobian, pPreconditioner);
-    return 0;
-}
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+                                                                     Vec currentGuess,
+                                                                     Mat globalJacobian,
+                                                                     Mat preconditioner,
+                                                                     void* pContext)
+    {
+        // Extract the solver from the void*
+        AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
+        p_solver->ComputeJacobian(currentGuess, &globalJacobian, &preconditioner);
+        return 0;
+    }
+#else
+    PetscErrorCode AbstractNonlinearElasticitySolver_ComputeJacobian(SNES snes,
+                                                                     Vec currentGuess,
+                                                                     Mat* pGlobalJacobian,
+                                                                     Mat* pPreconditioner,
+                                                                     MatStructure* pMatStructure,
+                                                                     void* pContext)
+    {
+        // Extract the solver from the void*
+        AbstractNonlinearElasticitySolver<DIM>* p_solver = (AbstractNonlinearElasticitySolver<DIM>*) pContext;
+        p_solver->ComputeJacobian(currentGuess, pGlobalJacobian, pPreconditioner);
+        return 0;
+    }
+#endif
 
 
 // Constant setting definitions

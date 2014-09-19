@@ -248,7 +248,11 @@ void VentilationProblem::SetupIterativeSolver()
     VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
 
     KSPCreate(PETSC_COMM_SELF, &mTerminalKspSolver);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix);
+#else
     KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
+#endif
     KSPSetFromOptions(mTerminalKspSolver);
     KSPSetUp(mTerminalKspSolver);
 }

@@ -46,10 +46,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "limits.h"
 
-PetscErrorCode ComputeTestResidual(SNES snes,Vec solution_guess,Vec residual,void* pContext);
+PetscErrorCode ComputeTestResidual(SNES snes, Vec solution_guess, Vec residual, void* pContext);
+PetscErrorCode ComputeTestResidual3d(SNES snes, Vec solution_guess, Vec residual, void* pContext);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+PetscErrorCode ComputeTestJacobian(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext);
+PetscErrorCode ComputeTestJacobian3d(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext);
+#else
 PetscErrorCode ComputeTestJacobian(SNES snes,Vec input,Mat* pJacobian ,Mat* pPreconditioner,MatStructure* pMatStructure ,void* pContext);
-PetscErrorCode ComputeTestResidual3d(SNES snes,Vec solution_guess,Vec residual,void* pContext);
 PetscErrorCode ComputeTestJacobian3d(SNES snes,Vec input,Mat* pJacobian ,Mat* pPreconditioner,MatStructure* pMatStructure ,void* pContext);
+#endif
 
 class TestNonlinearSolvers : public CxxTest::TestSuite
 {
@@ -92,8 +97,6 @@ public:
         // Solve using newton method
         Vec answer_newton = solver_newton.Solve(&ComputeTestResidual, &ComputeTestJacobian,
                                                 initial_guess, length, NULL);
-
-
 
         // Replicate the answers so we can access them without worrying about parallel stuff
         ReplicatableVector answer_petsc_repl(answer_petsc);
@@ -170,7 +173,7 @@ public:
 // global functions called by nonlinear solvers
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-PetscErrorCode ComputeTestResidual(SNES snes,Vec solution_guess,Vec residual,void* pContext)
+PetscErrorCode ComputeTestResidual(SNES snes, Vec solution_guess, Vec residual, void* pContext)
 {
     double x, y;
 
@@ -185,26 +188,7 @@ PetscErrorCode ComputeTestResidual(SNES snes,Vec solution_guess,Vec residual,voi
     return 0;
 }
 
-PetscErrorCode ComputeTestJacobian(SNES snes,Vec input,Mat* pJacobian ,Mat* pPreconditioner,MatStructure* pMatStructure ,void* pContext)
-{
-    double x, y;
-
-    ReplicatableVector input_replicated;
-    input_replicated.ReplicatePetscVector(input);
-    x = input_replicated[0];
-    y = input_replicated[1];
-
-    PetscMatTools::SetElement(*pJacobian, 0 , 0 , 2.0*x );
-    PetscMatTools::SetElement(*pJacobian, 0 , 1 , 2.0*y);
-    PetscMatTools::SetElement(*pJacobian, 1 , 0 , 1.0);
-    PetscMatTools::SetElement(*pJacobian, 1 , 1 , -1.0);
-    MatAssemblyBegin(*pJacobian,MAT_FINAL_ASSEMBLY);
-    MatAssemblyEnd(*pJacobian,MAT_FINAL_ASSEMBLY);
-
-    return 0;
-}
-
-PetscErrorCode ComputeTestResidual3d(SNES snes,Vec solution_guess,Vec residual,void* pContext)
+PetscErrorCode ComputeTestResidual3d(SNES snes, Vec solution_guess, Vec residual, void* pContext)
 {
     double x, y, z;
 
@@ -223,8 +207,39 @@ PetscErrorCode ComputeTestResidual3d(SNES snes,Vec solution_guess,Vec residual,v
     return 0;
 }
 
-PetscErrorCode ComputeTestJacobian3d(SNES snes,Vec input,Mat* pJacobian ,Mat* pPreconditioner,MatStructure* pMatStructure ,void* pContext)
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+PetscErrorCode ComputeTestJacobian(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext)
 {
+#else
+PetscErrorCode ComputeTestJacobian(SNES snes, Vec input, Mat* pJacobian, Mat* pPreconditioner, MatStructure* pMatStructure, void* pContext)
+{
+    Mat jacobian = *pJacobian;
+#endif
+    double x, y;
+
+    ReplicatableVector input_replicated;
+    input_replicated.ReplicatePetscVector(input);
+    x = input_replicated[0];
+    y = input_replicated[1];
+
+    PetscMatTools::SetElement(jacobian, 0 , 0 , 2.0*x );
+    PetscMatTools::SetElement(jacobian, 0 , 1 , 2.0*y);
+    PetscMatTools::SetElement(jacobian, 1 , 0 , 1.0);
+    PetscMatTools::SetElement(jacobian, 1 , 1 , -1.0);
+    PetscMatTools::Finalise(jacobian);
+
+    return 0;
+}
+
+
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+PetscErrorCode ComputeTestJacobian3d(SNES snes, Vec input, Mat jacobian, Mat preconditioner, void* pContext)
+{
+#else
+PetscErrorCode ComputeTestJacobian3d(SNES snes, Vec input, Mat* pJacobian, Mat* pPreconditioner, MatStructure* pMatStructure, void* pContext)
+{
+    Mat jacobian = *pJacobian;
+#endif
     double x, y, z;
 
     ReplicatableVector input_replicated;
@@ -234,19 +249,20 @@ PetscErrorCode ComputeTestJacobian3d(SNES snes,Vec input,Mat* pJacobian ,Mat* pP
     y = input_replicated[1];
     z = input_replicated[2];
 
-    PetscMatTools::SetElement(*pJacobian, 0 , 0 , 2.0*x );
-    PetscMatTools::SetElement(*pJacobian, 0 , 1 , 2.0*y);
-    PetscMatTools::SetElement(*pJacobian, 0 , 2 , 2.0*z);
-    PetscMatTools::SetElement(*pJacobian, 1 , 0 , 1.0);
-    PetscMatTools::SetElement(*pJacobian, 1 , 1 , -1.0);
-    PetscMatTools::SetElement(*pJacobian, 1 , 2 , 0.0);
-    PetscMatTools::SetElement(*pJacobian, 2 , 0 , 0.0);
-    PetscMatTools::SetElement(*pJacobian, 2 , 1 , 1.0);
-    PetscMatTools::SetElement(*pJacobian, 2 , 2 , -1.0);
-    MatAssemblyBegin(*pJacobian,MAT_FINAL_ASSEMBLY);
-    MatAssemblyEnd(*pJacobian,MAT_FINAL_ASSEMBLY);
+    PetscMatTools::SetElement(jacobian, 0 , 0 , 2.0*x );
+    PetscMatTools::SetElement(jacobian, 0 , 1 , 2.0*y);
+    PetscMatTools::SetElement(jacobian, 0 , 2 , 2.0*z);
+    PetscMatTools::SetElement(jacobian, 1 , 0 , 1.0);
+    PetscMatTools::SetElement(jacobian, 1 , 1 , -1.0);
+    PetscMatTools::SetElement(jacobian, 1 , 2 , 0.0);
+    PetscMatTools::SetElement(jacobian, 2 , 0 , 0.0);
+    PetscMatTools::SetElement(jacobian, 2 , 1 , 1.0);
+    PetscMatTools::SetElement(jacobian, 2 , 2 , -1.0);
+    PetscMatTools::Finalise(jacobian);
 
     return 0;
 }
+
+
 
 #endif //_TESTNONLINEARSOLVERS_HPP_

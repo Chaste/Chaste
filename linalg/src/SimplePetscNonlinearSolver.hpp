@@ -56,11 +56,12 @@ public:
  * correct size in which the residual is returned), void* (a pointer to
  * anything you may need to refer to when calculating the residual)
  *
- * @param pComputeJacobian points to
- * the function which computes the Jacobian, it must take arguments SNES (a PETSc
- * nonlinear solver * object), Mat* (a pointer to the Jacobian matrix) ,Mat* (a pointer
- * to a preconditioner matrix), MatStructure* (points to the PETSc matrix type e.g. AIJ), void* (a pointer to
- * anything you may need to refer to when calculating the residual).
+ * @param pComputeJacobian points to the function which computes the Jacobian.
+ * Before PETSc 3.5 it took arguments SNES (a PETSc nonlinear solver * object), Vec, Mat* (a pointer
+ * to the Jacobian matrix), Mat* (a pointer to a preconditioner matrix), MatStructure* (points
+ * to the PETSc matrix type e.g. AIJ), void* (a pointer to anything you may need to refer to
+ * when calculating the residual).
+ * For PETSc 3.5+ this became SNES, Vec, Mat, Mat, void*.
  *
  * @param initialGuess A PETSc Vec of the correct size, containing initial guesses
  *  for the nonlinear solver.
@@ -81,7 +82,11 @@ public:
  *
  */
     Vec Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+              PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat,Mat,void*),
+#else
               PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat*,Mat*,MatStructure*,void*),
+#endif
               Vec initialGuess,
               unsigned fill,
               void* pContext);

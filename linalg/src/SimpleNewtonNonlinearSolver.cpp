@@ -55,7 +55,11 @@ SimpleNewtonNonlinearSolver::~SimpleNewtonNonlinearSolver()
 {}
 
 Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+                                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat,Mat,void*),
+#else
                                        PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat*,Mat*,MatStructure*,void*),
+#endif
                                        Vec initialGuess,
                                        unsigned fill,
                                        void* pContext)
@@ -93,7 +97,11 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
         old_scaled_residual_norm = scaled_residual_norm;
 
         // Compute Jacobian and solve J dx = f for the (negative) update dx, (J the jacobian, f the residual)
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+        (*pComputeJacobian)(NULL, current_solution, (linear_system.rGetLhsMatrix()), NULL, pContext);
+#else
         (*pComputeJacobian)(NULL, current_solution, &(linear_system.rGetLhsMatrix()), NULL, NULL, pContext);
+#endif
 
         Vec negative_update = linear_system.Solve();
 

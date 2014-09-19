@@ -71,30 +71,57 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeResidual(SNES snes,
                                                                       Vec currentGuess,
                                                                       Vec residualVector,
                                                                       void* pContext);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    /**
+     * Function called by PETSc to compute the Jacobian matrix given the current solution guess.
+     * Calls a method on a AbstractNonlinearAssemblerSolverHybrid object to do the calculation.
+     *
+     * Note this method interface was updated in PETSc 3.5, as was the jacobian matrix interface
+     * itself, so you'll need to update your Jacobian too.
+     *
+     * @param snes This is not used by us, but required by PETSc.
+     * @param currentGuess The solution guess for the current iteration.
+     * @param globalJacobian Pointer to object to fill with the Jacobian matrix.
+     * @param preconditioner This is not used by us, but required by PETSc.
+     * @param pContext Pointer to a AbstractNonlinearAssemblerSolverHybrid object.
+     * @return PETSc expects this function to return a PetscErrorCode. We always return 0;
+     *   exceptions are thrown if there is an error.
+     *
+     * Note: this is a global function, hence the need a long name to avoid
+     * potential conflicting names
+     */
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 
-/**
- * Function called by PETSc to compute the Jacobian matrix given the current solution guess.
- * Calls a method on a AbstractNonlinearAssemblerSolverHybrid object to do the calculation.
- *
- * @param snes This is not used by us, but required by PETSc.
- * @param currentGuess The solution guess for the current iteration.
- * @param pGlobalJacobian Pointer to object to fill with the Jacobian matrix.
- * @param pPreconditioner This is not used by us, but required by PETSc.
- * @param pMatStructure This is not used by us, but required by PETSc.
- * @param pContext Pointer to a AbstractNonlinearAssemblerSolverHybrid object.
- * @return PETSc expects this function to return a PetscErrorCode. We always return 0;
- *   exceptions are thrown if there is an error.
- *
- * Note: this is a global function, hence the need a long name to avoid
- * potential conflicting names
- */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
-                                                                      Vec currentGuess,
-                                                                      Mat* pGlobalJacobian,
-                                                                      Mat* pPreconditioner,
-                                                                      MatStructure* pMatStructure,
-                                                                      void* pContext);
+    PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
+                                                                          Vec currentGuess,
+                                                                          Mat globalJacobian,
+                                                                          Mat preconditioner,
+                                                                          void* pContext);
+#else
+    /**
+     * Function called by PETSc to compute the Jacobian matrix given the current solution guess.
+     * Calls a method on a AbstractNonlinearAssemblerSolverHybrid object to do the calculation.
+     *
+     * @param snes This is not used by us, but required by PETSc.
+     * @param currentGuess The solution guess for the current iteration.
+     * @param pGlobalJacobian Pointer to object to fill with the Jacobian matrix.
+     * @param pPreconditioner This is not used by us, but required by PETSc.
+     * @param pMatStructure This is not used by us, but required by PETSc.
+     * @param pContext Pointer to a AbstractNonlinearAssemblerSolverHybrid object.
+     * @return PETSc expects this function to return a PetscErrorCode. We always return 0;
+     *   exceptions are thrown if there is an error.
+     *
+     * Note: this is a global function, hence the need a long name to avoid
+     * potential conflicting names
+     */
+    template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+    PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
+                                                                          Vec currentGuess,
+                                                                          Mat* pGlobalJacobian,
+                                                                          Mat* pPreconditioner,
+                                                                          MatStructure* pMatStructure,
+                                                                          void* pContext);
+#endif
 
 /**
  * The ASSEMBLER-SOLVER class.
@@ -457,6 +484,22 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeResidual(SNES snes,
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
+                                                                      Vec currentGuess,
+                                                                      Mat globalJacobian,
+                                                                      Mat preconditioner,
+                                                                      void* pContext)
+{
+    // Extract the solver from the void*
+    AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* p_solver =
+        (AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>*) pContext;
+
+    p_solver->ComputeJacobian(currentGuess, &globalJacobian);
+
+    return 0;
+}
+#else
 PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
                                                                       Vec currentGuess,
                                                                       Mat* pGlobalJacobian,
@@ -472,5 +515,6 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeJacobian(SNES snes,
 
     return 0;
 }
+#endif
 
 #endif /*ABSTRACTNONLINEARASSEMBLERSOLVERHYBRID_HPP_*/

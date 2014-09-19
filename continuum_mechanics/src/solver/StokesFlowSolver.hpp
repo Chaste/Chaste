@@ -194,7 +194,11 @@ void StokesFlowSolver<DIM>::Solve()
 
     KSP solver;
     KSPCreate(PETSC_COMM_WORLD,&solver);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix);
+#else
     KSPSetOperators(solver, this->mSystemLhsMatrix, this->mPreconditionMatrix, DIFFERENT_NONZERO_PATTERN /*in precond between successive solves*/);
+#endif
     KSPSetType(solver, KSPGMRES);
 
     if (mKspAbsoluteTol < 0)

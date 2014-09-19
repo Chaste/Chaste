@@ -90,8 +90,12 @@ void PCLDUFactorisation::PCLDUFactorisationCreate(KSP& rKspObject)
     KSPGetPC(rKspObject, &mPetscPCObject);
 
     Mat system_matrix, dummy;
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    KSPGetOperators(rKspObject, &system_matrix, &dummy);
+#else
     MatStructure flag;
     KSPGetOperators(rKspObject, &system_matrix, &dummy, &flag);
+#endif
 
     PetscInt num_rows, num_columns;
     MatGetSize(system_matrix, &num_rows, &num_columns);
@@ -244,7 +248,13 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
      * Set up preconditioner for block A11
      */
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    // Attempt to emulate SAME_PRECONDITIONER below
+    PCSetReusePreconditioner(mPCContext.PC_amg_A11, PETSC_TRUE);
+    PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock);
+#else
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock, SAME_PRECONDITIONER);
+#endif
 
     // Choose between the two following blocks in order to approximate inv(A11) with one AMG cycle
     // or with an CG solve with high tolerance
@@ -297,7 +307,13 @@ void PCLDUFactorisation::PCLDUFactorisationSetUp()
      * Set up amg preconditioner for block A22
      */
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    // Attempt to emulate SAME_PRECONDITIONER below
+    PCSetReusePreconditioner(mPCContext.PC_amg_A22, PETSC_TRUE);
+    PCSetOperators(mPCContext.PC_amg_A22, mPCContext.A22_matrix_subblock, mPCContext.A22_matrix_subblock);
+#else
     PCSetOperators(mPCContext.PC_amg_A22, mPCContext.A22_matrix_subblock, mPCContext.A22_matrix_subblock, SAME_PRECONDITIONER);
+#endif
 
     // Choose between the two following blocks in order to approximate inv(A11) with one AMG cycle
     // or with an CG solve with high tolerance

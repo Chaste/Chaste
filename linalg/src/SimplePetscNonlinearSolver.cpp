@@ -44,7 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+                                      PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat,Mat,void*),
+#else
                                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat*,Mat*,MatStructure*,void*),
+#endif
                                       Vec initialGuess,
                                       unsigned fill,
                                       void* pContext)
@@ -56,30 +60,31 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
     VecDuplicate(initialGuess, &residual);
 
     Mat jacobian; // Jacobian Matrix
-
     PetscInt N; // number of elements
 
     // Get the size of the Jacobian from the residual
-    VecGetSize(initialGuess,&N);
+    VecGetSize(initialGuess, &N);
 
     // Note that the Jacobian matrix might involve new non-zero elements in the course of a SNES solve
     PetscTools::SetupMat(jacobian, N, N, fill, PETSC_DECIDE, PETSC_DECIDE, true, false /*malloc flag*/);
 
     SNESCreate(PETSC_COMM_WORLD, &snes);
+
     SNESSetFunction(snes, residual, pComputeResidual, pContext);
     SNESSetJacobian(snes, jacobian, jacobian, pComputeJacobian, pContext);
+
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
     SNESSetType(snes, SNESNEWTONLS);
 #else
     SNESSetType(snes, SNESLS);
 #endif
+
     SNESSetTolerances(snes,1.0e-5,1.0e-5,1.0e-5,PETSC_DEFAULT,PETSC_DEFAULT);
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR == 3) //PETSc 3.3
     SNESLineSearch linesearch;
     SNESGetSNESLineSearch(snes, &linesearch);
     SNESLineSearchSetType(linesearch, "bt"); //Use backtracking search as default
-#endif
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
+#elif (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 4) //PETSc 3.4 or later
     SNESLineSearch linesearch;
     SNESGetLineSearch(snes, &linesearch);
     SNESLineSearchSetType(linesearch, "bt"); //Use backtracking search as default
@@ -87,15 +92,27 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
 
     // x is the iteration vector SNES uses when solving, set equal to initialGuess to start with
     Vec x;
+
     VecDuplicate(initialGuess, &x);
     VecCopy(initialGuess, x);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 5)
+    // Seems to want the preconditioner to be explicitly set to none now
+    // Copied this from the similar PETSc example at:
+    // http://www.mcs.anl.gov/petsc/petsc-current/src/snes/examples/tutorials/ex1.c
+    // Which got it to work...
+    KSP ksp;
+    SNESGetKSP(snes,&ksp);
+    PC pc;
+    KSPGetPC(ksp,&pc);
+    PCSetType(pc,PCNONE);
+#endif
 
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
     SNESSolve(snes, x);
 #else
     SNESSolve(snes, PETSC_NULL, x);
 #endif
-
     PetscTools::Destroy(residual);
     PetscTools::Destroy(jacobian); // Free Jacobian
 

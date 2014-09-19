@@ -73,7 +73,11 @@ public:
      * @return Returns a PETSc Vec of the solution.
      */
     virtual Vec Solve(PetscErrorCode (*pComputeResidual)(SNES,Vec,Vec,void*),
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+                      PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat,Mat,void*),
+#else
                       PetscErrorCode (*pComputeJacobian)(SNES,Vec,Mat*,Mat*,MatStructure*,void*),
+#endif
                       Vec initialGuess,
                       unsigned fill,
                       void* pContext)=0;

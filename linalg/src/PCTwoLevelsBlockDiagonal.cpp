@@ -73,8 +73,12 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
     KSPGetPC(rKspObject, &mPetscPCObject);
 
     Mat system_matrix, dummy;
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    KSPGetOperators(rKspObject, &system_matrix, &dummy);
+#else
     MatStructure flag;
     KSPGetOperators(rKspObject, &system_matrix, &dummy, &flag);
+#endif
 
     PetscInt num_rows, num_columns;
     MatGetSize(system_matrix, &num_rows, &num_columns);
@@ -259,14 +263,22 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     // Set up amg preconditioner for block A11
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A11));
     PCSetType(mPCContext.PC_amg_A11, PCBJACOBI);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock);
+#else
     PCSetOperators(mPCContext.PC_amg_A11, mPCContext.A11_matrix_subblock, mPCContext.A11_matrix_subblock, DIFFERENT_NONZERO_PATTERN);//   SAME_PRECONDITIONER);
+#endif
     PCSetFromOptions(mPCContext.PC_amg_A11);
     PCSetUp(mPCContext.PC_amg_A11);
 
     // Set up amg preconditioner for block A22_B1
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22_B1));
     PCSetType(mPCContext.PC_amg_A22_B1, PCBJACOBI);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    PCSetOperators(mPCContext.PC_amg_A22_B1, mPCContext.A22_B1_matrix_subblock, mPCContext.A22_B1_matrix_subblock);
+#else
     PCSetOperators(mPCContext.PC_amg_A22_B1, mPCContext.A22_B1_matrix_subblock, mPCContext.A22_B1_matrix_subblock, DIFFERENT_NONZERO_PATTERN);//   SAME_PRECONDITIONER);
+#endif
     PCSetFromOptions(mPCContext.PC_amg_A22_B1);
     PCSetUp(mPCContext.PC_amg_A22_B1);
 
@@ -280,7 +292,11 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalSetUp()
     PetscOptionsSetValue("-pc_hypre_boomeramg_strong_threshold", "0.0");
     PetscOptionsSetValue("-pc_hypre_boomeramg_coarsen_type", "HMIS");
 
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    PCSetOperators(mPCContext.PC_amg_A22_B2, mPCContext.A22_B2_matrix_subblock, mPCContext.A22_B2_matrix_subblock);
+#else
     PCSetOperators(mPCContext.PC_amg_A22_B2, mPCContext.A22_B2_matrix_subblock, mPCContext.A22_B2_matrix_subblock, DIFFERENT_NONZERO_PATTERN);//   SAME_PRECONDITIONER);
+#endif
     PCSetFromOptions(mPCContext.PC_amg_A22_B2);
     PCSetUp(mPCContext.PC_amg_A22_B2);
 }
