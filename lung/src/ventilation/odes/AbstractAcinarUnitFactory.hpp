@@ -72,13 +72,13 @@ public:
      * @param lo  Lowest index owned by this process.
      * @param hi  Highest index owned by this process.
      */
-    virtual void FinaliseAcinarUnitCreation(std::vector< AbstractAcinarUnit* >* pAcinarUnitsDistributed,
-                                            unsigned lo, unsigned hi);
+//    virtual void FinaliseAcinarUnitCreation(std::vector< AbstractAcinarUnit* >* pAcinarUnitsDistributed,
+//                                            unsigned lo, unsigned hi);
 
     /**
-     * @return  The number of acinar
+     * @return  The number of acini
      */
-    virtual unsigned GetNumberOfAcinar();
+    virtual unsigned GetNumberOfAcini();
 
     /**
      * Default constructor.

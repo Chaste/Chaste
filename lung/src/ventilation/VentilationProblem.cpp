@@ -69,6 +69,7 @@ VentilationProblem::VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFac
                                                mTerminalKspSolver(NULL)
 {
     Initialise(rMeshDirFilePath);
+    pAcinarUnitFactory->SetMesh(&mMesh);
 
     ///\todo We need to do some parallel here in order to load balance
 

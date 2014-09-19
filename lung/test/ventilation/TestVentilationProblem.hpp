@@ -416,7 +416,12 @@ public:
     void TestSwanThreeBifurcations() throw (Exception)
     {
          SwanAcinarUnitFactory swan_factory;
+
+         TS_ASSERT_THROWS_CONTAINS(swan_factory.GetMesh(), "The mesh object has not been set in the acinar unit factory");
+
          VentilationProblem problem(&swan_factory, "continuum_mechanics/test/data/three_bifurcations", 0u);
+
+         TS_ASSERT_EQUALS(swan_factory.GetNumberOfAcini(), 5u);
 
          //The three_bifurcation mesh has very small radii leading to instability, we adjust them to the physiological range.
          ///\todo This is partially ignored by the solver, which calculates the resistance of the acinar ducts in the constructor

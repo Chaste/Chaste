@@ -37,17 +37,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractAcinarUnit.hpp"
 
 
-void AbstractAcinarUnitFactory::FinaliseAcinarUnitCreation(
-    std::vector< AbstractAcinarUnit* >* pAcinarUnitsDistributed,
-    unsigned lo,
-    unsigned hi)
-{
-}
+//void AbstractAcinarUnitFactory::FinaliseAcinarUnitCreation(
+//    std::vector< AbstractAcinarUnit* >* pAcinarUnitsDistributed,
+//    unsigned lo,
+//    unsigned hi)
+//{
+//}
 
-unsigned AbstractAcinarUnitFactory::GetNumberOfAcinar()
+unsigned AbstractAcinarUnitFactory::GetNumberOfAcini()
 {
     assert(mpMesh != NULL);
-    return mpMesh->GetNumNodes();
+    return mpMesh->GetNumBoundaryNodes();
 }
 
 AbstractAcinarUnitFactory::AbstractAcinarUnitFactory()
