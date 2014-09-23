@@ -100,6 +100,17 @@ public:
      */
     virtual void RegenerateTables()=0;
 
+    /**
+     * You can call this method to free the memory used by lookup tables when they're no longer needed.
+     *
+     * In most usage scenarios you won't need to do this, but if you're running several simulations in turn that use different
+     * cell models, you may find it useful to prevent running out of memory.
+     *
+     * @note After calling this method, you \b must call RegenerateTables before trying to simulate any cell using this
+     * lookup tables object, or you'll get a segfault.
+     */
+    virtual void FreeMemory()=0;
+
     /** Virtual destructor since we have a virtual method. */
     virtual ~AbstractLookupTableCollection();
 

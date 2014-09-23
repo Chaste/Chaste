@@ -2052,6 +2052,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('}')
         self.writeln('return mpInstance.get();')
         self.close_block()
+        # Method to free the table memory
+        self.writeln('void FreeMemory()')
+        self.open_block()
+        self.output_lut_deletion()
+        self.writeln('mNeedsRegeneration.assign(mNeedsRegeneration.size(), true);')
+        self.close_block()
         # Table lookup methods
         self.output_lut_methods()
         self.output_lut_indexing_methods()
