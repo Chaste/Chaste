@@ -139,8 +139,13 @@ public:
     /**
      * @param boxWidth the width of each box (cut-off length in NodeBasedCellPopulation simulations)
      * @param domainSize the size of the domain, in the form (xmin, xmax, ymin, ymax) (etc)
-     * @param isPeriodicInX whether the domain is peiodic in the x direction
+     * @param isPeriodicInX whether the domain is periodic in the x direction
      * @param localRows the number of local rows in a parallel DistributedBoxCollection.
+     *
+     * Note that the domain size may be increased because each process should have at least one slice of boxes
+     * in the largest dimension.  For example, if the box size is 1 and the domain is [(0,0,0), (3,3,3)] then,
+     * if there are more than 3 processes the domain will be swollen to [(0,0,0), (3,3,num_procs)].  The
+     * user is warned when this happens.
      */
     DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, int localRows = PETSC_DECIDE);
 

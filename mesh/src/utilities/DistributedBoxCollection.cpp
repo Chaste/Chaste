@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedBoxCollection.hpp"
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 // Static member for "fudge factor" is instantiated here
 template<unsigned DIM>
@@ -81,6 +82,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     // Make sure there are enough boxes for the number of processes.
     if (mNumBoxesEachDirection(DIM-1) < PetscTools::GetNumProcs())
     {
+        WARNING("There are more processes than convenient for the domain/mesh/box size.  The domain size has been swollen.")
         mDomainSize[2*DIM - 1] += (PetscTools::GetNumProcs() - mNumBoxesEachDirection(DIM-1))*mBoxWidth;
         mNumBoxesEachDirection(DIM-1) = PetscTools::GetNumProcs();
     }

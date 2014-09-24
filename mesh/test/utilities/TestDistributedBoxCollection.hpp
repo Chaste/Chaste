@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedBoxCollection.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "ArchiveOpener.hpp"
+#include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -303,7 +304,12 @@ public:
         }
 
         TS_ASSERT_EQUALS(0u, box_collection.CalculateCoordinateIndices(0)[0]);
-        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 5u);
+
+        // The expected number of boxes is 5.
+        // However, if there are more processes than required then the top-most processes will be
+        // granted a box each anyway and the domain size will be swollen.
+        unsigned expected_number_of_boxes = std::max(5u, PetscTools::GetNumProcs());
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), expected_number_of_boxes);
 
         // Make sure the default number of rows are set for each process.
         std::vector<unsigned> rows_vector;
@@ -325,7 +331,7 @@ public:
             std::set<unsigned> local_boxes_to_box_0 = box_collection.GetLocalBoxes(0);
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
-            correct_answer_0.insert(1);
+            correct_answer_0.insert(1); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
 
@@ -333,9 +339,9 @@ public:
         {
             std::set<unsigned> local_boxes_to_box_1 = box_collection.GetLocalBoxes(1);
             std::set<unsigned> correct_answer_1;
-            correct_answer_1.insert(0);
+            correct_answer_1.insert(0); // Halo below
             correct_answer_1.insert(1);
-            correct_answer_1.insert(2);
+            correct_answer_1.insert(2);// Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_1, correct_answer_1);
         }
 
@@ -343,8 +349,13 @@ public:
         {
             std::set<unsigned> local_boxes_to_box_4 = box_collection.GetLocalBoxes(4);
             std::set<unsigned> correct_answer_4;
-            correct_answer_4.insert(3);
+            correct_answer_4.insert(3); // Halo below
             correct_answer_4.insert(4);
+            if (PetscTools::GetNumProcs() > 5u)
+            {
+                // There's a process (spinning) which requires an extra halo box
+                correct_answer_4.insert(5);
+            }
             TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
         }
 
@@ -412,9 +423,22 @@ public:
         domain_size(2) = 0.0;
         domain_size(3) = 3.0;
 
+        Warnings::Instance()->QuietDestroy();
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+
         DistributedBoxCollection<2> box_collection(width, domain_size);
 
-        assert(box_collection.GetNumBoxes()==12); // 4 * 3 boxes altogether
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
+                             "There are more processes than convenient for the domain/mesh/box size.  The domain size has been swollen.");
+            Warnings::Instance()->QuietDestroy();
+        }
+        // Number of slices is 3, unless there are more than 3 processes.
+        // Hence the expected number of boxes is 12, but will grow with the number of processes.
+        unsigned expected_number_boxes = 4u * std::max(3u, PetscTools::GetNumProcs());
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), expected_number_boxes); // 4 * 3 boxes altogether, normally
 
         box_collection.SetupAllLocalBoxes();
 
@@ -425,8 +449,8 @@ public:
             std::set<unsigned> correct_answer_0;
             correct_answer_0.insert(0);
             correct_answer_0.insert(1);
-            correct_answer_0.insert(4);
-            correct_answer_0.insert(5);
+            correct_answer_0.insert(4); // Halo above
+            correct_answer_0.insert(5); // Halo above
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
         if (box_collection.GetBoxOwnership(3))
@@ -458,12 +482,19 @@ public:
         {
             std::set<unsigned> local_boxes_to_box_10 = box_collection.GetLocalBoxes(10);
             std::set<unsigned> correct_answer_10;
-            correct_answer_10.insert(5);
-            correct_answer_10.insert(6);
-            correct_answer_10.insert(7);
+            correct_answer_10.insert(5); // Halo below 9
+            correct_answer_10.insert(6); // Halo below 10
+            correct_answer_10.insert(7); // Halo below 11
             correct_answer_10.insert(9);
             correct_answer_10.insert(10);
             correct_answer_10.insert(11);
+            if (PetscTools::GetNumProcs() > 3u)
+            {
+                // There's a process (spinning) which requires an extra halo slice (12, 13, 14, 15)
+                correct_answer_10.insert(13); // Halo above 9
+                correct_answer_10.insert(14); // Halo above 10
+                correct_answer_10.insert(15); // Halo above 11
+            }
             TS_ASSERT_EQUALS(local_boxes_to_box_10, correct_answer_10);
         }
     }
@@ -693,7 +724,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
     //
-    //  Cancer/cell_based tests
+    //  Cell-based tests
     //  The following are tests written from this DistributedBoxCollection used to be
     //  cell_based/src/tissue/NodeDistributedBoxCollection and test the cell-based
     //  functionality
@@ -1349,7 +1380,8 @@ public:
             }
             default:
             {
-                NEVER_REACHED;
+                // 4 or more procs
+                TS_TRACE("This test is not designed for more than 3 processes");
                 break;
             }
         }
@@ -1836,6 +1868,7 @@ public:
 
         DistributedBoxCollection<3> box_collection(cut_off_length, domain_size);
 
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u * std::max(4u, PetscTools::GetNumProcs()));
         box_collection.SetupLocalBoxesHalfOnly();
         box_collection.SetupHaloBoxes();
 
@@ -1848,7 +1881,7 @@ public:
             }
         }
 
-        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 36u);
+        TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u * std::max(4u, PetscTools::GetNumProcs()));
 
         if (box_collection.GetBoxOwnership(0))
         {
@@ -1864,65 +1897,71 @@ public:
             correct_answer_0.insert(13);
             TS_ASSERT_EQUALS(local_boxes_to_box_0, correct_answer_0);
         }
-        if (box_collection.GetBoxOwnership(13))
+        if (PetscTools::GetNumProcs() <= 3u)
         {
-            std::set<unsigned> local_boxes_to_box_13 = box_collection.GetLocalBoxes(13);
-            std::set<unsigned> correct_answer_13;
-            correct_answer_13.insert(5);
-            correct_answer_13.insert(6);
-            correct_answer_13.insert(7);
-            correct_answer_13.insert(8);
-            correct_answer_13.insert(13);
-            correct_answer_13.insert(14);
-            correct_answer_13.insert(15);
-            correct_answer_13.insert(16);
-            correct_answer_13.insert(17);
-            correct_answer_13.insert(22);
-            correct_answer_13.insert(23);
-            correct_answer_13.insert(24);
-            correct_answer_13.insert(25);
-            correct_answer_13.insert(26);
-            if (PetscTools::GetNumProcs() > 1)
+            // If there are more processors, then there are more slices and hence more boxes.
+            // We won't test for that here - there is a 2-d equivalent test.
+            if (box_collection.GetBoxOwnership(13))
             {
-                correct_answer_13.insert(18);
-                correct_answer_13.insert(19);
-                correct_answer_13.insert(20);
-                correct_answer_13.insert(21);
+                std::set<unsigned> local_boxes_to_box_13 = box_collection.GetLocalBoxes(13);
+                std::set<unsigned> correct_answer_13;
+                correct_answer_13.insert(5);
+                correct_answer_13.insert(6);
+                correct_answer_13.insert(7);
+                correct_answer_13.insert(8);
+                correct_answer_13.insert(13);
+                correct_answer_13.insert(14);
+                correct_answer_13.insert(15);
+                correct_answer_13.insert(16);
+                correct_answer_13.insert(17);
+                correct_answer_13.insert(22);
+                correct_answer_13.insert(23);
+                correct_answer_13.insert(24);
+                correct_answer_13.insert(25);
+                correct_answer_13.insert(26);
+                if (PetscTools::GetNumProcs() > 1)
+                {
+                    correct_answer_13.insert(18);
+                    correct_answer_13.insert(19);
+                    correct_answer_13.insert(20);
+                    correct_answer_13.insert(21);
+                }
+                TS_ASSERT_EQUALS(local_boxes_to_box_13, correct_answer_13);
             }
-            TS_ASSERT_EQUALS(local_boxes_to_box_13, correct_answer_13);
-        }
-        if (box_collection.GetBoxOwnership(34))
-        {
-            std::set<unsigned> local_boxes_to_box_34 = box_collection.GetLocalBoxes(34);
-            std::set<unsigned> correct_answer_34;
-            correct_answer_34.insert(26);
-            correct_answer_34.insert(34);
-            correct_answer_34.insert(35);
-            if (PetscTools::GetNumProcs() == 3)
-            {
-                correct_answer_34.insert(21);
-                correct_answer_34.insert(22);
-                correct_answer_34.insert(23);
-                correct_answer_34.insert(24);
-                correct_answer_34.insert(25);
-            }
-            TS_ASSERT_EQUALS(local_boxes_to_box_34, correct_answer_34);
-        }
-        if (box_collection.GetBoxOwnership(35))
-        {
-            std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
-            std::set<unsigned> correct_answer_35;
-            correct_answer_35.insert(35);
-            if (PetscTools::GetNumProcs() == 3)
-            {
-                correct_answer_35.insert(22);
-                correct_answer_35.insert(23);
-                correct_answer_35.insert(25);
-                correct_answer_35.insert(26);
-            }
-            TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
-        }
 
+            if (box_collection.GetBoxOwnership(34))
+            {
+                std::set<unsigned> local_boxes_to_box_34 = box_collection.GetLocalBoxes(34);
+                std::set<unsigned> correct_answer_34;
+                correct_answer_34.insert(26);
+                correct_answer_34.insert(34);
+                correct_answer_34.insert(35);
+                if (PetscTools::GetNumProcs() == 3)
+                {
+                    correct_answer_34.insert(21);
+                    correct_answer_34.insert(22);
+                    correct_answer_34.insert(23);
+                    correct_answer_34.insert(24);
+                    correct_answer_34.insert(25);
+                }
+                TS_ASSERT_EQUALS(local_boxes_to_box_34, correct_answer_34);
+            }
+
+            if (box_collection.GetBoxOwnership(35))
+            {
+                std::set<unsigned> local_boxes_to_box_35 = box_collection.GetLocalBoxes(35);
+                std::set<unsigned> correct_answer_35;
+                correct_answer_35.insert(35);
+                if (PetscTools::GetNumProcs() == 3)
+                {
+                    correct_answer_35.insert(22);
+                    correct_answer_35.insert(23);
+                    correct_answer_35.insert(25);
+                    correct_answer_35.insert(26);
+                }
+                TS_ASSERT_EQUALS(local_boxes_to_box_35, correct_answer_35);
+            }
+        }
         // Test whether we can correctly identify interior boxes
         if (PetscTools::IsSequential())
         {
@@ -1960,19 +1999,20 @@ public:
          std::string archive_file = "box_collection.arch";
          unsigned num_boxes = 0;
 
+         double cut_off_length = 1.6;
+         c_vector<double, 6> domain_size;
+         for (unsigned i=0; i<3; i++)
          {
-             double cut_off_length = 1.6;
-             c_vector<double, 6> domain_size;
+             domain_size[2*i] = 0.0;
+             domain_size[2*i+1] = 4.8;
+         }
 
-             for (unsigned i=0; i<3; i++)
-             {
-                 domain_size[2*i] = 0.0;
-                 domain_size[2*i+1] = 4.8;
-             }
-
+         {
              DistributedBoxCollection<3>* p_box_collection = new DistributedBoxCollection<3>(cut_off_length, domain_size);
              p_box_collection->SetupLocalBoxesHalfOnly();
              num_boxes = p_box_collection->GetNumBoxes();
+             // 4.8/1.6 = 3, so expect 3 times 3x3slices
+             TS_ASSERT_EQUALS(num_boxes, 9u * std::max(3u, PetscTools::GetNumProcs()));
 
              {
                  // Create an output archive
@@ -1988,6 +2028,12 @@ public:
              delete p_box_collection;
          }
 
+         // Note if the domain has been swollen:
+         if (PetscTools::GetNumProcs() > 3u)
+         {
+             domain_size[2*2+1] = 1.6 * PetscTools::GetNumProcs();
+         }
+
          {
              DistributedBoxCollection<3>* p_box_collection;
 
@@ -2001,7 +2047,7 @@ public:
              for (unsigned i=0; i<3; i++)
              {
                  TS_ASSERT_DELTA(0.0, p_box_collection->rGetDomainSize()[2*i], 1e-4);
-                 TS_ASSERT_DELTA(4.8, p_box_collection->rGetDomainSize()[2*i+1], 1e-4);
+                 TS_ASSERT_DELTA(domain_size[2*i+1], p_box_collection->rGetDomainSize()[2*i+1], 1e-4);
              }
 
              delete p_box_collection;
