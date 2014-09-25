@@ -93,7 +93,7 @@ c_matrix<double,3*(ELEMENT_DIM+1),3*(ELEMENT_DIM+1)>
     // first equation, third unknown
     matrix_slice<c_matrix<double, 3*ELEMENT_DIM+3, 3*ELEMENT_DIM+3> >
     slice300(ret, slice (0, 3, ELEMENT_DIM+1), slice (2, 3, ELEMENT_DIM+1));
-    slice300 = - (Am1*Cm1/delta_t)*basis_outer_prod;
+    slice300 = grad_phi_sigma_i_first_cell_grad_phi;
 
     // second equation, first unknown
     matrix_slice<c_matrix<double, 3*ELEMENT_DIM+3, 3*ELEMENT_DIM+3> >
@@ -108,22 +108,22 @@ c_matrix<double,3*(ELEMENT_DIM+1),3*(ELEMENT_DIM+1)>
     // second equation, third unknown
     matrix_slice<c_matrix<double, 3*ELEMENT_DIM+3, 3*ELEMENT_DIM+3> >
     slice030(ret, slice (1, 3, ELEMENT_DIM+1), slice (2, 3, ELEMENT_DIM+1));
-    slice030 = - (Am2*Cm2/delta_t)*basis_outer_prod;
+    slice030 = grad_phi_sigma_i_second_cell_grad_phi;
 
     // third equation, first unknown
     matrix_slice<c_matrix<double, 3*ELEMENT_DIM+3, 3*ELEMENT_DIM+3> >
     slice001(ret, slice (2, 3, ELEMENT_DIM+1), slice (0, 3, ELEMENT_DIM+1));
-    slice001 =   - grad_phi_sigma_i_first_cell_grad_phi;
+    slice001 =   grad_phi_sigma_i_first_cell_grad_phi;
 
     // third equation, second unknown
     matrix_slice<c_matrix<double, 3*ELEMENT_DIM+3, 3*ELEMENT_DIM+3> >
     slice002(ret, slice (2, 3, ELEMENT_DIM+1), slice (1, 3, ELEMENT_DIM+1));
-    slice002 =  - grad_phi_sigma_i_second_cell_grad_phi;
+    slice002 =  grad_phi_sigma_i_second_cell_grad_phi;
 
     // third equation, third unknown
     matrix_slice<c_matrix<double, 3*ELEMENT_DIM+3, 3*ELEMENT_DIM+3> >
     slice003(ret, slice (2, 3, ELEMENT_DIM+1), slice (2, 3, ELEMENT_DIM+1));
-    slice003 =  - grad_phi_sigma_e_grad_phi;
+    slice003 =  grad_phi_sigma_e_grad_phi + grad_phi_sigma_i_first_cell_grad_phi + grad_phi_sigma_i_second_cell_grad_phi;
 
     return ret;
 }

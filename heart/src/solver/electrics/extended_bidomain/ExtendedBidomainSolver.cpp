@@ -123,7 +123,6 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     {
         double V_first_cell = distributed_current_solution_v_first_cell[index];
         double V_second_Cell = distributed_current_solution_v_second_cell[index];
-        double Phi_e = distributed_current_solution_phi_e[index];
 
         double i_ionic_first_cell = this->mpExtendedBidomainTissue->rGetIionicCacheReplicated()[index.Global];
         double i_ionic_second_cell = this->mpExtendedBidomainTissue->rGetIionicCacheReplicatedSecondCell()[index.Global];
@@ -132,8 +131,8 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
         double extracellular_stimulus =  this->mpExtendedBidomainTissue->rGetExtracellularStimulusCacheReplicated()[index.Global];
         double g_gap = this->mpExtendedBidomainTissue->rGetGgapCacheReplicated()[index.Global];
         double delta_t = PdeSimulationTime::GetPdeTimeStep();
-        dist_vec_matrix_based_v_first_cell[index] = Am1*Cm1*V_first_cell/delta_t - Am1*Cm1*Phi_e/delta_t - Am1*i_ionic_first_cell + AmGap*g_gap*(V_second_Cell - V_first_cell) -  intracellular_stimulus_first_cell;
-        dist_vec_matrix_based_v_second_cell[index] = Am2*Cm2*V_second_Cell/delta_t- Am2*Cm2*Phi_e/delta_t - Am2*i_ionic_second_cell + AmGap*g_gap*(V_first_cell - V_second_Cell) - intracellular_stimulus_second_cell;
+        dist_vec_matrix_based_v_first_cell[index] = Am1*Cm1*V_first_cell/delta_t  - Am1*i_ionic_first_cell + AmGap*g_gap*(V_second_Cell - V_first_cell) -  intracellular_stimulus_first_cell;
+        dist_vec_matrix_based_v_second_cell[index] = Am2*Cm2*V_second_Cell/delta_t  - Am2*i_ionic_second_cell + AmGap*g_gap*(V_first_cell - V_second_Cell) - intracellular_stimulus_second_cell;
 
         if (this->mpExtendedBidomainTissue->HasTheUserSuppliedExtracellularStimulus() )
         {

@@ -320,21 +320,22 @@ void ExtendedBidomainProblem<DIM>::WriteInfo(double time)
         std::cout << "Solved to time " << time << "\n" << std::flush;
     }
 
-    double phi_i_max_first_cell, phi_i_min_first_cell, phi_i_max_second_cell, phi_i_min_second_cell, phi_e_min, phi_e_max;
+    double V_max_first_cell, V_min_first_cell, V_max_second_cell, V_min_second_cell, phi_e_min, phi_e_max;
 
-    VecStrideMax( this->mSolution, 0, PETSC_NULL, &phi_i_max_first_cell );
-    VecStrideMin( this->mSolution, 0, PETSC_NULL, &phi_i_min_first_cell );
+    VecStrideMax( this->mSolution, 0, PETSC_NULL, &V_max_first_cell );
+    VecStrideMin( this->mSolution, 0, PETSC_NULL, &V_min_first_cell );
 
-    VecStrideMax( this->mSolution, 1, PETSC_NULL, &phi_i_max_second_cell );
-    VecStrideMin( this->mSolution, 1, PETSC_NULL, &phi_i_min_second_cell );
+    VecStrideMax( this->mSolution, 1, PETSC_NULL, &V_max_second_cell );
+    VecStrideMin( this->mSolution, 1, PETSC_NULL, &V_min_second_cell );
 
     VecStrideMax( this->mSolution, 2, PETSC_NULL, &phi_e_max );
     VecStrideMin( this->mSolution, 2, PETSC_NULL, &phi_e_min );
 
+    ///\todo #2597 these should be min, max.  Check the output.    
     if (PetscTools::AmMaster())
     {
-        std::cout << " Phi_i first cell = " << "[" <<phi_i_max_first_cell << ", " << phi_i_min_first_cell << "]" << ";\n"
-                  << " Phi_i second cell = " << "[" <<phi_i_max_second_cell << ", " << phi_i_min_second_cell << "]" << ";\n"
+        std::cout << " V first cell = " << "[" <<V_max_first_cell << ", " << V_min_first_cell << "]" << ";\n"
+                  << " V second cell = " << "[" <<V_max_second_cell << ", " << V_min_second_cell << "]" << ";\n"
                   << " Phi_e = " << "[" <<phi_e_max << ", " << phi_e_min << "]" << ";\n"
                   << std::flush;
     }
@@ -390,8 +391,8 @@ void ExtendedBidomainProblem<DIM>::WriteOneStep(double time, Vec voltageVec)
     DistributedVector wrapped_ordered_solution = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(ordered_voltages);
     DistributedVector wrapped_solution = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(voltageVec);
 
-    DistributedVector::Stripe phi_i_first_cell_stripe(wrapped_solution,0);
-    DistributedVector::Stripe phi_i_second_cell_stripe(wrapped_solution,1);
+    DistributedVector::Stripe V_first_cell_stripe(wrapped_solution,0);
+    DistributedVector::Stripe V_second_cell_stripe(wrapped_solution,1);
     DistributedVector::Stripe phi_e_stripe(wrapped_solution,2);
 
     DistributedVector::Stripe wrapped_ordered_solution_first_stripe(wrapped_ordered_solution,0);
@@ -402,8 +403,8 @@ void ExtendedBidomainProblem<DIM>::WriteOneStep(double time, Vec voltageVec)
          index != wrapped_solution.End();
          ++index)
     {
-        wrapped_ordered_solution_first_stripe[index] = phi_i_first_cell_stripe[index] - phi_e_stripe[index];
-        wrapped_ordered_solution_second_stripe[index] = phi_i_second_cell_stripe[index] - phi_e_stripe[index];
+        wrapped_ordered_solution_first_stripe[index] = V_first_cell_stripe[index];
+        wrapped_ordered_solution_second_stripe[index] = V_second_cell_stripe[index];
         wrapped_ordered_solution_third_stripe[index] = phi_e_stripe[index];
     }
     wrapped_solution.Restore();

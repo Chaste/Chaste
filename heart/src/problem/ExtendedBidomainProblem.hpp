@@ -71,14 +71,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The solution vector used for calculations is arranged as a striped vector with this order:
  *
- *  - Intracellular potential of the first cell
- *  - Intracellular potential of the second cell
- *  - Extracellular potential
- *
- * However, the OUTPUT is rearranged as follows. The rearrangament occurs AFTER the solution is calculated:
- *
- *  - Transmembrane potential of the first cell (Intracellular potential of the first cell - Extracellular potential)
- *  - Transmembrane potential of the second cell (Intracellular potential of the second cell - Extracellular potential)
+ *  - Transmembrane potential of the first cell
+ *  - Transmembrane potential of the second cell
  *  - Extracellular potential
  *
  *  Unlike a bidomain problem, a node-wise extracellular stimulus can be set up in extended bidomain problems in absence of a bath.
@@ -150,13 +144,13 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             writer.EndDefineMode();
             writer.PutUnlimitedVariable(0.0);
 
-            //re-arrange to write out voltages...
+            ///\todo #2597  We used to re-arrange to write out voltages...but now they are given
             Vec voltages_to_be_written =  this->mpMesh->GetDistributedVectorFactory()->CreateVec(3);
             DistributedVector wrapped_voltages_to_be_written = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(voltages_to_be_written);
 
             DistributedVector distr_solution = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(this->mSolution);
-            DistributedVector::Stripe phi_i_first_cell_stripe(distr_solution,0);
-            DistributedVector::Stripe phi_i_second_cell_stripe(distr_solution,1);
+            DistributedVector::Stripe Vm_first_cell_stripe(distr_solution,0);
+            DistributedVector::Stripe Vm_second_cell_stripe(distr_solution,1);
             DistributedVector::Stripe phi_e_stripe(distr_solution,2);
 
 
@@ -168,8 +162,10 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
                  index != distr_solution.End();
                  ++index)
             {
-                wrapped_voltages_to_be_written_first_stripe[index] = phi_i_first_cell_stripe[index] - phi_e_stripe[index];
-                wrapped_voltages_to_be_written_second_stripe[index] = phi_i_second_cell_stripe[index] - phi_e_stripe[index];
+                ///\todo #2597 This used to be a calculation (phi_i to V_m).  Is it still required or can we do writer.PutStripedVector(variable_ids, this->mSolution);
+                /// check the bidomain code?
+                wrapped_voltages_to_be_written_first_stripe[index] = Vm_first_cell_stripe[index];
+                wrapped_voltages_to_be_written_second_stripe[index] = Vm_second_cell_stripe[index];
                 wrapped_voltages_to_be_written_third_stripe[index] = phi_e_stripe[index];
             }
             distr_solution.Restore();
@@ -241,17 +237,18 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             DistributedVector vm_first_cell_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(V);
             DistributedVector vm_second_cell_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(V_2);
             DistributedVector phie_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(phie);
+            ///\todo #2597  We used to re-arrange to write out voltages...but now they are given
 
-            DistributedVector::Stripe mSolution_phi_1(mSolution_distri,0);
-            DistributedVector::Stripe mSolution_phi_2(mSolution_distri,1);
+            DistributedVector::Stripe mSolution_V_1(mSolution_distri,0);
+            DistributedVector::Stripe mSolution_V_2(mSolution_distri,1);
             DistributedVector::Stripe mSolution_phie(mSolution_distri,2);
 
             for (DistributedVector::Iterator index = mSolution_distri.Begin();
                  index != mSolution_distri.End();
                  ++index)
             {
-                mSolution_phi_1[index] = vm_first_cell_distri[index] + phie_distri[index];//phi_i = Vm + phi_e
-                mSolution_phi_2[index] = vm_second_cell_distri[index] + phie_distri[index];
+            	mSolution_V_1[index] = vm_first_cell_distri[index];//phi_i = Vm + phi_e
+            	mSolution_V_2[index] = vm_second_cell_distri[index];
                 mSolution_phie[index] = phie_distri[index];
             }
             PetscTools::Destroy(V);
@@ -488,11 +485,9 @@ public:
 
     /**
      * Write one timestep of output data to the primary results file.
-     * The solution of the problem is in term of Phi_i_1, Phi_i_2 and Phi_e
-     * (i.e., intracellular potential of the two cells plus extracellular potential).
-     * This method works out the transmembrane potential of the two cells (V and V_2)
-     * calculated as V = Phi_i_1 - Phi_e and V_2 = Phi_i_2-Phi_e.
-     * It then writes to file V, V_2 and Phi_e.
+     * The solution of the problem is in terms of V_1, V_2 and Phi_e
+     * (i.e., transmembrane potentials of the two cells plus extracellular potential).
+     * It then writes to file V_1, V_2 and Phi_e.
      *
      * It also writes any extra variable (defined by HeartConfig).
      * Note that it does the job by calling the method in the parent class.

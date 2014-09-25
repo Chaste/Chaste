@@ -118,9 +118,9 @@ public:
 
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,10.0);
 
-        HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-4);
-        HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
+        //HeartConfig::Instance()->SetKSPSolver("gmres");
+        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
+        HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
     }
 
     /**
@@ -181,10 +181,19 @@ public:
          * directly from Martin's code. A plot of Chaste results versus Martin's result (at node 50) is stored
          * in the file 1DChasteVsMartin.eps for reference.
          *
+         * \todo #2597 Reproduce this graph with Martin v Chaste phi_i (old) v Chaste V_m (new).
+         *
          */
-        TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/extendedbidomain", "1DValid", false,
-                                                 dir, filename, true,
-                                                 1.7e-3));
+         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/extendedbidomain", "1DValid", false,
+                                                dir, filename, true,
+                                                0.2));
+         /*
+          * Here we compare the new formulation (V_m1, V_m2, phi_e)
+          *  with the previous formulation (phi_i1, phi_i2, phi_e) running with GMRES and an absolute KSP tolerance of 1e-8.
+          */
+         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/extendedbidomain", "extended1d_previous_chaste_formulation_abs_tol_1e-8", false,
+                                                dir, filename, true,
+                                                1e-5));
     }
 
     // Test the functionality for outputting the values of requested cell state variables
@@ -200,7 +209,7 @@ public:
         HeartConfig::Instance()->SetOutputFilenamePrefix(filename);
 
         HeartConfig::Instance()->SetSimulationDuration(0.1);
-        HeartConfig::Instance()->SetKSPSolver("gmres");
+        // HeartConfig::Instance()->SetKSPSolver("gmres");
         HeartConfig::Instance()->SetUseAbsoluteTolerance(2e-4);
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
 

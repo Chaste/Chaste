@@ -260,9 +260,9 @@ public:
                 {
                     ap_generated = true;
                 }
-                TS_ASSERT_DELTA(voltage_first_cell_extended[index] , voltage_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(voltage_first_cell_extended[index] , voltage_bidomain[index], 2e-3);
                 TS_ASSERT_LESS_THAN(voltage_second_cell_extended[index] , -83.5);//second unstimulated cell should be at rest
-                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 2e-3);
             }
         }
         TS_ASSERT_EQUALS(ap_generated, true);
@@ -328,9 +328,9 @@ public:
                 {
                     ap_generated = true;
                 }
-                TS_ASSERT_DELTA(voltage_second_cell_extended[index] , voltage_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(voltage_second_cell_extended[index] , voltage_bidomain[index], 2e-3);
                 TS_ASSERT_LESS_THAN(voltage_first_cell_extended[index] , -83.5);//first unstimulated cell should be at rest
-                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 2e-3);
             }
         }
         TS_ASSERT_EQUALS(ap_generated, true);
@@ -409,9 +409,9 @@ public:
                 {
                     ap_generated = true;
                 }
-                TS_ASSERT_DELTA(voltage_second_cell_extended[index] , voltage_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(voltage_second_cell_extended[index] , voltage_bidomain[index], 2e-3);
                 TS_ASSERT_LESS_THAN(voltage_first_cell_extended[index] , -83.5);//first unstimulated cell should be at rest
-                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 2e-3);
             }
         }
         TS_ASSERT_EQUALS(ap_generated, true);
@@ -504,9 +504,9 @@ public:
                 {
                     ap_generated = true;
                 }
-                TS_ASSERT_DELTA(voltage_second_cell_extended[index] , voltage_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(voltage_second_cell_extended[index] , voltage_bidomain[index], 2e-3);
                 TS_ASSERT_LESS_THAN(voltage_first_cell_extended[index] , -83.5);//first unstimulated cell should be at rest
-                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 1e-3);
+                TS_ASSERT_DELTA(phi_e_extended[index] , phi_e_bidomain[index], 2e-3);
             }
         }
         TS_ASSERT_EQUALS(ap_generated, true);
@@ -524,7 +524,7 @@ public:
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1400.0);
         HeartConfig::Instance()->SetOdeTimeStep(0.01);
         HeartConfig::Instance()->SetCapacitance(1.0);
-        HeartConfig::Instance()->SetKSPSolver("gmres");
+        //HeartConfig::Instance()->SetKSPSolver("gmres");
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
         HeartConfig::Instance()->SetSimulationDuration(5.0);
 
@@ -596,8 +596,8 @@ public:
             }
         }
 
-        TS_ASSERT_DELTA(first_cell_peak, -67.9974, 1e-4);
-        TS_ASSERT_DELTA(second_cell_peak, -57.7988, 1e-4);
+        TS_ASSERT_DELTA(first_cell_peak, -67.9974, 2e-4);
+        TS_ASSERT_DELTA(second_cell_peak, -57.7988, 2e-4);
 
 
     }

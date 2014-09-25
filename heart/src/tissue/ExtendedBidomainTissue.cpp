@@ -513,16 +513,17 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
     HeartEventHandler::BeginEvent(HeartEventHandler::SOLVE_ODES);
 
     DistributedVector dist_solution = this->mpDistributedVectorFactory->CreateDistributedVector(existingSolution);
-    DistributedVector::Stripe phi_i_first_cell(dist_solution, 0);
-    DistributedVector::Stripe phi_i_second_cell(dist_solution, 1);
+    DistributedVector::Stripe V_first_cell(dist_solution, 0);
+    DistributedVector::Stripe V_second_cell(dist_solution, 1);
     DistributedVector::Stripe phi_e(dist_solution, 2);
 
     for (DistributedVector::Iterator index = dist_solution.Begin();
          index != dist_solution.End();
          ++index)
     {
-        double voltage_first_cell = phi_i_first_cell[index] - phi_e[index];
-        double voltage_second_cell = phi_i_second_cell[index] - phi_e[index];
+        ///\todo #2597 remove ghost variables
+        double voltage_first_cell = V_first_cell[index];
+        double voltage_second_cell = V_second_cell[index];
 
         // overwrite the voltage with the input value
         this->mCellsDistributed[index.Local]->SetVoltage( voltage_first_cell );
