@@ -119,7 +119,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.1,0.1,10.0);
 
         //HeartConfig::Instance()->SetKSPSolver("gmres");
-        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-6);
+        HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-5);
         HeartConfig::Instance()->SetKSPPreconditioner("bjacobi");
     }
 
