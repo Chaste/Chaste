@@ -300,15 +300,10 @@ public:
     void TestCommandLineArgumentsParrotting() throw(Exception)
     {
         std::string verb = "--verbose";
-        try
+        if ( CommandLineArguments::Instance()->OptionExists(verb) )
         {
-            CommandLineArguments::Instance()->OptionExists(verb);
             bool is_verbose = CommandLineArguments::Instance()->GetBoolCorrespondingToOption(verb);
             std::cout << "You have successfully set "<< verb << " to take the value "<< is_verbose<<".\n";
-        }
-        catch (const Exception&)
-        {
-            std::cout << "Command line argument "<< verb << " was not set.\n";
         }
     }
 

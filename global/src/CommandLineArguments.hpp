@@ -108,7 +108,7 @@ public:
      * So you can use OptionExists() to avoid Exceptions in your code when using the other public methods.
      *
      * @param rOption  the option name as a string.
-     * @param throwIfNone  Whether to give an exception if there are no arguments for this rOption (defaults to true).
+     * @param throwIfNone  Whether to give an exception if there are no arguments for this rOption (defaults to false).
      * @return the number of arguments following this option.
      */
     int GetNumberOfArgumentsForOption(const std::string& rOption, bool throwIfNone=false);
