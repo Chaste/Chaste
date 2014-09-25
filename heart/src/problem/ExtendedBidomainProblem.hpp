@@ -130,6 +130,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
         archive & has_solution;
         if (has_solution)
         {
+            // Please see the todo tag (#1317) in AbstractCardiacProblem
             Hdf5DataWriter writer(*this->mpMesh->GetDistributedVectorFactory(), ArchiveLocationInfo::GetArchiveRelativePath(), "AbstractCardiacProblem_mSolution", false);
             writer.DefineFixedDimension(this->mpMesh->GetDistributedVectorFactory()->GetProblemSize());
             writer.DefineUnlimitedDimension("Time", "msec", 1);
@@ -144,35 +145,8 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             writer.EndDefineMode();
             writer.PutUnlimitedVariable(0.0);
 
-            ///\todo #2597  We used to re-arrange to write out voltages...but now they are given
-            Vec voltages_to_be_written =  this->mpMesh->GetDistributedVectorFactory()->CreateVec(3);
-            DistributedVector wrapped_voltages_to_be_written = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(voltages_to_be_written);
 
-            DistributedVector distr_solution = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(this->mSolution);
-            DistributedVector::Stripe Vm_first_cell_stripe(distr_solution,0);
-            DistributedVector::Stripe Vm_second_cell_stripe(distr_solution,1);
-            DistributedVector::Stripe phi_e_stripe(distr_solution,2);
-
-
-            DistributedVector::Stripe wrapped_voltages_to_be_written_first_stripe(wrapped_voltages_to_be_written,0);
-            DistributedVector::Stripe wrapped_voltages_to_be_written_second_stripe(wrapped_voltages_to_be_written,1);
-            DistributedVector::Stripe wrapped_voltages_to_be_written_third_stripe(wrapped_voltages_to_be_written,2);
-
-            for (DistributedVector::Iterator index = distr_solution.Begin();
-                 index != distr_solution.End();
-                 ++index)
-            {
-                ///\todo #2597 This used to be a calculation (phi_i to V_m).  Is it still required or can we do writer.PutStripedVector(variable_ids, this->mSolution);
-                /// check the bidomain code?
-                wrapped_voltages_to_be_written_first_stripe[index] = Vm_first_cell_stripe[index];
-                wrapped_voltages_to_be_written_second_stripe[index] = Vm_second_cell_stripe[index];
-                wrapped_voltages_to_be_written_third_stripe[index] = phi_e_stripe[index];
-            }
-            distr_solution.Restore();
-            wrapped_voltages_to_be_written.Restore();
-
-            writer.PutStripedVector(variable_ids, voltages_to_be_written);
-            PetscTools::Destroy(voltages_to_be_written);
+            writer.PutStripedVector(variable_ids, this->mSolution);
         }
     }
 
@@ -237,7 +211,6 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             DistributedVector vm_first_cell_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(V);
             DistributedVector vm_second_cell_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(V_2);
             DistributedVector phie_distri = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(phie);
-            ///\todo #2597  We used to re-arrange to write out voltages...but now they are given
 
             DistributedVector::Stripe mSolution_V_1(mSolution_distri,0);
             DistributedVector::Stripe mSolution_V_2(mSolution_distri,1);
@@ -247,7 +220,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
                  index != mSolution_distri.End();
                  ++index)
             {
-            	mSolution_V_1[index] = vm_first_cell_distri[index];//phi_i = Vm + phi_e
+            	mSolution_V_1[index] = vm_first_cell_distri[index];
             	mSolution_V_2[index] = vm_second_cell_distri[index];
                 mSolution_phie[index] = phie_distri[index];
             }

@@ -169,7 +169,8 @@ private:
         archive & has_solution;
         if (has_solution)
         {
-            /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods for Mono and BidomainProblem
+            /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods for Mono and BidomainProblem.
+            /// Note that extended_bidomain has its own version of this code.
             Hdf5DataWriter writer(*mpMesh->GetDistributedVectorFactory(), ArchiveLocationInfo::GetArchiveRelativePath(), "AbstractCardiacProblem_mSolution", false);
             writer.DefineFixedDimension(mpMesh->GetDistributedVectorFactory()->GetProblemSize());
             writer.DefineUnlimitedDimension("Time", "msec", 1);
@@ -262,7 +263,7 @@ private:
         archive & has_solution;
         if ((has_solution) && PROBLEM_DIM < 3)
         {
-            /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods fo Mono and BidomainProblem
+            /// \todo #1317 code for saving/loading mSolution is PROBLEM_DIM specific, move it into the save/load methods for Mono and BidomainProblem.  (ExtendedBidomain has its own already.)
             /// \todo #1317 is there a reason we can't use PETSc's load/save vector functionality?
             mSolution = mpMesh->GetDistributedVectorFactory()->CreateVec(PROBLEM_DIM);
             DistributedVector mSolution_distri = mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(mSolution);

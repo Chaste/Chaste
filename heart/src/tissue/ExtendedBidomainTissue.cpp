@@ -521,13 +521,9 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
          index != dist_solution.End();
          ++index)
     {
-        ///\todo #2597 remove ghost variables
-        double voltage_first_cell = V_first_cell[index];
-        double voltage_second_cell = V_second_cell[index];
-
         // overwrite the voltage with the input value
-        this->mCellsDistributed[index.Local]->SetVoltage( voltage_first_cell );
-        mCellsDistributedSecondCell[index.Local]->SetVoltage( voltage_second_cell );
+        this->mCellsDistributed[index.Local]->SetVoltage( V_first_cell[index] );
+        mCellsDistributedSecondCell[index.Local]->SetVoltage( V_second_cell[index] );
         try
         {
             // solve
