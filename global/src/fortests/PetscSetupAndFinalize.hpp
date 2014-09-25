@@ -52,7 +52,8 @@ class PetscSetup : public CxxTest::GlobalFixture
 {
 public:
 
-    /** Standard setup method for PETSc.
+    /**
+     * Standard setup method for PETSc.
      * @return true (by CxxTest convention)
      */
     bool setUpWorld()
@@ -60,12 +61,13 @@ public:
         PetscSetupUtils::CommonSetup();
         return true;
     }
-    /** Clean up PETSc after running all tests.
-     * * @return true (by CxxTest convention)
+    /**
+     * Clean up PETSc after running all tests.
+     * @return true (by CxxTest convention)
      */
     bool tearDownWorld()
     {
-        ///Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
+        /// Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
         PetscSetupUtils::CommonFinalize();
         return true;
     }

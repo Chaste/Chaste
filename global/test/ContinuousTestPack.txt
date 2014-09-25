@@ -1,5 +1,6 @@
 TestArchivingHelperClasses.hpp
 TestArchiving.hpp
+TestCitations.hpp
 TestCommandLineArguments.hpp
 TestCellBasedEventHandler.hpp
 TestChasteBuildInfo.hpp
@@ -30,4 +31,3 @@ TestTimer.hpp
 TestTimeStepper.hpp
 TestWarnings.hpp
 TestWritingTestsTutorial.hpp
-TestCitations.hpp

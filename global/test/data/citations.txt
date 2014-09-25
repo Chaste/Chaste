@@ -17,13 +17,14 @@ If you publish results based on this computation please cite the following:
   Year = {1997}}
 
 @article{mirams2013chaste,
-  author    = {Mirams, Gary R and Arthurs, Christopher J and Bernabeu, Miguel O and Bordas, Rafel and Cooper, Jonathan and Corrias, Alberto and Davit, Yohan and Dunn, Sara-Jane and Fletcher, Alexander G and Harvey, Daniel G and others},
+  author    = {Mirams, G.R. and Arthurs, C.J. and Bernabeu, M.O. and Bordas, R. and Cooper, J. and Corrias, A. and Davit, Y. and Dunn, S-J. and Fletcher, A.G. and Harvey, D.G. and Marsh, M.E. and Osborne, J.M. and Pathmanathan, P. and Pitt-Francis, J. and Southern, J. and Zemzemi, N. and Gavaghan, D.J.},
   title     = {Chaste: an open source C++ library for computational physiology and biology},
   journal   = {PLoS computational biology},
   volume    = {9},
   number    = {3},
   pages     = {e1002970},
   year      = {2013},
-  publisher = {Public Library of Science}}
+  publisher = {Public Library of Science}
+}
 
 ===========================================================================

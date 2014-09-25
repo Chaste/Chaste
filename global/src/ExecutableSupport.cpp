@@ -57,6 +57,7 @@ typedef std::pair<std::string, std::string> StringPair;
 #include "CommandLineArguments.hpp"
 #include "Exception.hpp"
 #include "PetscTools.hpp"
+#include "PetscSetupUtils.hpp"
 #include "PetscException.hpp"
 #include "ChasteSerialization.hpp"
 
@@ -432,5 +433,5 @@ void ExecutableSupport::Print(const std::string& rMessage)
 void ExecutableSupport::FinalizePetsc()
 {
     // Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
-    PetscFinalize();
+    PetscSetupUtils::CommonFinalize();
 }

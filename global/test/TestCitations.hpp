@@ -51,14 +51,17 @@ public:
     {
         // Make a directory to output the citations file
         OutputFileHandler output_dir("TestCitations");
-        FileFinder output_file(output_dir.GetOutputDirectoryFullPath()+"citations.txt");
+        FileFinder output_file(output_dir.GetOutputDirectoryFullPath() + "citations.txt");
+
         // Turn on citations with argument
-        CommandLineArgumentsMocker mocker("-citations "+output_file.GetAbsolutePath());
+        CommandLineArgumentsMocker mocker("-citations " + output_file.GetAbsolutePath());
         PetscSetupUtils::CommonSetup(); // This automatically includes some citations
         PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
+
         // Check
         FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
         FileComparison check_files(output_file, reference_citations);
+        check_files.CompareFiles();
     }
 };
 

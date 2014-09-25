@@ -98,16 +98,17 @@ const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
 /* Main Chaste citation */
 static PetscBool ChasteCite = PETSC_FALSE;
 const char ChasteCitation[] = "@article{mirams2013chaste,\n"
-                              "  author    = {Mirams, Gary R and Arthurs, Christopher J and Bernabeu, Miguel O and "
-                              "Bordas, Rafel and Cooper, Jonathan and Corrias, Alberto and Davit, Yohan and Dunn, Sara-Jane "
-                              "and Fletcher, Alexander G and Harvey, Daniel G and others},\n"
+                              "  author    = {Mirams, G.R. and Arthurs, C.J. and Bernabeu, M.O. and Bordas, R. and Cooper, "
+                              "J. and Corrias, A. and Davit, Y. and Dunn, S-J. and Fletcher, A.G. and Harvey, D.G. and "
+                              "Marsh, M.E. and Osborne, J.M. and Pathmanathan, P. and Pitt-Francis, J. and Southern, J. "
+                              "and Zemzemi, N. and Gavaghan, D.J.},\n"
                               "  title     = {Chaste: an open source C++ library for computational physiology and biology},\n"
                               "  journal   = {PLoS computational biology},\n"
                               "  volume    = {9},\n"
                               "  number    = {3},\n"
                               "  pages     = {e1002970},\n"
                               "  year      = {2013},\n"
-                              "  publisher = {Public Library of Science}}\n";
+                              "  publisher = {Public Library of Science}\n}\n";
 
 void PetscSetupUtils::InitialisePetsc()
 {
