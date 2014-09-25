@@ -331,12 +331,11 @@ void ExtendedBidomainProblem<DIM>::WriteInfo(double time)
     VecStrideMax( this->mSolution, 2, PETSC_NULL, &phi_e_max );
     VecStrideMin( this->mSolution, 2, PETSC_NULL, &phi_e_min );
 
-    ///\todo #2597 these should be min, max.  Check the output.    
     if (PetscTools::AmMaster())
     {
-        std::cout << " V first cell = " << "[" <<V_max_first_cell << ", " << V_min_first_cell << "]" << ";\n"
-                  << " V second cell = " << "[" <<V_max_second_cell << ", " << V_min_second_cell << "]" << ";\n"
-                  << " Phi_e = " << "[" <<phi_e_max << ", " << phi_e_min << "]" << ";\n"
+        std::cout << " V first cell = "  << "[" <<V_min_first_cell << ",   " << V_max_first_cell << "]" << ";\n"
+                  << " V second cell = " << "[" <<V_min_second_cell << ", " << V_max_second_cell << "]" << ";\n"
+                  << " Phi_e = "         << "[" <<phi_e_min << ", "         << phi_e_max << "]" << ";\n"
                   << std::flush;
     }
 }

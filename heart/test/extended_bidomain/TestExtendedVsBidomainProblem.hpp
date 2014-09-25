@@ -168,7 +168,7 @@ public:
  *   We test both the SetNodeForAverageOfPhiZeroed method and the nullbasis method of solution of the linear system
  */
 
-class TestExtendedBidomainProblem1D : public CxxTest::TestSuite
+class TestExtendedVsBidomainProblem : public CxxTest::TestSuite
 {
 
 public:
@@ -229,8 +229,13 @@ public:
     void TestCompareStimulationOfFirstCell() throw(Exception)
     {
         //run the two simulations, bidomain and extended bidomain
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         RunBidomain();
         RunExtendedBidomainStimulateFirstCell();
+        // Both the simulations use the "averaged phi" method which gives a non-symmetric matrix and hence uses GMRES
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 2u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Code has changed the KSP solver type from cg to gmres");
+        Warnings::Instance()->QuietDestroy();
 
         //pick up the results...
         Hdf5DataReader reader_extended("TestExtendedVs_Extended1dStimulateFirstCell", "extended1d");
@@ -299,6 +304,11 @@ public:
     {
         //first, run the extended bidomain simulation stimulating the second cell
         RunExtendedBidomainStimulateSecondCell();
+        // Check that the solver switched to GMRES for the simulation again
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Code has changed the KSP solver type from cg to gmres");
+        TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "gmres")==0);
+        Warnings::Instance()->QuietDestroy();
 
         //pick up the results...(note the bidomain simulatioon is the same as the test above for the first cell)
         Hdf5DataReader reader_extended("TestExtendedVs_Extended1dStimulateSecondCell", "extended1d");
@@ -377,9 +387,13 @@ public:
 
     void TestCompareNullBasis() throw (Exception)
     {
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+
         //first, run the extended bidomain simulation stimulating the second cell
         RunExtendedSimulationWithNullBasis();
         RunBidomainNullBasis();
+        TS_ASSERT(strcmp(HeartConfig::Instance()->GetKSPSolver(), "cg")==0);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
 
         //pick up the results...(note the bidomain simulatioon is the same as the test above for the first cell)
         Hdf5DataReader reader_extended("TestExtendedVs_Extended1dStimulateSecondCellNullBasis", "extended1d");
@@ -472,6 +486,7 @@ public:
 
     void TestComparePinnedNode() throw (Exception)
     {
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         //first, run the two simulations
         RunBidomainPinnedNode();
         RunExtendedSimulationPinnedNode();
@@ -634,7 +649,12 @@ public:
         extended_problem.SetExtracellularStimulusFactory(&extra_factory);
         extended_problem.Initialise();
         TS_ASSERT_EQUALS(extended_problem.GetExtendedBidomainTissue()->HasTheUserSuppliedExtracellularStimulus(), true);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         extended_problem.Solve();
+        // Averaged phi_e forces the solver to use GMRES
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),"Code has changed the KSP solver type from cg to gmres");
+        Warnings::Instance()->QuietDestroy();
     }
 
     void TestExceptions() throw (Exception)
