@@ -33,32 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PETSCSETUPUTILS_HPP_
-#define PETSCSETUPUTILS_HPP_
+#ifndef CITATIONS_HPP_
+#define CITATIONS_HPP_
 
-/**
- * Common code for setting up and tearing down tests.
- * Used by PetscSetupAndFinalize.hpp and FakePetscSetup.hpp
- */
-class PetscSetupUtils
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include "PetscTools.hpp"
+#include "CommandLineArguments.hpp"
+
+class Citations
 {
 public:
-    /**
-     * The global setup for Chaste tests.
-     */
-    static void CommonSetup();
+    static void Register(const char *, PetscTruth *);
 
-    /**
-     * Just initialise PETSc without performing the rest of the common setup.
-     */
-    static void InitialisePetsc();
-
-    /**
-     * The global finalize (prints citations).
-     */
-    static void CommonFinalize();
+    static void Print();
 
 private:
+#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+    static std::vector<const char *> mCitations;
+#endif
+
 };
 
-#endif // PETSCSETUPUTILS_HPP_
+#endif // CITATIONS_HPP_

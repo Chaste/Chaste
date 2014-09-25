@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CommandLineArguments.hpp"
 #include "ChasteBuildRoot.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
+#include "Citations.hpp"
 
 #ifdef TEST_FOR_FPE
 #include <fenv.h>
@@ -69,6 +70,45 @@ void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
 }
 #endif
 
+#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+/*
+ * If using older an older PETSc (pre-3.2) include some citations here from a more recent version.
+ * (The following are from 3.5.2)
+ */
+static PetscTruth PetscCite1 = PETSC_FALSE;
+const char PetscCitation1[] = "@TechReport{petsc-user-ref,\n"
+                              "  Author = {Satish Balay and Shrirang Abhyankar and Mark F. Adams and Jed Brown and Peter Brune "
+                              "and Kris Buschelman and Victor Eijkhout and William D. Gropp and Dinesh Kaushik and Matthew G. "
+                              "Knepley and Lois Curfman McInnes and Karl Rupp and Barry F. Smith and Hong Zhang},\n"
+                              "  Title = {{PETS}c Users Manual},\n"
+                              "  Number = {ANL-95/11 - Revision 3.5},\n"
+                              "  Institution = {Argonne National Laboratory},\n"
+                              "  Year = {2014}}\n";
+static PetscTruth PetscCite2 = PETSC_FALSE;
+const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
+                              "  Author = {Satish Balay and William D. Gropp and Lois Curfman McInnes and Barry F. Smith},\n"
+                              "  Title = {Efficient Management of Parallelism in Object Oriented Numerical Software Libraries},\n"
+                              "  Booktitle = {Modern Software Tools in Scientific Computing},\n"
+                              "  Editor = {E. Arge and A. M. Bruaset and H. P. Langtangen},\n"
+                              "  Pages = {163--202},\n"
+                              "  Publisher = {Birkh{\"{a}}user Press},\n"
+                              "  Year = {1997}}\n";
+#endif
+
+/* Main Chaste citation */
+static PetscTruth ChasteCite = PETSC_FALSE;
+const char ChasteCitation[] = "@article{mirams2013chaste,\n"
+                              "  author    = {Mirams, Gary R and Arthurs, Christopher J and Bernabeu, Miguel O and "
+                              "Bordas, Rafel and Cooper, Jonathan and Corrias, Alberto and Davit, Yohan and Dunn, Sara-Jane "
+                              "and Fletcher, Alexander G and Harvey, Daniel G and others},\n"
+                              "  title     = {Chaste: an open source C++ library for computational physiology and biology},\n"
+                              "  journal   = {PLoS computational biology},\n"
+                              "  volume    = {9},\n"
+                              "  number    = {3},\n"
+                              "  pages     = {e1002970},\n"
+                              "  year      = {2013},\n"
+                              "  publisher = {Public Library of Science}}\n";
+
 void PetscSetupUtils::InitialisePetsc()
 {
     // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
@@ -80,6 +120,14 @@ void PetscSetupUtils::InitialisePetsc()
 void PetscSetupUtils::CommonSetup()
 {
     InitialisePetsc();
+
+#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+    // Add some PETSc citations if we're not using the built-in citation mechanisms
+    Citations::Register(PetscCitation1, &PetscCite1);
+    Citations::Register(PetscCitation2, &PetscCite2);
+#endif
+    // Add main Chaste citation
+    Citations::Register(ChasteCitation, &ChasteCite);
 
     // Check that the working directory is correct, or many tests will fail
     std::string cwd = GetCurrentWorkingDirectory() + "/";
@@ -103,4 +151,10 @@ void PetscSetupUtils::CommonSetup()
     sa.sa_restorer = 0;
     sigaction(SIGFPE, &sa, NULL);
 #endif
+}
+
+void PetscSetupUtils::CommonFinalize()
+{
+    Citations::Print();
+    PETSCEXCEPT(PetscFinalize());
 }

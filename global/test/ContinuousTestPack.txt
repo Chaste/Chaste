@@ -30,3 +30,4 @@ TestTimer.hpp
 TestTimeStepper.hpp
 TestWarnings.hpp
 TestWritingTestsTutorial.hpp
+TestCitations.hpp

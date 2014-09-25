@@ -66,7 +66,7 @@ public:
     bool tearDownWorld()
     {
         ///Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
-        PETSCEXCEPT(PetscFinalize());
+        PetscSetupUtils::CommonFinalize();
         return true;
     }
 };

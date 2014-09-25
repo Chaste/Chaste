@@ -33,32 +33,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PETSCSETUPUTILS_HPP_
-#define PETSCSETUPUTILS_HPP_
+#ifndef TESTCITATIONS_HPP_
+#define TESTCITATIONS_HPP_
 
-/**
- * Common code for setting up and tearing down tests.
- * Used by PetscSetupAndFinalize.hpp and FakePetscSetup.hpp
- */
-class PetscSetupUtils
+#include <cxxtest/TestSuite.h>
+#include "PetscSetupUtils.hpp"
+#include "PetscException.hpp"
+#include "Citations.hpp"
+#include "OutputFileHandler.hpp"
+#include "CommandLineArgumentsMocker.hpp"
+#include "FileComparison.hpp"
+
+class TestCitations : public CxxTest::TestSuite
 {
 public:
-    /**
-     * The global setup for Chaste tests.
-     */
-    static void CommonSetup();
-
-    /**
-     * Just initialise PETSc without performing the rest of the common setup.
-     */
-    static void InitialisePetsc();
-
-    /**
-     * The global finalize (prints citations).
-     */
-    static void CommonFinalize();
-
-private:
+    void TestChasteCitation() throw (Exception)
+    {
+        // Make a directory to output the citations file
+        OutputFileHandler output_dir("TestCitations");
+        FileFinder output_file(output_dir.GetOutputDirectoryFullPath()+"citations.txt");
+        // Turn on citations with argument
+        CommandLineArgumentsMocker mocker("-citations "+output_file.GetAbsolutePath());
+        PetscSetupUtils::CommonSetup(); // This automatically includes some citations
+        PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
+        // Check
+        FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
+        FileComparison check_files(output_file, reference_citations);
+    }
 };
 
-#endif // PETSCSETUPUTILS_HPP_
+#endif // TESTCITATIONS_HPP_

@@ -95,7 +95,7 @@ public:
     {
         // Remind PETSc there were originally more processes so MPI is finalized properly.
         PETSC_COMM_WORLD = MPI_COMM_WORLD;
-        PETSCEXCEPT(PetscFinalize());
+        PetscSetupUtils::CommonFinalize();
         return true;
     }
 };
