@@ -1092,7 +1092,7 @@ public:
         {
             LinearSystem ls = LinearSystem(size);
             Mat temp_mat=ls.GetLhsMatrix();
-            PetscTruth symm_set, is_symmetric;
+            PetscBool symm_set, is_symmetric;
             is_symmetric = PETSC_FALSE;
             MatIsSymmetricKnown(temp_mat, &symm_set, &is_symmetric);
             TS_ASSERT_EQUALS(symm_set, PETSC_FALSE);
@@ -1153,7 +1153,7 @@ public:
             input_arch >> p_linear_system;
 
             // Check that structural symmetry is preserved
-            PetscTruth symm_set, is_symmetric;
+            PetscBool symm_set, is_symmetric;
             is_symmetric=PETSC_FALSE;
             MatIsSymmetricKnown(p_linear_system->GetLhsMatrix(), &symm_set, &is_symmetric);
             TS_ASSERT_EQUALS(symm_set, PETSC_TRUE);

@@ -335,7 +335,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool computeMatrix, bool computeVector)
 {
     assert(mBathSimulation);
-    PetscTruth is_matrix_assembled;
+    PetscBool is_matrix_assembled;
     MatAssembled(this->mpLinearSystem->GetLhsMatrix(), &is_matrix_assembled);
     assert(is_matrix_assembled == PETSC_TRUE);
 

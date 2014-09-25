@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 std::vector<const char *> Citations::mCitations;
 #endif
 
-void Citations::Register(const char cit[], PetscTruth *set)
+void Citations::Register(const char cit[], PetscBool *set)
 {
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
     PetscCitationsRegister(cit, set);

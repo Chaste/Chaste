@@ -52,7 +52,7 @@ public:
 
     void TestPetscIsThere()
     {
-        PetscTruth is_there;
+        PetscBool is_there;
         PetscInitialized(&is_there);
         TS_ASSERT( is_there == PETSC_TRUE );
     }

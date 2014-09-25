@@ -54,17 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** For use in tests that should ONLY be run in parallel. */
 #define EXIT_IF_SEQUENTIAL if(PetscTools::IsSequential()){TS_TRACE("This test is not meant to be executed in sequential.");return;}
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-typedef PetscBool PetscTruth;
-/**
- * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
- * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call.
- * Note that we only use this macro for calls which appear rarely in the code.  Please destroy Vec and Mat objects
- * via the overloaded PetscTools::Destroy methods.
- * @param x The object to destroy
- */
-#define PETSC_DESTROY_PARAM(x) &x
-#else
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
+typedef PetscTruth PetscBool;
 /**
  * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
  * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call.
@@ -73,6 +64,15 @@ typedef PetscBool PetscTruth;
  * @param x The object to destroy
  */
 #define PETSC_DESTROY_PARAM(x) x
+#else
+/**
+ * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
+ * PetscViewerDestroy(VecView view) ) to a PETSc3.2 destroy via pointer call.
+ * Note that we only use this macro for calls which appear rarely in the code.  Please destroy Vec and Mat objects
+ * via the overloaded PetscTools::Destroy methods.
+ * @param x The object to destroy
+ */
+#define PETSC_DESTROY_PARAM(x) &x
 #endif
 
 /**

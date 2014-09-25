@@ -58,7 +58,7 @@ static unsigned mNumBarriers = 0u;
 
 void PetscTools::ResetCache()
 {
-    PetscTruth is_there;
+    PetscBool is_there;
     PetscInitialized(&is_there);
     if (is_there)
     {

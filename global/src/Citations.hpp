@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class Citations
 {
 public:
-    static void Register(const char *, PetscTruth *);
+    static void Register(const char *, PetscBool *);
 
     static void Print();
 

@@ -556,8 +556,8 @@ void LinearSystem::SetMatrixIsSymmetric(bool isSymmetric)
 
 bool LinearSystem::IsMatrixSymmetric()
 {
-    PetscTruth symmetry_flag_is_set;
-    PetscTruth symmetry_flag;
+    PetscBool symmetry_flag_is_set;
+    PetscBool symmetry_flag;
 
     MatIsSymmetricKnown(mLhsMatrix, &symmetry_flag_is_set, &symmetry_flag);
 

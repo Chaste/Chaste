@@ -134,7 +134,7 @@ DistributedVectorFactory::~DistributedVectorFactory()
 void DistributedVectorFactory::CheckForPetsc()
 {
     assert(mPetscStatusKnown==false);
-    PetscTruth petsc_is_initialised;
+    PetscBool petsc_is_initialised;
     PetscInitialized(&petsc_is_initialised);
 
     /*

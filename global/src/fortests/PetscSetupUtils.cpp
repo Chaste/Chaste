@@ -75,7 +75,7 @@ void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
  * If using older an older PETSc (pre-3.2) include some citations here from a more recent version.
  * (The following are from 3.5.2)
  */
-static PetscTruth PetscCite1 = PETSC_FALSE;
+static PetscBool PetscCite1 = PETSC_FALSE;
 const char PetscCitation1[] = "@TechReport{petsc-user-ref,\n"
                               "  Author = {Satish Balay and Shrirang Abhyankar and Mark F. Adams and Jed Brown and Peter Brune "
                               "and Kris Buschelman and Victor Eijkhout and William D. Gropp and Dinesh Kaushik and Matthew G. "
@@ -84,7 +84,7 @@ const char PetscCitation1[] = "@TechReport{petsc-user-ref,\n"
                               "  Number = {ANL-95/11 - Revision 3.5},\n"
                               "  Institution = {Argonne National Laboratory},\n"
                               "  Year = {2014}}\n";
-static PetscTruth PetscCite2 = PETSC_FALSE;
+static PetscBool PetscCite2 = PETSC_FALSE;
 const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
                               "  Author = {Satish Balay and William D. Gropp and Lois Curfman McInnes and Barry F. Smith},\n"
                               "  Title = {Efficient Management of Parallelism in Object Oriented Numerical Software Libraries},\n"
@@ -96,7 +96,7 @@ const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
 #endif
 
 /* Main Chaste citation */
-static PetscTruth ChasteCite = PETSC_FALSE;
+static PetscBool ChasteCite = PETSC_FALSE;
 const char ChasteCitation[] = "@article{mirams2013chaste,\n"
                               "  author    = {Mirams, Gary R and Arthurs, Christopher J and Bernabeu, Miguel O and "
                               "Bordas, Rafel and Cooper, Jonathan and Corrias, Alberto and Davit, Yohan and Dunn, Sara-Jane "

@@ -599,7 +599,7 @@ inline void save_construct_data(
     PetscTools::DumpPetscObject(t->GetLhsMatrix(), archive_filename_lhs);
 
     //Is the matrix structurally symmetric?
-    PetscTruth symm_set, is_symmetric;
+    PetscBool symm_set, is_symmetric;
     is_symmetric = PETSC_FALSE;
     //Note that the following call only changes is_symmetric when symm_set is true
     MatIsSymmetricKnown(t->GetLhsMatrix(), &symm_set, &is_symmetric);
@@ -629,7 +629,7 @@ inline void load_construct_data(
 
      //This has to occur after the call to MatLoad as the matrix does not exist until MatLoad is called.
      //The property will be copied & set correctly in the LinearSystem constructor.
-     PetscTruth symm_set;
+     PetscBool symm_set;
 
      ar >> symm_set;
      if (symm_set == PETSC_TRUE)
