@@ -44,6 +44,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 //#include "HeartRegionCodes.hpp"
 
+// Add the citation for original Streeter paper.
+#include "Citations.hpp"
+static PetscBool StreeterCite = PETSC_FALSE;
+const char StreeterCitation[] = "@article{streeter1969fiber,\n"
+"  title={Fiber orientation in the canine left ventricle during diastole and systole},\n"
+"  author={Streeter, Daniel D and Spotnitz, Henry M and Patel, Dali P and Ross, John and Sonnenblick, Edmund H},\n"
+"  journal={Circulation research},\n"
+"  volume={24},\n"
+"  number={3},\n"
+"  pages={339--347},\n"
+"  year={1969},\n"
+"  publisher={Am Heart Assoc}\n"
+"}";
+
 template<unsigned SPACE_DIM>
 double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
         const unsigned nodeIndex, const std::vector<double>& wallThickness) const
@@ -141,6 +155,9 @@ StreeterFibreGenerator<SPACE_DIM>::StreeterFibreGenerator(AbstractTetrahedralMes
       mApexToBase(zero_vector<double>(SPACE_DIM)),
       mLogInfo(false)
 {
+    // Record a reference for the calculations performed here, can be extracted with the '-citations' flag.
+    Citations::Register(StreeterCitation, &StreeterCite);
+
     mWallThickness.resize(rMesh.GetNumNodes());
     mAveragedWallThickness.resize(rMesh.GetNumNodes());
 }
