@@ -60,10 +60,15 @@ CommandLineArguments* CommandLineArguments::mpInstance = NULL;
 
 bool CommandLineArguments::OptionExists(const std::string& rOption)
 {
-    int index = GetIndexForArgument(rOption);
-    assert(index!=0);
-
-    return (index > 0);
+    TestOptionFormat(rOption);
+    try
+    {
+        return(GetIndexForArgument(rOption));
+    }
+    catch (const Exception&)
+    {
+        return false;
+    }
 }
 
 char* CommandLineArguments::GetValueCorrespondingToOption(const std::string& rOption, int valueNumber)
@@ -71,10 +76,15 @@ char* CommandLineArguments::GetValueCorrespondingToOption(const std::string& rOp
     EXCEPT_IF_NOT(valueNumber>0);
     TestOptionFormat(rOption);
 
-    int num_args = GetNumberOfArgumentsForOption(rOption);
     int index = GetIndexForArgument(rOption);
-    EXCEPT_IF_NOT(index>0);
-    EXCEPT_IF_NOT(num_args>=valueNumber);
+    int num_args = GetNumberOfArgumentsForOption(rOption, true);
+    if ( num_args<valueNumber )
+    {
+        std::stringstream ss;
+        ss<<"Index="<<valueNumber<<" requested for '"<<rOption<<"', but only "<<num_args<<" given.";
+        EXCEPTION(ss.str());
+    }
+
     return (*p_argv)[index+valueNumber];
 }
 
@@ -101,27 +111,23 @@ unsigned CommandLineArguments::GetUnsignedCorrespondingToOption(const std::strin
     return (unsigned)(i);
 }
 
-int CommandLineArguments::GetIndexForArgument(std::string argument)
+int CommandLineArguments::GetIndexForArgument(std::string rOption)
 {
-    TestOptionFormat(argument);
+    TestOptionFormat(rOption);
 
     for (int i=1; i<*p_argc; i++)
     {
-        if (argument==std::string((*p_argv)[i]))
+        if (rOption==std::string((*p_argv)[i]))
         {
             return i;
         }
     }
-    return -1;
+    EXCEPTION("Command line option '"+rOption+"' does not exist");
 }
 
-int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOption)
+int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOption, bool throwIfNone)
 {
     int start_idx = GetIndexForArgument(rOption);
-    if (start_idx < 0)
-    {
-        EXCEPTION("Command line option '" + rOption + "' does not exist");
-    }
 
     int end_idx = start_idx;
     for (int i=start_idx+1; i<*p_argc; i++)
@@ -136,7 +142,15 @@ int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOpti
 
     if (end_idx == start_idx)
     {
-        EXCEPTION("No value(s) given after command line option '" + rOption + "'");
+        if ( throwIfNone )
+        {
+            EXCEPTION("No value(s) given after command line option '" + rOption + "'");
+        }
+        else
+        {
+            return 0;
+        }
+
     }
 
     return end_idx - start_idx;
@@ -152,7 +166,7 @@ std::string CommandLineArguments::GetStringCorrespondingToOption(const std::stri
 std::vector<std::string> CommandLineArguments::GetStringsCorrespondingToOption(const std::string& rOption)
 {
     std::vector<std::string> strings;
-    int num_args = GetNumberOfArgumentsForOption(rOption);
+    int num_args = GetNumberOfArgumentsForOption(rOption, true);
     for(int i=1; i<=num_args; ++i)
     {
         strings.push_back(GetStringCorrespondingToOption(rOption, i));
@@ -163,7 +177,7 @@ std::vector<std::string> CommandLineArguments::GetStringsCorrespondingToOption(c
 std::vector<double> CommandLineArguments::GetDoublesCorrespondingToOption(const std::string& rOption)
 {
     std::vector<double> doubles;
-    int num_args = GetNumberOfArgumentsForOption(rOption);
+    int num_args = GetNumberOfArgumentsForOption(rOption, true);
     for(int i=1; i<=num_args; ++i)
     {
         doubles.push_back(GetDoubleCorrespondingToOption(rOption, i));
@@ -174,7 +188,7 @@ std::vector<double> CommandLineArguments::GetDoublesCorrespondingToOption(const 
 std::vector<unsigned> CommandLineArguments::GetUnsignedsCorrespondingToOption(const std::string& rOption)
 {
     std::vector<unsigned> unsigneds;
-    int num_args = GetNumberOfArgumentsForOption(rOption);
+    int num_args = GetNumberOfArgumentsForOption(rOption, true);
     for(int i=1; i<=num_args; ++i)
     {
         unsigneds.push_back(GetUnsignedCorrespondingToOption(rOption, i));
@@ -185,7 +199,7 @@ std::vector<unsigned> CommandLineArguments::GetUnsignedsCorrespondingToOption(co
 std::vector<int> CommandLineArguments::GetIntsCorrespondingToOption(const std::string& rOption)
 {
     std::vector<int> ints;
-    int num_args = GetNumberOfArgumentsForOption(rOption);
+    int num_args = GetNumberOfArgumentsForOption(rOption, true);
     for(int i=1; i<=num_args; ++i)
     {
         ints.push_back(GetIntCorrespondingToOption(rOption, i));

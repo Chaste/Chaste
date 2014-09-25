@@ -72,20 +72,10 @@ private:
     /**
      * @return the index for the given argument. Returns -1 if the argument is not found.
      *
-     * @param argument  the argument name as a string.
+     * @param rOption  the argument name as a string.
      * @return the position of the argument in the list (indexed from 1)
      */
-    int GetIndexForArgument(std::string argument);
-
-    /**
-     * @return the number of arguments for a given option. Throws an Exception if the
-     * option does not have any following arguments, or the option does not exist.
-     * So you can use OptionExists() to avoid Exceptions in your code when using the other public methods.
-     *
-     * @param rOption  the option name as a string.
-     * @return the number of arguments following this option.
-     */
-    int GetNumberOfArgumentsForOption(const std::string& rOption);
+    int GetIndexForArgument(std::string rOption);
 
     /**
      * Throw an exception if the option is not of the required form: '-' followed by a non-numeric character.
@@ -111,6 +101,17 @@ public:
      * @param rOption  the option name as a string.
      */
     bool OptionExists(const std::string& rOption);
+
+    /**
+     * @return the number of arguments for a given option. Throws an Exception if the
+     * option does not have any following arguments, or the option does not exist.
+     * So you can use OptionExists() to avoid Exceptions in your code when using the other public methods.
+     *
+     * @param rOption  the option name as a string.
+     * @param throwIfNone  Whether to give an exception if there are no arguments for this rOption (defaults to true).
+     * @return the number of arguments following this option.
+     */
+    int GetNumberOfArgumentsForOption(const std::string& rOption, bool throwIfNone=false);
 
     /**
      * @return the value for a given option, i.e. the argument after the option name in

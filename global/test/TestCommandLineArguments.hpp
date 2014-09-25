@@ -163,7 +163,7 @@ public:
         // Test OptionExists()
         TS_ASSERT(CommandLineArguments::Instance()->OptionExists("-myoption"));
 
-        TS_ASSERT( ! CommandLineArguments::Instance()->OptionExists("-asddsgijdfgokgfgurgher"));
+        TS_ASSERT( ! CommandLineArguments::Instance()->OptionExists("-asddsgijdfgokgfgurgher") );
 
         TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->OptionExists("-42"),
                 "A command line option must begin with '-' followed by a non-numeric character.");
@@ -215,6 +215,8 @@ public:
         TS_ASSERT_EQUALS(string_arguments[0], "Baboons");
         TS_ASSERT_EQUALS(string_arguments[1], "Monkeys");
         TS_ASSERT_EQUALS(string_arguments[2], "Gibbons");
+        TS_ASSERT_THROWS_THIS(CommandLineArguments::Instance()->GetValueCorrespondingToOption("-mystrings",4),
+                              "Index=4 requested for '-mystrings', but only 3 given.");
 
         std::vector<double> double_arguments = CommandLineArguments::Instance()->GetDoublesCorrespondingToOption("-mydoubleval");
         TS_ASSERT_EQUALS(double_arguments.size(), 2u);
@@ -298,10 +300,15 @@ public:
     void TestCommandLineArgumentsParrotting() throw(Exception)
     {
         std::string verb = "--verbose";
-        if ( CommandLineArguments::Instance()->OptionExists(verb) )
+        try
         {
+            CommandLineArguments::Instance()->OptionExists(verb);
             bool is_verbose = CommandLineArguments::Instance()->GetBoolCorrespondingToOption(verb);
             std::cout << "You have successfully set "<< verb << " to take the value "<< is_verbose<<".\n";
+        }
+        catch (const Exception&)
+        {
+            std::cout << "Command line argument "<< verb << " was not set.\n";
         }
     }
 
