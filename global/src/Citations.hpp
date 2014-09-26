@@ -42,15 +42,40 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "CommandLineArguments.hpp"
 
+/**
+ * A class to register citations placed throughout the codebase, and pass them
+ * through to PETSc (3.5+) or save them and print to screen/disk at program exit
+ * (pre-PETSc 3.5).
+ *
+ * This feature may be switched on by passing the "-citations" flag at runtime
+ * to print to screen, or to file.txt using "-citations file.txt". Paths for the
+ * latter can be relative or absolute, but have NO error checking, so care is
+ * advised.
+ * 
+ * See r22760 for an example of adding a new citation to the trunk and registering
+ * it.
+ */ 
 class Citations
 {
 public:
-    static void Register(const char *, PetscBool *);
+    /** 
+     * Method to register a citation. Just passes through the PETSc for v 3.5+.
+     * 
+     * @param cit  The citation in bibtex format.
+     * @param set  A PetscBool that starts as false, used to track whether the citation
+     * has been added before.
+     */
+    static void Register(const char * cit, PetscBool * set);
 
+    /**
+     * Print the list of citations, called automatically when finalising the PETSc
+     * environment.
+     */
     static void Print();
 
 private:
 #if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+    /** The list of citations if using Chaste's built-in manager (pre-PETSc 3.5). */
     static std::vector<const char *> mCitations;
 #endif
 
