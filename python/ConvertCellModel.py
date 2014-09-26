@@ -350,6 +350,8 @@ def convert(model, output_dir):
     for rl_opt, rl_name in rush_larsen_variants.iteritems():
         if getattr(options, arg2name(rl_opt), False):
             opts = [rl_opt]
+            if rl_opt.startswith('--grl'):
+                opts.extend(maple_options)
             if not dyn_opt:
                 cmd, outputs = add_out_opts(command_base + opts, output_dir,
                                             class_name + rl_name, model_base, rl_name)

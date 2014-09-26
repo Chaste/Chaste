@@ -86,15 +86,20 @@ OdeSolution AbstractGeneralizedRushLarsenCardiacCell::Compute(double tStart, dou
     solutions.SetOdeSystemInformation(this->mpSystemInfo);
 
     // Loop over time
+    double v_old, v_new;
+    double& r_V = rGetStateVariables()[GetVoltageIndex()];
     for (unsigned i=0; i<n_steps; i++)
     {
         double curr_time = tStart;
         for (unsigned j=0; j<n_small_steps; j++)
         {
             curr_time = tStart + i*tSamp + j*mDt;
-           // EvaluateEquations(curr_time, dy);
+            v_old = r_V;
             UpdateTransmembranePotential(curr_time);
+            v_new = r_V;
+            r_V = v_old;
             ComputeOneStepExceptVoltage(curr_time);
+            r_V = v_new;
             VerifyStateVariables();
         }
 

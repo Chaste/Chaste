@@ -1706,9 +1706,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
         It also calls output_verify_state_variables.
         """
         self.include_serialization = not self.use_modifiers # TODO: Implement
-        
+
         # Check if we're generating a Backward Euler model
         self.use_backward_euler = self.model.get_option('backward_euler')
+        self.use_analytic_jacobian = (self.model.get_option('maple_output') and hasattr(self.model.solver_info, u'jacobian'))
         if self.use_backward_euler:
             assert hasattr(self.model, u'solver_info')
             # Find the size of the nonlinear system
@@ -2471,6 +2472,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         This is used by self.output_evaluate_y_derivatives and self.output_rush_larsen_mathematics
         to compute the derivatives (and any extra nodes, if given).  It contains the special logic
         to obey the mSetVoltageDerivativeToZero member variable in the generated code.
+        Returns a nodeset containing the equations output.
         """
         # Work out what equations are needed to compute the derivatives
         derivs = set(map(lambda v: (v, self.free_vars[0]), state_vars))
@@ -2510,6 +2512,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.open_block()
             self.output_equations(v_nodeset - table_index_nodes_used)
             self.close_block()
+        return all_nodes | table_index_nodes_used
 
     def output_backward_euler_mathematics(self):
         """Output the mathematics methods used in a backward Euler cell.
@@ -2751,7 +2754,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
     #Council (NSERC) of Canada and the MITACS/Mprime 
     #Canadian Network of Centres of Excellence.
     def output_derivative_calculations_grl(self, var, assign_rY=False, extra_nodes=set(), extra_table_nodes=set()):
-        """This is used by self.output_grl?_mathematics to get equations for each variable separately."""
+        """This is used by self.output_grl?_mathematics to get equations for each variable separately.
+
+        Returns a node set with the equations output.
+        """
         # Work out what equations are needed to compute the derivative of var
         if var in self.state_vars:
             dvardt = (var, self.free_vars[0])
@@ -2764,6 +2770,63 @@ class CellMLToChasteTranslator(CellMLTranslator):
         table_index_nodes_used = self.calculate_lookup_table_indices(var_nodeset, self.code_name(self.free_vars[0]))
         self.output_comment('Mathematics')
         self.output_equations(var_nodeset - table_index_nodes_used)
+        return var_nodeset | table_index_nodes_used
+
+    def find_grl_partial_derivatives(self):
+        """If we have analytic Jacobian information available from Maple, find the terms needed for GRL methods.
+
+        This caches where the diagonal entries are in the matrix, indexed by the state variable objects currently in use,
+        since the entries in the matrix may reference non-partially-evaluated variables.
+        """
+        if not hasattr(self, 'jacobian_diagonal'):
+            self.jacobian_diagonal = {}
+        if self.use_analytic_jacobian and not self.jacobian_diagonal:
+            for entry in self.model.solver_info.jacobian.entry:
+                if entry.var_i == entry.var_j:
+                    # It's a diagonal entry
+                    var = self.varobj(entry.var_i).get_source_variable(recurse=True)
+                    assert var in self.state_vars, "Jacobian diagonal entry is not in the state vector: " + entry.xml()
+                    entry_content = list(entry.math.xml_element_children())
+                    assert len(entry_content) == 1, "Malformed Jacobian entry: " + entry.xml()
+                    self.jacobian_diagonal[var] = entry_content[0]
+
+    def output_grl_compute_partial(self, i, var):
+        """Compute the partial derivative of f(var) wrt var, the i'th variable in the state vector.
+
+        This uses an analytic Jacobian if available; otherwise it approximates using finite differences.
+        """
+        self.output_method_start('EvaluatePartialDerivative'+str(i),
+                                 [self.TYPE_DOUBLE + self.code_name(self.free_vars[0]),
+                                  'std::vector<double>& rY', 'double delta', 'bool forceNumerical'],
+                                 'double', access='public', defaults=['', '', '', 'false'])
+        self.open_block()
+        self.writeln('double partialF;')
+        if self.jacobian_diagonal:
+            # Work out what equations are needed to compute the analytic derivative
+            self.writeln('if (!forceNumerical)')
+            self.open_block()
+            entry = self.jacobian_diagonal[var]
+            nodeset = self.calculate_extended_dependencies(self._vars_in(entry))
+            self.output_state_assignments(nodeset=nodeset, assign_rY=False)
+            table_index_nodes_used = self.calculate_lookup_table_indices(nodeset|set([entry]), self.code_name(self.free_vars[0]))
+            self.output_equations(nodeset)
+            # Calculate the derivative
+            self.writeln('partialF = ', nl=False)
+            self.output_expr(entry, paren=False)
+            self.writeln(self.STMT_END, indent=False)
+            self.close_block(blank_line=False)
+            self.writeln('else')
+            self.open_block()
+        # Numerical approximation
+        self.writeln('const double y_save = rY[', i, '];')
+        self.writeln('rY[', i, '] += delta;')
+        self.writeln('const double temp = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
+        self.writeln('partialF = (temp-mEvalF[', i, '])/delta;')
+        self.writeln('rY[', i, '] = y_save;')
+        if self.jacobian_diagonal:
+            self.close_block(blank_line=False)
+        self.writeln('return partialF;')
+        self.close_block()
 
     #Megan E. Marsh, Raymond J. Spiteri 
     #Numerical Simulation Laboratory 
@@ -2775,12 +2838,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
     #Canadian Network of Centres of Excellence.
     def output_grl1_mathematics(self):
         """Output the special methods needed for GRL1 style cell models.
-        
+
         We generate:
          * UpdateTransmembranePotential update V_m
          * ComputeOneStepExceptVoltage  does a GRL1 update for variables except voltage
          * EvaluateYDerivativeI for each variable I
         """
+        self.find_grl_partial_derivatives()
         ########################################################UpdateTransmembranePotential
         self.output_method_start('UpdateTransmembranePotential',
                                  [self.TYPE_DOUBLE + self.code_name(self.free_vars[0])],
@@ -2789,17 +2853,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('std::vector<double>& rY = rGetStateVariables();')
         self.writeln('unsigned v_index = GetVoltageIndex();')
         self.writeln('const double delta = 1e-8;')
-        self.writeln('const double V_m_save = rY[v_index];')
         self.writeln()
         # Compute partial derivative of dV wrt V
         self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
         self.output_derivative_calculations_grl(self.v_variable)
         self.writeln()
         self.writeln('double evalF = ', self.code_name(self.v_variable, ode=True), self.STMT_END)
-        self.writeln('rY[v_index] += delta;')
-        self.writeln('double temp = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
-        self.writeln('double partialF = (temp-evalF)/delta;')
-        self.writeln('rY[v_index] = V_m_save;')
+        self.writeln('mEvalF[', self.v_index, '] = ', self.code_name(self.v_variable, ode=True), self.STMT_END)
+        self.writeln('double partialF = EvaluatePartialDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY, delta, true);')
         self.writeln('if (fabs(partialF) < delta)')
         self.open_block()
         self.writeln('rY[v_index] += evalF*mDt;')
@@ -2829,13 +2890,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Compute partial derivatives (for non-V)
         for i, var in enumerate(self.state_vars):
             if var is not self.v_variable:
-                self.open_block()
-                self.writeln('const double y_save = rY[', i, '];')
-                self.writeln('rY[', i, '] += delta;')
-                self.writeln('double temp = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
-                self.writeln('mPartialF[', i, '] = (temp - ', self.code_name(var, True), ')/delta;')
-                self.writeln('rY[', i, '] = y_save;')
-                self.close_block()
+                self.writeln('mEvalF[', i, '] = ', self.code_name(var, ode=True), self.STMT_END)
+                self.writeln('mPartialF[', i, '] = EvaluatePartialDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY, delta);')
 
         # Do the GRL updates
         for i, var in enumerate(self.state_vars):
@@ -2847,8 +2903,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.close_block(False)
                 self.writeln('else')
                 self.open_block()
-                self.writeln('rY[', i, '] += (', self.code_name(var, True), '/mPartialF[', i,
-                             '])*(exp(mPartialF[', i, ']*mDt)-1.0);')
+                self.writeln('rY[', i, '] += (', self.code_name(var, True), '/mPartialF[', i, '])*(exp(mPartialF[', i, ']*mDt)-1.0);')
                 self.close_block()
                 self.close_block()
         self.close_block()
@@ -2867,6 +2922,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('return ', self.code_name(var, True), ';')
             self.close_block()
 
+            self.output_grl_compute_partial(i, var)
+
     #Megan E. Marsh, Raymond J. Spiteri 
     #Numerical Simulation Laboratory 
     #University of Saskatchewan 
@@ -2877,12 +2934,13 @@ class CellMLToChasteTranslator(CellMLTranslator):
     #Canadian Network of Centres of Excellence.     
     def output_grl2_mathematics(self):
         """Output the special methods needed for GRL2 style cell models.
-        
+
         We generate:
          * Update TransmembranePotential update V_m
          * ComputeOneStepExceptVoltage  does a GRL2 update for variables except voltage
          * EvaluateYDerivativeI for each variable I
         """
+        self.find_grl_partial_derivatives()
         ########################################################UpdateTransmembranePotential
         self.output_method_start('UpdateTransmembranePotential',
                                  [self.TYPE_DOUBLE + self.code_name(self.free_vars[0])],
@@ -2892,18 +2950,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('const unsigned v_index = GetVoltageIndex();')
         self.writeln('const double delta = 1e-8;')
         self.writeln('const double yinit = rY[v_index];')
-        self.writeln('double V_m_save = rY[v_index];')
         self.writeln()
-    
+
         # Do the first half step
         self.writeln(self.TYPE_DOUBLE, self.code_name(self.v_variable, ode=True), self.STMT_END)
         self.output_derivative_calculations_grl(self.v_variable)
         self.writeln()
         self.writeln('double evalF = ', self.code_name(self.v_variable, ode=True), self.STMT_END)
-        self.writeln('rY[v_index] += delta;')
-        self.writeln('double temp = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
-        self.writeln('double partialF = (temp-evalF)/delta;')
-        self.writeln('rY[v_index] = V_m_save;')
+        self.writeln('mEvalF[', self.v_index, '] = ', self.code_name(self.v_variable, ode=True), self.STMT_END)
+        self.writeln('double partialF = EvaluatePartialDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY, delta, true);')
         self.writeln('if (fabs(partialF) < delta)')
         self.open_block()
         self.writeln('rY[v_index] += 0.5*evalF*mDt;')
@@ -2912,15 +2967,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.open_block()
         self.writeln('rY[v_index] += (evalF/partialF)*(exp(partialF*0.5*mDt)-1.0);')
         self.close_block()
-    
+
         # Do the second half step
-        self.writeln('V_m_save = rY[v_index];')
         self.writeln('rY[v_index] = yinit;')
         self.writeln('evalF = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
-        self.writeln()
-        self.writeln('rY[v_index] += delta;')
-        self.writeln('temp = EvaluateYDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY);')
-        self.writeln('partialF = (temp-evalF)/delta;')
+        self.writeln('mEvalF[', self.v_index, '] = evalF;')
+        self.writeln('partialF = EvaluatePartialDerivative', self.v_index, '(', self.code_name(self.free_vars[0]), ', rY, delta, true);')
         self.writeln('if (fabs(partialF) < delta)')
         self.open_block()
         self.writeln('rY[v_index] = yinit + evalF*mDt;')
@@ -2929,7 +2981,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.open_block()
         self.writeln('rY[v_index] = yinit + (evalF/partialF)*(exp(partialF*mDt)-1.0);')
         self.close_block()
-        self.close_block()
+        self.close_block() # End method
 
         #########################################################ComputeOneStepExceptVoltage
         self.output_method_start('ComputeOneStepExceptVoltage',
@@ -2941,25 +2993,18 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.writeln('const double delta=1e-8;')
         self.writeln('const unsigned size = GetNumberOfStateVariables();')
         self.writeln('mYInit = rY;')
-        self.writeln('double y_save, temp;')
+        self.writeln('double y_save;')
         self.writeln()
-    
+
         # Calculate partial derivatives
         self.output_derivative_calculations(self.state_vars)
         for i, var in enumerate(self.state_vars):
             self.writeln(self.vector_index('mEvalF', i), self.EQ_ASSIGN, self.code_name(var, True), self.STMT_END)
-            self.writeln()
+        self.writeln()
         for i, var in enumerate(self.state_vars):
             if var is not self.v_variable:
-                self.writeln('')
-                self.writeln('y_save = rY[', i, '];')
-                self.writeln('rY[', i, '] += delta;')
-                self.writeln('')
-                # Evaluate RHS again
-                self.writeln('temp = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
-                self.writeln('mPartialF[', i, '] = (temp-mEvalF[', i, '])/delta;')
-                self.writeln('rY[', i, '] = y_save;')
-        
+                self.writeln('mPartialF[', i, '] = EvaluatePartialDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY, delta);')
+
         # Update all variables
         self.writeln('for (unsigned var=0; var<size; var++)')
         self.open_block()
@@ -2982,13 +3027,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.writeln('y_save = rY[', i, '];')
                 self.writeln('rY[', i, '] = mYInit[', i, '];')
                 self.writeln('mEvalF[', i, '] = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
-                self.writeln('rY[', i, '] += delta;')
-                self.writeln()
-                # Evaluate RHS again
-                self.writeln('temp = EvaluateYDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY);')
-                self.writeln('mPartialF[', i, '] = (temp-mEvalF[', i, '])/delta;')
+                self.writeln('mPartialF[', i, '] = EvaluatePartialDerivative', i, '(', self.code_name(self.free_vars[0]), ', rY, delta);')
                 self.writeln('rY[', i, '] = y_save;')
-        
+
         # Update all variables
         self.writeln('for (unsigned var=0; var<size; var++)')
         self.open_block()
@@ -3003,8 +3044,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.close_block()
         self.close_block()
         self.writeln()
-        self.close_block()
-    
+        self.close_block() # End method
+
         #########################################################Evaluate each equation
         for i, var in enumerate(self.state_vars):
             self.output_method_start('EvaluateYDerivative'+str(i),
@@ -3019,10 +3060,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln('return '+self.code_name(var, True)+';')
             self.close_block()
 
+            self.output_grl_compute_partial(i, var)
+
 
     def output_model_attributes(self):
         """Output any named model attributes defined in metadata.
-        
+
         Such attributes are given by compound RDF annotations:
           model --pycml:named-attribute--> bnode
           bnode --pycml:name--> Literal(Attribute name, string)
@@ -3355,15 +3398,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
 class CellMLToCvodeTranslator(CellMLToChasteTranslator):
     """Translate a CellML model to C++ code for use with Chaste+CVODE."""
-    
+
     # Type of (a reference to) the state variable vector
     TYPE_VECTOR = 'N_Vector '
     TYPE_VECTOR_REF = 'N_Vector ' # CVODE's vector is actually a pointer type
-        
+
     def vector_index(self, vector, i):
         """Return code for accessing the i'th index of vector."""
         return 'NV_Ith_S(' + vector + ', ' + str(i) + ')'
-    
+
     def vector_create(self, vector, size):
         """Return code for creating a new vector with the given size."""
         return ''.join(map(str, [self.TYPE_VECTOR, vector, self.EQ_ASSIGN,
@@ -3382,11 +3425,10 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         # CVODE is optional in Chaste
         self.writeln("#ifdef CHASTE_CVODE")
         self.writeln_hpp("#ifdef CHASTE_CVODE")
-        
+
         self.include_serialization = not self.use_modifiers # TODO: Implement
         self.use_backward_euler = False
-        self.use_analytic_jacobian = (self.model.get_option('maple_output') and
-                                      hasattr(self.model.solver_info, u'jacobian'))
+        self.use_analytic_jacobian = (self.model.get_option('maple_output') and hasattr(self.model.solver_info, u'jacobian'))
         self.output_includes(base_class='AbstractCvodeCell')
         # Separate class for lookup tables?
         if self.use_lookup_tables and self.separate_lut_class:
