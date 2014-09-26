@@ -51,25 +51,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * to print to screen, or to file.txt using "-citations file.txt". Paths for the
  * latter can be relative or absolute, but have NO error checking, so care is
  * advised.
- * 
+ *
  * See r22760 for an example of adding a new citation to the trunk and registering
  * it.
- */ 
+ */
 class Citations
 {
 public:
-    /** 
-     * Method to register a citation. Just passes through the PETSc for v 3.5+.
-     * 
-     * @param cit  The citation in bibtex format.
-     * @param set  A PetscBool that starts as false, used to track whether the citation
-     * has been added before.
+    /**
+     * Method to register a citation. Just passes through to PETSc for v3.5+.
+     *
+     * @param pCitation  the citation in BibTeX format.
+     * @param pSet  pointer to a flag used to track whether the citation
+     *     has been added before; will be set to true by this method.
      */
-    static void Register(const char * cit, PetscBool * set);
+    static void Register(const char* pCitation, PetscBool* pSet);
 
     /**
      * Print the list of citations, called automatically when finalising the PETSc
-     * environment.
+     * environment (see PetscSetupUtils).
      */
     static void Print();
 

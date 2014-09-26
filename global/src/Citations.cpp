@@ -39,16 +39,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 std::vector<const char *> Citations::mCitations;
 #endif
 
-void Citations::Register(const char cit[], PetscBool *set)
+void Citations::Register(const char pCitation[], PetscBool* pSet)
 {
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
-    PetscCitationsRegister(cit, set);
+    PetscCitationsRegister(pCitation, pSet);
 #else
-    if (!(*set))
+    if (!(*pSet))
     {
         // Not yet added this one
-        mCitations.push_back(cit);
-        *set = PETSC_TRUE;
+        mCitations.push_back(pCitation);
+        *pSet = PETSC_TRUE;
     }
 #endif
 }

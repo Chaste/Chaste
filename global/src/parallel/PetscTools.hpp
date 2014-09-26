@@ -55,6 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EXIT_IF_SEQUENTIAL if(PetscTools::IsSequential()){TS_TRACE("This test is not meant to be executed in sequential.");return;}
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
+/**
+ * Older versions of PETSc used PetscTruth in place of PetscBool, so we define an alias for those installations.
+ */
 typedef PetscTruth PetscBool;
 /**
  * This macro is for converting a pre-PETSc3.2 "Destroy" function call (which involves an object, such as
