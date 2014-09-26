@@ -544,7 +544,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(5.0);
 
         TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        DistributedTetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> unstimulated_cell_factory(0.0);
