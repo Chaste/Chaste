@@ -474,7 +474,7 @@ public:
 
     void TestGeneralizedRushLarsen1CellsOpt() throw (Exception)
     {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1");
+        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen1Opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl1");
@@ -502,7 +502,7 @@ public:
 
     void TestGeneralizedRushLarsen2CellsOpt() throw (Exception)
     {
-        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2");
+        std::string dirname("TestPyCmlNightlyGeneralizedRushLarsen2Opt");
         std::vector<std::string> args;
         args.push_back("--Wu");
         args.push_back("--grl2");
