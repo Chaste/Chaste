@@ -133,7 +133,7 @@ private:
         Timer::Reset();
         OdeSolution solution = pCell->Compute(0.0, end_time, sampling_interval);
         std::stringstream message;
-        message << "Model " << rModelName << " writing to " << rOutputDirName << " took ";
+        message << "Model " << rModelName << " writing to " << rOutputDirName << " took";
         Timer::Print(message.str());
 
         const unsigned output_freq = 10; // Only output every N samples
@@ -484,7 +484,7 @@ public:
         models.erase(std::find(models.begin(), models.end(), "iyer_model_2004"));
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, models, args, true, -1000, false);
     }
 
     void TestGeneralizedRushLarsen2Cells() throw (Exception)
@@ -511,7 +511,7 @@ public:
         AddAllModels(models);
         // Winslow model needs a smaller timestep
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.0001, 0.1, 1.0);
-        RunTests(dirname, models, args, false, 0, false);
+        RunTests(dirname, models, args, true, -1000, false);
     }
 };
 

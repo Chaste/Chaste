@@ -139,6 +139,14 @@ public:
         // Check the models really use Rush-Larsen
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
 
+        // Some coverage
+        AbstractGeneralizedRushLarsenCardiacCell* p_grl_cell = dynamic_cast<AbstractGeneralizedRushLarsenCardiacCell*>(mpGeneralizedRushLarsenCell);
+        TS_ASSERT(p_grl_cell);
+        TS_ASSERT(!p_grl_cell->HasAnalyticJacobian());
+        TS_ASSERT(!p_grl_cell->GetUseAnalyticJacobian());
+        TS_ASSERT_THROWS_THIS(p_grl_cell->ForceUseOfNumericalJacobian(false),
+                              "Using analytic Jacobian terms for generalised Rush-Larsen is not yet supported.");
+
         // Normal Luo-Rudy for comparison
         boost::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
         CellLuoRudy1991FromCellML reference_model(p_heun_solver, mpGeneralizedRushLarsenCell->GetStimulusFunction());

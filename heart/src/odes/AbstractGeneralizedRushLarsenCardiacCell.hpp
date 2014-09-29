@@ -130,6 +130,21 @@ public:
      */
     void SolveAndUpdateState(double tStart, double tEnd);
 
+
+    /**
+     * @return whether the ODE system has an analytic Jacobian (#mHasAnalyticJacobian).
+     */
+    bool HasAnalyticJacobian() const;
+
+    /**
+     * Force the use of a numerical Jacobian, even if an analytic form is provided.
+     * This is needed for a handful of troublesome models.
+     *
+     * @param useNumericalJacobian  Whether to use a numerical instead of the analytic Jacobian.
+     */
+    void ForceUseOfNumericalJacobian(bool useNumericalJacobian = true);
+
+
 private:
 #define COVERAGE_IGNORE
     /**
@@ -168,6 +183,9 @@ protected:
 
     /** The state at the beginning of the current step, working memory for use by subclasses. */
     std::vector<double> mYInit;
+
+    /** Whether we have an analytic Jacobian. */
+    bool mHasAnalyticJacobian;
 };
 
 CLASS_IS_ABSTRACT(AbstractGeneralizedRushLarsenCardiacCell)

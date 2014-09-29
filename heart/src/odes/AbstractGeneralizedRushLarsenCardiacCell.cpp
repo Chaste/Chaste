@@ -56,7 +56,8 @@ AbstractGeneralizedRushLarsenCardiacCell::AbstractGeneralizedRushLarsenCardiacCe
     : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
                           numberOfStateVariables,
                           voltageIndex,
-                          pIntracellularStimulus)
+                          pIntracellularStimulus),
+      mHasAnalyticJacobian(false)
 {
     mPartialF.resize(numberOfStateVariables);
     mEvalF.resize(numberOfStateVariables);
@@ -150,3 +151,20 @@ void AbstractGeneralizedRushLarsenCardiacCell::SolveAndUpdateState(double tStart
     }
 }
 
+bool AbstractGeneralizedRushLarsenCardiacCell::HasAnalyticJacobian() const
+{
+    return mHasAnalyticJacobian;
+}
+
+void AbstractGeneralizedRushLarsenCardiacCell::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
+{
+    if (!useNumericalJacobian)
+    {
+        EXCEPTION("Using analytic Jacobian terms for generalised Rush-Larsen is not yet supported.");
+    }
+//    if (!useNumericalJacobian && !mHasAnalyticJacobian)
+//    {
+//        EXCEPTION("Analytic Jacobian requested, but this ODE system doesn't have one. You can check this with HasAnalyticJacobian().");
+//    }
+    mUseAnalyticJacobian = !useNumericalJacobian;
+}
