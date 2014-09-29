@@ -134,10 +134,16 @@ void AbstractGeneralizedRushLarsenCardiacCell::SolveAndUpdateState(double tStart
 {
     TimeStepper stepper(tStart, tEnd, mDt);
 
+    double v_old, v_new;
+    double& r_V = rGetStateVariables()[GetVoltageIndex()];
     while (!stepper.IsTimeAtEnd())
     {
+        v_old = r_V;
         UpdateTransmembranePotential(stepper.GetTime());
+        v_new = r_V;
+        r_V = v_old;
         ComputeOneStepExceptVoltage(stepper.GetTime());
+        r_V = v_new;
         VerifyStateVariables();
 
         stepper.AdvanceOneTimeStep();
