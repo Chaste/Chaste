@@ -360,9 +360,12 @@ public:
         {
             TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
         }
-
-        BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
-        TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
+        // Guard here because if it's massively parallel then a process may have no boundary
+        if (mesh.GetNumLocalBoundaryElements() > 0u)
+        {
+            BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
+            TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
+        }
     }
 
     void TestConstructFromMeshReader3DFullyQuadratic() throw(Exception)

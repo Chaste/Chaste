@@ -148,12 +148,15 @@ public:
 
         c_vector<double, 6> set_domain_size = mesh.GetBoxCollection()->rGetDomainSize();
         double box_width = mesh.GetBoxCollection()->GetBoxWidth();
+        double expected_domain_size[6] = {0.0, 3.0, 0.0, 3.0, 0.0, 3.0};
+        // Distributed boxes will extend the range of the z dimension when there are redundant processes
+        expected_domain_size[5] = (double) std::max(3u, PetscTools::GetNumProcs());
 
         // Check the correct domain size has been set (swelled to be a multiple of the box width)
         for (unsigned i=0; i<3; i++)
         {
             TS_ASSERT_DELTA(set_domain_size[2*i], 0.0, 1e-4);
-            TS_ASSERT_DELTA(set_domain_size[2*i+1], 3.0, 1e-4);
+            TS_ASSERT_DELTA(set_domain_size[2*i+1], expected_domain_size[2*i+1], 1e-4);
         }
 
         // Make sure the boxes are the width of the cut-off distance.
