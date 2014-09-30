@@ -1080,7 +1080,10 @@ class CellMLTranslator(object):
         for idx in self.doc.lookup_table_indexes.itervalues():
             if only_index is None or only_index == idx:
                 self.writeln('if (_lookup_table_', idx, ')')
-                self.writeln('delete[] _lookup_table_', idx, self.STMT_END, indent_offset=1)
+                self.open_block()
+                self.writeln('delete[] _lookup_table_', idx, self.STMT_END)
+                self.writeln('_lookup_table_', idx, self.EQ_ASSIGN, 'NULL', self.STMT_END)
+                self.close_block(blank_line=False)
 
     def output_lut_declarations(self):
         """Output declarations for the lookup tables."""
