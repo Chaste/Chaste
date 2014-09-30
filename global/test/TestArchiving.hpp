@@ -113,8 +113,8 @@ public:
             TS_ASSERT_DELTA(j.GetVectorOfDoubles()[1],1.2,1e-12);
             TS_ASSERT_DELTA(j.GetVectorOfDoubles()[2],1.3,1e-12);
 
-            TS_ASSERT_EQUALS(j.GetVectorOfBools()[0],true);
-            TS_ASSERT_EQUALS(j.GetVectorOfBools()[1],true);
+            TS_ASSERT(j.GetVectorOfBools()[0]);
+            TS_ASSERT(j.GetVectorOfBools()[1]);
         }
     }
 
