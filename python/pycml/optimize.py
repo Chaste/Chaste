@@ -122,7 +122,11 @@ class PartialEvaluator(object):
             return
         if expr._get_binding_time() is BINDING_TIMES.static:
             # Evaluate
-            value = expr.evaluate() # Needed here for the is_assignment case
+            try:
+                value = expr.evaluate() # Needed here for the is_assignment case
+            except:
+                print "Error evaluating", self._describe_expr(expr)
+                raise
             self._debug("Evaluated", self._describe_expr(expr), "to", value)
             if isinstance(expr, mathml_apply):
                 if expr.is_ode():
