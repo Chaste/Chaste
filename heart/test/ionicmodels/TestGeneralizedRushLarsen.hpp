@@ -146,6 +146,7 @@ public:
         TS_ASSERT(!p_grl_cell->GetUseAnalyticJacobian());
         TS_ASSERT_THROWS_THIS(p_grl_cell->ForceUseOfNumericalJacobian(false),
                               "Using analytic Jacobian terms for generalised Rush-Larsen is not yet supported.");
+        TS_ASSERT_THROWS_NOTHING(p_grl_cell->ForceUseOfNumericalJacobian(true));
 
         // Normal Luo-Rudy for comparison
         boost::shared_ptr<HeunIvpOdeSolver> p_heun_solver(new HeunIvpOdeSolver());
