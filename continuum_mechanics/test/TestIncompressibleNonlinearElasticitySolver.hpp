@@ -318,6 +318,14 @@ public:
 
     void TestComputeResidualAndGetNormWithBadDeformation() throw(Exception)
     {
+        // There are 10 nodes (including internals) which means that the (non)linear system
+        // can't be distributed over more than 10 processes.  This may cause deadlock in
+        // VecNorm when calculating the norm of the residual at the end of this test.
+        if (PetscTools::GetNumProcs() > 10u)
+        {
+            TS_TRACE("This test is designed for fewer processes!");
+            return;
+        }
         QuadraticMesh<3> mesh;
         TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
         mesh.ConstructFromMeshReader(mesh_reader1);
@@ -1194,7 +1202,7 @@ public:
             {
                 for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
                 {
-                    TS_ASSERT_DELTA(soln_normal[3*i+j], soln_reordered[3*i+j], 1e-7);
+                    TS_ASSERT_DELTA(soln_normal[3*i+j], soln_reordered[3*i+j], 4e-7);
                 }
             }
         }
@@ -1202,8 +1210,8 @@ public:
         // Check the solution at nodes 4 and 81
         for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
         {
-            TS_ASSERT_DELTA(soln_normal[3*4+j],  soln_reordered[3*81+j], 1e-7);
-            TS_ASSERT_DELTA(soln_normal[3*81+j], soln_reordered[3*4+j],  1e-7);
+            TS_ASSERT_DELTA(soln_normal[3*4+j],  soln_reordered[3*81+j], 4e-7);
+            TS_ASSERT_DELTA(soln_normal[3*81+j], soln_reordered[3*4+j],  4e-7);
         }
     }
 
