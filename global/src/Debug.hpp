@@ -67,7 +67,8 @@ void PrintTheStack();
 
 /** Print some trace containing the file name and line number. */
 #define MARK std::cout << FormDebugHead() <<  __FILE__ << " at line " << __LINE__ << std::endl << std::flush;
-
+/** Print some trace containing the file name and line number, but only on the matching process*/
+#define MARK_ON_PROCESS(proc) if (PetscTools::GetMyRank()==proc) std::cout << FormDebugHead() <<  __FILE__ << " at line " << __LINE__ << std::endl << std::flush;
 /** Print the name and value of the given variable.
  * @param var */
 #define PRINT_VARIABLE(var) std::cout << FormDebugHead() << #var " = " << var << std::endl << std::flush;

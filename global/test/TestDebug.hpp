@@ -107,9 +107,9 @@ public:
         vec[3] = 3.1;
         PRINT_VECTOR(vec);
 
-        MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 104"
-
-        MARK_IN_ORDER; // Something like: "DEBUG: proc 0 ./global/test/TestDebug.hpp at line 106" etc
+        MARK; // Something like: "DEBUG: ./global/test/TestDebug.hpp at line 110"
+        MARK_IN_ORDER; // Something like: "DEBUG: proc 0 ./global/test/TestDebug.hpp at line 111" etc
+        MARK_ON_PROCESS(1); // In serial there is no output.  In parallel, something like: "DEBUG: proc 1: ./global/test/TestDebug.hpp at line 112"
 
         // Check interaction with process isolation
         PetscTools::IsolateProcesses();
