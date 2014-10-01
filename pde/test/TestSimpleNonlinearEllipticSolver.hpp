@@ -427,7 +427,7 @@ public:
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = sqrt(x*(4-x));
-            TS_ASSERT_DELTA(answer_repl[i], u, 0.001);
+            TS_ASSERT_DELTA(answer_repl[i], u, 0.0015);
         }
 
         PetscTools::Destroy(badly_sized_init_guess);

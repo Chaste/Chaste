@@ -1405,6 +1405,12 @@ public:
     void TestPermutation()
     {
         int number_nodes = 10;
+        //Note that we need a 10x10 permutation matrix which is difficult to share over more processes
+        if (PetscTools::GetNumProcs() > 10u)
+        {
+            TS_TRACE("This test is designed for fewer processes!");
+            return;
+        }
         DistributedVectorFactory factory(number_nodes);
 
         Hdf5DataWriter writer(factory, "TestHdf5DataWriter", "hdf5_permuted", false);
