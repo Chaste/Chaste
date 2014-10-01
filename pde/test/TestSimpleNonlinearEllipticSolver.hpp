@@ -427,7 +427,7 @@ public:
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = sqrt(x*(4-x));
-            TS_ASSERT_DELTA(answer_repl[i], u, 0.0015);
+            TS_ASSERT_DELTA(answer_repl[i], u, 0.002); //Error is likely to accumulate at the Neumann boundary (x=0)
         }
 
         PetscTools::Destroy(badly_sized_init_guess);
