@@ -75,7 +75,7 @@ void Citations::Print()
         /* Write citations */
         for ( unsigned i=0; i<mCitations.size(); ++i )
         {
-            (*p_output) << mCitations[i] << std::endl;
+            (*p_output) << mCitations[i];
         }
         /* Write footer */
         (*p_output) << "===========================================================================" << std::endl;

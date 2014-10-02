@@ -77,13 +77,16 @@ void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context )
  */
 static PetscBool PetscCite1 = PETSC_FALSE;
 const char PetscCitation1[] = "@TechReport{petsc-user-ref,\n"
-                              "  Author = {Satish Balay and Shrirang Abhyankar and Mark F. Adams and Jed Brown and Peter Brune "
-                              "and Kris Buschelman and Victor Eijkhout and William D. Gropp and Dinesh Kaushik and Matthew G. "
-                              "Knepley and Lois Curfman McInnes and Karl Rupp and Barry F. Smith and Hong Zhang},\n"
+                              "  Author = {Satish Balay and Shrirang Abhyankar and Mark F. Adams and Jed Brown and Peter Brune\n"
+                              "            and Kris Buschelman and Victor Eijkhout and William D. Gropp\n"
+                              "            and Dinesh Kaushik and Matthew G. Knepley\n"
+                              "            and Lois Curfman McInnes and Karl Rupp and Barry F. Smith\n"
+                              "            and Hong Zhang},\n"
                               "  Title = {{PETS}c Users Manual},\n"
                               "  Number = {ANL-95/11 - Revision 3.5},\n"
                               "  Institution = {Argonne National Laboratory},\n"
-                              "  Year = {2014}}\n";
+                              "  Year = {2014}\n"
+                              "}\n";
 static PetscBool PetscCite2 = PETSC_FALSE;
 const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
                               "  Author = {Satish Balay and William D. Gropp and Lois Curfman McInnes and Barry F. Smith},\n"
@@ -91,8 +94,9 @@ const char PetscCitation2[] = "@InProceedings{petsc-efficient,\n"
                               "  Booktitle = {Modern Software Tools in Scientific Computing},\n"
                               "  Editor = {E. Arge and A. M. Bruaset and H. P. Langtangen},\n"
                               "  Pages = {163--202},\n"
-                              "  Publisher = {Birkh{\"{a}}user Press},\n"
-                              "  Year = {1997}}\n";
+                              "  Publisher = {Birkh{\\\"{a}}user Press},\n"
+                              "  Year = {1997}\n"
+                              "}\n";
 #endif
 
 /* Main Chaste citation */
@@ -108,7 +112,8 @@ const char ChasteCitation[] = "@article{mirams2013chaste,\n"
                               "  number    = {3},\n"
                               "  pages     = {e1002970},\n"
                               "  year      = {2013},\n"
-                              "  publisher = {Public Library of Science}\n}\n";
+                              "  publisher = {Public Library of Science}\n"
+                              "}\n";
 
 void PetscSetupUtils::InitialisePetsc()
 {
