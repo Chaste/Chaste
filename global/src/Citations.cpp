@@ -67,6 +67,7 @@ void Citations::Print()
             writing_to_file = true;
             std::string out_file_path = CommandLineArguments::Instance()->GetStringCorrespondingToOption("-citations");
             p_output = new std::ofstream( out_file_path.c_str(), std::ios::out );
+            EXCEPT_IF_NOT( p_output->good() );
         }
 
         /* Write header */

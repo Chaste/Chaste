@@ -49,18 +49,27 @@ class TestCitations : public CxxTest::TestSuite
 public:
     void TestChasteCitation() throw (Exception)
     {
-        // Make a directory to output the citations file
-        OutputFileHandler output_dir("TestCitations");
-        FileFinder output_file(output_dir.GetOutputDirectoryFullPath() + "citations.txt");
-
+        /*
+         * Get location of output file to pass through as -citation argument.
+         * At this point we haven't called PetscSetup, so the number of threads
+         * running at this point is implementation-dependent, and it's not really
+         * safe to do anything collective! Fortunately FileFinder isn't.
+         */
+        FileFinder output_file("TestCitations/citations.txt", RelativeTo::ChasteTestOutput);
         // Turn on citations with argument
         CommandLineArgumentsMocker mocker("-citations " + output_file.GetAbsolutePath());
+
         PetscSetupUtils::CommonSetup(); // This automatically includes some citations
+        /*
+         * Make empty directory now that Petsc is set up, because this must be done
+         * collectively.
+         */
+        OutputFileHandler handler("TestCitations");
         PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
 
         // Check
         FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
-        FileComparison check_files(output_file, reference_citations);
+        FileComparison check_files(output_file, reference_citations, false); // Not collective
         check_files.CompareFiles();
     }
 };

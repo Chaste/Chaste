@@ -49,8 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This feature may be switched on by passing the "-citations" flag at runtime
  * to print to screen, or to file.txt using "-citations file.txt". Paths for the
- * latter can be relative or absolute, but have NO error checking, so care is
- * advised.
+ * latter can be relative or absolute, if the file can't be written (because the
+ * directory doesn't exist, or otherwise) you'll get an exception.
  *
  * See r22760 for an example of adding a new citation to the trunk and registering
  * it.
