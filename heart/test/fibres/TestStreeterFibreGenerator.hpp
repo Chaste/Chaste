@@ -54,6 +54,8 @@ class TestStreeterFibreGenerator : public CxxTest::TestSuite
 private:
     void CompareGeneratedWithReferenceFile(FileFinder& rGeneratedFile, FibreFileType generatedFileType, FileFinder& rReferenceFile, FibreFileType referenceFileType) throw (Exception)
     {
+        // Make sure that any parallel file writers have finished before attempting to open
+        PetscTools::Barrier("Wait for WriteData()");
         FibreReader<3> fibre_reader1(rGeneratedFile, generatedFileType);
         FibreReader<3> fibre_reader2(rReferenceFile, referenceFileType);
 

@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
-#include "Debug.hpp"
+
 double MATERIAL_PARAM = 1.0;
 double ALPHA = 0.2;
 
