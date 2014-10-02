@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
-
+#include "Debug.hpp"
 double MATERIAL_PARAM = 1.0;
 double ALPHA = 0.2;
 
@@ -1202,7 +1202,7 @@ public:
             {
                 for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
                 {
-                    TS_ASSERT_DELTA(soln_normal[3*i+j], soln_reordered[3*i+j], 4e-7);
+                    TS_ASSERT_DELTA(soln_normal[3*i+j], soln_reordered[3*i+j], 7e-7);
                 }
             }
         }
@@ -1211,7 +1211,7 @@ public:
         for(unsigned j=0; j<3; j++) // [u,v,p] unknowns
         {
             TS_ASSERT_DELTA(soln_normal[3*4+j],  soln_reordered[3*81+j], 4e-7);
-            TS_ASSERT_DELTA(soln_normal[3*81+j], soln_reordered[3*4+j],  4e-7);
+            TS_ASSERT_DELTA(soln_normal[3*81+j], soln_reordered[3*4+j],  5e-7);
         }
     }
 
