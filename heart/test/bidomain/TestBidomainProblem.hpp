@@ -182,6 +182,12 @@ public:
 
     void TestBidomainErrorHandling() throw (Exception)
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 nodes in this simulation
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 1.75, 1.75));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(7.0, 7.0, 7.0));
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms

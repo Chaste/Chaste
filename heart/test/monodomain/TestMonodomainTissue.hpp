@@ -132,10 +132,16 @@ class TestMonodomainTissue : public CxxTest::TestSuite
 public:
     void TestMonodomainTissueBasic() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 nodes in this simulation
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
         HeartConfig::Instance()->Reset();
         unsigned num_nodes=2;
         TetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 2 node mesh
+        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. A mesh with 2 nodes
         assert(mesh.GetNumNodes()==num_nodes);
 
         double start_time = 0;
@@ -226,9 +232,15 @@ public:
 
     void TestMonodomainTissueGetCardiacCell() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 nodes in this simulation
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
         HeartConfig::Instance()->Reset();
         TetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 2 node mesh
+        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. 2 nodes in the mesh
 
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);
@@ -250,9 +262,15 @@ public:
 
     void TestSolveCellSystemsInclUpdateVoltage() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 nodes in this simulation
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
         HeartConfig::Instance()->Reset();
         TetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, ie 2 node mesh
+        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. a 2 node mesh
 
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);
@@ -352,9 +370,15 @@ public:
 
     void TestSolveCellSystemsInclUpdateVoltageWithNodeExchange() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 nodes in this simulation
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
         HeartConfig::Instance()->Reset();
         DistributedTetrahedralMesh<1,1> mesh;
-        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=0.1, ie 11 node mesh
+        mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. 2 node mesh
 
         MyCardiacCellFactory cell_factory;
         cell_factory.SetMesh(&mesh);

@@ -102,6 +102,12 @@ public:
 
     void TestBidomainTissueSolveCellSystems( void )
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 nodes in this simulation
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
         // This call is required to set the appropriate conductivity media and to make sure that
         // HeartConfig knows the mesh filename despite we use our own mesh reader.
         HeartConfig::Instance()->SetMeshFileName("linear_mesh", cp::media_type::NoFibreOrientation);

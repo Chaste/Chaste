@@ -511,6 +511,13 @@ public:
 
     void TestCardiacSimulationKirsten() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 2u)
+        {
+            // There are only 2 layers of nodes in this simulation -- z length is equal to space step.
+            TS_TRACE("This test is not suitable for more than 2 processes.");
+            return;
+        }
+
         CardiacSimulation simulation("heart/test/data/xml/base_monodomain_tt06_region.xml");
         std::string foldername = "Kirsten";
         TS_ASSERT(CompareFilesViaHdf5DataReaderGlobalNorm("heart/test/data/cardiac_simulations", "Kirsten", false,

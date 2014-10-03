@@ -72,19 +72,21 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     }
 
     unsigned num_local_nodes = mpDistributedVectorFactory->GetLocalOwnership();
-    unsigned ownership_range_low = mpDistributedVectorFactory->GetLow();
-    mCellsDistributed.resize(num_local_nodes);
-    if(num_local_nodes == 0u)
+    bool process_has_no_nodes = (num_local_nodes == 0u);
+    if (PetscTools::ReplicateBool(process_has_no_nodes))
     {
+        /* If there are no nodes on a process then there is a potential for an error in preconditioning.
+         * This is dangerous because the process without nodes may segfault and not propagate the error
+         * to the other processes.  Therefore, to avoid deadlock, we share this potential for error between
+         * processes and throw an exception.
+         */
 #define COVERAGE_IGNORE
-        // This process owns no nodes.
         // This problem normally occurs on 3 or more processes, so we can't cover it - coverage only runs with 1 and 2 processes.
-        WARNING("No cells were assigned to process " << PetscTools::GetMyRank() << " in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
-        // Make sure this warning is printed to screen even when the simulation crashes
-        Warnings::PrintWarnings();
-        // Investigate (refer to ticket #2282) why having some processors without any nodes causes some simulations to fail (HECToR)
+        EXCEPTION("No cells were assigned some process in AbstractCardiacTissue constructor. Advice: Make total number of processors no greater than number of nodes in the mesh");
 #undef COVERAGE_IGNORE
     }
+    unsigned ownership_range_low = mpDistributedVectorFactory->GetLow();
+    mCellsDistributed.resize(num_local_nodes);
 
     // Figure out if we're dealing with Purkinje
     AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* p_purkinje_cell_factory
