@@ -167,7 +167,12 @@ public:
 
     void TestBidomainTissueWithHeterogeneousConductivitiesDistributed() throw (Exception)
     {
-        HeartConfig::Instance()->Reset();
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
+       HeartConfig::Instance()->Reset();
 
         // This call is required to set the appropriate conductivity media and to make sure that
         // HeartConfig knows the mesh filename despite we use our own mesh reader.

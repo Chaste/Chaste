@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CompareHdf5ResultsFiles.hpp"
 #include "OutputFileHandler.hpp"
 #include "FileFinder.hpp"
+#include "Debug.hpp"
 
 class TestCheckpointing : public CxxTest::TestSuite
 {
@@ -105,6 +106,11 @@ public:
 
     void TestCheckpointingGeneratesMultipleDirectories() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         CardiacSimulation simulation("heart/test/data/xml/bidomain2d_checkpoint.xml");
 
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetSimulationDuration(), 0.2);
@@ -139,6 +145,11 @@ public:
 
     void TestCheckpointingGeneratesSameResults()
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         CardiacSimulation simulation("heart/test/data/xml/bidomain2d_checkpoint.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetOutputDirectory(), "SaveBi2DCheckPoint");
 

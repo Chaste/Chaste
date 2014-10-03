@@ -215,7 +215,12 @@ public:
     //This test reproduces the problem size of heart/test/data/xml/bidomain1d_small.xml
     void TestBidomainSmallestMesh()
     {
-        HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
+       HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
         HeartConfig::Instance()->SetFibreLength(0.1, 0.05);
         HeartConfig::Instance()->SetSpaceDimension(1u);
         HeartConfig::Instance()->SetOutputDirectory("Bidomain1dSmall");

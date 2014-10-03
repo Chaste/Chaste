@@ -92,6 +92,11 @@ public:
 
     void TestMono1dSmall() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         // Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/monodomain1d_small.xml", true);
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "mono_1d_small", false,
@@ -108,6 +113,11 @@ public:
 
     void TestMono2dSmall() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         //Clear any warnings from previous tests
         Warnings::QuietDestroy();
         {
@@ -150,6 +160,11 @@ public:
 
     void TestMono3dSmall() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         CardiacSimulation simulation("heart/test/data/xml/monodomain3d_small.xml");
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/monodomain3d_resume.xml");
@@ -169,6 +184,11 @@ public:
 
     void TestMonoStimUsingEllipsoids() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         // Fox2002BackwardEuler cell model
         CardiacSimulation simulation("heart/test/data/xml/monodomain1d_stim_using_ellipsoid.xml", true);
         TS_ASSERT( CompareFilesViaHdf5DataReader("heart/test/data/cardiac_simulations", "monodomain1d_stim_using_ellipsoid", false,
@@ -177,6 +197,11 @@ public:
 
     void TestBi1dSmall() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         { CardiacSimulation simulation("heart/test/data/xml/bidomain1d_small.xml"); }
         { CardiacSimulation simulation2("heart/test/data/xml/bidomain1d_resume.xml"); }
         {
@@ -189,13 +214,23 @@ public:
     }
     void TestBi2dSmall() throw(Exception)
     {
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
         CardiacSimulation simulation("heart/test/data/xml/bidomain2d_small.xml");
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/bidomain2d_resume.xml");
     }
     void TestBi3dSmall() throw(Exception)
     {
-        CardiacSimulation simulation("heart/test/data/xml/bidomain3d_small.xml");
+        if (PetscTools::GetNumProcs() > 3u)
+        {
+            TS_TRACE("This test is not suitable for more than 3 processes.");
+            return;
+        }
+       CardiacSimulation simulation("heart/test/data/xml/bidomain3d_small.xml");
         //Check that archive which has just been produced can be read
         CardiacSimulation simulation2("heart/test/data/xml/bidomain3d_resume.xml");
     }
