@@ -1096,6 +1096,11 @@ template void TetrahedralMesh<1u, 1u>::ImportFromMesher<tetgen::tetgenio>(tetgen
 template void TetrahedralMesh<2u, 2u>::ImportFromMesher<tetgen::tetgenio>(tetgen::tetgenio&, unsigned int, int*, unsigned int, int*, int*);
 template void TetrahedralMesh<1u, 1u>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
 
+// Compiler on ARC cluser HAL requires the following
+template void TetrahedralMesh<3u, 3u>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
+template void TetrahedralMesh<1u, 1u>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
+template void TetrahedralMesh<2u, 2u>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
+
 // Intel v11 compilation thinks that it's missing even more bizarre instantiations
 //template void TetrahedralMesh<2,2>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
 //template void TetrahedralMesh<3,3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
