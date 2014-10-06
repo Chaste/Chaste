@@ -541,19 +541,29 @@ public:
         // Create a cell population
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
-        // Make one cell start apoptosis
-        node_based_cell_population.GetCellUsingLocationIndex(PetscTools::GetMyRank())->StartApoptosis();
+        // Only do this is we have some local nodes in the mesh...
+        if (mesh.GetNumNodes() > PetscTools::GetMyRank())
+        {
+            // Make one cell start apoptosis
+            node_based_cell_population.GetCellUsingLocationIndex(PetscTools::GetMyRank())->StartApoptosis();
 
-        // Test we have the right numbers of nodes and cells
-        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
-        TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), mesh.GetNumNodes());
+            // Test we have the right numbers of nodes and cells
+            TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), mesh.GetNumNodes());
 
-        // Test GetNeighbouringNodeIndices() method
-        TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(PetscTools::GetMyRank()), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+            // Test GetNeighbouringNodeIndices() method
+            TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(PetscTools::GetMyRank()), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+        }
 
+        // Update
         node_based_cell_population.Update();
 
-        TS_ASSERT_THROWS_CONTAINS(node_based_cell_population.GetNeighbouringNodeIndices(PetscTools::GetMyRank()), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell");
+        // Only do this is we have some local nodes in the mesh...
+        if (mesh.GetNumNodes() > PetscTools::GetMyRank())
+        {
+
+            TS_ASSERT_THROWS_CONTAINS(node_based_cell_population.GetNeighbouringNodeIndices(PetscTools::GetMyRank()), "mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell");
+        }
     }
 
     void TestAddAndRemoveAndAddWithOutRemovingDeletedNodes()
