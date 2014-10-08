@@ -326,11 +326,11 @@ public:
         {
             if (vector_index == 2u || vector_index == 3u || vector_index == 4u)
             {
-                TS_ASSERT_EQUALS(labelled[vector_index], true);
+                TS_ASSERT(labelled[vector_index]);
             }
             else
             {
-                TS_ASSERT_EQUALS(labelled[vector_index], false);
+                TS_ASSERT(!labelled[vector_index]);
             }
         }
         RandomNumberGenerator::Destroy();

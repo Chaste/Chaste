@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #ifndef _ODE5JACOBIAN_HPP_
-#define _ODE5JACONIAN_HPP_
+#define _ODE5JACOBIAN_HPP_
 
 #include "AbstractOdeSystemWithAnalyticJacobian.hpp"
 #include "OdeSystemInformation.hpp"

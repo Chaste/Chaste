@@ -96,8 +96,8 @@ public:
             TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2,1e-12);
             TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
-            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
-            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+            TS_ASSERT(p_recv_class->GetVectorOfBools()[0]);
+            TS_ASSERT(p_recv_class->GetVectorOfBools()[1]);
 
         }
     }
@@ -152,8 +152,8 @@ public:
                     TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2 + PetscTools::GetMyRank(),1e-12);
                     TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3 + p,1e-12);
 
-                    TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
-                    TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+                    TS_ASSERT(p_recv_class->GetVectorOfBools()[0]);
+                    TS_ASSERT(p_recv_class->GetVectorOfBools()[1]);
                 }
             }
         }
@@ -209,8 +209,8 @@ public:
             TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[1],1.2+PetscTools::GetMyRank(),1e-12);
             TS_ASSERT_DELTA(p_recv_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
-            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[0],true);
-            TS_ASSERT_EQUALS(p_recv_class->GetVectorOfBools()[1],true);
+            TS_ASSERT(p_recv_class->GetVectorOfBools()[0]);
+            TS_ASSERT(p_recv_class->GetVectorOfBools()[1]);
         }
         PetscTools::Barrier("Make sure that no ISendObject buffers are in use before proceeding");
     }
@@ -250,8 +250,8 @@ public:
             TS_ASSERT_DELTA(p_class->GetVectorOfDoubles()[1],1.2,1e-12);
             TS_ASSERT_DELTA(p_class->GetVectorOfDoubles()[2],1.3,1e-12);
 
-            TS_ASSERT_EQUALS(p_class->GetVectorOfBools()[0],true);
-            TS_ASSERT_EQUALS(p_class->GetVectorOfBools()[1],true);
+            TS_ASSERT(p_class->GetVectorOfBools()[0]);
+            TS_ASSERT(p_class->GetVectorOfBools()[1]);
         }
     }
 };

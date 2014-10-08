@@ -193,7 +193,7 @@ public:
              ++cell_iter)
         {
             unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            TS_ASSERT_EQUALS(is_particle[node_index], false);
+            TS_ASSERT(!is_particle[node_index]);
             counter++;
         }
 
