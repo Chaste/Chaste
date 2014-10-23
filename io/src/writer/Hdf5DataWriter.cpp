@@ -291,7 +291,7 @@ void Hdf5DataWriter::OpenFile()
 
     // Set up a property list saying how we'll open the file
     hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
-    H5Pset_fapl_mpiposix(fapl, PETSC_COMM_WORLD, 0);
+    H5Pset_fapl_mpio(fapl, PETSC_COMM_WORLD, MPI_INFO_NULL);
 
     // Set size of each dimension in main dataset.
     mDatasetDims[0] = mEstimatedUnlimitedLength; // While developing we got a non-documented "only the first dimension can be extendible" error.
