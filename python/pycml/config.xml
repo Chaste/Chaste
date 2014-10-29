@@ -35,12 +35,6 @@
       <max>99.9999</max>
       <step>0.001</step>
     </lookup_table>
-    <lookup_table units="mM">
-      <var type="oxmeta">cytosolic_calcium_concentration</var>
-      <min>0.000001</min><!-- Can't do log(0) -->
-      <max>30.000001</max>
-      <step>0.000001</step>
-    </lookup_table>
   </lookup_tables>
 
   <!-- Default settings for finding key variables in potentially non-annotated models -->
