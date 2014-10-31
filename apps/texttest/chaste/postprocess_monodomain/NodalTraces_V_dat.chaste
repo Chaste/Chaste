@@ -28,7 +28,7 @@
 -49.8653	-49.8649	
 -42.8708	-42.8697	
 -30.7966	-30.7955	
--0.748315	-0.754925	
+-0.748318	-0.754927	
 30.2098	30.1961	
 41.0788	41.0601	
 44.7399	44.7153	
@@ -39,3 +39,4 @@
 45.1667	45.0719	
 44.498	44.3738	
 43.755	43.5948	
+# Created by Chaste version 3.2.23000 (with uncommitted modifications) on Fri, 31 Oct 2014 12:48:16 +0000.  Chaste was built on Fri, 31 Oct 2014 12:38:50 +0000 by machine (uname) 'Linux scoop 3.2.0-32-generic #51-Ubuntu SMP Wed Sep 26 21:33:09 UTC 2012 x86_64' using settings: GccOptNative, shared libraries.  Checked-out project versions: DanH=22719M; JohnW=18696.
