@@ -507,9 +507,12 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     unsigned num_cells = this->GetNumRealCells();
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
-    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    unsigned num_cell_data_items = 0u;
+    if (num_cells > 0u)
+    {
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     // Not used here: std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
-
+    }
     std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
     {
