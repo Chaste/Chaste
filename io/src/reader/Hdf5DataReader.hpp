@@ -49,6 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A concrete HDF5 data reader class.
+ *
+ * \todo Add to documentation whether we can call this in serial/parallel, whether we can call it when file is open already etc...
  */
 class Hdf5DataReader : public AbstractHdf5Access
 {
