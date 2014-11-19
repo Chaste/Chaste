@@ -483,11 +483,13 @@ public:
      * @param intraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
      */
     void GetIntracellularConductivities(c_vector<double, 3>& intraConductivities) const;
+
     /**
      * 2D version
      * @param intraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
      */
     void GetIntracellularConductivities(c_vector<double, 2>& intraConductivities) const;
+
     /**
      * 1D version
      * @param intraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
@@ -499,11 +501,13 @@ public:
      * @param extraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
      */
     void GetExtracellularConductivities(c_vector<double, 3>& extraConductivities) const;
+
     /**
      * 2D version
      * @param extraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
      */
     void GetExtracellularConductivities(c_vector<double, 2>& extraConductivities) const;
+
     /**
      * 1D version
      * @param extraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
@@ -758,6 +762,7 @@ public:
      * @param inter_node_space  Spacing in cartesian direction (cm). Diagonals will be longer.
      */
     void SetSlabDimensions(double x, double y, double z, double inter_node_space);
+
     /**
      * Set dimensions of simulation for use with a cuboid mesh generated on the fly.  2-D.
      * @param x  length in 1st dimension (cm)
@@ -765,6 +770,7 @@ public:
      * @param inter_node_space  Spacing in cartesian direction (cm). Diagonals will be longer.
      */
     void SetSheetDimensions(double x, double y, double inter_node_space);
+
     /**
      * Set dimensions of simulation for use with a cuboid mesh generated on the fly.  1-D.
      * @param x  length in 1st dimension (cm)
@@ -804,6 +810,7 @@ public:
      * @param rOutputDirectory  Full path to output directory (will be created if necessary)
      */
     void SetOutputDirectory(const std::string& rOutputDirectory);
+
     /**
      * @param rOutputFilenamePrefix  Prefix for files
      * If set to "res" this will produce
@@ -849,11 +856,13 @@ public:
      * @param rIntraConductivities  DIM-vector of intracellular conductivities (mS/cm)
      */
     void SetIntracellularConductivities(const c_vector<double, 3>& rIntraConductivities);
+
     /**
      * 2D version
      * @param rIntraConductivities  DIM-vector of intracellular conductivities (mS/cm)
      */
     void SetIntracellularConductivities(const c_vector<double, 2>& rIntraConductivities);
+
     /**
      * 1D version
      * @param rIntraConductivities  DIM-vector of intracellular conductivities (mS/cm)
@@ -865,11 +874,13 @@ public:
      * @param rExtraConductivities  DIM-vector of extracellular conductivities (mS/cm)
      */
     void SetExtracellularConductivities(const c_vector<double, 3>& rExtraConductivities);
+
     /**
      * 2D version
      * @param rExtraConductivities  DIM-vector of extracellular conductivities (mS/cm)
      */
     void SetExtracellularConductivities(const c_vector<double, 2>& rExtraConductivities);
+
     /**
      * 1D version
      * @param rExtraConductivities  DIM-vector of extracellular conductivities (mS/cm)

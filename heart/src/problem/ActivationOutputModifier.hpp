@@ -93,6 +93,7 @@ public:
           mThreshold(threshold)
     {
     }
+
     /**
      * Initialise the modifier (make space for local activation times) when the solve loop is starting.
      *
@@ -108,7 +109,7 @@ public:
     virtual void FinaliseAtEnd();
 
     /**
-     * Process a solution time-step (memoize all new activations)
+     * Process a solution time-step (memorise all new activations)
      * @param time  The current simulation time
      * @param solution  A working copy of the solution at the current time-step.  This is the PETSc vector which is distributed across the processes.
      * @param problemDim  The calling problem dimension. Used here to avoid probing the size of the solution vector
