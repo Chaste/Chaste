@@ -439,6 +439,7 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
             test_log_files.append(SConscript(script, src_dir=toplevel_dir, build_dir=bld_dir, duplicate=0))
     
     # Any user projects?
+    project_path_list = set()
     for project in glob.glob('projects/*'):
         if not os.path.isdir(project):
             if debug:
@@ -447,6 +448,11 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
         if not os.path.exists(os.path.join(project, 'SConscript')):
             print >>sys.stderr, "Unexpected folder", project, "in projects folder."
             continue
+        real_path = os.path.realpath(project)
+        if real_path in project_path_list:
+            raise ValueError('Two project folders have the same real path (%s)! This would cause compilation failure; bailing out.' % real_path)
+        else:
+            project_path_list.add(real_path)
         if install_files and not (project in BUILD_TARGETS or project+os.sep in BUILD_TARGETS):
             # Only install projects if explicitly requested
             continue
@@ -459,6 +465,7 @@ if not isinstance(build, BuildTypes.DoxygenCoverage):
             test_log_files.append(SConscript(script, src_dir=project, variant_dir=bld_dir, duplicate=0))
         else:
             test_log_files.append(SConscript(script, src_dir=project, build_dir=bld_dir, duplicate=0))
+    del project_path_list
      
     # Calculate full library dependencies now we know what projects need
     # This also sets up the full include paths for each component & project
