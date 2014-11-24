@@ -78,7 +78,7 @@ class CellMLValidator(object):
                 try:
                     self.relaxng_validator = klass(schema_base)
                 except ValidatorError, e:
-                    run_errors.append(e)
+                    run_errors.append(str(e))
                 else:
                     break
             if not self.relaxng_validator:
