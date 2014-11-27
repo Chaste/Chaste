@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import glob
 import os
+import subprocess
 
 # If you are an active developer, committing back to the trunk, 
 # please uncomment the following line to run tests on duplicate file names, 
@@ -101,8 +102,16 @@ if ubuntu_ver >= [10,10]:
 if ubuntu_ver >= [9,10] and ubuntu_ver <= [12,10]:
     boost_libs = map(lambda l: l+'-mt', boost_libs)
 
+# Determine installed version of Xerces
+if subprocess.check_output(['dpkg-query', '-W', '-f', '${version}', 'libxerces-c-dev']):
+    # Xerces 3(.1)
+    xerces_lib = 'xerces-c-3.1'
+else:
+    # Xerces 2(.8)
+    xerces_lib = 'xerces-c'
+
 other_libraries = libs_for_petsc + boost_libs + \
-                  ['xerces-c',
+                  [xerces_lib,
                    'hdf5', 'z',
                    'parmetis', 'metis']
 
