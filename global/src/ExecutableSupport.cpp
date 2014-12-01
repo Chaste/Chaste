@@ -69,7 +69,10 @@ typedef std::pair<std::string, std::string> StringPair;
 #ifdef CHASTE_CVODE
 #include <sundials/sundials_config.h>
 #endif
+
+// Note: the following are not a requirement for cell-based Chaste so may not be present!
 //#include <xsd/cxx/version.hxx>
+//#include <xercesc/util/XercesVersion.hpp>
 
 // Check whether the version of ParMETIS being used is the one we wanted
 #ifdef CHASTE_PARMETIS_REQUIRED
@@ -366,6 +369,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "." << PARMETIS_SUBMINOR_VERSION;
 #endif
     output << "</Parmetis>" << std::endl;
+//    output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n"; // Note: not a requirement for cell-based so may not be present!
     output << "\t\t</CompiledIn>\n";
 
     output << "\t\t<Binaries>\n";
