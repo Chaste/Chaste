@@ -104,7 +104,7 @@ if ubuntu_ver >= [9,10] and ubuntu_ver <= [12,10]:
 
 # Determine installed version of Xerces
 try:
-    xerces3 = bool(subprocess.check_output(['dpkg-query', '-W', '-f', '${version}', 'libxerces-c-dev']))
+    xerces3 = bool(subprocess.check_output(['dpkg-query', '-W', '-f', '${version}', 'libxerces-c-dev'], stderr=subprocess.STDOUT))
 except:
     xerces3 = False
 if xerces3:
