@@ -103,11 +103,15 @@ if ubuntu_ver >= [9,10] and ubuntu_ver <= [12,10]:
     boost_libs = map(lambda l: l+'-mt', boost_libs)
 
 # Determine installed version of Xerces
-if subprocess.check_output(['dpkg-query', '-W', '-f', '${version}', 'libxerces-c-dev']):
-    # Xerces 3(.1)
+try:
+    xerces3 = bool(subprocess.check_output(['dpkg-query', '-W', '-f', '${version}', 'libxerces-c-dev']))
+except:
+    xerces3 = False
+if xerces3:
+    # Xerces 3.1
     xerces_lib = 'xerces-c-3.1'
 else:
-    # Xerces 2(.8)
+    # Xerces 2.8
     xerces_lib = 'xerces-c'
 
 other_libraries = libs_for_petsc + boost_libs + \
