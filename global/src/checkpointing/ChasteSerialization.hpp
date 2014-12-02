@@ -86,4 +86,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error "Chaste won't work with Boost 1.41 due to a bug in its serialization library."
 #endif
 
+/**
+ * Add some missing #includes for boost 1.56 and boost 1.57,
+ * these are to work around bugs in these boost versions.
+ *
+ * See tickets #2585 (boost 1.56) and #2626 (boost 1.57).
+ */
+#if BOOST_VERSION == 105600
+#include <boost/serialization/singleton.hpp>
+#include <boost/serialization/extended_type_info.hpp>
+#endif
+
+#if BOOST_VERSION == 105700
+#include <boost/serialization/type_info_implementation.hpp>
+#endif
+
 #endif // CHASTESERIALIZATION_HPP_
