@@ -357,13 +357,38 @@ public:
         p_gen->Shuffle(just_empty);
     }
 
+    void TestDistributionReproducibilityAcrossPlatforms()
+    {
+        // Simple test that the underlying method for producing a particular distribution has not changed.
+        // This test checks that the underlying RNG is the doing the same thing on your operating system
+        RandomNumberGenerator::Destroy();
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+
+        //Predictable uniform?
+        p_gen->Reseed(42);
+        TS_ASSERT_DELTA(p_gen->ranf(), 0.3745, 1e-4);
+
+        //Predictable exponential?
+        p_gen->Reseed(42);
+        TS_ASSERT_DELTA(p_gen->ExponentialRandomDeviate(4.0), 0.1173, 1e-4);
+
+        //Predictable gamma?
+        p_gen->Reseed(42);
+        TS_ASSERT_DELTA(p_gen->GammaRandomDeviate(1.0, 2.0), 0.9385, 1e-4);
+
+        //Predictable normal?
+        p_gen->Reseed(42);
+        // NB fails on Boost 1.56 and above
+        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), -1.2582, 1e-4);  ///\todo #2585
+    }
+
     void TestReproducibilityAcrossPlatforms()
     {
         // This test checks that the underlying RNG is the doing the same thing on your operating system
         RandomNumberGenerator::Destroy();
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-        p_gen->Reseed(42);
 
+        p_gen->Reseed(42);
         TS_ASSERT_DELTA(p_gen->ranf(), 0.3745, 1e-4);
 
         std::vector<unsigned> empty_perm_for_shuffle;
