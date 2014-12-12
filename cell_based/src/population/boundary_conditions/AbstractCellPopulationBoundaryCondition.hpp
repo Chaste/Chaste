@@ -90,7 +90,7 @@ public:
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
-     * @param rOldLocations the node locations before any boundary conditions are applied
+     * @param rOldLocations the node locations prior to being updated in UpdateNodePositions()
      */
     virtual void ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)=0;
 

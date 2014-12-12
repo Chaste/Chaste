@@ -65,18 +65,18 @@ private:
     /** The location of this node within the mesh. */
     c_vector<double, SPACE_DIM> mLocation;
 
-    /** A pointer to a NodeAttributes class asscoiated with this node. */
+    /** A pointer to a NodeAttributes object associated with this node. */
     NodeAttributes<SPACE_DIM>* mpNodeAttributes;
 
     /** Whether this node is a boundary node. */
     bool mIsBoundaryNode;
 
-    /** Whether this node is an internal node. (For use with QuadraticMesh)*/
+    /** Whether this node is an internal node (for use in the QuadraticMesh class). */
     bool mIsInternal;
 
     /**
-     * Whether this node has been deleted, and hence
-     * whether its location in the mesh can be re-used. (For use in MutableMesh)
+     * Whether this node has been deleted, and hence whether its location in the
+     * mesh can be re-used (for use in the MutableMesh class).
      */
     bool mIsDeleted;
 
@@ -117,12 +117,12 @@ private:
     void CommonConstructor(unsigned index, bool isBoundaryNode);
 
     /**
-     * Construct an empty NodeAttributes container
+     * Construct an empty NodeAttributes container.
      */
     void ConstructNodeAttributes();
 
     /**
-     * Check that node attributes have been set up, and throw and exception if not.
+     * Check that node attributes have been set up, and throw an exception if not.
      */
     void CheckForNodeAttributes() const;
 
@@ -134,7 +134,7 @@ public:
      */
 
     /**
-     * Constructor which takes the node's location as a ChastePoint.
+     * Constructor that takes in the node's location as a ChastePoint.
      *
      * @param index  the index of the node in the mesh
      * @param point  the location of the node in the mesh
@@ -143,7 +143,7 @@ public:
     Node(unsigned index, ChastePoint<SPACE_DIM> point, bool isBoundaryNode=false);
 
     /**
-     * Constructor which takes the node's location as a std::vector.
+     * Constructor that takes in the node's location as a std::vector.
      *
      * @param index  the index of the node in the mesh
      * @param coords  the location of the node in the mesh
@@ -152,7 +152,7 @@ public:
     Node(unsigned index, std::vector<double> coords, bool isBoundaryNode=false);
 
     /**
-     * Constructor which takes the node's location as a c_vector.
+     * Constructor that takes in the node's location as a c_vector.
      *
      * @param index  the index of the node in the mesh
      * @param location  the location of the node in the mesh
@@ -161,7 +161,7 @@ public:
     Node(unsigned index, c_vector<double, SPACE_DIM> location, bool isBoundaryNode=false);
 
     /**
-     * Constructor which takes the coordinates of the node's location as separate input arguments.
+     * Constructor that takes the coordinates of the node's location as separate input arguments.
      *
      * @param index  the index of the node in the mesh
      * @param isBoundaryNode  whether the node is a boundary node (defaults to false)
@@ -172,7 +172,7 @@ public:
     Node(unsigned index, bool isBoundaryNode=false, double v1=0, double v2=0, double v3=0);
 
     /**
-     * Constructor which takes the coordinates of the node's location as array pointer.
+     * Constructor that takes in the coordinates of the node's location as an array pointer.
      *
      * @param index  the index of the node in the mesh
      * @param isBoundaryNode  whether the node is a boundary node (defaults to false)
@@ -182,22 +182,22 @@ public:
     Node(unsigned index,  double *location, bool isBoundaryNode=false);
 
     /**
-     * Explicit destructor to free memory from mpNodeAttributes
+     * Explicit destructor to free memory from mpNodeAttributes.
      */
     ~Node();
 
     /**
      * Set the node's location.
      *
-     * Note: setting the point in space is dangerous.
-     * Jacobian and JacobianDeterminant of element need to be updated.
+     * Note: setting the point in space is dangerous, because the Jacobian and
+     * JacobianDeterminant of any corresponding elements need to be updated.
      *
      * @param point the new location of the node
      */
     void SetPoint(ChastePoint<SPACE_DIM> point);
 
     /**
-     * Set the index of this node in the mesh.
+     * Set the index of the node in the mesh.
      *
      * @param index the index of the node
      */
@@ -211,7 +211,7 @@ public:
     void AddNodeAttribute(double attribute);
 
     /**
-     * Set whether this node is a boundary node.
+     * Set whether the node is a boundary node.
      *
      * @param value whether the node is a boundary node
      */
