@@ -459,6 +459,7 @@ class CellMLTranslator(object):
         attribute if not.  If there is an interface component, strip the name of it out of the
         display name.
         """
+        # TODO: support other ontologies too?
         if var.oxmeta_name:
             name = var.oxmeta_name
         elif hasattr(var, u'id') and var.id:
@@ -4682,8 +4683,13 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln(self.vector_create('self.state', len(self.state_vars)))
         self.writeln('self.stateVarMap = {}')
         self.writeln(self.vector_create('self.initialState', len(self.state_vars)))
+        input_names = set() # Check for duplicates
         for i, var in enumerate(self.state_vars):
-            self.writeln('self.stateVarMap["', self.var_display_name(var), '"] = ', i)
+            for name in self.get_ontology_names(var, no_names_ok=True):
+                if name in input_names:
+                    raise ValueError('Duplicate input variable name "' + name + '" found')
+                input_names.add(name)
+                self.writeln('self.stateVarMap["', name, '"] = ', i)
             init_val = getattr(var, u'initial_value', None)
             init_comm = ' # ' + var.units
             if init_val is None:
@@ -4695,10 +4701,13 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln('self.parameterMap = {}')
         self.writeln(self.vector_create('self.parameters', len(self.cell_parameters)))
         for var in self.cell_parameters:
-            self.writeln('self.parameterMap["', self.var_display_name(var), '"] = ', var._cml_param_index)
+            for name in self.get_ontology_names(var):
+                if name in input_names:
+                    raise ValueError('Duplicate input variable name "' + name + '" found')
+                input_names.add(name)
+                self.writeln('self.parameterMap["', name, '"] = ', var._cml_param_index)
             self.writeln(self.vector_index('self.parameters', var._cml_param_index),
-                         self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ',
-                         self.COMMENT_START, var.units)
+                         self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ', self.COMMENT_START, var.units)
         self.writeln()
 
     def output_top_boilerplate(self):
@@ -4767,6 +4776,26 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.output_get_outputs_content()
         self.close_block()
     
+    def get_ontology_names(self, var, no_names_ok=False):
+        """Get the local names of this variable within any ontology annotations.
+        
+        We look at all annotations of this variable using bqbiol:is, and if any of them occur within namespaces mapped
+        in the protocol, we extract the local part of the annotation URI, after the base defined by the protocol.
+        Returns a list of such names, raising an error if none exist, unless no_names_ok is True.
+        """
+        names = []
+        name_uris = var.get_rdf_annotations(('bqbiol:is', NSS['bqbiol']))
+        for name_uri in name_uris:
+            # Iterate through possible URI bases to find which this one is part of
+            for uri_base in self.model._cml_protocol_namespaces.itervalues():
+                local_part = cellml_metadata.namespace_member(name_uri, uri_base, wrong_ns_ok=True)
+                if local_part:
+                    names.append(local_part)
+                    break # No other bases possible for this URI
+        if not names and not no_names_ok:
+            raise ValueError('No suitable name annotations found for variable ' + str(var))
+        return names
+    
     def output_get_outputs_content(self):
         """Output the content and open/close block for the GetOutputs method."""
         # Figure out what equations are needed to compute the outputs
@@ -4782,9 +4811,18 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.writeln()
         # Put them in an Environment
         self.writeln('outputs = {}')
+        output_names = set() # Check for duplicate local parts
         for var in self._outputs:
-            self.writeln('outputs["', self.var_display_name(var), '"] = np.array(', self.code_name(var), ')')
+            # TODO: A later optimisation could look at which names the protocol actually uses, and only generate those.
+            for name in self.get_ontology_names(var):
+                if name in output_names:
+                    raise ValueError('Duplicate output name "' + name + '" found')
+                output_names.add(name)
+                self.writeln('outputs["', name, '"] = np.array(', self.code_name(var), ')')
         for name, vars in self._vector_outputs.iteritems():
+            if name in output_names:
+                raise ValueError('Duplicate output name "' + name + '" found')
+            output_names.add(name)
             self.writeln('outputs["', name, '"] = np.array([', nl=False)
             for var in vars:
                 if not var is vars[0]:
@@ -4895,6 +4933,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('self.dirty = False')
         self.writeln('self.AssociateWithModel(self)')
         self.writeln('self._parameters = Sundials.N_VMake_Serial(len(self.state), <Sundials.realtype*>(<np.ndarray>self.state).data)')
+        # TODO: Use a separate environment for each ontology
         self.writeln('self.env = Env.ModelWrapperEnvironment(self)')
         # Initialise CVODE
         self.close_block()
@@ -4924,7 +4963,13 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.close_block()
         self.writeln('def GetEnvironmentMap(self):')
         self.open_block()
-        self.writeln("return {'oxmeta': self.env}")
+        self.writeln('return {', nl=False)
+        # TODO: Use a separate env for each ontology
+        for i, prefix in enumerate(self.model._cml_protocol_namespaces.iterkeys()):
+            if i > 0:
+                self.write(', ')
+            self.write("'%s': self.env" % prefix)
+        self.writeln('}', indent=False)
         self.close_block()
         self.writeln('cpdef SetFreeVariable(self, double t):')
         self.open_block()

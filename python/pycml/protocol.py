@@ -68,9 +68,8 @@ class Protocol(processors.ModelModifier):
         """
         self._protocol_component = None
         self._units_converter = None
-        self._pending_oxmeta_assignments = []
         self._free_var_has_changed = None
-        self._protocol_namespaces = {}
+        self._protocol_namespaces = model._cml_protocol_namespaces = {}
         self.add_protocol_namespaces(namespaces)
         self.model = model
         self.inputs = set()
@@ -311,9 +310,10 @@ class Protocol(processors.ModelModifier):
     
     def _create_annotated_variable(self, prefixed_name, units):
         """Create a new variable in the model, annotated with the given term, and in the given units."""
-        oxmeta_name = prefixed_name.split(':')[1]
-        var = self.add_variable(self._get_protocol_component(), oxmeta_name, units, id=oxmeta_name)
-        var.set_oxmeta_name(oxmeta_name)
+        #1903 TODO: Be more careful to create unique local names and ids
+        prefix, local_name = prefixed_name.split(':')
+        var = self.add_variable(self._get_protocol_component(), local_name, units, id=prefix + '_' + local_name)
+        var.add_rdf_annotation(('bqbiol:is', NSS['bqbiol']), (prefixed_name, self._protocol_namespaces[prefix]))
         return var
     
     def _find_state_variables(self):
@@ -413,9 +413,9 @@ class Protocol(processors.ModelModifier):
             # Update initial value if specified
             if input['initial_value']:
                 input_var.initial_value = unicode(input['initial_value'])
-            # Ensure the oxmeta name annotation is correct
-            oxmeta_name = input['prefixed_name'].split(':')[1]
-            input_var.set_oxmeta_name(oxmeta_name)
+            # Ensure the name annotation is correct
+            prefix = input['prefixed_name'].split(':')[0]
+            input_var.add_rdf_annotation(('bqbiol:is', NSS['bqbiol']), (input['prefixed_name'], self._protocol_namespaces[prefix]))
             # Add to the old self.inputs collection for statistics calculation
             self.inputs.add(input_var)
             if var is not input_var:
@@ -578,9 +578,6 @@ class Protocol(processors.ModelModifier):
         self._fix_model_connections()
         self.finalize(self._error_handler, self._add_units_conversions)
         self._filter_assignments()
-        # This is a bit of a hack!
-        for var, oxmeta_name in self._pending_oxmeta_assignments:
-            var.set_oxmeta_name(oxmeta_name)
         self.report_stats()
     
     @property
@@ -951,8 +948,6 @@ class Protocol(processors.ModelModifier):
         The term should be given in prefixed form, with the prefix appearing in the protocol's namespace
         mapping (prefix->uri, as found e.g. at elt.rootNode.xmlns_prefixes).
         
-        Currently we just support the oxmeta annotations.
-        
         Will throw ValueError if the variable doesn't exist in the model, or the given term is invalid.
         If enforce_uniqueness is True, also ensures there's only one variable with the annotation.
         
@@ -968,8 +963,6 @@ class Protocol(processors.ModelModifier):
             nsuri = self._protocol_namespaces[prefix]
         except KeyError:
             raise ValueError("The namespace prefix '%s' has not been declared" % prefix)
-        if nsuri != NSS['oxmeta']:
-            raise ValueError("We only support 'oxmeta' annotations at present")
         vars = self.model.get_variables_by_ontology_term((prefixed_name, nsuri))
         if len(vars) == 0:
             if check_optional and prefixed_name in self._optional_vars:
