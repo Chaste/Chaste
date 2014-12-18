@@ -41,7 +41,11 @@ RandomNumberGenerator* RandomNumberGenerator::mpInstance = NULL;
 RandomNumberGenerator::RandomNumberGenerator()
     : mMersenneTwisterGenerator(0u),
       mGenerateUnitReal(mMersenneTwisterGenerator, boost::uniform_real<>()),
+#if BOOST_VERSION < 1//05600  //#2585
+      mGenerateStandardNormal(mMersenneTwisterGenerator, boost::random::normal_distribution_v156<>(0.0, 1.0))
+#else
       mGenerateStandardNormal(mMersenneTwisterGenerator, boost::normal_distribution<>(0.0, 1.0))
+#endif
 {
     assert(mpInstance == NULL); // Ensure correct serialization
 }
