@@ -772,8 +772,9 @@ public:
                  */
                 FileComparison comparer(file_1, file_2, false /*Pretend that it's not called collectively*/);
                 comparer.SetIgnoreLinesBeginningWith("<cp:ChasteParameters");
+                comparer.IgnoreBlankLines(); // Needed for XSD 4.0, which strips blanks on writing
 
-                bool result = comparer.CompareFiles(0,false); // Don't throw a TS_ASSERT
+                bool result = comparer.CompareFiles(0, false); // Don't throw a TS_ASSERT
 
                 if (!result && (i == 3))
                 {

@@ -50,6 +50,9 @@ private:
     /** Whether or not we should ignore comment lines. True by default. */
     bool mIgnoreCommentLines;
 
+    /** Whether or not we should ignore blank lines. False by default. */
+    bool mIgnoreBlankLines;
+
     /**
      * A list of strings, which if found at the beginning of lines when
      * #mIgnoreCommentLines is true, differences in these lines are ignored.
@@ -71,7 +74,8 @@ public:
      */
     FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
         : AbstractFileComparison(fileName1, fileName2, calledCollectively, suppressOutput),
-          mIgnoreCommentLines(true)
+          mIgnoreCommentLines(true),
+          mIgnoreBlankLines(false)
     {
         SetupCommentLines();
     }
@@ -119,6 +123,17 @@ public:
         {
             mCommentLineStarts.clear();
         }
+    }
+
+    /**
+     * Set whether or not we should ignore blank lines.  If only one of the files being
+     * compared has a blank line, if this mode is on we just skip that line and see if the
+     * next content line matches the other file.
+     * @param ignore  whether to ignore blank lines appearing only in one file
+     */
+    void IgnoreBlankLines(bool ignore=true)
+    {
+        mIgnoreBlankLines = ignore;
     }
 
     /**
@@ -170,8 +185,21 @@ public:
         {
             std::string buffer1;
             std::string buffer2;
-            getline(*mpFile1,buffer1);
-            getline(*mpFile2,buffer2);
+            getline(*mpFile1, buffer1);
+            getline(*mpFile2, buffer2);
+
+            if (mIgnoreBlankLines)
+            {
+                // Keep reading lines until we see non-blank, end-of-file or read error
+                while (buffer1.empty() && mpFile1->good())
+                {
+                    getline(*mpFile1, buffer1);
+                }
+                while (buffer2.empty() && mpFile2->good())
+                {
+                    getline(*mpFile2, buffer2);
+                }
+            }
 
             if (mIgnoreCommentLines)
             {

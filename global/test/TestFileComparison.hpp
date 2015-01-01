@@ -125,6 +125,25 @@ public:
         TS_ASSERT_EQUALS(file_comparer.CompareFiles(1,false), expected_fail_result);
     }
 
+    void TestIgnoreBlankLines() throw (Exception)
+    {
+        std::string base_file = "./global/test/data/random_data.txt";
+        std::string changed_file = "./global/test/data/same_random_data_with_blanks.txt";
+
+        FileComparison file_comparer(base_file, changed_file, CalledCollectively, SuppressOutput);
+
+        // A default compare fails because of the added blank lines
+        TS_ASSERT_EQUALS(file_comparer.CompareFiles(0, false), expected_fail_result);
+
+        // Now make this pass using IgnoreBlankLines()
+        file_comparer.IgnoreBlankLines();
+        TS_ASSERT_EQUALS(file_comparer.CompareFiles(0,false), true);
+
+        // Now turn that off and make it fail again
+        file_comparer.IgnoreBlankLines(false);
+        TS_ASSERT_EQUALS(file_comparer.CompareFiles(0, false), expected_fail_result);
+    }
+
     void TestBinaryFiles() throw(Exception)
     {
         std::string base_file = "./mesh/test/data/simple_cube_binary.node";
