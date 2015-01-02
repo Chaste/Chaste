@@ -163,6 +163,7 @@ public:
             // Make a folder using a FileFinder, for coverage of the case where the root output folder doesn't exist
             FileFinder sub_folder("test_folder", RelativeTo::ChasteTestOutput);
             TS_ASSERT(!sub_folder.Exists());
+            PetscTools::Barrier("TestOutputFileHandler-3a");
             OutputFileHandler creating_handler(sub_folder);
             TS_ASSERT(sub_folder.Exists());
 
@@ -181,7 +182,7 @@ public:
         // Reset the location of CHASTE_TEST_OUTPUT
         setenv("CHASTE_TEST_OUTPUT", chaste_test_output.c_str(), 1/*Overwrite*/);
 
-        // We don't want other people using CHASTE_TEST_OUTPUT whilst we are messing with it!
+        // We don't want other people using CHASTE_TEST_OUTPUT while we are messing with it!
         PetscTools::Barrier("TestOutputFileHandler-4");
 
         // Coverage of the case where we can't open a file for writing

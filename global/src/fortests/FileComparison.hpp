@@ -91,7 +91,8 @@ public:
      */
     FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
         : AbstractFileComparison(rFileName1, rFileName2, calledCollectively, suppressOutput),
-          mIgnoreCommentLines(true)
+          mIgnoreCommentLines(true),
+          mIgnoreBlankLines(false)
     {
         SetupCommentLines();
     }
