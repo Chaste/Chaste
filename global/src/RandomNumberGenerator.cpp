@@ -141,6 +141,12 @@ double RandomNumberGenerator::ExponentialRandomDeviate(double scale)
 void RandomNumberGenerator::Reseed(unsigned seed)
 {
     mMersenneTwisterGenerator.seed(seed);
+
+    // Because this does some Box-Muller type thing it remembers if you don't reset it - see #2633
+    mGenerateStandardNormal.distribution().reset();
+
+    // Probably don't need to do this, but it probably is good practice!
+    mGenerateUnitReal.distribution().reset();
 }
 
 void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues)

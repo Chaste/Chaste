@@ -414,7 +414,7 @@ public:
 
     }
 
-    void xTestReseedingWorksProperly()
+    void TestReseedingWorksProperly()
     {
         // This test checks that the underlying boost RNG is the doing the same thing on reseeding
         RandomNumberGenerator::Destroy();
@@ -447,18 +447,14 @@ public:
 
 			p_gen->Reseed(42);
 
-			// This line fails on boost 1.54
-			// we suspect the method tried to be clever and remembers two numbers it generates, so the number we get here is actually second_time.
+			// This line failed on boost 1.54
+			// we suspect the method tried to be clever and remembers two numbers it generates,
+			// so the number we get here is actually second_time.
 			double first_again = p_gen->StandardNormalRandomDeviate();
 
-			// So this test fails,
+			// Hunch was correct, we needed to reset the distribution generator,
+			// which we now do.
 			TS_ASSERT_DELTA(first_correct, first_again, 1e-12);
-
-			// and we are actually getting back the second correct number generated before the reseed!
-			TS_ASSERT_DELTA(second_correct, first_again, 1e-12);
-
-			// But the second number we generate now will be the same as the first should have been, so this line passes.
-			TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), first_correct, 1e-12);
         }
     }
 

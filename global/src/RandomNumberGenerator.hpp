@@ -54,6 +54,8 @@ private:
     /** The main random number generator. **/
     boost::mt19937 mMersenneTwisterGenerator;
 
+    // If you add any more generators below, then remember to add lines for them in the Reseed() method too.
+
     /** An adaptor to a unit interval distribution. */
     boost::variate_generator<boost::mt19937& , boost::uniform_real<> > mGenerateUnitReal;
 
