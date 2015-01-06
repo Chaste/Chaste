@@ -415,6 +415,10 @@ def OptionalLibraryDefines():
     for libname, symbol in possible_flags.iteritems():
         if getattr(conf, 'use_' + libname, False):
             actual_flags.append(symbol)
+    for lib in conf.other_libraries:
+        if lib.startswith('xerces-c'):
+            actual_flags.append('CHASTE_XERCES')
+            break
     return actual_flags
 
 def Configure(build):

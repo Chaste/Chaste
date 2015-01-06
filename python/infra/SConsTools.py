@@ -574,12 +574,13 @@ def GetVersionCpp(templateFilePath, env):
     else:
         compiler_version = "unknown"
 
-    command = env['build'].tools['xsd'] + ' version 2>&1'
+    xsd_path = os.path.join(chaste_root, env['build'].tools['xsd']) # Account for possible relative path being given
+    command = xsd_path + ' version 2>&1'
     xsd_version_string = os.popen(command).readline().strip()
     xsd_version = xsd_version_string[-5:]
     if xsd_version == "ctory": # "No such file or directory" !!
         xsd_version = "undetermined"
-    
+
     from CheckForCopyrights import current_notice
     licence = current_notice.replace('\nThis file is part of Chaste.\n', '')
     licence = licence.replace('"', '\\"').replace('\n', '\\n')
@@ -673,7 +674,7 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
         if xsd_version_string.startswith('XML Schema Definition Compiler'):
             xsd_version = 2
         elif xsd_version_string.startswith('CodeSynthesis XSD XML Schema to C++ compiler'):
-            xsd_version = 3
+            xsd_version = 3 # Or 4, but we don't need the detailed version here
         else:
             print "Unexpected XSD program found:"
             print xsd_version_string

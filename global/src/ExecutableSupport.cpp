@@ -72,7 +72,9 @@ typedef std::pair<std::string, std::string> StringPair;
 
 // Note: the following are not a requirement for cell-based Chaste so may not be present!
 //#include <xsd/cxx/version.hxx>
-//#include <xercesc/util/XercesVersion.hpp>
+#ifdef CHASTE_XERCES
+#include <xercesc/util/XercesVersion.hpp>
+#endif
 
 // Check whether the version of ParMETIS being used is the one we wanted
 #ifdef CHASTE_PARMETIS_REQUIRED
@@ -369,7 +371,6 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "." << PARMETIS_SUBMINOR_VERSION;
 #endif
     output << "</Parmetis>" << std::endl;
-//    output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n"; // Note: not a requirement for cell-based so may not be present!
     output << "\t\t</CompiledIn>\n";
 
     output << "\t\t<Binaries>\n";
@@ -377,16 +378,20 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t</Binaries>\n";
 
     output << "\t\t<Optional>\n";
+#ifdef CHASTE_CVODE
+    output << "\t\t\t<SUNDIALS>" << SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
+#else
+    output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
+#endif
 #ifdef CHASTE_VTK
     output << "\t\t\t<VTK>" << VTK_MAJOR_VERSION << "." << VTK_MINOR_VERSION << "</VTK>\n";
 #else
     output << "\t\t\t<VTK>no</VTK>\n";
 #endif
-
-#ifdef CHASTE_CVODE
-    output << "\t\t\t<SUNDIALS>" << SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
+#ifdef CHASTE_XERCES
+    output << "\t\t\t<Xerces>" << XERCES_FULLVERSIONDOT << "</Xerces>\n"; // Note: not a requirement for cell-based so may not be present!
 #else
-    output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
+    output << "\t\t\t<Xerces>no</Xerces>\n";
 #endif
     output << "\t\t</Optional>\n";
 
