@@ -69,6 +69,31 @@ LIABILITY, OR TORT \(INCLUDING NEGLIGENCE OR OTHERWISE\) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """, re.MULTILINE)
 
+deprecated_notice_GPL = re.compile(r"""Copyright \(C\) University of Oxford, 2005-\d{4}
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+((
+This file is part of Chaste.
+)?)
+Chaste is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 2.1 of the License, or
+\(at your option\) any later version.
+
+Chaste is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details. The offer of Chaste under the terms of the
+License is subject to the License being interpreted in accordance with
+English Law and subject to any action against the University of Oxford
+being under the jurisdiction of the English Courts.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Chaste. If not, see <http://www.gnu.org/licenses/>.
+""", re.MULTILINE)
+
 current_notice="""Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
@@ -211,7 +236,6 @@ def HeadAppendStringInFile(appendString, filePath):
     print 'Notice: applied copyright notice in ', filePath
 
    
-
 def InspectFile(fileName):
     file_in = open(fileName)
     if fileName[-21:] == 'CheckForCopyrights.py':
@@ -236,12 +260,23 @@ def InspectFile(fileName):
             return False
         else:
             return True
+    
     if valid_notice:
         return True
+    
     if CheckForCopyrightNotice(deprecated_notice, file_in):
         print 'Found deprecated copyright notice for', fileName
         if apply_update:
             ReplaceStringInFile(deprecated_notice, replacement_notice, fileName)
+            return True
+        else:
+            print 'Fix this by doing:',sys.argv[0],'-update'
+            return False
+        
+    if CheckForCopyrightNotice(deprecated_notice_GPL, file_in):
+        print 'Found deprecated GPL copyright notice for', fileName
+        if apply_update:
+            ReplaceStringInFile(deprecated_notice_GPL, replacement_notice, fileName)
             return True
         else:
             print 'Fix this by doing:',sys.argv[0],'-update'
