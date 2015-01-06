@@ -39,10 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Citations.hpp"
 static PetscBool CardiacCellChasteCite = PETSC_FALSE;
-const char CardiacCellChasteCitation[] = "@article{cooper2014cce,\n"
+const char CardiacCellChasteCitation[] = "@article{cooper2015cce,\n"
 " title = {{Cellular cardiac electrophysiology modelling with Chaste and CellML}},\n"
 "  author = {Cooper, Jonathan and Spiteri, Raymond and Mirams, Gary R},\n"
-"  year = {2014},\n"
+"  year = {2015},\n"
 "  journal = {Frontiers in Physiology},\n"
 "  pages = {511},\n"
 "  url = {http://journal.frontiersin.org/Journal/10.3389/fphys.2014.00511},\n"
