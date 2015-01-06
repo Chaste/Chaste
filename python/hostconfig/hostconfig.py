@@ -401,6 +401,17 @@ def DoDealii(build):
         libs = map(lambda s: s + '.g', libs)
     libraries.extend(libs)
 
+def Flatten(iterable):
+    """Flatten a list which may have nested lists.
+    A utility method for OptionalLibraryDefines."""
+    it = iter(iterable)
+    for e in it:
+        if isinstance(e, (list, tuple)):
+            for f in Flatten(e):
+                yield f
+        else:
+            yield e
+
 def OptionalLibraryDefines():
     """
     Work out what optional libraries have been asked for,
@@ -415,7 +426,7 @@ def OptionalLibraryDefines():
     for libname, symbol in possible_flags.iteritems():
         if getattr(conf, 'use_' + libname, False):
             actual_flags.append(symbol)
-    for lib in conf.other_libraries:
+    for lib in Flatten(conf.other_libraries):
         if lib.startswith('xerces-c'):
             actual_flags.append('CHASTE_XERCES')
             break
