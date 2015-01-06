@@ -388,7 +388,7 @@ public:
 
     /**
      * HOW_TO_TAG General/Archiving
-     * * Use a binary rather than ascii boost archive format, for speed and smaller file sizes.
+     * Use a binary rather than ascii boost archive format, for speed and smaller file sizes.
      *
      * (NB this file is actually larger, but when there's lots of data it should be smaller!)
      *
