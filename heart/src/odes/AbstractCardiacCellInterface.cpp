@@ -34,11 +34,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HeartConfig.hpp" // First for Boost 1.33/PETSc 2.2
-
 #include "AbstractCardiacCellInterface.hpp"
-
 #include "Exception.hpp"
 
+#include "Citations.hpp"
+static PetscBool CardiacCellChasteCite = PETSC_FALSE;
+const char CardiacCellChasteCitation[] = "@article{cooper2014cce,\n"
+" title = {{Cellular cardiac electrophysiology modelling with Chaste and CellML}},\n"
+"  author = {Cooper, Jonathan and Spiteri, Raymond and Mirams, Gary R},\n"
+"  year = {2014},\n"
+"  journal = {Frontiers in Physiology},\n"
+"  pages = {511},\n"
+"  url = {http://journal.frontiersin.org/Journal/10.3389/fphys.2014.00511},\n"
+"  volume = {5},\n"
+"  doi = {10.3389/fphys.2014.00511},\n"
+"}\n";
 
 AbstractCardiacCellInterface::AbstractCardiacCellInterface(
             boost::shared_ptr<AbstractIvpOdeSolver> pOdeSolver,
@@ -52,6 +62,9 @@ AbstractCardiacCellInterface::AbstractCardiacCellInterface(
       mHasDefaultStimulusFromCellML(false),
       mFixedVoltage(DOUBLE_UNSET)
 {
+    // Record a reference for the calculations performed using this class,
+    // can be extracted with the '-citations' flag as an argument to any executable.
+    Citations::Register(CardiacCellChasteCitation, &CardiacCellChasteCite);
 }
 
 

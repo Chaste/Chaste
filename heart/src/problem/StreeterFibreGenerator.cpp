@@ -56,7 +56,7 @@ const char StreeterCitation[] = "@article{streeter1969fiber,\n"
 "  pages={339--347},\n"
 "  year={1969},\n"
 "  publisher={Am Heart Assoc}\n"
-"}";
+"}\n";
 
 template<unsigned SPACE_DIM>
 double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
