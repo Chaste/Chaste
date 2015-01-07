@@ -144,6 +144,11 @@ public:
      * how many processors there are, and which one we are.
      */
     static void ResetCache();
+    
+    /**
+     * @return whether PETSc has been initialised yet.
+     */
+    static bool IsInitialised();
 
     /**
      *  @return whether there is one process or not.

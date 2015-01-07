@@ -53,6 +53,7 @@ public:
 
     void TestMostOfPetscTools() throw (Exception)
     {
+        TS_ASSERT(PetscTools::IsInitialised());
         PetscInt my_rank;
         MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
         TS_ASSERT_EQUALS(PetscTools::GetMyRank(), (unsigned)my_rank);

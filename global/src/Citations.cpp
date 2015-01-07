@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Citations.hpp"
+#include "PetscTools.hpp"
 
 #if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
 std::vector<const char *> Citations::mCitations;
@@ -41,6 +42,7 @@ std::vector<const char *> Citations::mCitations;
 
 void Citations::Register(const char pCitation[], PetscBool* pSet)
 {
+    EXCEPT_IF_NOT(PetscTools::IsInitialised());
 #if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
     PetscCitationsRegister(pCitation, pSet);
 #else

@@ -51,6 +51,7 @@ class TestPetscTools2 : public CxxTest::TestSuite
 public:
     void TestSequentialBehaviour()
     {
+        TS_ASSERT(!PetscTools::IsInitialised());
         TS_ASSERT(PetscTools::IsSequential());
         TS_ASSERT_EQUALS(PetscTools::GetMyRank(), 0u);
         TS_ASSERT_EQUALS(PetscTools::GetNumProcs(), 1u);

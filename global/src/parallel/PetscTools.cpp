@@ -83,6 +83,12 @@ void PetscTools::ResetCache()
 
 // Information methods
 
+bool PetscTools::IsInitialised()
+{
+    CheckCache();
+    return mPetscIsInitialised;
+}
+
 bool PetscTools::IsSequential()
 {
     CheckCache();
