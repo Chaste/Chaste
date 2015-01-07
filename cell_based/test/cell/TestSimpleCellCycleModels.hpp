@@ -367,19 +367,34 @@ public:
 
     void TestExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel() throw(Exception)
     {
-        // make sure we can generate this model
+        // Make sure we can generate this model
         TS_ASSERT_THROWS_NOTHING(ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel cell_model);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
 
-        // get a pointer to a cell cycle model of this kind
+        // Get a pointer to a cell cycle model of this kind
         ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_stem_model =
                 new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
 
         // Test set and get method for the rate parameter
         TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.5, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 14.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 2.0, 1e-10);
+
+        p_stem_model->SetStemCellG1Duration(8.0);
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.125, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 8.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 2.0, 1e-10);
+
+        p_stem_model->SetTransitCellG1Duration(0.1);
+        TS_ASSERT_DELTA(p_stem_model->GetRate(), 10.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 8.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 0.1, 1e-10);
+
         p_stem_model->SetRate(0.25);
         TS_ASSERT_DELTA(p_stem_model->GetRate(), 0.25, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetStemCellG1Duration(), 4.0, 1e-10);
+        TS_ASSERT_DELTA(p_stem_model->GetTransitCellG1Duration(), 4.0, 1e-10);
 
         // When we set the rate parameter we also reset the TransitCellG1Duration and StemCellG1Duration such that
         // average cell cycle times are calculated correctly
@@ -388,13 +403,13 @@ public:
         TS_ASSERT_DELTA(p_stem_model->GetAverageTransitCellCycleTime(), 14.0, 1e-10);
         TS_ASSERT_DELTA(p_stem_model->GetAverageStemCellCycleTime(), 14.0, 1e-10);
 
-        // make a stem cell with the model
+        // Make a stem cell with the model
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         CellPtr p_stem_cell(new Cell(p_healthy_state, p_stem_model));
         p_stem_cell->SetCellProliferativeType(p_stem_type);
         p_stem_cell->InitialiseCellCycleModel();
 
-        // make another cell cycle model of this kind and give it to a transit cell
+        // Make another cell cycle model of this kind and give it to a transit cell
         ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_transit_model = new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
         p_transit_model->SetRate(1.0);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -402,7 +417,7 @@ public:
         p_transit_cell->SetCellProliferativeType(p_transit_type);
         p_transit_cell->InitialiseCellCycleModel();
 
-        // and finally a cell cycle model for a differentiated cell
+        // And finally a cell cycle model for a differentiated cell
         ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel* p_diff_model = new ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel;
         p_diff_model->SetRate(200.0);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -459,8 +474,8 @@ public:
         p_cell->InitialiseCellCycleModel();
 
         // Set up oxygen_concentration
-        double lo_oxygen_concentration=0.0;
-        double hi_oxygen_concentration=1.0;
+        double lo_oxygen_concentration = 0.0;
+        double hi_oxygen_concentration = 1.0;
         p_cell->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
 
         p_model->ReadyToDivide();

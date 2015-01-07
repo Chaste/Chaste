@@ -339,14 +339,14 @@ public:
      *
      * @param stemCellG1Duration  the new value of mStemCellG1Duration
      */
-    void SetStemCellG1Duration(double stemCellG1Duration);
+    virtual void SetStemCellG1Duration(double stemCellG1Duration);
 
     /**
      * Set mTransitCellG1Duration.
      *
      * @param transitCellG1Duration  the new value of mTransitCellG1Duration
      */
-    void SetTransitCellG1Duration(double transitCellG1Duration);
+    virtual void SetTransitCellG1Duration(double transitCellG1Duration);
 
     /**
      * Set mSDuration.

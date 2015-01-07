@@ -115,6 +115,22 @@ void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::Se
     SetStemCellG1Duration(1.0/rate);
 }
 
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
+{
+    assert(stemCellG1Duration > 0.0);
+    mStemCellG1Duration = stemCellG1Duration;
+
+    mRate = 1.0/stemCellG1Duration;
+}
+
+void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
+{
+    assert(transitCellG1Duration > 0.0);
+    mTransitCellG1Duration = transitCellG1Duration;
+
+    mRate = 1.0/transitCellG1Duration;
+}
+
 void ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
      *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";

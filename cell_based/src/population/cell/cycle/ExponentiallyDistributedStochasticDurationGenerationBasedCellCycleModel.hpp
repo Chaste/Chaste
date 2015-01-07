@@ -40,7 +40,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A cell cycle model where the G1 duration is drawn from an exponential random distribution
+ * A cell cycle model where the G1 duration is drawn from an exponential
+ * random distribution. The rate parameter of this distribution is defined
+ * by the member variable mRate.
+ *
+ * The default value of mRate is set to the inverse of the default value
+ * of mTransitCellG1Duration in the constructor.
+ *
+ * mRate may be set using the method SetRate(), which also sets
+ * mTransitCellG1Duration and mStemCellG1Duration to take the inverse of
+ * mRate's new value. Similarly, the overridden methods SetTransitCellG1Duration()
+ * and SetStemCellG1Duration() also set mRate to take the inverse of the
+ * new value of mTransitCellG1Duration and mStemCellG1Duration, respectively.
  */
 class ExponentiallyDistributedStochasticDurationGenerationBasedCellCycleModel : public AbstractSimpleGenerationBasedCellCycleModel
 {
@@ -116,6 +127,26 @@ public:
      * @param rate
      */
     void SetRate(double rate);
+
+    /**
+     * Overridden SetStemCellG1Duration() method.
+     *
+     * Set mStemCellG1Duration to be a given value and also
+     * set mRate to be the inverse of this value
+     *
+     * @param stemCellG1Duration  the new value of mStemCellG1Duration
+     */
+    void SetStemCellG1Duration(double stemCellG1Duration);
+
+    /**
+     * Overridden SetTransitCellG1Duration() method.
+     *
+     * Set mTransitCellG1Duration to be a given value and also
+     * set mRate to be the inverse of this value
+     *
+     * @param transitCellG1Duration  the new value of mTransitCellG1Duration
+     */
+    void SetTransitCellG1Duration(double transitCellG1Duration);
 
     /**
      * Outputs cell cycle model parameters to file.
