@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleDataWriter.hpp"
 #include "Timer.hpp"
 
-
+#include "PetscSetupAndFinalize.hpp"
 
 class TestNhsModelWithBackwardSolver : public CxxTest::TestSuite
 {

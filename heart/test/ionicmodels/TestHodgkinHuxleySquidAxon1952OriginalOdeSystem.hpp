@@ -44,6 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HodgkinHuxley1952.hpp"
 #include "SimpleStimulus.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestHodgkinHuxleySquidAxon1952OriginalOdeSystem: public CxxTest::TestSuite
 {
 public:

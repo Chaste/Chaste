@@ -45,6 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Modifiers.hpp"
 #include "Shannon2004.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class TestModifiers : public CxxTest::TestSuite
 {
 public:
