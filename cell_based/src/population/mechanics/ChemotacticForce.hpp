@@ -41,9 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractForce.hpp"
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "CellLabel.hpp"
-
 /**
  * A chemotactic force class.
  */

@@ -299,7 +299,6 @@ template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     VertexElementMap element_map(mpMutableVertexMesh->GetNumAllElements());
-
     mpMutableVertexMesh->ReMesh(element_map);
 
     if (!element_map.IsIdentityMap())
@@ -462,6 +461,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
     time << num_timesteps;
 
     mesh_writer.WriteVtkUsingMesh(*mpMutableVertexMesh, time.str());
+
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";

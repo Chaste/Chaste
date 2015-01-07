@@ -42,13 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCaUpdateRule.hpp"
 #include "CaBasedCellPopulation.hpp"
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "CellLabel.hpp"
-#include "PottsMesh.hpp"
-
 /**
  * A diffusion update rule for use in cell-based simulations
- * using the cellular Ca model.
+ * using the cellular CA model.
  *
  * The probability of moving to an adjacent lattice site is
  *
@@ -57,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Where D is the mDiffusionParameter.
  * delta_t is the timestep.
  * delta_x is the separation of the two lattice sites.
- *
  */
 template<unsigned DIM>
 class DiffusionCaUpdateRule : public AbstractCaUpdateRule<DIM>

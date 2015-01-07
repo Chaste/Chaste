@@ -38,8 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
+
 #include "AbstractCellPopulation.hpp"
-#include "Identifiable.hpp"
 
 /**
  * An abstract modifier class (to implement setup, update and finalise methods), for use in cell-based simulations.

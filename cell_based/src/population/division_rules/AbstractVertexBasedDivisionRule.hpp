@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_
 #define ABSTRACTVERTEXBASEDDIVISIONRULE_HPP_
 
+#include "VertexBasedCellPopulation.hpp"
+
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include "Identifiable.hpp"
-#include "VertexBasedCellPopulation.hpp"
 
 // Forward declaration prevents circular include chain
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;

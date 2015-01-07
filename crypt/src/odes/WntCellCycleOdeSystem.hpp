@@ -46,11 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSystem.hpp"
 #include "AbstractCellMutationState.hpp"
 
-// Needed here to avoid serialization errors
-#include "ApcOneHitCellMutationState.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-
 /**
  * Represents the Mirams et al. system of ODEs, based on Swat et al. (2004)
  * [doi:10.1093/bioinformatics/bth110]

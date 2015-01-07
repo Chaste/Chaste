@@ -36,14 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef LINEARSPRINGWITHVARIABLESPRINGCONSTANTSFORCE_HPP
 #define LINEARSPRINGWITHVARIABLESPRINGCONSTANTSFORCE_HPP
 
-#include "GeneralisedLinearSpringForce.hpp"
-
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
+#include "GeneralisedLinearSpringForce.hpp"
 
 /**
  * A subclass of GeneralisedLinearSpringForce with variable spring constants.

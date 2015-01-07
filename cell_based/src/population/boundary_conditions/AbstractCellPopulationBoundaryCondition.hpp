@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include "Identifiable.hpp"
 
 /**
  * An abstract cell population boundary condition class, for use in cell-based simulations.

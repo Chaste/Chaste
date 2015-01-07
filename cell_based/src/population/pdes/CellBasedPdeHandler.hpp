@@ -47,7 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 #include "TetrahedralMesh.hpp"
 #include "ChasteCuboid.hpp"
-#include "Identifiable.hpp"
 
 /**
  * A helper class, containing code for handling the numerical solution of one or more PDEs

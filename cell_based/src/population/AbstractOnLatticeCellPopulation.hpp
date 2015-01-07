@@ -38,9 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellPopulation.hpp"
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "WildTypeCellMutationState.hpp"
-
 /**
  * An abstract class for on-lattice cell populations.
  */

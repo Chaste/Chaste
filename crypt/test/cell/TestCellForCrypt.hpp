@@ -343,7 +343,7 @@ public:
         TS_ASSERT_EQUALS(p_wnt_cell3->ReadyToDivide(), false);
         TS_ASSERT_EQUALS(p_wnt_cell4->ReadyToDivide(), false);
 
-        //Tidy up
+        // Tidy up
         WntConcentration<2>::Destroy();
     }
 };

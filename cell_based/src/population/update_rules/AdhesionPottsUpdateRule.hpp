@@ -42,9 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPottsUpdateRule.hpp"
 #include "PottsBasedCellPopulation.hpp"
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "CellLabel.hpp"
-
 /**
  * An adhesion update rule for use in cell-based simulations
  * using the cellular Potts model.

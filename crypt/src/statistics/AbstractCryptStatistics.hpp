@@ -38,10 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MeshBasedCellPopulation.hpp"
 
-// Needed here to avoid serialization errors
-#include "WildTypeCellMutationState.hpp"
-#include "CellLabel.hpp"
-
 /**
  * Abstract crypt statistics class.
  */

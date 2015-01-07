@@ -57,11 +57,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 
-#include "Node.hpp"
+#include "AbstractMesh.hpp"
 #include "CellPropertyRegistry.hpp"
 #include "Identifiable.hpp"
+#include "AbstractCellPopulationCountWriter.hpp"
+#include "AbstractCellPopulationWriter.hpp"
+#include "AbstractCellWriter.hpp"
 
-// Needed here to avoid serialization errors (on Boost<1.37)
+// These #includes are needed for SetDefaultCellMutationStateAndProliferativeTypeOrdering()
 #include "WildTypeCellMutationState.hpp"
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
@@ -70,13 +73,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
-#include "ApoptoticCellProperty.hpp"
-#include "CellLabel.hpp"
-#include "CellData.hpp"
-#include "AbstractMesh.hpp"
-#include "AbstractCellPopulationCountWriter.hpp"
-#include "AbstractCellPopulationWriter.hpp"
-#include "AbstractCellWriter.hpp"
 
 /**
  * An abstract facade class encapsulating a cell population.

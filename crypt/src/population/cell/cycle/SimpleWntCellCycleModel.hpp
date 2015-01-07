@@ -40,16 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 #include "WntConcentration.hpp"
 
-// Needed here to avoid serialization errors
-#include "WildTypeCellMutationState.hpp"
-#include "CellLabel.hpp"
-#include "ApcOneHitCellMutationState.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-
-
 /**
- *  Simple Wnt-dependent cell-cycle model
+ * Simple Wnt-dependent cell-cycle model.
  */
 class SimpleWntCellCycleModel : public AbstractSimpleCellCycleModel
 {

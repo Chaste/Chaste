@@ -35,6 +35,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Mirams2010WntOdeSystem.hpp"
 #include "CellwiseOdeSystemInformation.hpp"
 
+// These #includes are needed for the constructor and EvaluateYDerivatives()
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+#include "CellLabel.hpp"
+#include "WildTypeCellMutationState.hpp"
+
 Mirams2010WntOdeSystem::Mirams2010WntOdeSystem(double wntLevel,
                                                boost::shared_ptr<AbstractCellMutationState> pMutationState,
                                                std::vector<double> stateVariables)

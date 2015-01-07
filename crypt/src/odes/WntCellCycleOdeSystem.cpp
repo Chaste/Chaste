@@ -37,6 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseOdeSystemInformation.hpp"
 #include "IsNan.hpp"
 
+// These #includes are needed for the constructor and EvaluateYDerivatives()
+#include "ApcOneHitCellMutationState.hpp"
+#include "ApcTwoHitCellMutationState.hpp"
+#include "BetaCateninOneHitCellMutationState.hpp"
+
 WntCellCycleOdeSystem::WntCellCycleOdeSystem(double wntLevel,
                                              boost::shared_ptr<AbstractCellMutationState> pMutationState,
                                              std::vector<double> stateVariables)

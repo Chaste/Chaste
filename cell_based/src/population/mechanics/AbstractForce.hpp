@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ClassIsAbstract.hpp"
 
 #include "AbstractCellPopulation.hpp"
-#include "Identifiable.hpp"
 
 /**
  * An abstract force class, for use in cell-based simulations.
@@ -90,7 +89,7 @@ public:
     void OutputForceInfo(out_stream& rParamsFile);
 
     /**
-     * Outputs force parameters to file
+     * Outputs force parameters to file.
      *
      * As this method is pure virtual, it must be overridden
      * in subclasses.

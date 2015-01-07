@@ -45,15 +45,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
 
-// Needed here to avoid serialization errors (on Boost<1.37)
-#include "WildTypeCellMutationState.hpp"
-
 template<unsigned DIM>
 class AbstractCaUpdateRule; // Circular definition
 
 /**
  * A facade class encapsulating a cell population under the Cellular
- * Automota framework.
+ * Automaton (CA) framework.
  *
  * Contains a group of cells and maintains the associations
  * between CellPtrs and nodes in a specialised PottsMesh class.

@@ -38,8 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
+
 #include "CaBasedCellPopulation.hpp"
-#include "Identifiable.hpp"
 
 template<unsigned DIM>
 class CaBasedCellPopulation; // Circular definition

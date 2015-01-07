@@ -47,17 +47,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellMutationState.hpp"
 #include "MathsCustomFunctions.hpp"
 
-// Needed here to avoid serialization errors
-#include "ApcOneHitCellMutationState.hpp"
-#include "ApcTwoHitCellMutationState.hpp"
-#include "BetaCateninOneHitCellMutationState.hpp"
-
 /**
  * Represents the van Leeuwen et al. (2007) system of ODEs
  * [doi:10.1016/j.jtbi.2007.01.019]
  * coupled to the Swat et al. cell-cycle model equations.
  * [doi:10.1093/bioinformatics/bth110]
- *
  *
  * The variables are
  *
