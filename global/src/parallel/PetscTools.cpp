@@ -45,7 +45,6 @@ bool PetscTools::mPetscIsInitialised = false;
 unsigned PetscTools::mNumProcessors = 0;
 unsigned PetscTools::mRank = 0;
 bool PetscTools::mIsolateProcesses = false;
-//unsigned PetscTools::mMaxNumNonzerosIfMatMpiAij = 54;
 
 #ifndef NDEBUG
 // Uncomment this to trace calls to PetscTools::Barrier
