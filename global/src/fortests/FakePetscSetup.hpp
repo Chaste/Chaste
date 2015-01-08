@@ -83,6 +83,7 @@ public:
         // Fool PETSc into thinking it was only run on one process.
         // This ensures any barriers etc. don't cause deadlock.
         PETSC_COMM_WORLD = MPI_COMM_SELF;
+        PetscSetupUtils::ResetStatusCache();
 
         return true;
     }

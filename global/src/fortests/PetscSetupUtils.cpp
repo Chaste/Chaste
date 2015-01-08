@@ -41,13 +41,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 #include <iostream>
 
-#include "ChasteSyscalls.hpp"
-#include "Exception.hpp"
-#include "PetscException.hpp"
-#include "CommandLineArguments.hpp"
 #include "ChasteBuildRoot.hpp"
-#include "GetCurrentWorkingDirectory.hpp"
+#include "ChasteSyscalls.hpp"
 #include "Citations.hpp"
+#include "CommandLineArguments.hpp"
+#include "Exception.hpp"
+#include "GetCurrentWorkingDirectory.hpp"
+#include "PetscException.hpp"
+#include "PetscTools.hpp"
 
 #ifdef TEST_FOR_FPE
 #include <fenv.h>
@@ -163,4 +164,9 @@ void PetscSetupUtils::CommonFinalize()
 {
     Citations::Print();
     PETSCEXCEPT(PetscFinalize());
+}
+
+void PetscSetupUtils::ResetStatusCache()
+{
+    PetscTools::ResetCache();
 }

@@ -54,6 +54,12 @@ public:
     static void InitialisePetsc();
 
     /**
+     * Call PetscTools::ResetCache().
+     * Used by FakePetscSetup.hpp to ensure the cache doesn't reflect being run in parallel.
+     */
+    static void ResetStatusCache();
+
+    /**
      * The global finalize (prints citations).
      */
     static void CommonFinalize();
