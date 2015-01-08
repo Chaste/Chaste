@@ -541,9 +541,10 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 #ifdef CHASTE_VTK
-        //Test that VTK writer has produced some files
+        // Test that VTK writer has produced some files
         OutputFileHandler handler("TestPotts3DCellSorting", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath();
+
         // Initial condition file
         FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file.Exists());
@@ -558,16 +559,17 @@ public:
         std::vector<double> cell_types;
         vtk_reader.GetPointData("Cell types", cell_types);
         TS_ASSERT_EQUALS(cell_types.size(), 1000u);
-        // The cell types are between -1 and 5.  Check the maximum
-        TS_ASSERT_DELTA( *max_element(cell_types.begin(), cell_types.end()), 5.0, 1e-12);
+
+        // The cell types are between -1 and 5. Check the maximum
+        TS_ASSERT_DELTA(*max_element(cell_types.begin(), cell_types.end()), 5.0, 1e-12);
 
         std::vector<double> cell_ids;
         vtk_reader.GetPointData("Cell IDs", cell_ids);
-        // Prior to release 3.2 this was called "Element index". It is changed to cell_id as this is preferable for VTK
-        // output.
+        // Prior to release 3.2 this was called "Element index".
+        // It is changed to cell_id as this is preferable for VTK output.
         //vtk_reader.GetPointData("Element index", cell_ids);
         TS_ASSERT_EQUALS(cell_ids.size(), 1000u);
-        TS_ASSERT_DELTA( *max_element(cell_ids.begin(), cell_ids.end()), 63.0, 1e-12);
+        TS_ASSERT_DELTA(*max_element(cell_ids.begin(), cell_ids.end()), 63.0, 1e-12);
 
  #endif //CHASTE_VTK
     }
