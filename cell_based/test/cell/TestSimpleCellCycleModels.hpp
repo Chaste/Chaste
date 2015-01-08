@@ -1173,7 +1173,7 @@ public:
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->SetCurrentHypoxiaOnsetTime(3.1);
             static_cast<StochasticOxygenBasedCellCycleModel*>(p_model)->GenerateStochasticG2Duration();
 
-            TS_ASSERT_DELTA(p_model->GetG2Duration(), 2.7219, 1e-4);
+            TS_ASSERT_DELTA(p_model->GetG2Duration(), 3.0822, 1e-4);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1198,7 +1198,7 @@ public:
 
             input_arch >> p_model2;
 
-            TS_ASSERT_DELTA(p_model2->GetG2Duration(), 2.7219, 1e-4);
+            TS_ASSERT_DELTA(p_model2->GetG2Duration(), 3.0822, 1e-4);
 
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetHypoxicConcentration(), 0.8, 1e-6);
             TS_ASSERT_DELTA(static_cast<StochasticOxygenBasedCellCycleModel*>(p_model2)->GetQuiescentConcentration(), 0.7, 1e-6);

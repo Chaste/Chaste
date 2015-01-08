@@ -68,6 +68,20 @@ private:
 
 public:
 
+    void xTestSetTheRandomNumbersForAllTheseTests() throw(Exception)
+    {
+        // If random numbers change then copy the output of these to the static definitions at the bottom.
+        // (Some beta-catenin concentrations might need changing manually too)
+
+        double mean = 2.0;
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+    }
+
+
     void TestCorrectBehaviour() throw(Exception)
     {
         // Set up the simulation time
@@ -108,10 +122,10 @@ public:
         double steady_beta_cat_at_wnt_equals_1 = p_cycle_model->GetBetaCateninConcentration();
 
 #ifdef CHASTE_CVODE
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4362, 2e-3);
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4973, 2e-3);
         // (Different CVODE versions give slightly different answers here...)
 #else
-        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.4511, 1e-4);
+        TS_ASSERT_DELTA(steady_beta_cat_at_wnt_equals_1, 143.5119, 1e-4);
 #endif
 
         // Divide the cell
@@ -188,10 +202,10 @@ public:
 
         TS_ASSERT_DELTA(91.6693, p_cycle_model->GetBetaCateninConcentration(), 1e-3);
 #ifdef CHASTE_CVODE
-        TS_ASSERT_DELTA(354.2739, p_cycle_model2->GetBetaCateninConcentration(), 5e-1);
+        TS_ASSERT_DELTA(361.5455, p_cycle_model2->GetBetaCateninConcentration(), 5e-1);
         // Different versions of CVODE giving different answers here.
 #else
-        TS_ASSERT_DELTA(354.1761, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
+        TS_ASSERT_DELTA(361.4677, p_cycle_model2->GetBetaCateninConcentration(), 1e-3);
 #endif
 
         TS_ASSERT_DELTA(p_cycle_model->GetBetaCateninDivisionThreshold(), 100, 1e-9);
@@ -387,13 +401,14 @@ public:
         std::string single_ode_wnt_results_dir = output_file_handler.GetOutputDirectoryFullPath();
         FileComparison( single_ode_wnt_results_dir + "single_ode_wnt_results.parameters", "crypt/test/data/TestCellCycleModels/single_ode_wnt_results.parameters").CompareFiles();
     }
+
 };
 
-//Member initialisation
-    const double TestSingleOdeWntCellCycleModel::mFirstRandomNumber = 0.721992;  // 3.11227;
-    const double TestSingleOdeWntCellCycleModel::mSecondRandomNumber = 1.59526;  // 1.65468;
-    const double TestSingleOdeWntCellCycleModel::mThirdRandomNumber = 1.58154;   // 2.60806;
-    const double TestSingleOdeWntCellCycleModel::mFourthRandomNumber = 0.117421; // 2.64101;
-    const double TestSingleOdeWntCellCycleModel::mFifthRandomNumber = 0.422089;  // 1.28792;
+// Member initialisation
+const double TestSingleOdeWntCellCycleModel::mFirstRandomNumber = 1.08221;
+const double TestSingleOdeWntCellCycleModel::mSecondRandomNumber = 3.21839;
+const double TestSingleOdeWntCellCycleModel::mThirdRandomNumber = 3.73243;
+const double TestSingleOdeWntCellCycleModel::mFourthRandomNumber = 2.83804;
+const double TestSingleOdeWntCellCycleModel::mFifthRandomNumber = 1.7031;
 
 #endif /* TESTSINGLEODEWNTCELLCYCLEMODEL_HPP_ */

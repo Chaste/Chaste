@@ -68,6 +68,18 @@ private:
 
 public:
 
+    void xTestSetTheRandomNumbersForAllTheseTests() throw(Exception)
+    {
+        // If random numbers change then copy the output of these to the static definitions at the bottom.
+
+        double mean = 2.0;
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+        std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
+    }
+
     void TestSimpleWntCellCycleModel() throw(Exception)
     {
         // Set up the simulation time
@@ -561,10 +573,10 @@ public:
 };
 
 // Member initialisation
-const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 0.721992;  // 3.11227;
-const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 1.59526;  // 1.65468;
-const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 1.58154;   // 2.60806;
-const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 0.117421; // 2.64101;
-const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 0.422089;  // 1.28792;
+const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 1.08221;  // 3.11227;
+const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 3.21839;  // 1.65468;
+const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 3.73243;   // 2.60806;
+const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 2.83804; // 2.64101;
+const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 1.7031;  // 1.28792;
 
 #endif /*TESTSIMPLECELLCYCLEMODELSFORCRYPT_HPP_*/

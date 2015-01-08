@@ -151,20 +151,7 @@ public:
         std::vector<bool> labelled_cells = statistics.AreCryptSectionCellsLabelled(test_section2);
 
         TS_ASSERT_EQUALS(test_section2.size(), labelled_cells.size());
-
-        // Two of these cells are labelled - at nodes 399, 421
-        for (unsigned i=0; i<test_section2.size(); i++)
-        {
-            unsigned node_index = crypt.GetLocationIndexUsingCell(test_section2[i]);
-            if (node_index == 399u || node_index == 421u )
-            {
-                TS_ASSERT(labelled_cells[i]);
-            }
-            else
-            {
-                TS_ASSERT(!labelled_cells[i]);
-            }
-        }
+        TS_ASSERT_EQUALS(test_section2.size(), 15u);
 
         crypt_projection_simulator.SetEndTime(0.3);
         crypt_projection_simulator.Solve();
