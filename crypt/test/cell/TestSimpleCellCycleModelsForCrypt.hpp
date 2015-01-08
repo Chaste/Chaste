@@ -573,10 +573,10 @@ public:
 };
 
 // Member initialisation
-const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 1.08221;  // 3.11227;
-const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 3.21839;  // 1.65468;
-const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 3.73243;   // 2.60806;
-const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 2.83804; // 2.64101;
-const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 1.7031;  // 1.28792;
+const double TestSimpleCellCycleModelsForCrypt::mFirstRandomNumber = 1.08221;
+const double TestSimpleCellCycleModelsForCrypt::mSecondRandomNumber = 3.21839;
+const double TestSimpleCellCycleModelsForCrypt::mThirdRandomNumber = 3.73243;
+const double TestSimpleCellCycleModelsForCrypt::mFourthRandomNumber = 2.83804;
+const double TestSimpleCellCycleModelsForCrypt::mFifthRandomNumber = 1.7031;
 
 #endif /*TESTSIMPLECELLCYCLEMODELSFORCRYPT_HPP_*/
