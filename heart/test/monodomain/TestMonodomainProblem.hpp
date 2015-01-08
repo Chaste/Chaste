@@ -1461,7 +1461,7 @@ public:
 
         // Save
         {
-            AbstractOutputModifier* const p_abstract_class = new SingleTraceOutputModifier("SomeFileName", 123);
+            AbstractOutputModifier* const p_abstract_class = new SingleTraceOutputModifier("SomeFileName", 123, 3.142);
 
             // Create an output file
             std::ofstream ofs(archive_filename.c_str());
@@ -1493,6 +1493,10 @@ public:
             // (if your abstract class doesn't contain the necessary variables and methods)
 
             TS_ASSERT_EQUALS(p_abstract_class_2->mFilename, "SomeFileName");
+
+            SingleTraceOutputModifier *p_concrete_class = static_cast<SingleTraceOutputModifier*>(p_abstract_class_2);
+            TS_ASSERT_EQUALS(p_concrete_class->mGlobalIndex, 123u);
+            TS_ASSERT_DELTA(p_abstract_class_2->mFlushTime, 3.142, 1e-3);
 
             delete p_abstract_class_2;
 

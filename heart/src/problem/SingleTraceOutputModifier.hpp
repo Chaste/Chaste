@@ -45,14 +45,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Provide the trace for a transmembrane potential at a single mode of the mesh.
  * File updated during the simulation.
+ *
+ * WARNING:  If you checkpoint this class then the file output will not be saved in the checkpoint.
+ *           The state of the output file will be unchanged (up to the most recent file flush) but
+ *           may be overwritten by a restarted simulation.   You will need to manually move the output file
+ *           before restarting the simulation and then merge the two files together at a later point.
  */
 class SingleTraceOutputModifier : public AbstractOutputModifier
 {
 private:
+    /** For testing */
+    friend class TestMonodomainProblem;
     /** Needed for serialization. */
     friend class boost::serialization::access;
-
-    unsigned mGlobalIndex; /**< The global index of the node for which the trace is to be made.*/
+    /** The global index of the node for which the trace is to be made.
+     *  This is the index *in memory at solve time*.  If you are running in parallel and you want a
+     *  specific index/location in your mesh then you will need to look in the mesh permutation.
+     */
+    unsigned mGlobalIndex;
     unsigned mLocalIndex; /**< The local index of the node for which the trace is to be made - set to UINT_MAX if the node is not local to the process*/
     out_stream mFileStream; /**< Output file stream (remains open during solve).*/
 
@@ -70,7 +80,8 @@ private:
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<AbstractOutputModifier>(*this);
         archive & mGlobalIndex;
-        // This one need re-calculating... archive & mLocalIndex;
+        // This one would need re-calculating, so we don't archive it... archive & mLocalIndex;
+        archive & mFlushTime;
     }
 
     /** Private constructor that resets process-specific data, for archiving */
@@ -82,8 +93,18 @@ public:
     /**
      * Constructor
      *
-     * @param globalIndex The global index of the node which is to be output (assumes no permutation)
+     * @param globalIndex The global index of the node which is to be output (assumes no permutation).
+     *  This is the index *in memory at solve time*.  If you are running in parallel and you want a
+     *  specific location or index in your mesh then you will need to look in the mesh for node or permutation.
+     *     ChastePoint<1> point(0.05);
+     *     unsigned new_index_for_5 = mesh.GetNearestNodeIndex(point);
+     *     SingleTraceOutputModifier("trace_5.txt", new_index_for_5));
+     *  or
+     *     unsigned new_index_for_5 = mesh.rGetNodePermutation()[5];
+     *     SingleTraceOutputModifier("trace_5.txt", new_index_for_5));
+     *
      * @param rFilename  The file which is eventually produced by this modifier
+     * @param flushTime The simulation time between manual file flushes (if required)
      *
      */
     SingleTraceOutputModifier(const std::string& rFilename, unsigned globalIndex, double flushTime=0.0)

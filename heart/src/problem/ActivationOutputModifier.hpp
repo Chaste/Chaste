@@ -51,6 +51,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ...
  *
  * Any missing data (node was not activated a second time or did not recover) is marked with -1.
+ *
+ *  WARNING:  If you checkpoint this class then the partial results will not be stored.  This is because
+ *  the sizes of the activation time vectors will be dependent on the number of processes involved in the
+ *  parallel code.
+ *  To fix this: archive as PETSc vectors? Then check ProcessSolutionAtTimeStep logic...
+ *
  */
 class ActivationOutputModifier : public AbstractOutputModifier
 {

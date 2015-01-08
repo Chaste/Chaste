@@ -1044,6 +1044,9 @@ public:
 
     /*
      * Simple bidomain simulation with a straight permutation applied.
+     * HOW_TO_TAG Cardiac/Output
+     * Use the `SingleTraceOutputModifier` to output based on a global index
+     * (index AFTER any permutation has been applied)
      *
      * NOTE: This test uses NON-PHYSIOLOGICAL parameters values.
      */
@@ -1080,9 +1083,27 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         BidomainProblem<1> bidomain_problem( &cell_factory );
 
+        // Single trace at node 5
+        unsigned new_index_for_5 = mesh.rGetNodePermutation()[5];
+        TS_ASSERT_EQUALS(new_index_for_5, 8u);
+        ChastePoint<1> point(0.05);
+        unsigned index_for_location = mesh.GetNearestNodeIndex(point);
+        TS_ASSERT_EQUALS(index_for_location, 8u);
+
+        boost::shared_ptr<SingleTraceOutputModifier> trace_5(new SingleTraceOutputModifier("trace_5.txt", new_index_for_5, 0.1));
+        bidomain_problem.AddOutputModifier(trace_5);
+
+
+
         bidomain_problem.SetMesh(&mesh);
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
+
+
+        // Extra trace data
+        OutputFileHandler handler1("BidomainUnpermuted1d", false);
+        NumericFileComparison comp1(handler1.GetOutputDirectoryFullPath()+ "trace_5.txt", "heart/test/data/BidomainUnpermuted1d/trace_5.txt");
+        TS_ASSERT(comp1.CompareFiles(5e-4));
 
         //Can't read in the final mesh since it's a 1d example...
         OutputFileHandler handler("BidomainUnpermuted1d/output", false);
