@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "ChasteSerialization.hpp"
 
+// These headers were needed here to fix segfaults on Boost 1.44 when using optimised builds...
 #include <typeinfo>
 #include <boost/serialization/extended_type_info.hpp>
 #include <boost/serialization/extended_type_info_typeid.hpp>
@@ -54,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * concrete class.  Also, any test in which the GetIdentifier method is used,
  * even via the main cell_based code, \b must include CheckpointArchiveTypes.hpp
  * or CellBasedSimulationArchiver.hpp as the first Chaste header included.
- * Failure to do so will result in a seg fault.
+ * Failure to do so will result in a segmentation fault.
  */
 class Identifiable
 {

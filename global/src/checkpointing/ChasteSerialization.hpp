@@ -72,17 +72,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Also check for versions of Boost we don't support at all.
  */
-#if BOOST_VERSION < 103301
-#error "Chaste doesn't support versions of Boost earlier than 1.33.1."
-#elif BOOST_VERSION == 103500
-// There's a bug in 1.35 which involves a
-// #include <boost/serialization/extended_type_info_typeid.hpp>
-// missing at the end of <boost/serialization/export.hpp>
-// We might have worked around this now, but it's so old it's not worth checking!
-#error "Chaste won't work with Boost 1.35 due to a bug in its serialization library."
+#if BOOST_VERSION < 103700
+#error "Chaste doesn't support versions of Boost earlier than 1.37."
 #elif BOOST_VERSION == 104100
-// There's another bug in 1.41 with shared_ptr support; see e.g.
-// http://sourceforge.net/apps/trac/easystroke/ticket/21
+// There's a bug in 1.41 with shared_ptr support; see e.g. http://sourceforge.net/apps/trac/easystroke/ticket/21
 #error "Chaste won't work with Boost 1.41 due to a bug in its serialization library."
 #endif
 

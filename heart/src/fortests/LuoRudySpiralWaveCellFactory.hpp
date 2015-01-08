@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991BackwardEuler.hpp"
 #include "AbstractCardiacCellFactory.hpp"
 #include "MultiStimulus.hpp"
+#include "SimpleStimulus.hpp"
 
 /**
  * This class sets up Luo Rudy 1991 backward Euler cells with

@@ -47,28 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
 
-/*
- * Archiving extravaganza:
- *
- * Various objects are archived through a pointer to an abstract class.  All the potential
- * concrete classes need to be included here, so they are registered with Boost.  If not,
- * Boost (<1.37) won't be able to find the archiving methods of the concrete class and will
- * throw the following exception:
- *
- *       terminate called after throwing an instance of 'boost::archive::archive_exception
- *       what():  unregistered class
- *
- * No member variable is defined to be of any of these classes, so removing them won't
- * produce any compiler error.  The exception above will occur at runtime.
- *
- * This might not be even necessary in certain cases, if the file is included implicitly by
- * another header file or by the test itself.  It's safer though.
- */
 #include "MonodomainProblem.hpp"
 #include "BidomainProblem.hpp"
 #include "BidomainWithBathProblem.hpp"
-#include "HeartConfigRelatedCellFactory.hpp"
-
 
 template<class PROBLEM_CLASS>
 void CardiacSimulationArchiver<PROBLEM_CLASS>::Save(PROBLEM_CLASS& rSimulationToArchive,

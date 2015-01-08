@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "IsNan.hpp"
 #include "HeartConfig.hpp"
 #include "GaussianQuadratureRule.hpp"
+#include "RegularStimulus.hpp"
 
 template<unsigned DIM>
 ElectrodesStimulusFactory<DIM>::ElectrodesStimulusFactory(std::vector<std::pair<AbstractChasteRegion<DIM>*, AbstractChasteRegion<DIM>*> >& rElectrodePairs,

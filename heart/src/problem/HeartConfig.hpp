@@ -47,9 +47,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteParameters_3_3.hpp"
 
 #include "AbstractStimulusFunction.hpp"
-// These are needed here for Boost < 1.37
-#include "SimpleStimulus.hpp"
-#include "RegularStimulus.hpp"
 
 #include "ChastePoint.hpp"
 #include "ChasteCuboid.hpp"

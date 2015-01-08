@@ -75,14 +75,12 @@ public:
      * - To do this re-run TestGenerateSteadyStateCrypt.hpp
      * - Archives produced can then be copied to crypt/test/data/<test below>/archive/
      *
-     * Note that when updating the archive, you can run TestGenerateSteadyStateCrypt.hpp
-     * with build=GccOpt to speed up the test.
+     * Note that when updating the archive, you can run TestGenerateSteadyStateCrypt.hpp with build=GccOpt to speed up the test.
      *
-     * Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
-     * The earliest version of Boost supported is 1.37.
+     * Note: from Chaste release 3.3 onward the earliest version of Boost supported is 1.40.
      *
      * NB: Produce archives with
-     *  scons build=GccOpt_hostconfig,boost=1-37,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
+     *  scons build=GccOpt_hostconfig,boost=1-40,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
      *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
      */
