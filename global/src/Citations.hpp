@@ -45,7 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class to register citations placed throughout the codebase, and pass them
  * through to PETSc (3.5+) or save them and print to screen/disk at program exit
- * (pre-PETSc 3.5).
+ * (pre-PETSc 3.5). The behaviour from the user's point of view should be the
+ * same regardless of PETSc version.
  *
  * This feature may be switched on by passing the "-citations" flag at runtime
  * to print to screen, or to file.txt using "-citations file.txt". Paths for the
@@ -74,11 +75,11 @@ public:
     static void Print();
 
 private:
-#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
-    /** The list of citations if using Chaste's built-in manager (pre-PETSc 3.5). */
+    /** The list of citations if using Chaste's built-in manager (pre-PETSc 3.5 or PETSc not initialised). */
     static std::vector<const char *> mCitations;
-#endif
 
+    /** Whether to use Chaste's own implementation rather than the PETSc one (e.g. if PETSc hasn't been initialised, or is too old). */
+    static bool mUseChasteImplementation;
 };
 
 #endif // CITATIONS_HPP_

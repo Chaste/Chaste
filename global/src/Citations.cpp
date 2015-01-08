@@ -36,57 +36,71 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Citations.hpp"
 #include "PetscTools.hpp"
 
-#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
+// Initialise 'member' variables
 std::vector<const char *> Citations::mCitations;
-#endif
+bool Citations::mUseChasteImplementation = false;
 
 void Citations::Register(const char pCitation[], PetscBool* pSet)
 {
-    EXCEPT_IF_NOT(PetscTools::IsInitialised());
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
-    PetscCitationsRegister(pCitation, pSet);
+    // Figure out if we can use PETSc's implementation.
+    // Note that the effect of this if() is to ensure we don't switch implementation if PETSc is initialised after the first citation is registered.
+    // (If PETSc is finalised after the first citation is registered we will probably switch implementation, but there's no way to avoid that.)
+    if (!mUseChasteImplementation)
+    {
+#if ( (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5) || PETSC_VERSION_MAJOR>3 )
+        mUseChasteImplementation = !PetscTools::IsInitialised();
 #else
-    if (!(*pSet))
+        mUseChasteImplementation = true;
+#endif
+    }
+
+    if (!mUseChasteImplementation)
+    {
+#if ( (PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5) || PETSC_VERSION_MAJOR>3 )
+        PetscCitationsRegister(pCitation, pSet);
+#endif
+    }
+    else if (!(*pSet))
     {
         // Not yet added this one
         mCitations.push_back(pCitation);
         *pSet = PETSC_TRUE;
     }
-#endif
 }
 
 void Citations::Print()
 {
-#if ( PETSC_VERSION_MAJOR<3 || PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR<5 )
-    if( PetscTools::AmMaster() && CommandLineArguments::Instance()->OptionExists("-citations") )
+    if (mUseChasteImplementation)
     {
-        std::ostream * p_output = &(std::cout);
-        bool writing_to_file = false;
-
-        if ( CommandLineArguments::Instance()->GetNumberOfArgumentsForOption("-citations")>0 )
+        if ( PetscTools::AmMaster() && CommandLineArguments::Instance()->OptionExists("-citations") )
         {
-            // We've got a file to write to - assume the user has given us something sensible!
-            writing_to_file = true;
-            std::string out_file_path = CommandLineArguments::Instance()->GetStringCorrespondingToOption("-citations");
-            p_output = new std::ofstream( out_file_path.c_str(), std::ios::out );
-            EXCEPT_IF_NOT( p_output->good() );
-        }
+            std::ostream * p_output = &(std::cout);
+            bool writing_to_file = false;
 
-        /* Write header */
-        (*p_output) << "If you publish results based on this computation please cite the following:" << std::endl;
-        (*p_output) << "===========================================================================" << std::endl;
-        /* Write citations */
-        for ( unsigned i=0; i<mCitations.size(); ++i )
-        {
-            (*p_output) << mCitations[i];
-        }
-        /* Write footer */
-        (*p_output) << "===========================================================================" << std::endl;
+            if ( CommandLineArguments::Instance()->GetNumberOfArgumentsForOption("-citations")>0 )
+            {
+                // We've got a file to write to - assume the user has given us something sensible!
+                writing_to_file = true;
+                std::string out_file_path = CommandLineArguments::Instance()->GetStringCorrespondingToOption("-citations");
+                p_output = new std::ofstream( out_file_path.c_str(), std::ios::out );
+                EXCEPT_IF_NOT( p_output->good() );
+            }
 
-        if ( writing_to_file )
-        {
-            delete p_output;
+            /* Write header */
+            (*p_output) << "If you publish results based on this computation please cite the following:" << std::endl;
+            (*p_output) << "===========================================================================" << std::endl;
+            /* Write citations */
+            for ( unsigned i=0; i<mCitations.size(); ++i )
+            {
+                (*p_output) << mCitations[i];
+            }
+            /* Write footer */
+            (*p_output) << "===========================================================================" << std::endl;
+
+            if ( writing_to_file )
+            {
+                delete p_output;
+            }
         }
     }
-#endif
 }
