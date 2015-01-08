@@ -86,8 +86,8 @@ public:
      * @param rFilename  The file which is eventually produced by this modifier
      *
      */
-    SingleTraceOutputModifier(const std::string& rFilename, unsigned globalIndex)
-        : AbstractOutputModifier(rFilename),
+    SingleTraceOutputModifier(const std::string& rFilename, unsigned globalIndex, double flushTime=0.0)
+        : AbstractOutputModifier(rFilename, flushTime),
           mGlobalIndex(globalIndex),
           mLocalIndex(UINT_MAX),
           mFileStream(NULL)

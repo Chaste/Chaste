@@ -74,6 +74,9 @@ protected:
 
     std::string mFilename; /**<The file which is eventually produced by this modifier*/
 
+    /** Simulation time period between flushes to disk */
+    double mFlushTime;
+
 public:
     /**
      * Standard construction method contains only the name of the file which this simulation modifier should produce.
@@ -84,10 +87,12 @@ public:
      * Note the problem passes parameters in a non-templated fashion in order to keep the interface as lightweight as
      * possible.
      * @param rFilename  The file which is eventually produced by this modifier
+     * @param flushTime  The (simulation) time between flushing the file to disk. Default (0) means don't flush.
      *
      */
-    AbstractOutputModifier(const std::string& rFilename)
-    : mFilename(rFilename)
+    AbstractOutputModifier(const std::string& rFilename, double flushTime=0.0)
+    : mFilename(rFilename),
+      mFlushTime(flushTime)
     {}
     /**
      * Destructor should be overridden when necessary
