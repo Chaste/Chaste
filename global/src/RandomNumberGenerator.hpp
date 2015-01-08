@@ -38,6 +38,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
 #include <boost/shared_ptr.hpp>
+#include <boost/version.hpp>
+
+
+#if BOOST_VERSION < 105600
+// Forward compatibility with Boost 1.56 onwards
+#include "Boost156NormalDistribution.hpp"
+#endif
+
 #include <boost/random.hpp>
 
 #include "ChasteSerialization.hpp"
@@ -60,8 +68,11 @@ private:
     boost::variate_generator<boost::mt19937& , boost::uniform_real<> > mGenerateUnitReal;
 
     /** An adaptor to a standard normal distribution. */
+#if BOOST_VERSION < 105600  //#2585
+    boost::variate_generator<boost::mt19937& , boost::random::normal_distribution_v156<> > mGenerateStandardNormal;
+#else
     boost::variate_generator<boost::mt19937& , boost::normal_distribution<> > mGenerateStandardNormal;
-
+#endif
     /** Pointer to the single instance. */
     static RandomNumberGenerator* mpInstance;
 
@@ -84,7 +95,11 @@ private:
         archive & rng_internals_string;
 
         std::stringstream normal_internals;
+#if BOOST_VERSION < 105600  //#2585
+        const boost::random::normal_distribution_v156<>& r_normal_dist = mGenerateStandardNormal.distribution();
+#else
         const boost::normal_distribution<>& r_normal_dist = mGenerateStandardNormal.distribution();
+#endif
         normal_internals << r_normal_dist;
         std::string normal_internals_string = normal_internals.str();
         archive & normal_internals_string;

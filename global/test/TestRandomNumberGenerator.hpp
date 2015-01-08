@@ -378,9 +378,31 @@ public:
 
         //Predictable normal?
         p_gen->Reseed(42);
-        // NB fails on Boost 1.56 and above
-        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), -1.2582, 1e-4);  ///\todo #2585
+        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), -0.6387, 1e-4);
     }
+
+    void TestExponentialMethodsInsideBoost() throw(Exception)
+	{
+    	boost::mt19937 mersenneTwisterGenerator(0u);
+
+    	// Generator way of doing it
+        // make an exponential distribution
+        boost::exponential_distribution<> ed;
+
+        // `merge' this distribution with our random number generator
+        boost::variate_generator<boost::mt19937& , boost::exponential_distribution<> > var_exponential(mersenneTwisterGenerator, ed);
+
+        // return the random number
+        TS_ASSERT_DELTA(var_exponential(), 0.7958, 1e-4);
+
+        // Reseed
+        mersenneTwisterGenerator.seed(0u);
+
+        // Distribution way of doing it
+        // Works only on 1.47+
+        //TS_ASSERT_DELTA(ed(mersenneTwisterGenerator), 0.7958, 1e-4);
+	}
+
 
     void TestReproducibilityAcrossPlatforms()
     {
@@ -409,8 +431,9 @@ public:
         {
             p_gen->StandardNormalRandomDeviate();
         }
-        TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.9870, 1e-4);
-        TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.8389, 1e-4);
+    	// Boost 1.56 values
+     	TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.2132, 1e-4);
+     	TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.6166, 1e-4);
 
     }
 
@@ -474,7 +497,7 @@ public:
     {
         /**
          * Here we test the exponentially distributed random number generation. As with the other
-         * distributions we only test reproducability and trust the underlying boost library
+         * distributions we only test reproducibility and trust the underlying boost library
          * to correctly implement the distribution. This test is only a
          * sanity check that we interfaced the boost library correctly.
          */
