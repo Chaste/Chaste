@@ -76,6 +76,18 @@ void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::WriteNewline()
     *mpOutStream << "\n";
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::SetFileName(std::string fileName)
+{
+    mFileName = fileName;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::string AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::GetFileName()
+{
+    return mFileName;
+}
+
 // Explicit instantiation
 template class AbstractCellBasedWriter<1,1>;
 template class AbstractCellBasedWriter<1,2>;

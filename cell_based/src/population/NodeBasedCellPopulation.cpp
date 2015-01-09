@@ -490,7 +490,7 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
     {
         averaged_cell_radius += (num_neighbours_equil-num_cells)*cell_radius;
 
-        averaged_cell_radius /=num_neighbours_equil;
+        averaged_cell_radius /= num_neighbours_equil;
     }
     else
     {
@@ -519,11 +519,6 @@ double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-/**
- * \todo #2441 - note that in the most recent version of this code, each cell's radius would be
- * output if there was a CellVolumesWriter present. Consider adding a new class CellRadiusWriter,
- * which outputs each cell's radius if using an appropriate cell population.
- */
 #ifdef CHASTE_VTK
     // Store the present time as a string
     std::stringstream time;

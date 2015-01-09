@@ -631,6 +631,48 @@ public:
     }
 
     /**
+     * Add a cell population writer through an input argument.
+     * This alternative to the templated AddPopulationWriter()
+     * method allows the user to, for example, add a writer
+     * with a non-default value for its member mFileName.
+     *
+     * @param pPopulationWriter shared pointer to a cell population writer
+     * @return This method returns void
+     */
+    void AddPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
+    {
+        mCellPopulationWriters.push_back(pPopulationWriter);
+    }
+
+    /**
+     * Add a cell writer through an input argument.
+     * This alternative to the templated AddCellWriter()
+     * method allows the user to, for example, add a writer
+     * with a non-default value for its member mFileName.
+     *
+     * @param pCellWriter shared pointer to a cell writer
+     * @return This method returns void
+     */
+    void AddCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter)
+    {
+        mCellWriters.push_back(pCellWriter);
+    }
+
+    /**
+     * Add a cell population count writer through an input argument.
+     * This alternative to the templated AddPopulationCountWriter()
+     * method allows the user to, for example, add a writer
+     * with a non-default value for its member mFileName.
+     *
+     * @param pCellPopulationCountWriter shared pointer to a cell population count writer
+     * @return This method returns void
+     */
+    void AddCellPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationCountWriter)
+    {
+        mCellPopulationCountWriters.push_back(pCellPopulationCountWriter);
+    }
+
+    /**
      * Get whether the population has a writer of the specified type.
      *
      * @return whether the population has this writer

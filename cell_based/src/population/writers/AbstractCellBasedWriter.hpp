@@ -114,6 +114,21 @@ public:
      * Add a newline character to mpOutStream.
      */
     virtual void WriteNewline();
+
+    /**
+     * Set the output file name.
+     * This method allows the user to change mFileName from
+     * its default value, which is set in each subclass's
+     * constructor.
+     *
+     * @param fileName the output file name
+     */
+    void SetFileName(std::string fileName);
+
+    /**
+     * @return the output file name.
+     */
+    std::string GetFileName();
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractCellBasedWriter)

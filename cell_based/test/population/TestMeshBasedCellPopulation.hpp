@@ -982,6 +982,152 @@ public:
  #endif //CHASTE_VTK
     }
 
+    void TestWriteResultsToFileWithAlternativeAddWriterMethods()
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+
+        // Resetting the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
+
+        // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_diff(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+
+        std::vector<CellPtr> cells;
+        for (unsigned elem_index=0; elem_index<mesh.GetNumNodes(); elem_index++)
+        {
+            FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
+
+            CellPtr p_cell(new Cell(p_wildtype, p_model));
+            if (elem_index%3 == 0)
+            {
+                p_cell->SetCellProliferativeType(p_stem);
+            }
+            else if (elem_index%3 == 1)
+            {
+                p_cell->SetCellProliferativeType(p_transit);
+            }
+            else
+            {
+                p_cell->SetCellProliferativeType(p_diff);
+            }
+
+            double birth_time = 0.0 - elem_index;
+            p_cell->SetBirthTime(birth_time);
+
+            cells.push_back(p_cell);
+        }
+
+        boost::shared_ptr<AbstractCellProperty> p_apc1(CellPropertyRegistry::Instance()->Get<ApcOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apc2(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_bcat1(CellPropertyRegistry::Instance()->Get<BetaCateninOneHitCellMutationState>());
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+
+        cells[0]->AddCellProperty(p_apoptotic_state);
+        cells[1]->SetMutationState(p_apc1);
+        cells[2]->SetMutationState(p_apc2);
+        cells[3]->SetMutationState(p_bcat1);
+        cells[4]->AddCellProperty(p_label);
+
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.InitialiseCells();
+
+        typedef VoronoiDataWriter<2, 2> VorWriter;
+        MAKE_PTR(VorWriter, p_voronoi_writer);
+        p_voronoi_writer->SetFileName("new_voronoi.dat");
+        cell_population.AddPopulationWriter(p_voronoi_writer);
+
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.SetWriteVtkAsPoints(true);
+        cell_population.SetOutputMeshInVtk(true);
+
+        // Test set methods
+        cell_population.SetOutputResultsForChasteVisualizer(true);
+
+        typedef CellMutationStatesCountWriter<2, 2> MutWriter;
+        MAKE_PTR(MutWriter, p_count_writer);
+        p_count_writer->SetFileName("new_cellmutationstates.dat");
+        cell_population.AddCellPopulationCountWriter(p_count_writer);
+
+        typedef CellAgesWriter<2, 2> AgWriter;
+        MAKE_PTR(AgWriter, p_ages_writer);
+        p_ages_writer->SetFileName("new_cellages.dat");
+        p_ages_writer->SetVtkCellDataName("New Ages");
+        cell_population.AddCellWriter(p_ages_writer);
+
+        // This method is usually called by Update()
+        cell_population.CreateVoronoiTessellation();
+
+        std::string output_directory = "TestWriteResultsToFileWithAlternativeAddWriterMethods";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+        cell_population.WriteResultsToFiles(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+
+        cell_population.WriteResultsToFiles(output_directory);
+        cell_population.CloseWritersFiles();
+
+        // Test that the cell population parameters are output correctly
+        out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
+
+        // Write cell population parameters to file
+        cell_population.OutputCellPopulationParameters(parameter_file);
+        parameter_file->close();
+
+        // Compare output with saved files of what they should look like
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        FileComparison(results_dir + "new_voronoi.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/voronoi.dat").CompareFiles();
+        FileComparison(results_dir + "new_cellmutationstates.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "new_cellages.dat", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/cellages.dat").CompareFiles();
+
+#ifdef CHASTE_VTK
+        // Test that VTK writer has produced some files
+
+        // Initial condition files
+        FileFinder vtk_file(results_dir + "results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file.Exists());
+
+        FileFinder vtk_mesh_file(results_dir + "mesh_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_mesh_file.Exists());
+
+        // Final files
+        FileFinder vtk_file2(results_dir + "results_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file2.Exists());
+
+        FileFinder vtk_mesh_file2(results_dir + "mesh_1.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_mesh_file2.Exists());
+
+        // PVD file
+        FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
+
+        // Read VTK file and check it doesn't cause any problems
+        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+
+        std::vector<double> ages_data;
+        vtk_reader.GetPointData("New Ages", ages_data);
+        TS_ASSERT_EQUALS(ages_data.size(), 5u);
+        TS_ASSERT_DELTA(ages_data[0], 0.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[1], 1.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[2], 2.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[3], 3.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[4], 4.0, 1e-9);
+ #endif //CHASTE_VTK
+    }
+
     void TestCellPopulationWritersIn3d()
     {
         // Cannot write cell populations in parallel

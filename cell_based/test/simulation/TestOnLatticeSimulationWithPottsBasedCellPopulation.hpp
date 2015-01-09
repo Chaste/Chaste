@@ -553,7 +553,6 @@ public:
         FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
         TS_ASSERT(vtk_file2.Exists());
 
-        ///\todo #2441 Fix the "no element ids" bug - idea for a failing test.
         // Check that the second VTK file for Potts specific data (element IDs)
         VtkMeshReader<3,3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
         std::vector<double> cell_types;
@@ -567,7 +566,6 @@ public:
         vtk_reader.GetPointData("Cell IDs", cell_ids);
         // Prior to release 3.2 this was called "Element index".
         // It is changed to cell_id as this is preferable for VTK output.
-        //vtk_reader.GetPointData("Element index", cell_ids);
         TS_ASSERT_EQUALS(cell_ids.size(), 1000u);
         TS_ASSERT_DELTA(*max_element(cell_ids.begin(), cell_ids.end()), 63.0, 1e-12);
 

@@ -32,31 +32,60 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "AbstractCellWriter.hpp"
-#include "AbstractCellPopulation.hpp"
+
+#include "CellRadiusWriter.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::AbstractCellWriter(const std::string& rFileName)
-    : AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>(rFileName)
+CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::CellRadiusWriter()
+    : AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>("cellradii.dat")
 {
+    this->mVtkCellDataName = "Cell radii";
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::SetVtkCellDataName(std::string vtkCellDataName)
+double CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    mVtkCellDataName = vtkCellDataName;
+    double cell_radius = 0.0;
+    if (dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(pCellPopulation))
+    {
+        unsigned node_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+        cell_radius = pCellPopulation->GetNode(node_index)->GetRadius();
+    }
+    return cell_radius;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::string AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVtkCellDataName()
+void CellRadiusWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
-    return mVtkCellDataName;
+    unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+    unsigned cell_id = pCell->GetCellId();
+    c_vector<double, SPACE_DIM> cell_location = pCellPopulation->GetLocationOfCellCentre(pCell);
+
+    double cell_radius = 0.0;
+    if (dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(pCellPopulation))
+    {
+        unsigned node_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
+        cell_radius = pCellPopulation->GetNode(node_index)->GetRadius();
+    }
+
+    *this->mpOutStream << location_index << " " << cell_id << " ";
+    for (unsigned i=0; i<SPACE_DIM; i++)
+    {
+        *this->mpOutStream << cell_location[i] << " ";
+    }
+
+    *this->mpOutStream << cell_radius << " ";
 }
 
 // Explicit instantiation
-template class AbstractCellWriter<1,1>;
-template class AbstractCellWriter<1,2>;
-template class AbstractCellWriter<2,2>;
-template class AbstractCellWriter<1,3>;
-template class AbstractCellWriter<2,3>;
-template class AbstractCellWriter<3,3>;
+template class CellRadiusWriter<1,1>;
+template class CellRadiusWriter<1,2>;
+template class CellRadiusWriter<2,2>;
+template class CellRadiusWriter<1,3>;
+template class CellRadiusWriter<2,3>;
+template class CellRadiusWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+// Declare identifier for the serializer
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellRadiusWriter)

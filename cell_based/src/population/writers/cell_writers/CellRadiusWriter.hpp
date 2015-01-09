@@ -33,25 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTCELLWRITER_HPP_
-#define ABSTRACTCELLWRITER_HPP_
+#ifndef CELLRADIUSWRITER_HPP_
+#define CELLRADIUSWRITER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractCellBasedWriter.hpp"
-#include "Cell.hpp"
-
-// Forward declaration prevents circular include chain
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellPopulation;
+#include "AbstractCellWriter.hpp"
 
 /**
- * An abstract class for a writer that visits individual cells of a population and writes their data.
+ * A class written using the visitor pattern for writing the radius of each cell
+ * to file. This class is designed for use with a NodeBasedCellPopulation (or its
+ * subclasses) only; if used with other cell populations, the writer will output
+ * zero for each cell's radius.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractCellWriter : public AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>
+class CellRadiusWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -63,57 +61,48 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
-
-protected:
-
-    /**
-     * The name of the cell data used in VTK output.
-     */
-    std::string mVtkCellDataName;
 
 public:
 
     /**
      * Default constructor.
-     * @param rFileName the name of the file to write to.
      */
-    AbstractCellWriter(const std::string& rFileName);
+    CellRadiusWriter();
 
     /**
+     * Overridden GetCellDataForVtkOutput() method.
+     *
      * Get a double associated with a cell. This method reduces duplication
      * of code between the methods VisitCell() and AddVtkData().
      *
      * @param pCell a cell
-     * @param pCellPopulation a pointer to the cell population owning the cell.
+     * @param pCellPopulation a pointer to the cell population owning the cell
      *
      * @return data associated with the cell
      */
-    virtual double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
+    double GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit a cell and write its data.
+     * Overridden VisitCell() method.
+     *
+     * Visit a cell and write its radius.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [cell radius] ...
+     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively.
+     *
+     * This is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCell a cell
-     * @param pCellPopulation a pointer to the cell population owning the cell.
+     * @param pCellPopulation a pointer to the cell population owning the cell
      */
-    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)=0;
-
-    /**
-     * Set the name of the cell data used in VTK output.
-     * This method allows the user to change mVtkCellDataName from
-     * its default value, which is set in each subclass's
-     * constructor.
-     *
-     * @param vtkCellDataName the output file name
-     */
-    void SetVtkCellDataName(std::string vtkCellDataName);
-
-    /**
-     * @return the name of the cell data used in VTK output.
-     */
-    std::string GetVtkCellDataName();
+    virtual void VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 };
 
-#endif /*ABSTRACTCELLWRITER_HPP_*/
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellRadiusWriter)
+
+#endif /* CELLRADIUSWRITER_HPP_ */
