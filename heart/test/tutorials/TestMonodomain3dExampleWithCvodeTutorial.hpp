@@ -73,13 +73,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991Cvode.hpp"
 /* then include the rest of the headers as usual */
 #include "TetrahedralMesh.hpp"
+#include "SimpleStimulus.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 /*
  * Since CVODE is an optional extra dependency for Chaste - albeit now
  * one that is highly recommended - see the [wiki:InstallGuides/InstallGuide InstallGuide].
- *
- * EMPTYLINE
  *
  * We guard any code that relies upon it with the following `#ifdef`.
  * This CHASTE_CVODE flag is set automatically if your hostconfig file
@@ -181,8 +180,6 @@ public:
          * CVODE will take as many adaptive internal timesteps as it requires each time
          * it is called, so we should just call it once per PDE timestep - i.e. set the
          * ODE and PDE timesteps to be the same.
-         *
-         * EMPTYLINE
          *
          * '''NB''': CVODE will only give you a big speedup when the ODE/PDE timestep is larger than
          * a typical Forward Euler timestep would be for that model. But it doesn't

@@ -60,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // The main classes to be used for running simulations.
 #include "BidomainProblem.hpp"
 #include "MonodomainProblem.hpp"
+#include "SimpleStimulus.hpp"
 ///* All tests which run cardiac simulations (which use Petsc) should include
 // * {{{PetscSetupAndFinalize.hpp}}}.  This class ensures that {{{PetscInitialise()}}}
 // * is called with the appropriate arguments before any tests in the suite are run. */
@@ -78,11 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 
 
-///* EMPTYLINE
-// *
 // * == Defining a cell factory ==
-// *
-// * EMPTYLINE
 // *
 // * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
 // * which tells the problem class what type of cardiac cells to create. The cell-factory
@@ -93,8 +90,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // * could be used in the simulation, but for completeness we create our own cell factory in
 // * this test. For complicated problems with, say, heterogeneous cell types or particular stimuli,
 // * a new cell factory will have to be defined by the user for their particular problem.
-// *
-// * EMPTYLINE
 // *
 // * This cell factory is a simple cell factory where every cell is a Luo-Rudy 91 cell,
 // * and only the cell at position (0) is given a non-zero stimulus.
@@ -149,11 +144,7 @@ public:
 };
 
 ///*
-// * EMPTYLINE
-// *
 // * == Running the mono- and bi-domain simulations ==
-// *
-// * EMPTYLINE
 // *
 // * Now we can define the test class, which must inherit from {{{CxxTest::TestSuite}}}
 // * as described in the writing basic tests tutorial. */

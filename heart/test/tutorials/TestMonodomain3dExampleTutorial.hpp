@@ -56,8 +56,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
 #include "LuoRudy1991.hpp"
-#include "PetscSetupAndFinalize.hpp"
+#include "SimpleStimulus.hpp"
 #include "TetrahedralMesh.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 /* Here we define a cell factory that gives stimuli to cells in the block
  * 0<x<0.1, 0<y<0.1, 0<z<0.1. Note that it inherits from `AbstractCardiacCellFactory<3>`
@@ -117,8 +118,6 @@ public:
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
         HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);
         /* (In 2D the call is identical, but without the depth parameter).
-         *
-         * EMPTYLINE
          *
          * Set the simulation duration, etc, and create an instance of the cell factory.
          * One thing that should be noted for monodomain problems, the ''intracellular

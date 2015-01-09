@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "LuoRudy1991BackwardEuler.hpp"
 #include "MonodomainProblem.hpp"
+#include "SimpleStimulus.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 

@@ -55,9 +55,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "MonodomainProblem.hpp"
 #include "LuoRudy1991BackwardEuler.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "GenericMeshReader.hpp"
+#include "SimpleStimulus.hpp"
 #include "DistributedTetrahedralMesh.hpp"
+#include "PetscSetupAndFinalize.hpp"
 
 /* Here we define a cell factory that gives stimuli to all cells
  * below height z = 0.042... this corresponds to the apex of the heart.
