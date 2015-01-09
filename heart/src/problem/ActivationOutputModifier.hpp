@@ -83,7 +83,8 @@ private:
     }
 
     /** Private constructor that does nothing, for archiving */
-    ActivationOutputModifier(){};
+    ActivationOutputModifier()
+    {}
 
 public:
     /**

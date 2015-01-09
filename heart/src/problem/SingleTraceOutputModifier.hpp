@@ -81,13 +81,13 @@ private:
         archive & boost::serialization::base_object<AbstractOutputModifier>(*this);
         archive & mGlobalIndex;
         // This one would need re-calculating, so we don't archive it... archive & mLocalIndex;
-        archive & mFlushTime;
     }
 
     /** Private constructor that resets process-specific data, for archiving */
     SingleTraceOutputModifier()
-        :mLocalIndex(UINT_MAX),
-         mFileStream(NULL){};
+        : mLocalIndex(UINT_MAX),
+          mFileStream(NULL)
+    {}
 
 public:
     /**
@@ -114,6 +114,7 @@ public:
           mFileStream(NULL)
     {
     }
+
     /**
      * Initialise the modifier (open the file) when the solve loop is starting.
      *

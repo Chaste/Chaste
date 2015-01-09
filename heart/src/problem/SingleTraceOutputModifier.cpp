@@ -78,7 +78,7 @@ SingleTraceOutputModifier::ProcessSolutionAtTimeStep(double time, Vec solution, 
         (*mFileStream) << "\n";
         VecRestoreArray(solution, &p_solution);
 
-        if (Divides(mFlushTime, time))
+        if (mFlushTime > 0.0 && Divides(mFlushTime, time))
         {
             mFileStream->flush();
         }

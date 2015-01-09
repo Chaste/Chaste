@@ -66,11 +66,14 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & mFilename;
+        archive & mFlushTime;
     }
 
 protected:
     /** Constructor that does nothing, for archiving */
-    AbstractOutputModifier(){};
+    AbstractOutputModifier()
+        : mFilename(), mFlushTime(0.0)
+    {}
 
     std::string mFilename; /**<The file which is eventually produced by this modifier*/
 
@@ -91,8 +94,8 @@ public:
      *
      */
     AbstractOutputModifier(const std::string& rFilename, double flushTime=0.0)
-    : mFilename(rFilename),
-      mFlushTime(flushTime)
+        : mFilename(rFilename),
+          mFlushTime(flushTime)
     {}
     /**
      * Destructor should be overridden when necessary
