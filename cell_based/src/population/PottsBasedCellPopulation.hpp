@@ -138,6 +138,10 @@ private:
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
+     * As a CellIdWriter is added to the population in the overridden method
+     * OpenWritersFiles(), distinct cells can be visualized when viewing VTK
+     * output of Potts model simulations.
+     *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
