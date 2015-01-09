@@ -117,7 +117,7 @@ void NodeBasedCellPopulation<DIM>::Validate()
         }
         catch (Exception&)
         {
-            EXCEPTION("Node " << node_iter->GetIndex() << " does not appear to have a cell associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Node " << node_iter->GetIndex() << " does not appear to have a cell associated with it");
         }
     }
 }

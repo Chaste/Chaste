@@ -167,7 +167,7 @@ public:
         // This should throw an exception as the number of cells does not equal the number of elements
         std::vector<CellPtr> cells_copy(cells);
         TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
-                "Element 8 does not appear to have a cell associated with it");
+                "At time 0, Element 8 does not appear to have a cell associated with it");
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -234,7 +234,7 @@ public:
         // This should throw an exception as the number of cells
         // does not equal the number of elements
         TS_ASSERT_THROWS_THIS(VertexBasedCellPopulation<2> cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
-                "Element 0 appears to have 2 cells associated with it");
+                "At time 0, Element 0 appears to have 2 cells associated with it");
     }
 
     void TestGetDampingConstant()

@@ -108,8 +108,14 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
     double average_damping_constant = 0.0;
 
     std::set<unsigned> containing_elements = GetNode(nodeIndex)->rGetContainingElementIndices();
-    double temp = 1.0/((double) containing_elements.size());
 
+    unsigned num_containing_elements = containing_elements.size();
+    if (num_containing_elements == 0)
+    {
+        EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Node " << nodeIndex << " is not contained in any elements, so GetDampingConstant() returns zero");
+    }
+
+    double temp = 1.0/((double) num_containing_elements);
     for (std::set<unsigned>::iterator iter = containing_elements.begin();
          iter != containing_elements.end();
          ++iter)
@@ -346,13 +352,13 @@ void VertexBasedCellPopulation<DIM>::Validate()
     {
         if (validated_element[i] == 0)
         {
-            EXCEPTION("Element " << i << " does not appear to have a cell associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " does not appear to have a cell associated with it");
         }
 
         if (validated_element[i] > 1)
         {
             // This should never be reached as you can only set one cell per element index
-            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }

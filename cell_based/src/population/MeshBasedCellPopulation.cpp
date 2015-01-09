@@ -197,7 +197,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Validate()
     {
         if (!validated_node[i])
         {
-            EXCEPTION("Node " << i << " does not appear to have a cell associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Node " << i << " does not appear to have a cell associated with it");
         }
     }
 }

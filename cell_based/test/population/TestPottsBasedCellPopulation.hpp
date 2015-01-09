@@ -168,7 +168,7 @@ public:
         // This should throw an exception as the number of cells does not equal the number of elements
         std::vector<CellPtr> cells_copy(cells);
         TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation<2> cell_population(*p_mesh, cells_copy),
-                "Element 3 does not appear to have a cell associated with it");
+                "At time 0, Element 3 does not appear to have a cell associated with it");
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -232,10 +232,10 @@ public:
             cell_location_indices2.push_back(i%p_mesh2->GetNumElements()); // Element 0 will have 2 cells
         }
 
-        // This should throw a never reached exception as the number of cells
+        // This should throw a never-reached exception as the number of cells
         // does not equal the number of elements
         TS_ASSERT_THROWS_THIS(PottsBasedCellPopulation<2> cell_population2(*p_mesh2, cells2, false, true, cell_location_indices2),
-                "Element 0 appears to have 2 cells associated with it");
+            "At time 0, Element 0 appears to have 2 cells associated with it");
     }
 
     void TestRemoveDeadCellsAndUpdate() throw(Exception)

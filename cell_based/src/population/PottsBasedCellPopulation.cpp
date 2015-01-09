@@ -64,12 +64,12 @@ void PottsBasedCellPopulation<DIM>::Validate()
     {
         if (validated_element[i] == 0)
         {
-            EXCEPTION("Element " << i << " does not appear to have a cell associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Element " << i << " does not appear to have a cell associated with it");
         }
 
         if (validated_element[i] > 1)
         {
-            EXCEPTION("Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
 }

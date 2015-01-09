@@ -205,7 +205,7 @@ public:
         // Fails as no cell corresponding to node 4
         std::vector<CellPtr> cells_copy(cells);
         TS_ASSERT_THROWS_THIS(MeshBasedCellPopulation<2> cell_population2(mesh, cells_copy),
-                              "Node 4 does not appear to have a cell associated with it");
+                              "At time 0, Node 4 does not appear to have a cell associated with it");
 
         // Add another cell
         AbstractCellCycleModel* p_cell_cycle_model = new FixedDurationGenerationBasedCellCycleModel();
