@@ -242,7 +242,7 @@ public:
 
         // Test the Wnt concentration result
         WntConcentration<2>* p_wnt = WntConcentration<2>::Instance();
-        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(257)), 0.7757, 1e-3);
+        TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(257)), 0.7757, 2e-3);
         TS_ASSERT_DELTA(p_wnt->GetWntLevel(crypt.GetCellUsingLocationIndex(503)), 0.8876, 1e-3);
       // Tidy up
         WntConcentration<2>::Destroy();
