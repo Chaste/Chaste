@@ -231,25 +231,90 @@ void NodeBasedCellPopulationWithParticles<DIM>::UpdateNodeLocations(double dt)
 template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
-///\todo #2441 - change this method to make use of the CellWriter functionality
-///(see MeshBasedCellPopulation::WriteVtkResultsToFile, for example)
 #ifdef CHASTE_VTK
-    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    // Store the present time as a string
     std::stringstream time;
-    time << num_timesteps;
+    time << SimulationTime::Instance()->GetTimeStepsElapsed();
 
+    // Make sure the nodes are ordered contiguously in memory
+    NodeMap map(1 + this->mpNodesOnlyMesh->GetMaximumNodeIndex());
+    this->mpNodesOnlyMesh->ReMesh(map);
+
+    // Store the number of cells for which to output data to VTK
+    unsigned num_nodes = this->GetNumNodes();
+    std::vector<double> rank(num_nodes);
+    std::vector<double> particles(num_nodes);
+
+    unsigned num_cell_data_items = 0;
+    std::vector<std::string> cell_data_names;
+
+    // We assume that the first cell is representative of all cells
+    if (num_nodes > 0)
+    {
+        num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+        cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    }
+
+    std::vector<std::vector<double> > cell_data;
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        std::vector<double> cell_data_var(num_nodes);
+        cell_data.push_back(cell_data_var);
+    }
+
+    // Create mesh writer for VTK output
     VtkMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results_"+time.str(), false);
+    mesh_writer.SetParallelFiles(*(this->mpNodesOnlyMesh));
 
-    unsigned num_cells = this->GetNumNodes();
-    std::vector<double> particles(num_cells);
-    std::vector<double> cell_types(num_cells);
-    std::vector<double> cell_ancestors(num_cells);
-    std::vector<double> cell_mutation_states(num_cells);
-    std::vector<double> cell_ages(num_cells);
-    std::vector<double> cell_cycle_phases(num_cells);
-    std::vector<double> cell_radii(num_cells);
+    // Iterate over any cell writers that are present
+    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+         cell_writer_iter != this->mCellWriters.end();
+         ++cell_writer_iter)
+    {
+        // Create vector to store VTK cell data
+        std::vector<double> vtk_cell_data(num_nodes);
 
-    ///\todo #1975 - deal with possibility of information stored in CellData
+        // Loop over nodes
+        for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+             node_iter != this->mrMesh.GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+
+            // If this node is a particle (not a cell), then we set the 'dummy' VTK cell data for this to be -2.0...
+            if (this->IsParticle(node_index))
+            {
+                vtk_cell_data[node_index] = -2.0;
+            }
+            else
+            {
+                // ...otherwise we populate the vector of VTK cell data as usual
+                CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+                vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+            }
+        }
+
+        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+    }
+
+    // Loop over cells
+    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        // Get the node index corresponding to this cell
+        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
+
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            cell_data[var][node_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+        }
+
+        rank[node_index] = (PetscTools::GetMyRank());
+    }
+
+    mesh_writer.AddPointData("Process rank", rank);
 
     // Loop over nodes
     for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
@@ -257,102 +322,34 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
          ++node_iter)
     {
         unsigned node_index = node_iter->GetIndex();
-        Node<DIM>* p_node = this->GetNode(node_index);
-
-        if (!this->IsParticle(node_index))
-        {
-            CellPtr cell_iter = this->GetCellUsingLocationIndex(node_index);
-            if (this-> template HasWriter<CellAncestorWriter>())
-            {
-                double ancestor_index = (cell_iter->GetAncestor() == UNSIGNED_UNSET) ? (-1.0) : (double)cell_iter->GetAncestor();
-                cell_ancestors[node_index] = ancestor_index;
-            }
-            if (this-> template HasWriter<CellProliferativeTypesWriter>())
-            {
-                double cell_type = cell_iter->GetCellProliferativeType()->GetColour();
-                cell_types[node_index] = cell_type;
-            }
-            if (this-> template HasWriter<CellMutationStatesCountWriter>())
-            {
-                double mutation_state = cell_iter->GetMutationState()->GetColour();
-                cell_mutation_states[node_index] = mutation_state;
-            }
-            if (this-> template HasWriter<CellAgesWriter>())
-            {
-                double age = cell_iter->GetAge();
-                cell_ages[node_index] = age;
-            }
-            if (this-> template HasWriter<CellProliferativePhasesWriter>())
-            {
-                double cycle_phase = cell_iter->GetCellCycleModel()->GetCurrentCellCyclePhase();
-                cell_cycle_phases[node_index] = cycle_phase;
-            }
-            if (this-> template HasWriter<CellVolumesWriter>())
-            {
-                double cell_radius = p_node->GetRadius();
-                cell_radii[node_index] = cell_radius;
-            }
-        }
-        else
-        {
-            particles[node_index] = (double)(this->IsParticle(node_index));
-            if (this-> template HasWriter<CellAncestorWriter>())
-            {
-                cell_ancestors[node_index] = -2.0;
-            }
-            if (this-> template HasWriter<CellProliferativeTypesWriter>())
-            {
-                cell_types[node_index] = -2.0;
-            }
-            if (this-> template HasWriter<CellMutationStatesCountWriter>())
-            {
-                cell_mutation_states[node_index] = -2.0;
-            }
-            if (this-> template HasWriter<CellAgesWriter>())
-            {
-                cell_ages[node_index] = -2.0;
-            }
-            if (this-> template HasWriter<CellProliferativePhasesWriter>())
-            {
-                cell_cycle_phases[node_index] = -2.0;
-            }
-        }
+        particles[node_index] = (double) (this->IsParticle(node_index));
     }
 
     mesh_writer.AddPointData("Non-particles", particles);
-    if (this-> template HasWriter<CellProliferativeTypesWriter>())
-    {
-        mesh_writer.AddPointData("Cell types", cell_types);
-    }
-    if (this-> template HasWriter<CellAncestorWriter>())
-    {
-        mesh_writer.AddPointData("Ancestors", cell_ancestors);
-    }
-    if (this-> template HasWriter<CellMutationStatesCountWriter>())
-    {
-        mesh_writer.AddPointData("Mutation states", cell_mutation_states);
-    }
-    if (this-> template HasWriter<CellAgesWriter>())
-    {
-        mesh_writer.AddPointData("Ages", cell_ages);
-    }
-    if (this-> template HasWriter<CellProliferativePhasesWriter>())
-    {
-        mesh_writer.AddPointData("Cycle phases", cell_cycle_phases);
-    }
-    if (this-> template HasWriter<CellVolumesWriter>())
-    {
-        mesh_writer.AddPointData("Cell radii", cell_radii);
-    }
-    ///\todo #1975 - deal with possibility of information stored in CellData
 
-    mesh_writer.WriteFilesUsingMesh(static_cast<NodesOnlyMesh<DIM>& >((this->mrMesh)));
+    if (num_cell_data_items > 0)
+    {
+        for (unsigned var=0; var<cell_data.size(); var++)
+        {
+            mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
+        }
+    }
+
+    mesh_writer.WriteFilesUsingMesh(*(this->mpNodesOnlyMesh));
 
     *(this->mpVtkMetaFile) << "        <DataSet timestep=\"";
-    *(this->mpVtkMetaFile) << num_timesteps;
+    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
-    *(this->mpVtkMetaFile) << num_timesteps;
-    *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
+    if (PetscTools::IsSequential())
+    {
+        *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+    }
+    else
+    {
+        // Parallel vtu files  .vtu -> .pvtu
+        *(this->mpVtkMetaFile) << ".pvtu\"/>\n";
+    }
 #endif //CHASTE_VTK
 }
 

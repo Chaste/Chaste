@@ -530,7 +530,6 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
     // Store the number of cells for which to output data to VTK
     unsigned num_nodes = GetNumNodes();
-    std::vector<double> cell_radii(num_nodes);
     std::vector<double> rank(num_nodes);
 
     unsigned num_cell_data_items = 0;
