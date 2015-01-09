@@ -16,7 +16,7 @@
  *
  * - Class renamed normal_distribution_v156 (also to preserve uniqueness)
  *
- * - Constructor takes a compulsory first argument of underlying Mersenne Twister, to get it to 
+ * - Constructor takes a compulsory first argument of underlying Mersenne Twister, to get it to
  *   compile on pre boost 1.47, due to changes in the result_type of the variate_generator.
  *
  * - In unit_normal_distribution boost::random::exponential_distribution
@@ -248,7 +248,7 @@ generate_one_digit(Engine& eng, std::size_t bits)
 {
     typedef typename Engine::result_type base_result;
     typedef typename boost::make_unsigned<base_result>::type base_unsigned;
-    
+
     base_unsigned range =
         detail::subtract<base_result>()((eng.max)(), (eng.min)());
     base_unsigned y0_mask = (base_unsigned(2) << (bits - 1)) - 1;
@@ -265,26 +265,28 @@ std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
 {
     typedef typename Engine::result_type base_result;
     typedef typename boost::make_unsigned<base_result>::type base_unsigned;
-    
+
     base_unsigned range =
         detail::subtract<base_result>()((eng.max)(), (eng.min)());
-    
+
     std::size_t m =
         (range == (std::numeric_limits<base_unsigned>::max)()) ?
             std::numeric_limits<base_unsigned>::digits :
 #if BOOST_VERSION < 104700
-			// Just in the boost namespace
-			integer_log2(range + 1);
+            // Just in the boost namespace
+            integer_log2(range + 1);
 #else
-			// In the detail namespace
+            // In the detail namespace
             detail::integer_log2(range + 1);
 #endif
-            
+
     int bucket = 0;
     // process as many full digits as possible into the int part
     for(std::size_t i = 0; i < w/m; ++i) {
+#define COVERAGE_IGNORE
         base_unsigned u = generate_one_digit(eng, m);
         bucket = (bucket << m) | u;
+#undef COVERAGE_IGNORE
     }
     RealType r;
 
@@ -296,14 +298,18 @@ std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
         const RealType mult = RealType(1)/RealType(base_unsigned(1) << (m - w%m));
         // zero out unused bits
         if (m - w%m > digits) {
+#define COVERAGE_IGNORE
             u &= ~(base_unsigned(1) << (m - digits));
+#undef COVERAGE_IGNORE
         }
         r = RealType(u >> (w%m)) * mult;
     }
     for(std::size_t i = m - w%m; i + m < digits; ++i) {
+#define COVERAGE_IGNORE
         base_unsigned u = generate_one_digit(eng, m);
         r += u;
         r *= RealType(0.5)/RealType(base_unsigned(1) << (m - 1));
+#undef COVERAGE_IGNORE
     }
     if (m - w%m < digits)
     {
@@ -320,7 +326,7 @@ template<class RealType, std::size_t w, class Engine>
 inline std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::false_)
 {
 #if BOOST_VERSION < 104700
-	int bucket = uniform_int<>(0, (1 << w) - 1)(eng);
+    int bucket = uniform_int<>(0, (1 << w) - 1)(eng);
 #else
     int bucket = uniform_int_distribution<>(0, (1 << w) - 1)(eng);
 #endif
@@ -364,7 +370,9 @@ struct unit_normal_distribution
         boost::exponential_distribution<RealType> exponential;
         boost::variate_generator<Engine& , boost::exponential_distribution<RealType> > var_exponential(eng, exponential);
         const RealType tail_start = RealType(normal_table<double>::table_x[1]);
+#define COVERAGE_IGNORE
         for(;;) {
+#undef COVERAGE_IGNORE
             RealType x = var_exponential()/tail_start;
             RealType y = var_exponential();
             if(2*y > x*x) return x + tail_start;
@@ -411,7 +419,7 @@ public:
         /** Returns the mean of the distribution. */
         RealType mean() const { return _mean; }
 
-        /** Returns the standand deviation of the distribution. */
+        /** Returns the standard deviation of the distribution. */
         RealType sigma() const { return _sigma; }
 
         /** Writes a @c param_type to a @c std::ostream. */
@@ -425,7 +433,7 @@ public:
         /** Returns true if the two sets of parameters are the same. */
         BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(param_type, lhs, rhs)
         { return lhs._mean == rhs._mean && lhs._sigma == rhs._sigma; }
-        
+
         /** Returns true if the two sets of parameters are the different. */
         BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(param_type)
 
@@ -441,9 +449,9 @@ public:
      * Requires: sigma >= 0
      */
     explicit normal_distribution_v156(boost::mt19937& engine_arg,
-									  const RealType& mean_arg = RealType(0.0),
-									  const RealType& sigma_arg = RealType(1.0)
-									  )
+                                      const RealType& mean_arg = RealType(0.0),
+                                      const RealType& sigma_arg = RealType(1.0)
+                                      )
       : _mean(mean_arg), _sigma(sigma_arg), _engine(engine_arg)
     {
         BOOST_ASSERT(_sigma >= RealType(0));
