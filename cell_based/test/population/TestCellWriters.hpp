@@ -1138,6 +1138,11 @@ public:
 
         // Test GetVtkCellDataName() method
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell radii");
+
+	for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
     }
 
     void TestCellRadiusWriterArchiving() throw (Exception)
