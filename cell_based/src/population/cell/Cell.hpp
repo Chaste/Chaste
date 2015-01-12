@@ -294,7 +294,7 @@ public:
     }
 
     /**
-     * @return whether this cell is ready to divide at the current simulation time.
+     * @return whether this cell is ready to divide at the present simulation time.
      * MUST be called before calling Divide().
      */
     bool ReadyToDivide();

@@ -70,35 +70,75 @@ public:
     CellPopulationAreaWriter();
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the areas (or volume, in 3D) occupied by the
+     * entire cell population and by apoptotic cells. Any ghost nodes present in
+     * the population are neglected from these areas.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [total area] [apoptotic area]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the areas (or volume, in 3D) occupied by the
+     * entire cell population and by apoptotic cells. Any ghost nodes present in
+     * the population are neglected from these areas.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [total area] [apoptotic area]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the areas (or volume, in 3D) occupied by the
+     * entire cell population and by apoptotic cells. Any ghost nodes present in
+     * the population are neglected from these areas.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [total area] [apoptotic area]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the areas (or volume, in 3D) occupied by the
+     * entire cell population and by apoptotic cells. Any ghost nodes present in
+     * the population are neglected from these areas.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [total area] [apoptotic area]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the areas (or volume, in 3D) occupied by the
+     * entire cell population and by apoptotic cells. Any ghost nodes present in
+     * the population are neglected from these areas.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [total area] [apoptotic area]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

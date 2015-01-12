@@ -91,7 +91,7 @@ public:
      * ...[location index] [protein 1 conc] [protein 2 conc] ... [protein n conc] ...
      *
      * This is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * Note that the "protein concentrations" refer to the solution of the ODE system that is
      * present in the cell-cycle model. If the cell-cycle model does not inherit from

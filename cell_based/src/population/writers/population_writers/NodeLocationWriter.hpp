@@ -74,35 +74,80 @@ public:
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the location of each Node.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ... [node x-pos] [node y-pos] [node z-pos] ...
+     *
+     * where z-pos is used in 3 dimensions.
+     * Here the indexing of nodes is as given by the NodeIterator.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the location of each Node.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ... [node x-pos] [node y-pos] [node z-pos] ...
+     *
+     * where z-pos is used in 3 dimensions.
+     * Here the indexing of nodes is as given by the NodeIterator.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the location of each Node.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ... [node x-pos] [node y-pos] [node z-pos] ...
+     *
+     * where z-pos is used in 3 dimensions.
+     * Here the indexing of nodes is as given by the NodeIterator.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the location of each Node.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ... [node x-pos] [node y-pos] [node z-pos] ...
+     *
+     * where z-pos is used in 3 dimensions.
+     * Here the indexing of nodes is as given by the NodeIterator.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the location of each Node.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ... [node x-pos] [node y-pos] [node z-pos] ...
+     *
+     * where z-pos is used in 3 dimensions.
+     * Here the indexing of nodes is as given by the NodeIterator.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

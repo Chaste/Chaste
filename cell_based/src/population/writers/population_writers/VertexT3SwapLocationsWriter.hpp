@@ -62,12 +62,14 @@ private:
 public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     VertexT3SwapLocationsWriter();
 
     /**
      * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
@@ -76,12 +78,16 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
@@ -90,12 +96,26 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the VertexBasedCellPopulation and write the location of any T3 swaps at the present
+     * simulation time.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num T3 swaps] [T3 swap 0 x-pos] [T3 swap 0 y-pos] [T3 swap 0 z-pos] [T3 swap 1 x-pos] [T3 swap 1 y-pos] [T3 swap 1 z-pos] ...
+     *
+     * where [num T3 swaps] denotes the number of T3 swaps at the present time, and
+     * [T3 swap 0 x-pos] denotes the x-coordinate of the T3 swap with index 0 in
+     * the MutableVertexMesh member mLocationsOfT3Swaps, and so on, with [z-pos]
+     * included for 3-dimensional simulations.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

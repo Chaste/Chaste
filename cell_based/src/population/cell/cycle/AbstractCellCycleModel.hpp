@@ -163,7 +163,7 @@ public:
 
     /**
      * Sets up a new AbstractCellCycleModel, gives it a birth time of the
-     * current simulation time (which is overwritten by some subclasses)
+     * present simulation time (which is overwritten by some subclasses)
      */
     AbstractCellCycleModel();
 

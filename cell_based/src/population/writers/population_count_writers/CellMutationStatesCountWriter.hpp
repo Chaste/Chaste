@@ -94,7 +94,7 @@ public:
      * by the cell population method SetDefaultCellMutationStateAndProliferativeTypeOrdering().
      *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
@@ -112,7 +112,7 @@ public:
      * by the cell population method SetDefaultCellMutationStateAndProliferativeTypeOrdering().
      *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
@@ -130,7 +130,7 @@ public:
      * by the cell population method SetDefaultCellMutationStateAndProliferativeTypeOrdering().
      *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
@@ -148,7 +148,7 @@ public:
      * by the cell population method SetDefaultCellMutationStateAndProliferativeTypeOrdering().
      *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
@@ -166,7 +166,7 @@ public:
      * by the cell population method SetDefaultCellMutationStateAndProliferativeTypeOrdering().
      *
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

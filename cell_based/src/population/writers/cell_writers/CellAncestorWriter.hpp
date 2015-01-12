@@ -89,7 +89,7 @@ public:
      * where -1 is used to denote a cell whose ancestor is not set.
      *
      * This is appended to the output written by AbstractCellBasedWriter, which is a single
-     * value [current simulation time], followed by a tab.
+     * value [present simulation time], followed by a tab.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell

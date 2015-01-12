@@ -58,7 +58,7 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
-
+.
 public:
 
     /**
@@ -69,12 +69,16 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
@@ -83,6 +87,8 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
@@ -90,12 +96,26 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the VertexBasedCellPopulation and write the location of any T1 swaps at the present
+     * simulation time.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num T2 swaps] [T1 swap 0 x-pos] [T1 swap 0 y-pos] [T1 swap 0 z-pos] [T1 swap 1 x-pos] [T1 swap 1 y-pos] [T1 swap 1 z-pos] ...
+     *
+     * where [num T1 swaps] denotes the number of T1 swaps at the present time, and
+     * [T1 swap 0 x-pos] denotes the x-coordinate of the T1 swap with index 0 in
+     * the MutableVertexMesh member mLocationsOfT1Swaps, and so on, with [z-pos]
+     * included for 3-dimensional simulations.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

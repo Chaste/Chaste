@@ -42,8 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A class written using the visitor pattern for writing voronoi data from a cell population to file.
- *
- * \todo Comment about the resulting file format?
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VoronoiDataWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
@@ -71,7 +69,15 @@ public:
     VoronoiDataWriter();
 
     /**
-     * Visit the population and write the data.
+     * Visit the MeshBasedCellPopulation and write the index and location of each node, as well
+     * as the volume and surface area (area and perimeter in 2 dimensions) of the corresponding
+     * element in the dual Voronoi tessellation.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[node index] [node x-pos] [node y-pos] [node z-pos] [elem volume] [elem surface area] ...
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
@@ -80,12 +86,16 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a MeshBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is defined for use with a MeshBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
@@ -94,12 +104,16 @@ public:
     /**
      * Visit the population and write the data.
      *
+     * This is an empty dummy function, since this class is defined for use with a MeshBasedCellPopulation only.
+     *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is defined for use with a MeshBasedCellPopulation only.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

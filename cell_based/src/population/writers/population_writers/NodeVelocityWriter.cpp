@@ -95,7 +95,6 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCellPopulation<E
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    ///\todo replace with warning or exception? (#2404)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -146,7 +145,6 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<S
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
-    ///\todo replace with warning or exception? (#2404)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
