@@ -58,11 +58,11 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
-.
+
 public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     VertexT1SwapLocationsWriter();
 
