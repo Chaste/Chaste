@@ -596,7 +596,7 @@ void CellBasedPdeHandler<DIM>::WritePdeSolution(double time)
             if (mpCoarsePdeMesh != NULL)
             {
                 PdeAndBoundaryConditions<DIM>* p_pde_and_bc = mPdeAndBcCollection[pde_index];
-                assert( p_pde_and_bc->rGetDependentVariableName()!="");
+                assert(p_pde_and_bc->rGetDependentVariableName() != "");
 
 #ifdef CHASTE_VTK
                 if (p_pde_and_bc->GetSolution())

@@ -140,12 +140,22 @@ protected:
     /**
      * Write the PDE solution to file at a specified time.
      *
+     * Outputs a line of space-separated values of the form:
+     * [time] [node 0 index] [node 0 x-pos] [node 0 y-pos]  [node 0 z-pos] [node 0 solution] ...
+     *
+     * where [node 0 index] is equal to 0 if mpCoarsePdeMesh exists, otherwise [node 0 index] is
+     * the location index corresponding to the cell first encountered by the cell population
+     * Iterator, and so on.
+     *
      * @param time The time at which to record the PDE solution
      */
     virtual void WritePdeSolution(double time);
 
     /**
      * Write the average radial PDE solution to file at a specified time.
+     *
+     * Outputs a line of space-separated values of the form:
+     * [time] [radius interval 0] [average solution 0] [radius interval 1] [average solution 1] ...
      *
      * @param time The time at which to record the average radial PDE solution
      */

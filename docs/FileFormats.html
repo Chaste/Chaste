@@ -210,11 +210,18 @@
   </dd>
   <dt>build.info</dt>
   <dd>
-    Details of computer setup for a particular <tt>cell_based</tt> chaste simulation. This contains information on versions of librarys used and the revision of the Chaste code.
+    Details of computer setup for a particular <tt>cell_based</tt> chaste simulation. This contains information on versions of libraries used and the revision of the Chaste code.
   </dd>
   <dt>results.parameters</dt>
   <dd>
     Details of all the classes and parameters used in a <tt>cell_based</tt> chaste simulation.
+  </dd>
+  <dt>*.dat</dt>
+  <dd>
+    General format of results files written by cell writer classes, which include a range of different properties of cells at each printing timestep. These take different 
+    formats but, as a representative example, the file <tt>cellareas.dat</tt> (which is written using the class <tt>CellAgesWriter</tt>) consists of space-separated lines of the form 
+    <tt>[time] [location index] [cell 0 x-pos] [cell 0 y-pos] [cell 0 z-pos] [cell 0 age] [cell 1 x-pos] [cell 1 y-pos] [cell 1 z-pos] [cell 1 age]...</tt>. Note that if 
+    VTK output is switched on, then cell writer objects also output VTK data for the cell population at each printing timestep.
   </dd>
   <dt>.viz*</dt>
   <dd>
@@ -222,25 +229,25 @@
   </dd>
    <dt>.vizancestors</dt>
   <dd>
-    The ancestor index of each cell at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time ancestor_1 ancestor_2 ... ancestor_n</tt>.
+    The ancestor index of each cell at each timestep in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time ancestor_1 ancestor_2 ... ancestor_n</tt>.
   </dd>
    <dt>.vizbetacatenin</dt>
   <dd>
-   The levels of membrane-bound, cytoplasmic and nuclear beta-catenin in each cell at each time step in a <tt>CryptSimulation2d</tt>.
+   The levels of membrane-bound, cytoplasmic and nuclear beta-catenin in each cell at each timestep in a <tt>CryptSimulation2d</tt>.
    Each line has the form <tt> time location_index_1 x_1 y_1 b_cat_membrane_1 b_cat_cytoplasm_1 b_cat_nuclear_1 ... 
    location_index_n x_n y_n b_cat_membrane_n b_cat_cytoplasm_n b_cat_nuclear_n</tt>.
   </dd>
    <dt>.vizboundarynodes</dt>
   <dd>
-    Whether each node at each time step in a <tt>CellBasedSimulation</tt> is a boundary node. Each line has the form <tt>time bool_1 bool_2 ... bool_n</tt>.
+    Whether each node at each timestep in a <tt>CellBasedSimulation</tt> is a boundary node. Each line has the form <tt>time bool_1 bool_2 ... bool_n</tt>.
   </dd>
    <dt>.vizcelltypes</dt>
   <dd>
-    The cell type of each cell at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time c_1 c_2 ... c_n</tt>.
+    The cell type of each cell at each timestep in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time c_1 c_2 ... c_n</tt>.
   </dd>
    <dt>.vizcellphases</dt>
   <dd>
-    The cell cycle phase that each cell is in at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time p_1 p_2 ... p_n</tt>.
+    The cell cycle phase that each cell is in at each timestep in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time p_1 p_2 ... p_n</tt>.
   </dd>
   <dt>.vizcoarsepdesolution</dt>
   <dd>
@@ -248,16 +255,16 @@
   </dd>
   <dt>.vizelements</dt>
   <dd>
-    The nodes associated with each element at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time element1_node1 element1_node2 element1_node3 ... elementn_node1 elementn_node2 elementn_node3</tt>.
+    The nodes associated with each element at each timestep in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time element1_node1 element1_node2 element1_node3 ... elementn_node1 elementn_node2 elementn_node3</tt>.
   </dd>
   <dt>.vizlocationindices</dt>
   <dd>
-    The location of each cell each time step in a <tt>CaBasedCellPopulation</tt>, which allows for multiple occupancy of lattice sites. Each line has the form <tt>time location_index_1 ... location_index_n</tt>
+    The location of each cell each timestep in a <tt>CaBasedCellPopulation</tt>, which allows for multiple occupancy of lattice sites. Each line has the form <tt>time location_index_1 ... location_index_n</tt>
     Also used in <tt>MeshBasedCellPopulationWithGhostNodes</tt> to indicate which nodes have cells attached.
   </dd>
   <dt>.viznodes</dt>
   <dd>
-    The position of each node at each time step in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time x_1 ... x_n</tt> in 1D, <tt>time x_1 y_1 ... x_n y_n</tt> in 2D and <tt>time x_1 y_1 z_1... x_n y_n z_n</tt> in 3D.
+    The position of each node at each timestep in a <tt>CellBasedSimulation</tt>. Each line has the form <tt>time x_1 ... x_n</tt> in 1D, <tt>time x_1 y_1 ... x_n y_n</tt> in 2D and <tt>time x_1 y_1 z_1... x_n y_n z_n</tt> in 3D.
   </dd>
   <dt>.vizpdesolution</dt>
   <dd>

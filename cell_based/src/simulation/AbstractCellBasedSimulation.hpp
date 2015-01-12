@@ -187,6 +187,14 @@ protected:
      * If the simulation includes cell birth, causes (almost) all cells that are ready to divide
      * to produce daughter cells.
      *
+     * If mOutputDivisionLocations is set to true, then this method also writes the
+     * location of each cell division at the present time to mpDivisionLocationFile.
+     * This outputs a line of tab-separated values of the form:
+     * [time] [div 0 x-pos] [div 0 y-pos] [div 0 z-pos] [div 0 age] [div 1 x-pos] [div 1 y-pos] [div 1 z-pos] [div 1 age] ...
+     *
+     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively,
+     * and [...age] denoting the age of the dividing cell.
+     *
      * @return the number of births that occurred.
      */
     virtual unsigned DoCellBirth();
@@ -427,6 +435,14 @@ public:
      * deaths and cell divisions through DoCellRemoval() and DoCellBirth() respectively. We then
      * update the correspondence between cells and the mesh by calling Update() on the cell
      * population.
+     *
+     * If mOutputCellVelocities is set to true and we are at a printing time, then we als write the
+     * velocity of each cell at the present time to mpCellVelocitiesFile.
+     * This outputs a line of tab-separated values of the form:
+     * [time] [cell 0 x-pos] [cell 0 y-pos] [cell 0 z-pos] [cell 0 x-vel] [cell 0 y-vel] [cell 0 z-vel] ...
+     *
+     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively,
+     * and data for cells being ordered as given by the cell population Iterator.
      *
      * Next, we call UpdateCellLocationsAndTopology(), which is pure virtual in the parent class so
      * must be overridden. As the cell population has been updated, we then increment

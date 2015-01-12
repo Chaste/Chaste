@@ -448,7 +448,6 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // This function calls DoCellRemoval(), DoCellBirth() and CellPopulation::Update()
         UpdateCellPopulation();
 
-
         // Store whether we are sampling results at the current timestep
         SimulationTime* p_time = SimulationTime::Instance();
         bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
