@@ -1020,7 +1020,7 @@ public:
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
 
         // Test VTK output
-        ///\todo check all properties, not just mutations
+        ///\todo check all properties, not just mutations (#2441)
 #ifdef CHASTE_VTK
         node_based_cell_population.WriteVtkResultsToFile(output_directory);
 
@@ -1101,7 +1101,7 @@ public:
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
 
         // Test VTK output
-        ///\todo check all properties, not just mutations
+        ///\todo check all properties, not just mutations (#2441)
 #ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 

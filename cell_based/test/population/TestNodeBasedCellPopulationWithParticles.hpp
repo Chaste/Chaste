@@ -622,6 +622,7 @@ public:
         MAKE_PTR(NodesOnlyMesh<3>, p_mesh);
         p_mesh->ConstructNodesWithoutMesh(nodes, 1.5);
 
+        // Specify the node indices corresponding to cells (the others correspond to particles)
         std::vector<unsigned> location_indices;
         for (unsigned index=0; index<5; index++)
         {
@@ -639,6 +640,16 @@ public:
 
         // Create cell population
         NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
+
+        // Coverage of writing CellData to VTK
+        for (NodeBasedCellPopulationWithParticles<3>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_iter->GetCellData()->SetItem("var0", 1.0);
+            cell_iter->GetCellData()->SetItem("var1", 2.0);
+        }
+
         cell_population.Update(); // so cell neighbours are calculated when outputting volume
 
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "NodeBasedCellPopulationWithParticles-3");
