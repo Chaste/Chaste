@@ -81,7 +81,13 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its data.
+     * Visit a cell and write its mutation state, as given by this property's member mColour.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[cell mutation state] ...
+     *
+     * This is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell

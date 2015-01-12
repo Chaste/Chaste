@@ -82,7 +82,19 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its data.
+     * Visit a cell and write its proliferative type, as given by this property's member mColour.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[cell proliferative type] ...
+     *
+     * Note that if the cell is undergoing apoptosis (i.e. has the property ApoptoticCellProperty),
+     * then the hard-coded value 6 is written. If instead the cell is labelled (i.e. has the property
+     * CellLabel), then this property's member mColour is instead written. Lastly, if the cell
+     * has a mutation state other than WildTypeCellMutationState, then this property's member
+     * mColour is instead written.
+     *
+     * This is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
