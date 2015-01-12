@@ -67,42 +67,87 @@ public:
     CellProliferativeTypesCountWriter();
 
     /**
-     * A general method for writing to any population
+     * A general method for writing to any population.
      *
      * @param pCellPopulation the population to write.
      */
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num stem] [num transit] [num differentiated] [num default]
+     *
+     * where [num stem] denotes the number of cells in the population that have a StemCellProliferativeType,
+     * and so on. These counts are computed through the cell population method GetCellProliferativeTypeCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num stem] [num transit] [num differentiated] [num default]
+     *
+     * where [num stem] denotes the number of cells in the population that have a StemCellProliferativeType,
+     * and so on. These counts are computed through the cell population method GetCellProliferativeTypeCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num stem] [num transit] [num differentiated] [num default]
+     *
+     * where [num stem] denotes the number of cells in the population that have a StemCellProliferativeType,
+     * and so on. These counts are computed through the cell population method GetCellProliferativeTypeCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num stem] [num transit] [num differentiated] [num default]
+     *
+     * where [num stem] denotes the number of cells in the population that have a StemCellProliferativeType,
+     * and so on. These counts are computed through the cell population method GetCellProliferativeTypeCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num stem] [num transit] [num differentiated] [num default]
+     *
+     * where [num stem] denotes the number of cells in the population that have a StemCellProliferativeType,
+     * and so on. These counts are computed through the cell population method GetCellProliferativeTypeCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */

@@ -67,42 +67,96 @@ public:
     CellProliferativePhasesCountWriter();
 
     /**
-     * A general method for writing to any population.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
+     *
+     * where [num G0 phase] denotes the number of cells in the population that are in G0 phase,
+     * and so on. These counts are computed through the cell population method GetCellCyclePhaseCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation the population to write.
      */
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
+     *
+     * where [num G0 phase] denotes the number of cells in the population that are in G0 phase,
+     * and so on. These counts are computed through the cell population method GetCellCyclePhaseCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
+     *
+     * where [num G0 phase] denotes the number of cells in the population that are in G0 phase,
+     * and so on. These counts are computed through the cell population method GetCellCyclePhaseCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the CaBasedCellPopulation to visit.
      */
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
+     *
+     * where [num G0 phase] denotes the number of cells in the population that are in G0 phase,
+     * and so on. These counts are computed through the cell population method GetCellCyclePhaseCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
      */
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
+     *
+     * where [num G0 phase] denotes the number of cells in the population that are in G0 phase,
+     * and so on. These counts are computed through the cell population method GetCellCyclePhaseCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the PottsBasedCellPopulation to visit.
      */
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the data.
+     * Visit the population and write the number of cells in the population that have each proliferative type.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
+     *
+     * where [num G0 phase] denotes the number of cells in the population that are in G0 phase,
+     * and so on. These counts are computed through the cell population method GetCellCyclePhaseCount().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [current simulation time], followed by a tab.
      *
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
