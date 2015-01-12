@@ -67,7 +67,7 @@ public:
     CellProliferativePhasesCountWriter();
 
     /**
-     * Visit the population and write the number of cells in the population that have each proliferative type.
+     * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:
      * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
@@ -83,7 +83,7 @@ public:
     void VisitAnyPopulation(AbstractCellPopulation<SPACE_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the number of cells in the population that have each proliferative type.
+     * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:
      * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
@@ -99,7 +99,7 @@ public:
     virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the number of cells in the population that have each proliferative type.
+     * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:
      * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
@@ -115,7 +115,7 @@ public:
     virtual void Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the number of cells in the population that have each proliferative type.
+     * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:
      * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
@@ -131,7 +131,7 @@ public:
     virtual void Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the number of cells in the population that have each proliferative type.
+     * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:
      * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
@@ -147,7 +147,7 @@ public:
     virtual void Visit(PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
-     * Visit the population and write the number of cells in the population that have each proliferative type.
+     * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:
      * [num G0 phase] [num G1 phase] [num S phase] [num G2 phase] [num M phase]
