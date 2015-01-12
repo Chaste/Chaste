@@ -416,7 +416,7 @@ public:
             TS_ASSERT_DELTA(cell_volumes_data[i], 1.0, 1e-9);
         }
 
-        // Test that the correct cell ages were recorded
+        // Test that the correct cell cycle phases were recorded
         std::vector<double> cycle_phases_data;
         vtk_reader.GetPointData("Cycle phases", cycle_phases_data);
         TS_ASSERT_EQUALS(cycle_phases_data.size(), 5u);

@@ -1020,13 +1020,13 @@ public:
         FileComparison(results_dir + "results.parameters", "cell_based/test/data/TestNodeBasedCellPopulationWriters2d/results.parameters").CompareFiles();
 
         // Test VTK output
-        ///\todo check all properties, not just mutations (#2441)
 #ifdef CHASTE_VTK
         node_based_cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
         VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
 
+        // Test that the correct mutation states were recorded
         std::vector<double> mutation_states_data;
         std::vector<double> saved_mutation_states_data;
         saved_mutation_states_data.push_back(5.0);
@@ -1040,6 +1040,51 @@ public:
         {
             TS_ASSERT_DELTA(mutation_states_data[i], saved_mutation_states_data[i], 1e-9);
         }
+
+        // Test that the correct cell proliferative types were recorded
+        std::vector<double> proliferative_types_data;
+        vtk_reader.GetPointData("Cell types", proliferative_types_data);
+        TS_ASSERT_EQUALS(proliferative_types_data.size(), 4u);
+        TS_ASSERT_DELTA(proliferative_types_data[0], 5.0, 1e-9);
+        TS_ASSERT_DELTA(proliferative_types_data[1], 3.0, 1e-9);
+        TS_ASSERT_DELTA(proliferative_types_data[2], 4.0, 1e-9);
+        TS_ASSERT_DELTA(proliferative_types_data[3], 6.0, 1e-9);
+
+        // Test that the correct cell volumes were recorded
+        std::vector<double> cell_volumes_data;
+        vtk_reader.GetPointData("Cell volumes", cell_volumes_data);
+        TS_ASSERT_EQUALS(cell_volumes_data.size(), 4u);
+        TS_ASSERT_DELTA(cell_volumes_data[0], 1.0690, 1e-3);
+        TS_ASSERT_DELTA(cell_volumes_data[1], 0.7594, 1e-3);
+        TS_ASSERT_DELTA(cell_volumes_data[2], 0.7853, 1e-3);
+        TS_ASSERT_DELTA(cell_volumes_data[3], 0.7594, 1e-3);
+
+        // Test that the correct cell cycle phases were recorded
+        std::vector<double> cycle_phases_data;
+        vtk_reader.GetPointData("Cycle phases", cycle_phases_data);
+        TS_ASSERT_EQUALS(cycle_phases_data.size(), 4u);
+        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        {
+            TS_ASSERT_DELTA(cycle_phases_data[i], 4.0, 1e-9);
+        }
+
+        // Test that the correct cell ages were recorded
+        std::vector<double> ages_data;
+        vtk_reader.GetPointData("Ages", ages_data);
+        TS_ASSERT_EQUALS(ages_data.size(), 4u);
+        TS_ASSERT_DELTA(ages_data[0], 0.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[1], 1.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[2], 2.0, 1e-9);
+        TS_ASSERT_DELTA(ages_data[3], 3.0, 1e-9);
+
+        // Test that the correct ancestors were recorded
+        std::vector<double> ancestors_data;
+        vtk_reader.GetPointData("Ancestors", ancestors_data);
+        TS_ASSERT_EQUALS(ancestors_data.size(), 4u);
+        TS_ASSERT_DELTA(ancestors_data[0], 0.0, 1e-9);
+        TS_ASSERT_DELTA(ancestors_data[1], 1.0, 1e-9);
+        TS_ASSERT_DELTA(ancestors_data[2], 2.0, 1e-9);
+        TS_ASSERT_DELTA(ancestors_data[3], 3.0, 1e-9);
 #endif
     }
 
@@ -1101,7 +1146,6 @@ public:
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWriters3d/cellareas.dat").CompareFiles();
 
         // Test VTK output
-        ///\todo check all properties, not just mutations (#2441)
 #ifdef CHASTE_VTK
         cell_population.WriteVtkResultsToFile(output_directory);
 
@@ -1115,6 +1159,33 @@ public:
         for (unsigned i=0; i<mutation_states_data.size(); i++)
         {
             TS_ASSERT_DELTA(mutation_states_data[i], 0.0, 1e-9);
+        }
+
+        // Test that the correct cell cycle phases were recorded
+        std::vector<double> cycle_phases_data;
+        vtk_reader.GetPointData("Cycle phases", cycle_phases_data);
+        TS_ASSERT_EQUALS(cycle_phases_data.size(), 51u);
+        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        {
+            TS_ASSERT_DELTA(cycle_phases_data[i], 4.0, 1e-9);
+        }
+
+        // Test that the correct cell ages were recorded
+        std::vector<double> ages_data;
+        vtk_reader.GetPointData("Ages", ages_data);
+        TS_ASSERT_EQUALS(ages_data.size(), 51u);
+        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        {
+            TS_ASSERT_DELTA(ages_data[i], i, 1e-9);
+        }
+
+        // Test that the correct ancestors were recorded
+        std::vector<double> ancestors_data;
+        vtk_reader.GetPointData("Ancestors", ancestors_data);
+        TS_ASSERT_EQUALS(ancestors_data.size(), 51u);
+        for (unsigned i=0; i<cycle_phases_data.size(); i++)
+        {
+            TS_ASSERT_DELTA(ancestors_data[i], i, 1e-9);
         }
 #endif
     }
