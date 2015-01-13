@@ -381,16 +381,15 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
         EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than twice the radius of cell " << index << " (" << radius_of_cell_i << ") so interactions may be missed. Make the cut-off larger to avoid errors.");
     }
 
-
-    // Get set of 'candidate' neighbours.
+    // Get set of 'candidate' neighbours
     std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
 
     // Find which ones are actually close
     for (std::set<unsigned>::iterator iter = near_nodes.begin();
-            iter != near_nodes.end();
-            ++iter)
+         iter != near_nodes.end();
+         ++iter)
     {
-        // Be sure not to return the index itself.
+        // Be sure not to return the index itself
         if ((*iter) != index)
         {
             Node<DIM>* p_node_j = this->GetNode((*iter));
@@ -415,7 +414,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             {
                 EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
-            if (distance_between_nodes <= max_interaction_distance)// + DBL_EPSILSON) //Assumes that max_interaction_distance is of over 1
+            if (distance_between_nodes <= max_interaction_distance)// + DBL_EPSILSON) //Assumes that max_interaction_distance is of order 1
             {
                 // ...then add this node index to the set of neighbouring node indices
                 neighbouring_node_indices.insert((*iter));

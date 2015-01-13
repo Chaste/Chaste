@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryNodeWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
+#include "HeterotypicBoundaryLengthWriter.hpp"
 #include "NodeLocationWriter.hpp"
 #include "NodeVelocityWriter.hpp"
 #include "VertexT1SwapLocationsWriter.hpp"
@@ -265,6 +266,276 @@ public:
             delete p_population_writer;
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
+    }
+
+    void TestHeterotypicBoundaryLengthWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Test with a MeshBasedCellPopulationWithGhostNodes
+        {
+            // Create a simple 2D cell population (use ghost nodes to avoid infinite edge lengths in the Voronoi tessellation)
+            HoneycombMeshGenerator generator(5, 3, 2);
+            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel,2> cells_generator;
+            cells_generator.GenerateGivenLocationIndices(cells, location_indices);
+            MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+            cell_population.InitialiseCells();
+
+            // Label a subset of the cells
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            cell_population.GetCellUsingLocationIndex(20)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(21)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(22)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(23)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(24)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(32)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(39)->AddCellProperty(p_label);
+
+            /*
+             * In this case, the group of labelled cells 0, 1, 2, 3, 4, 8 share 11 edges
+             * with unlabelled cells, while the isolated labelled cell 11 shares 4 edges
+             * with unlabelled cells.
+             *
+             * Thus there are 15 edges shared between labelled and unlabelled cells.
+             * There are 30 shared edges in total (regardless of label).
+             * Each edge has length 1/sqrt(3) = 0.577350.
+             *
+             * Thus the total length is 30/sqrt(3) = ??? and the heterotypic boundary
+             * length is 15/sqrt(3) = 8.660254.
+             *
+             * This can be verified by eyeballing the output file.
+             */
+
+            // Create an output directory for the writer
+            std::string output_directory = "TestHeterotypicBoundaryLengthWriterMesh";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create a BoundaryNodeWriter and test that the correct output is generated
+            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            labelled_boundary_writer.OpenOutputFile(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_mesh").CompareFiles();
+        }
+
+        // Test with a NodeBasedCellPopulation
+        {
+            // Create a simple 2D cell population
+            std::vector<Node<2>* > nodes;
+            for (unsigned j=0; j<4; j++)
+            {
+                for (unsigned i=0; i<6; i++)
+                {
+                    unsigned node_index = i + 6*j;
+                    nodes.push_back(new Node<2>(node_index, false, (double)i, (double)j));
+                }
+            }
+            NodesOnlyMesh<2> mesh;
+            mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+            for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+            {
+                mesh.GetNode(index)->SetRadius(0.6);
+            }
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
+            NodeBasedCellPopulation<2> cell_population(mesh, cells);
+            cell_population.InitialiseCells();
+
+            // Label a subset of the cells
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(9)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(10)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(11)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(12)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(15)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(16)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(17)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(19)->AddCellProperty(p_label);
+
+            /*
+             * In this case, the group of labelled cells 0, 1, 12 share 4 edges with
+             * unlabelled cells; the group of labelled cells 9, 10, 11, 15, 16, 17
+             * share 8 edges with unlabelled cells; and the isolated labelled cell 19
+             * shares 3 edges with unlabelled cells.
+             * Thus there are 15 edges shared between labelled and unlabelled cells.
+             *
+             * In total there are 38 shared edges (regardless of label).
+             *
+             * Since each cell's radius is set to 0.6 and neighbours are a distance
+             * 1.0 apart, the approximate shared edge is given by sqrt(11)/5 = 0.663324.
+             *
+             * Thus the total length is 38*sqrt(11)/5 = 25.206348 and the heterotypic
+             * boundary length is 15*sqrt(11)/5 = 9.949874.
+             *
+             * This can be verified by eyeballing the output file.
+             */
+
+            // Create an output directory for the writer
+            std::string output_directory = "TestHeterotypicBoundaryLengthWriterNode";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create a BoundaryNodeWriter and test that the correct output is generated
+            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            labelled_boundary_writer.OpenOutputFile(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_node").CompareFiles();
+
+            // Avoid memory leak
+            for (unsigned i=0; i<nodes.size(); i++)
+            {
+                delete nodes[i];
+            }
+        }
+
+        // Test with a PottsBasedCellPopulation
+        {
+            // Create a simple 2D cell population
+            PottsMeshGenerator<2> generator(9, 3, 3, 6, 3, 2);
+            PottsMesh<2>* p_mesh = generator.GetMesh();
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+            PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.InitialiseCells();
+
+            // Label a subset of the cells
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(5)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(8)->AddCellProperty(p_label);
+
+            /*
+             * In this case, the group of labelled cells 0, 1, 4, 5 share 3 'long' edges
+             * and 3 'short' edges with unlabelled cells.
+             *
+             * Thus there are 6 edges shared between labelled and unlabelled cells.
+             *
+             * In total there are 6 'long' edges and 6 'short' edges, thus 12 shared
+             * edges in total (regardless of label). 'Long' edges have length 3 and
+             * 'short' edges have length 2.
+             *
+             * Thus the total length is 6*3 + 6*2 = 30 and the heterotypic boundary
+             * length is 3*3 + 3*2 = 15.
+             *
+             * This can be verified by eyeballing the output file.
+             */
+
+            // Create an output directory for the writer
+            std::string output_directory = "TestHeterotypicBoundaryLengthWriterPotts";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create a BoundaryNodeWriter and test that the correct output is generated
+            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            labelled_boundary_writer.OpenOutputFile(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_potts").CompareFiles();
+        }
+
+        // Test with a VertexBasedCellPopulation
+        {
+            // Create a simple 2D cell population
+            HoneycombVertexMeshGenerator generator(4, 4);
+            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+            std::vector<CellPtr> cells;
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.InitialiseCells();
+
+            // Label a subset of the cells
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(7)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(8)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(9)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(12)->AddCellProperty(p_label);
+
+            /*
+             * In this case, the group of labelled cells 1, 4, 8, 9, 12 share 9 edges
+             * with unlabelled cells, while the isolated labelled cell 7 shares 3 edges
+             * with unlabelled cells.
+             *
+             * Thus there are 12 edges shared between labelled and unlabelled cells.
+             * There are 33 shared edges in total (regardless of label).
+             * Each edge has length 1/sqrt(3) = 0.577350.
+             *
+             * Thus the total length is 33/sqrt(3) = 19.052558 and the heterotypic boundary
+             * length is 12/sqrt(3) = 6.928203.
+             *
+             * This can be verified by eyeballing the output file.
+             */
+
+            // Create an output directory for the writer
+            std::string output_directory = "TestHeterotypicBoundaryLengthWriterVertex";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create a BoundaryNodeWriter and test that the correct output is generated
+            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            labelled_boundary_writer.OpenOutputFile(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_vertex").CompareFiles();
+
+            // Test that we can append to files
+            labelled_boundary_writer.OpenOutputFileForAppend(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_vertex_twice").CompareFiles();
+        }
+    }
+
+    void TestHeterotypicBoundaryLengthWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "HeterotypicBoundaryLengthWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new HeterotypicBoundaryLengthWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+        PetscTools::Barrier(); // Processes read after last process has (over-)written archive
         {
             AbstractCellBasedWriter<2,2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);

@@ -107,7 +107,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
 
             // Remove ghost nodes from the neighbour indices
             for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
-                    iter != neighbour_indices.end();)
+                 iter != neighbour_indices.end();)
             {
                 if (p_cell_population->IsGhostNode(*iter))
                 {
