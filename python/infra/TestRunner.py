@@ -194,12 +194,17 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
     log_fp = file(logfile, 'w')
     if not log_fp:
         raise IOError("Unable to open log file")
+    if build.no_store_results:
+        stdout = None
+        echo = False
+    else:
+        stdout = subprocess.PIPE
     start_time = time.time()
-    test_proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, env=env)
+    test_proc = subprocess.Popen(command, shell=True, stdout=stdout, stderr=subprocess.STDOUT, env=env)
     if time_limit and psutil:
         # Set a Timer to kill the test if it runs too long
         kill_timer = TestKillerTimer(time_limit, test_proc.pid, os.path.abspath(exefile), log_fp)
-    for line in test_proc.stdout:
+    for line in test_proc.stdout or []:
         log_fp.write(line)
         if echo:
             print line,

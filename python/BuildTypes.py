@@ -72,6 +72,7 @@ class BuildType(object):
         self.needs_static = False # Profiling with gprof requires static libraries
         self.is_production = False
         self.is_windows = False
+        self.no_store_results = False
         # Where test output will go
         import socket
         machine_fqdn = socket.getfqdn()

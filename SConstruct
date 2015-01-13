@@ -198,6 +198,9 @@ if install_files:
 test_component = ARGUMENTS.get('test_component', '')
 Export('test_component')
 
+# Special mode that doesn't store test results, to avoid the buffering that occurs when we do so
+build.no_store_results = int(ARGUMENTS.get('no_store_results', 0))
+
 
 # If building static libraries, get rid of any old shared libraries,
 # in order to stop the automatic dependency algorithm getting confused.
