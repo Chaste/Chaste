@@ -508,6 +508,17 @@ public:
     virtual std::set<unsigned> GetNeighbouringNodeIndices(unsigned index)=0;
 
     /**
+     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pCell a cell
+     * @return the set of neighbouring location indices.
+     */
+    virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell)=0;
+
+    /**
      * @return the centroid of the cell population.
      */
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();

@@ -203,6 +203,20 @@ public:
     unsigned GetNumNodes();
 
     /**
+     * Overridden GetNeighbouringLocationIndices() method.
+     *
+     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     *
+     * Note: In keeping with other parts of the code in this class, we assume a Moore
+     * neighbourhood. Also, at present this method assumes a unit carrying capacity at
+     * each lattice site.
+     *
+     * @param pCell a cell
+     * @return the set of neighbouring location indices.
+     */
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
      * Overridden GetLocationOfCellCentre() method.
      * Find where a given cell is in space.
      *

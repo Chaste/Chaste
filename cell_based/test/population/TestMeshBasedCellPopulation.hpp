@@ -560,6 +560,11 @@ public:
         TS_ASSERT_EQUALS(node_50_neighbours.size(), expected_node_50_neighbours.size());
         TS_ASSERT_EQUALS(node_50_neighbours, expected_node_50_neighbours);
 
+        // Test GetNeighbouringLocationIndices() method
+        CellPtr p_cell_50 = cell_population.GetCellUsingLocationIndex(50);
+        std::set<unsigned> neighbours_of_cell_0 = cell_population.GetNeighbouringLocationIndices(p_cell_50);
+        TS_ASSERT(neighbours_of_cell_0 == expected_node_50_neighbours);
+
         p_simulation_time->IncrementTimeOneStep();
 
         unsigned num_removed = cell_population.RemoveDeadCells();

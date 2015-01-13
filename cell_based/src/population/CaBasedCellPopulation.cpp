@@ -155,6 +155,26 @@ unsigned CaBasedCellPopulation<DIM>::GetNumNodes()
 }
 
 template<unsigned DIM>
+std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+{
+    unsigned index = this->GetLocationIndexUsingCell(pCell);
+    std::set<unsigned> candidates = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(index);
+
+    std::set<unsigned> neighbour_indices;
+    for (std::set<unsigned>::iterator iter = candidates.begin();
+         iter != candidates.end();
+         ++iter)
+    {
+        if (!IsSiteAvailable(*iter, pCell))
+        {
+            neighbour_indices.insert(*iter);
+        }
+    }
+
+    return neighbour_indices;
+}
+
+template<unsigned DIM>
 c_vector<double, DIM> CaBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
     return this->mrMesh.GetNode(this->GetLocationIndexUsingCell(pCell))->rGetLocation();

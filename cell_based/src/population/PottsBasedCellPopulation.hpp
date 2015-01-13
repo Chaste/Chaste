@@ -220,6 +220,16 @@ public:
     unsigned GetNumNodes();
 
     /**
+     * Overridden GetNeighbouringLocationIndices() method.
+     *
+     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     *
+     * @param pCell a cell
+     * @return the set of neighbouring location indices.
+     */
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
      * Overridden GetLocationOfCellCentre() method.
      * Find where a given cell is in space.
      *

@@ -122,7 +122,7 @@ public:
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter2), 1.0, 1e-6);
         }
 
-        // For Ccverage of GetWidth() method (note that this returns the size of the underlying mesh, not the population of cells)
+        // For coverage of GetWidth() method (note that this returns the size of the underlying mesh, not the population of cells)
         TS_ASSERT_DELTA(cell_population.GetWidth(0), 4.0, 1e-12);
         TS_ASSERT_DELTA(cell_population.GetWidth(1), 4.0, 1e-12);
 
@@ -652,6 +652,15 @@ public:
             TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), location_index);
             location_index++;
         }
+
+        // Test GetNeighbouringLocationIndices() method
+        std::set<unsigned> expected_neighbours_of_cell_0;
+        expected_neighbours_of_cell_0.insert(1);
+        expected_neighbours_of_cell_0.insert(3);
+        expected_neighbours_of_cell_0.insert(4);
+
+        std::set<unsigned> neighbours_of_cell_0 = cell_population.GetNeighbouringLocationIndices(*(cell_population.Begin()));
+        TS_ASSERT(neighbours_of_cell_0 == expected_neighbours_of_cell_0);
     }
 
     void TestUpdateCellLocationsRandomlyExceptions()

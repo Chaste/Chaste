@@ -155,6 +155,13 @@ unsigned PottsBasedCellPopulation<DIM>::GetNumNodes()
 }
 
 template<unsigned DIM>
+std::set<unsigned> PottsBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+{
+    unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
+    return mpPottsMesh->GetNeighbouringElementIndices(elem_index);
+}
+
+template<unsigned DIM>
 c_vector<double, DIM> PottsBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
     return mpPottsMesh->GetCentroidOfElement(this->GetLocationIndexUsingCell(pCell));

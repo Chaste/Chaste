@@ -509,8 +509,6 @@ unsigned PottsMesh<DIM>::AddElement(PottsElement<DIM>* pNewElement)
     return pNewElement->GetIndex();
 }
 
-
-
 template<unsigned DIM>
 std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elementIndex)
 {
@@ -610,21 +608,18 @@ void PottsMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMesh
         }
     }
 
-    // If just using mesh reader then there is no neighbour information see #1932
-    if (mVonNeumannNeighbouringNodeIndices.size()==0)
+    // If we are just using a mesh reader, then there is no neighbour information (see #1932)
+    if (mVonNeumannNeighbouringNodeIndices.empty())
     {
         mVonNeumannNeighbouringNodeIndices.resize(num_nodes);
     }
-    if (mMooreNeighbouringNodeIndices.size()==0)
+    if (mMooreNeighbouringNodeIndices.empty())
     {
         mMooreNeighbouringNodeIndices.resize(num_nodes);
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////////////
-
 template class PottsMesh<1>;
 template class PottsMesh<2>;
 template class PottsMesh<3>;

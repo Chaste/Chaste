@@ -168,8 +168,6 @@ public:
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
 
-
-
     /**
      * Outputs CellPopulation parameters to file
      *

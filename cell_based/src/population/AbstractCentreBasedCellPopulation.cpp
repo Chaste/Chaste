@@ -146,6 +146,13 @@ bool AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAssociated
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+{
+    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+    return this->GetNeighbouringNodeIndices(node_index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocations(double dt)
 {
     // Iterate over all nodes associated with real cells to update their positions

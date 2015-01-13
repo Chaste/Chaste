@@ -173,7 +173,7 @@ public:
             is_ghost_node[*it] = true;
         }
 
-        //Note in the following that some compilers (clang on recent OSX) can't cope with operator== overloading in CxxTest TS_ASSERT_EQUALS
+        // Note in the following that some compilers (clang on recent OSX) can't cope with operator== overloading in CxxTest TS_ASSERT_EQUALS
         TS_ASSERT(cell_population.rGetGhostNodes() == is_ghost_node);
         //TS_ASSERT_EQUALS(cell_population.rGetGhostNodes(), is_ghost_node); // might not compile on recent clang
 
@@ -199,6 +199,14 @@ public:
         TS_ASSERT_EQUALS(counter + ghost_node_indices.size(), p_mesh->GetNumNodes());
 
         TS_ASSERT_EQUALS(cell_population.rGetGhostNodes().size(), p_mesh->GetNumNodes());
+
+        // Test GetNeighbouringLocationIndices() method
+        std::set<unsigned> expected_neighbours_of_cell_0;
+        expected_neighbours_of_cell_0.insert(23);
+        expected_neighbours_of_cell_0.insert(32);
+
+        std::set<unsigned> neighbours_of_cell_0 = cell_population.GetNeighbouringLocationIndices(*(cell_population.Begin()));
+        TS_ASSERT(neighbours_of_cell_0 == expected_neighbours_of_cell_0);
     }
 
     void TestCellPopulationIteratorWithNoCells()

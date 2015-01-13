@@ -34,12 +34,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DeltaNotchTrackingModifier.hpp"
-#include "NodeBasedCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "PottsBasedCellPopulation.hpp"
-#include "CaBasedCellPopulation.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
 
 template<unsigned DIM>
@@ -94,60 +88,8 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
          cell_iter != rCellPopulation.End();
          ++cell_iter)
     {
-        // Get the location index corresponding to this cell
-        unsigned index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
         // Get the set of neighbouring location indices
-        std::set<unsigned> neighbour_indices;
-
-        if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
-        {
-            MeshBasedCellPopulationWithGhostNodes<DIM>* p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
-
-            neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
-
-            // Remove ghost nodes from the neighbour indices
-            for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
-                 iter != neighbour_indices.end();)
-            {
-                if (p_cell_population->IsGhostNode(*iter))
-                {
-                    neighbour_indices.erase(iter++);
-                }
-                else
-                {
-                    ++iter;
-                }
-            }
-        }
-        else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation))
-        {
-            neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
-        }
-        else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation))
-        {
-            neighbour_indices = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetNeighbouringElementIndices(index);
-        }
-        else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
-        {
-            neighbour_indices = static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh().GetNeighbouringElementIndices(index);
-        }
-        else
-        {
-            // Assume that we must be using a CaBasedCellPopulation
-            CaBasedCellPopulation<DIM>* p_static_population = static_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation);
-            std::set<unsigned> candidates = static_cast<PottsMesh<DIM>*>(&(p_static_population->rGetMesh()))->GetMooreNeighbouringNodeIndices(index);
-
-            for (std::set<unsigned>::iterator iter = candidates.begin();
-                 iter != candidates.end();
-                 ++iter)
-            {
-                if (!p_static_population->IsSiteAvailable(*iter, *cell_iter))
-                {
-                    neighbour_indices.insert(*iter);
-                }
-            }
-        }
+        std::set<unsigned> neighbour_indices = rCellPopulation.GetNeighbouringLocationIndices(*cell_iter);
 
         // Compute this cell's average neighbouring Delta concentration and store in CellData
         if (!neighbour_indices.empty())

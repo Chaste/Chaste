@@ -178,6 +178,16 @@ public:
     bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
+     * Overridden GetNeighbouringLocationIndices() method.
+     *
+     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     *
+     * @param pCell a cell
+     * @return the set of neighbouring location indices.
+     */
+    virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
      * Overridden UpdateNodeLocations() method.
      *
      * @param dt the time step

@@ -140,6 +140,16 @@ public:
     virtual ~MeshBasedCellPopulationWithGhostNodes();
 
     /**
+     * Overridden GetNeighbouringLocationIndices() method.
+     *
+     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     *
+     * @param pCell a cell
+     * @return the set of neighbouring location indices.
+     */
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
      * Overridden UpdateNodeLocation() method.
      *
      * Update the location of each node in the cell population given

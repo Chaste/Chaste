@@ -280,6 +280,29 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateGhostNodesAfterReMesh(Nod
 }
 
 template<unsigned DIM>
+std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+{
+    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+    std::set<unsigned> neighbour_indices = this->GetNeighbouringNodeIndices(node_index);
+
+    // Remove ghost nodes from the neighbour indices
+    for (std::set<unsigned>::iterator iter = neighbour_indices.begin();
+         iter != neighbour_indices.end();)
+    {
+        if (this->IsGhostNode(*iter))
+        {
+            neighbour_indices.erase(iter++);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+
+    return neighbour_indices;
+}
+
+template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
 {
     // First update ghost positions first because they do not affect the real cells

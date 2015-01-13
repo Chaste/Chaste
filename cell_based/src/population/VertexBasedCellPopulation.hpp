@@ -222,6 +222,16 @@ public:
     Node<DIM>* GetNode(unsigned index);
 
     /**
+     * Overridden GetNeighbouringLocationIndices() method.
+     *
+     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     *
+     * @param pCell a cell
+     * @return the set of neighbouring location indices.
+     */
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
      * Overridden AddNode() method.
      *
      * Add a new node to the cell population.

@@ -145,6 +145,14 @@ public:
         {
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), sqrt(3.0)/2, 1e-6);
         }
+
+        // Test GetNeighbouringLocationIndices() method
+        std::set<unsigned> expected_neighbours_of_cell_0;
+        expected_neighbours_of_cell_0.insert(1);
+        expected_neighbours_of_cell_0.insert(5);
+
+        std::set<unsigned> neighbours_of_cell_0 = cell_population.GetNeighbouringLocationIndices(*(cell_population.Begin()));
+        TS_ASSERT(neighbours_of_cell_0 == expected_neighbours_of_cell_0);
     }
 
     void TestValidate() throw (Exception)

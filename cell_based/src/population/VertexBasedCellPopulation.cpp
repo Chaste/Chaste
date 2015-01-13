@@ -174,6 +174,13 @@ Node<DIM>* VertexBasedCellPopulation<DIM>::GetNode(unsigned index)
 }
 
 template<unsigned DIM>
+std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+{
+    unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
+    return this->rGetMesh().GetNeighbouringElementIndices(elem_index);
+}
+
+template<unsigned DIM>
 unsigned VertexBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
     return mpMutableVertexMesh->AddNode(pNewNode);
