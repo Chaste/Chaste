@@ -274,7 +274,7 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
         }
     }
 
-    //Remove from connectivity
+    // Remove from connectivity
     mVonNeumannNeighbouringNodeIndices[index].clear();
     mMooreNeighbouringNodeIndices[index].clear();
 

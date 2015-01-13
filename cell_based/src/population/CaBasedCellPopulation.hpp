@@ -165,7 +165,9 @@ public:
     std::vector<unsigned>& rGetAvailableSpaces();
 
     /**
-     * Find if a given node has space available. Overridden in subclasses to implement different division regiemes.
+     * Find if a given node has space available. Overridden in subclasses to implement different division regimes.
+     *
+     * \todo Which subclasses? Why is the second input argument needed?
      *
      * @param index  The global index of a specified node.
      * @param pCell  The cell wanting to divide into the lattice site (defaults to NULL).

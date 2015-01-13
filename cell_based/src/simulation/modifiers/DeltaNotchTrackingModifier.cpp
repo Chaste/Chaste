@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "PottsBasedCellPopulation.hpp"
+#include "CaBasedCellPopulation.hpp"
 #include "DeltaNotchCellCycleModel.hpp"
 
 template<unsigned DIM>
@@ -101,7 +102,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
 
         if (dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
         {
-            MeshBasedCellPopulationWithGhostNodes<DIM> * p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
+            MeshBasedCellPopulationWithGhostNodes<DIM>* p_cell_population = static_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation);
 
             neighbour_indices = rCellPopulation.GetNeighbouringNodeIndices(index);
 
@@ -133,8 +134,19 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         }
         else
         {
-            ///\todo #2265 - this functionality is not yet implemented in lattice-based simulations
-            NEVER_REACHED;
+            // Assume that we must be using a CaBasedCellPopulation
+            CaBasedCellPopulation<DIM>* p_static_population = static_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation);
+            std::set<unsigned> candidates = static_cast<PottsMesh<DIM>*>(&(p_static_population->rGetMesh()))->GetMooreNeighbouringNodeIndices(index);
+
+            for (std::set<unsigned>::iterator iter = candidates.begin();
+                 iter != candidates.end();
+                 ++iter)
+            {
+                if (!p_static_population->IsSiteAvailable(*iter, *cell_iter))
+                {
+                    neighbour_indices.insert(*iter);
+                }
+            }
         }
 
         // Compute this cell's average neighbouring Delta concentration and store in CellData
@@ -153,8 +165,8 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         }
         else
         {
-            // If simulation trips at this assertion it is because at least one of the cells has no neighbours (as defined by mesh/population/interaction distance)
-            NEVER_REACHED;
+            // If this cell has no neighbours, such as an isolated cell in a CaBasedCellPopulation, store -1.0 for the cell data
+            cell_iter->GetCellData()->SetItem("mean delta", -1.0);
         }
     }
 }

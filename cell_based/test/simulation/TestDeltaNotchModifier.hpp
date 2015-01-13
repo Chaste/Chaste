@@ -498,6 +498,70 @@ public:
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
     }
 
+    void TestUpdateAtEndOfTimeStepCaBased() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Create cell population
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        std::vector<unsigned> location_indices;
+        location_indices.push_back(0);
+        location_indices.push_back(1);
+        location_indices.push_back(4);
+        location_indices.push_back(5);
+        location_indices.push_back(6);
+        location_indices.push_back(10);
+        location_indices.push_back(11);
+        location_indices.push_back(13);
+        location_indices.push_back(14);
+        location_indices.push_back(18);
+        location_indices.push_back(19);
+
+        // Create some cells, each with a cell-cycle model that incorporates a Delta-Notch ODE system
+        std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        for (unsigned i=0; i<location_indices.size(); i++)
+        {
+            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
+            p_model->SetDimension(2);
+
+            CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(p_diff_type);
+            double birth_time = 0.0;
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
+        }
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        cell_population.AddCellWriter<CellIdWriter>();
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestDeltaNotchCaBasedUpdateAtEndOfTimeStep");
+        simulator.SetDt(0.01);
+        simulator.SetEndTime(0.01);
+
+        // Add Delta-Notch tracking modifier
+        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+        simulator.AddSimulationModifier(p_modifier);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check levels in cell 0 (this should be the same as for the Potts test, considering the configuration)
+        CellPtr cell0 = cell_population.rGetCells().front();
+        double notch = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch, 0.9999, 1e-04);
+        double delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
+        double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
+        TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
+    }
+
     void TestArchiving() throw (Exception)
     {
         EXIT_IF_PARALLEL;
