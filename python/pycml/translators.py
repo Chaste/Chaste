@@ -4708,6 +4708,22 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                 self.writeln('self.parameterMap["', name, '"] = ', var._cml_param_index)
             self.writeln(self.vector_index('self.parameters', var._cml_param_index),
                          self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ', self.COMMENT_START, var.units)
+        # Object creation for the GetOutputs method
+        self.writeln()
+        self.writeln('outputs = self._outputs = {}')
+        output_names = set() # Check for duplicate local parts
+        for var in self._outputs:
+            # TODO: A later optimisation could look at which names the protocol actually uses, and only generate those.
+            for name in self.get_ontology_names(var):
+                if name in output_names:
+                    raise ValueError('Duplicate output name "' + name + '" found')
+                output_names.add(name)
+                self.writeln('outputs["', name, '"] = np.array(0.0)')
+        for name, vars in self._vector_outputs.iteritems():
+            if name in output_names:
+                raise ValueError('Duplicate output name "' + name + '" found')
+            output_names.add(name)
+            self.writeln('outputs["', name, '"] = np.array([', ', '.join(['0.0'] * len(vars)), '])')
         self.writeln()
 
     def output_top_boilerplate(self):
@@ -4809,26 +4825,15 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.output_comment('Mathematics computing outputs of interest')
         self.output_equations(nodeset)
         self.writeln()
-        # Put them in an Environment
-        self.writeln('outputs = {}')
-        output_names = set() # Check for duplicate local parts
+        # Put the results in a dictionary to be returned to the caller
+        self.writeln('outputs = self._outputs')
         for var in self._outputs:
             # TODO: A later optimisation could look at which names the protocol actually uses, and only generate those.
             for name in self.get_ontology_names(var):
-                if name in output_names:
-                    raise ValueError('Duplicate output name "' + name + '" found')
-                output_names.add(name)
-                self.writeln('outputs["', name, '"] = np.array(', self.code_name(var), ')')
+                self.writeln('outputs["', name, '"][()] = ', self.code_name(var))
         for name, vars in self._vector_outputs.iteritems():
-            if name in output_names:
-                raise ValueError('Duplicate output name "' + name + '" found')
-            output_names.add(name)
-            self.writeln('outputs["', name, '"] = np.array([', nl=False)
-            for var in vars:
-                if not var is vars[0]:
-                    self.write(', ')
-                self.write(self.code_name(var))
-            self.writeln('])', indent=False)
+            for i, var in enumerate(vars):
+                self.writeln('outputs["', name, '"][', i, '] = ', self.code_name(var))
         self.writeln('return outputs')
         self.close_block()
 
@@ -4923,6 +4928,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('cdef public object simEnv')
         self.writeln()
         self.writeln('cdef Sundials.N_Vector _parameters')
+        self.writeln('cdef public object _outputs')
         self.writeln()
         # Constructor
         self.writeln('def __init__(self):')
