@@ -49,6 +49,7 @@ NodeBasedCellPopulationWithParticles<DIM>::NodeBasedCellPopulationWithParticles(
                                       bool deleteMesh)
     : NodeBasedCellPopulation<DIM>(rMesh, rCells, locationIndices, deleteMesh, false)
 {
+    EXCEPT_IF_NOT(PetscTools::IsSequential());
     if (!locationIndices.empty())
     {
         // Create a set of node indices corresponding to particles
@@ -341,15 +342,14 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std:
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << SimulationTime::Instance()->GetTimeStepsElapsed();
-    if (PetscTools::IsSequential())
+    EXCEPT_IF_NOT(PetscTools::IsSequential());
     {
         *(this->mpVtkMetaFile) << ".vtu\"/>\n";
     }
-    else
-    {
+/*    {
         // Parallel vtu files  .vtu -> .pvtu
         *(this->mpVtkMetaFile) << ".pvtu\"/>\n";
-    }
+    }*/
 #endif //CHASTE_VTK
 }
 

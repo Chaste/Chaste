@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 
 #include "NodeBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulationWithParticles.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
@@ -420,97 +419,6 @@ public:
         }
     }
 
-    void TestNodeBasedCellPopulationWithParticlesOutputInParallel() throw (Exception)
-    {
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
-
-        // Resetting the Maximum cell Id to zero (to account for previous tests)
-        CellId::ResetMaxCellId();
-
-        // Create a simple mesh
-        std::vector<Node<2>* > nodes;
-        for (unsigned i=0; i<10; i++)
-        {
-            nodes.push_back(new Node<2>(i, false, 0.0, 0.75*i));
-        }
-
-        // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
-
-        // Specify the node indices corresponding to cells (the others correspond to particles)
-        std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<5; index++)
-        {
-            location_indices.push_back(index);
-        }
-
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateGivenLocationIndices(cells, location_indices);
-        for (unsigned i=0; i<cells.size(); i++)
-        {
-            cells[i]->SetBirthTime(0.0);
-        }
-
-        // Create cell population
-        NodeBasedCellPopulationWithParticles<2> cell_population(mesh, cells, location_indices);
-
-        cell_population.Update(); // so cell neighbours are calculated
-
-        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
-        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
-        cell_population.AddCellWriter<CellIdWriter>();
-        cell_population.AddCellWriter<CellProliferativePhasesWriter>();
-        cell_population.AddCellWriter<CellAgesWriter>();
-        cell_population.AddCellWriter<CellVolumesWriter>();
-        cell_population.AddCellWriter<CellAncestorWriter>();
-
-        // Test set methods
-        std::string output_directory = "TestNodeBasedCellPopulationWithParticlesOutputInParallel";
-        OutputFileHandler output_file_handler(output_directory, false);
-
-        cell_population.OpenWritersFiles(output_file_handler);
-
-        // Write out the files here
-        cell_population.WriteResultsToFiles(output_directory);
-        cell_population.CloseWritersFiles();
-
-        // Compare output with saved files of what they should look like
-        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
-
-        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/results.viznodes").CompareFiles();
-        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/results.vizcelltypes").CompareFiles();
-        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/results.vizancestors").CompareFiles();
-        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/cellmutationstates.dat").CompareFiles();
-
-        if (PetscTools::IsSequential())
-        {
-            // Cell ages and volumes file differs because it writes the global index of the node to file, which is different depending on how many processes there are.
-            FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/cellages.dat").CompareFiles();
-            FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/cellareas.dat").CompareFiles();
-        }
-
-#ifdef CHASTE_VTK
-        if (PetscTools::IsParallel())
-        {
-            // Meta-file links to parallel files (which link to the fragments)
-            FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/results_from_parallel.pvd").CompareFiles();
-        }
-        else
-        {
-            FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestNodeBasedCellPopulationWithParticlesOutputInParallel/results.pvd").CompareFiles();
-        }
-#endif //CHASTE_VTK
-
-        // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
 };
 
 #endif /*TESTNODEBASEDCELLPOPULATIONPARALLELMETHODS_HPP_*/
