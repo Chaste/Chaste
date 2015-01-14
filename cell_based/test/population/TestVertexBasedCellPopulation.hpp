@@ -13,7 +13,8 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice,
+ * Redistributions in binary form must re
+ * produce the above copyright notice,
    this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
  * Neither the name of the University of Oxford nor the names of its
@@ -300,6 +301,56 @@ public:
         // Node 25 is contained in cells 6 and 7, therefore should have a mutant damping constant
         double damping_constant_at_node_25 = cell_population.GetDampingConstant(25);
         TS_ASSERT_DELTA(damping_constant_at_node_25, mutant_damping_constant, 1e-6);
+    }
+
+    /**
+     * This test covers the case where GetDampingConstant() is called on a node
+     * that is not contained in any elements.
+     *
+     * \todo it may be sensible to check that each node is contained in at least
+     * one element in a method such as Validate()
+     */
+    void TestGetDampingConstantException()
+    {
+        // Create a simple vertex mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, 0.0, 1.0));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(4, true, 0.0, 2.0));
+
+        // Make a square element out of nodes 0,1,2,3
+        std::vector<Node<2>*> nodes_elem;
+        nodes_elem.push_back(nodes[0]);
+        nodes_elem.push_back(nodes[1]);
+        nodes_elem.push_back(nodes[2]);
+        nodes_elem.push_back(nodes[3]);
+
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+
+        // Make a vertex mesh
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+
+        // Create cells
+        MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, vertex_mesh.GetNumElements());
+        cells[0]->SetMutationState(p_apc1);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
+        cell_population.InitialiseCells(); // this method must be called explicitly as there is no simulation
+        cell_population.SetDampingConstantMutant(8.0);
+
+        // Node 0 is contained in element 0 only, therefore should have mutant damping constant
+        TS_ASSERT_DELTA(cell_population.GetDampingConstant(0), 8.0, 1e-6);
+
+        // Node 4 is not contained in any elements, so GetDampingConstant() should throw an exception
+        TS_ASSERT_THROWS_THIS(cell_population.GetDampingConstant(4),
+            "At time 0, Node 4 is not contained in any elements, so GetDampingConstant() returns zero");
     }
 
     void TestUpdateWithoutBirthOrDeath() throw (Exception)
