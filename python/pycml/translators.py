@@ -4708,9 +4708,10 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                 self.writeln('self.parameterMap["', name, '"] = ', var._cml_param_index)
             self.writeln(self.vector_index('self.parameters', var._cml_param_index),
                          self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ', self.COMMENT_START, var.units)
-        # Object creation for the GetOutputs method
+        # List outputs, and create objects for the GetOutputs method
         self.writeln()
-        self.writeln('outputs = self._outputs = {}')
+        self.writeln('self.outputNames = []')
+        self.writeln('outputs = self._outputs = []')
         output_names = set() # Check for duplicate local parts
         for var in self._outputs:
             # TODO: A later optimisation could look at which names the protocol actually uses, and only generate those.
@@ -4718,12 +4719,14 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                 if name in output_names:
                     raise ValueError('Duplicate output name "' + name + '" found')
                 output_names.add(name)
-                self.writeln('outputs["', name, '"] = np.array(0.0)')
+                self.writeln('self.outputNames.append("', name, '")')
+                self.writeln('outputs.append(np.array(0.0))')
         for name, vars in self._vector_outputs.iteritems():
             if name in output_names:
                 raise ValueError('Duplicate output name "' + name + '" found')
             output_names.add(name)
-            self.writeln('outputs["', name, '"] = np.array([', ', '.join(['0.0'] * len(vars)), '])')
+            self.writeln('self.outputNames.append("', name, '")')
+            self.writeln('outputs.append(np.array([', ', '.join(['0.0'] * len(vars)), ']))')
         self.writeln()
 
     def output_top_boilerplate(self):
@@ -4825,15 +4828,18 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
         self.output_comment('Mathematics computing outputs of interest')
         self.output_equations(nodeset)
         self.writeln()
-        # Put the results in a dictionary to be returned to the caller
+        # Put the results in a list to be returned to the caller
         self.writeln('outputs = self._outputs')
+        output_count = 0
         for var in self._outputs:
             # TODO: A later optimisation could look at which names the protocol actually uses, and only generate those.
             for name in self.get_ontology_names(var):
-                self.writeln('outputs["', name, '"][()] = ', self.code_name(var))
+                self.writeln('outputs[', output_count, '][()] = ', self.code_name(var))
+                output_count += 1
         for name, vars in self._vector_outputs.iteritems():
             for i, var in enumerate(vars):
-                self.writeln('outputs["', name, '"][', i, '] = ', self.code_name(var))
+                self.writeln('outputs[', output_count, '][', i, '] = ', self.code_name(var))
+            output_count += 1
         self.writeln('return outputs')
         self.close_block()
 
@@ -4918,6 +4924,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('cdef public np.ndarray initialState')
         self.writeln('cdef public object parameterMap')
         self.writeln('cdef public np.ndarray parameters')
+        self.writeln('cdef public object outputNames')
         self.writeln()
         self.writeln('cdef public object savedStates')
         self.writeln('cdef public object env')
