@@ -71,7 +71,7 @@ unsigned ChasteBuildInfo::GetMajorReleaseNumber()
 
 unsigned ChasteBuildInfo::GetMinorReleaseNumber()
 {
-    return 2u;
+    return 3u;
 }
 
 unsigned ChasteBuildInfo::GetRevisionNumber()

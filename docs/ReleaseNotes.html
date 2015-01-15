@@ -8,6 +8,95 @@
 <h1>Chaste Release Notes</h1>
 
 
+
+<h2>Release 3.3 (changes since Release 3.2)</h2>
+<p>
+This release is designed to coincide with several publications that have associated code projects, including <a href="https://chaste.cs.ox.ac.uk/trac/wiki/PaperTutorials/Frontiers2014">PaperTutorials/Frontiers2014</a> and others under review; see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/PaperTutorials">PaperTutorials</a> for the latest list.
+It also includes support for new library versions that have been released since Chaste 3.2, and for the latest version of Ubuntu.
+</p>
+
+<h3>Headline features</h3>
+
+<h4>General</h4>
+<ul><li>A new run time flag <tt>-citations [file]</tt> was implemented that generates a list of BibTeX-format citations for the libraries/algorithms used in a particular run. With no arguments the citations are printed to std::cout. With an optional argument they are printed to a file on disk (note: a relative or absolute path may be given but the directory must exist and be writeable). 
+</li><li>Chaste works with most recent PETSc versions up to and including PETSc 3.5.
+</li><li>Recent releases of Boost (1.56 and newer) are now supported, and support for versions prior to 1.40 has been dropped.
+</li><li>CodeSynthesis XSD version 4.0 is now supported.
+</li><li>Ubuntu Utopic (14.10) is now supported.
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>Meshalyzer output is now off by default, as more people are using VTK. It can be turned back on with <tt>HeartConfig::Instance()-&gt;SetVisualizeWithMeshalyzer()</tt>. 
+</li><li>A human heart mesh has been added to our public data repository: <a href="https://chaste.cs.ox.ac.uk/trac/browser/data/public">https://chaste.cs.ox.ac.uk/trac/browser/data/public</a>
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>The re-factoring of the way cell populations write data to file, begun in the last release, has been further refined. See below for more details.
+</li></ul>
+
+<h3>Major new functionality &amp; code changes</h3>
+
+<h4>General</h4>
+<ul><li>PETSc 3.5 support has been added. If you have been solving nonlinear systems with your own Jacobian matrices, then the method interface needs to change to work with PETSc 3.5. The commit <a href="https://chaste.cs.ox.ac.uk/trac/changeset/22721" title="#2565 PETSc 3.5 support">r22721</a> gives lots of examples of how to do this.
+</li><li>In Boost 1.56 the algorithm for generating normal random numbers has changed, to fix a bug in earlier Boost versions. Chaste now uses that algorithm across all Boost versions, giving consistent results, but this means <strong>random numbers have changed from previous Chaste releases</strong>, and this may change simulation results.
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>The formulation for extended biodomain (tridomain) has been changed from solving for voltages (3 phi variables at each point in space) to transmembrane potentials (1 phi and 2 V_m variables at each point in space).  The new matrix formulation is symmetric and hence faster linear solvers (conjugate gradient) are now used by default. Checkpointing is backward compatible. 
+</li><li>The list of Oxford CellML metadata has been moved to a new file <tt>oxford-metadata.ttl</tt>, see <a href="https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#Standardisednames">CodeGenerationFromCellML</a> for more details.
+</li><li>Lookup table settings can take advantage of automatic units conversion.
+</li><li>A new lightweight output class has been added as an addition (or replacement) to HDF5 output and post-processing. There are currently two concrete implementations: <a href="https://chaste.cs.ox.ac.uk/docs/classSingleTraceOutputModifier.html" title="Documentation for the SingleTraceOutputModifier class">class:SingleTraceOutputModifier</a> which outputs time and voltage(s) at a single node to a named file during the simulation and ​<a href="https://chaste.cs.ox.ac.uk/docs/classActivationOutputModifier.html" title="Documentation for the ActivationOutputModifier class">class:ActivationOutputModifier</a> which computes a limited number of activation/recovery times at every node with results being written to file at the end of the simulation.
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>The method <tt>OutputSimulationModifierParameters()</tt> has been added to the simulation modifier class hierarchy. This is pure virtual in <tt>AbstractCellBasedSimulationModifier</tt> so must be provided by subclasses.
+</li><li>For clarity, <tt>CellLocationWriter</tt> and <tt>CellVariablesWriter</tt> have been renamed to <tt>CellLocationIndexWriter</tt> and <tt>CellCycleModelProteinConcentrationsWriter</tt> respectively; their associated output filenames and VTK cell data names have also been updated.
+</li><li>Writers which involve total counts of cells (<tt>CellMutationStatesCountWriter</tt>, <tt>CellProliferativeTypesCountWriter</tt> and <tt>CellProliferativePhasesCountWriter</tt>) form a new subclass which behaves differently to the <tt>CellPopulationWriter</tt> class.  They should be added to the population with <tt>AddCellPopulationCountWriter&lt;&gt;()</tt>.
+</li></ul>
+
+<h3>Minor</h3>
+<p>
+New functionality and code changes, which may still require changes to user code.
+</p>
+
+<h4>General</h4>
+<ul><li>Code timing should now be done with the <a href="https://chaste.cs.ox.ac.uk/docs/classTimer.html" title="Documentation for the Timer class">class:Timer</a>, rather than manual calls to <tt>std::clock</tt> or <tt>MPI_Wtime</tt>.
+</li><li>Updated random normal distribution sampling using <tt>RandomNumberGenerator</tt> - it has been altered to match the results from the latest boost (no matter what version of boost you are using): a small bug fix introduced in boost 1.56.
+</li><li>Fixed a bug in reseeding random normal numbers. If you had called a random normal distribution sample an odd number of times, the first number you got after reseeding was what the next one should have been before reseeding. 
+</li><li>We have replaced all occurrences of <tt>PetscTruth</tt> with <tt>PetscBool</tt>. New code should be written to use the newer type (<tt>PetscBool</tt>).
+</li><li>Some new utility methods have been added: <tt>OutputFileHandler::GetRelativePath</tt>, <tt>PetscTools::IsInitialised</tt>, <tt>FileComparison::IgnoreBlankLines</tt>
+</li></ul>
+
+<h4>Cardiac</h4>
+<ul><li>If using many different cell models with lookup tables, the memory used could become excessive. A new <tt>FreeMemory()</tt> method has been added to the <a href="https://chaste.cs.ox.ac.uk/docs/classAbstractLookupTableCollection.html" title="Documentation for the AbstractLookupTableCollection class">class:AbstractLookupTableCollection</a> class for releasing memory when a particular cell model is no longer needed. Note that if you are just using multiple instances of the same cell model there is no need for this, as the lookup tables are shared between instances.
+</li><li>Running a parallel cardiac simulation on more processes than suitable for the size of the problem now produces an error which terminates the simulation (rather than a warning). This is to avoid potential deadlock later in the run.
+</li><li>There is a new method <tt>SetSolver()</tt> on <a href="https://chaste.cs.ox.ac.uk/docs/classAbstractCardiacCellInterface.html" title="Documentation for the AbstractCardiacCellInterface class">class:AbstractCardiacCellInterface</a>, and a method <tt>HasAnalyticJacobian</tt> on <a href="https://chaste.cs.ox.ac.uk/docs/classAbstractCvodeSystem.html" title="Documentation for the AbstractCvodeSystem class">class:AbstractCvodeSystem</a>.
+</li><li>The <a href="https://chaste.cs.ox.ac.uk/docs/classCellMLLoader.html" title="Documentation for the CellMLLoader class">class:CellMLLoader</a> now copies <tt>.out</tt> files if present, meaning it can generate analytic Jacobians for CVODE.
+</li><li>When using CVODE in tissue simulations we now perform a reset on the rare occasions that it fails to solve.
+</li><li>Added (somewhat slow) support for lookup tables in generalised Rush-Larsen models.
+</li></ul>
+
+<h4>Cell-based</h4>
+<ul><li>There's now a new <tt>AbstractCellBasedWithTimingsTestSuite</tt> which uses <tt>Timer</tt>, and then calls the normal <tt>AbstractCellBasedTestSuite</tt> <tt>setUp</tt> and <tt>tearDown</tt> methods.
+</li><li>There's now a <tt>ReturnSimulationModifiers</tt> method (on the simulation) to return the vector of simulation modifiers.
+</li><li>The redundant <tt>VertexElementMap</tt> input argument has been removed from the <tt>MutableVertexMesh</tt> methods <tt>CheckForSwapsFromShortEdges()</tt> and <tt>IdentifySwapType()</tt>.
+</li></ul>
+
+<h3>Future Plans</h3>
+<ul><li>Tested support for various older versions of third party libraries will likely be dropped in the next release. See <a href="https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions">InstallGuides/DependencyVersions</a> for up-to-date information as development progresses.
+</li></ul>
+
+
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<hr />
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+
+
+
+
 <h2>Release 3.2 (changes since Release 3.1)</h2>
 
 <p>
@@ -29,7 +118,7 @@ This is a minor release, but includes new support for many recent versions of de
 </li></ul>
 
 <h4>Cardiac</h4>
-<ul><li>Analytic Jacobians can now be auto-generated for cardiac cell models, using maple, and used by CVODE solvers to provide between 5-30% speed up in ODE solving. These can be used in single cell and tissue. If present, the analytic Jacobian is used by default (see <a class="closed ticket" href="https://chaste.cs.ox.ac.uk/trac/ticket/1795" title="user story: Set up analytic jacobians for Cvode systems (closed: fixed)">#1795</a> for some benchmarking).
+<ul><li>Analytic Jacobians can now be auto-generated for cardiac cell models, using maple, and used by CVODE solvers to provide between 5-30% speed up in ODE solving. These can be used in single cell and tissue. If present, the analytic Jacobian is used by default (see <a href="https://chaste.cs.ox.ac.uk/trac/ticket/1795" title="user story: Set up analytic jacobians for Cvode systems (closed: fixed)">#1795</a> for some benchmarking).
 </li><li>HDF5 file access has been improved to use more appropriate 'chunk' sizes. This speeds up cardiac output file reading/writing/postprocessing in quite a lot of situations.
 </li><li>Postprocessing maps can now be written to VTK as well as meshalyzer. They are now written via HDF5, so you can get them to any format you like with an appropriate HDF converter.
 </li></ul>
@@ -94,7 +183,7 @@ New functionality and code changes, which may still require changes to user code
 </li><li>Unfortunately, an error was discovered in a calculation behind the <tt>CompressibleExponentialLaw</tt> (a material law, and for compressible cardiac electro-mechanics the default law), which will have resulted in too small stresses and overly large deformations. The class has been fixed. This may change user projects results
 </li><li>The coarsened version of the Oxford Rabbit mesh located at <tt>apps/texttest/weekly/Propagation3d</tt> has been renamed <tt>OxfordRabbitHeart_481um</tt>.
 </li><li>When constraints are placed on valid values for cardiac cell model state variables (e.g. gating variables should stay between 0 and 1), CVODE is now allowed to break these to within a factor of its specified absolute tolerances, following the CVODE documentation on "Advice on controlling unphysical negative values".
-</li><li><tt>AbstractCardiacCellInterface::UseCellMLDefaultStimulus()</tt> now returns a <tt>boost::shared_ptr&lt;RegularStimulus&gt;</tt> to the stimulus instead of returning <tt>void</tt>. <strong>This may break user projects if you are storing auto-generated models</strong>. In this case the method should be updated as per <a class="changeset" href="https://chaste.cs.ox.ac.uk/trac/changeset/19552" title="#2412 Make dealing with the CellML default stimulus nicer.">r19552</a>. This has the benefit of providing access to the <tt>RegularStimulus</tt> methods, without having to remember how to static cast a boost shared pointer to an <tt>AbstractStimulusFunction</tt>. 
+</li><li><tt>AbstractCardiacCellInterface::UseCellMLDefaultStimulus()</tt> now returns a <tt>boost::shared_ptr&lt;RegularStimulus&gt;</tt> to the stimulus instead of returning <tt>void</tt>. <strong>This may break user projects if you are storing auto-generated models</strong>. In this case the method should be updated as per <a href="https://chaste.cs.ox.ac.uk/trac/changeset/19552" title="#2412 Make dealing with the CellML default stimulus nicer.">r19552</a>. This has the benefit of providing access to the <tt>RegularStimulus</tt> methods, without having to remember how to static cast a boost shared pointer to an <tt>AbstractStimulusFunction</tt>. 
 </li><li> You can now print out additional action potential model variables in a <tt>BidomainWithBath</tt> simulation, previously this failed because a <tt>FakeBathCell</tt> doesn't have them.
 </li><li><tt>HeartConfig::Instance()-&gt;SetVisualizeWithVtk();</tt> will now work in 1D as well as 2D and 3D.
 </li><li>The CVODE change (see general above) has led to a small improvement in accuracy for CVODE in heart tissue, since voltage was not being updated at precisely the correct time before.

@@ -13,5 +13,5 @@ Full documentation can be found on the Chaste wiki at
 https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML
 
 Static versions of the guide accompanying Chaste releases are also available.  See
-https://chaste.cs.ox.ac.uk/chaste/tutorials/release_3.2/ChasteGuides/CodeGenerationFromCellML.html
-for release 3.2.
+https://chaste.cs.ox.ac.uk/chaste/tutorials/release_3.3/ChasteGuides/CodeGenerationFromCellML.html
+for release 3.3.
