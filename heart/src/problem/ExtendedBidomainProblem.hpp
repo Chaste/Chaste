@@ -220,8 +220,8 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
                  index != mSolution_distri.End();
                  ++index)
             {
-            	mSolution_V_1[index] = vm_first_cell_distri[index];
-            	mSolution_V_2[index] = vm_second_cell_distri[index];
+                mSolution_V_1[index] = vm_first_cell_distri[index];
+                mSolution_V_2[index] = vm_second_cell_distri[index];
                 mSolution_phie[index] = phie_distri[index];
             }
             PetscTools::Destroy(V);

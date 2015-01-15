@@ -1140,7 +1140,7 @@ public:
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell radii");
 
         // Avoid memory leak
-	    for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
         }

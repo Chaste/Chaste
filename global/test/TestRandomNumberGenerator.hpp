@@ -382,10 +382,10 @@ public:
     }
 
     void TestExponentialMethodsInsideBoost() throw(Exception)
-	{
-    	boost::mt19937 mersenneTwisterGenerator(0u);
+    {
+        boost::mt19937 mersenneTwisterGenerator(0u);
 
-    	// Generator way of doing it
+        // Generator way of doing it
         // make an exponential distribution
         boost::exponential_distribution<> ed;
 
@@ -401,7 +401,7 @@ public:
         // Distribution way of doing it
         // Works only on 1.47+
         //TS_ASSERT_DELTA(ed(mersenneTwisterGenerator), 0.7958, 1e-4);
-	}
+    }
 
 
     void TestReproducibilityAcrossPlatforms()
@@ -431,9 +431,9 @@ public:
         {
             p_gen->StandardNormalRandomDeviate();
         }
-    	// Boost 1.56 values
-     	TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.2132, 1e-4);
-     	TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.6166, 1e-4);
+        // Boost 1.56 values
+         TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), 0.2132, 1e-4);
+         TS_ASSERT_DELTA(p_gen->NormalRandomDeviate(256.0, 0.5), 255.6166, 1e-4);
 
     }
 
@@ -448,36 +448,36 @@ public:
 
         // First check with an even number of calls (This works!)
         {
-			p_gen->Reseed(42);
+            p_gen->Reseed(42);
 
-			// Call an even number of times
-			first_correct = p_gen->StandardNormalRandomDeviate();
-			second_correct = p_gen->StandardNormalRandomDeviate();
+            // Call an even number of times
+            first_correct = p_gen->StandardNormalRandomDeviate();
+            second_correct = p_gen->StandardNormalRandomDeviate();
 
-			p_gen->Reseed(42);
+            p_gen->Reseed(42);
 
-			TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), first_correct, 1e-12);
-			TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), second_correct, 1e-12);
+            TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), first_correct, 1e-12);
+            TS_ASSERT_DELTA(p_gen->StandardNormalRandomDeviate(), second_correct, 1e-12);
         }
 
         // Then check with an odd number of calls (this doesn't!)
         {
-			p_gen->Reseed(42);
+            p_gen->Reseed(42);
 
-			// Call an odd number of times (just once)
-			double first_time = p_gen->StandardNormalRandomDeviate();
-			TS_ASSERT_DELTA(first_correct, first_time, 1e-12);
+            // Call an odd number of times (just once)
+            double first_time = p_gen->StandardNormalRandomDeviate();
+            TS_ASSERT_DELTA(first_correct, first_time, 1e-12);
 
-			p_gen->Reseed(42);
+            p_gen->Reseed(42);
 
-			// This line failed on boost 1.54
-			// we suspect the method tried to be clever and remembers two numbers it generates,
-			// so the number we get here is actually second_time.
-			double first_again = p_gen->StandardNormalRandomDeviate();
+            // This line failed on boost 1.54
+            // we suspect the method tried to be clever and remembers two numbers it generates,
+            // so the number we get here is actually second_time.
+            double first_again = p_gen->StandardNormalRandomDeviate();
 
-			// Hunch was correct, we needed to reset the distribution generator,
-			// which we now do.
-			TS_ASSERT_DELTA(first_correct, first_again, 1e-12);
+            // Hunch was correct, we needed to reset the distribution generator,
+            // which we now do.
+            TS_ASSERT_DELTA(first_correct, first_again, 1e-12);
         }
     }
 

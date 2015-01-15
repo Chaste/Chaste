@@ -178,11 +178,11 @@ public:
          *
          * The h5 file (1DValid.h5) is a Chaste (old phi_i formulation) file with is valid because, when extrapolating results from it, they look very similar
          * (except for a few points at the end of the upstroke) to the results taken
-         * directly from Martin's code. 
+         * directly from Martin's code.
          * A plot of Chaste results versus Martin's result (at node 50) is stored
          * in the file 1DChasteVsMartin.eps for reference.
          *
-         * A second plot comparing the old formulation (with phi_i) to the new formulation with V_m is contained in 
+         * A second plot comparing the old formulation (with phi_i) to the new formulation with V_m is contained in
          *.1DChasteNewFormulation.png
          *
          */

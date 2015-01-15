@@ -1037,12 +1037,12 @@ Vec LinearSystem::Solve(Vec lhsGuess)
                 KSPDefaultConvergedCreate(&mpConvergenceTestContext);
     #endif
             }
-	#if ( PETSC_VERSION_MINOR>=5 )
+    #if ( PETSC_VERSION_MINOR>=5 )
             // From PETSc 3.5, KSPDefaultConverged became KSPConvergedDefault.
             KSPSetConvergenceTest(mKspSolver, KSPConvergedDefault, &mpConvergenceTestContext, PETSC_NULL);
-	#else
+    #else
             KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, &mpConvergenceTestContext, PETSC_NULL);
-	#endif
+    #endif
 
 #else
             KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, PETSC_NULL);
