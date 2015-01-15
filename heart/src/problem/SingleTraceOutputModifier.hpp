@@ -96,12 +96,16 @@ public:
      * @param globalIndex The global index of the node which is to be output (assumes no permutation).
      *  This is the index *in memory at solve time*.  If you are running in parallel and you want a
      *  specific location or index in your mesh then you will need to look in the mesh for node or permutation.
+     *  \code
      *     ChastePoint<1> point(0.05);
      *     unsigned new_index_for_5 = mesh.GetNearestNodeIndex(point);
      *     SingleTraceOutputModifier("trace_5.txt", new_index_for_5));
+     *  \endcode
      *  or
+     *  \code
      *     unsigned new_index_for_5 = mesh.rGetNodePermutation()[5];
      *     SingleTraceOutputModifier("trace_5.txt", new_index_for_5));
+     *  \endcode
      *
      * @param rFilename  The file which is eventually produced by this modifier
      * @param flushTime The simulation time between manual file flushes (if required)
