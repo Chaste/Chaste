@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "FakePetscSetup.hpp"
-
+#include "Debug.hpp"
 class TestCryptSimulationAnother2dNightly : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
@@ -75,7 +75,7 @@ public:
      * Sloughing with a sloughing cell killer and not turning
      * into ghost nodes on a non-periodic mesh.
      */
-    void TestSloughingCellKillerOnNonPeriodicCrypt() throw (Exception)
+    void joeTestSloughingCellKillerOnNonPeriodicCrypt() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -114,7 +114,7 @@ public:
         simulator.Solve();
     }
 
-    void TestSloughingDeathWithPeriodicMesh() throw (Exception)
+    void joeTestSloughingDeathWithPeriodicMesh() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -172,7 +172,7 @@ public:
         TS_ASSERT_EQUALS(crypt.GetNumRealCells(), 84u);
     }
 
-    void TestMonolayerWithCutoffPointAndNoGhosts() throw (Exception)
+    void joeTestMonolayerWithCutoffPointAndNoGhosts() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
@@ -223,6 +223,21 @@ public:
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        /*
+         * Shift all left-hand cells.
+         * The first column of cells are on x=0 ( == x=16) which is the periodic boundary.
+         * These might flip to x=16 on the first timestep (depending on the re-mesh implementation).
+         * The second column of cells are at x=1/2.
+         */
+        for (Cylindrical2dMesh::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+                        node_iter != p_mesh->GetNodeIteratorEnd();
+                        ++node_iter)
+        {
+            if (node_iter->rGetLocation()[0] <= DBL_EPSILON) // In first column
+            {
+                node_iter->rGetModifiableLocation()[0] += 1e-8; // Shift right
+            }
+        }
 
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
