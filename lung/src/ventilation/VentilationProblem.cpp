@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "Warnings.hpp"
 //#include "Debug.hpp"
-
+//#include "Timer.hpp"
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
       mDynamicResistance(false),
@@ -180,8 +180,8 @@ void VentilationProblem::SolveDirectFromFlux()
 
 void VentilationProblem::SetupIterativeSolver()
 {
-    const unsigned num_non_zeroes = 100;
-
+    //double start = Timer::GetElapsedTime();
+    const unsigned num_non_zeroes = std::min(250u, mMesh.GetNumBoundaryNodes()-1);
     MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, num_non_zeroes, NULL, &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
@@ -232,16 +232,23 @@ void VentilationProblem::SetupIterativeSolver()
     {
         unsigned parent_index = iter->GetIndex();
         double parent_resistance = CalculateResistance(*iter);
+        std::vector<PetscInt> indices( descendant_nodes[parent_index].begin(), descendant_nodes[parent_index].end() );
         if (descendant_nodes[parent_index].size() <= num_non_zeroes)
         {
-            std::vector<PetscInt> indices( descendant_nodes[parent_index].begin(), descendant_nodes[parent_index].end() );
             std::vector<double> resistance_to_add(indices.size()*indices.size(), parent_resistance);
 
             MatSetValues(mTerminalInteractionMatrix,
                          indices.size(), (PetscInt*) &indices[0],
                          indices.size(), (PetscInt*) &indices[0], &resistance_to_add[0], ADD_VALUES);
         }
-        ///\todo #2300 add to diagonals anyway
+        else
+        {
+            ///\todo Does this make so much difference?
+            for (int i=0; i<indices.size(); i++)
+            {
+                MatSetValue(mTerminalInteractionMatrix, indices[i], indices[i], parent_resistance, ADD_VALUES);
+            }
+        }
     }
     PetscMatTools::Finalise(mTerminalInteractionMatrix);
     assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
@@ -256,6 +263,7 @@ void VentilationProblem::SetupIterativeSolver()
 #endif
     KSPSetFromOptions(mTerminalKspSolver);
     KSPSetUp(mTerminalKspSolver);
+//    PRINT_VARIABLE(Timer::GetElapsedTime() - start);
 }
 void VentilationProblem::SolveIterativelyFromPressure()
 {
@@ -263,6 +271,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
     {
         SetupIterativeSolver();
     }
+    //double start = Timer::GetElapsedTime();
     /* Now use the pressure boundary conditions to determine suitable flux boundary conditions
      * and iteratively update them until we are done
      */
@@ -272,9 +281,9 @@ void VentilationProblem::SolveIterativelyFromPressure()
     unsigned num_terminals = mMesh.GetNumBoundaryNodes()-1u;
     double pressure_tolerance = 1e-4;
     bool converged=false;
-    double terminal_flux_correction = 0.0;
-    double last_max_pressure_change;
     double last_norm_pressure_change;
+    Vec old_terminal_pressure_change;
+    VecDuplicate(mTerminalPressureChangeVector, &old_terminal_pressure_change);
     for (unsigned iteration = 0; iteration < max_iterations && converged==false; iteration++)
     {
         for (unsigned terminal=0; terminal<num_terminals; terminal++)
@@ -289,9 +298,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
             }
             VecSetValue(mTerminalPressureChangeVector, terminal, delta_pressure, INSERT_VALUES);
         }
-        double max_pressure_change, norm_pressure_change;
-        PetscInt temp_index;
-        VecMax(mTerminalPressureChangeVector, &temp_index, &last_max_pressure_change);
+        double norm_pressure_change;
         VecNorm(mTerminalPressureChangeVector, NORM_2, &last_norm_pressure_change);
 
         if (last_norm_pressure_change < pressure_tolerance)
@@ -300,6 +307,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
             break;
         }
 
+        VecCopy(mTerminalPressureChangeVector, old_terminal_pressure_change);
         KSPSolve(mTerminalKspSolver, mTerminalPressureChangeVector, mTerminalFluxChangeVector);
         double* p_mTerminalFluxChangeVector;
         VecGetArray(mTerminalFluxChangeVector, &p_mTerminalFluxChangeVector);
@@ -327,35 +335,26 @@ void VentilationProblem::SolveIterativelyFromPressure()
             }
             VecSetValue(mTerminalPressureChangeVector, terminal, delta_pressure, INSERT_VALUES);
         }
-        VecMax(mTerminalPressureChangeVector, &temp_index, &max_pressure_change);
         VecNorm(mTerminalPressureChangeVector, NORM_2, &norm_pressure_change);
         if (norm_pressure_change < pressure_tolerance)
         {
             converged = true;
             break;
         }
-        bool rescale = true;
-        if (max_pressure_change*last_max_pressure_change < 0.0)
+        double pressure_change_dot_product;
+        VecDot(mTerminalPressureChangeVector, old_terminal_pressure_change, &pressure_change_dot_product);
+        if (pressure_change_dot_product < 0.0)
         {
             /* The pressure correction has changed sign
              *  * so we have overshot the root
              *  * back up by setting a correction factor
              */
-            terminal_flux_correction =  last_norm_pressure_change / (last_norm_pressure_change + norm_pressure_change) - 1.0;
-        }
-        else if (last_norm_pressure_change > norm_pressure_change)
-        {
-            /* We have a better solution without rescaling. */
-            rescale = false;
-        }
-        else
-        {
-            //use the previous scaling factor based on the last overshoot
-            //assert(terminal_flux_correction != 0.0);
-        }
-
-        if (rescale)
-        {
+            double terminal_flux_correction =  last_norm_pressure_change / (last_norm_pressure_change + norm_pressure_change) - 1.0;
+///\todo some sqrt response?
+//            if (mDynamicResistance)
+//            {
+//                terminal_flux_correction *= 0.99;
+//            }
             for (unsigned terminal=0; terminal<num_terminals; terminal++)
             {
                 double estimated_mTerminalFluxChangeVector=p_mTerminalFluxChangeVector[terminal];
@@ -369,6 +368,8 @@ void VentilationProblem::SolveIterativelyFromPressure()
     {
         NEVER_REACHED;
     }
+    PetscTools::Destroy(old_terminal_pressure_change);
+//    PRINT_2_VARIABLES(Timer::GetElapsedTime() - start, mDynamicResistance);
 }
 
 double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool usePedley, double flux)
