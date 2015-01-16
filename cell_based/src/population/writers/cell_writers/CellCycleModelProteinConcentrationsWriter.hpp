@@ -42,6 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A class written using the visitor pattern for writing cell-cycle model protein concentrations to file.
+ *
+ * The output file is called proteinconcentrations.dat by default. If VTK is switched on, then the
+ * writer also specifies the VTK output for each cell, which is stored in
+ * the VTK cell data "Protein concentrations" by default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellCycleModelProteinConcentrationsWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>

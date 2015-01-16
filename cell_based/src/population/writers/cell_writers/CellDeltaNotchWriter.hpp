@@ -33,25 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef CELLRADIUSWRITER_HPP_
-#define CELLRADIUSWRITER_HPP_
+#ifndef CELLDELTANOTCHWRITER_HPP_
+#define CELLDELTANOTCHWRITER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellWriter.hpp"
 
 /**
- * A class written using the visitor pattern for writing the radius of each cell
- * to file. This class is designed for use with a NodeBasedCellPopulation (or its
- * subclasses) only; if used with other cell populations, the writer will output
- * zero for each cell's radius.
+ * A class written using the visitor pattern for writing to file, for each cell,
+ * the level of delta, notch and mean level of delta among neighbouring cells.
  *
- * The output file is called cellradii.dat by default. If VTK is switched on,
+ * The output file is called celldeltanotch.dat by default. If VTK is switched on,
  * then the writer also specifies the VTK output for each cell, which is stored in
- * the VTK cell data "Cell radii" by default.
+ * the VTK cell data "Cell delta" by default.
+ *
+ * Note: if you use a DeltaNotchCellCycleModel then the delta and notch levels are
+ * stored in CellData, and thus (if VTK is switched on) will be output as VTK cell
+ * data already.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CellRadiusWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
+class CellDeltaNotchWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Needed for serialization. */
@@ -73,7 +75,7 @@ public:
     /**
      * Default constructor.
      */
-    CellRadiusWriter();
+    CellDeltaNotchWriter();
 
     /**
      * Overridden GetCellDataForVtkOutput() method.
@@ -91,10 +93,10 @@ public:
     /**
      * Overridden VisitCell() method.
      *
-     * Visit a cell and write its radius.
+     * Visit a cell and write its delta and notch data.
      *
      * Outputs a line of space-separated values of the form:
-     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [cell radius] ...
+     * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [delta] [notch] [mean neighbouring delta]...
      * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, respectively.
      *
      * This is appended to the output written by AbstractCellBasedWriter, which is a single
@@ -107,6 +109,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellRadiusWriter)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellDeltaNotchWriter)
 
-#endif /* CELLRADIUSWRITER_HPP_ */
+#endif /* CELLDELTANOTCHWRITER_HPP_ */

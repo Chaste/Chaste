@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StemCellProliferativeType.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "TysonNovakCellCycleModel.hpp"
+#include "DeltaNotchCellCycleModel.hpp"
 #include "BackwardEulerIvpOdeSolver.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
@@ -64,6 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
+#include "CellDeltaNotchWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabelWriter.hpp"
 #include "CellLocationIndexWriter.hpp"
@@ -264,6 +266,96 @@ public:
 
         {
             AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAncestorWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+    void TestCellDeltaNotchWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Set up SimulationTime (this is usually done by a simulation object)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(25, 2);
+
+        // Create a regular vertex mesh
+        HoneycombVertexMeshGenerator generator(2, 2);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
+        std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+            DeltaNotchCellCycleModel* p_model = new DeltaNotchCellCycleModel();
+            p_model->SetDimension(2);
+
+            CellPtr p_cell(new Cell(p_state, p_model));
+            p_cell->SetCellProliferativeType(p_diff_type);
+            double birth_time = 0.0;
+            p_cell->SetBirthTime(birth_time);
+            cells.push_back(p_cell);
+        }
+
+        // Create cell-based population object
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetDataOnAllCells("delta", 1.56);
+        cell_population.SetDataOnAllCells("notch", 9.54);
+        cell_population.SetDataOnAllCells("mean delta", 87.3);
+
+        // Create output directory
+        std::string output_directory = "TestCellDeltaNotchWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create cell writer and output data for each cell to file
+        CellDeltaNotchWriter<2,2> cell_writer;
+        cell_writer.OpenOutputFile(output_file_handler);
+        cell_writer.WriteTimeStamp();
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            cell_writer.VisitCell(*cell_iter, &cell_population);
+        }
+        cell_writer.CloseFile();
+
+        // Test that the data are output correctly
+        FileComparison(results_dir + "celldeltanotch.dat", "cell_based/test/data/TestCellWriters/celldeltanotch.dat").CompareFiles();
+
+        // Test the correct data are returned for VTK output for the first cell
+        double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+        TS_ASSERT_DELTA(vtk_data, 1.56, 1e-6);
+
+        // Test GetVtkCellDataName() method
+        TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell delta");
+    }
+
+    void TestCellDeltaNotchWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellDeltaNotchWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellDeltaNotchWriter<2,2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);

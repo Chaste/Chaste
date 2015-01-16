@@ -40,7 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 #include "AbstractCellWriter.hpp"
 
-/** A class written using the visitor pattern for writing cell proliferative phases to file. */
+/**
+ * A class written using the visitor pattern for writing cell proliferative phases to file.
+ *
+ * The output file is called results.vizcellphases by default. If VTK is switched on,
+ * then the writer also specifies the VTK output for each cell, which is stored in
+ * the VTK cell data "Cycle phases" by default.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellProliferativePhasesWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
