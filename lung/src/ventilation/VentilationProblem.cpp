@@ -244,7 +244,7 @@ void VentilationProblem::SetupIterativeSolver()
         else
         {
             ///\todo Does this make so much difference?
-            for (int i=0; i<indices.size(); i++)
+            for (unsigned i=0; i<indices.size(); i++)
             {
                 MatSetValue(mTerminalInteractionMatrix, indices[i], indices[i], parent_resistance, ADD_VALUES);
             }
