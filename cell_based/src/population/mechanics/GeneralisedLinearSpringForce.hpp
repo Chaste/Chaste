@@ -129,7 +129,7 @@ public:
      * Return a multiplication factor for the spring constant, which
      * returns a default value of 1.
      *
-     * This method is overridden in a subclass.
+     * This method may be overridden in subclasses.
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node

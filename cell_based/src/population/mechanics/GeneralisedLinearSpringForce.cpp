@@ -280,10 +280,7 @@ void GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(
     AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class GeneralisedLinearSpringForce<1,1>;
 template class GeneralisedLinearSpringForce<1,2>;
 template class GeneralisedLinearSpringForce<2,2>;
