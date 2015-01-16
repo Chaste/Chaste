@@ -46,6 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cell property CellLabel) in a cell population to file. This is a measure
  * of how mixed the populations are.
  *
+ * The output file is called heterotypicboundary.dat by default.
+ *
  * For usage of this measure for cell sorting, see for example the
  * heterotypic boundary length described in Zhang et al (2011). Computer
  * simulations of cell sorting due to differential adhesion. PLOS ONE

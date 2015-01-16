@@ -40,7 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-/** A class written using the visitor pattern for writing the number of cells of each proliferative type to file. */
+/**
+ * A class written using the visitor pattern for writing the number of cells of each proliferative type to file.
+ *
+ * The output file is called celltypes.dat by default.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellProliferativeTypesCountWriter : public AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>
 {

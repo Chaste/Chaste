@@ -41,7 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A class written using the visitor pattern for writing voronoi data from a cell population to file.
+ * A class written using the visitor pattern for writing Voronoi data from a cell population to file.
+ *
+ * The output file is called voronoi.dat by default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VoronoiDataWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>

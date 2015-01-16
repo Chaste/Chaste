@@ -40,7 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-/** A class written using the visitor pattern for writing the number of cells in each proliferative phase to file. */
+/**
+ * A class written using the visitor pattern for writing the number of cells in each proliferative phase to file.
+ *
+ * The output file is called cellcyclephases.dat by default.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellProliferativePhasesCountWriter : public AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>
 {

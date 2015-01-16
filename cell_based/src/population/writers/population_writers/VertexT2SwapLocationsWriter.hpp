@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A writer class to output the time and locations of T2 swaps to a file.
+ *
+ * The output file is called T2SwapLocations.dat by default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexT2SwapLocationsWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>

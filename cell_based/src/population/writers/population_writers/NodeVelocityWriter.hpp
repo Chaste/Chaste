@@ -44,6 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A class written using the visitor pattern for writing the velocities of the nodes
  * associated with a cell population to file.
  *
+ * The output file is called nodevelocities.dat by default.
+ *
  * \todo some code duplication in methods; potential for refactoring (#2404)
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -40,7 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-/** A class written using the visitor pattern for writing the boundary nodes of a population to file. */
+/**
+ * A class written using the visitor pattern for writing the boundary nodes of a population to file.
+ *
+ * The output file is called results.vizboundarynodes by default.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class BoundaryNodeWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {

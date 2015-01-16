@@ -43,6 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class written using the visitor pattern for writing cell population volume data to file.
  * Used by MeshBasedCellPopulation.
+ *
+ * The output file is called cellpopulationareas.dat by default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellPopulationAreaWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>

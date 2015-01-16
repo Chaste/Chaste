@@ -40,7 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
-/** A class written using the visitor pattern for writing node location from a cell population to file.*/
+/**
+ * A class written using the visitor pattern for writing node locations from a cell population to file.
+ *
+ * The output file is called results.viznodes by default.
+ */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class NodeLocationWriter : public AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>
 {
