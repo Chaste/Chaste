@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Cell population writers
 #include "BoundaryNodeWriter.hpp"
+#include "CellPopulationAdjacencyMatrixWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "HeterotypicBoundaryLengthWriter.hpp"
@@ -132,6 +133,139 @@ public:
 
         {
             AbstractCellBasedWriter<2,2>* const p_population_writer = new BoundaryNodeWriter<2,2>();
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+            output_arch << p_population_writer;
+            delete p_population_writer;
+        }
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+            input_arch >> p_population_writer_2;
+            delete p_population_writer_2;
+       }
+    }
+
+    void TestCellPopulationAdjacencyMatrixWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Test with a MeshBasedCellPopulation
+        HoneycombMeshGenerator tet_generator(5, 5, 0);
+        MutableMesh<2,2>* p_tet_mesh = tet_generator.GetMesh();
+        std::vector<CellPtr> mesh_based_cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> mesh_based_cells_generator;
+        mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
+        MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
+
+        // Label a subset of the cells
+        boost::shared_ptr<AbstractCellProperty> p_label(mesh_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        mesh_based_cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+        mesh_based_cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellPopulationAdjacencyMatrixWriter";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        // Create a CellPopulationAreaWriter and test that the correct output is generated
+        CellPopulationAdjacencyMatrixWriter<2,2> adjacency_writer;
+        adjacency_writer.OpenOutputFile(output_file_handler);
+        adjacency_writer.WriteTimeStamp();
+        adjacency_writer.Visit(&mesh_based_cell_population);
+        adjacency_writer.WriteNewline();
+        adjacency_writer.CloseFile();
+
+        FileComparison(results_dir + "cellpopulationadjacency.dat", "cell_based/test/data/TestCellPopulationWriters/cellpopulationadjacency.dat").CompareFiles();
+
+        // Test that we can append to files
+        adjacency_writer.OpenOutputFileForAppend(output_file_handler);
+        adjacency_writer.WriteTimeStamp();
+        adjacency_writer.Visit(&mesh_based_cell_population);
+        adjacency_writer.WriteNewline();
+        adjacency_writer.CloseFile();
+
+        FileComparison(results_dir + "cellpopulationadjacency.dat", "cell_based/test/data/TestCellPopulationWriters/cellpopulationadjacency_twice.dat").CompareFiles();
+
+        // Coverage of the Visit() method when called on a CaBasedCellPopulation
+        {
+            PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
+            PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+            std::vector<CellPtr> ca_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> ca_based_cells_generator;
+            ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
+            std::vector<unsigned> location_indices;
+            location_indices.push_back(7);
+            location_indices.push_back(11);
+            location_indices.push_back(12);
+            location_indices.push_back(13);
+            location_indices.push_back(17);
+            CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
+
+            TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&ca_based_cell_population));
+        }
+
+        // Coverage of the Visit() method when called on a NodeBasedCellPopulation
+        {
+            std::vector<Node<2>* > node_based_nodes;
+            node_based_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+            node_based_nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+            NodesOnlyMesh<2> node_based_mesh;
+            node_based_mesh.ConstructNodesWithoutMesh(node_based_nodes, 1.5);
+            std::vector<CellPtr> node_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> node_based_generator;
+            node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
+            NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&node_based_cell_population));
+
+            // Tidy up
+            delete node_based_nodes[0];
+            delete node_based_nodes[1];
+        }
+
+        // Coverage of the Visit() method when called on a PottsBasedCellPopulation
+        {
+            PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
+            PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+            std::vector<CellPtr> potts_based_cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> potts_based_cells_generator;
+            potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
+            PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
+
+            TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&potts_based_cell_population));
+        }
+
+        // Coverage of the Visit() method when called on a VertexBasedCellPopulation
+        {
+            HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
+            MutableVertexMesh<2,2>* p_vertex_based_mesh = vertex_based_generator.GetMesh();
+            std::vector<CellPtr> vertex_based_cells;
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> vertex_based_cells_generator;
+            vertex_based_cells_generator.GenerateBasic(vertex_based_cells, p_vertex_based_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+            VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
+
+            boost::shared_ptr<AbstractCellProperty> p_label(vertex_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            vertex_based_cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_label);
+            vertex_based_cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
+            vertex_based_cell_population.GetCellUsingLocationIndex(5)->AddCellProperty(p_label);
+            vertex_based_cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_label);
+
+            TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&vertex_based_cell_population));
+        }
+    }
+
+    void TestCellPopulationAdjacencyMatrixWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationAdjacencyMatrixWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellPopulationAdjacencyMatrixWriter<2,2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
