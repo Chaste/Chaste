@@ -108,12 +108,11 @@ private:
     }
 
     /**
-     * Overriden Validate Method.
+     * Overridden Validate() method.
      *
      * Not used in CA simulations so just contains NEVER_REACHED
      */
     void Validate();
-
 
     /**
      * Overridden WriteVtkResultsToFile() method.
@@ -342,7 +341,7 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
-     * @param pCell the cell whose data is being written.
+     * @param pCell the cell whose data are being written.
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 

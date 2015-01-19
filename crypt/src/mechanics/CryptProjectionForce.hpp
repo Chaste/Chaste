@@ -185,10 +185,7 @@ public:
     void AddForceContribution(AbstractCellPopulation<2>& rCellPopulation);
 
     /**
-     * Outputs force parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

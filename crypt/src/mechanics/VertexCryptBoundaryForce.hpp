@@ -103,19 +103,14 @@ public:
     double GetForceStrength() const;
 
     /**
-     * Outputs force parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputForceParameters(out_stream& rParamsFile);
 };
 
-
 #include "SerializationExportWrapper.hpp"
-
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VertexCryptBoundaryForce)
 
 #endif /*VERTEXCRYPTBOUNDARYFORCE_HPP_*/

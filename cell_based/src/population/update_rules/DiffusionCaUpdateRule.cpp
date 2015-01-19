@@ -73,18 +73,6 @@ void DiffusionCaUpdateRule<DIM>::SetDiffusionParameter(double diffusionParameter
     mDiffusionParameter = diffusionParameter;
 }
 
-//template<unsigned DIM>
-//double DiffusionCaUpdateRule<DIM>::GetTimeStep()
-//{
-//    return mDt;
-//}
-//
-//template<unsigned DIM>
-//void DiffusionCaUpdateRule<DIM>::SetTimeStep(double dt)
-//{
-//  mDt = dt;
-//}
-
 template<unsigned DIM>
 void DiffusionCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFile)
 {
@@ -94,10 +82,7 @@ void DiffusionCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsF
     AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class DiffusionCaUpdateRule<1u>;
 template class DiffusionCaUpdateRule<2u>;
 template class DiffusionCaUpdateRule<3u>;

@@ -72,7 +72,7 @@ private:
     /** The elements file for the mesh. */
     std::ifstream mElementsFile;
 
-    /** True if input data is numbered from zero, false otherwise. */
+    /** True if input data are numbered from zero, false otherwise. */
     bool mIndexFromZero;
 
     /** Number of nodes in the mesh. */

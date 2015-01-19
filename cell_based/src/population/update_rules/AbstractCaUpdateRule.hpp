@@ -46,7 +46,7 @@ class CaBasedCellPopulation; // Circular definition
 
 /**
  * An abstract CA update rule class, for use in cell-based simulations
- * using the cellular automota model.
+ * using the cellular automaton model.
  */
 template<unsigned DIM>
 class AbstractCaUpdateRule : public Identifiable

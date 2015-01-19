@@ -374,7 +374,7 @@ public:
      * write data from this object to file.
      *
      * @param pCellWriter the population writer.
-     * @param pCell the cell whose data is being written.
+     * @param pCell the cell whose data are being written.
      */
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 

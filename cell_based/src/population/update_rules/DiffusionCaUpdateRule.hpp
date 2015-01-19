@@ -68,12 +68,6 @@ private:
      */
     double mDiffusionParameter;
 
-    /**
-     * The timestep (units?) for this probability
-     * \todo #2066
-     */
-    double mDt;
-
     friend class boost::serialization::access;
     /**
      * Boost Serialization method for archiving/checkpointing.
@@ -119,8 +113,7 @@ public:
                                CaBasedCellPopulation<DIM>& rCellPopulation,
                                double dt,
                                double deltaX,
-                               CellPtr cell
-                               );
+                               CellPtr cell);
 
     /**
       * @return mDiffusionParameter
@@ -133,18 +126,6 @@ public:
      * @param diffusionParameter the new value of mDiffusionParameter
      */
     void SetDiffusionParameter(double diffusionParameter);
-
-
-   //    /**
-//      * \todo #2066 return the time step (mDt) defined in the calculation of the probability of a cell moving to a certain site
-//      */
-//    double GetTimeStep();
-//
-//
-//    /**
-//      * \todo #2066 define the time step (dt) defined in the calculation of the probability of a cell moving to a certain site
-//      */
-//    void SetTimeStep(double dt);
 
     /**
      * Overridden OutputUpdateRuleParameters() method.
