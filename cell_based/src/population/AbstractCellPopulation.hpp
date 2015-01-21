@@ -671,7 +671,7 @@ public:
 
     /**
      * Add a cell population count writer through an input argument.
-     * This alternative to the templated AddPopulationCountWriter()
+     * This alternative to the templated AddCellPopulationCountWriter()
      * method allows the user to, for example, add a writer
      * with a non-default value for its member mFileName.
      *
