@@ -59,7 +59,7 @@ template<unsigned DIM>
 void DiffusionForce<DIM>::SetCutOffLength(double cutOffLength)
 {
     assert(cutOffLength > 0.0);
-    mMechanicsCutOffLength=cutOffLength;
+    mMechanicsCutOffLength = cutOffLength;
 }
 
 template<unsigned DIM>
@@ -118,17 +118,15 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
 {
     double dt = SimulationTime::Instance()->GetTimeStep();
 
-    // Loop over the cells
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    // Iterate over the nodes
+    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
+         node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
     {
-        // Get the radius, damping constant and node index associated with this cell
-        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-        Node<DIM>* p_node = rCellPopulation.GetNode(node_index);
-
+        // Get the index, radius and damping constant of this node
+        unsigned node_index = node_iter->GetIndex();
+        double node_radius = node_iter->GetRadius();
         double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
-        double cell_radius = p_node->GetRadius();
 
         /*
          * Compute the diffusion coefficient D as D = k*T/(6*pi*eta*r), where
@@ -139,7 +137,7 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
          * r = cell radius.
          */
         double diffusion_const_scaling = GetDiffusionScalingConstant();
-        double diffusion_constant = diffusion_const_scaling/cell_radius;
+        double diffusion_constant = diffusion_const_scaling/node_radius;
 
         c_vector<double, DIM> force_contribution;
         for (unsigned i=0; i<DIM; i++)
@@ -157,7 +155,7 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
 
             force_contribution[i] = (nu*sqrt(2.0*diffusion_constant*dt)/dt)*xi;
         }
-        p_node->AddAppliedForceContribution(force_contribution);
+        node_iter->AddAppliedForceContribution(force_contribution);
     }
 }
 
@@ -171,10 +169,7 @@ void DiffusionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class DiffusionForce<1>;
 template class DiffusionForce<2>;
 template class DiffusionForce<3>;

@@ -44,7 +44,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A force class to model diffusion.
+ * A 'diffusion force' class to model the random movement of nodes.
+ *
+ * This class works with all off-lattice cell populations.
  */
 template<unsigned DIM>
 class DiffusionForce : public AbstractForce<DIM>

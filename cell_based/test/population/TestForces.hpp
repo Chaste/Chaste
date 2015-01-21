@@ -1959,6 +1959,41 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
+    void TestDiffusionForceWithVertexBasedCellPopulation()
+	{
+        // Define the seed
+        RandomNumberGenerator::Instance()->Reseed(0);
+
+        // Set up time parameters
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+
+	    // Create a simple VertexBasedCellPopulation
+		HoneycombVertexMeshGenerator mesh_generator(4, 6);
+		MutableVertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+             node_iter != p_mesh->GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_iter->ClearAppliedForce();
+        }
+
+		std::vector<CellPtr> cells;
+		boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+		VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // Create DiffusionForce object
+        DiffusionForce<2> force;
+
+        // Check that AddForceContribution() does not throw an error when called on a VertexBasedCellPopulation
+		TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
+
+        // Tidy up
+        SimulationTime::Destroy();
+        RandomNumberGenerator::Destroy();
+	}
+
     void TestDiffusionForceIn3D()
     {
         // Define the seed
