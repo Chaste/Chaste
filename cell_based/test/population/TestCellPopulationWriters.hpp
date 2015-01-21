@@ -248,11 +248,11 @@ public:
             vertex_based_cells_generator.GenerateBasic(vertex_based_cells, p_vertex_based_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
             VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
 
-            boost::shared_ptr<AbstractCellProperty> p_label(vertex_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
-            vertex_based_cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_label);
-            vertex_based_cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
-            vertex_based_cell_population.GetCellUsingLocationIndex(5)->AddCellProperty(p_label);
-            vertex_based_cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_label);
+            boost::shared_ptr<AbstractCellProperty> p_new_label(vertex_based_cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            vertex_based_cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_new_label);
+            vertex_based_cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_new_label);
+            vertex_based_cell_population.GetCellUsingLocationIndex(5)->AddCellProperty(p_new_label);
+            vertex_based_cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_new_label);
 
             TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&vertex_based_cell_population));
         }
