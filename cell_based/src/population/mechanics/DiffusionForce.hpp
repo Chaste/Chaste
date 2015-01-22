@@ -181,7 +181,7 @@ public :
 
     /**
      * Overridden AddForceContribution() method.
-     *
+     * Note that this method requires cell/node radii to be set.
      * @param rCellPopulation reference to the tissue
      *
      */

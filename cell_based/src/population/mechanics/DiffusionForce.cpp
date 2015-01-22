@@ -126,6 +126,7 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         // Get the index, radius and damping constant of this node
         unsigned node_index = node_iter->GetIndex();
         double node_radius = node_iter->GetRadius();
+        assert (node_radius > 0.0);
         double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
 
         /*
