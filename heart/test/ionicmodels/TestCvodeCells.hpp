@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCVODECELLS_HPP_
 
 #include <iostream>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
+#include "ArchiveLocationInfo.hpp"
 
 #include "AbstractCvodeCell.hpp"
 #include "LuoRudy1991Cvode.hpp"

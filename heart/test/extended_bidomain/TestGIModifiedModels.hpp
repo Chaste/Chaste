@@ -42,24 +42,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vector>
 #include <string>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include "CheckpointArchiveTypes.hpp"
+#include "ArchiveLocationInfo.hpp"
 
 #include "Exception.hpp"
 #include "RunAndCheckIonicModels.hpp"
 #include "SimpleStimulus.hpp"
 #include "RegularStimulus.hpp"
 #include "ZeroStimulus.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "EulerIvpOdeSolver.hpp"
-#include "RungeKutta2IvpOdeSolver.hpp"
-#include "RungeKutta4IvpOdeSolver.hpp"
-#include "BackwardEulerIvpOdeSolver.hpp"
 #include "HeartConfig.hpp"
 #include "ColumnDataReader.hpp"
 #include "CellProperties.hpp"
 #include "CorriasBuistSMCModified.hpp"
 #include "CorriasBuistICCModified.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 // Note: RunOdeSolverWithIonicModel(), CheckCellModelResults(), CompareCellModelResults()
 // are defined in RunAndCheckIonicModels.hpp
@@ -67,8 +65,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestGIModifiedModels : public CxxTest::TestSuite
 {
 public:
-
-
 
     void TestICCmodelModified(void) throw (Exception)
     {
@@ -154,7 +150,7 @@ public:
           k=k+100;
         }
 
-        CellProperties  cell_properties(voltages, times, -45.0);//note the lower threshold for SMC calculation of 'AP');
+        CellProperties cell_properties(voltages, times, -45.0);//note the lower threshold for SMC calculation of 'AP');
 
         TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(50), 8331.3835, 0.1);
         TS_ASSERT_DELTA(cell_properties.GetLastActionPotentialDuration(70), 8571.1671, 0.1);

@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasCustomFunctions.hpp"
 
 #include "HeartConfig.hpp"
+#include "ArchiveLocationInfo.hpp"
 #include "OutputFileHandler.hpp"
 #include "Exception.hpp"
 #include "ChastePoint.hpp"
@@ -1287,9 +1288,9 @@ bool HeartConfig::GetConductivityHeterogeneitiesProvided() const
 
 template<unsigned DIM>
 void HeartConfig::GetConductivityHeterogeneities(
-        std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& conductivitiesHeterogeneityAreas,
-        std::vector< c_vector<double,3> >& intraConductivities,
-        std::vector< c_vector<double,3> >& extraConductivities) const
+        std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rConductivitiesHeterogeneityAreas,
+        std::vector< c_vector<double,3> >& rIntraConductivities,
+        std::vector< c_vector<double,3> >& rExtraConductivities) const
 {
     CheckSimulationIsDefined("ConductivityHeterogeneities");
     CHECK_EXISTS(GetConductivityHeterogeneitiesProvided(), "Physiological/ConductivityHeterogeneities");
@@ -1308,7 +1309,7 @@ void HeartConfig::GetConductivityHeterogeneities(
             cp::point_type point_b = ht.Location().Cuboid()->UpperCoordinates();
             ChastePoint<DIM> chaste_point_a ( point_a.x(), point_a.y(), point_a.z() );
             ChastePoint<DIM> chaste_point_b ( point_b.x(), point_b.y(), point_b.z() );
-            conductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteCuboid<DIM> ( chaste_point_a, chaste_point_b )) );
+            rConductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteCuboid<DIM> ( chaste_point_a, chaste_point_b )) );
         }
         else if (ht.Location().Ellipsoid().present())
         {
@@ -1316,7 +1317,7 @@ void HeartConfig::GetConductivityHeterogeneities(
             cp::point_type radii  = ht.Location().Ellipsoid()->Radii();
             ChastePoint<DIM> chaste_point_a ( centre.x(), centre.y(), centre.z() );
             ChastePoint<DIM> chaste_point_b ( radii.x(), radii.y(), radii.z() );
-            conductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
+            rConductivitiesHeterogeneityAreas.push_back(boost::shared_ptr<AbstractChasteRegion<DIM> >   (  new ChasteEllipsoid<DIM> ( chaste_point_a, chaste_point_b )) );
         }
         else if (ht.Location().EpiLayer().present() || ht.Location().MidLayer().present() || ht.Location().EndoLayer().present() )
         {
@@ -1334,13 +1335,13 @@ void HeartConfig::GetConductivityHeterogeneities(
             double intra_y = ht.IntracellularConductivities()->trans();
             double intra_z = ht.IntracellularConductivities()->normal();
 
-            intraConductivities.push_back( Create_c_vector(intra_x, intra_y, intra_z) );
+            rIntraConductivities.push_back( Create_c_vector(intra_x, intra_y, intra_z) );
         }
         else
         {
             c_vector<double, 3> intra_conductivities;
             GetIntracellularConductivities(intra_conductivities);
-            intraConductivities.push_back(intra_conductivities);
+            rIntraConductivities.push_back(intra_conductivities);
         }
 
         if (ht.ExtracellularConductivities().present())
@@ -1349,13 +1350,13 @@ void HeartConfig::GetConductivityHeterogeneities(
             double extra_y = ht.ExtracellularConductivities()->trans();
             double extra_z = ht.ExtracellularConductivities()->normal();
 
-            extraConductivities.push_back( Create_c_vector(extra_x, extra_y, extra_z) );
+            rExtraConductivities.push_back( Create_c_vector(extra_x, extra_y, extra_z) );
         }
         else
         {
             c_vector<double, 3> extra_conductivities;
             GetExtracellularConductivities(extra_conductivities);
-            extraConductivities.push_back(extra_conductivities);
+            rExtraConductivities.push_back(extra_conductivities);
         }
 
     }
@@ -1436,7 +1437,7 @@ HeartFileFinder HeartConfig::GetArchivedSimulationDir() const
 }
 
 
-void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& intraConductivities) const
+void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& rIntraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
     cp::conductivities_type intra_conductivities
@@ -1448,12 +1449,12 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 3>& intraCondu
     assert(intra_y_cond != DBL_MAX);
     assert(intra_z_cond != DBL_MAX);
 
-    intraConductivities[0] = intra_x_cond;
-    intraConductivities[1] = intra_y_cond;
-    intraConductivities[2] = intra_z_cond;
+    rIntraConductivities[0] = intra_x_cond;
+    rIntraConductivities[1] = intra_y_cond;
+    rIntraConductivities[2] = intra_z_cond;
 }
 
-void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& intraConductivities) const
+void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& rIntraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
     cp::conductivities_type intra_conductivities
@@ -1463,21 +1464,21 @@ void HeartConfig::GetIntracellularConductivities(c_vector<double, 2>& intraCondu
 
     assert(intra_y_cond != DBL_MAX);
 
-    intraConductivities[0] = intra_x_cond;
-    intraConductivities[1] = intra_y_cond;
+    rIntraConductivities[0] = intra_x_cond;
+    rIntraConductivities[1] = intra_y_cond;
 }
 
-void HeartConfig::GetIntracellularConductivities(c_vector<double, 1>& intraConductivities) const
+void HeartConfig::GetIntracellularConductivities(c_vector<double, 1>& rIntraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().IntracellularConductivities().present(), "Physiological/IntracellularConductivities");
     cp::conductivities_type intra_conductivities
         = mpParameters->Physiological().IntracellularConductivities().get();
     double intra_x_cond = intra_conductivities.longi();
 
-    intraConductivities[0] = intra_x_cond;
+    rIntraConductivities[0] = intra_x_cond;
 }
 
-void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& extraConductivities) const
+void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& rExtraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
     cp::conductivities_type extra_conductivities
@@ -1489,12 +1490,12 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 3>& extraCondu
     assert(extra_y_cond != DBL_MAX);
     assert(extra_z_cond != DBL_MAX);
 
-    extraConductivities[0] = extra_x_cond;
-    extraConductivities[1] = extra_y_cond;
-    extraConductivities[2] = extra_z_cond;
+    rExtraConductivities[0] = extra_x_cond;
+    rExtraConductivities[1] = extra_y_cond;
+    rExtraConductivities[2] = extra_z_cond;
 }
 
-void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& extraConductivities) const
+void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& rExtraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
     cp::conductivities_type extra_conductivities
@@ -1504,18 +1505,18 @@ void HeartConfig::GetExtracellularConductivities(c_vector<double, 2>& extraCondu
 
     assert(extra_y_cond != DBL_MAX);
 
-    extraConductivities[0] = extra_x_cond;
-    extraConductivities[1] = extra_y_cond;
+    rExtraConductivities[0] = extra_x_cond;
+    rExtraConductivities[1] = extra_y_cond;
 }
 
-void HeartConfig::GetExtracellularConductivities(c_vector<double, 1>& extraConductivities) const
+void HeartConfig::GetExtracellularConductivities(c_vector<double, 1>& rExtraConductivities) const
 {
     CHECK_EXISTS(mpParameters->Physiological().ExtracellularConductivities().present(), "Physiological/ExtracellularConductivities");
     cp::conductivities_type extra_conductivities
         = mpParameters->Physiological().ExtracellularConductivities().get();
     double extra_x_cond = extra_conductivities.longi();
 
-    extraConductivities[0] = extra_x_cond;
+    rExtraConductivities[0] = extra_x_cond;
 }
 
 double HeartConfig::GetBathConductivity(unsigned bathRegion) const
@@ -2081,41 +2082,41 @@ void HeartConfig::SetIonicModelRegions(std::vector<ChasteCuboid<3> >& rDefinedRe
     }
 }
 
-void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& conductivityAreas,
-        std::vector< c_vector<double,3> >& intraConductivities,
-        std::vector< c_vector<double,3> >& extraConductivities)
+void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& rConductivityAreas,
+        std::vector< c_vector<double,3> >& rIntraConductivities,
+        std::vector< c_vector<double,3> >& rExtraConductivities)
 {
-    assert ( conductivityAreas.size() == intraConductivities.size() );
-    assert ( intraConductivities.size() == extraConductivities.size());
+    assert ( rConductivityAreas.size() == rIntraConductivities.size() );
+    assert ( rIntraConductivities.size() == rExtraConductivities.size());
 
     XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
 
-    for (unsigned region_index=0; region_index<conductivityAreas.size(); region_index++)
+    for (unsigned region_index=0; region_index<rConductivityAreas.size(); region_index++)
     {
-        cp::point_type point_a(conductivityAreas[region_index].rGetLowerCorner()[0],
-                           conductivityAreas[region_index].rGetLowerCorner()[1],
-                           conductivityAreas[region_index].rGetLowerCorner()[2]);
+        cp::point_type point_a(rConductivityAreas[region_index].rGetLowerCorner()[0],
+                               rConductivityAreas[region_index].rGetLowerCorner()[1],
+                               rConductivityAreas[region_index].rGetLowerCorner()[2]);
 
-        cp::point_type point_b(conductivityAreas[region_index].rGetUpperCorner()[0],
-                           conductivityAreas[region_index].rGetUpperCorner()[1],
-                           conductivityAreas[region_index].rGetUpperCorner()[2]);
+        cp::point_type point_b(rConductivityAreas[region_index].rGetUpperCorner()[0],
+                               rConductivityAreas[region_index].rGetUpperCorner()[1],
+                               rConductivityAreas[region_index].rGetUpperCorner()[2]);
 
         XSD_CREATE_WITH_FIXED_ATTR(cp::location_type, locn, "cm");
         locn.Cuboid().set(cp::box_type(point_a, point_b));
         cp::conductivity_heterogeneity_type ht(locn);
 
         XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, intra,
-                                    intraConductivities[region_index][0],
-                                    intraConductivities[region_index][1],
-                                    intraConductivities[region_index][2],
+                                    rIntraConductivities[region_index][0],
+                                    rIntraConductivities[region_index][1],
+                                    rIntraConductivities[region_index][2],
                                     "mS/cm");
 
         ht.IntracellularConductivities(intra);
 
         XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, extra,
-                                    extraConductivities[region_index][0],
-                                    extraConductivities[region_index][1],
-                                    extraConductivities[region_index][2],
+                                    rExtraConductivities[region_index][0],
+                                    rExtraConductivities[region_index][1],
+                                    rExtraConductivities[region_index][2],
                                     "mS/cm");
 
         ht.ExtracellularConductivities(extra);
@@ -2129,41 +2130,41 @@ void HeartConfig::SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& 
     mpParameters->Physiological().ConductivityHeterogeneities().set(heterogeneities_object);
 }
 
-void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& conductivityAreas,
-        std::vector< c_vector<double,3> >& intraConductivities,
-        std::vector< c_vector<double,3> >& extraConductivities)
+void HeartConfig::SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& rConductivityAreas,
+        std::vector< c_vector<double,3> >& rIntraConductivities,
+        std::vector< c_vector<double,3> >& rExtraConductivities)
 {
-    assert ( conductivityAreas.size() == intraConductivities.size() );
-    assert ( intraConductivities.size() == extraConductivities.size());
+    assert ( rConductivityAreas.size() == rIntraConductivities.size() );
+    assert ( rIntraConductivities.size() == rExtraConductivities.size());
 
     XSD_ANON_SEQUENCE_TYPE(cp::physiological_type, ConductivityHeterogeneities, ConductivityHeterogeneity) heterogeneities_container;
 
-    for (unsigned region_index=0; region_index<conductivityAreas.size(); region_index++)
+    for (unsigned region_index=0; region_index<rConductivityAreas.size(); region_index++)
     {
-        cp::point_type centre(conductivityAreas[region_index].rGetCentre()[0],
-                              conductivityAreas[region_index].rGetCentre()[1],
-                              conductivityAreas[region_index].rGetCentre()[2]);
+        cp::point_type centre(rConductivityAreas[region_index].rGetCentre()[0],
+                              rConductivityAreas[region_index].rGetCentre()[1],
+                              rConductivityAreas[region_index].rGetCentre()[2]);
 
-        cp::point_type radii(conductivityAreas[region_index].rGetRadii()[0],
-                             conductivityAreas[region_index].rGetRadii()[1],
-                             conductivityAreas[region_index].rGetRadii()[2]);
+        cp::point_type radii(rConductivityAreas[region_index].rGetRadii()[0],
+                             rConductivityAreas[region_index].rGetRadii()[1],
+                             rConductivityAreas[region_index].rGetRadii()[2]);
 
         XSD_CREATE_WITH_FIXED_ATTR(cp::location_type, locn, "cm");
         locn.Ellipsoid().set(cp::ellipsoid_type(centre, radii));
         cp::conductivity_heterogeneity_type ht(locn);
 
         XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, intra,
-                                    intraConductivities[region_index][0],
-                                    intraConductivities[region_index][1],
-                                    intraConductivities[region_index][2],
+                                    rIntraConductivities[region_index][0],
+                                    rIntraConductivities[region_index][1],
+                                    rIntraConductivities[region_index][2],
                                     "mS/cm");
 
         ht.IntracellularConductivities(intra);
 
         XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, extra,
-                                    extraConductivities[region_index][0],
-                                    extraConductivities[region_index][1],
-                                    extraConductivities[region_index][2],
+                                    rExtraConductivities[region_index][0],
+                                    rExtraConductivities[region_index][1],
+                                    rExtraConductivities[region_index][2],
                                     "mS/cm");
 
         ht.ExtracellularConductivities(extra);
@@ -2237,61 +2238,61 @@ void HeartConfig::SetCheckpointSimulation(bool saveSimulation, double checkpoint
 
 // Physiological
 
-void HeartConfig::SetIntracellularConductivities(const c_vector<double, 3>& intraConductivities)
+void HeartConfig::SetIntracellularConductivities(const c_vector<double, 3>& rIntraConductivities)
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, intra,
-                                intraConductivities[0],
-                                intraConductivities[1],
-                                intraConductivities[2],
+                                rIntraConductivities[0],
+                                rIntraConductivities[1],
+                                rIntraConductivities[2],
                                 "mS/cm");
 
     mpParameters->Physiological().IntracellularConductivities().set(intra);
 }
 
-void HeartConfig::SetIntracellularConductivities(const c_vector<double, 2>& intraConductivities)
+void HeartConfig::SetIntracellularConductivities(const c_vector<double, 2>& rIntraConductivities)
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, intra,
-                                intraConductivities[0],
-                                intraConductivities[1],
+                                rIntraConductivities[0],
+                                rIntraConductivities[1],
                                 0.0, "mS/cm");
 
     mpParameters->Physiological().IntracellularConductivities().set(intra);
 }
 
-void HeartConfig::SetIntracellularConductivities(const c_vector<double, 1>& intraConductivities)
+void HeartConfig::SetIntracellularConductivities(const c_vector<double, 1>& rIntraConductivities)
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, intra,
-                                intraConductivities[0],
+                                rIntraConductivities[0],
                                 0.0, 0.0, "mS/cm");
 
     mpParameters->Physiological().IntracellularConductivities().set(intra);
 }
 
-void HeartConfig::SetExtracellularConductivities(const c_vector<double, 3>& extraConductivities)
+void HeartConfig::SetExtracellularConductivities(const c_vector<double, 3>& rExtraConductivities)
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, extra,
-                                extraConductivities[0],
-                                extraConductivities[1],
-                                extraConductivities[2],
+                                rExtraConductivities[0],
+                                rExtraConductivities[1],
+                                rExtraConductivities[2],
                                 "mS/cm");
 
     mpParameters->Physiological().ExtracellularConductivities().set(extra);
 }
 
-void HeartConfig::SetExtracellularConductivities(const c_vector<double, 2>& extraConductivities)
+void HeartConfig::SetExtracellularConductivities(const c_vector<double, 2>& rExtraConductivities)
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, extra,
-                                extraConductivities[0],
-                                extraConductivities[1],
+                                rExtraConductivities[0],
+                                rExtraConductivities[1],
                                 0.0, "mS/cm");
 
     mpParameters->Physiological().ExtracellularConductivities().set(extra);
 }
 
-void HeartConfig::SetExtracellularConductivities(const c_vector<double, 1>& extraConductivities)
+void HeartConfig::SetExtracellularConductivities(const c_vector<double, 1>& rExtraConductivities)
 {
     XSD_CREATE_WITH_FIXED_ATTR3(cp::conductivities_type, extra,
-                                extraConductivities[0],
+                                rExtraConductivities[0],
                                 0.0, 0.0, "mS/cm");
 
     mpParameters->Physiological().ExtracellularConductivities().set(extra);

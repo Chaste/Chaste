@@ -40,23 +40,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
+#include <boost/shared_ptr.hpp>
 
-#include "UblasIncludes.hpp"
+#include "UblasVectorInclude.hpp"
 
-#include "ArchiveLocationInfo.hpp"
 #include "ChasteParameters_3_3.hpp"
 
 #include "AbstractStimulusFunction.hpp"
-
+#include "AbstractChasteRegion.hpp"
 #include "ChastePoint.hpp"
 #include "ChasteCuboid.hpp"
 #include "ChasteEllipsoid.hpp"
 #include "DistributedTetrahedralMeshPartitionType.hpp"
-
-#include <boost/shared_ptr.hpp>
+#include "PetscTools.hpp"
+#include "FileFinder.hpp"
 
 #include "ChasteSerialization.hpp"
-#include "ChasteSerializationVersion.hpp"
 #include <boost/serialization/split_member.hpp>
 
 namespace cp = chaste::parameters::v3_3;
@@ -286,7 +286,7 @@ public:
      */
     template<unsigned DIM>
     void GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rDefinedRegions,
-                               std::vector<cp::ionic_model_selection_type>& rIonicModels) const;
+                              std::vector<cp::ionic_model_selection_type>& rIonicModels) const;
 
     /**
      * Set the regions where we need to use a different cell model (think infarction).
@@ -356,11 +356,11 @@ public:
      * \todo There is no set method
      */
     template<unsigned DIM>
-    void GetCellHeterogeneities( std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
-                                 std::vector<double>& rScaleFactorGks,
-                                 std::vector<double>& rScaleFactorIto,
-                                 std::vector<double>& rScaleFactorGkr,
-                                 std::vector<std::map<std::string, double> >* pParameterSettings);
+    void GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
+                                std::vector<double>& rScaleFactorGks,
+                                std::vector<double>& rScaleFactorIto,
+                                std::vector<double>& rScaleFactorGkr,
+                                std::vector<std::map<std::string, double> >* pParameterSettings);
 
     bool GetConductivityHeterogeneitiesProvided() const; /**< @return  true if there are conductivity heterogeneities for GetConductivityHeterogeneities to return*/
 
@@ -477,39 +477,39 @@ public:
     // Physiological
     /**
      * 3D version
-     * @param intraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
+     * @param rIntraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
      */
-    void GetIntracellularConductivities(c_vector<double, 3>& intraConductivities) const;
+    void GetIntracellularConductivities(c_vector<double, 3>& rIntraConductivities) const;
 
     /**
      * 2D version
-     * @param intraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
+     * @param rIntraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
      */
-    void GetIntracellularConductivities(c_vector<double, 2>& intraConductivities) const;
+    void GetIntracellularConductivities(c_vector<double, 2>& rIntraConductivities) const;
 
     /**
      * 1D version
-     * @param intraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
+     * @param rIntraConductivities  DIM-vector for returning intracellular conductivities (mS/cm)
      */
-    void GetIntracellularConductivities(c_vector<double, 1>& intraConductivities) const;
+    void GetIntracellularConductivities(c_vector<double, 1>& rIntraConductivities) const;
 
     /**
      * 3D version
-     * @param extraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
+     * @param rExtraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
      */
-    void GetExtracellularConductivities(c_vector<double, 3>& extraConductivities) const;
+    void GetExtracellularConductivities(c_vector<double, 3>& rExtraConductivities) const;
 
     /**
      * 2D version
-     * @param extraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
+     * @param rExtraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
      */
-    void GetExtracellularConductivities(c_vector<double, 2>& extraConductivities) const;
+    void GetExtracellularConductivities(c_vector<double, 2>& rExtraConductivities) const;
 
     /**
      * 1D version
-     * @param extraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
+     * @param rExtraConductivities  DIM-vector for returning extracellular conductivities (mS/cm)
      */
-    void GetExtracellularConductivities(c_vector<double, 1>& extraConductivities) const;
+    void GetExtracellularConductivities(c_vector<double, 1>& rExtraConductivities) const;
 
     /**
      *  Returns bath conductivities for different regions of the bath. When called without a
@@ -796,13 +796,13 @@ public:
     /**
      * Set a number of heterogeneous regions (Axis-aligned ellipsoids)
      * It is assumed that the std::vectors are all of the same length
-     * @param conductivityAreas conductivityAreas[0] is the first region
-     * @param intraConductivities  intraConductivities[0] is conductivity vector for the first region
-     * @param extraConductivities  extraConductivities[0] is conductivity vector for the first region
+     * @param rConductivityAreas conductivityAreas[0] is the first region
+     * @param rIntraConductivities  intraConductivities[0] is conductivity vector for the first region
+     * @param rExtraConductivities  extraConductivities[0] is conductivity vector for the first region
      */
-    void SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& conductivityAreas,
-            std::vector< c_vector<double,3> >& intraConductivities,
-            std::vector< c_vector<double,3> >& extraConductivities);
+    void SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& rConductivityAreas,
+                                                 std::vector< c_vector<double,3> >& rIntraConductivities,
+                                                 std::vector< c_vector<double,3> >& rExtraConductivities);
     /**
      * @param rOutputDirectory  Full path to output directory (will be created if necessary)
      */
@@ -901,10 +901,10 @@ public:
     /**
      *  Sets which region identifiers have to be considered cardiac tissue and bath.
      *
-     *  @param tissueIds set of identifiers
-     *  @param bathIds set of identifiers
+     *  @param rTissueIds set of identifiers
+     *  @param rBathIds set of identifiers
      */
-    void SetTissueAndBathIdentifiers(const std::set<unsigned>& tissueIds, const std::set<unsigned>& bathIds);
+    void SetTissueAndBathIdentifiers(const std::set<unsigned>& rTissueIds, const std::set<unsigned>& rBathIds);
 
     /**
      *  Sets which region identifiers have to be considered cardiac tissue.
@@ -1101,9 +1101,9 @@ public:
      *  @param startTime Switch on time
      *  @param duration Duration of the stimulus.
      */
-    void SetElectrodeParameters( bool groundSecondElectrode,
-                                 unsigned index, double magnitude,
-                                 double startTime, double duration );
+    void SetElectrodeParameters(bool groundSecondElectrode,
+                                unsigned index, double magnitude,
+                                double startTime, double duration);
 
    /**
      * Set the use of State Variable Interpolation in the computation of ionic currents.
@@ -1111,7 +1111,7 @@ public:
      *
      * @param  useStateVariableInterpolation Whether to use it.
      */
-    void SetUseStateVariableInterpolation( bool useStateVariableInterpolation = true);
+    void SetUseStateVariableInterpolation(bool useStateVariableInterpolation = true);
 
     /**
      * Set the use of mass lumping in the FE solver.

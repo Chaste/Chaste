@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #ifdef CHASTE_CAN_CHECKPOINT_DLLS
 #include "CheckpointArchiveTypes.hpp"
+#include "ArchiveLocationInfo.hpp"
 #endif // CHASTE_CAN_CHECKPOINT_DLLS
 
 #include "RunAndCheckIonicModels.hpp"
