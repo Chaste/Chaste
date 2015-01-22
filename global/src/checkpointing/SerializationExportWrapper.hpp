@@ -53,9 +53,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In Boost 1.36 (and up to 1.40) both the archive header includes and the
  * BOOST_CLASS_EXPORT should go in .cpp files.
  *
- * We support 1.41 and above, which introduce BOOST_CLASS_EXPORT_KEY
- * and BOOST_CLASS_EXPORT_IMPLEMENT. Note 1.41.1 has bugs in serialization
- * and 1.48 is the current recommended one.
+ * We also support 1.41 and above, which introduce BOOST_CLASS_EXPORT_KEY
+ * and BOOST_CLASS_EXPORT_IMPLEMENT. Note 1.41.1 has bugs in serialization.
+ * See https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions
+ * for recommended versions.
  *
  * To handle all situations in Chaste:
  *   1. In .hpp files, include this header after the class definition.

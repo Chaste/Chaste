@@ -39,13 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "ChasteSerialization.hpp"
 
-// These headers were needed here to fix segfaults on Boost 1.44 when using optimised builds...
-#include <typeinfo>
-#include <boost/serialization/extended_type_info.hpp>
-#include <boost/serialization/extended_type_info_typeid.hpp>
-#include <boost/serialization/extended_type_info_no_rtti.hpp>
-#include <boost/serialization/type_info_implementation.hpp>
-
 /**
  * "Mix-in" base class for any class that needs to provide a unique ID specifying
  * what type the derived class is.
