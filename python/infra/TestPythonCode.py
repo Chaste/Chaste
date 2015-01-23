@@ -262,8 +262,7 @@ def main(filepath, profile=False, lineProfile=False):
         result = runner.run(suite)
         sys.exit(not result.wasSuccessful())
     else:
-        unittest.main(module=module, argv=[sys.argv[0]] + sys.argv[2:],
-                      testRunner=runner, testLoader=ChasteTestLoader())
+        unittest.main(module=module, argv=[sys.argv[0]], testRunner=runner, testLoader=ChasteTestLoader())
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -273,7 +272,10 @@ if __name__ == '__main__':
         line_profile = '--line-profile' in sys.argv
         if line_profile:
             sys.argv.remove('--line-profile')
-        main(sys.argv[1], profile=profile, lineProfile=line_profile)
+        original_argv = sys.argv[:]
+        sys.argv[0:1] = [] # Remove this file from list
+        main(sys.argv[0], profile=profile, lineProfile=line_profile)
+        sys.argv = original_argv
     else:
         # Default test of this file
         unittest.main(testRunner=ChasteTestRunner(), testLoader=ChasteTestLoader())

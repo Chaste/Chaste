@@ -186,7 +186,7 @@ def run_test(exefile, logfile, build, run_time_flags='', echo=True, time_limit=0
             prof = ' --profile'
         else:
             prof = ''
-        command = './python/infra/TestPythonCode.py ' + exefile + prof + ' 2>&1'
+        command = './python/infra/TestPythonCode.py ' + exefile + prof + ' 2>&1 ' + run_time_flags
     else:
         command = build.GetTestRunnerCommand(exefile, '2>&1 ' + run_time_flags)
 
