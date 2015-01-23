@@ -268,6 +268,10 @@ class BuildType(object):
         assert np > 0, 'Cannot run fewer than 1 process!'
         self._num_processes = np
     
+    def GetNumProcesses(self):
+        """Get the number of parallel processes to run."""
+        return self._num_processes
+    
     def GetTestRunnerCommand(self, exefile, exeflags=''):
         """Return the command to be used to run a test suite.
         

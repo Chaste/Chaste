@@ -50,6 +50,9 @@ module, class TestTest.
 
 The module-scope variable CHASTE_TEST_OUTPUT will be set in test source
 files to the path to the output folder, which is guaranteed to exist.
+
+Also, the module-scope variable CHASTE_NUM_PROCS will be set to the maximum
+number of processes to use for any test that can be run in parallel.
 """
 
 import imp
@@ -203,9 +206,9 @@ class ChasteTestRunner:
                 self.stream.write('\n\nProfile report:\n\n')
                 stats.sort_stats('time')
                 stats.print_stats(50)
-                self.stream.write('\n\n')
+                self.stream.write('\n\nMethod callees:\n\n')
                 stats.print_callees(.2, 30)
-                self.stream.write('\n\n')
+                self.stream.write('\n\nMethod callers:\n\n')
                 stats.print_callers(.2, 30)
         return result
 
@@ -233,11 +236,12 @@ def SetTestOutput(module):
     except os.error:
         pass
 
-def main(filepath, profile=False, lineProfile=False):
+def main(filepath, profile=False, lineProfile=False, numProcs=1):
     """Run tests defined in the given Python file.
 
     :param profile: whether to enable profiling of the test execution using cProfile.
     :param lineProfile: whether to enable profiling of the test execution using line_profiler.
+    :param numProcs: maximum number of processes to use, if a test supports running in parallel.
     """
     if not os.path.isfile(filepath):
         raise ValueError(filepath + ' is not a file')
@@ -256,6 +260,7 @@ def main(filepath, profile=False, lineProfile=False):
         file.close()
     # Extract and run its tests
     SetTestOutput(module)
+    module.CHASTE_NUM_PROCS = numProcs
     runner = ChasteTestRunner(profile=profile, lineProfile=lineProfile)
     if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
         suite = module.MakeTestSuite()
@@ -272,9 +277,15 @@ if __name__ == '__main__':
         line_profile = '--line-profile' in sys.argv
         if line_profile:
             sys.argv.remove('--line-profile')
+        try:
+            i = sys.argv.index('--num-procs')
+            num_procs = int(sys.argv[i+1])
+            sys.argv[i:i+2] = []
+        except ValueError:
+            num_procs = 1
         original_argv = sys.argv[:]
         sys.argv[0:1] = [] # Remove this file from list
-        main(sys.argv[0], profile=profile, lineProfile=line_profile)
+        main(sys.argv[0], profile=profile, lineProfile=line_profile, numProcs=num_procs)
         sys.argv = original_argv
     else:
         # Default test of this file
