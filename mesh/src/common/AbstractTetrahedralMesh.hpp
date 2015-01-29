@@ -522,14 +522,15 @@ public:
 
     /**
      *  This is a wrapper method to ConstructRegularSlabMesh() which is useful for parallel distributed meshes.
-     *  By default slabs are split across processes in the x-dimension but it may be more useful to split in y or z.
+     *  By default slabs are split across processes in the top dimension (y in 2d, z in 3d)
+     *  but it may be more useful to split in x or y.
      *
      *  Create a 1D mesh on [0, width], 2D mesh on [0, width]x[0 height] with staggering or
      *  3D mesh on [0, width]x[0 height]x[0 depth with a given axis-aligned space step.
      *  If SPACE_DIM > ELEMENT_DIM then the y & z default to 0.0 for every node.
      *
-     *  @param dimension The dimension/axis to be split over the processes.  If dimension=0 then the default behaviour (split on x)
-     *  will be preserved.  dimension=1 indicates split on y etc.  If dimension >= SPACE_DIM then an exception is thrown
+     *  @param dimension The dimension/axis to be split over the processes.  When dimension=0 the split is on x, dimension=1
+     *  indicates split on y etc.  If dimension >= SPACE_DIM then an exception is thrown.
      *  @param spaceStep The axis-aligned space step
      *  @param width The width (x-dimension)
      *  @param height The height (y-dimension - ignored if ELEMENT_DIM is 1D)

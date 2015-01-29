@@ -1119,8 +1119,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
         // Construct the elements
 
         unsigned element_nodes[6][4] = {{0, 1, 5, 7}, {0, 1, 3, 7},
-                                            {0, 2, 3, 7}, {0, 2, 6, 7},
-                                            {0, 4, 6, 7}, {0, 4, 5, 7}};
+                                        {0, 2, 3, 7}, {0, 2, 6, 7},
+                                        {0, 4, 6, 7}, {0, 4, 5, 7}};
         std::vector<Node<SPACE_DIM>*> tetrahedra_nodes;
 
         for (unsigned k=lo_z; k<hi_z-1; k++)

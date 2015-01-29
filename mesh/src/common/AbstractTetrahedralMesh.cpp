@@ -619,17 +619,17 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(d
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWithDimensionSplit(unsigned dimension, double spaceStep,
-                                                                                  double width, double height,
-                                                                                  double depth)
+void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWithDimensionSplit(
+        unsigned dimension, double spaceStep,
+        double width, double height, double depth)
 {
     assert (ELEMENT_DIM == SPACE_DIM); ///\todo #2651 Will this break?
     if (dimension >= SPACE_DIM)
     {
         EXCEPTION("Cannot split on non-existent dimension");
     }
-    // Rotate the width <- height <- depth around (if dimension is non-zero)
-    if (SPACE_DIM == 2 && dimension == 1)
+    // Rotate the width <- height <- depth around (if dimension is non-default)
+    if (SPACE_DIM == 2 && dimension == 0)
     {
         double temp = width;
         width = height;
@@ -637,7 +637,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
     }
     this->ConstructRegularSlabMesh(spaceStep, width, height, depth);
     // Rotate the positions back again x -> y -> z
-    if (SPACE_DIM == 2 && dimension == 1)
+    if (SPACE_DIM == 2 && dimension == 0)
     {
         ///\todo #2651 - use exact transformations
         this->Rotate(M_PI_2);

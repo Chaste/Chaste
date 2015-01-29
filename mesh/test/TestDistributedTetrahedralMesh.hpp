@@ -2343,6 +2343,106 @@ public:
             TS_ASSERT(any_local);
         }
     }
+
+    void TestConstructSlabMeshWithDimensionSplit() throw (Exception)
+    {
+        double step = 1.0;
+        double width = 3.0;
+        double height = 5.0;
+        //double depth = 7.0;
+
+        // In 1D we shouldn't be able to change the split dimension from 0.  (Can only split in x.)
+        {
+            DistributedTetrahedralMesh<1,1> mesh;
+            TS_ASSERT_THROWS_THIS(mesh.ConstructRegularSlabMeshWithDimensionSplit(1, step, width), "Cannot split on non-existent dimension");
+            mesh.ConstructRegularSlabMeshWithDimensionSplit(0, step, width);
+         }
+
+        {
+            DistributedTetrahedralMesh<2,2> mesh;
+            mesh.ConstructRegularSlabMesh(step, width, height);
+            DistributedTetrahedralMesh<2,2> mesh_with_default_split;
+            mesh_with_default_split.ConstructRegularSlabMeshWithDimensionSplit(1, step, width, height);
+            DistributedTetrahedralMesh<2,2> mesh_with_x_split;
+            mesh_with_x_split.ConstructRegularSlabMeshWithDimensionSplit(0, step, width, height);
+
+            // Check that mesh and mesh_with_default_split are identical
+            CompareMeshes(mesh, mesh_with_default_split);
+
+            // Check that the y-split has the same bounding box
+            ChasteCuboid<2> bounds = mesh.CalculateBoundingBox();
+            ChasteCuboid<2> bounds_with_x_split = mesh_with_x_split.CalculateBoundingBox();
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], bounds_with_x_split.rGetUpperCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], bounds_with_x_split.rGetUpperCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], bounds_with_x_split.rGetLowerCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], bounds_with_x_split.rGetLowerCorner()[1], 1e-6);
+
+            // Same amount of stuff
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_with_x_split.GetNumNodes());
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_with_x_split.GetNumElements());
+            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_with_x_split.GetNumBoundaryElements());
+
+            // Show that the y-split has a different indexing scheme
+            // Normal meshes start at the origin
+            if (mesh_with_default_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(0u))
+            {
+                c_vector<double, 2> orig1 = mesh_with_default_split.GetNode(0u)->rGetLocation();
+                TS_ASSERT_DELTA(orig1[0], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig1[1], 0.0, 1e-5);
+            }
+
+            // The new one has the origin at an index height away
+            if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(5u))
+            {
+                c_vector<double, 2> orig2 = mesh_with_x_split.GetNode(5u)->rGetLocation();
+                TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
+            }
+
+            // Check that we are really splitting on x, by checking every process' split reaches the top of y.
+            double max_x_with_x_split = DBL_MIN;
+            double max_y_with_x_split = DBL_MIN;
+            for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh_with_x_split.GetNodeIteratorBegin();
+                 iter != mesh_with_x_split.GetNodeIteratorEnd();
+                 ++iter)
+            {
+                c_vector<double, 2> pos = iter->rGetLocation();
+                max_x_with_x_split = std::max(max_x_with_x_split, pos[0]);
+                max_y_with_x_split = std::max(max_y_with_x_split, pos[1]);
+            }
+            TS_ASSERT_DELTA(max_y_with_x_split, height, 1e-6);
+            if (PetscTools::AmTopMost())
+            {
+                TS_ASSERT_DELTA(max_x_with_x_split, width, 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_LESS_THAN(max_x_with_x_split, width - step/2.0);
+            }
+
+            // We also sanity check that the default split does split on y.
+            double max_x_with_default_split = DBL_MIN;
+            double max_y_with_default_split = DBL_MIN;
+            for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh_with_default_split.GetNodeIteratorBegin();
+                 iter != mesh_with_default_split.GetNodeIteratorEnd();
+                 ++iter)
+            {
+                c_vector<double, 2> pos = iter->rGetLocation();
+                max_x_with_default_split = std::max(max_x_with_default_split, pos[0]);
+                max_y_with_default_split = std::max(max_y_with_default_split, pos[1]);
+            }
+            TS_ASSERT_DELTA(max_x_with_default_split, width, 1e-6);
+            if (PetscTools::AmTopMost())
+            {
+                TS_ASSERT_DELTA(max_y_with_default_split, height, 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_LESS_THAN(max_y_with_default_split, height - step/2.0);
+            }
+        }
+    }
+
 };
 
 #endif /*TESTDISTRIBUTEDTETRAHEDRALMESH_HPP_*/
