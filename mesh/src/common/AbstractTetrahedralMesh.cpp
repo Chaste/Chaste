@@ -618,6 +618,35 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(d
     this->Scale(spaceStep, spaceStep, spaceStep);
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWithDimensionSplit(unsigned dimension, double spaceStep,
+                                                                                  double width, double height,
+                                                                                  double depth)
+{
+    assert (ELEMENT_DIM == SPACE_DIM); ///\todo #2651 Will this break?
+    if (dimension >= SPACE_DIM)
+    {
+        EXCEPTION("Cannot split on non-existent dimension");
+    }
+    // Rotate the width <- height <- depth around (if dimension is non-zero)
+    if (SPACE_DIM == 2 && dimension == 1)
+    {
+        double temp = width;
+        width = height;
+        height = temp;
+    }
+    this->ConstructRegularSlabMesh(spaceStep, width, height, depth);
+    // Rotate the positions back again x -> y -> z
+    if (SPACE_DIM == 2 && dimension == 1)
+    {
+        ///\todo #2651 - use exact transformations
+        this->Rotate(M_PI_2);
+        this->Translate(0.0, width); // Formerly known as height, but we rotated it
+    }
+
+}
+
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfBoundaryElement( unsigned faceIndex )
 {
@@ -936,6 +965,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIn
     }
     EXCEPTION(ss.str());
 }
+
 
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
