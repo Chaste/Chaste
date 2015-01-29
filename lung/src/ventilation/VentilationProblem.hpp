@@ -57,6 +57,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class VentilationProblem
 {
 private:
+    friend class TestVentilationProblem;
+
     /**< The 1d in 3d branching tree mesh */
     TetrahedralMesh<1,3> mMesh;
 
@@ -115,19 +117,33 @@ private:
      */
     Mat mTerminalInteractionMatrix;
 
-    /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh node indexing */
+    /**
+     * Number of non-zeroes per row in #mTerminalInteractionMatrix (which is a sparse approximation to a fully dense matrix).
+     * This is used to cut down the fill of the matrix.   The time spent constructing the approximation goes up
+     * quadratically in this parameter.
+     */
+    unsigned mNumNonZeroesPerRow;
+    /**
+     * The set of all terminals which are the descendants of each particular edge.
+     * The root edge has all terminals as its descendants.  Maximum depth edges have only one descendant.
+     *
+     * This structure is used in the computation of mTerminalInteractionMatrix
+     */
+    std::vector<std::set<unsigned> > mEdgeDescendantNodes;
+
+    /** A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh node indexing */
     std::map<unsigned, unsigned> mTerminalToNodeIndex;
 
-    /**< A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh element indexing */
+    /** A mapping from the indexing scheme used in the mTerminalInteractionMatrix to the full mesh element indexing */
     std::map<unsigned, unsigned> mTerminalToEdgeIndex;
 
-    /**< Used as the output of the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    /** Used as the output of the mTerminalInteractionMatrix terminal pressure to flux solver*/
     Vec mTerminalFluxChangeVector;
 
-    /**< Used as the input of the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    /** Used as the input of the mTerminalInteractionMatrix terminal pressure to flux solver*/
     Vec mTerminalPressureChangeVector;
 
-    /**< The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
+    /** The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
     KSP mTerminalKspSolver;
 
     /** The acinar unit factory creates an acinar unit for each distal node in the tree. */
@@ -146,9 +162,19 @@ private:
      * Set up the PETSc machinery for solving the iterative problem: given pressure conditions at the terminals
      * guess and refine flux conditions which match them.
      *
-     * This creates and fills a PETSc Mat.  It also creates two PETSc Vecs and a KSP solver.
+     * This creates but doesn't fill a PETSc Mat.  It also creates two PETSc Vecs and a KSP solver.
      */
     void SetupIterativeSolver();
+    /**
+     * Set up the PETSc machinery for solving the iterative problem: given pressure conditions at the terminals
+     * guess and refine flux conditions which match them.
+     *
+     * This fills the PETSc Mat created by #SetupIterativeSolver.
+     *
+     * @param  redoExisting  Indicates that existing resistances are changing (due to changed flux).
+     */
+    void FillInteractionMatrix(bool redoExisting);
+
 
     /**
      * Use pressure boundary conditions at leaves (and pressure condition at root) to perform

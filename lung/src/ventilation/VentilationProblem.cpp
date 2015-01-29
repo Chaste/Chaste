@@ -181,15 +181,15 @@ void VentilationProblem::SolveDirectFromFlux()
 void VentilationProblem::SetupIterativeSolver()
 {
     //double start = Timer::GetElapsedTime();
-    const unsigned num_non_zeroes = std::min(250u, mMesh.GetNumBoundaryNodes()-1);
-    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, num_non_zeroes, NULL, &mTerminalInteractionMatrix);
+    mNumNonZeroesPerRow = std::min(250u, mMesh.GetNumBoundaryNodes()-1);
+    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, NULL, &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
 
     /* Map each edge to its terminal descendants so that we can keep track
      * of which terminals can affect each other via a particular edge.
      */
-    std::vector<std::set<unsigned> > descendant_nodes(mMesh.GetNumElements());
+    mEdgeDescendantNodes.resize(mMesh.GetNumElements());
     unsigned terminal_index=0;
     //First set up all the boundary nodes
     for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
@@ -202,12 +202,12 @@ void VentilationProblem::SetupIterativeSolver()
             unsigned parent_index =  *((*iter)->ContainingElementsBegin());
             mTerminalToNodeIndex[terminal_index] = node_index;
             mTerminalToEdgeIndex[terminal_index] = parent_index;
-            descendant_nodes[parent_index].insert(terminal_index++);
+            mEdgeDescendantNodes[parent_index].insert(terminal_index++);
         }
     }
     // The outer loop here is for special cases where we find an internal node before its descendants
     // In this case we need to scan the tree more than once (up to log(N)) before the sets are correctly propagated
-    while (descendant_nodes[mOutletNodeIndex].size() != terminal_index)
+    while (mEdgeDescendantNodes[mOutletNodeIndex].size() != terminal_index)
     {
         //Work back up the tree making the unions of the sets of descendants
         for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
@@ -220,10 +220,35 @@ void VentilationProblem::SetupIterativeSolver()
                 ++element_iterator;
                 for (;element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
                 {
-                    descendant_nodes[parent_index].insert(descendant_nodes[*element_iterator].begin(),descendant_nodes[*element_iterator].end());
+                    mEdgeDescendantNodes[parent_index].insert(mEdgeDescendantNodes[*element_iterator].begin(),mEdgeDescendantNodes[*element_iterator].end());
                 }
             }
         }
+    }
+
+    FillInteractionMatrix(false);
+
+    assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
+    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalFluxChangeVector);
+    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
+
+    KSPCreate(PETSC_COMM_SELF, &mTerminalKspSolver);
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
+    KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix);
+#else
+    KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
+#endif
+    KSPSetFromOptions(mTerminalKspSolver);
+    KSPSetUp(mTerminalKspSolver);
+//    PRINT_VARIABLE(Timer::GetElapsedTime() - start);
+}
+
+void VentilationProblem::FillInteractionMatrix(bool redoExisting)
+{
+    assert(!redoExisting);
+    if (redoExisting)
+    {
+//        MatZeroEntries(mTerminalInteractionMatrix);
     }
     // Use the descendant sets to build the mTerminalInteractionMatrix structure of resistances
     for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
@@ -231,9 +256,18 @@ void VentilationProblem::SetupIterativeSolver()
             ++iter)
     {
         unsigned parent_index = iter->GetIndex();
-        double parent_resistance = CalculateResistance(*iter);
-        std::vector<PetscInt> indices( descendant_nodes[parent_index].begin(), descendant_nodes[parent_index].end() );
-        if (descendant_nodes[parent_index].size() <= num_non_zeroes)
+        double parent_resistance=0.0;
+        if (redoExisting)
+        {
+ //           assert(mDynamicResistance);
+ //           parent_resistance=CalculateResistance(*iter);
+        }
+        else
+        {
+            parent_resistance=CalculateResistance(*iter, true, mFlux[parent_index]);
+        }
+        std::vector<PetscInt> indices( mEdgeDescendantNodes[parent_index].begin(), mEdgeDescendantNodes[parent_index].end() );
+        if (mEdgeDescendantNodes[parent_index].size() <= mNumNonZeroesPerRow)
         {
             std::vector<double> resistance_to_add(indices.size()*indices.size(), parent_resistance);
 
@@ -251,27 +285,15 @@ void VentilationProblem::SetupIterativeSolver()
         }
     }
     PetscMatTools::Finalise(mTerminalInteractionMatrix);
-    assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
-    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalFluxChangeVector);
-    VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
-
-    KSPCreate(PETSC_COMM_SELF, &mTerminalKspSolver);
-#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR>=5 )
-    KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix);
-#else
-    KSPSetOperators(mTerminalKspSolver, mTerminalInteractionMatrix, mTerminalInteractionMatrix, SAME_PRECONDITIONER);
-#endif
-    KSPSetFromOptions(mTerminalKspSolver);
-    KSPSetUp(mTerminalKspSolver);
-//    PRINT_VARIABLE(Timer::GetElapsedTime() - start);
 }
+
 void VentilationProblem::SolveIterativelyFromPressure()
 {
     if (mTerminalInteractionMatrix == NULL)
     {
         SetupIterativeSolver();
     }
-    //double start = Timer::GetElapsedTime();
+//    double start = Timer::GetElapsedTime();
     /* Now use the pressure boundary conditions to determine suitable flux boundary conditions
      * and iteratively update them until we are done
      */
@@ -368,6 +390,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
     {
         NEVER_REACHED;
     }
+
     PetscTools::Destroy(old_terminal_pressure_change);
 //    PRINT_2_VARIABLES(Timer::GetElapsedTime() - start, mDynamicResistance);
 }
