@@ -357,7 +357,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rTransVec)
 {
-    unsigned num_nodes = this->GetNumAllNodes();
+    unsigned num_nodes = this->mNodes.size();
 
     for (unsigned i=0; i<num_nodes; i++)
     {
@@ -371,7 +371,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPAC
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double , SPACE_DIM, SPACE_DIM> rotationMatrix)
 {
-    unsigned num_nodes = this->GetNumAllNodes();
+    unsigned num_nodes = this->mNodes.size();
 
     for (unsigned i=0; i<num_nodes; i++)
     {
