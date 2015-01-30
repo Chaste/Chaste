@@ -623,7 +623,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
         unsigned dimension, double spaceStep,
         double width, double height, double depth)
 {
-    assert (ELEMENT_DIM == SPACE_DIM); ///\todo #2651 Will this break?
+    assert(ELEMENT_DIM == SPACE_DIM); ///\todo #2651 Will this break?
     if (dimension >= SPACE_DIM)
     {
         EXCEPTION("Cannot split on non-existent dimension");
