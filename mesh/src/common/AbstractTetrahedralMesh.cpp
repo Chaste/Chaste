@@ -628,20 +628,47 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
     {
         EXCEPTION("Cannot split on non-existent dimension");
     }
-    // Rotate the width <- height <- depth around (if dimension is non-default)
+    // Rotate the width -> height -> depth around (if dimension is non-default)
     if (SPACE_DIM == 2 && dimension == 0)
     {
-        double temp = width;
-        width = height;
-        height = temp;
+        double temp = height ;
+        height = width;
+        width = temp;
+    }
+    else if (SPACE_DIM == 3)
+    {
+        unsigned rotate_perm = SPACE_DIM - 1u - dimension; // How many shuffles to get the user's axis to the top
+        for (unsigned i=0; i<rotate_perm; i++)
+        {
+            double temp = depth;
+            depth = height;
+            height = width;
+            width = temp;
+        }
     }
     this->ConstructRegularSlabMesh(spaceStep, width, height, depth);
-    // Rotate the positions back again x -> y -> z
     if (SPACE_DIM == 2 && dimension == 0)
     {
         ///\todo #2651 - use exact transformations
+        // Rotate the positions back again x -> y -> x
         this->Rotate(M_PI_2);
         this->Translate(0.0, width); // Formerly known as height, but we rotated it
+    }
+    else if (SPACE_DIM == 3 && dimension == 0)
+    {
+        ///\todo #2651 - use exact transformations
+        this->RotateZ(M_PI_2);
+        this->RotateY(M_PI_2);
+        // RotY * RotZ = [0 0 1; 1 0 0; 0 1 0] x->y->z->x
+        this->Translate(depth /*old width*/, width /*old height*/, 0.0);
+    }
+    else if (SPACE_DIM == 3 && dimension == 1)
+    {
+        ///\todo #2651 - use exact transformations
+        this->RotateY(-M_PI_2);
+        this->RotateZ(-M_PI_2);
+        // RotZ' after RotY' = RotZ' * RotY' = [0 1 0; 0 0 1; 1 0 0] x->z->y->x
+        this->Translate(height /*old width*/, 0.0, width /*old depth*/);
     }
 
 }

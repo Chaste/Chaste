@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "CuboidMeshConstructor.hpp"
 #include "ArchiveOpener.hpp"
-
+#include "Debug.hpp"
 class TestTetrahedralMesh : public CxxTest::TestSuite
 {
 public:
@@ -1998,15 +1998,17 @@ public:
         double step = 1.0;
         double width = 3.0;
         double height = 5.0;
-        //double depth = 7.0;
+        double depth = 7.0;
 
         // In 1D we shouldn't be able to change the split dimension from 0.  (Can only split in x.)
         {
             TetrahedralMesh<1,1> mesh;
             TS_ASSERT_THROWS_THIS(mesh.ConstructRegularSlabMeshWithDimensionSplit(1, step, width), "Cannot split on non-existent dimension");
             mesh.ConstructRegularSlabMeshWithDimensionSplit(0, step, width);
-         }
+        }
 
+        // In 2D we test that we can split in x (not just y)
+        // We also test that a requested y-split gives back the default behaviour (node-for-node)
         {
             TetrahedralMesh<2,2> mesh;
             mesh.ConstructRegularSlabMesh(step, width, height);
@@ -2017,8 +2019,8 @@ public:
 
             // Check that mesh and mesh_with_default_split are identical
             for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
-                 iter != mesh.GetNodeIteratorEnd();
-                 ++iter)
+                    iter != mesh.GetNodeIteratorEnd();
+                    ++iter)
             {
                 unsigned index = iter->GetIndex();
                 // Position of this node
@@ -2029,7 +2031,7 @@ public:
                 TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
             }
 
-            // Check that the y-split has the same bounding box
+            // Check that the x-split has the same bounding box
             ChasteCuboid<2> bounds = mesh.CalculateBoundingBox();
             ChasteCuboid<2> bounds_with_x_split = mesh_with_x_split.CalculateBoundingBox();
             TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], bounds_with_x_split.rGetUpperCorner()[0], 1e-6);
@@ -2042,7 +2044,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_with_x_split.GetNumElements());
             TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_with_x_split.GetNumBoundaryElements());
 
-            // Show that the y-split has a different indexing scheme
+            // Show that the x-split has a different indexing scheme
             // Normal meshes start at the origin
             c_vector<double, 2> orig1 = mesh_with_default_split.GetNode(0u)->rGetLocation();
             TS_ASSERT_DELTA(orig1[0], 0.0, 1e-5);
@@ -2052,8 +2054,81 @@ public:
             c_vector<double, 2> orig2 = mesh_with_x_split.GetNode(5u)->rGetLocation();
             TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
             TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
-         }
-    }
+        }
+        // In 3D we test that we can split in x, y (not just z)
+        // We also test that a requested z-split gives back the default behaviour (node-for-node)
+        {
+            TetrahedralMesh<3,3> mesh;
+            mesh.ConstructRegularSlabMesh(step, width, height, depth);
+            TetrahedralMesh<3,3> mesh_with_default_split;
+            mesh_with_default_split.ConstructRegularSlabMeshWithDimensionSplit(2, step, width, height, depth);
+            TetrahedralMesh<3,3> mesh_with_x_split;
+            mesh_with_x_split.ConstructRegularSlabMeshWithDimensionSplit(0, step, width, height, depth);
+            TetrahedralMesh<3,3> mesh_with_y_split;
+            mesh_with_y_split.ConstructRegularSlabMeshWithDimensionSplit(1, step, width, height, depth);
 
+            // Check that mesh and mesh_with_default_split are identical
+            for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+                    iter != mesh.GetNodeIteratorEnd();
+                    ++iter)
+            {
+                unsigned index = iter->GetIndex();
+                // Position of this node
+                c_vector<double, 3> pos1 = iter->rGetLocation();
+                // Position in the other mesh
+                c_vector<double, 3> pos2 = mesh_with_default_split.GetNode(index)->rGetLocation();
+                TS_ASSERT_DELTA(pos1[0], pos2[0], 1e-5);
+                TS_ASSERT_DELTA(pos1[1], pos2[1], 1e-5);
+                TS_ASSERT_DELTA(pos1[2], pos2[2], 1e-5);
+            }
+
+
+            // Check that the x-split and y-split have the same bounding box
+            ChasteCuboid<3> bounds = mesh.CalculateBoundingBox();
+            ChasteCuboid<3> bounds_with_x_split = mesh_with_x_split.CalculateBoundingBox();
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], bounds_with_x_split.rGetUpperCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], bounds_with_x_split.rGetUpperCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[2], bounds_with_x_split.rGetUpperCorner()[2], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], bounds_with_x_split.rGetLowerCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], bounds_with_x_split.rGetLowerCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[2], bounds_with_x_split.rGetLowerCorner()[2], 1e-6);
+
+            ChasteCuboid<3> bounds_with_y_split = mesh_with_y_split.CalculateBoundingBox();
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], bounds_with_y_split.rGetUpperCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], bounds_with_y_split.rGetUpperCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[2], bounds_with_y_split.rGetUpperCorner()[2], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], bounds_with_y_split.rGetLowerCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], bounds_with_y_split.rGetLowerCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[2], bounds_with_y_split.rGetLowerCorner()[2], 1e-6);
+
+            // Same amount of stuff
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_with_x_split.GetNumNodes());
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_with_x_split.GetNumElements());
+            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_with_x_split.GetNumBoundaryElements());
+
+            TS_ASSERT_EQUALS(mesh.GetNumNodes(), mesh_with_y_split.GetNumNodes());
+            TS_ASSERT_EQUALS(mesh.GetNumElements(), mesh_with_y_split.GetNumElements());
+            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_with_y_split.GetNumBoundaryElements());
+
+            // Show that the x-split and y-split have different indexing schemes
+            // Normal meshes start at the origin
+            c_vector<double, 3> orig1 = mesh_with_default_split.GetNode(0u)->rGetLocation();
+            TS_ASSERT_DELTA(orig1[0], 0.0, 1e-5);
+            TS_ASSERT_DELTA(orig1[1], 0.0, 1e-5);
+            TS_ASSERT_DELTA(orig1[2], 0.0, 1e-5);
+
+            // The x split one has the origin at ...
+            c_vector<double, 3> orig2 = mesh_with_x_split.GetNode((width*(depth+1)+1)*(height+1)-1)->rGetLocation();
+            TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
+            TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
+            TS_ASSERT_DELTA(orig2[2], 0.0, 1e-5);
+            ///\todo #2651 Tidy this test and add parallel variety
+            // The y split one has the origin at
+//            c_vector<double, 3> orig3 = mesh_with_y_split.GetNode(5u)->rGetLocation();
+//            TS_ASSERT_DELTA(orig3[0], 0.0, 1e-5);
+//            TS_ASSERT_DELTA(orig3[1], 0.0, 1e-5);
+//            TS_ASSERT_DELTA(orig3[2], 0.0, 1e-5);
+        }
+    }
 };
 #endif //_TESTTETRAHEDRALMESH_HPP_

@@ -2349,7 +2349,7 @@ public:
         double step = 1.0;
         double width = 3.0;
         double height = 5.0;
-        //double depth = 7.0;
+        double depth = 7.0;
 
         // In 1D we shouldn't be able to change the split dimension from 0.  (Can only split in x.)
         {
@@ -2441,8 +2441,22 @@ public:
                 TS_ASSERT_LESS_THAN(max_y_with_default_split, height - step/2.0);
             }
         }
-    }
 
+        {
+            DistributedTetrahedralMesh<3,3> mesh;
+            mesh.ConstructRegularSlabMesh(step, width, height, depth);
+            DistributedTetrahedralMesh<3,3> mesh_with_default_split;
+            mesh_with_default_split.ConstructRegularSlabMeshWithDimensionSplit(2, step, width, height, depth);
+            DistributedTetrahedralMesh<3,3> mesh_with_x_split;
+            mesh_with_x_split.ConstructRegularSlabMeshWithDimensionSplit(0, step, width, height, depth);
+            DistributedTetrahedralMesh<3,3> mesh_with_y_split;
+            mesh_with_y_split.ConstructRegularSlabMeshWithDimensionSplit(1, step, width, height, depth);
+
+            // Check that mesh and mesh_with_default_split are identical
+            CompareMeshes(mesh, mesh_with_default_split);
+            ///\todo #2651 Write rest of 3D test
+        }
+    }
 };
 
 #endif /*TESTDISTRIBUTEDTETRAHEDRALMESH_HPP_*/
