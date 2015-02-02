@@ -2347,9 +2347,9 @@ public:
     void TestConstructSlabMeshWithDimensionSplit() throw (Exception)
     {
         double step = 1.0;
-        double width = 3.0;
-        double height = 5.0;
-        double depth = 7.0;
+        unsigned width = 3;
+        unsigned height = 5;
+        unsigned depth = 7;
 
         // In 1D we shouldn't be able to change the split dimension from 0.  (Can only split in x.)
         {
@@ -2392,9 +2392,9 @@ public:
             }
 
             // The new one has the origin at an index height away
-            if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(5u))
+            if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(height))
             {
-                c_vector<double, 2> orig2 = mesh_with_x_split.GetNode(5u)->rGetLocation();
+                c_vector<double, 2> orig2 = mesh_with_x_split.GetNode(height)->rGetLocation();
                 TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
                 TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
             }
@@ -2454,7 +2454,125 @@ public:
 
             // Check that mesh and mesh_with_default_split are identical
             CompareMeshes(mesh, mesh_with_default_split);
-            ///\todo #2651 Write rest of 3D test
+
+            // Check that the x-split and y-split have the same bounding box
+            ChasteCuboid<3> bounds = mesh.CalculateBoundingBox();
+            ChasteCuboid<3> bounds_with_x_split = mesh_with_x_split.CalculateBoundingBox();
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], bounds_with_x_split.rGetUpperCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], bounds_with_x_split.rGetUpperCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[2], bounds_with_x_split.rGetUpperCorner()[2], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], bounds_with_x_split.rGetLowerCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], bounds_with_x_split.rGetLowerCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[2], bounds_with_x_split.rGetLowerCorner()[2], 1e-6);
+            ChasteCuboid<3> bounds_with_y_split = mesh_with_y_split.CalculateBoundingBox();
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[0], bounds_with_y_split.rGetUpperCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[1], bounds_with_y_split.rGetUpperCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetUpperCorner()[2], bounds_with_y_split.rGetUpperCorner()[2], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[0], bounds_with_y_split.rGetLowerCorner()[0], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[1], bounds_with_y_split.rGetLowerCorner()[1], 1e-6);
+            TS_ASSERT_DELTA(bounds.rGetLowerCorner()[2], bounds_with_y_split.rGetLowerCorner()[2], 1e-6);
+
+            // Show that the splits have different indexing schemes
+            // Normal meshes start at the origin
+            if (mesh_with_default_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(0u))
+            {
+                c_vector<double, 3> orig1 = mesh_with_default_split.GetNode(0u)->rGetLocation();
+                TS_ASSERT_DELTA(orig1[0], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig1[1], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig1[2], 0.0, 1e-5);
+            }
+
+            // The x split one has the origin on the last layer
+            unsigned expected_origin2_index = (width+1)*(depth+1)*(height+1) - (height+1)*depth -1;
+            if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_origin2_index))
+            {
+                c_vector<double, 3> orig2 = mesh_with_x_split.GetNode(expected_origin2_index)->rGetLocation();
+                TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig2[2], 0.0, 1e-5);
+            }
+            // the y split has the origin at the end of the first layer
+            unsigned expected_origin3_index = (width+1)*(depth+1)-1;
+            if (mesh_with_y_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_origin3_index))
+            {
+                c_vector<double, 3> orig3 = mesh_with_y_split.GetNode(expected_origin3_index)->rGetLocation();
+                TS_ASSERT_DELTA(orig3[0], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig3[1], 0.0, 1e-5);
+                TS_ASSERT_DELTA(orig3[2], 0.0, 1e-5);
+            }
+
+            // Check that we are really splitting on x, by checking every process' split reaches the top of y,z.
+            double max_x_with_x_split = DBL_MIN;
+            double max_y_with_x_split = DBL_MIN;
+            double max_z_with_x_split = DBL_MIN;
+            for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = mesh_with_x_split.GetNodeIteratorBegin();
+                 iter != mesh_with_x_split.GetNodeIteratorEnd();
+                 ++iter)
+            {
+                c_vector<double, 3> pos = iter->rGetLocation();
+                max_x_with_x_split = std::max(max_x_with_x_split, pos[0]);
+                max_y_with_x_split = std::max(max_y_with_x_split, pos[1]);
+                max_z_with_x_split = std::max(max_z_with_x_split, pos[2]);
+            }
+            TS_ASSERT_DELTA(max_y_with_x_split, height, 1e-6);
+            TS_ASSERT_DELTA(max_z_with_x_split, depth, 1e-6);
+            if (PetscTools::AmMaster())  // After rotation, top-most has origin and master has top layer
+            {
+                TS_ASSERT_DELTA(max_x_with_x_split, width, 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_LESS_THAN(max_x_with_x_split, width - step/2.0);
+            }
+
+            // Check that we are really splitting on y, by checking every process' split reaches the top of x,z.
+            double max_x_with_y_split = DBL_MIN;
+            double max_y_with_y_split = DBL_MIN;
+            double max_z_with_y_split = DBL_MIN;
+            for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = mesh_with_y_split.GetNodeIteratorBegin();
+                 iter != mesh_with_y_split.GetNodeIteratorEnd();
+                 ++iter)
+            {
+                c_vector<double, 3> pos = iter->rGetLocation();
+                max_x_with_y_split = std::max(max_x_with_y_split, pos[0]);
+                max_y_with_y_split = std::max(max_y_with_y_split, pos[1]);
+                max_z_with_y_split = std::max(max_z_with_y_split, pos[2]);
+            }
+            TS_ASSERT_DELTA(max_x_with_y_split, width, 1e-6);
+            TS_ASSERT_DELTA(max_z_with_y_split, depth, 1e-6);
+            if (PetscTools::AmTopMost())  // After rotation, top-most has top layer
+            {
+                TS_ASSERT_DELTA(max_y_with_y_split, height, 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_LESS_THAN(max_y_with_y_split, height - step/2.0);
+            }
+
+            // We also sanity check that the default split does split on z.
+            double max_x_with_default_split = DBL_MIN;
+            double max_y_with_default_split = DBL_MIN;
+            double max_z_with_default_split = DBL_MIN;
+            for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = mesh_with_default_split.GetNodeIteratorBegin();
+                 iter != mesh_with_default_split.GetNodeIteratorEnd();
+                 ++iter)
+            {
+                c_vector<double, 3> pos = iter->rGetLocation();
+                max_x_with_default_split = std::max(max_x_with_default_split, pos[0]);
+                max_y_with_default_split = std::max(max_y_with_default_split, pos[1]);
+                max_z_with_default_split = std::max(max_z_with_default_split, pos[2]);
+            }
+            TS_ASSERT_DELTA(max_x_with_default_split, width, 1e-6);
+            TS_ASSERT_DELTA(max_y_with_default_split, height, 1e-6);
+            if (PetscTools::AmTopMost())
+            {
+                TS_ASSERT_DELTA(max_z_with_default_split, depth, 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_LESS_THAN(max_z_with_default_split, depth - step/2.0);
+            }
+
         }
     }
 };

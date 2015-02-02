@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "CuboidMeshConstructor.hpp"
 #include "ArchiveOpener.hpp"
-#include "Debug.hpp"
+
 class TestTetrahedralMesh : public CxxTest::TestSuite
 {
 public:
@@ -1996,9 +1996,9 @@ public:
     void TestConstructSlabMeshWithDimensionSplit() throw (Exception)
     {
         double step = 1.0;
-        double width = 3.0;
-        double height = 5.0;
-        double depth = 7.0;
+        unsigned width = 3;
+        unsigned height = 5;
+        unsigned depth = 7;
 
         // In 1D we shouldn't be able to change the split dimension from 0.  (Can only split in x.)
         {
@@ -2051,7 +2051,7 @@ public:
             TS_ASSERT_DELTA(orig1[1], 0.0, 1e-5);
 
             // The new one has the origin at an index height away
-            c_vector<double, 2> orig2 = mesh_with_x_split.GetNode(5u)->rGetLocation();
+            c_vector<double, 2> orig2 = mesh_with_x_split.GetNode(height)->rGetLocation();
             TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
             TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
         }
@@ -2117,17 +2117,17 @@ public:
             TS_ASSERT_DELTA(orig1[1], 0.0, 1e-5);
             TS_ASSERT_DELTA(orig1[2], 0.0, 1e-5);
 
-            // The x split one has the origin at ...
-            c_vector<double, 3> orig2 = mesh_with_x_split.GetNode((width*(depth+1)+1)*(height+1)-1)->rGetLocation();
+            // The x split one has the origin on the last layer
+            c_vector<double, 3> orig2 = mesh_with_x_split.GetNode((width+1)*(depth+1)*(height+1) - (height+1)*depth -1)->rGetLocation();
             TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
             TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
             TS_ASSERT_DELTA(orig2[2], 0.0, 1e-5);
-            ///\todo #2651 Tidy this test and add parallel variety
-            // The y split one has the origin at
-//            c_vector<double, 3> orig3 = mesh_with_y_split.GetNode(5u)->rGetLocation();
-//            TS_ASSERT_DELTA(orig3[0], 0.0, 1e-5);
-//            TS_ASSERT_DELTA(orig3[1], 0.0, 1e-5);
-//            TS_ASSERT_DELTA(orig3[2], 0.0, 1e-5);
+
+            // the y split has the origin at the end of the first layer
+            c_vector<double, 3> orig3 = mesh_with_y_split.GetNode((width+1)*(depth+1)-1)->rGetLocation();
+            TS_ASSERT_DELTA(orig3[0], 0.0, 1e-5);
+            TS_ASSERT_DELTA(orig3[1], 0.0, 1e-5);
+            TS_ASSERT_DELTA(orig3[2], 0.0, 1e-5);
         }
     }
 };
