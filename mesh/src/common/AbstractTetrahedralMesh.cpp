@@ -623,7 +623,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
         unsigned dimension, double spaceStep,
         double width, double height, double depth)
 {
-    assert(ELEMENT_DIM == SPACE_DIM); ///\todo #2651 Will this break?
+    assert(ELEMENT_DIM == SPACE_DIM);
     if (dimension >= SPACE_DIM)
     {
         EXCEPTION("Cannot split on non-existent dimension");
@@ -649,26 +649,37 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
     this->ConstructRegularSlabMesh(spaceStep, width, height, depth);
     if (SPACE_DIM == 2 && dimension == 0)
     {
-        ///\todo #2651 - use exact transformations
         // Rotate the positions back again x -> y -> x
-        this->Rotate(M_PI_2);
+        // this->Rotate(M_PI_2);
+        c_matrix<double, 2, 2> axis_rotation = zero_matrix<double>(2, 2);
+        axis_rotation(0,1)=1.0;
+        axis_rotation(1,0)=-1.0;
+        this->Rotate(axis_rotation);
         this->Translate(0.0, width); // Formerly known as height, but we rotated it
     }
     else if (SPACE_DIM == 3 && dimension == 0)
     {
-        ///\todo #2651 - use exact transformations
-        this->RotateZ(M_PI_2);
-        this->RotateY(M_PI_2);
+        //        this->RotateZ(M_PI_2);
+        //        this->RotateY(M_PI_2);
         // RotY * RotZ = [0 0 1; 1 0 0; 0 1 0] x->y->z->x
-        this->Translate(depth /*old width*/, width /*old height*/, 0.0);
+        //this->Translate(depth /*old width*/, width /*old height*/, 0.0);
+        c_matrix<double, 3, 3> axis_permutation = zero_matrix<double>(3, 3);
+        axis_permutation(0, 2)=1.0;
+        axis_permutation(1, 0)=1.0;
+        axis_permutation(2, 1)=1.0;
+        this->Rotate(axis_permutation);
     }
     else if (SPACE_DIM == 3 && dimension == 1)
     {
-        ///\todo #2651 - use exact transformations
-        this->RotateY(-M_PI_2);
-        this->RotateZ(-M_PI_2);
-        // RotZ' after RotY' = RotZ' * RotY' = [0 1 0; 0 0 1; 1 0 0] x->z->y->x
-        this->Translate(height /*old width*/, 0.0, width /*old depth*/);
+        //        this->RotateY(-M_PI_2);
+        //        this->RotateZ(-M_PI_2);
+        //        // RotZ' after RotY' = RotZ' * RotY' = [0 1 0; 0 0 1; 1 0 0] x->z->y->x
+        //        this->Translate(height /*old width*/, 0.0, width /*old depth*/);
+        c_matrix<double, 3, 3> axis_permutation = zero_matrix<double>(3, 3);
+        axis_permutation(0, 1)=1.0;
+        axis_permutation(1, 2)=1.0;
+        axis_permutation(2, 0)=1.0;
+        this->Rotate(axis_permutation);
     }
 
 }

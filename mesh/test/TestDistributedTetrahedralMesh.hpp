@@ -2474,31 +2474,31 @@ public:
 
             // Show that the splits have different indexing schemes
             // Normal meshes start at the origin
-            if (mesh_with_default_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(0u))
+            if (mesh_with_default_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(width))
             {
-                c_vector<double, 3> orig1 = mesh_with_default_split.GetNode(0u)->rGetLocation();
-                TS_ASSERT_DELTA(orig1[0], 0.0, 1e-5);
-                TS_ASSERT_DELTA(orig1[1], 0.0, 1e-5);
-                TS_ASSERT_DELTA(orig1[2], 0.0, 1e-5);
+                c_vector<double, 3> xaxis1 = mesh_with_default_split.GetNode(width)->rGetLocation();
+                TS_ASSERT_DELTA(xaxis1[0], (double) width, 1e-5);
+                TS_ASSERT_DELTA(xaxis1[1], 0.0, 1e-5);
+                TS_ASSERT_DELTA(xaxis1[2], 0.0, 1e-5);
             }
 
-            // The x split one has the origin on the last layer
-            unsigned expected_origin2_index = (width+1)*(depth+1)*(height+1) - (height+1)*depth -1;
-            if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_origin2_index))
+            // The x split one indexes in y, then z so x-axis is in top layer
+            unsigned expected_xaxis2_index = width*(depth+1)*(height+1);
+            if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_xaxis2_index))
             {
-                c_vector<double, 3> orig2 = mesh_with_x_split.GetNode(expected_origin2_index)->rGetLocation();
-                TS_ASSERT_DELTA(orig2[0], 0.0, 1e-5);
-                TS_ASSERT_DELTA(orig2[1], 0.0, 1e-5);
-                TS_ASSERT_DELTA(orig2[2], 0.0, 1e-5);
+                c_vector<double, 3> xaxis2 = mesh_with_x_split.GetNode(expected_xaxis2_index)->rGetLocation();
+                TS_ASSERT_DELTA(xaxis2[0], (double) width, 1e-5);
+                TS_ASSERT_DELTA(xaxis2[1], 0.0, 1e-5);
+                TS_ASSERT_DELTA(xaxis2[2], 0.0, 1e-5);
             }
-            // the y split has the origin at the end of the first layer
-            unsigned expected_origin3_index = (width+1)*(depth+1)-1;
-            if (mesh_with_y_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_origin3_index))
+            // the y split indexes in z first so x-axis is the end of the first layer
+            unsigned expected_xaxis3_index = width*(depth+1);
+            if (mesh_with_y_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_xaxis3_index))
             {
-                c_vector<double, 3> orig3 = mesh_with_y_split.GetNode(expected_origin3_index)->rGetLocation();
-                TS_ASSERT_DELTA(orig3[0], 0.0, 1e-5);
-                TS_ASSERT_DELTA(orig3[1], 0.0, 1e-5);
-                TS_ASSERT_DELTA(orig3[2], 0.0, 1e-5);
+                c_vector<double, 3> xaxis3 = mesh_with_y_split.GetNode(expected_xaxis3_index)->rGetLocation();
+                TS_ASSERT_DELTA(xaxis3[0], (double) width, 1e-5);
+                TS_ASSERT_DELTA(xaxis3[1], 0.0, 1e-5);
+                TS_ASSERT_DELTA(xaxis3[2], 0.0, 1e-5);
             }
 
             // Check that we are really splitting on x, by checking every process' split reaches the top of y,z.
@@ -2516,7 +2516,7 @@ public:
             }
             TS_ASSERT_DELTA(max_y_with_x_split, height, 1e-6);
             TS_ASSERT_DELTA(max_z_with_x_split, depth, 1e-6);
-            if (PetscTools::AmMaster())  // After rotation, top-most has origin and master has top layer
+            if (PetscTools::AmTopMost())
             {
                 TS_ASSERT_DELTA(max_x_with_x_split, width, 1e-6);
             }
@@ -2540,7 +2540,7 @@ public:
             }
             TS_ASSERT_DELTA(max_x_with_y_split, width, 1e-6);
             TS_ASSERT_DELTA(max_z_with_y_split, depth, 1e-6);
-            if (PetscTools::AmTopMost())  // After rotation, top-most has top layer
+            if (PetscTools::AmTopMost())
             {
                 TS_ASSERT_DELTA(max_y_with_y_split, height, 1e-6);
             }
