@@ -39,10 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 #include "TetrahedralMesh.hpp"
+#include "DistributedTetrahedralMesh.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "PetscSetupAndFinalize.hpp"
-
 #include <cmath>
 
 
@@ -555,6 +555,39 @@ public:
         TS_ASSERT_DELTA(corner_after[0], 1.0, 1e-7);
         TS_ASSERT_DELTA(corner_after[1], 1.0, 1e-7);
         TS_ASSERT_DELTA(corner_after[2], 1.0, 1e-7);
+    }
+    void failsInParallelTestDistributedRigidBodyMethods()
+    {
+        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
+        DistributedTetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        c_matrix<double, 3, 3> dummy;
+        double jacobian_det = 0.0;
+
+        double scaled_volume = 0.0;
+        for (typename AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
+             iter != mesh.GetElementIteratorEnd();
+             ++iter)
+        {
+            iter->CalculateJacobian(dummy, jacobian_det);
+            scaled_volume += jacobian_det;
+        }
+        TS_ASSERT_DELTA(scaled_volume, 1.0*6, 1e-6);
+
+        mesh.RotateX(M_PI);
+        //mesh.Translate(100.0, 0.0, 0.0);
+
+        double scaled_volume_after = 0.0;
+        for (typename AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
+             iter != mesh.GetElementIteratorEnd();
+             ++iter)
+        {
+            iter->CalculateJacobian(dummy, jacobian_det);
+            scaled_volume_after += jacobian_det;
+        }
+        TS_ASSERT_DELTA(scaled_volume_after, 1.0*6, 1e-6);
+
     }
 
     void TestExceptions()
