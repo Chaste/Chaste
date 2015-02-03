@@ -321,6 +321,24 @@ public:
      */
     virtual c_vector<double, 2> CalculateMinMaxEdgeLengths();
 
+    /**
+     * Do a general mesh rotation with a positive determinant orthonormal rotation matrix.
+     * This is the rotation method that actually does the work.
+     * This override is because class has halo nodes.
+     *
+     * @param rotationMatrix is a Ublas rotation matrix of the correct form
+     */
+    void Rotate(c_matrix<double , SPACE_DIM, SPACE_DIM> rotationMatrix);
+
+    /**
+     * Translate the mesh given the displacement vector.
+     * This is the translation method that actually does the work.
+     * This override is because class has halo nodes.
+     *
+     * @param rDisplacement is a translation vector of the correct size
+     */
+    void Translate(const c_vector<double, SPACE_DIM>& rDisplacement);
+
 
 protected:
     /**

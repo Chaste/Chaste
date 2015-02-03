@@ -2440,6 +2440,18 @@ public:
             {
                 TS_ASSERT_LESS_THAN(max_y_with_default_split, height - step/2.0);
             }
+
+            c_matrix<double, 2, 2> dummy;
+            // Check that all the elements (including halos) are the same size -- TetrahedralMesh has an active RefreshMesh but DistributedTetrahedralMesh does not
+            for (typename AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh_with_x_split.GetElementIteratorBegin();
+                 iter != mesh_with_x_split.GetElementIteratorEnd();
+                 ++iter)
+            {
+                double jacobian_det;
+                iter->CalculateJacobian(dummy, jacobian_det);
+                TS_ASSERT_DELTA(jacobian_det, 1.0, 1e-6)
+            }
+
         }
 
         {
@@ -2572,6 +2584,26 @@ public:
             {
                 TS_ASSERT_LESS_THAN(max_z_with_default_split, depth - step/2.0);
             }
+
+            c_matrix<double, 3, 3> dummy;
+            // Check that all the elements (including halos) are the same size -- TetrahedralMesh has an active RefreshMesh but DistributedTetrahedralMesh does not
+            for (typename AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh_with_x_split.GetElementIteratorBegin();
+                 iter != mesh_with_x_split.GetElementIteratorEnd();
+                 ++iter)
+            {
+                double jacobian_det;
+                iter->CalculateJacobian(dummy, jacobian_det);
+                TS_ASSERT_DELTA(jacobian_det, 1.0, 1e-6)
+            }
+            for (typename AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh_with_y_split.GetElementIteratorBegin();
+                 iter != mesh_with_y_split.GetElementIteratorEnd();
+                 ++iter)
+            {
+                double jacobian_det;
+                iter->CalculateJacobian(dummy, jacobian_det);
+                TS_ASSERT_DELTA(jacobian_det, 1.0, 1e-6)
+            }
+
 
         }
     }

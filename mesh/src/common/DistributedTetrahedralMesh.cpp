@@ -1677,6 +1677,40 @@ typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator Di
     return mHaloNodes.begin();
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double, SPACE_DIM, SPACE_DIM> rotationMatrix)
+{
+    // First do the extras
+    for (unsigned i=0; i<this->mHaloNodes.size(); i++)
+    {
+        c_vector<double, SPACE_DIM>& r_location = this->mHaloNodes[i]->rGetModifiableLocation();
+        r_location = prod(rotationMatrix, r_location);
+    }
+    // Now a copy of the base class implementation
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
+        r_location = prod(rotationMatrix, r_location);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rDisplacement)
+{
+    // First do the extras
+    for (unsigned i=0; i<this->mHaloNodes.size(); i++)
+    {
+        c_vector<double, SPACE_DIM>& r_location = this->mHaloNodes[i]->rGetModifiableLocation();
+        r_location += rDisplacement;
+    }
+    // Now a copy of the base class implementation
+    for (unsigned i=0; i<this->mNodes.size(); i++)
+    {
+        c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
+        r_location += rDisplacement;
+    }
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIteratorEnd() const
 {

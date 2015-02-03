@@ -355,14 +355,14 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rTransVec)
+void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rDisplacement)
 {
     unsigned num_nodes = this->mNodes.size();
 
     for (unsigned i=0; i<num_nodes; i++)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
-        r_location += rTransVec;
+        r_location += rDisplacement;
     }
 
     RefreshMesh();
