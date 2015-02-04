@@ -2129,11 +2129,6 @@ public:
             TS_ASSERT_DELTA(xaxis3[2], 0.0, 1e-5);
 
         }
-        {
-            TetrahedralMesh<3,3> mesh;
-
-            mesh.ConstructRegularSlabMeshWithDimensionSplit(0, 0.05, 2.0, 0.7, 0.3);
-        }
     }
 };
 #endif //_TESTTETRAHEDRALMESH_HPP_

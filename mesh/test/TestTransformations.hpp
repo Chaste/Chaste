@@ -566,7 +566,7 @@ public:
         double jacobian_det = 0.0;
 
         double scaled_volume = 0.0;
-        for (typename AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -579,7 +579,7 @@ public:
         //mesh.Translate(100.0, 0.0, 0.0);
 
         double scaled_volume_after = 0.0;
-        for (typename AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
