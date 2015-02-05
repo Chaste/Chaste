@@ -2443,7 +2443,7 @@ public:
 
             c_matrix<double, 2, 2> dummy;
             // Check that all the elements (including halos) are the same size -- TetrahedralMesh has an active RefreshMesh but DistributedTetrahedralMesh does not
-            for (typename AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh_with_x_split.GetElementIteratorBegin();
+            for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh_with_x_split.GetElementIteratorBegin();
                  iter != mesh_with_x_split.GetElementIteratorEnd();
                  ++iter)
             {
