@@ -126,7 +126,14 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         // Get the index, radius and damping constant of this node
         unsigned node_index = node_iter->GetIndex();
         double node_radius = node_iter->GetRadius();
-        assert (node_radius > 0.0);
+
+        // If the node radius is zero, then it has not been set...
+        if (node_radius == 0.0)
+        {
+            // ...so throw an exception to avoid dividing by zero when we compute diffusion_constant below
+            EXCEPTION("SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
+        }
+
         double nu = dynamic_cast<AbstractOffLatticeCellPopulation<DIM>*>(&rCellPopulation)->GetDampingConstant(node_index);
 
         /*

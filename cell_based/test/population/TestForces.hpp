@@ -1959,7 +1959,7 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
-    void trips_assertion_in_DiffusionForce_TestDiffusionForceWithVertexBasedCellPopulation()
+    void TestDiffusionForceWithVertexBasedCellPopulation()
     {
         // Define the seed
         RandomNumberGenerator::Instance()->Reseed(0);
@@ -1986,8 +1986,20 @@ public:
         // Create DiffusionForce object
         DiffusionForce<2> force;
 
-        // Check that AddForceContribution() does not throw an error when called on a VertexBasedCellPopulation
-	TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
+        // Check that AddForceContribution() throws the right error if the node radii have not been set
+	    TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
+            "SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
+
+	    // Now set each node radius...
+        for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_iter->SetRadius(1.0);
+        }
+
+        // ...and check that AddForceContribution() throws no error
+        TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
 
         // Tidy up
         SimulationTime::Destroy();
