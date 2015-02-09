@@ -50,6 +50,20 @@ void ActivationOutputModifier::FinaliseAtEnd()
 {
     //Dump out all data in a round-robin fashion
     OutputFileHandler output_handler(HeartConfig::Instance()->GetOutputDirectory(), false);
+
+    // Belt and braces
+    std::stringstream filepath_process_specific;
+    filepath_process_specific << mFilename << "." << PetscTools::GetMyRank();
+    out_stream file_stream_process_specific = output_handler.OpenOutputFile(filepath_process_specific.str().c_str());
+    for (unsigned i=0; i<mLocalSize; i++)
+    {
+        (*file_stream_process_specific) << mFirstActivitationTimes[i] <<",\t"
+                << mFirstRecoveryTimes[i] <<",\t"
+                << mSecondActivitationTimes[i] <<",\t"
+                << mSecondRecoveryTimes[i] <<"\n";
+    }
+    file_stream_process_specific->close();
+
     PetscTools::BeginRoundRobin();
     {
         out_stream file_stream = out_stream(NULL);

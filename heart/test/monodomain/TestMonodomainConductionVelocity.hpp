@@ -100,6 +100,14 @@ public:
         NumericFileComparison comp_minus_70(handler.GetOutputDirectoryFullPath()+ "activation_map_-70.0.txt", "heart/test/data/MonoConductionVel/activation_map_-70.0.txt");
         TS_ASSERT(comp_minus_70.CompareFiles());
 
+        // Non-round-robin files
+        // We also produce file fragments in case anything happens during post-processing.  These are identical in the sequential case
+        if (PetscTools::IsSequential())
+        {
+            NumericFileComparison comp_0_fragment(handler.GetOutputDirectoryFullPath()+ "activation_map_0.0.txt.0", "heart/test/data/MonoConductionVel/activation_map_0.0.txt");
+            TS_ASSERT(comp_0_fragment.CompareFiles());
+        }
+
 
         // test whether voltages and gating variables are in correct ranges
         CheckMonoLr91Vars<1>(monodomain_problem);
