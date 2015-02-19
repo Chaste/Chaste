@@ -1,2 +1,3 @@
 ventilation/TestAcinarUnitModels.hpp
+ventilation/TestMatrixVentilationProblem.hpp
 ventilation/TestVentilationProblem.hpp
