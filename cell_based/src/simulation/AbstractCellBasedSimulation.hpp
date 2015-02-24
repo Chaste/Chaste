@@ -151,7 +151,7 @@ protected:
 
     /**
      * Whether to write the cell velocities to a file.
-     * Initialised to false in constuctor.
+     * Initialised to false in constructor.
      */
     bool mOutputCellVelocities;
 
