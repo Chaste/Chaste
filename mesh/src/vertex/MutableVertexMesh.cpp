@@ -1005,7 +1005,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
          *  /
          *
          */
-        EXCEPTION("A node is contained in more than three elements"); // The code can't handle this case
+
+        /*
+         * This case is handled in a separate method to allow child classes to implement different
+         * functionality for high-order-junction remodelling events
+         */
+        this->HandleHighOrderJunctions(pNodeA, pNodeB);
     }
     else // each node is contained in at most three elements
     {
@@ -1280,7 +1285,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                  *    / \ Node B
                  *   /(3)\
                  */
-                PerformT1Swap(pNodeA, pNodeB, all_indices);
+
+                /*
+                 * This case is handled in a separate method to allow child classes to implement different
+                 * functionality for junction remodelling events
+                 */
+                this->HandleAdditionalRemodellingBahaviour(pNodeA, pNodeB, all_indices, 4u);
                 break;
             }
             default:
@@ -2451,6 +2461,33 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(Node<SPACE_DI
 
     // Remove the deleted nodes and re-index
     RemoveDeletedNodes();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleHighOrderJunctions(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+{
+    /*
+     * This case is handled in a separate method to allow child classes to implement different
+     * functionality for high-order-junction remodelling events
+     */
+    EXCEPTION("A node is contained in more than three elements"); // This base class can't handle this case
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleAdditionalRemodellingBahaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elem_indices, unsigned case_num)
+{
+    /*
+     * This case is handled in a separate method to allow child classes to implement different
+     * functionality for junction remodelling events
+     */
+    if( case_num == 4 )
+    {
+        PerformT1Swap(pNodeA, pNodeB, elem_indices);
+    }
+    else
+    {
+        EXCEPTION("No functionality for this case yet");
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

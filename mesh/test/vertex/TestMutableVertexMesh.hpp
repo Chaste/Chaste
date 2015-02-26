@@ -1804,6 +1804,50 @@ public:
         unsigned edge_closest_to_point1 = mesh.GetLocalIndexForElementEdgeClosestToPoint(test_point1,0);
         TS_ASSERT(edge_closest_to_point1 == 1u || edge_closest_to_point1 == 2u);
     }
+
+    void TestHandleHighOrderJunctions()
+    {
+        /*
+         * Create simple mesh to test exception in HandleHighOrderJunnctions()
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, false, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, false, 0.0, 0.1));
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+
+        TS_ASSERT_THROWS_THIS(mesh.HandleHighOrderJunctions(nodes[0],nodes[1]), "A node is contained in more than three elements");
+    }
+
+    void TestHandleAdditionalRemodellingBehaviour()
+    {
+        /*
+         * Create simple mesh to test exception in HandleAdditionalRemodellingBehavour()
+         */
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, false, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, false, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, false, 0.0, 0.1));
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+
+        std::set<unsigned> set;
+
+        // Test that case 4 doesn't throw exception
+        TS_ASSERT_THROWS_NOTHING(mesh.HandleAdditionalRemodellingBahaviour(nodes[0], nodes[1], set, 4u));
+
+        // Test that case 3 does throw exception
+        TS_ASSERT_THROWS_THIS(mesh.HandleAdditionalRemodellingBahaviour(nodes[0], nodes[1], set, 3u), "No functionality for this case yet");
+    }
 };
 
 #endif /*TESTMUTABLEVERTEXMESH_HPP_*/

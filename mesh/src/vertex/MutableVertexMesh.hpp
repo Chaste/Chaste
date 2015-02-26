@@ -232,6 +232,32 @@ protected:
     void PerformVoidRemoval(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, Node<SPACE_DIM>* pNodeC);
 
     /**
+     * Helper method for ReMesh(), called by IdentifySwapType().
+     *
+     * Handles the case where a swap involves a junction with more than three adjacent elements.
+     * This is implemented in a separate method to allow child classes to override this behaviour
+     * and implement junction remodelling with high-order nodes.
+     *
+     * @param pNodeA one of the nodes to perform the swap with
+     * @param pNodeB the other node to perform the swap
+     */
+    virtual void HandleHighOrderJunctions(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
+
+    /**
+     * Helper method for ReMesh(), called by IdentifySwapType().
+     *
+     * Handles different cases where the nodes involved in a potential swap are both
+     * contained in three or fewer elements.  This is implemented in a separate method
+     * to allow child classes to override the standard behaviour.
+     *
+     * @param pNodeA one of the nodes to perform the swap with
+     * @param pNodeB the other node to perform the swap
+     * @param elem_indices indices of elements touching nodes potentually involved in swap
+     * @param case_num the case corresponding to location within IdentifySwapType()
+     */
+    virtual void HandleAdditionalRemodellingBahaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elem_indices, unsigned case_num);
+
+    /**
      * Helper method for ReMesh(), called by PerformT3Swap(). During T3 swaps nodes are merged onto edges. This
      * method checks if the edge is too short and moves its vertices apart if necessary in order to prevent T1 swaps
      * from happening right away. The method also checks that the location where the merged node is going to end up at
