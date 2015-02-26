@@ -252,7 +252,7 @@ protected:
      *
      * @param pNodeA one of the nodes to perform the swap with
      * @param pNodeB the other node to perform the swap
-     * @param elem_indices indices of elements touching nodes potentually involved in swap
+     * @param elem_indices indices of elements touching nodes potentially involved in swap
      * @param case_num the case corresponding to location within IdentifySwapType()
      */
     virtual void HandleAdditionalRemodellingBahaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elem_indices, unsigned case_num);
