@@ -236,7 +236,7 @@ protected:
      *
      * Handles the case where a swap involves a junction with more than three adjacent elements.
      * This is implemented in a separate method to allow child classes to override this behaviour
-     * and implement junction remodelling with high-order nodes.
+     * and implement junction remodelling with high-order nodes (see #2664).
      *
      * @param pNodeA one of the nodes to perform the swap with
      * @param pNodeB the other node to perform the swap
@@ -247,15 +247,15 @@ protected:
      * Helper method for ReMesh(), called by IdentifySwapType().
      *
      * Handles different cases where the nodes involved in a potential swap are both
-     * contained in three or fewer elements.  This is implemented in a separate method
-     * to allow child classes to override the standard behaviour.
+     * contained in three or fewer elements. This is implemented in a separate method
+     * to allow child classes to override the standard behaviour (see #2664).
      *
      * @param pNodeA one of the nodes to perform the swap with
      * @param pNodeB the other node to perform the swap
-     * @param elem_indices indices of elements touching nodes potentially involved in swap
-     * @param case_num the case corresponding to location within IdentifySwapType()
+     * @param elemIndices indices of elements touching nodes potentially involved in swap
+     * @param caseNumber the case corresponding to location within IdentifySwapType()
      */
-    virtual void HandleAdditionalRemodellingBahaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elem_indices, unsigned case_num);
+    virtual void HandleAdditionalRemodellingBehaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elemIndices, unsigned caseNumber);
 
     /**
      * Helper method for ReMesh(), called by PerformT3Swap(). During T3 swaps nodes are merged onto edges. This

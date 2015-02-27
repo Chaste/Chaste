@@ -1008,7 +1008,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
         /*
          * This case is handled in a separate method to allow child classes to implement different
-         * functionality for high-order-junction remodelling events
+         * functionality for high-order-junction remodelling events (see #2664).
          */
         this->HandleHighOrderJunctions(pNodeA, pNodeB);
     }
@@ -1021,7 +1021,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
                 /*
                  * Each node is contained in a single element, so the nodes must lie on the boundary
                  * of the mesh, as shown below. In this case, we merge the nodes and tidy up node
-                 * indices through calls to PerformNodeMerge() and  RemoveDeletedNodes().
+                 * indices through calls to PerformNodeMerge() and RemoveDeletedNodes().
                  *
                  *    A   B
                  * ---o---o---
@@ -1288,9 +1288,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(Node<SPACE_DIM>
 
                 /*
                  * This case is handled in a separate method to allow child classes to implement different
-                 * functionality for junction remodelling events
+                 * functionality for junction remodelling events (see #2664).
                  */
-                this->HandleAdditionalRemodellingBahaviour(pNodeA, pNodeB, all_indices, 4u);
+                this->HandleAdditionalRemodellingBehaviour(pNodeA, pNodeB, all_indices, 4);
                 break;
             }
             default:
@@ -2468,21 +2468,21 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleHighOrderJunctions(Node<SP
 {
     /*
      * This case is handled in a separate method to allow child classes to implement different
-     * functionality for high-order-junction remodelling events
+     * functionality for high-order-junction remodelling events (see #2664).
      */
     EXCEPTION("A node is contained in more than three elements"); // This base class can't handle this case
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleAdditionalRemodellingBahaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elem_indices, unsigned case_num)
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleAdditionalRemodellingBehaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elemIndices, unsigned caseNumber)
 {
     /*
      * This case is handled in a separate method to allow child classes to implement different
-     * functionality for junction remodelling events
+     * functionality for junction remodelling events (see #2664).
      */
-    if( case_num == 4 )
+    if (caseNumber == 4)
     {
-        PerformT1Swap(pNodeA, pNodeB, elem_indices);
+        PerformT1Swap(pNodeA, pNodeB, elemIndices);
     }
     else
     {
