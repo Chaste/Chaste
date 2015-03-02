@@ -295,7 +295,6 @@ public:
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15000); //Needed to increase the resistance in these artificial airways
         problem.SetDynamicResistance();
-        //problem.SetMeshInMilliMetres();
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
@@ -310,6 +309,10 @@ public:
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
+
+        //For coverage
+        problem.SetMeshInMilliMetres();
+        problem.SetOutflowFlux(0.0);
     }
 
     void TestTimeVaryingThreeBifurcations() throw (Exception)

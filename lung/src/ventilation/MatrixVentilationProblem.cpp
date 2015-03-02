@@ -136,10 +136,10 @@ MatrixVentilationProblem::~MatrixVentilationProblem()
     {
         PetscTools::Destroy(mSolution);
     }
-    for (unsigned i=0; i<mAcinarUnits.size(); i++)
-    {
-        delete mAcinarUnits[i];
-    }
+//    for (unsigned i=0; i<mAcinarUnits.size(); i++)
+//    {
+//        delete mAcinarUnits[i];
+//    }
 }
 
 void MatrixVentilationProblem::SetMeshInMilliMetres()
