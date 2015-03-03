@@ -4945,7 +4945,7 @@ class CellMLToCythonTranslator(CellMLToPythonTranslator):
         self.writeln('self.savedStates = {}')
         self.writeln('self.dirty = False')
         self.writeln('self.AssociateWithModel(self)')
-        self.writeln('self._parameters = Sundials.N_VMake_Serial(len(self.state), <Sundials.realtype*>(<np.ndarray>self.state).data)')
+        self.writeln('self._parameters = Sundials.N_VMake_Serial(len(self.parameters), <Sundials.realtype*>(<np.ndarray>self.parameters).data)')
         # TODO: Use a separate environment for each ontology
         self.writeln('self.env = Env.ModelWrapperEnvironment(self)')
         # Initialise CVODE
