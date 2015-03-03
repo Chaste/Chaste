@@ -181,7 +181,8 @@ def make_xml_binder():
                        'exp', 'ln', 'log', 'abs', 'power', 'root',
                        'leq', 'geq', 'lt', 'gt', 'eq', 'neq',
                        'rem',
-                       'ci', 'cn', 'apply', 'piecewise', 'piece']:
+                       'ci', 'cn', 'apply', 'piecewise', 'piece',
+                       'sin', 'cos', 'tan']:
         exec "binder.set_binding_class(NSS[u'm'], '%s', mathml_%s)" % (mathml_elt, mathml_elt)
     binder.set_binding_class(NSS[u'm'], "and_", mathml_and)
     binder.set_binding_class(NSS[u'm'], "or_", mathml_or)
@@ -6077,6 +6078,36 @@ class mathml_piece(mathml):
     Only defined to make it inherit from mathml.
     """
     pass
+
+class mathml_sin(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <sin> operator."""
+    def evaluate(self):
+        """Return the sine of the single operand."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 1:
+            self.wrong_number_of_operands(len(ops), [1])
+        return math.sin(self.eval(ops[0]))
+
+class mathml_cos(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <cos> operator."""
+    def evaluate(self):
+        """Return the cosine of the single operand."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 1:
+            self.wrong_number_of_operands(len(ops), [1])
+        return math.cos(self.eval(ops[0]))
+
+class mathml_tan(mathml_operator, mathml_units_mixin_set_operands):
+    """Class representing the MathML <tan> operator."""
+    def evaluate(self):
+        """Return the tangent of the single operand."""
+        app = self.xml_parent
+        ops = list(app.operands())
+        if len(ops) != 1:
+            self.wrong_number_of_operands(len(ops), [1])
+        return math.tan(self.eval(ops[0]))
 
 
 
