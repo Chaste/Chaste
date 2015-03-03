@@ -1170,14 +1170,24 @@ def _statusColour(status, build):
             return 'red'
 
 # Regexprs and state strings for _parseBuildTimings
-_time_re = re.compile(r"Command execution time: ([0-9.]+) seconds")
+#Command execution time: heart/build/debug/src/io/ChasteParameters_3_3.hpp: 0.737745 seconds
+_time_re = re.compile(r"Command execution time:(?: ([^:]+):)? ([0-9.]+) seconds")
 _states = ['Other', 'Compile', 'Object dependency analysis', 'CxxTest generation', 'PyCml execution', 'Test running']
+# For older scons versions we need to parse the line before a timing output to determine what happened.
+# Note that the order must match the _states list, except that we skip the 'Other' state.
 _state_res = map(re.compile,
                  [r"[^ ]*mpicxx ",
                   r"BuildTest\(\[",
                   r"cxxtest/cxxtestgen.py",
                   r"RunPyCml\(\[",
                   r"(r|R)unning '(.*/build/.*/Test.*Runner|python/test/.*\.py)'"])
+# For newer scons versions the timing line includes the target that was created, so we parse that instead
+_target_state_map = [lambda t, ext: ext in ['.so', '.o', '.os'] or t.endswith('Runner'), # Compile
+                     lambda t, ext: ext == '.dummy',                                     # Obj dep analysis
+                     lambda t, ext: t.endswith('Runner.cpp'),                            # CxxTest
+                     lambda t, ext: ext in ['.hpp', '.cpp'] and 'cellml' in t,           # PyCml
+                     lambda t, ext: ext == '.log'                                        # Test running
+                     ]
 
 def _parseBuildTimings(logfilepath):
     """Parse a build log file to determine timings.
@@ -1185,6 +1195,7 @@ def _parseBuildTimings(logfilepath):
     Returns a dictionary mapping activity to time (in seconds).
     """
     times = [0] * len(_states)
+    new_style = False
     try:
         logfile = open(logfilepath, 'r')
         if 'Windows' in logfilepath:
@@ -1194,9 +1205,17 @@ def _parseBuildTimings(logfilepath):
         for line in logfile:
             m = _time_re.match(line)
             if m:
-                times[state] += float(m.group(1))
+                if m.group(1):
+                    # New-style with target info
+                    new_style = True
+                    ext = os.path.splitext(m.group(1))[1]
+                    for i, func in enumerate(_target_state_map):
+                        if func(m.group(1), ext):
+                            state = i+1
+                            break
+                times[state] += float(m.group(2))
                 state = 0
-            elif state == 0:
+            elif not new_style and state == 0:
                 for i, regexp in enumerate(_state_res):
                     m = regexp.match(line)
                     if m:
