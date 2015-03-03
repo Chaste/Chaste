@@ -44,6 +44,7 @@ tool is not present, the variable should be set to None.  These variables are:
  * petsc_2_2_path - path to PETSc 2.2 install
  * petsc_2_3_path - path to PETSc 2.3 install
  * petsc_3_0_path - path to PETSc 3.0 install
+ * petsc_path     - path to PETSc install for versions 3.1 and newer
  * dealii_path    - path to Deal.II install
  * metis_path     - path to METIS install
  * intel_path     - path to Intel compiler installation
@@ -192,6 +193,7 @@ def AddXerces(basePath):
     # Remove existing paths
     RemoveFromPath(conf.other_includepaths, 'xerces')
     RemoveFromPath(conf.other_libpaths, 'xerces')
+    RemoveFromPath(conf.other_libraries, 'xerces') # The default library is called xerces-c-3.1 on some systems
     # Add new location
     conf.other_includepaths.append(os.path.join(basePath, 'include'))
     conf.other_libpaths.append(os.path.join(basePath, 'lib'))
@@ -255,6 +257,27 @@ for name in dir():
         item = globals()[name]
         if type(item) == types.FunctionType:
             setattr(conf, name, item)
+
+if sys.version_info[:2] < (2,7):
+    # Add subprocess.check_output to earlier Python versions
+    import subprocess
+    def check_output(*popenargs, **kwargs):
+        """Run command with arguments and return its output as a string. Copied from Python 2.7"""
+        if 'stdout' in kwargs:
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+        output, unused_err = process.communicate()
+        retcode = process.poll()
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            print >>sys.stderr, "Called process failed; output was:"
+            print >>sys.stderr, output
+            raise subprocess.CalledProcessError(retcode, cmd)
+        return output
+    subprocess.check_output = check_output
+
 
 def EnsureVariablesDefined():
     """Ensure that the other_* variables are defined; default to empty lists if not."""
