@@ -103,8 +103,8 @@ class BuildType(object):
         print "Build class", self.__class__.__name__, "from build type", self.build_type
         print "Tool locations:", self.tools
         print "Compiler type:", self._compiler_type
-        print "CC flags:", self.CcFlags()
-        print "LD flags:", self.LinkFlags()
+        print "Extra CC flags:", self.CcFlags()
+        print "Extra LD flags:", self.LinkFlags()
         print "Test packs:", self.TestPacks()
         print "Library preferences:", self.GetPreferedVersions()
     

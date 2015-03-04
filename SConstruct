@@ -321,6 +321,11 @@ env.Append(CCFLAGS = include_flag + include_flag.join(other_includepaths)
            + ' ' + extra_flags)
 env.Append(LINKFLAGS = link_flags)
 env.Append(CPPDEFINES = hostconfig.CppDefines() + ['TRILIBRARY', 'TETLIBRARY', 'ANSI_DECLARATORS'])
+if debug:
+    print "Core compiler flags used by Chaste:"
+    print "    CCFLAGS =", env['CCFLAGS']
+    print "    LDFLAGS =", env['LINKFLAGS']
+    print "    Defines =", env['CPPDEFINES']
 
 # Base search path for Chaste #includes, common to all components
 cpppath = [Dir('.'), Dir('cxxtest')]
