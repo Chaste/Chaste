@@ -40,7 +40,7 @@ template<unsigned DIM>
 VolumeDependentAveragedSourcePde<DIM>::VolumeDependentAveragedSourcePde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
     : AveragedSourcePde<DIM>(rCellPopulation, coefficient)
 {
-    assert(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)));
+    assert(bool(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))));
     mpStaticCastCellPopulation = static_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
 }
 

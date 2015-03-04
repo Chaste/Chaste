@@ -60,7 +60,7 @@ OnLatticeSimulation<DIM>::OnLatticeSimulation(AbstractCellPopulation<DIM>& rCell
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdateRule<DIM> > pUpdateRule)
 {
-    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
     }
@@ -69,7 +69,7 @@ void OnLatticeSimulation<DIM>::AddCaUpdateRule(boost::shared_ptr<AbstractCaUpdat
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
 {
-    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
     }
@@ -78,7 +78,7 @@ void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
 {
-    if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddUpdateRule(pUpdateRule);
     }
@@ -87,7 +87,7 @@ void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPott
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::RemoveAllPottsUpdateRules()
 {
-    if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllUpdateRules();
     }
@@ -103,7 +103,7 @@ c_vector<double, DIM> OnLatticeSimulation<DIM>::CalculateCellDivisionVector(Cell
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::WriteVisualizerSetupFile()
 {
-    if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&this->mrCellPopulation))
+    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&this->mrCellPopulation)))
     {
        *this->mpVizSetupFile << "PottsSimulation\n";
     }
@@ -122,7 +122,7 @@ template<unsigned DIM>
 void OnLatticeSimulation<DIM>::UpdateCellPopulation()
 {
     bool update_cell_population_this_timestep = true;
-    if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         /*
          * If mInitialiseCells is false, then the simulation has been loaded from an archive.
@@ -152,7 +152,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
 {
     // Loop over the collection of update rules and output info for each
     *rParamsFile << "\n\t<UpdateRules>\n";
-    if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    if (bool(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         std::vector<boost::shared_ptr<AbstractPottsUpdateRule<DIM> > > collection =
             static_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();
@@ -164,7 +164,7 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
             (*iter)->OutputUpdateRuleInfo(rParamsFile);
         }
     }
-    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    else if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
     {
         std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > collection =
             static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetUpdateRuleCollection();

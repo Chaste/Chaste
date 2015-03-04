@@ -78,7 +78,7 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>
      *
      * \todo work out how to properly fix this (#1986)
      */
-    if (dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
+    if (bool(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)))
     {
         static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation))->CreateVoronoiTessellation();
     }
