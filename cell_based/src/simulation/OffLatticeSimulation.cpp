@@ -62,9 +62,8 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     {
         this->mDt = 1.0/120.0; // 30 seconds
     }
-    else
+    else if (bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
     {
-        assert(bool(dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)));
         this->mDt = 0.002; // smaller time step required for convergence/stability
 
         // For VertexBasedCellPopulations we automatically add a T2SwapCellKiller. In order to inhibit T2 swaps
@@ -72,6 +71,11 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
         VertexBasedCellPopulation<SPACE_DIM>* p_vertex_based_cell_population = dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation);
         MAKE_PTR_ARGS(T2SwapCellKiller<SPACE_DIM>, T2_swap_cell_killer, (p_vertex_based_cell_population));
         this->AddCellKiller(T2_swap_cell_killer);
+    }
+    else
+    {
+        // All classes derived from  AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes)
+        NEVER_REACHED;
     }
 }
 
