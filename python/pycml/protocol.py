@@ -66,12 +66,11 @@ class Protocol(processors.ModelModifier):
         The public methods listed above should be called to set up the internal data structures,
         and then self.modify_model called to apply the protocol to the model.
         """
+        super(Protocol, self).__init__(model)
         self._protocol_component = None
-        self._units_converter = None
         self._free_var_has_changed = None
         self._protocol_namespaces = model._cml_protocol_namespaces = {}
         self.add_protocol_namespaces(namespaces)
-        self.model = model
         self.inputs = set()
         self._input_specifications = []
         self.outputs = set()
@@ -1023,6 +1022,7 @@ class Protocol(processors.ModelModifier):
         proto_comp = self._get_protocol_component()
         converter.add_conversions_for_component(proto_comp)
         converter.convert_assignments(filter(lambda i: isinstance(i, mathml_apply), self.inputs))
+        converter.convert_connections(self.connections_made)
         converter.finalize(self._error_handler, check_units=False)
         notifier.flush()
         logging.getLogger('units-converter').removeHandler(notifier)

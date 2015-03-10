@@ -59,6 +59,7 @@ class ModelModifier(object):
         """Constructor."""
         self.model = model
         self._units_converter = None
+        self.connections_made = set()
         
     def finalize(self, error_handler, pre_units_check_hook=None, check_units=True):
         """Re-do the model validation steps needed for further processing of the model.
@@ -216,6 +217,7 @@ class ModelModifier(object):
             target_var.xml_set_attribute((target_if + u'_interface', None), u'in')
             # Create the connection element
             self._create_connection_element(src_var, target_var)
+            self.connections_made.add(frozenset([src_var, target_var]))
             # Ensure we handle a later connection attempt between these variables correctly
             target_var._set_source_variable(src_var)
         else:
@@ -747,13 +749,14 @@ class UnitsConverter(ModelModifier):
     """Top-level interface to the units conversion code in PyCml.
     """
     def __init__(self, model, warn_only=None, show_xml_context_only=False):
-        self.model = model
+        super(UnitsConverter, self).__init__(model)
         if warn_only is None:
             warn_only = model.get_option('warn_on_units_errors')
         self.warn_only = warn_only
         self.show_xml_context_only = show_xml_context_only
         self.special_conversions = {}
         self._setup_logger()
+        self._converted_mappings = set()
     
     def __del__(self):
         self._cleanup_logger()
@@ -893,6 +896,13 @@ class UnitsConverter(ModelModifier):
     def convert_mapping(self, mapping, comp1, comp2, var1, var2):
         """Apply conversions to a mapping between two variables."""
         model = self.model
+        # Check for being already converted
+        var_pair = frozenset([var1, var2])
+        if var_pair in self._converted_mappings:
+            DEBUG('units-converter', 'Skipping already converted mapping', var1, '<->', var2)
+            return
+        else:
+            self._converted_mappings.add(var_pair)
         # Ensure mapping is var1 := var2; swap vars if needed
         swapped = False
         try:
@@ -940,6 +950,22 @@ class UnitsConverter(ModelModifier):
             assignments = model.get_assignments()
             idx = assignments.index(var1)
             assignments[idx:idx+1] = [var1_converter, app]
+    
+    def convert_connections(self, connections):
+        """Add units conversions for all connections in the given set.
+        
+        :param connections: a set of variable pairs representing connections.  For each pair of variables a units conversion
+        will be added if needed and not already performed.
+        """
+        model = self.model
+        for conn in getattr(model, u'connection', []):
+            comp1 = model.get_component_by_name(conn.map_components.component_1)
+            comp2 = model.get_component_by_name(conn.map_components.component_2)
+            for mapping in conn.map_variables:
+                var1 = model.get_variable_by_name(comp1.name, mapping.variable_1)
+                var2 = model.get_variable_by_name(comp2.name, mapping.variable_2)
+                if frozenset([var1, var2]) in connections:
+                    self.convert_mapping(mapping, comp1, comp2, var1, var2)
     
     def add_conversions_for_component(self, comp):
         """Add all units conversions required by the given component.
