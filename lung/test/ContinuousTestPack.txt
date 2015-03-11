@@ -1,3 +1,7 @@
+TestAirwayBranch.hpp
+TestAirwayPropertiesCalculator.hpp
+TestAirwayTreeWalker.hpp
+TestLobePropertiesCalculator.hpp
 ventilation/TestAcinarUnitModels.hpp
 ventilation/TestMatrixVentilationProblem.hpp
 ventilation/TestVentilationProblem.hpp
