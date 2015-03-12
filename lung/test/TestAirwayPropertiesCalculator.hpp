@@ -53,7 +53,7 @@ public:
     void TestBranchProperties() throw(Exception)
     {
         TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("notforrelease_lung/test/data/Novartis002");
+        TrianglesMeshReader<1,3> mesh_reader("notforrelease_lung/test/data/TestSubject002");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayPropertiesCalculator properties_calculator(mesh, 0u);
