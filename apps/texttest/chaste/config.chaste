@@ -2,6 +2,17 @@ binary:$TEXTTEST_CHECKOUT/apps/texttest/chaste/wrapper
 default_checkout:Chaste
 create_catalogues:true
 
+# Note that texttest checks some binary results by 
+# * converting from binary to text using h5dump from HDF5
+#  * (we currently use version 1.8.8)
+# * rounding the results to a certain number of decimal places with python/infra/RoundResultsFiles.py
+#  * (we currently round to 8 places) 
+
+# On failure, check your version of HDF5 with 
+# $ h5dump -V
+# h5dump: Version 1.8.11    (<-- this is the 14.04 LTS one, provided by the repository)
+
+
 # Files needed by running tests
 link_test_path:ChasteParameters.xml
 link_test_path:ChasteParameters_2_0.xsd
