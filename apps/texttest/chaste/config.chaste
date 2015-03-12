@@ -3,9 +3,10 @@ default_checkout:Chaste
 create_catalogues:true
 
 # Note that texttest checks some binary results by 
-# * converting from binary to text using h5dump from HDF5
-#  * (we currently use version 1.8.8)
-# * rounding the results to a certain number of decimal places with python/infra/RoundResultsFiles.py
+# 1. converting from binary to text using h5dump from HDF5
+#  * (we currently use version 1.8.9, 1.8.11 or 1.8.13)
+#  * (h5dump 1.8.4--1.8.8 has a variation in whitespace indentation in H5T_STRING definitions)
+# 2. rounding the results to a certain number of decimal places with python/infra/RoundResultsFiles.py
 #  * (we currently round to 8 places) 
 
 # On failure, check your version of HDF5 with 
