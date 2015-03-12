@@ -53,7 +53,7 @@ public:
     void TestBranchProperties() throw(Exception)
     {
         TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("notforrelease_lung/test/data/TestSubject002");
+        TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayPropertiesCalculator properties_calculator(mesh, 0u);
@@ -126,7 +126,7 @@ public:
     {
         // Load test mesh
         TetrahedralMesh<1, 3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("notforrelease_lung/test/data/TestSubtreeProperties");
+        TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubtreeProperties");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check num nodes and elements are as expected
@@ -181,7 +181,7 @@ public:
     {
         // Load test mesh
         TetrahedralMesh<1, 3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("notforrelease_lung/test/data/TestSubtreeProperties");
+        TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubtreeProperties");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check num nodes and elements are as expected

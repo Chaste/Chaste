@@ -92,11 +92,11 @@ public:
 #if defined(CHASTE_VTK) && ( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
         LobePropertiesCalculator calculator;
-        calculator.AddLobe("notforrelease_lung/test/data/lll.stl", LEFT, "lll");
-        calculator.AddLobe("notforrelease_lung/test/data/lul.stl", LEFT, "lul");
-        calculator.AddLobe("notforrelease_lung/test/data/rll.stl", RIGHT, "rll");
-        calculator.AddLobe("notforrelease_lung/test/data/rml.stl", RIGHT, "rml");
-        calculator.AddLobe("notforrelease_lung/test/data/rul.stl", RIGHT, "rul");
+        calculator.AddLobe("lung/test/data/lll.stl", LEFT, "lll");
+        calculator.AddLobe("lung/test/data/lul.stl", LEFT, "lul");
+        calculator.AddLobe("lung/test/data/rll.stl", RIGHT, "rll");
+        calculator.AddLobe("lung/test/data/rml.stl", RIGHT, "rml");
+        calculator.AddLobe("lung/test/data/rul.stl", RIGHT, "rul");
 
         //Confirmed manually to be correct for this subject
         TS_ASSERT_DELTA(calculator.GetLobeVolumeFraction("lll"), 0.1686, 1e-3);
