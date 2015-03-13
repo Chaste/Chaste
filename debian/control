@@ -8,7 +8,7 @@ Standards-Version: 3.7.2
 Package: chaste-source
 Architecture: all
 Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c-dev, libsundials-serial-dev, libvtk5-dev, python-lxml, python-amara, python-rdflib
-Recommends: valgrind, libfltk1.1
+Recommends: valgrind, libfltk1.1, hdf5-tools
 Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, gnuplot
 Description: general purpose computational biology simulation package
  Chaste (Cancer, Heart and Soft Tissue Environment) is a general purpose
@@ -26,7 +26,7 @@ Description: general purpose computational biology simulation package
 Package: chaste-dependencies
 Architecture: all
 Depends: scons, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev | libboost-serialization1.48-dev, libboost-filesystem-dev | libboost-filesystem1.48-dev, libparmetis-dev, libxerces-c-dev, libsundials-serial-dev, libvtk5-dev, python-lxml, python-amara, python-rdflib
-Recommends: valgrind, libpetsc3.4.2-dbg|libpetsc3.2-dbg|libpetsc3.1-dbg|libpetsc3.0.0-dbg, libfltk1.1
+Recommends: valgrind, libpetsc3.4.2-dbg|libpetsc3.2-dbg|libpetsc3.1-dbg|libpetsc3.0.0-dbg, libfltk1.1, hdf5-tools
 Suggests: libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, subversion, gnuplot
 Description: metapackage for installing the dependencies of Chaste
  Chaste (Cancer, Heart and Soft Tissue Environment) is a general purpose
