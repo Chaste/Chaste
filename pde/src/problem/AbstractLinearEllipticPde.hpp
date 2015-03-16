@@ -94,7 +94,8 @@ public:
      * @param rX The point in space
      * @param pElement The element
      */
-    virtual double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX, Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
+    virtual double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX,
+                                                Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
 
     /**
      * @return computed coefficient of u in the linear part of the source term, i.e f(x) in

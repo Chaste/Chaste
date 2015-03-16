@@ -67,7 +67,8 @@ public:
      * @param rX the point in space at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the point
      */
-    virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX, double u)=0;
+    virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
+                                     double u)=0;
 
     /**
      * @return computed source term at a node.
@@ -75,7 +76,8 @@ public:
      * @param rNode the node at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the node
      */
-    virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode, double u);
+    virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
+                                           double u);
 
 
     /**
@@ -85,7 +87,9 @@ public:
      * @param pElement The mesh element that x is contained in (optional).
      * @return A matrix.
      */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX, Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
+                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+
     /**
      * Destructor.
      */

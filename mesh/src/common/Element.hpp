@@ -91,9 +91,9 @@ public:
     void UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode);
 
     /**
-     * Reset the index of this boundary element in the mesh.
+     * Reset the index of this element in the mesh.
      *
-     * @param index the new index of the boundary element
+     * @param index the new index of the element
      */
     void ResetIndex(unsigned index);
 
@@ -108,7 +108,8 @@ public:
      * @param rJacobian  the Jacobian matrix
      * @param rInverseJacobian  the inverse Jacobian matrix
      */
-    c_vector<double,SPACE_DIM+1> CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian);
+    c_vector<double,SPACE_DIM+1> CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian,
+                                                       c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian);
 
     /**
      * @return the volume of the circumsphere, or area of the circumcircle, of this element.
