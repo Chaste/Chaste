@@ -66,9 +66,11 @@ public:
      *
      * @param rX the point in space at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the point
+     * @param pElement the element that we are inside
      */
     virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
-                                     double u)=0;
+                                     double u,
+                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
 
     /**
      * @return computed source term at a node.
@@ -105,7 +107,8 @@ public:
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractLinearParabolicPde<ELEMENT_DIM, SPACE_DIM>::ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode, double u)
+double AbstractLinearParabolicPde<ELEMENT_DIM, SPACE_DIM>::ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
+                                                                                   double u)
 {
     return ComputeSourceTerm(rNode.GetPoint(), u);
 }

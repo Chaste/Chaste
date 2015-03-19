@@ -762,7 +762,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
         }
     }
 
-    if (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) // ie doing a whole linear system
+    if (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY) // i.e. doing a whole linear system
     {
         // Now zero the appropriate rows and columns of the matrix. If the matrix is symmetric we apply the
         // boundary conditions in a way the symmetry isn't lost (rows and columns). If not only the row is

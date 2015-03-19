@@ -59,7 +59,7 @@ c_vector<double,1*(ELEMENT_DIM+1)> SimpleLinearParabolicSolver<ELEMENT_DIM,SPACE
         c_matrix<double,1,SPACE_DIM>& rGradU,
         Element<ELEMENT_DIM,SPACE_DIM>* pElement)
 {
-    return (mpParabolicPde->ComputeSourceTerm(rX, rU(0))
+    return (mpParabolicPde->ComputeSourceTerm(rX, rU(0), pElement)
             + PdeSimulationTime::GetPdeTimeStepInverse() * mpParabolicPde->ComputeDuDtCoefficientFunction(rX) * rU(0)) * rPhi;
 }
 

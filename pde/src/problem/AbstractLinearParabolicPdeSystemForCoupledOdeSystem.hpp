@@ -76,7 +76,10 @@ public:
      * @param rOdeSolution the ODE system state vector (v_1, ..., v_q) at the point x (if an ODE system is present)
      * @param pdeIndex the index of the PDE, denoted by i above
      */
-    virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX, c_vector<double,PROBLEM_DIM>& rU, std::vector<double>& rOdeSolution, unsigned pdeIndex)=0;
+    virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
+                                     c_vector<double,PROBLEM_DIM>& rU,
+                                     std::vector<double>& rOdeSolution,
+                                     unsigned pdeIndex)=0;
 
     /**
      * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a node.
@@ -86,7 +89,10 @@ public:
      * @param rOdeSolution the ODE system state vector (v_1, ..., v_q) at the node (if an ODE system is present)
      * @param pdeIndex the index of the PDE, denoted by i above
      */
-    virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode, c_vector<double,PROBLEM_DIM>& rU, std::vector<double>& rOdeSolution, unsigned pdeIndex);
+    virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
+                                           c_vector<double,PROBLEM_DIM>& rU,
+                                           std::vector<double>& rOdeSolution,
+                                           unsigned pdeIndex);
 
     /**
      * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
@@ -95,7 +101,9 @@ public:
      * @param pdeIndex the index of the PDE, denoted by i above
      * @param pElement The mesh element that x is contained in (optional)
      */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX, unsigned pdeIndex, Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
+                                                                        unsigned pdeIndex,
+                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
 
     /**
      * Destructor.

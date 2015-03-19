@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _HEATEQUATIONWITHSOURCETERM_HPP_
-#define _HEATEQUATIONWITHSOURCETERM_HPP_
+#ifndef _HEATEQUATIONWITHELEMENTDEPENDENTSOURCETERM_HPP_
+#define _HEATEQUATIONWITHELEMENTDEPENDENTSOURCETERM_HPP_
 
 #include "AbstractLinearParabolicPde.hpp"
 #include "ChastePoint.hpp"
@@ -43,16 +43,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A simple parabolic PDE used in tests.
  */
 template <int SPACE_DIM>
-class HeatEquationWithSourceTerm : public AbstractLinearParabolicPde<SPACE_DIM>
+class HeatEquationWithElementDependentSourceTerm : public AbstractLinearParabolicPde<SPACE_DIM>
 {
 public:
-    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double, Element<SPACE_DIM,SPACE_DIM>* )
+    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double, Element<SPACE_DIM,SPACE_DIM>* pElement)
     {
-        return 1.0;
+        // This is intended to mock different source terms in different mesh regions
+        // (to do it in practice you'd have to make a list of the elements in each region)
+        if (pElement->GetIndex()==0u)
+        {
+            return 0.0;
+        }
+        else
+        {
+            return 1.0;
+        }
     }
 
-    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& ,
-                                                                Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
+    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
     {
         return identity_matrix<double>(SPACE_DIM);
     }
@@ -63,4 +71,4 @@ public:
     }
 };
 
-#endif //_HEATEQUATIONWITHSOURCETERM_HPP_
+#endif //_HEATEQUATIONWITHELEMENTDEPENDENTSOURCETERM_HPP_

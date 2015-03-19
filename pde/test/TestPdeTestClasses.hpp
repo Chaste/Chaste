@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Node.hpp"
 
 #include "HeatEquation.hpp"
+#include "HeatEquationWithElementDependentSourceTerm.hpp"
 #include "NonlinearEquationPde.hpp"
 #include "SimplePoissonEquation.hpp"
 #include "VaryingDiffusionAndSourceTermPde.hpp"
@@ -156,6 +157,84 @@ public:
 
         Node<1> node(0, zero1);
         TS_ASSERT_DELTA(pde1.ComputeSourceTermAtNode(node,u), 0.0, 1e-12);
+    }
+
+    void TestHeatEquationWithElementDependentSourceTerm()
+    {
+        // The PDE is set to give elements with index = 0 a source of zero
+        // and a source of 1 otherwise.
+
+        std::vector<Node<1>*> one_d_nodes;
+        one_d_nodes.push_back(new Node<1>(0, false, 2.0));
+        one_d_nodes.push_back(new Node<1>(1, false, 2.5));
+        Element<1,1> one_d_element(0u, one_d_nodes);
+        ChastePoint<1> zero1(0);
+
+        std::vector<Node<2>*> two_d_nodes;
+        two_d_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        two_d_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
+        two_d_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
+        Element<2,2> two_d_element(0u, two_d_nodes);
+        ChastePoint<2> zero2(0,0);
+
+        std::vector<Node<3>*> three_d_nodes;
+        three_d_nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
+        three_d_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
+        three_d_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
+        three_d_nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
+        Element<3,3> three_d_element(0u, three_d_nodes);
+        ChastePoint<3> zero3(0,0,0);
+        double u = 2.0;
+
+        HeatEquationWithElementDependentSourceTerm<1> pde1;
+        HeatEquationWithElementDependentSourceTerm<2> pde2;
+        HeatEquationWithElementDependentSourceTerm<3> pde3;
+
+        TS_ASSERT_DELTA(pde1.ComputeSourceTerm(zero1, u, &one_d_element), 0.0, 1e-12);
+        one_d_element.ResetIndex(1u);
+        TS_ASSERT_DELTA(pde1.ComputeSourceTerm(zero1, u, &one_d_element), 1.0, 1e-12);
+
+        TS_ASSERT_DELTA(pde2.ComputeSourceTerm(zero2, u, &two_d_element), 0.0, 1e-12);
+        two_d_element.ResetIndex(1u);
+        TS_ASSERT_DELTA(pde2.ComputeSourceTerm(zero2, u, &two_d_element), 1.0, 1e-12);
+
+        TS_ASSERT_DELTA(pde3.ComputeSourceTerm(zero3, u, &three_d_element), 0.0, 1e-12);
+        three_d_element.ResetIndex(1u);
+        TS_ASSERT_DELTA(pde3.ComputeSourceTerm(zero3, u, &three_d_element), 1.0, 1e-12);
+
+        TS_ASSERT_DELTA(pde1.ComputeDuDtCoefficientFunction(zero1), 1.0, 1e-12);
+        TS_ASSERT_DELTA(pde2.ComputeDuDtCoefficientFunction(zero2), 1.0, 1e-12);
+        TS_ASSERT_DELTA(pde3.ComputeDuDtCoefficientFunction(zero3), 1.0, 1e-12);
+
+        // Diffusion matrices should be equal to identity
+        c_matrix<double, 1, 1> diff1 = pde1.ComputeDiffusionTerm(zero1);
+        c_matrix<double, 2, 2> diff2 = pde2.ComputeDiffusionTerm(zero2);
+        c_matrix<double, 3, 3> diff3 = pde3.ComputeDiffusionTerm(zero3);
+
+        TS_ASSERT_DELTA(diff1(0,0), 1, 1e-12);
+
+        TS_ASSERT_DELTA(diff2(0,0), 1, 1e-12);
+        TS_ASSERT_DELTA(diff2(1,1), 1, 1e-12);
+        TS_ASSERT_DELTA(diff2(0,1), 0, 1e-12);
+
+        TS_ASSERT_DELTA(diff3(0,0), 1, 1e-12);
+        TS_ASSERT_DELTA(diff3(1,1), 1, 1e-12);
+        TS_ASSERT_DELTA(diff3(2,2), 1, 1e-12);
+        TS_ASSERT_DELTA(diff3(0,1), 0, 1e-12);
+        TS_ASSERT_DELTA(diff3(0,2), 0, 1e-12);
+        TS_ASSERT_DELTA(diff3(1,2), 0, 1e-12);
+
+        delete one_d_nodes[0];
+        delete one_d_nodes[1];
+
+        delete two_d_nodes[0];
+        delete two_d_nodes[1];
+        delete two_d_nodes[2];
+
+        delete three_d_nodes[0];
+        delete three_d_nodes[1];
+        delete three_d_nodes[2];
+        delete three_d_nodes[3];
     }
 
     void TestVaryingPde1D()

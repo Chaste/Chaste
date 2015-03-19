@@ -48,7 +48,7 @@ class HeatEquation : public AbstractLinearParabolicPde<SPACE_DIM>
 {
 
 public:
-    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double )
+    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double, Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
     {
         return 0.0;
     }
