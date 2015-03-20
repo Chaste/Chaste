@@ -1,5 +1,7 @@
 # Compiler flag definitions common to Chaste & third party library builds
 
+
+if(MSVC) # Applies only to MSVC
 #For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
 #The overrides.cmake include takes care of non GUI builds.
 foreach(flag_var
@@ -28,7 +30,7 @@ if(NOT "${PROJECT_NAME}" STREQUAL "Chaste")
     # Some third party libaries need further suppressions
     message("Adding further compiler flags for third-party libraries")
     add_definitions(
-        -MTd    # => static debug build
+    #    -MTd    # => static debug build
         -Yu     # => use precompiled headers: this prevents a linker warning: "H5FDdirect.obj : warning LNK4221: This object
                 # file does not define any previously undefined public symbols, so it will not be used by any link operation
                 # that consumes this library".
@@ -44,3 +46,4 @@ endif()
 #message("  LINK: ${CMAKE_EXE_LINKER_FLAGS}; debug: ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
 #get_directory_property(DirDefs DEFINITIONS)
 #message("  DEFS: ${DirDefs}")
+endif(MSVC)

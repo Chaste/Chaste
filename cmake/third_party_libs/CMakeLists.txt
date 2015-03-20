@@ -19,6 +19,7 @@ set(OUTPUT_LIB_DIR "${MS_HPC_PACK_DIR}/Lib/amd64")
 set(OUTPUT_INCLUDE_DIR "${MS_HPC_PACK_DIR}/Inc")
 
 option(BUILD_BOOST "Do you want to build Boost?" ON)
+option(BUILD_PETSC "Do you want to build PETSc?" OFF)
 
 set(DOWNLOAD_DIR "${CMAKE_BINARY_DIR}/downloads")
 string(REGEX REPLACE "([a-zA-Z]):" "/cygdrive/\\1" CYG_DOWNLOAD_DIR "${DOWNLOAD_DIR}")
@@ -286,6 +287,7 @@ endforeach(url ${BOOST_URLS})
 endif(BUILD_BOOST)
 
 
+if (BUILD_PETSC)
 foreach(url ${PETSC_URLS})
     #remove leading and trailing whitespaces and newlines from url
     string(STRIP "${url}" url)
@@ -721,6 +723,9 @@ set(MS_HPC_PACK_LIB64 \"${MS_HPC_PACK_DIR}/Lib/amd64\") \n"
         set(OUTPUT_LIB_DIR "${OUTPUT_LIB_DIR}" "${CMAKE_INSTALL_PREFIX}/petsc_${petsc_basicname}/lib")
         set(OUTPUT_INCLUDE_DIR "${OUTPUT_INCLUDE_DIR}" "${CMAKE_INSTALL_PREFIX}/petsc_${petsc_basicname}/include")
 
+	#generate cmake config file for petsc
+ 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PETScConfigForChaste.cmake.in
+  			"${CMAKE_INSTALL_PREFIX}/petsc_${petsc_basicname}/PETScConfig.cmake" @ONLY)
 
         #Delete an errant directory created by PETSc
         string(REGEX REPLACE "([a-zA-Z]:)[^\n]+" "\\1/" WORKING_DIR "${DOWNLOAD_DIR}")
@@ -735,6 +740,7 @@ set(MS_HPC_PACK_LIB64 \"${MS_HPC_PACK_DIR}/Lib/amd64\") \n"
         set(ENV{TEMP} "${TEMP_DIR}")
 
 endforeach(url ${PETSC_URLS})
+endif(BUILD_PETSC)
 
 #Build the HDF5s
 foreach(url ${HDF5_URLS})
@@ -779,6 +785,7 @@ foreach(url ${SUNDIALS_URLS})
  set(sundials_basicname "${bname}")
 
 #Build sundials as an external project
+    message("trying to build from ${DOWNLOAD_DIR}/sundials/${sundials_basicname}")
     externalproject_add(Sundials_${sundials_basicname}
         SOURCE_DIR ${DOWNLOAD_DIR}/sundials/${sundials_basicname}
         CMAKE_GENERATOR ${CMAKE_GENERATOR}
@@ -820,12 +827,12 @@ foreach(url ${VTK_URLS})
     download_from_url(${url} "vtk")
     set(vtk_basicname "VTK")
 
-    #message("Building VTK with flags:")
-    #message("   C: ${CMAKE_C_FLAGS}; debug: ${CMAKE_C_FLAGS_DEBUG}")
-    #message("   CXX: ${CMAKE_CXX_FLAGS}; debug: ${CMAKE_CXX_FLAGS_DEBUG}")
-    #get_directory_property(DirDefs DEFINITIONS)
-    #string(REPLACE "-" "/" DirDefs "${DirDefs}")
-    #message("   DEFS: ${DirDefs}")
+    message("Building VTK with flags:")
+    message("   C: ${CMAKE_C_FLAGS}; debug: ${CMAKE_C_FLAGS_DEBUG}")
+    message("   CXX: ${CMAKE_CXX_FLAGS}; debug: ${CMAKE_CXX_FLAGS_DEBUG}")
+    get_directory_property(DirDefs DEFINITIONS)
+    string(REPLACE "-" "/" DirDefs "${DirDefs}")
+    message("   DEFS: ${DirDefs}")
 
     externalproject_add(Vtk_${vtk_basicname}
         SOURCE_DIR ${DOWNLOAD_DIR}/vtk/${vtk_basicname}

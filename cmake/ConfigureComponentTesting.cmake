@@ -16,3 +16,7 @@ option(ENABLE_crypt_TESTING "Generate the test infrastructure for the crypt comp
 mark_as_advanced(ENABLE_crypt_TESTING)
 option(ENABLE_continuum_mechanics_TESTING "Generate the test infrastructure for the continuum_mechanics component" ON)
 mark_as_advanced(ENABLE_continuum_mechanics_TESTING)
+option(ENABLE_heart_TESTING "Generate the test infrastructure for the heart component" ON)
+mark_as_advanced(ENABLE_heart_TESTING)
+option(ENABLE_continuum_mechanics_TESTING "Generate the test infrastructure for the continuum_mechanics component" ON)
+mark_as_advanced(ENABLE_continuum_mechanics_TESTING)

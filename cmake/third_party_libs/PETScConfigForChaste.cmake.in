@@ -1,0 +1,33 @@
+# - Config file for the PETSc package
+# It defines the following variables
+#  PETSC_INCLUDES - include directories for FooBar
+#  PETSC_LIBRARIES    - libraries to link against
+ 
+# Compute paths
+get_filename_component(PETSC_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+set(PETSC_LIB_DIR "${PETSC_CMAKE_DIR}/lib")
+set(PETSC_EXT_DIR "${PETSC_CMAKE_DIR}/..")
+
+set(PETSC_LIBRARIES
+	"${PETSC_CMAKE_DIR}/lib/libpetsc.lib"
+	"@MPI_CXX_LIBRARIES@"
+	"${PETSC_EXT_DIR}/metis_@metis_basicname@/lib/metis.lib"
+	"${PETSC_EXT_DIR}/parmetis_@parmetis_basicname@/lib/parmetis.lib"
+	"${PETSC_EXT_DIR}/f2cblaslapack_@f2c_basicname@/lib/f2cblas.lib"
+	"${PETSC_EXT_DIR}/f2cblaslapack_@f2c_basicname@/lib/f2clpack.lib"
+)
+
+set(PETSC_INCLUDES
+	"${PETSC_CMAKE_DIR}/include"
+	"@MPI_CXX_INCLUDE_PATH@"
+	"${PETSC_EXT_DIR}/metis_@metis_basicname@/include"
+        "${PETSC_EXT_DIR}/parmetis_@parmetis_basicname@/include"
+        "${PETSC_EXT_DIR}/f2cblaslapack_@f2c_basicname@/include"
+    )
+
+include (FindPackageHandleStandardArgs)
+find_package_handle_standard_args (PETSc
+  "PETSc could not be found.  Be sure to set PETSC_DIR and PETSC_ARCH."
+  PETSC_INCLUDES PETSC_LIBRARIES)
+

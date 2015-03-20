@@ -1,0 +1,23 @@
+#include "ChasteBuildRoot.hpp" 
+
+const char* ChasteBuildRootDir() 
+{ 
+    return "${Chaste_SOURCE_DIR}/"; 
+}
+
+std::string ChasteComponentBuildDir(const std::string& rComponent)
+{
+    return std::string(ChasteBuildRootDir()) + rComponent + "/CHASTE_BUILD_DIR_NAME/" ;
+}
+
+std::string ChasteBuildDirName()
+{
+    return "CHASTE_BUILD_DIR_NAME";
+}
+
+std::string ChasteBuildType()
+{
+    return "${CMAKE_BUILD_TYPE}";
+}
+
+${additional}

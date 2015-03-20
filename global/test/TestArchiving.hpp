@@ -409,7 +409,7 @@ public:
         // Save
         {
             // Create an output archive
-            std::ofstream ofs(archive_filename.c_str());
+            std::ofstream ofs(archive_filename.c_str(), std::ios::binary);
             boost::archive::binary_oarchive output_arch(ofs); // LINE CHANGED!
 
             boost::shared_ptr<BaseClass> p_base(new SubChildClass());

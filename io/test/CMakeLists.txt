@@ -1,6 +1,6 @@
 project(testio)
-
+if(MSVC)
 set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT /NODEFAULTLIB:MSVCRTD")
 set(HAS_OWN_LINKER_FLAGS TRUE)
-
+endif()
 chaste_do_test_component(io)
