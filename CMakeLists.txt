@@ -120,7 +120,7 @@ if(BUILD_SHARED_LIBS)
 else()
 	set( Boost_USE_STATIC_LIBS ON) 
 endif()
-find_package(Boost COMPONENTS filesystem system date_time serialization REQUIRED)
+find_package(Boost COMPONENTS filesystem system serialization REQUIRED)
 list(APPEND CHASTE_INCLUDES "${Boost_INCLUDE_DIR}")
 list(APPEND CHASTE_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
