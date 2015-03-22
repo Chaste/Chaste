@@ -220,7 +220,7 @@ public:
         CellsGenerator<StochasticDurationCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
 
-        /* We make a {{{NodeBasedCellPopulation}}} (this time with dimension 3) as before and define the cut off length.
+        /* We make a {{{NodeBasedCellPopulation}}} (this time with dimension 3) as before.
          */
         NodeBasedCellPopulation<3> cell_population(mesh, cells);
 
