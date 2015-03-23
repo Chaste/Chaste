@@ -48,16 +48,6 @@ foreach(cellml_file ${cellml_files})
     #else()
         set(pycml_args ${pycml_args} "--normal" "--opt" "--cvode")
     #endif()
-    set(output_files_hpp ${out_dir}/${cellml_file_name}.hpp 
-                     ${out_dir}/${cellml_file_name}Cvode.hpp 
-                     ${out_dir}/${cellml_file_name}Opt.hpp 
-                     ${out_dir}/${cellml_file_name}CvodeOpt.hpp
-                     )
-    set(output_files_cpp ${out_dir}/${cellml_file_name}.cpp
-                     ${out_dir}/${cellml_file_name}Cvode.cpp
-                     ${out_dir}/${cellml_file_name}Opt.cpp
-                     ${out_dir}/${cellml_file_name}CvodeOpt.cpp
-                     )
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     if(EXISTS ${cellml_dir}/${cellml_file_name}-conf.xml)
         set(depends ${depends} ${cellml_dir}/${cellml_file_name}-conf.xml)
@@ -66,11 +56,18 @@ foreach(cellml_file ${cellml_files})
     if(EXISTS ${cellml_dir}/${cellml_file_name}.out)
         set(depends ${depends} ${cellml_dir}/${cellml_file_name}.out)
         set(pycml_args ${pycml_args} "--backward-euler")
-        set(output_files_hpp ${output_files_hpp} ${out_dir}/${cellml_file_name}BackwardEuler.hpp)
-        set(output_files_cpp ${output_files_cpp} ${out_dir}/${cellml_file_name}BackwardEuler.cpp)
     endif()
 
-    add_custom_command(OUTPUT ${output_files_cpp} ${output_files_hpp}
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" ConvertCellModel.py ${pycml_args} --show-outputs ${cellml_file}   
+                        WORKING_DIRECTORY ${Chaste_python_dir}
+                        OUTPUT_VARIABLE ConvertCellModelDepends
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+                        )
+
+    string(REGEX MATCHALL "[^\n]*\\.hpp" output_files_hpp "${ConvertCellModelDepends}")
+    string(REGEX MATCHALL "[^\n]*\\.cpp" output_files_cpp "${ConvertCellModelDepends}")
+
+    add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} 
                         COMMAND "${PYTHON_EXECUTABLE}" ConvertCellModel.py ${pycml_args} ${cellml_file}
                         WORKING_DIRECTORY ${Chaste_python_dir}
                         DEPENDS ${depends}

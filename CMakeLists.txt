@@ -196,7 +196,7 @@ endif(WIN32 OR CYGWIN)
 # List the available Chaste components
 set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
 if (NOT (WIN32 OR CYGWIN))
-    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} lung)
+    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} lung heart)
 endif()
 
 if(ENABLE_CHASTE_TESTING)

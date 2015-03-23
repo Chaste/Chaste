@@ -1,9 +1,9 @@
 project(global)
 chaste_do_component(global ${config_dir}/Version.cpp ${config_dir}/ChasteBuildInfo.cpp)
 if (MSCV)
-	set_property(TARGET global APPEND PROPERTY COMPILE_DEFINITIONS CHASTE_BUILD_DIR_NAME="")
-else()
 	set_property(TARGET global APPEND PROPERTY COMPILE_DEFINITIONS CHASTE_BUILD_DIR_NAME="$<CONFIGURATION>")
+else()
+	set_property(TARGET global APPEND PROPERTY COMPILE_DEFINITIONS CHASTE_BUILD_DIR_NAME="")
 endif()
 add_dependencies(global generateTimestamp)
 
