@@ -59,6 +59,7 @@ option(BUILD_SHARED_LIBS
 endif()
 
 option(ENABLE_CHASTE_TESTING "Enable Chaste Testing" ON)
+option(ENABLE_CHASTE_PROJECT_TESTING "Enable Chaste Project Testing" ON)
 
 #Some Chaste-specific #defines
 add_definitions(-DCHASTE_CVODE -DCHASTE_SUNDIALS_VERSION=20500)
@@ -199,6 +200,20 @@ if (NOT (WIN32 OR CYGWIN))
     set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} lung heart)
 endif()
 
+# Find any projects
+file(GLOB potential_dirs RELATIVE "${Chaste_SOURCE_DIR}/projects" "${Chaste_SOURCE_DIR}/projects/*")
+set(Chaste_PROJECTS "")
+foreach(potential_dir ${potential_dirs})
+    if (IS_DIRECTORY "${Chaste_SOURCE_DIR}/projects/${potential_dir}")
+        # test for CMakeLists.txt file
+        if (EXISTS "${Chaste_SOURCE_DIR}/projects/${potential_dir}/CMakeLists.txt")
+            list(APPEND Chaste_PROJECTS "${potential_dir}")
+        else()
+            message(WARNING "No CMakeLists.txt file found in project directory ${Chaste_SOURCE_DIR}/projects/${potential_dir}. This project will not be built")
+        endif()
+    endif ()
+endforeach(potential_dir ${potential_dirs})
+
 if(ENABLE_CHASTE_TESTING)
     enable_testing()
     list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
@@ -207,6 +222,18 @@ if(ENABLE_CHASTE_TESTING)
         option(ENABLE_${component}_TESTING "Generate the test infrastructure for the ${component} component" ON)
         mark_as_advanced(ENABLE_${component}_TESTING)
     endforeach()
+    if (ENABLE_CHASTE_PROJECT_TESTING)
+        foreach(projectName ${Chaste_PROJECTS})
+            if (EXISTS "${Chaste_SOURCE_DIR}/projects/${projectName}/test/CMakeLists.txt")
+                option(ENABLE_project_${projectName}_TESTING "Generate the test infrastructure for the ${projectName} project" ON)
+                mark_as_advanced(ENABLE_project_${projectName}_TESTING)
+            else()
+                message(WARNING "No CMakeLists.txt file found in project test directory ${Chaste_SOURCE_DIR}/projects/${projectName}/test. Tests for this project will not be built")
+                set(ENABLE_project_${projectName}_TESTING OFF)
+            endif()
+
+        endforeach()
+    endif()
 endif()
 
 include(ChasteBuildInfo)
@@ -294,9 +321,27 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
       endif()
   endmacro(CHASTE_GENERATE_TEST_NAME test outTestName)
 
-  macro(CHASTE_DO_COMPONENT component)
-    message("Configuring component ${component}")
+
+  macro(CHASTE_DO_COMMON component)
+    # Expand out dependences. currently only done for core
+    set(CHASTE_DEPENDS_${component}_new "")
+    foreach(dep ${CHASTE_DEPENDS_${component}})
+        if (${dep} STREQUAL core)
+            list(APPEND CHASTE_DEPENDS_${component}_new ${CHASTE_DEPENDS_${dep}})
+        else()
+            list(APPEND CHASTE_DEPENDS_${component}_new ${dep})
+        endif()
+    endforeach(dep)
+    set(CHASTE_DEPENDS_${component} ${CHASTE_DEPENDS_${component}_new})
+
     # Figure out include path
+    if (NOT CHASTE_${component}_INCLUDE_DIRS)
+        set(CHASTE_${component}_INCLUDE_DIRS 
+            "${CMAKE_CURRENT_SOURCE_DIR}/src" 
+            "${CMAKE_CURRENT_SOURCE_DIR}/test" 
+            "${CMAKE_CURRENT_SOURCE_DIR}/apps/src"
+            )
+    endif (NOT CHASTE_${component}_INCLUDE_DIRS)
     include_directories("${CHASTE_${component}_INCLUDE_DIRS}")
     foreach(dep ${CHASTE_DEPENDS_${component}})
         include_directories("${CHASTE_${dep}_INCLUDE_DIRS}")
@@ -311,7 +356,9 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
     #if (BUILD_SHARED_LIBS)
     	target_link_libraries(${component} ${CHASTE_LINK_LIBRARIES})
     #endif()
-    install(TARGETS ${component} DESTINATION lib COMPONENT ${component}_libraries)
+    if(NOT(${component} MATCHES "^project"))
+        install(TARGETS ${component} DESTINATION lib COMPONENT ${component}_libraries)
+    endif(NOT(${component} MATCHES "^project"))
 
     # Do testing if requested
     if(ENABLE_${component}_TESTING)
@@ -319,12 +366,12 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
     endif()
 	# Build applications if present
 	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/apps")
-		message("Building apps in ${CMAKE_CURRENT_SOURCE_DIR} comp ${component}")
+        message("Configuring apps for ${component}")
 		file(GLOB CHASTE_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/apps/src/*.cpp)
 		foreach(app ${CHASTE_${component}_APPS})
 			string(REGEX REPLACE ".*/([a-zA-Z0-9_]+)[.]cpp" "\\1" appName "${app}")
-			message("Building app ${app} named ${appName}.")
-			message("Libraries=${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES}")
+            message("Configuring app ${app} named ${appName}.")
+            #message("Libraries=${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES}")
 			add_executable(${appName} ${app})
 			target_link_libraries(${appName} ${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES})
             if(MSVC)
@@ -338,11 +385,22 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
 			set_target_properties(${appName} PROPERTIES INCLUDE_DIRECTORIES "${incDirs}")
 		endforeach(app)
 	endif()
+  endmacro(CHASTE_DO_COMMON)
+
+
+  macro(CHASTE_DO_COMPONENT component)
+    message("Configuring component ${component}")
+    CHASTE_DO_COMMON(${component} ${ARGN})
   endmacro(CHASTE_DO_COMPONENT)
 
-  macro(CHASTE_DO_TEST_COMPONENT component)
+  macro(CHASTE_DO_PROJECT projectName)
+    message("Configuring project ${projectName}")
+    CHASTE_DO_COMMON(project_${projectName})
+  endmacro(CHASTE_DO_PROJECT)
+
+
+  macro(CHASTE_DO_TEST_COMMON component)
     if(ENABLE_CHASTE_TESTING)
-        message("Configuring tests for ${component}")
         # Figure out include path for tests
         header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" CHASTE_${component}_TEST_DIRS)
         include_directories("${CHASTE_${component}_TEST_DIRS}" "${CHASTE_${component}_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")
@@ -381,8 +439,10 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
                     target_link_libraries(${targetName} ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
                     set_target_properties(${targetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
                     set_property(TEST ${targetName} PROPERTY LABELS ${component} ${type})
-                    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
+                    if(NOT(${component} MATCHES "^project"))
+                        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
                             DESTINATION test/${component} COMPONENT  ${component}_tests)
+                    endif(NOT(${component} MATCHES "^project"))
                 else()
                     get_property(myLabels TEST ${targetName} PROPERTY LABELS)
                     list(APPEND myLabels ${type})
@@ -392,7 +452,17 @@ set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
             endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
         endforeach(type ${TestPackTypes})
     endif(ENABLE_CHASTE_TESTING)
+  endmacro(CHASTE_DO_TEST_COMMON)
+
+  macro(CHASTE_DO_TEST_COMPONENT component)
+    message("Configuring tests for ${component}")
+    CHASTE_DO_TEST_COMMON(${component})
   endmacro(CHASTE_DO_TEST_COMPONENT)
+
+  macro(CHASTE_DO_TEST_PROJECT projectName)
+    message("Configuring tests for project ${projectName}")
+    CHASTE_DO_TEST_COMMON(project_${projectName})
+  endmacro(CHASTE_DO_TEST_PROJECT)
 
 
 # Specify which other components each depends on.
@@ -408,6 +478,7 @@ set(CHASTE_DEPENDS_crypt cell_based pde ode mesh linalg io global)
 set(CHASTE_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 set(CHASTE_DEPENDS_heart ${CHASTE_DEPENDS_continuum_mechanics} continuum_mechanics)
 set(CHASTE_DEPENDS_lung ${CHASTE_DEPENDS_continuum_mechanics} continuum_mechanics)
+set(CHASTE_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 
 foreach(component ${CHASTE_COMPONENTS})
     # Set up the component source & include directories
@@ -430,6 +501,13 @@ foreach(component ${CHASTE_COMPONENTS})
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
             )
 endforeach(component)
+
+foreach(projectName ${Chaste_PROJECTS})
+    add_subdirectory(projects/${projectName})
+    if(CHASTE_DEPENDS_PROJECT_${projectName})
+        add_dependencies(project_${projectName} ${CHASTE_DEPENDS_project_${projectName}})
+    endif()
+endforeach(projectName)
 
 set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Computational Biology Group - Computer Science - University of Oxford")
