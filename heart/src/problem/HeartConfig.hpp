@@ -57,7 +57,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 
 #include "ChasteSerialization.hpp"
+#include "ChasteSerializationVersion.hpp"
 #include <boost/serialization/split_member.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
 
 namespace cp = chaste::parameters::v3_3;
 
@@ -102,6 +105,27 @@ private:
         {
             mpInstance->Write( true );
         }
+
+        // Archive other member variables that don't appear in the XML
+        if (version > 1)
+        {
+        	archive & mEpiFraction;
+			archive & mEndoFraction;
+			archive & mMidFraction;
+			archive & mIndexMid;
+			archive & mIndexEpi;
+			archive & mIndexEndo;
+			archive & mUserAskedForCellularTransmuralHeterogeneities;
+			archive & mUseMassLumping;
+			archive & mUseMassLumpingForPrecond;
+			archive & mUseReactionDiffusionOperatorSplitting;
+			archive & mBathConductivities;
+			archive & mTissueIdentifiers;
+			archive & mBathIdentifiers;
+			archive & mUseFixedNumberIterations;
+			archive & mEvaluateNumItsEveryNSolves;
+        }
+
         PetscTools::Barrier("HeartConfig::save");
     }
 
@@ -115,6 +139,26 @@ private:
     void load(Archive & archive, const unsigned int version)
     {
         LoadFromCheckpoint();
+
+        // Load other member variables
+        if (version > 1)
+        {
+        	archive & mEpiFraction;
+			archive & mEndoFraction;
+			archive & mMidFraction;
+			archive & mIndexMid;
+			archive & mIndexEpi;
+			archive & mIndexEndo;
+			archive & mUserAskedForCellularTransmuralHeterogeneities;
+			archive & mUseMassLumping;
+			archive & mUseMassLumpingForPrecond;
+			archive & mUseReactionDiffusionOperatorSplitting;
+			archive & mBathConductivities;
+			archive & mTissueIdentifiers;
+			archive & mBathIdentifiers;
+			archive & mUseFixedNumberIterations;
+			archive & mEvaluateNumItsEveryNSolves;
+        }
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -1344,7 +1388,7 @@ private:
 };
 
 
-BOOST_CLASS_VERSION(HeartConfig, 1)
+BOOST_CLASS_VERSION(HeartConfig, 2)
 #include "SerializationExportWrapper.hpp"
 // Declare identifier for the serializer
 CHASTE_CLASS_EXPORT(HeartConfig)

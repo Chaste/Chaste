@@ -885,9 +885,21 @@ public:
 
         { // save...
             HeartConfig::Instance()->SetSimulationDuration(0.01);  //ms
-            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes");
+            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1_10_elements_with_three_attributes");
             HeartConfig::Instance()->SetOutputDirectory(archive_dir + "Output");
             HeartConfig::Instance()->SetOutputFilenamePrefix("BidomainLR91_1d");
+
+            std::set<unsigned> tissue_ids;
+            tissue_ids.insert(0u); // (The default)
+            std::set<unsigned> bath_ids;
+            bath_ids.insert(1u); // (The default)
+            bath_ids.insert(2u); // Some other type of bath
+            HeartConfig::Instance()->SetTissueAndBathIdentifiers(tissue_ids,bath_ids);
+
+            std::map<unsigned, double> multiple_bath_conductivities;
+            multiple_bath_conductivities[1] = 3.14;
+            multiple_bath_conductivities[2] = 2.72;
+            HeartConfig::Instance()->SetBathMultipleConductivities(multiple_bath_conductivities);
 
             ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
             BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
@@ -897,31 +909,53 @@ public:
             CardiacSimulationArchiver<BidomainWithBathProblem<1> >::Save(bidomain_problem, archive_dir, false);
         }
 
+        HeartConfig::Instance()->Reset(); // Forget these IDs/conductivities, they should be loaded from the archive.
+
         { // load...
             AbstractCardiacProblem<1,1,2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<1> >::Load(archive_dir);
 
+            // Check the identifiers have made it
+            std::set<unsigned> tissue_ids = HeartConfig::Instance()->rGetTissueIdentifiers();
+            TS_ASSERT( tissue_ids.size() == 1u );
+            TS_ASSERT( *(tissue_ids.begin()) == 0u );
+            std::set<unsigned> bath_ids = HeartConfig::Instance()->rGetBathIdentifiers();
+            TS_ASSERT( bath_ids.size() == 2u );
+            TS_ASSERT( *bath_ids.begin() == 1u );
+            TS_ASSERT( *(++bath_ids.begin()) == 2u );
+
             AbstractTetrahedralMesh<1,1>* p_mesh = &(p_abstract_problem->rGetMesh());
 
-
-            // the middle 4 elements are 'heart' elements (ie region=0),
-            char expected_element_regions[10]={ 'B', 'B', 'B',
-                       'T', 'T', 'T', 'T',
-                       'B','B','B'};
+            /* Check the element ids have been loaded properly. The middle 4 elements are 'heart' elements
+             * (region=0). The edges are different "flavours" of bath... */
+            unsigned expected_element_regions[10]={ 2,1,1,0,0,0,0,1,1,2 };
             for (AbstractTetrahedralMesh<1,1>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
                  iter != p_mesh->GetElementIteratorEnd();
                  ++iter)
             {
-                if ( expected_element_regions[iter->GetIndex()] == 'T')
+                unsigned element_index = iter->GetIndex();
+                unsigned element_attribute = iter->GetUnsignedAttribute();
+                switch ( expected_element_regions[element_index] )
                 {
-                     TS_ASSERT(HeartRegionCode::IsRegionTissue( iter->GetUnsignedAttribute() ));
-                }
-                else
-                {
-                     TS_ASSERT_EQUALS( expected_element_regions[iter->GetIndex()], 'B')
-                     TS_ASSERT(HeartRegionCode::IsRegionBath( iter->GetUnsignedAttribute() ));
-                }
+                case 0:
+                    TS_ASSERT(HeartRegionCode::IsRegionTissue( element_attribute ));
+                    break;
+                case 1:
+                    TS_ASSERT_EQUALS( expected_element_regions[element_index], 1);
+                    TS_ASSERT(HeartRegionCode::IsRegionBath( element_attribute ));
+                    TS_ASSERT_DELTA(HeartConfig::Instance()->GetBathConductivity( element_attribute ), 3.14, 1e-9);
+                    break;
+                case 2:
+                    TS_ASSERT_EQUALS( expected_element_regions[element_index], 2);
+                    TS_ASSERT(HeartRegionCode::IsRegionBath( element_attribute ));
+                    TS_ASSERT_DELTA(HeartConfig::Instance()->GetBathConductivity( element_attribute ), 2.72, 1e-9);
+                    break;
+                default:
+                    NEVER_REACHED;
+                    break;
+                };
+
             }
-            // so the middle 5 nodes should be heart nodes
+            /* ...so the middle 5 nodes should be heart nodes */
             char expected_node_regions[11]={ 'B', 'B', 'B',
                        'T', 'T', 'T', 'T', 'T',
                        'B','B','B'};
