@@ -373,9 +373,6 @@ def DoPetsc(version, optimised, profile=False, production=False, includesOnly=Fa
         binpath = os.path.join(petsc_base, build_name, 'bin')
         if not hasattr(conf, 'tools'):
             conf.tools = {}
-        if os.path.isdir(binpath):
-            # Also add to the beginning of the path for the PETSc verion of h5dump to be preferred
-            os.environ['PATH'] = binpath + ':' + os.environ['PATH']
         if os.path.exists(os.path.join(binpath, 'mpicxx')):
             conf.tools['mpicxx'] = os.path.abspath(os.path.join(binpath, 'mpicxx'))
         if os.path.exists(os.path.join(binpath, 'mpirun')):
