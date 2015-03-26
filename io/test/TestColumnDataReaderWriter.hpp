@@ -321,6 +321,9 @@ public:
 
     void TestPutNegativeVariable() throw(Exception)
     {
+#ifdef  _MSC_VER
+        _set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testunlimitednegative", false));
         int time_var_id = 0;
         int ina_var_id = 0;
@@ -353,11 +356,8 @@ public:
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
 
-#ifdef  _MSC_VER
-        TS_ASSERT(FilesMatch(output_dir + "testunlimitednegative.dat", "io/test/data/testunlimitednegative_good_Windows.dat"));
-#else
         TS_ASSERT(FilesMatch(output_dir + "testunlimitednegative.dat", "io/test/data/testunlimitednegative_good.dat"));
-#endif
+
         // Compare with known good data using ColumnDataReader
         ColumnDataReader good_reader("io/test/data", "testunlimitednegative_good", false);
         ColumnDataReader our_reader("TestColumnDataReaderWriter", "testunlimitednegative");
@@ -369,6 +369,9 @@ public:
 
     void TestPutVariableInFixedFileAndPrecision() throw(Exception)
     {
+#ifdef  _MSC_VER
+        _set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testfixed", false, 3)); // precision = 3
 
         int node_var_id = 0;
@@ -405,11 +408,7 @@ public:
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
 
-#ifndef _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testfixed.dat", "io/test/data/testfixed_good.dat"));
-#else
-        TS_ASSERT(FilesMatch(output_dir + "testfixed.dat", "io/test/data/testfixed_Windows_good.dat"));
-#endif
         TS_ASSERT(FilesMatch(output_dir + "testfixed.info", "io/test/data/testfixed_good.info"));
 
         TS_ASSERT_THROWS_NOTHING(mpTestReader = new ColumnDataReader("TestColumnDataReaderWriter", "testfixed"));
@@ -530,6 +529,10 @@ public:
 
     void TestPutVariableInFixedandUnlimitedFile() throw(Exception)
     {
+#ifdef _MSC_VER
+        _set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
+
         TS_ASSERT_THROWS_NOTHING(mpTestWriter = new ColumnDataWriter("TestColumnDataReaderWriter", "testfixedandunlimited", false));
 
         int time_var_id = 0;
@@ -571,20 +574,11 @@ public:
 
         std::string output_dir = mpTestWriter->GetOutputDirectory();
         delete mpTestWriter;
-#ifndef _MSC_VER
         TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_unlimited.dat",
                              "io/test/data/testfixedandunlimited_unlimited.dat"));
 
         TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_000001.dat",
                              "io/test/data/testfixedandunlimited_000001.dat"));
-#else
-        TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_unlimited.dat",
-                             "io/test/data/testfixedandunlimited_Windows_unlimited.dat"));
-
-        TS_ASSERT(FilesMatch(output_dir + "testfixedandunlimited_000001.dat",
-                             "io/test/data/testfixedandunlimited_Windows_000001.dat"));
-
-#endif
 
         TS_ASSERT_THROWS_NOTHING(mpTestReader = new ColumnDataReader("TestColumnDataReaderWriter", "testfixedandunlimited"));
 

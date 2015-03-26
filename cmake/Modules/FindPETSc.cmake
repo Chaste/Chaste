@@ -89,7 +89,7 @@ find_program (MAKE_EXECUTABLE NAMES make gmake)
 if (PETSC_DIR AND NOT PETSC_ARCH)
   set (_petsc_arches
     $ENV{PETSC_ARCH}                   # If set, use environment variable first
-    c-opt_icl_mkl c-debug_icl_mkl #PETSc for Windows
+    c-debug_icl_mkl c-opt_icl_mkl #PETSc for Windows
     linux-gnu-c-debug linux-gnu-c-opt  # Debian defaults
     x86_64-unknown-linux-gnu i386-unknown-linux-gnu)
   set (petscconf "NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
@@ -116,7 +116,8 @@ find_package_multipass (PETSc petsc_config_current
   STATES DIR ARCH
   DEPENDENTS INCLUDES LIBRARIES COMPILER MPIEXEC ${petsc_slaves})
 
-if (PETSC_DIR)
+if (PETSC_DIR AND PETSC_ARCH)
+    petsc_get_version()
 	#search for config file in ${PETSC_DIR}/${PETSC_ARCH}. if exists use this
 	if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/PETScConfig.cmake")
 		find_package(PETSc NO_MODULE PATHS ${PETSC_DIR}/${PETSC_ARCH} NO_DEFAULT_PATH)
@@ -147,8 +148,6 @@ endif ()
 
 
 if (petsc_conf_rules AND petsc_conf_variables AND NOT petsc_config_current)
-  petsc_get_version()
-
 	
   # Put variables into environment since they are needed to get
   # configuration (petscvariables) in the PETSc makefile

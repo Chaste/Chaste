@@ -157,16 +157,12 @@ public:
                 "[End time=1; start=0; dt=0.3; error=0.1]");
 
 #ifdef _MSC_VER
-        TS_ASSERT_THROWS_THIS( TimeStepper bad_const_dt_stepper2(0.0, 1.0, 0.99999999, true),
-                "TimeStepper estimates non-constant timesteps will need to be used: "
-                "check timestep divides (end_time-start_time) (or divides printing timestep). "
-                "[End time=1; start=0; dt=1; error=1e-008]");//There is no way to control the formatting of the mantissa
-#else
+        _set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
         TS_ASSERT_THROWS_THIS( TimeStepper bad_const_dt_stepper2(0.0, 1.0, 0.99999999, true),
                 "TimeStepper estimates non-constant timesteps will need to be used: "
                 "check timestep divides (end_time-start_time) (or divides printing timestep). "
                 "[End time=1; start=0; dt=1; error=1e-08]");
-#endif
         TimeStepper const_dt_stepper(0.0, 1.0, 0.1, true);
         unsigned counter = 0;
         while (!const_dt_stepper.IsTimeAtEnd())

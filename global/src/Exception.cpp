@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
+#include "ChasteBuildRoot.hpp"
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
 typedef PetscTruth PetscBool;
@@ -63,7 +64,16 @@ Exception::Exception(const std::string& rMessage,
 void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
-    std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
+    // Strip off source root dir if exists
+    std::string filename(rFilename);
+    std::string sourceRootDir(ChasteBuildRootDir());
+    size_t start_pos = filename.find(sourceRootDir);
+    if (start_pos == 0)
+    {
+        filename.replace(start_pos,sourceRootDir.length(),"./");
+    }
+
+    std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(filename)));
     mShortMessage = rMessage;
     std::stringstream line_number_stream;
     line_number_stream << lineNumber;
