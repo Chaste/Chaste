@@ -1077,13 +1077,23 @@ void Hdf5DataWriter::PossiblyExtend()
     {
 #if H5_VERS_MAJOR>=1 && H5_VERS_MINOR>=8 // HDF5 1.8+
         H5Dset_extent( mVariablesDatasetId, mDatasetDims );
-        H5Dset_extent( mUnlimitedDatasetId, &mDatasetDims[0] );
+        H5Dset_extent( mUnlimitedDatasetId, mDatasetDims );
 #else // Deprecated
         H5Dextend( mVariablesDatasetId, mDatasetDims );
         H5Dextend( mUnlimitedDatasetId, mDatasetDims );
 #endif
     }
     mNeedExtend = false;
+}
+
+void Hdf5DataWriter::EmptyDataset()
+{
+    // Set internal counter to 0
+    mCurrentTimeStep = 0;
+    // Set dataset to 1 x nodes x vars
+    mDatasetDims[0] = 1;
+    mNeedExtend = 1;
+    PossiblyExtend(); // Abusing the notation here, this is probably a contraction.
 }
 
 int Hdf5DataWriter::GetVariableByName(const std::string& rVariableName)

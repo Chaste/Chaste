@@ -221,6 +221,14 @@ public:
     void PossiblyExtend();
 
     /**
+     * Reset mCurrentTimeStep to 0 and resize the dataset and unlimited dataset to size 1
+     * in the first dimension. Future writes will therefore overwrite the original contents.
+     *
+     * * THIS METHOD (EFFECTIVELY) DELETES THE DATASET! * *
+     */
+    void EmptyDataset();
+
+    /**
      * Write data for a given variable from a PETSc vector to the dataset.
      *
      * @param variableID the variable id of the column in the HDF5 file

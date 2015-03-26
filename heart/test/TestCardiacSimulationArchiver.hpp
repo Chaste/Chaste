@@ -1148,6 +1148,61 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
         DoSimulationsAfterMigrationAndCompareResults(p_problem, source_directory, ref_archive_dir, new_archive_dir, 2, 0.2);
     }
 
+    /*
+     * The following tests that there are no problems when running and resuming a simulation with postprocessing.
+     */
+    void TestSolveAndResumeWithPostprocessing() throw (Exception)
+    {
+        setUp();
+        HeartConfig::Instance()->SetOutputDirectory("SolveAndResumeWithPostprocessing");
+        const std::string archive_dir = "SolveAndResumeWithPostprocessing/saved_simulation";
+        // Solve with some postprocessing switched on
+        {
+            HeartConfig::Instance()->SetSimulationDuration(400.0);
+            HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.1, 1.0);
+            HeartConfig::Instance()->SetMeshFileName("mesh/test/data/1D_0_to_1mm_10_elements");
+            HeartConfig::Instance()->SetOutputFilenamePrefix("results");
+
+            std::vector<double> upstroke_maps;
+            upstroke_maps.push_back(0.0);
+            HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_maps);
+
+            std::vector<std::pair<double,double> > apd_maps;
+            apd_maps.push_back(std::pair<double, double>(90.0, 0.0)); // APD90, 0 mV threshold
+            HeartConfig::Instance()->SetApdMaps(apd_maps);
+
+            PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory(-5.0e5, 1.0);
+            MonodomainProblem<1> monodomain_problem( &cell_factory );
+
+            monodomain_problem.Initialise();
+            monodomain_problem.Solve();
+
+            CardiacSimulationArchiver<MonodomainProblem<1> >::Save(monodomain_problem, archive_dir, true); // Clear just in case
+        }
+        {
+            MonodomainProblem<1>* p_problem = CardiacSimulationArchiver<MonodomainProblem<1> >::Load(archive_dir);
+            HeartConfig::Instance()->SetSimulationDuration(500.0);
+            // All other settings inherited, including output folder and maps, so the writer will try and overwrite.
+            p_problem->Solve();
+        }
+        {
+            // Do it all again but this time in one go, for comparison.
+            HeartConfig::Instance()->SetOutputDirectory("SolveWithPostprocessing");
+            HeartConfig::Instance()->SetSimulationDuration(500.0);
+
+            PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory(-5.0e5, 1.0);
+            MonodomainProblem<1> monodomain_problem( &cell_factory );
+
+            monodomain_problem.Initialise();
+            monodomain_problem.Solve();
+        }
+        {
+            // Compare
+            TS_ASSERT(CompareFilesViaHdf5DataReader("SolveAndResumeWithPostprocessing", "results", true,
+                                                    "SolveWithPostprocessing", "results", true));
+        }
+    }
+
     /**
      * The next pair of tests cover the case where the master process (that creates the archive)
      * has no boundary conditions, but at least one other process does.

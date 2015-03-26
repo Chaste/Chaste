@@ -178,10 +178,19 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
                           true,  // to extending
                           rDatasetName); // dataset name
 
-    int apd_id = writer.DefineVariable(rDatasetName,rDatasetUnit);
-    writer.DefineFixedDimension(mrMesh.GetNumNodes());
-    writer.DefineUnlimitedDimension(rUnlimitedVariableName, rUnlimitedVariableUnit);
-    writer.EndDefineMode();
+    int apd_id;
+    try
+    {
+        apd_id = writer.GetVariableByName(rDatasetName);
+        writer.EmptyDataset();
+    }
+    catch(Exception&)
+    {
+        apd_id = writer.DefineVariable(rDatasetName, rDatasetUnit);
+        writer.DefineFixedDimension(mrMesh.GetNumNodes());
+        writer.DefineUnlimitedDimension(rUnlimitedVariableName, rUnlimitedVariableUnit);
+        writer.EndDefineMode();
+    }
 
     //Determine the maximum number of paces
     unsigned local_max_paces = 0u;
