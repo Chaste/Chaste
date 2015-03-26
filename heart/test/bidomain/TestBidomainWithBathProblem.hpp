@@ -940,12 +940,12 @@ public:
                     TS_ASSERT(HeartRegionCode::IsRegionTissue( element_attribute ));
                     break;
                 case 1:
-                    TS_ASSERT_EQUALS( expected_element_regions[element_index], 1);
+                    TS_ASSERT_EQUALS( expected_element_regions[element_index], 1u);
                     TS_ASSERT(HeartRegionCode::IsRegionBath( element_attribute ));
                     TS_ASSERT_DELTA(HeartConfig::Instance()->GetBathConductivity( element_attribute ), 3.14, 1e-9);
                     break;
                 case 2:
-                    TS_ASSERT_EQUALS( expected_element_regions[element_index], 2);
+                    TS_ASSERT_EQUALS( expected_element_regions[element_index], 2u);
                     TS_ASSERT(HeartRegionCode::IsRegionBath( element_attribute ));
                     TS_ASSERT_DELTA(HeartConfig::Instance()->GetBathConductivity( element_attribute ), 2.72, 1e-9);
                     break;

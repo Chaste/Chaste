@@ -1987,10 +1987,10 @@ public:
         DiffusionForce<2> force;
 
         // Check that AddForceContribution() throws the right error if the node radii have not been set
-	    TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
+        TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
             "SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
 
-	    // Now set each node radius...
+        // Now set each node radius...
         for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)

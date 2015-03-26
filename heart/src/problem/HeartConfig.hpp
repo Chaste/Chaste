@@ -109,21 +109,21 @@ private:
         // Archive other member variables that don't appear in the XML
         if (version > 1)
         {
-        	archive & mEpiFraction;
-			archive & mEndoFraction;
-			archive & mMidFraction;
-			archive & mIndexMid;
-			archive & mIndexEpi;
-			archive & mIndexEndo;
-			archive & mUserAskedForCellularTransmuralHeterogeneities;
-			archive & mUseMassLumping;
-			archive & mUseMassLumpingForPrecond;
-			archive & mUseReactionDiffusionOperatorSplitting;
-			archive & mBathConductivities;
-			archive & mTissueIdentifiers;
-			archive & mBathIdentifiers;
-			archive & mUseFixedNumberIterations;
-			archive & mEvaluateNumItsEveryNSolves;
+            archive & mEpiFraction;
+            archive & mEndoFraction;
+            archive & mMidFraction;
+            archive & mIndexMid;
+            archive & mIndexEpi;
+            archive & mIndexEndo;
+            archive & mUserAskedForCellularTransmuralHeterogeneities;
+            archive & mUseMassLumping;
+            archive & mUseMassLumpingForPrecond;
+            archive & mUseReactionDiffusionOperatorSplitting;
+            archive & mBathConductivities;
+            archive & mTissueIdentifiers;
+            archive & mBathIdentifiers;
+            archive & mUseFixedNumberIterations;
+            archive & mEvaluateNumItsEveryNSolves;
         }
 
         PetscTools::Barrier("HeartConfig::save");
@@ -143,21 +143,21 @@ private:
         // Load other member variables
         if (version > 1)
         {
-        	archive & mEpiFraction;
-			archive & mEndoFraction;
-			archive & mMidFraction;
-			archive & mIndexMid;
-			archive & mIndexEpi;
-			archive & mIndexEndo;
-			archive & mUserAskedForCellularTransmuralHeterogeneities;
-			archive & mUseMassLumping;
-			archive & mUseMassLumpingForPrecond;
-			archive & mUseReactionDiffusionOperatorSplitting;
-			archive & mBathConductivities;
-			archive & mTissueIdentifiers;
-			archive & mBathIdentifiers;
-			archive & mUseFixedNumberIterations;
-			archive & mEvaluateNumItsEveryNSolves;
+            archive & mEpiFraction;
+            archive & mEndoFraction;
+            archive & mMidFraction;
+            archive & mIndexMid;
+            archive & mIndexEpi;
+            archive & mIndexEndo;
+            archive & mUserAskedForCellularTransmuralHeterogeneities;
+            archive & mUseMassLumping;
+            archive & mUseMassLumpingForPrecond;
+            archive & mUseReactionDiffusionOperatorSplitting;
+            archive & mBathConductivities;
+            archive & mTissueIdentifiers;
+            archive & mBathIdentifiers;
+            archive & mUseFixedNumberIterations;
+            archive & mEvaluateNumItsEveryNSolves;
         }
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
