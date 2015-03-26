@@ -57,7 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * Note that the airway generation code is dependent of having VTK installed.
+ * Note that the airway generation code is dependent of having VTK installed.  However, we cannot put a guard around the
+ * whole file since that gives compiler errors if VTK is not installed.  Instead we guard the internals of each test, and
+ * any includes that will be missing if VTK is not present.
  */
 #ifdef CHASTE_VTK
 
@@ -68,6 +70,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkSTLReader.h"
+
+#endif // CHASTE_VTK
 
 /* The usual headers are included */
 #include <cxxtest/TestSuite.h>
@@ -188,10 +192,8 @@ public: // Tests should be public!
          */
         generator.Generate("TestAirwayGenerationTutorial", "example_complete_conducting_airway");
 
-    #endif
+#endif // VTK >= 5.6
     }
 };
-
-#endif /*CHASTE_VTK*/
 
 #endif /*TESTAIRWAYGENERATIONTUTORIAL_HPP_*/
