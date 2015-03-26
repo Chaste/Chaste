@@ -868,7 +868,7 @@ public:
      * @param rOutputVariables  a vector of std::strings of the names
      * of each variable that should be outputted at each time step.
      *
-     * USING THIS METHOD WILL OVERRIDE THE ANY OUTPUT VARIABLES SET IN THE XML FILE
+     * USING THIS METHOD WILL OVERRIDE ANY OUTPUT VARIABLES SET IN THE XML FILE
      */
     void SetOutputVariables(const std::vector<std::string>& rOutputVariables);
 
