@@ -61,7 +61,7 @@ public:
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
 
         double current_time = Timer::GetWallTime();
-        TS_ASSERT_LESS_THAN(1.0e6, current_time);
+        TS_ASSERT_LESS_THAN(1.0e5, current_time);
     }
 };
 
