@@ -120,6 +120,12 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(3.0, 0.3));
 
         p_bidomain_problem->Solve();
+
+        /* Note that the pointer p_bidomain_problem exists in the scope of this test and that the object
+         * which was unarchived was created on the CardiacSimulationArchiver::Load() line above.  We are therefore
+         * responsible for deleting the memory.
+         */
+        delete p_bidomain_problem;
     }
 };
 

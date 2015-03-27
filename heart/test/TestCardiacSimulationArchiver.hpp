@@ -1184,6 +1184,7 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
             HeartConfig::Instance()->SetSimulationDuration(500.0);
             // All other settings inherited, including output folder and maps, so the writer will try and overwrite.
             p_problem->Solve();
+            delete p_problem;
         }
         {
             // Do it all again but this time in one go, for comparison.
@@ -1196,11 +1197,9 @@ cp /tmp/$USER/testoutput/TestCreateArchiveForLoadFromSequentialWithBath/?* ./hea
             monodomain_problem.Initialise();
             monodomain_problem.Solve();
         }
-        {
-            // Compare
-            TS_ASSERT(CompareFilesViaHdf5DataReader("SolveAndResumeWithPostprocessing", "results", true,
-                                                    "SolveWithPostprocessing", "results", true));
-        }
+        // Compare
+        TS_ASSERT(CompareFilesViaHdf5DataReader("SolveAndResumeWithPostprocessing", "results", true,
+                                                "SolveWithPostprocessing", "results", true));
     }
 
     /**
