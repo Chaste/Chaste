@@ -112,7 +112,7 @@ public:
          * This means that we are running from {{{t=5 ms}}} (the end of the previous simulation) to {{{t=10 ms}}}.
          * The output files are concatenated so that they appear to be made by a single simulation running from
          * {{{t=0 ms}}} to {{{t=10 ms}}}.
-         * Note: loading an archive also loads HeartConfig options, so HeartConfig calls such as this one must appear
+         * Note: loading an archive also loads `HeartConfig` options, so `HeartConfig` calls such as this one must appear
          * ''after'' CardiacSimulationArchiver::Load().
          */
         HeartConfig::Instance()->SetSimulationDuration(10); //ms
@@ -141,14 +141,14 @@ public:
  *   from disk and hasn't been modified (e.g. by permuting).  Because of this, if you modify the mesh in memory,
  *   e.g. by setting element attributes in [UserTutorials/BidomainWithBath bidomain-with-bath simulations], then
  *   you need to inform Chaste by calling `mesh.SetMeshHasChangedSinceLoading()`, so your modifications aren't lost.
- * * Meshes written in checkpoints use a binary form of the Triangle/Tetgen mesh format. This makes checkpoints
+ * * Meshes written in checkpoints use a binary form of the !Triangle/Tetgen mesh format. This makes checkpoints
  *   significantly smaller but will cause portability problems if checkpoints are moved between little-endian systems
  *   (e.g. x86) and big-endian systems (e.g. PowerPC).
  * * Checkpoints may be resumed on any number of processes — you are not restricted to the number on which it was
  *   saved. However, the mesh will not be re-partitioned if loaded on a different number of processes, so the parallel
  *   efficiency of the simulation may be significantly reduced in this case.
  * * Resuming a checkpoint will attempt to extend the original results HDF5 file if it exists (specified by
- *   HeartConfig::SetOutputDirectory and HeartConfig::SetOutputFilenamePrefix), so that the file contains the complete
+ *   `HeartConfig::SetOutputDirectory` and `HeartConfig::SetOutputFilenamePrefix`), so that the file contains the complete
  *   simulation results. If this file does not exist a new file will be created containing just the results from the
  *   resume time.
  *
