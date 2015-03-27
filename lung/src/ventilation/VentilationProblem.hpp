@@ -121,6 +121,18 @@ private:
      * Number of non-zeroes per row in #mTerminalInteractionMatrix (which is a sparse approximation to a fully dense matrix).
      * This is used to cut down the fill of the matrix.   The time spent constructing the approximation goes up
      * quadratically in this parameter.
+     *
+     * A sensible number for this parameter is 25 (or somewhere between 10 and 50).
+     *
+     * Why? Because when running profiled time-varying Poiseuille and Pedley simulations on large airway trees:
+     *  * If mNumNonZeroesPerRow is very large (~500) then the time to construct the becomes infeasible.
+     *  * If mNumNonZeroesPerRow is large (250) then the iteration count is quite small but the cost of doing in
+     * PETSc solve dominates the run time
+     *  * If mNumNonZeroesPerRow is between 10 and 50 then the cost of doing the linear solve and the cost of doing the
+     * direct solve on each iteration are balanced.  The total run time is mimimised.
+     *  * If mNumNonZeroesPerRow is 1 (the terminal unit are modelled as long pipes with no interaction between them) then the
+     * matrix solve is trivial but the iteration count goes too high.
+     *
      */
     unsigned mNumNonZeroesPerRow;
     /**

@@ -46,6 +46,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
       mDensity(1.51e-6),
       mFluxGivenAtInflow(false),
       mTerminalInteractionMatrix(NULL),
+      mNumNonZeroesPerRow(25u), //See note in header definition
       mTerminalFluxChangeVector(NULL),
       mTerminalPressureChangeVector(NULL),
       mTerminalKspSolver(NULL)
@@ -181,7 +182,7 @@ void VentilationProblem::SolveDirectFromFlux()
 void VentilationProblem::SetupIterativeSolver()
 {
     //double start = Timer::GetElapsedTime();
-    mNumNonZeroesPerRow = std::min(250u, mMesh.GetNumBoundaryNodes()-1);
+    mNumNonZeroesPerRow = std::min(mNumNonZeroesPerRow, mMesh.GetNumBoundaryNodes()-1);
     MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, NULL, &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
