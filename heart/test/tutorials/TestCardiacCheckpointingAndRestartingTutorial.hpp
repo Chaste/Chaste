@@ -112,6 +112,8 @@ public:
          * This means that we are running from {{{t=5 ms}}} (the end of the previous simulation) to {{{t=10 ms}}}.
          * The output files are concatenated so that they appear to be made by a single simulation running from
          * {{{t=0 ms}}} to {{{t=10 ms}}}.
+         * Note: loading an archive also loads HeartConfig options, so HeartConfig calls such as this one must appear
+         * ''after'' CardiacSimulationArchiver::Load().
          */
         HeartConfig::Instance()->SetSimulationDuration(10); //ms
 
@@ -145,9 +147,11 @@ public:
  * * Checkpoints may be resumed on any number of processes — you are not restricted to the number on which it was
  *   saved. However, the mesh will not be re-partitioned if loaded on a different number of processes, so the parallel
  *   efficiency of the simulation may be significantly reduced in this case.
- * * Resuming a checkpoint will attempt to extend the original results h5 file, if present, so that the file contains
- *   the complete simulation results. If this file does not exist, a new file will be created to contain just the
- *   results from the resume point.
+ * * Resuming a checkpoint will attempt to extend the original results HDF5 file if it exists (specified by
+ *   HeartConfig::SetOutputDirectory and HeartConfig::SetOutputFilenamePrefix), so that the file contains the complete
+ *   simulation results. If this file does not exist a new file will be created containing just the results from the
+ *   resume time.
+ *
  * * When checkpointing, the `progress_status.txt` file only reports the percentage of time to
  *   go until the ''next'' checkpoint, not until the end of the simulation.  This makes it slightly less
  *   useful; however, the presence of the checkpoint directories (`1ms`, `2ms`, etc.) provides overall
