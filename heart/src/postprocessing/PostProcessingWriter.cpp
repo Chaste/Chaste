@@ -178,18 +178,21 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
                           true,  // to extending
                           rDatasetName); // dataset name
 
+    /* Probe define mode. We asked to extend, so if the writer is currently in define mode it means the
+     * dataset doesn't exist yet and needs creating. If it is NOT in define mode, it means the dataset
+     * exists, so we'll empty it and calculate new postprocessing data. */
     int apd_id;
-    try
-    {
-        apd_id = writer.GetVariableByName(rDatasetName);
-        writer.EmptyDataset();
-    }
-    catch(Exception&)
+    if ( writer.IsInDefineMode() )
     {
         apd_id = writer.DefineVariable(rDatasetName, rDatasetUnit);
         writer.DefineFixedDimension(mrMesh.GetNumNodes());
         writer.DefineUnlimitedDimension(rUnlimitedVariableName, rUnlimitedVariableUnit);
         writer.EndDefineMode();
+    }
+    else
+    {
+        apd_id = writer.GetVariableByName(rDatasetName);
+        writer.EmptyDataset();
     }
 
     //Determine the maximum number of paces

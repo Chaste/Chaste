@@ -552,6 +552,11 @@ void Hdf5DataWriter::CheckUnitsName(const std::string& rName)
     }
 }
 
+bool Hdf5DataWriter::IsInDefineMode()
+{
+    return mIsInDefineMode;
+}
+
 void Hdf5DataWriter::EndDefineMode()
 {
     // Check that at least one variable has been defined

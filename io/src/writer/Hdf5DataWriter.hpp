@@ -211,6 +211,17 @@ public:
     int DefineVariable(const std::string& rVariableName, const std::string& rVariableUnits);
 
     /**
+     * Check whether writer is in define mode.
+     *
+     * When in define mode variables can be defined but no data may be written, and vice versa.
+     * When extending, the writer will be in define mode if the dataset does not exist, and vice
+     * versa.
+     *
+     * @return whether in define mode.
+     */
+    bool IsInDefineMode();
+
+    /**
      * End the define mode of the DataWriter.
      */
     virtual void EndDefineMode();
