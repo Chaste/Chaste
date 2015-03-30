@@ -1,1 +1,2 @@
 tutorials/TestAirwayGenerationTutorial.hpp
+tutorials/TestSimpleImpedanceProblemTutorial.hpp
