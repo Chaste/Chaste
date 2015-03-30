@@ -1,6 +1,8 @@
 TestAirwayBranch.hpp
 TestAirwayPropertiesCalculator.hpp
 TestAirwayTreeWalker.hpp
+TestImpedancePostProcessor.hpp
+TestSimpleImpedanceProblem.hpp
 TestLobePropertiesCalculator.hpp
 airway_generation/TestAirwayGeneration.hpp
 airway_generation/TestAirwayGenerator.hpp
