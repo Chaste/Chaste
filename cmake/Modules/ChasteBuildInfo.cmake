@@ -21,21 +21,30 @@ else()
 	# Install SlikSVN or the distribution from Collabnet (if you don't mind registering)
 	find_package(Subversion)
 	if(SUBVERSION_FOUND)
-	   Subversion_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
-	   set(chaste_revision "${chaste_WC_REVISION}")
-	   message("Current Chaste SVN Revision = ${chaste_WC_REVISION}. Chaste Last Changed Revision = ${chaste_WC_LAST_CHANGED_REV}")
-	   if(${chaste_WC_REVISION} EQUAL ${chaste_WC_LAST_CHANGED_REV})
-	      set(chaste_WC_MODIFIED "false")
-	   else()
-	      set(chaste_WC_MODIFIED "true")
-	   endif()
-	else(SUBVERSION_FOUND)
-       # ReleaseVersion file not found, obtain revision information from Git
+       execute_process(COMMAND ${Subversion_SVN_EXECUTABLE} info "${Chaste_SOURCE_DIR}"
+            OUTPUT_VARIABLE dummy
+            ERROR_VARIABLE Subversion_svn_info_error
+            RESULT_VARIABLE Subversion_svn_info_result
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+       if(${Subversion_svn_info_result} EQUAL 0)
+          Subversion_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
+	      set(chaste_revision "${chaste_WC_REVISION}")
+	      message("Current Chaste SVN Revision = ${chaste_WC_REVISION}. Chaste Last Changed Revision = ${chaste_WC_LAST_CHANGED_REV}")
+	      if(${chaste_WC_REVISION} EQUAL ${chaste_WC_LAST_CHANGED_REV})
+	         set(chaste_WC_MODIFIED "false")
+	      else()
+	         set(chaste_WC_MODIFIED "true")
+	      endif()
+       endif()
+    endif(SUBVERSION_FOUND)
+    if (NOT (SUBVERSION_FOUND AND (${Subversion_svn_info_result} EQUAL 0)))
+       # assume its a git repo 
        find_package(Git REQUIRED)
-       Git_WC_INFO("${CHASTE_SOURCE_ROOT}" chaste)
+       Git_WC_INFO("${Chaste_SOURCE_DIR}" chaste)
        set(chaste_revision "${chaste_WC_REVISION}")
        message("Current Chaste Git Revision = ${chaste_WC_REVISION}. Chaste Modified = ${chaste_WC_MODIFIED}")
-    endif(SUBVERSION_FOUND)
+    endif()
 endif()
 
 #The generated timekeeper.cpp code below keeps track of build timestamp.
