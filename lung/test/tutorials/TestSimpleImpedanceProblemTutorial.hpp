@@ -146,7 +146,7 @@ public: // Tests should be public!
         std::cout << "\n";
         std::cout << "X5       = " << imag(impedances[5])*1e-6 << " kPa.s.L^-1" << std::endl;
         std::cout << "Fres     = " << processor.GetResonantFrequency() << " Hz " << std::endl;
-        std::cout << "Ax       = " << processor.GetAx()*1e-6 << " kPa.s^2.L^-1" << std::endl;
+        std::cout << "Ax       = " << processor.GetAx()*1e-6 << " kPa.L^-1" << std::endl;
         std::cout << "\n";
     }
 };
