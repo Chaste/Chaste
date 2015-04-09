@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef IMPEDANCEPOSTPROCESSOR_HPP_
 #define IMPEDANCEPOSTPROCESSOR_HPP_
 
-#include <cxxtest/TestSuite.h>
 #include <complex>
 #include <vector>
 

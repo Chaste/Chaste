@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellMLToSharedLibraryConverter.hpp"
 
 #include <sstream>
+#include <fstream>      // for std::ofstream
 #include <sys/stat.h> // For mkdir()
 #include <ctime>
 #include <cstring> // For strerror()
@@ -145,19 +146,19 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
     FileFinder build_folder;
 
     std::string old_cwd = GetCurrentWorkingDirectory();
-    // Check that the Chaste source tree exists
-    FileFinder chaste_root("", RelativeTo::ChasteSourceRoot);
+    // Check that the Chaste build tree exists
+    FileFinder chaste_root("", RelativeTo::ChasteBuildRoot);
 
     if (!chaste_root.IsDir())
     {
-        EXCEPTION("No Chaste source tree found at '" << chaste_root.GetAbsolutePath()
+        EXCEPTION("No Chaste build tree found at '" << chaste_root.GetAbsolutePath()
                   << "' - you need the source to use CellML models directly in Chaste.");
     }
-    FileFinder component_dir(mComponentName, RelativeTo::ChasteSourceRoot);
+    FileFinder component_dir(mComponentName, RelativeTo::ChasteBuildRoot);
     if (!component_dir.IsDir())
     {
         EXCEPTION("Unable to convert CellML model: required Chaste component '" << mComponentName
-                  << "' does not exist in '" << ChasteBuildRootDir() << "'.");
+                  << "' does not exist in '" << chaste_root.GetAbsolutePath() << "'.");
     }
     // Try the conversion
     try
@@ -169,8 +170,16 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             std::stringstream folder_name;
             folder_name << "dynamic/tmp_" << getpid() << "_" << time(NULL);
 
+#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition 
+#define COVERAGE_IGNORE
+            tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
+            build_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
+#undef COVERAGE_IGNORE
+#else
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
             build_folder.SetPath(component_dir.GetAbsolutePath() + "/build/" + ChasteBuildDirName() + "/" + folder_name.str(), RelativeTo::Absolute);
+#endif
+
             int ret = mkdir((tmp_folder.GetAbsolutePath()).c_str(), 0700);
             if (ret != 0)
             {
@@ -189,10 +198,34 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                 r_cellml_file.CopyTo(tmp_folder);
             }
 
+#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition 
+#define COVERAGE_IGNORE
+            std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
+            std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
+            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.10)\n" << 
+                                      "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
+                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" << 
+                                      "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
+                                      "include_directories(${Chaste_INCLUDE_DIRS})\n" <<
+                                      "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n"
+                                      //"target_link_libraries(" << cellml_leaf_name << " ${Chaste_LIBRARIES})\n"
+                                      ;
+            cmake_lists_filestream.close();
+            std::string cmake_args = " -DCMAKE_PREFIX_PATH=" + chaste_root.GetAbsolutePath() +
+                                     " -DCMAKE_BUILD_TYPE=" + ChasteBuildType() +
+                                     " -DBUILD_SHARED_LIBS=ON" +
+                                     " -DENABLE_CHASTE_TESTING=OFF" +
+                                     " -DChaste_USE_SHARED_LIBS=ON";
+            EXPECT0(chdir, tmp_folder.GetAbsolutePath());
+            EXPECT0(system, "cmake" + cmake_args + " .");
+            EXPECT0(system, "cmake --build . --config " + ChasteBuildType());
+#undef COVERAGE_IGNORE
+#else
             // Change to Chaste source folder
-            EXPECT0(chdir, ChasteBuildRootDir());
+            EXPECT0(chdir, chaste_root.GetAbsolutePath());
             // Run scons to generate C++ code and compile it to a .so
             EXPECT0(system, "scons --warn=no-all dyn_libs_only=1 build=" + ChasteBuildType() + " " + tmp_folder.GetAbsolutePath());
+#endif
 
             FileFinder so_file(tmp_folder.GetAbsolutePath() + "/lib" + cellml_leaf_name + "." + msSoSuffix, RelativeTo::Absolute);
             EXCEPT_IF_NOT(so_file.Exists());

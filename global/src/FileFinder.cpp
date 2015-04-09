@@ -101,6 +101,10 @@ void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value rel
     switch (relativeTo)
     {
         case RelativeTo::ChasteSourceRoot:
+            mAbsPath = ChasteSourceRootDir() + rRelativePath;
+            break;
+
+        case RelativeTo::ChasteBuildRoot:
             mAbsPath = ChasteBuildRootDir() + rRelativePath;
             break;
 
@@ -367,11 +371,18 @@ void FileFinder::PrivateRemove(bool dangerous) const
             const std::string source_folder(FileFinder("",RelativeTo::ChasteSourceRoot).GetAbsolutePath());
             const std::string source_folder_path = ChastePosixPathFixer::ToPosix(fs::path(source_folder));
             bool in_source = (absolute_path.substr(0, source_folder_path.length()) == source_folder_path);
-            if (!in_source)
+
+            const std::string build_folder(FileFinder("",RelativeTo::ChasteBuildRoot).GetAbsolutePath());
+            const std::string build_folder_path = ChastePosixPathFixer::ToPosix(fs::path(build_folder));
+            bool in_build = (absolute_path.substr(0, build_folder_path.length()) == build_folder_path);
+
+            if (!(in_source || in_build))
             {
                 EXCEPTION("Cannot remove location '" << mAbsPath
                           << "' as it is not located within the Chaste test output folder ("
-                          << test_output_path << ") or the Chaste source folder (" << source_folder_path <<").");
+                          << test_output_path << "), the Chaste source folder (" 
+                          << source_folder_path <<") or the Chaste build folder ("
+                          << build_folder_path <<").");
             }
         }
         else

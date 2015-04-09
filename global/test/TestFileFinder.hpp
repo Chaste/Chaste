@@ -63,11 +63,12 @@ public:
             TS_ASSERT(file_finder.IsPathSet());
 
             // Check the path is as expected
-            std::string abs_path = ChasteBuildRootDir() + file_name;
+            std::string abs_path = ChasteSourceRootDir() + file_name;
             TS_ASSERT_EQUALS(file_finder.GetAbsolutePath(), abs_path);
 
             // CWD should be the Chaste source root
             FileFinder file_finder2(file_name, RelativeTo::CWD);
+            std::cout << file_finder2.GetAbsolutePath();
             TS_ASSERT(file_finder2.Exists());
             TS_ASSERT(file_finder2.IsFile());
             TS_ASSERT(!file_finder2.IsDir());
@@ -177,7 +178,7 @@ public:
         TS_ASSERT(!dir.IsFile());
         TS_ASSERT(!dir.IsEmpty());
         TS_ASSERT(dir.IsPathSet());
-        std::string abs_path = std::string(ChasteBuildRootDir()) + "global/";
+        std::string abs_path = std::string(ChasteSourceRootDir()) + "global/";
         TS_ASSERT(fs::equivalent(fs::path(dir.GetAbsolutePath()),fs::path(abs_path)));
 
         FileFinder dir2("global", RelativeTo::CWD); // CWD should be the same as ChasteSourceRoot for tests
@@ -257,7 +258,7 @@ public:
 
         FileFinder::StopFaking();
         path.SetPath("file", RelativeTo::ChasteSourceRoot);
-        TS_ASSERT_EQUALS(path.GetAbsolutePath(), std::string(ChasteBuildRootDir()) + "file");
+        TS_ASSERT_EQUALS(path.GetAbsolutePath(), std::string(ChasteSourceRootDir()) + "file");
     }
 
     void TestRemove()
@@ -306,7 +307,7 @@ public:
         FileFinder obscure_file("/TodayIsThe25thOfOctober2012AndWeLikedRafsCake.obscure", RelativeTo::Absolute);
         TS_ASSERT_THROWS_CONTAINS(obscure_file.Remove(),
                 "as it is not located within the Chaste test output folder");
-        TS_ASSERT_THROWS_CONTAINS(obscure_file.DangerousRemove(), "or the Chaste source folder");
+        TS_ASSERT_THROWS_CONTAINS(obscure_file.DangerousRemove(), ", the Chaste source folder");
     }
 
     void TestFindMatches() throw (Exception)

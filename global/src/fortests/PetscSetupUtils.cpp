@@ -138,12 +138,12 @@ void PetscSetupUtils::CommonSetup()
 
     // Check that the working directory is correct, or many tests will fail
     std::string cwd = GetCurrentWorkingDirectory() + "/";
-    if (strcmp(cwd.c_str(), ChasteBuildRootDir()) != 0)
+    if (strcmp(cwd.c_str(), ChasteSourceRootDir()) != 0)
     {
 #define COVERAGE_IGNORE
         // Change directory
-        std::cout << std::endl << "Changing directory from '" << cwd << "' to '" << ChasteBuildRootDir() << "'." << std::endl;
-        EXPECT0(chdir, ChasteBuildRootDir());
+        std::cout << std::endl << "Changing directory from '" << cwd << "' to '" << ChasteSourceRootDir() << "'." << std::endl;
+        EXPECT0(chdir, ChasteSourceRootDir());
         std::cout << "CWD now: " << GetCurrentWorkingDirectory() << std::endl;
 #undef COVERAGE_IGNORE
     }

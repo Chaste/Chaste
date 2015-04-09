@@ -57,10 +57,10 @@ class TestCwd : public CxxTest::TestSuite
 public:
     void TestShowCwd()
     {
-        std::string chaste_build_root(ChasteBuildRootDir());
-        fs::path chaste_build_root_path(chaste_build_root);
+        std::string chaste_source_root(ChasteSourceRootDir());
+        fs::path chaste_source_root_path(chaste_source_root);
         fs::path cwd(GetCurrentWorkingDirectory()+"/");
-        TS_ASSERT(fs::equivalent(cwd,chaste_build_root));
+        TS_ASSERT(fs::equivalent(cwd,chaste_source_root));
     }
 
     void TestDivideOneByZero() throw(Exception)

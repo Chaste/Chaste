@@ -8,6 +8,9 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 
 project(Chaste)
 
+set (Chaste_VERSION_MAJOR 3)
+set (Chaste_VERSION_MINOR 3)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/definitions.cmake)
 
 
@@ -62,13 +65,7 @@ option(ENABLE_CHASTE_TESTING "Enable Chaste Testing" ON)
 option(ENABLE_CHASTE_PROJECT_TESTING "Enable Chaste Project Testing" ON)
 
 #Some Chaste-specific #defines
-add_definitions(-DCHASTE_CVODE -DCHASTE_SUNDIALS_VERSION=20500)
-add_definitions(-DCHASTE_VTK)
-
-option(CMAKE_LINK_DEPENDS_NO_SHARED
-    "Whether to skip link dependencies on shared library files. ON by default"
-    ON)
-
+add_definitions(-DCHASTE_CMAKE)
 
 if(WIN32 OR CYGWIN)
     add_definitions(-D_WIN64 -D_AMD64_)
@@ -76,6 +73,10 @@ if(WIN32 OR CYGWIN)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(WIN32 OR CYGWIN)
 
+
+################################
+#  FIND THIRD PARTY LIBRARIES  #
+################################
 
 set(CHASTE_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR})
 set(CHASTE_LINK_LIBRARIES "")
@@ -112,6 +113,7 @@ endif()
 find_package(VTK REQUIRED)
 list(APPEND CHASTE_INCLUDES "${VTK_INCLUDE_DIRS}")
 list(APPEND CHASTE_LINK_LIBRARIES "${VTK_LIBRARIES}")
+add_definitions(-DCHASTE_VTK)
 
 #find Boost
 add_definitions( -DBOOST_ALL_NO_LIB )
@@ -151,8 +153,6 @@ if (NOT ("${PETSC_LIBRARIES}" MATCHES ".*parmetis.*"))
     endif()
 endif()
 
-
-
 #Locate Sundials
 if(BUILD_SHARED_LIBS)
 	set(SUNDIALS_USE_STATIC_LIBRARIES OFF)
@@ -162,6 +162,9 @@ endif()
 find_package(SUNDIALS REQUIRED)
 list(APPEND CHASTE_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
 list(APPEND CHASTE_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
+add_definitions(-DCHASTE_CVODE)
+math(EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
+add_definitions(-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
 
 
 #Locate Xerces and XSD
@@ -170,6 +173,7 @@ if (NOT (WIN32 OR CYGWIN))
 	find_package(XSD REQUIRED)
 	list(APPEND CHASTE_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
 	list(APPEND CHASTE_LINK_LIBRARIES "${XERCESC_LIBRARY}")
+    add_definitions(-DCHASTE_XERCES)
 endif()
 
 set(CXXTEST_INCLUDES "${CMAKE_SOURCE_DIR}/cxxtest")
@@ -194,6 +198,16 @@ list(APPEND CHASTE_INCLUDES "${WINDOWS_SDK}" "${VS_INCLUDES}" "${MS_MPI_INCLUDES
 
 endif(WIN32 OR CYGWIN)
 
+if(ENABLE_CHASTE_TESTING)
+    enable_testing()
+    list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
+    find_package(CxxTest)
+endif()
+
+###########################################
+# SETUP AVAILABLE COMPONENTS AND PROJECTS #
+###########################################
+
 # List the available Chaste components
 set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
 if (NOT (WIN32 OR CYGWIN))
@@ -214,256 +228,9 @@ foreach(potential_dir ${potential_dirs})
     endif ()
 endforeach(potential_dir ${potential_dirs})
 
-if(ENABLE_CHASTE_TESTING)
-    enable_testing()
-    list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
-    find_package(CxxTest)
-    foreach(component ${CHASTE_COMPONENTS})
-        option(ENABLE_${component}_TESTING "Generate the test infrastructure for the ${component} component" ON)
-        mark_as_advanced(ENABLE_${component}_TESTING)
-    endforeach()
-    if (ENABLE_CHASTE_PROJECT_TESTING)
-        foreach(projectName ${Chaste_PROJECTS})
-            if (EXISTS "${Chaste_SOURCE_DIR}/projects/${projectName}/test/CMakeLists.txt")
-                option(ENABLE_project_${projectName}_TESTING "Generate the test infrastructure for the ${projectName} project" ON)
-                mark_as_advanced(ENABLE_project_${projectName}_TESTING)
-            else()
-                message(WARNING "No CMakeLists.txt file found in project test directory ${Chaste_SOURCE_DIR}/projects/${projectName}/test. Tests for this project will not be built")
-                set(ENABLE_project_${projectName}_TESTING OFF)
-            endif()
-
-        endforeach()
-    endif()
-endif()
-
-include(ChasteBuildInfo)
-
-include_directories("${CHASTE_INCLUDES}")
-
-# Where generated source/header files are put
-include_directories("${config_dir}")
-
-# A macro to recursively find Chaste header locations
-macro(HEADER_DIRS base_dir return_list)
-    set(new_list "")
-    set(dir_list "")
-    #message("base dir = ${base_dir}")
-
-    file(GLOB_RECURSE new_list ${base_dir}/*.hpp ${base_dir}/*.h)
-    #message("new list = ${new_list}")
-    foreach(file_path ${new_list})
-        get_filename_component(dir_path ${file_path} PATH)
-        set(dir_list ${dir_list} ${dir_path})
-    endforeach()
-    
-    list(REMOVE_DUPLICATES dir_list)
-    
-    if(NOT ${PROJECT_NAME} MATCHES "^test")
-        list(APPEND dir_list "${CHASTE_INCLUDES}")
-    endif()
-    
-
-    #message("return list = ${return_list}")
-    #message("dir list = ${dir_list}")
-
-    set(${return_list} ${dir_list})
-endmacro()
-
-
-#Build the component Test infrastructure
-option (ENABLE_CHASTE_TESTING "Set whether to generate the CHASTE testing infrastructure." ON)
-set(CMAKE_INCLUDE_PATH "${CMAKE_INCLUDE_PATH}" "${CMAKE_SOURCE_DIR}/cxxtest")
-
-
-    #Chaste Testing Macro. The predefined cxxtest_add_test is not suitable because of little control over
-    #the test's working directory
-    macro(CHASTE_ADD_TEST _testname _test_output_filename)
-        set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_test_output_filename}")
-        add_custom_command(
-            OUTPUT "${_test_real_output_filename}"
-            DEPENDS ${ARGN}
-            COMMAND ${CXXTEST_TESTGEN_INTERPRETER} ${CXXTEST_TESTGEN_EXECUTABLE} ${CXXTEST_TESTGEN_ARGS} -o "${_test_real_output_filename}" ${ARGN}
-        )
-
-        set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
-        add_executable("${_testname}" "${_test_real_output_filename}" ${ARGN})
-
-        if(TEST_MPIEXEC_ENABLED)
-            #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
-            # on the local host with n+1 cores.
-            # Here we are using the form ${MPIEXEC} /np 2 ${test}.
-            # A figure-it-out-yourselfnstalled libvtk-java and libvtk5-qt4-dev form would be ${MPIEXEC} /np * ${test} which runs on all available cores
-            # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
-            # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
-            # run more tests than intended!
-
-            add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" /np 2 $<TARGET_FILE:${_testname}>)
-        else()
-            add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${_testname}>)
-        endif(TEST_MPIEXEC_ENABLED)
-    endmacro(CHASTE_ADD_TEST)
-
-  macro(CHASTE_GENERATE_TEST_NAME test outTestName)
-      string(REGEX REPLACE "([a-zA-Z0-9_/]+)[.]hpp" "\\1" testName "${test}")
-      string(REPLACE "/" ";" testPath "${testName}")
-      list(LENGTH testPath pathLength)
-      if(${pathLength} EQUAL 1)
-        set(testName ${testPath})
-        set(testPath "")
-        set(${outTestName} ${testName})
-      else()
-        math(EXPR index "${pathLength} - 1")
-        list(GET testPath ${index} testName)
-        list(REMOVE_AT testPath ${index})
-        string(REPLACE ";" "_" _testPath_ "${testPath}")
-        string(REPLACE ";" "/" testPath "${testPath}")
-        set(${outTestName} "${testName}_${_testPath_}_")
-      endif()
-  endmacro(CHASTE_GENERATE_TEST_NAME test outTestName)
-
-
-  macro(CHASTE_DO_COMMON component)
-    # Expand out dependences. currently only done for core
-    set(CHASTE_DEPENDS_${component}_new "")
-    foreach(dep ${CHASTE_DEPENDS_${component}})
-        if (${dep} STREQUAL core)
-            list(APPEND CHASTE_DEPENDS_${component}_new ${CHASTE_DEPENDS_${dep}})
-        else()
-            list(APPEND CHASTE_DEPENDS_${component}_new ${dep})
-        endif()
-    endforeach(dep)
-    set(CHASTE_DEPENDS_${component} ${CHASTE_DEPENDS_${component}_new})
-
-    # Figure out include path
-    if (NOT CHASTE_${component}_INCLUDE_DIRS)
-        set(CHASTE_${component}_INCLUDE_DIRS 
-            "${CMAKE_CURRENT_SOURCE_DIR}/src" 
-            "${CMAKE_CURRENT_SOURCE_DIR}/test" 
-            "${CMAKE_CURRENT_SOURCE_DIR}/apps/src"
-            )
-    endif (NOT CHASTE_${component}_INCLUDE_DIRS)
-    include_directories("${CHASTE_${component}_INCLUDE_DIRS}")
-    foreach(dep ${CHASTE_DEPENDS_${component}})
-        include_directories("${CHASTE_${dep}_INCLUDE_DIRS}")
-    endforeach(dep)
-    # Make & install component library
-    file(GLOB_RECURSE CHASTE_${component}_SOURCES 
-			RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
-			${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
-			${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
-
-    add_library(${component} ${CHASTE_${component}_SOURCES} ${ARGN})
-    #if (BUILD_SHARED_LIBS)
-    	target_link_libraries(${component} ${CHASTE_LINK_LIBRARIES})
-    #endif()
-    if(NOT(${component} MATCHES "^project"))
-        install(TARGETS ${component} DESTINATION lib COMPONENT ${component}_libraries)
-    endif(NOT(${component} MATCHES "^project"))
-
-    # Do testing if requested
-    if(ENABLE_${component}_TESTING)
-        add_subdirectory(test)
-    endif()
-	# Build applications if present
-	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/apps")
-        message("Configuring apps for ${component}")
-		file(GLOB CHASTE_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/apps/src/*.cpp)
-		foreach(app ${CHASTE_${component}_APPS})
-			string(REGEX REPLACE ".*/([a-zA-Z0-9_]+)[.]cpp" "\\1" appName "${app}")
-            message("Configuring app ${app} named ${appName}.")
-            #message("Libraries=${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES}")
-			add_executable(${appName} ${app})
-			target_link_libraries(${appName} ${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES})
-            if(MSVC)
-			    set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
-            endif()
-			get_target_property(incDirs ${appName} INCLUDE_DIRECTORIES)
-			list(APPEND incDirs "${CXXTEST_INCLUDES}")
-			foreach(dep ${CHASTE_DEPENDS_${component}})
-				list(APPEND incDirs "${CHASTE_${dep}_INCLUDE_DIRS}")
-			endforeach(dep)
-			set_target_properties(${appName} PROPERTIES INCLUDE_DIRECTORIES "${incDirs}")
-		endforeach(app)
-	endif()
-  endmacro(CHASTE_DO_COMMON)
-
-
-  macro(CHASTE_DO_COMPONENT component)
-    message("Configuring component ${component}")
-    CHASTE_DO_COMMON(${component} ${ARGN})
-  endmacro(CHASTE_DO_COMPONENT)
-
-  macro(CHASTE_DO_PROJECT projectName)
-    message("Configuring project ${projectName}")
-    CHASTE_DO_COMMON(project_${projectName})
-  endmacro(CHASTE_DO_PROJECT)
-
-
-  macro(CHASTE_DO_TEST_COMMON component)
-    if(ENABLE_CHASTE_TESTING)
-        # Figure out include path for tests
-        header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" CHASTE_${component}_TEST_DIRS)
-        include_directories("${CHASTE_${component}_TEST_DIRS}" "${CHASTE_${component}_INCLUDE_DIRS}" "${CXXTEST_INCLUDES}")
-        foreach(dep ${CHASTE_DEPENDS_${component}})
-            include_directories("${CHASTE_${dep}_INCLUDE_DIRS}")
-        endforeach(dep)
-        # Make test library if sources exist
-        set(COMPONENT_LIBRARIES ${component})
-        file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
-        if(test_sources)
-            add_library(test${component} STATIC ${test_sources})
-            set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
-        endif()
-        set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} ${CHASTE_DEPENDS_${component}})
-        # Generate test suites
-
-        if(MSVC)
-            if(NOT HAS_OWN_LINKER_FLAGS)
-                set(LINKER_FLAGS "/NODEFAULTLIB:LIBCMT")
-            endif(NOT HAS_OWN_LINKER_FLAGS)
-
-            #disable linker warnings 4217, 4049: locally-defined symbol imported in function ...
-            set(LINKER_FLAGS "${LINKER_FLAGS} /IGNORE:4217 /IGNORE:4049")
-            #message("Linker flags for project ${PROJECT_NAME} = ${LINKER_FLAGS}")
-        endif(MSVC)
-
-        foreach(type ${TestPackTypes})
-            if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
-            file(STRINGS "${type}TestPack.txt" testpack)
-            foreach(filename ${testpack})
-                string(STRIP ${filename} filename)
-                chaste_generate_test_name(${filename} "testName")
-                set(targetName "${testName}Runner")
-                if (NOT TARGET ${targetName})
-                    chaste_add_test(${targetName} "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
-                    target_link_libraries(${targetName} ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-                    set_target_properties(${targetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
-                    set_property(TEST ${targetName} PROPERTY LABELS ${component} ${type})
-                    if(NOT(${component} MATCHES "^project"))
-                        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
-                            DESTINATION test/${component} COMPONENT  ${component}_tests)
-                    endif(NOT(${component} MATCHES "^project"))
-                else()
-                    get_property(myLabels TEST ${targetName} PROPERTY LABELS)
-                    list(APPEND myLabels ${type})
-                    set_property(TEST ${targetName} PROPERTY LABELS ${myLabels})
-                endif()
-            endforeach(filename ${testpack})
-            endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")
-        endforeach(type ${TestPackTypes})
-    endif(ENABLE_CHASTE_TESTING)
-  endmacro(CHASTE_DO_TEST_COMMON)
-
-  macro(CHASTE_DO_TEST_COMPONENT component)
-    message("Configuring tests for ${component}")
-    CHASTE_DO_TEST_COMMON(${component})
-  endmacro(CHASTE_DO_TEST_COMPONENT)
-
-  macro(CHASTE_DO_TEST_PROJECT projectName)
-    message("Configuring tests for project ${projectName}")
-    CHASTE_DO_TEST_COMMON(project_${projectName})
-  endmacro(CHASTE_DO_TEST_PROJECT)
-
+#######################################################
+# SETUP COMPONENT DEPENDANCIES AND HEADER DIRECTORIES #
+#######################################################
 
 # Specify which other components each depends on.
 # This information is used to set up CMake dependencies, include search paths and libraries to link against.
@@ -481,33 +248,98 @@ set(CHASTE_DEPENDS_lung ${CHASTE_DEPENDS_continuum_mechanics} continuum_mechanic
 set(CHASTE_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
 
 foreach(component ${CHASTE_COMPONENTS})
-    # Set up the component source & include directories
-    #string(TOUPPER ${component} c_upper)
     set(CHASTE_${component}_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src")
     header_dirs(${CHASTE_${component}_SOURCE_DIR} CHASTE_${component}_INCLUDE_DIRS)
 endforeach(component)
 
+set(Chaste_PYTHON_DIR "${Chaste_SOURCE_DIR}/python")
+
+#####################################
+#  SETUP CONFIG FOR IN-TREE BUILDS  #
+#####################################
+
+configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
+    "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
+
+
+####################
+# BUILD COMPONENTS #
+####################
+
 foreach(component ${CHASTE_COMPONENTS})
     # Build each component as a project
     add_subdirectory(${component})
-    if(CHASTE_DEPENDS_${component})
-        add_dependencies(${component} ${CHASTE_DEPENDS_${component}})
-    endif()
-
-    # Install Chaste headers for Chaste developers
-    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${component}/src/"
-            DESTINATION include/${component}
-            COMPONENT ${component}_headers
-            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
-            )
 endforeach(component)
+
+####################
+#  BUILD MAIN APPS (TODO) #
+####################
+
+
+####################
+#  BUILD PROJECTS  #
+####################
 
 foreach(projectName ${Chaste_PROJECTS})
     add_subdirectory(projects/${projectName})
-    if(CHASTE_DEPENDS_PROJECT_${projectName})
-        add_dependencies(project_${projectName} ${CHASTE_DEPENDS_project_${projectName}})
-    endif()
 endforeach(projectName)
+
+
+
+########################################
+# EXPORT CONFIG FOR OUT-OF-TREE BUILDS #
+########################################
+
+export(TARGETS ${CHASTE_COMPONENTS}
+    FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
+    EXPORT_LINK_INTERFACE_LIBRARIES 
+    )
+
+
+export(PACKAGE Chaste)
+
+
+# Configure file for install dir
+set(EXPORT_Chaste_PYTHON_DIR "\${Chaste_CMAKE_DIR}/python")
+foreach(component ${CHASTE_COMPONENTS})
+    set(EXPORT_CHASTE_${component}_INCLUDE_DIRS "")
+    foreach(dir ${CHASTE_${component}_INCLUDE_DIRS})
+        file(RELATIVE_PATH rel_dir "${Chaste_SOURCE_DIR}" "${dir}")
+        list(APPEND EXPORT_CHASTE_${component}_INCLUDE_DIRS "\${Chaste_CMAKE_DIR}/include/${rel_dir}")
+    endforeach()
+endforeach(component)
+
+configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
+    "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake" @ONLY)
+
+# Configure file for build dir
+set(EXPORT_Chaste_PYTHON_DIR "${Chaste_PYTHON_DIR}")
+foreach(component ${CHASTE_COMPONENTS})
+    set(EXPORT_CHASTE_${component}_INCLUDE_DIRS ${CHASTE_${component}_INCLUDE_DIRS})
+endforeach(component)
+
+configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
+    "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
+
+
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake 
+    DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+
+install(FILES
+    "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
+    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
+    "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake"
+    DESTINATION .
+     COMPONENT Config)
+
+# Python folder
+install(DIRECTORY ${Chaste_SOURCE_DIR}/python
+    DESTINATION .
+    COMPONENT Python)
+
+####################
+#    PACKAGING     #
+####################
 
 set(CPACK_PACKAGE_NAME "${CMAKE_PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Computational Biology Group - Computer Science - University of Oxford")

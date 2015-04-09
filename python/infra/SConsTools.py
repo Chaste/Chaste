@@ -79,10 +79,10 @@ chaste_source_exts = ['.cpp', '.xsd', '.cellml']
 def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=False,
                     sourceExts=None, checkSourcesExist=False, otherVars={}):
     """Look for source files under rootDir.
-    
+
     Returns 2 lists: the first of source (.cpp, .xsd, .cellml) files, and the second
     of the directories in which they may be found.
-    
+
     Optionally:
      * specify ignoreDirs to not search within particular folder names
      * set dirsOnly to True to only find source directories.  In this case
@@ -159,15 +159,15 @@ def FindSourceFiles(env, rootDir, ignoreDirs=[], dirsOnly=False, includeRoot=Fal
 def FasterSharedLibrary(env, library, sources, **args):
     """Override SharedLibrary to update the libs in '#linklib' only if the symbols change.
     This is to avoid rebuilding binaries when a shared library has changes.
-    
+
     Use it like:
     env['BUILDERS']['OriginalSharedLibrary'] = env['BUILDERS']['SharedLibrary']
     env['BUILDERS']['SharedLibrary'] = FasterSharedLibrary
-    
+
     This would be MUCH simpler to implement if we could override the
     signature to be used for the SharedLibrary node itself directly. That is
     certainly possible, but would rely on the internal structure of SCons.
-    
+
     Based on http://www.scons.org/wiki/SharedLibrarySignatureOverride.
     """
     # SCons version compatibility
@@ -309,7 +309,7 @@ def RegisterObjects(env, key, objs):
 
 def CloneEnv(env):
     """Clone a construction environment, but don't copy some objects.
-    
+
     There are a few special dictionaries which need to be the same object in all
     environments, to ensure that updates are shared.  So after calling the normal Clone
     we need to refer back to the original.
@@ -327,7 +327,7 @@ def CloneEnv(env):
 
 def DetermineLibraryDependencies(env, partialGraph):
     """Determine which Chaste libraries each component/project needs to link against.
-    
+
     The supplied partial dependency graph maps each component/project to a list of its
     direct dependencies.  On exit from this method each will be mapped instead to an
     ordered list of all its direct and indirect dependencies.  The ordering is based
@@ -509,7 +509,7 @@ def FindTestsToRun(env, build, BUILD_TARGETS, otherVars,
 
 def ExeName(env, exePath):
     """Figure out the real name of an executable.
-    
+
     Given the Linux-style path, this works out what an executable is actually
     called, so that we can run on cygwin.
     """
@@ -522,7 +522,7 @@ def ExeName(env, exePath):
 
 def GetPathRevision(path, asInt):
     """Use svnversion to get the revision number of the given path.
-    
+
     If asInt is set, then return the highest complete revision number in the string.
     Returns a pair (revision, is_locally_modified).
     """
@@ -610,11 +610,16 @@ def GetChasteBuildRootCpp(env):
              'build_type': env['build'].build_type,
              'build_dir': env['build'].build_dir}
     return """
-#include "ChasteBuildRoot.hpp" 
+#include "ChasteBuildRoot.hpp"
 
-const char* ChasteBuildRootDir() 
-{ 
-    return "%(chaste_root)s/"; 
+const char* ChasteBuildRootDir()
+{
+    return "%(chaste_root)s/";
+}
+
+const char* ChasteSourceRootDir()
+{
+    return "%(chaste_root)s/";
 }
 
 std::string ChasteComponentBuildDir(const std::string& rComponent)
@@ -660,9 +665,9 @@ def RecordBuildInfo(env, build_type, static_libs, use_chaste_libs):
 
 def CreateXsdBuilder(build, buildenv, fakeIt=False):
     """Add a 'builder' for running xsd to generate parser code from an XML schema.
-    
+
     Adds the converter as a source action to the C/C++ builders.
-    
+
     If fakeIt is True, the builder doesn't actually run the converter.  This means
     that inner SCons runs for generating dynamically loadable cell models don't try
     regenerating it unnecessarily.
@@ -721,13 +726,13 @@ def CreateXsdBuilder(build, buildenv, fakeIt=False):
 
 def CreatePyCmlBuilder(build, buildenv):
     """Create a builder for running PyCml to generate C++ source code from CellML.
-    
+
     PyCml is run to generate as many types of output as we can.  If a .out file is
     present, giving output from Maple, this will include backward Euler code.  A
     -conf.xml file may be given to tune this process somewhat, by specifying extra
     arguments to be passed to ConvertCellModel.py; it will also be used as the
     configuration file for PyCml itself.
-    
+
     The SCons environment variable PYCML_EXTRA_ARGS may also be used to pass additional
     command-line arguments to ConvertCellModel.py.  This can be set in a project
     SConscript file, by including lines like the following prior to the DoProjectSConscript
@@ -813,7 +818,7 @@ def CreatePyCmlBuilder(build, buildenv):
 
 class PyScanner(SCons.Scanner.Classic):
     """A scanner for import lines in Python source code.
-    
+
     This partly supports "import module", "from module import ...", package imports and relative imports.
     It doesn't handle cases like "from .package import module" properly, as it makes the package the dependency.
     """
@@ -931,11 +936,11 @@ def RunAcceptanceTests(build, env, appsPath, testsPath, exes, otherVars):
 
 def BuildExes(build, env, appsPath, components, otherVars):
     """Build 'standalone' executables (i.e. with their own main(), not using cxxtest).
-    
+
     apps_path should refer to a directory structure containing folders:
       src - no subfolders, contains .cpp file(s) each defining main()
       texttest/chaste - definitions for acceptance tests, optional
-    
+
     components gives the Chaste libraries that these executables link against.
     """
     env = CloneEnv(env)
@@ -966,11 +971,11 @@ def BuildExes(build, env, appsPath, components, otherVars):
 
 def ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs):
     """Set the compilation of a single test.
-    
+
     This handles the logic of building with or without chaste_libs, and ensures
     the test is added to the default targets.  The behaviour is indentical for
     projects and core components.
-    
+
     @param env  the main SCons environment to use
     @param overrides  construction variable overrides for building the test exe
     @param testfile  the path of the test .hpp file, relative to the 'test' folder
@@ -1004,7 +1009,7 @@ def ScheduleTestBuild(env, overrides, testfile, prefix, use_chaste_libs):
 
 def DoDynamicallyLoadableModules(baseEnv, otherVars):
     """Logic to find and schedule for building any dynamically-loadable modules.
-    
+
     These are generated from source files found in a 'dynamic' folder in a component
     or project.
     """
@@ -1050,7 +1055,7 @@ def DoDynamicallyLoadableModules(baseEnv, otherVars):
 
 def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
     """Main logic for a project's SConscript file.
-    
+
     The aim of this method is that a project's SConscript file should be able to be as
     simple as:
         import os
@@ -1148,13 +1153,13 @@ def DoProjectSConscript(projectName, chasteLibsUsed, otherVars):
         lib_deps.append(project_lib)
 
     test_log_files = ScheduleTests(env, all_libs, dyn_libs, lib_deps, libpath, testfiles, otherVars)
-    
+
     # Any executables to build?
     if otherVars['build_exes']:
         apps_path = os.path.join(Dir('#').abspath, 'projects', projectName, 'apps')
         if os.path.isdir(apps_path):
             BuildExes(otherVars['build'], env, apps_path, components=chaste_libs, otherVars=otherVars)
-    
+
     return test_log_files
 
 def CheckForSpecialFiles(env, component, files, otherVars):
@@ -1191,7 +1196,7 @@ def FindPyDirs(env, otherVars):
 
 def AddPyDirs(env, basePath, pydirs, componentName):
     """Add folders containing Python sources, if any, to the module search path.
-    
+
     Also sets up build data structures so other components can use them.
     """
     pydir_paths = map(lambda d: os.path.join('#', basePath, d), pydirs)
@@ -1204,7 +1209,7 @@ def AddPyDirs(env, basePath, pydirs, componentName):
 
 def DoComponentSConscript(component, otherVars):
     """Main logic for a Chaste component's SConscript file.
-    
+
     The aim of this method is that a component's SConscript file should be able to be as
     simple as:
         import os
@@ -1238,7 +1243,7 @@ def DoComponentSConscript(component, otherVars):
         env.Alias('install', t)
     # Move back to the buid dir
     os.chdir(curdir)
-    
+
     # Update CPPPATH for folders in this component, with a hook to pull in its dependencies later
     env['CHASTE_CPP_PATHS'][component] = CompleteFolderPaths(cpppath)
     all_cpppath = cpppath + test_cpppath
@@ -1299,7 +1304,7 @@ def DoComponentSConscript(component, otherVars):
             RegisterObjects(env, key, objs)
     if set_env_chaste_libs:
         env['CHASTE_LIBRARIES'][component] = lib
-    
+
     # Determine libraries to link against.
     # Note that order does matter!
     chaste_libs = ["${CHASTE_COMP_DEPS['%s']}" % component]
@@ -1308,7 +1313,7 @@ def DoComponentSConscript(component, otherVars):
     if test_lib:
         chaste_libs = ['test' + component] + chaste_libs
     all_libs = chaste_libs + otherVars['other_libs']
-    
+
     # Make test output depend on shared libraries, so if implementation changes then tests are re-run.
     lib_deps = []
     if test_lib:
@@ -1335,7 +1340,7 @@ def ScheduleTests(env, allLibs, dynLibs, libDeps, libPath, testFiles, otherVars)
     use_chaste_libs = otherVars['use_chaste_libs']
     # Collect a list of test log files to use as dependencies for the test summary generation
     test_log_files = []
-    
+
     # Build and run tests of this component/project
     if testFiles:
         if not use_chaste_libs:
@@ -1345,7 +1350,7 @@ def ScheduleTests(env, allLibs, dynLibs, libDeps, libPath, testFiles, otherVars)
         else:
             overrides = {'LIBS': allLibs,
                          'LIBPATH': [libPath, '.'] + otherVars['other_libpaths']}
-    
+
     for testfile in testFiles:
         prefix, ext = os.path.splitext(testfile)
         is_py_test = ext == '.py'
@@ -1369,5 +1374,5 @@ def ScheduleTests(env, allLibs, dynLibs, libDeps, libPath, testFiles, otherVars)
                 env.RunTest(log_file, runner_exe)
             if otherVars['force_test_runs']:
                 env.AlwaysBuild(log_file)
-    
+
     return test_log_files

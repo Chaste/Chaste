@@ -267,6 +267,7 @@
       <xs:enumeration value="cwd"/>
       <xs:enumeration value="chaste_test_output"/>
       <xs:enumeration value="chaste_source_root"/>
+      <xs:enumeration value="chaste_build_root"/>
       <xs:enumeration value="absolute"/>
       <xs:enumeration value="this_file"/>
     </xs:restriction>

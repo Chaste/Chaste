@@ -1,0 +1,103 @@
+# - Config file for the Chaste package
+# It defines the following variables
+#  Chaste_INCLUDE_DIRS - include directories for FooBar
+#  Chaste_LIBRARIES    - libraries to link against
+ 
+# Compute paths
+get_filename_component(Chaste_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# If not in a build tree set required variables
+if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
+
+    add_definitions(-DCHASTE_CMAKE)
+    add_definitions(-DCHASTE_VTK)
+    add_definitions(-DCHASTE_CVODE)
+    add_definitions(-DCHASTE_SUNDIALS_VERSION=@Chaste_SUNDIALS_VERSION@)
+
+    if (NOT (WIN32 OR CYGWIN))
+        add_definitions(-DCHASTE_XERCES)
+    endif()
+
+    find_package(PythonInterp REQUIRED)
+    set(Chaste_PYTHON_DIR @EXPORT_Chaste_PYTHON_DIR@)
+
+    include(${Chaste_CMAKE_DIR}/cmake/Modules/ChasteMacros.cmake)
+
+    set(ENABLE_CHASTE_TESTING ON CACHE BOOL "Enable Chaste Testing")
+    if(ENABLE_CHASTE_TESTING)
+        enable_testing()
+        list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
+        find_package(CxxTest)
+    endif()
+
+    set(CHASTE_DEPENDS_global @CHASTE_DEPENDS_global@)
+    set(CHASTE_DEPENDS_io @CHASTE_DEPENDS_io@)
+    set(CHASTE_DEPENDS_linalg @CHASTE_DEPENDS_linalg@)
+    set(CHASTE_DEPENDS_mesh @CHASTE_DEPENDS_mesh@)
+    set(CHASTE_DEPENDS_ode @CHASTE_DEPENDS_ode@)
+    set(CHASTE_DEPENDS_pde @CHASTE_DEPENDS_pde@)
+    set(CHASTE_DEPENDS_cell_based @CHASTE_DEPENDS_cell_based@)
+    set(CHASTE_DEPENDS_crypt @CHASTE_DEPENDS_crypt@)
+    set(CHASTE_DEPENDS_continuum_mechanics @CHASTE_DEPENDS_continuum_mechanics@)
+    set(CHASTE_DEPENDS_heart @CHASTE_DEPENDS_heart@)
+    set(CHASTE_DEPENDS_lung @CHASTE_DEPENDS_lung@)
+    set(CHASTE_DEPENDS_core @CHASTE_DEPENDS_core@)
+
+    set(CHASTE_global_INCLUDE_DIRS @EXPORT_CHASTE_global_INCLUDE_DIRS@)
+    set(CHASTE_io_INCLUDE_DIRS @EXPORT_CHASTE_io_INCLUDE_DIRS@)
+    set(CHASTE_linalg_INCLUDE_DIRS @EXPORT_CHASTE_linalg_INCLUDE_DIRS@)
+    set(CHASTE_mesh_INCLUDE_DIRS @EXPORT_CHASTE_mesh_INCLUDE_DIRS@)
+    set(CHASTE_ode_INCLUDE_DIRS @EXPORT_CHASTE_ode_INCLUDE_DIRS@)
+    set(CHASTE_pde_INCLUDE_DIRS @EXPORT_CHASTE_pde_INCLUDE_DIRS@)
+    set(CHASTE_continuum_mechanics_INCLUDE_DIRS @EXPORT_CHASTE_continuum_mechanics_INCLUDE_DIRS@)
+    set(CHASTE_cell_based_INCLUDE_DIRS @EXPORT_CHASTE_cell_based_INCLUDE_DIRS@)
+    set(CHASTE_crypt_INCLUDE_DIRS @EXPORT_CHASTE_crypt_INCLUDE_DIRS@)
+    set(CHASTE_lung_INCLUDE_DIRS @EXPORT_CHASTE_lung_INCLUDE_DIRS@)
+    set(CHASTE_heart_INCLUDE_DIRS @EXPORT_CHASTE_heart_INCLUDE_DIRS@)
+
+    set(CHASTE_INCLUDES @CHASTE_INCLUDES@)
+    set(CHASTE_LINK_LIBRARIES @CHASTE_LINK_LIBRARIES@)
+
+    set(TestPackTypes @TestPackTypes@)
+
+    # Our library dependencies (contains definitions for IMPORTED targets)
+    include("${Chaste_CMAKE_DIR}/ChasteTargets.cmake")
+endif()
+
+set(Chaste_INCLUDE_DIRS "${CHASTE_INCLUDES}")
+set(Chaste_LIBRARIES "${CHASTE_LINK_LIBRARIES}")
+set(Chaste_COMPONENTS "")
+
+
+# If no components are specified include core
+if (NOT Chaste_FIND_COMPONENTS)
+    set(Chaste_COMPONENTS ${CHASTE_DEPENDS_core})
+endif()
+
+# Setup dependent components in case they are not specified
+foreach(component ${Chaste_FIND_COMPONENTS})
+    if (NOT(Chaste_FIND_COMPONENTS STREQUAL "none"))
+        list(APPEND Chaste_COMPONENTS ${component}) 
+        list(APPEND Chaste_COMPONENTS ${CHASTE_DEPENDS_${component}})
+    endif()
+endforeach(component)
+
+list(REMOVE_DUPLICATES Chaste_COMPONENTS)
+
+foreach(component ${Chaste_COMPONENTS})
+    # Set up the component include directories
+    list(APPEND Chaste_INCLUDE_DIRS "${CHASTE_${component}_INCLUDE_DIRS}")
+
+    if (NOT TARGET ${component})
+        message(SEND_ERROR "Cannot find component ${component}")
+    elseif(Chaste_USE_SHARED_LIBS)
+        get_target_property(is_shared ${component} POSITION_INDEPENDENT_CODE)
+        if (NOT is_shared)
+            message(SEND_ERROR "Requesting shared libraries but ${component} is not a shared library!")
+        endif()
+    endif()
+
+    # These are IMPORTED targets created by ChasteTargets.cmake
+    list(APPEND Chaste_LIBRARIES ${component})
+endforeach(component)
+

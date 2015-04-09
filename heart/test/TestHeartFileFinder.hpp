@@ -56,7 +56,7 @@ public:
             HeartFileFinder file_finder(path);
             TS_ASSERT(file_finder.Exists());
             // Check the path is as expected
-            std::string abs_path = ChasteBuildRootDir() + file_name;
+            std::string abs_path = ChasteSourceRootDir() + file_name;
             TS_ASSERT_EQUALS(file_finder.GetAbsolutePath(), abs_path);
 
             // CWD should be the Chaste source root
@@ -105,7 +105,7 @@ public:
             sibling_path.relative_to(cp::relative_to_type::this_file);
             HeartFileFinder sibling(sibling_path);
             TS_ASSERT(sibling.IsFile());
-            TS_ASSERT_EQUALS(sibling.GetAbsolutePath(), ChasteBuildRootDir() + file_name);
+            TS_ASSERT_EQUALS(sibling.GetAbsolutePath(), ChasteSourceRootDir() + file_name);
         }
     }
 };

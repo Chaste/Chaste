@@ -45,10 +45,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 /**
- * @return the path to the root directory of the Chaste source tree.
+ * @return the path to the root directory of the Chaste build tree.
  * Will always give you the absolute path with a trailing slash.
  */
 const char* ChasteBuildRootDir();
+
+/**
+ * @return the path to the root directory of the Chaste source tree.
+ * Will always give you the absolute path with a trailing slash.
+ */
+const char* ChasteSourceRootDir();
 
 /**
  * @return the folder in which compiled files are placed for the given

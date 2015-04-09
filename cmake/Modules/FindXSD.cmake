@@ -63,29 +63,35 @@ MACRO( XSD_SCHEMA NAME FILE )
   # generated files.
   #
   GET_FILENAME_COMPONENT( xs_FILE "${FILE}" NAME_WE )
-  SET( xs_CXX "${CMAKE_CURRENT_BINARY_DIR}/${xs_FILE}.cxx" )
-  SET( xs_HXX "${CMAKE_CURRENT_BINARY_DIR}/${xs_FILE}.hxx" )
-  SET( xs_IXX "${CMAKE_CURRENT_BINARY_DIR}/${xs_FILE}.ixx" )
+  file(RELATIVE_PATH xs_FILE_REL "${CMAKE_SOURCE_DIR}" "${FILE}" )
+  set(xs_OUT_TMP "${CMAKE_BINARY_DIR}/${xs_FILE_REL}")
+  GET_FILENAME_COMPONENT( xs_OUT_DIR "${xs_OUT_TMP}" DIRECTORY )
+  SET( xs_CPP "${xs_OUT_DIR}/${xs_FILE}.cpp" )
+  SET( xs_HPP "${xs_OUT_DIR}/${xs_FILE}.hpp" )
+  #SET( xs_IPP "${xs_FILE_DIR}/${xs_FILE}.ipp" )
 
   #
   # Add the source files to the NAME variable, which presumably will be used to
   # define the source of another target.
   #
-  LIST( APPEND ${NAME} ${xs_CXX} )
+  LIST( APPEND ${NAME} ${xs_CPP} )
 
   #
   # Set up a generator for the output files from the given schema file using
   # the XSD cxx-tree command.
   #
-  ADD_CUSTOM_COMMAND( OUTPUT "${xs_CXX}" "${xs_HXX}" "${xs_IXX}"
+  ADD_CUSTOM_COMMAND( OUTPUT "${xs_CPP}" "${xs_HPP}"
   					  COMMAND ${XSD_EXECUTABLE}
-					  ARGS "cxx-tree" ${ARGN} ${xs_SRC}
-					  DEPENDS ${xs_SRC} )
+                      ARGS "cxx-tree" "--output-dir" "${xs_OUT_DIR}" ${ARGN} ${xs_SRC}
+					  DEPENDS ${xs_SRC} 
+                      COMMENT "Processing XML schema ${xs_FILE_REL}"
+                      VERBATIM
+                      )
 
   #
   # Don't fail if a generated file does not exist.
   #
-  SET_SOURCE_FILES_PROPERTIES( "${xs_CXX}" "${xs_HXX}" "${xs_IXX}"
+  SET_SOURCE_FILES_PROPERTIES( "${xs_CPP}" "${xs_HPP}"
   							   PROPERTIES GENERATED TRUE )
 
 ENDMACRO( XSD_SCHEMA )

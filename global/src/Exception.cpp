@@ -65,13 +65,16 @@ void Exception::SetMessage(const std::string& rMessage,
                            const std::string& rFilename, unsigned lineNumber)
 {
     // Strip off source root dir if exists
+    // Check only valid for cmake builds so ignore coverage here
+    // /todo #2656 - remove coverage ignore after cmake transition
+#define COVERAGE_IGNORE
     std::string filename(rFilename);
-    std::string sourceRootDir(ChasteBuildRootDir());
-    size_t start_pos = filename.find(sourceRootDir);
-    if (start_pos == 0)
+    const size_t root_dir_length = std::strlen(ChasteSourceRootDir());
+    if (filename.compare(0,root_dir_length,ChasteSourceRootDir()) == 0)
     {
-        filename.replace(start_pos,sourceRootDir.length(),"./");
+        filename.replace(0,root_dir_length,"./");
     }
+#undef COVERAGE_IGNORE
 
     std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(filename)));
     mShortMessage = rMessage;

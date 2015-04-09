@@ -58,6 +58,9 @@ HeartFileFinder::HeartFileFinder(const cp::path_type& rPath)
             case cp::relative_to_type::chaste_source_root:
                 relative_to = RelativeTo::ChasteSourceRoot;
                 break;
+            case cp::relative_to_type::chaste_build_root:
+                relative_to = RelativeTo::ChasteBuildRoot;
+                break;
             case cp::relative_to_type::absolute:
                 relative_to = RelativeTo::Absolute;
                 break;

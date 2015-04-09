@@ -278,25 +278,25 @@ public:
                                   "Conversion of CellML to Chaste shared object failed.");
         ResetMode(cellml_file, old_mode);
 
-        // What if the Chaste source tree is missing?
-        FileFinder::FakePath(RelativeTo::ChasteSourceRoot, "/tmp/not-a-chaste-source-tree");
+        // What if the Chaste build tree is missing?
+        FileFinder::FakePath(RelativeTo::ChasteBuildRoot, "/tmp/not-a-chaste-source-tree");
         TS_ASSERT_THROWS_THIS(converter.Convert(cellml_file),
-                              "No Chaste source tree found at '/tmp/not-a-chaste-source-tree' - you need the source to use CellML models directly in Chaste.");
+                              "No Chaste build tree found at '/tmp/not-a-chaste-source-tree' - you need the source to use CellML models directly in Chaste.");
         FileFinder::StopFaking();
 
         // Or a required project is missing?
         {
-            FileFinder source_root("", RelativeTo::ChasteSourceRoot);
+            FileFinder build_root("", RelativeTo::ChasteBuildRoot);
             CellMLToSharedLibraryConverter failed_converter(true, "not_a_project");
             TS_ASSERT_THROWS_CONTAINS(failed_converter.Convert(cellml_file),
                 "Unable to convert CellML model: required Chaste component 'not_a_project' does not exist in '"
-                                      + source_root.GetAbsolutePath() + "'.");
+                                      + build_root.GetAbsolutePath() + "'.");
         }
 
         // Or we can't create the temp folder for some other reason?
         {
             OutputFileHandler fake_chaste_tree("FakeChaste/heart");
-            FileFinder::FakePath(RelativeTo::ChasteSourceRoot, fake_chaste_tree.GetChasteTestOutputDirectory() + "FakeChaste");
+            FileFinder::FakePath(RelativeTo::ChasteBuildRoot, fake_chaste_tree.GetChasteTestOutputDirectory() + "FakeChaste");
             TS_ASSERT_THROWS_CONTAINS(converter.Convert(cellml_file),
                                       "Failed to create temporary folder '");
             FileFinder::StopFaking();

@@ -2,22 +2,27 @@
 
 const char* ChasteBuildRootDir() 
 { 
+    return "${Chaste_BINARY_DIR}/"; 
+}
+
+const char* ChasteSourceRootDir() 
+{ 
     return "${Chaste_SOURCE_DIR}/"; 
 }
 
 std::string ChasteComponentBuildDir(const std::string& rComponent)
 {
-    return std::string(ChasteBuildRootDir()) + rComponent + "/CHASTE_BUILD_DIR_NAME/" ;
+    return std::string(ChasteBuildRootDir()) + rComponent + "/${Chaste_BUILD_DIR_NAME}/" ;
 }
 
 std::string ChasteBuildDirName()
 {
-    return "CHASTE_BUILD_DIR_NAME";
+    return "${Chaste_BUILD_DIR_NAME}";
 }
 
 std::string ChasteBuildType()
 {
-    return "${CMAKE_BUILD_TYPE}";
+    return "${Chaste_BUILD_TYPE}";
 }
 
 ${additional}

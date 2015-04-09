@@ -1,7 +1,7 @@
 
 
 # The auto-generated source files
-set(config_dir ${Chaste_BINARY_DIR}/src)
+set(Chaste_GENERATE_DIR ${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/src)
 
 #Generate Version.cpp
 set(CHASTE_WC_MODIFIED "false")
@@ -50,7 +50,7 @@ endif()
 #The generated timekeeper.cpp code below keeps track of build timestamp.
 #It is built and executed prior to starting a build and prints the timestamp
 #in a given format. This timestamp is used by Version.cpp, which is also auto-generated.
-file(WRITE ${config_dir}/timekeeper.cpp
+file(WRITE ${Chaste_GENERATE_DIR}/timekeeper.cpp
 "#include <iostream>
 #include <fstream>
 #include <ctime>
@@ -69,7 +69,7 @@ int main( )
 }
 ")
 
-add_executable(timekeeper "${config_dir}/timekeeper.cpp")
+add_executable(timekeeper "${Chaste_GENERATE_DIR}/timekeeper.cpp")
 
 
 #string(TIMESTAMP build_time)
@@ -109,7 +109,7 @@ set (Chaste_VERSION_MINOR 3)
 # to the source code
 configure_file (
   "global/src/Version_cmake.cpp.in"
-  ${config_dir}/Version.cpp
+  ${Chaste_GENERATE_DIR}/Version.cpp
   )
 
 
@@ -125,19 +125,22 @@ endif()
 
 configure_file (
   "global/src/ChasteBuildInfo_cmake.cpp.in"
-  ${config_dir}/ChasteBuildInfo.cpp
+  ${Chaste_GENERATE_DIR}/ChasteBuildInfo.cpp
   )
 
 add_custom_target(generateTimestamp ALL
     COMMAND "$<TARGET_FILE:timekeeper>"
     COMMAND ${CMAKE_COMMAND} -P
         ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteUpdateBuildTime.cmake
-    WORKING_DIRECTORY "${config_dir}"
+    WORKING_DIRECTORY "${Chaste_GENERATE_DIR}"
     DEPENDS timekeeper
     COMMENT "Generating Build Timestamp"
     VERBATIM
 )
 
+
+configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
+    "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
 
 #add_custom_target(generateTimestamp ALL DEPENDS updateVersionCpp)
 

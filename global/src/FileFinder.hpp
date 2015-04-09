@@ -55,6 +55,7 @@ struct RelativeTo
         CWD, /**< The current working directory */
         ChasteTestOutput, /**< The CHASTE_TEST_OUTPUT folder */
         ChasteSourceRoot, /**< The root of the Chaste source tree */
+        ChasteBuildRoot, /**< The root of the Chaste build tree */
         Absolute, /**< This is an absolute path */
         AbsoluteOrCwd /**< If it starts with a / then it's absolute, otherwise interpret relative to CWD */
     };

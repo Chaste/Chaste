@@ -31,6 +31,9 @@
 #
 # This module will define the following variables:
 #  SUNDIALS_INCLUDE_DIRS - Location of the SUNDIALS includes
+#  SUNDIALS_VERSION_MAJOR 
+#  SUNDIALS_VERSION_MINOR
+#  SUNDIALS_VERSION_SUBMINOR
 #  SUNDIALS_FOUND - true if SUNDIALS was found on the system
 #  SUNDIALS_LIBRARIES - Required libraries for all requested components
 
@@ -105,6 +108,17 @@ set( SUNDIALS_INCLUDE_DIRS
     "${SUNDIALS_INCLUDE_DIR}/.."
     "${SUNDIALS_INCLUDE_DIR}"
 )
+
+# get SUNDIALS version
+if (SUNDIALS_INCLUDE_DIR)
+    file(STRINGS "${SUNDIALS_INCLUDE_DIR}/sundials_config.h" _SUNDIALS_VERSION_HPP_CONTENTS REGEX "#define SUNDIALS_PACKAGE_VERSION ")
+    string(REGEX MATCH "\"([0-9]*)\\." _DUMMY "${_SUNDIALS_VERSION_HPP_CONTENTS}")
+    set(SUNDIALS_VERSION_MAJOR ${CMAKE_MATCH_1})
+    string(REGEX MATCH "\\.([0-9]*)\\." _DUMMY "${_SUNDIALS_VERSION_HPP_CONTENTS}")
+    set(SUNDIALS_VERSION_MINOR ${CMAKE_MATCH_1})
+    string(REGEX MATCH "\\.([0-9]*)\"" _DUMMY "${_SUNDIALS_VERSION_HPP_CONTENTS}")
+    set(SUNDIALS_VERSION_SUBMINOR ${CMAKE_MATCH_1})
+endif(SUNDIALS_INCLUDE_DIR)
 
 
 # find the SUNDIALS libraries

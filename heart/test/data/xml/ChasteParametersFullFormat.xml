@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ChasteParameters
-	xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"
+	xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://chaste.comlab.ox.ac.uk/nss/parameters/3_1 ../../../src/io/ChasteParameters_3_1.xsd">
  
@@ -41,7 +41,7 @@
 			<Region>
 				<IonicModel>
 					<Dynamic>
-						<Path relative_to="chaste_source_root">heart/dynamic/libDynamicallyLoadableLr91.so</Path>
+						<Path relative_to="chaste_build_root">heart/dynamic/libDynamicallyLoadableLr91.so</Path>
 					</Dynamic>
 				</IonicModel>
 				<Location unit="cm">

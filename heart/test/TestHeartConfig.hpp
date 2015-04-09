@@ -311,7 +311,7 @@ public:
         TS_ASSERT(ionic_model_regions[0]->DoesContain(ChastePoint<3>(-1.95, 0, 0)));
         std::string model_zero("heart/dynamic/libDynamicallyLoadableLr91.so");
         TS_ASSERT(ionic_models_defined[0].Dynamic().present());
-        TS_ASSERT_EQUALS(ionic_models_defined[0].Dynamic()->Path().relative_to(), cp::relative_to_type::chaste_source_root);
+        TS_ASSERT_EQUALS(ionic_models_defined[0].Dynamic()->Path().relative_to(), cp::relative_to_type::chaste_build_root);
         TS_ASSERT_EQUALS(ionic_models_defined[0].Dynamic()->Path(), model_zero);
         TS_ASSERT(ionic_models_defined[1].Hardcoded().present());
         TS_ASSERT_EQUALS(ionic_models_defined[1].Hardcoded().get(), cp::ionic_models_available_type::DifrancescoNoble);
@@ -327,7 +327,7 @@ public:
 
         TS_ASSERT(ionic_model_regions_2D[0]->DoesContain(ChastePoint<2>(-1.95, 0)));
         TS_ASSERT(ionic_models_defined_2D[0].Dynamic().present());
-        TS_ASSERT_EQUALS(ionic_models_defined_2D[0].Dynamic()->Path().relative_to(), cp::relative_to_type::chaste_source_root);
+        TS_ASSERT_EQUALS(ionic_models_defined_2D[0].Dynamic()->Path().relative_to(), cp::relative_to_type::chaste_build_root);
         TS_ASSERT_EQUALS(ionic_models_defined_2D[0].Dynamic()->Path(), model_zero);
 
         TS_ASSERT(ionic_model_regions_2D[1]->DoesContain(ChastePoint<2>(-0.5, 0)));
@@ -349,7 +349,7 @@ public:
 
         TS_ASSERT(ionic_model_regions_1D[0]->DoesContain(ChastePoint<1>(-1.95)));
         TS_ASSERT(ionic_models_defined_1D[0].Dynamic().present());
-        TS_ASSERT_EQUALS(ionic_models_defined_1D[0].Dynamic()->Path().relative_to(), cp::relative_to_type::chaste_source_root);
+        TS_ASSERT_EQUALS(ionic_models_defined_1D[0].Dynamic()->Path().relative_to(), cp::relative_to_type::chaste_build_root);
         TS_ASSERT_EQUALS(ionic_models_defined_1D[0].Dynamic()->Path(), model_zero);
         TS_ASSERT(ionic_models_defined_1D[1].Hardcoded().present());
         TS_ASSERT_EQUALS(ionic_models_defined_1D[1].Hardcoded().get(), cp::ionic_models_available_type::DifrancescoNoble);

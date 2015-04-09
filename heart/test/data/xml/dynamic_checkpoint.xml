@@ -9,7 +9,7 @@
 	    <Domain>Bi</Domain>
 	    <IonicModels>
 	    	<Default><Dynamic>
-	    	    <Path relative_to="chaste_source_root">heart/dynamic/libDynamicallyLoadableLr91.so</Path>
+	    	    <Path relative_to="chaste_build_root">heart/dynamic/libDynamicallyLoadableLr91.so</Path>
 	        </Dynamic></Default>
             </IonicModels>
 	    
