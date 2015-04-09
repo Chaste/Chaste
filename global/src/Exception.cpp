@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <iostream>
 #include <petsc.h>
+#include <string>     // std::char_traits
 
 #include "Exception.hpp"
 #include "BoostFilesystem.hpp"
@@ -69,7 +70,7 @@ void Exception::SetMessage(const std::string& rMessage,
     // /todo #2656 - remove coverage ignore after cmake transition
 #define COVERAGE_IGNORE
     std::string filename(rFilename);
-    const size_t root_dir_length = std::strlen(ChasteSourceRootDir());
+    const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
     if (filename.compare(0,root_dir_length,ChasteSourceRootDir()) == 0)
     {
         filename.replace(0,root_dir_length,"./");
