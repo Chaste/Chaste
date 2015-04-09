@@ -261,6 +261,7 @@ set(Chaste_PYTHON_DIR "${Chaste_SOURCE_DIR}/python")
 configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
     "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
 
+export(PACKAGE Chaste)
 
 ####################
 # BUILD COMPONENTS #
@@ -284,8 +285,6 @@ foreach(projectName ${Chaste_PROJECTS})
     add_subdirectory(projects/${projectName})
 endforeach(projectName)
 
-
-
 ########################################
 # EXPORT CONFIG FOR OUT-OF-TREE BUILDS #
 ########################################
@@ -294,10 +293,6 @@ export(TARGETS ${CHASTE_COMPONENTS}
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
     EXPORT_LINK_INTERFACE_LIBRARIES 
     )
-
-
-export(PACKAGE Chaste)
-
 
 # Configure file for install dir
 set(EXPORT_Chaste_PYTHON_DIR "\${Chaste_CMAKE_DIR}/python")
