@@ -291,7 +291,7 @@ endforeach(projectName)
 
 export(TARGETS ${CHASTE_COMPONENTS}
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
-    EXPORT_LINK_INTERFACE_LIBRARIES 
+    #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES 
     )
 
 # Configure file for install dir
