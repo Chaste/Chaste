@@ -134,7 +134,6 @@ add_custom_target(generateTimestamp ALL
     COMMAND ${CMAKE_COMMAND} -P
         ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteUpdateBuildTime.cmake
     COMMAND ${CMAKE_COMMAND} 
-    ARGS
         "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
         "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
         "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
