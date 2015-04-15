@@ -74,7 +74,7 @@ endmacro()
         set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
         add_executable("${_testname}" "${_test_real_output_filename}" ${ARGN})
 
-        if(TEST_MPIEXEC_ENABLED)
+        if(${_testname} MATCHES "^.*Parallel$")
             #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
             # on the local host with n+1 cores.
             # Here we are using the form ${MPIEXEC} /np 2 ${test}.
@@ -82,11 +82,14 @@ endmacro()
             # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
             # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
             # run more tests than intended!
-
-            add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" /np 2 $<TARGET_FILE:${_testname}>)
+            if (WIN32)
+                add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" /np 2 $<TARGET_FILE:${_testname}>)
+            else()
+                add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" -np 2 $<TARGET_FILE:${_testname}>)
+            endif()
         else()
             add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${_testname}>)
-        endif(TEST_MPIEXEC_ENABLED)
+        endif()
     endmacro(CHASTE_ADD_TEST)
 
   macro(CHASTE_GENERATE_TEST_NAME test outTestName)
@@ -231,7 +234,11 @@ endmacro()
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
                 chaste_generate_test_name(${filename} "testName")
-                set(targetName "${testName}Runner")
+                if (type STREQUAL "Parallel")
+                    set(targetName "${testName}Parallel")
+                else()
+                    set(targetName "${testName}Serial")
+                endif()
                 if (NOT TARGET ${targetName})
                     chaste_add_test(${targetName} "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
                     #target_link_libraries(${targetName} ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
