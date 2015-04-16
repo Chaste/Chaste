@@ -6221,6 +6221,8 @@ def get_options(args, default_options=None):
     usage = 'usage: %prog [options] <cellml file or URI>'
     parser = optparse.OptionParser(version="%%prog %s" % __version__,
                                    usage=usage)
+    parser.add_option('-q', '--quiet', action='store_true', default=False,
+                      help="don't show warning messages, only errors")
     # What type of translation is being performed
     parser.add_option('-T', '--translate',
                       dest='translate', action='store_true',
@@ -6488,7 +6490,7 @@ def load_model(model_file, options):
     notifier = NotifyHandler(level=logging.WARNING_TRANSLATE_ERROR)
     logging.getLogger('validator').addHandler(notifier)
     v = validator.CellMLValidator(create_relaxng_validator=not options.assume_valid)
-    valid, doc = v.validate(model_file, True,
+    valid, doc = v.validate(model_file, return_doc=True, show_warnings=not options.quiet,
                             check_for_units_conversions=options.warn_on_unit_conversions,
                             warn_on_units_errors=options.warn_on_units_errors,
                             assume_valid=options.assume_valid)

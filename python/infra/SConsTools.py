@@ -758,6 +758,8 @@ def CreatePyCmlBuilder(build, buildenv):
     def GetArgs(target, source, env):
         args = ['-A', '-p', '--output-dir', os.path.dirname(target[0].abspath)]
         args.extend(env.get('PYCML_EXTRA_ARGS', []))
+        if SCons.Script.Main.GetOption('silent'):
+            args.append('--quiet')
         if IsDynamicSource(source):
             # If we're creating a dynamic library, do things differently:
             # only create a single output .so.  The helper script will recognise
