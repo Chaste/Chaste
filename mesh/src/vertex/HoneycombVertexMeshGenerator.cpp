@@ -39,12 +39,14 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                                                            unsigned numElementsUp,
                                                            bool isFlatBottom,
                                                            double cellRearrangementThreshold,
-                                                           double t2Threshold)
+                                                           double t2Threshold,
+                                                           double elementArea)
 {
     assert(numElementsAcross > 0);
     assert(numElementsUp > 0);
     assert(cellRearrangementThreshold > 0.0);
     assert(t2Threshold > 0.0);
+    assert(elementArea > 0.0);
 
     std::vector<Node<2>*> nodes;
     std::vector<VertexElement<2,2>*>  elements;
@@ -142,6 +144,9 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
     }
 
     mpMesh = new MutableVertexMesh<2,2>(nodes, elements, cellRearrangementThreshold, t2Threshold);
+
+    // Scale the mesh so that each element's area takes the value elementArea
+    mpMesh->Scale(sqrt(elementArea*2.0/sqrt(3.0)), sqrt(elementArea*2.0/sqrt(3.0)));
 }
 
 HoneycombVertexMeshGenerator::~HoneycombVertexMeshGenerator()

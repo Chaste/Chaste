@@ -444,7 +444,7 @@ public:
              * There are 30 shared edges in total (regardless of label).
              * Each edge has length 1/sqrt(3) = 0.577350.
              *
-             * Thus the total length is 30/sqrt(3) = ??? and the heterotypic boundary
+             * Thus the total length is 30/sqrt(3) and the heterotypic boundary
              * length is 15/sqrt(3) = 8.660254.
              *
              * This can be verified by eyeballing the output file.

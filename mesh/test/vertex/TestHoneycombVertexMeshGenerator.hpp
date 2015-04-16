@@ -37,9 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTHONEYCOMBVERTEXMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
-
 #include "HoneycombVertexMeshGenerator.hpp"
-
 #include "PetscSetupAndFinalize.hpp"
 
 class TestHoneycombVertexMeshGenerator : public CxxTest::TestSuite
@@ -49,7 +47,6 @@ public:
     void TestSimpleMesh() throw(Exception)
     {
         HoneycombVertexMeshGenerator generator(2, 2, false, 0.1, 0.1);
-
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
@@ -84,6 +81,20 @@ public:
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 20400u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 10000u);
+    }
+
+    void TestElementArea() throw(Exception)
+    {
+        HoneycombVertexMeshGenerator generator(6, 6, false, 0.01, 0.001, 2.456);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 96u);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
+
+        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        {
+        	TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(elem_index), 2.456, 1e-3);
+        }
     }
 };
 
