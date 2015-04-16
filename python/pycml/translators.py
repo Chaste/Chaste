@@ -6228,8 +6228,7 @@ def get_options(args, default_options=None):
                       help="output computer code [default]")
     parser.add_option('-C', '--output-cellml',
                       dest='translate', action='store_false',
-                      help="output an annotated CellML file instead of translating, "
-                      " on stdout unless -o specified")
+                      help="output an annotated CellML file instead of translating, on stdout unless -o specified")
     translators = sorted(CellMLTranslator.translators)
     parser.add_option('-t', '--translate-type',
                       type='choice', choices=translators,
@@ -6237,8 +6236,7 @@ def get_options(args, default_options=None):
                       help="the type of code to output [default: %default].  "
                       "Choices: " + str(translators))
     parser.add_option('-o', dest='outfilename', metavar='OUTFILE',
-                      help="write program code to OUTFILE [default action is"
-                      " to use the input filename with a different extension]")
+                      help="write program code to OUTFILE [default action is to use the input filename with a different extension]")
     # Global adjustment settings
     parser.add_option('--config-file',
                       action='append', default=[],
@@ -6249,18 +6247,22 @@ def get_options(args, default_options=None):
     parser.add_option('--assume-valid',
                       action='store_true', default=False,
                       help="skip some of the model validation checks")
-    parser.add_option('-V', '--transmembrane-potential',
-                      default=None, metavar='POT_VAR',
-                      help="POT_VAR is the full name of the variable representing"
-                      " the transmembrane potential.  If not specified here,"
-                      " the configuration file will be used.  Defaults to "
-                      "'membrane,V'.")
+    parser.add_option('--warn-on-unit-conversions',
+                      action='store_true', default=False,
+                      help="generate a warning if unit conversions are required")
+    parser.add_option('--Wu', '--warn-on-units-errors',
+                      action='store_true', default=False,
+                      dest='warn_on_units_errors',
+                      help="give a warning instead of an error for dimensional inconsistencies")
+    parser.add_option('-V', '--transmembrane-potential', default=None, metavar='POT_VAR',
+                      help="POT_VAR is the full name of the variable representing the transmembrane potential."
+                      "  If not specified here, the configuration file will be used, which is the prefered method."
+                      "  Defaults to 'membrane,V'.")
     parser.add_option('-d', '--debug', action='store_true', default=False,
                       help="output debug info to stderr")
     parser.add_option('-D', '--debug-source', action='append',
-                      help="only show debug info from the specified part of the"
-                      " code.  This option may appear more than once to select"
-                      " multiple sources.  Implies -d.")
+                      help="only show debug info from the specified part of the code."
+                      "  This option may appear more than once to select multiple sources.  Implies -d.")
     parser.add_option('--profile', action='store_true', default=False,
                       help="turn on profiling of PyCml")
     # To examine the profile do something like:
@@ -6270,109 +6272,109 @@ def get_options(args, default_options=None):
     #    p = pstats.Stats(*files)
     #    p.strip_dirs().sort_stats('cum').print_stats(15)
     # What optimisations/transformations to do
-    parser.add_option('-l', '--lookup-tables',
-                      dest='lut', action='store_true', default=False,
-                      help="perform a lookup table analysis")
-    parser.add_option('-p', '--pe', '--partial-evaluation',
-                      dest='pe', action='store_true', default=False,
-                      help="partially evaluate the model")
-    parser.add_option('-u', '--units-conversions',
-                      action='store_true', default=False,
-                      help="add explicit units conversion mathematics")
-    parser.add_option('--warn-on-unit-conversions',
-                      action='store_true', default=False,
-                      help="generate a warning if unit conversions are required")
-    parser.add_option('--Wu', '--warn-on-units-errors',
-                      action='store_true', default=False,
-                      dest='warn_on_units_errors',
-                      help="give a warning instead of an error for dimensional inconsistencies")
-    parser.add_option('-j', '--maple-output',
-                      metavar='FILENAME', default=None,
-                      help="file containing output from a Maple script generated using -J.  The generated"
-                      " code/CellML will then contain a symbolic Jacobian as computed by Maple.")
-    parser.add_option('--backward-euler',
-                      action='store_true', default=False,
-                      help="generate a specialised cell model that solves itself using a decoupled"
-                      " backward Euler method.  Not compatible with --rush-larsen.  Implies -t Chaste."
-                      "  Requires -j.")
-    parser.add_option('--rush-larsen',
-                      action='store_true', default=False,
-                      help="use the Rush-Larsen method to solve Hodgkin-Huxley style gating variable"
-                      " equations.  Not compatible with --backward-euler.  Implies -t Chaste.")
-    parser.add_option('--grl1',
-                      action='store_true', default=False,
-                      help="use the GRL1 method to solve Hodgkin-Huxley style gating variable"
-                      " equations.  Not compatible with the backward Euler transformation."
-                      " Implies -t Chaste.")
-    parser.add_option('--grl2',
-                      action='store_true', default=False,
-                      help="use the GRL2 method to solve Hodgkin-Huxley style gating variable"
-                      " equations.  Not compatible with the backward Euler transformation."
-                      " Implies -t Chaste.")        
+    group = optparse.OptionGroup(parser, 'Transformations',
+                                 "These options control which transformations (typically optimisations) are applied in the generated code")
+    group.add_option('-l', '--lookup-tables',
+                     dest='lut', action='store_true', default=False,
+                     help="perform a lookup table analysis")
+    group.add_option('-p', '--pe', '--partial-evaluation',
+                     dest='pe', action='store_true', default=False,
+                     help="partially evaluate the model")
+    group.add_option('-u', '--units-conversions',
+                     action='store_true', default=False,
+                     help="add explicit units conversion mathematics")
+    group.add_option('-j', '--maple-output',
+                     metavar='FILENAME', default=None,
+                     help="file containing output from a Maple script generated using -J.  The generated"
+                     " code/CellML will then contain a symbolic Jacobian as computed by Maple.")
+    group.add_option('-J', '--do-jacobian-analysis',
+                     action='store_true', default=False,
+                     help="generate code to perform Jacobian analysis for backward Euler & CVODE; implies -t Maple")
+    group.add_option('--backward-euler',
+                     action='store_true', default=False,
+                     help="generate a specialised cell model that solves itself using a decoupled"
+                     " backward Euler method.  Not compatible with --rush-larsen.  Implies -t Chaste."
+                     "  Requires -j.")
+    group.add_option('--rush-larsen',
+                     action='store_true', default=False,
+                     help="use the Rush-Larsen method to solve Hodgkin-Huxley style gating variable"
+                     " equations.  Not compatible with --backward-euler.  Implies -t Chaste.")
+    group.add_option('--grl1',
+                     action='store_true', default=False,
+                     help="use the GRL1 method to solve Hodgkin-Huxley style gating variable"
+                     " equations.  Not compatible with the backward Euler transformation."
+                     " Implies -t Chaste.")
+    group.add_option('--grl2',
+                     action='store_true', default=False,
+                     help="use the GRL2 method to solve Hodgkin-Huxley style gating variable"
+                     " equations.  Not compatible with the backward Euler transformation."
+                     " Implies -t Chaste.")
+    parser.add_option_group(group)
     # Settings tweaking the generated code
-    parser.add_option('-c', '--class-name', default=None,
-                      help="explicitly set the name of the generated class")
-    parser.add_option('-a', '--augment-class-name',
-                      dest='augment_class_name', action='store_true',
-                      default=False,
-                      help="alter the class name to show what transformations"
-                      " are used")
-    parser.add_option('--no-timestamp',
-                      action='store_true', default=False,
-                      help="don't add a timestamp comment to generated files")
-    parser.add_option('-J', '--do-jacobian-analysis',
-                      action='store_true', default=False,
-                      help="experimental Jacobian analysis for backward Euler; implies -t Maple")
+    group = optparse.OptionGroup(parser, 'Generated code options')
+    group.add_option('-c', '--class-name', default=None,
+                     help="explicitly set the name of the generated class")
+    group.add_option('-a', '--augment-class-name',
+                     dest='augment_class_name', action='store_true',
+                     default=False,
+                     help="alter the class name to show what transformations are used")
+    group.add_option('--no-timestamp',
+                     action='store_true', default=False,
+                     help="don't add a timestamp comment to generated files")
+    parser.add_option_group(group)
     # Options specific to Maple output
-    parser.add_option('--dont-omit-constants',
-                      dest='omit_constants', action='store_false', default=True,
-                      help="when generating Maple code, include assignments of constants")
-    parser.add_option('--compute-partial-jacobian', dest='compute_full_jacobian',
-                      action='store_false', default=True,
-                      help="make generated Maple code compute a Jacobian specific to a Newton solve"
-                      " of the nonlinear portion of the ODE system, rather than the full system Jacobian")
+    group = optparse.OptionGroup(parser, 'Maple options', "Options specific to Maple code output")
+    group.add_option('--dont-omit-constants',
+                     dest='omit_constants', action='store_false', default=True,
+                     help="when generating Maple code, include assignments of constants")
+    group.add_option('--compute-partial-jacobian', dest='compute_full_jacobian',
+                     action='store_false', default=True,
+                     help="make generated Maple code compute a Jacobian specific to a Newton solve"
+                     " of the nonlinear portion of the ODE system, rather than the full system Jacobian")
+    parser.add_option_group(group)
     # Options specific to Python output
-    parser.add_option('--no-numba', dest='numba', default=True, action='store_false',
-                      help="turn off using Numba to optimise code on-the-fly")
+    group = optparse.OptionGroup(parser, 'Python options', "Options specific to Python code output")
+    group.add_option('--no-numba', dest='numba', default=True, action='store_false',
+                     help="turn off using Numba to optimise code on-the-fly")
+    parser.add_option_group(group)
     # Options specific to Chaste output
-    parser.add_option('-y', '--dll', '--dynamically-loadable',
-                      dest='dynamically_loadable',
-                      action='store_true', default=False,
-                      help="add code to allow the model to be compiled to a"
-                      " shared library and dynamically loaded"
-                      " (only works if -t Chaste is used)")
-    parser.add_option('--use-chaste-stimulus',
-                      action='store_true', default=False,
-                      help="when generating Chaste code, use Chaste's stimulus"
-                      " rather than that defined in the model")
-    parser.add_option('--no-use-chaste-stimulus', dest='use_chaste_stimulus',
-                      action='store_false',
-                      help="when generating Chaste code, use the model's stimulus, not Chaste's")
-    parser.add_option('-i', '--convert-interfaces',
-                      action='store_true', default=False,
-                      help="perform units conversions at interfaces to Chaste"
-                      " (only works if -t Chaste is used)")
-    parser.add_option('--use-i-ionic-regexp', dest='use_i_ionic_regexp',
-                      action='store_true', default=False,
-                      help="determine ionic currents from the regexp specified in the config file"
-                      " rather than analysing the voltage derivative equation")
-    parser.add_option('--include-dt-in-tables',
-                      action='store_true', default=False,
-                      help="[experimental] allow timestep to be included in lookup tables.  By default"
-                      " uses the timestep of the first cell created.  Requires support from external"
-                      " code if timestep changes.  Only really useful for backward Euler cells.")
-    parser.add_option('-m', '--use-modifiers',
-                      action='store_true', default=False,
-                      help="[experimental] add modifier functions for certain"
-                      " metadata-annotated variables for use in sensitivity analysis"
-                      " (only works if -t Chaste is used)")
-    parser.add_option('--expose-annotated-variables',
-                      action='store_true', default=False,
-                      help="expose all oxmeta-annotated variables for access via the"
-                      " GetAnyVariable functionality")
-    parser.add_option('--expose-all-variables',
-                      action='store_true', default=False,
-                      help="expose all variables for access via the GetAnyVariable functionality")
+    group = optparse.OptionGroup(parser, 'Chaste options', "Options specific to Chaste code output")
+    group.add_option('-y', '--dll', '--dynamically-loadable',
+                     dest='dynamically_loadable',
+                     action='store_true', default=False,
+                     help="add code to allow the model to be compiled to a shared library and dynamically loaded"
+                     " (only works if -t Chaste is used)")
+    group.add_option('--use-chaste-stimulus',
+                     action='store_true', default=False,
+                     help="when generating Chaste code, use Chaste's stimulus rather than that defined in the model")
+    group.add_option('--no-use-chaste-stimulus', dest='use_chaste_stimulus',
+                     action='store_false',
+                     help="when generating Chaste code, use the model's stimulus, not Chaste's")
+    group.add_option('-i', '--convert-interfaces',
+                     action='store_true', default=False,
+                     help="perform units conversions at interfaces to Chaste (only works if -t Chaste is used)")
+    group.add_option('--use-i-ionic-regexp', dest='use_i_ionic_regexp',
+                     action='store_true', default=False,
+                     help="determine ionic currents from the regexp specified in the config file"
+                     " rather than analysing the voltage derivative equation")
+    group.add_option('--include-dt-in-tables',
+                     action='store_true', default=False,
+                     help="[experimental] allow timestep to be included in lookup tables.  By default"
+                     " uses the timestep of the first cell created.  Requires support from external"
+                     " code if timestep changes.  Only really useful for backward Euler cells.")
+    group.add_option('-m', '--use-modifiers',
+                     action='store_true', default=False,
+                     help="[experimental] add modifier functions for certain"
+                     " metadata-annotated variables for use in sensitivity analysis (only works if -t Chaste is used)")
+    group.add_option('--expose-annotated-variables',
+                     action='store_true', default=False,
+                     help="expose all oxmeta-annotated variables for access via the GetAnyVariable functionality")
+    group.add_option('--expose-all-variables',
+                     action='store_true', default=False,
+                     help="expose all variables for access via the GetAnyVariable functionality")
+    parser.add_option_group(group)
+    # Options specific to Functional Curation
+    group = optparse.OptionGroup(parser, 'Functional Curation options', "Options specific to use by Functional Curation")
     def protocol_callback(option, opt_str, value, parser):
         """
         Protocols don't always produce normal cardiac cell models.
@@ -6381,58 +6383,61 @@ def get_options(args, default_options=None):
         parser.values.protocol = value
         parser.values.convert_interfaces = False
         parser.values.use_chaste_stimulus = False
-    parser.add_option('--protocol',
-                      action='callback', callback=protocol_callback, type='string', nargs=1,
-                      help="[experimental] specify a simulation protocol to apply to"
-                      " the model prior to translation")
-    parser.add_option('--protocol-options', action='store', type='string',
-                      help="[experimental] extra options for the protocol")
+    group.add_option('--protocol',
+                     action='callback', callback=protocol_callback, type='string', nargs=1,
+                     help="specify a simulation protocol to apply to the model prior to translation")
+    group.add_option('--protocol-options', action='store', type='string',
+                     help="extra options for the protocol")
+    parser.add_option_group(group)
     # Settings for lookup tables
+    group = optparse.OptionGroup(parser, 'Lookup tables options', "Options specific to the lookup tables optimisation")
     lookup_type_choices = ['entry-below', 'nearest-neighbour', 'linear-interpolation']
-    parser.add_option('--lookup-type', choices=lookup_type_choices,
-                      default='linear-interpolation',
-                      help="the type of table lookup to perform [default: %default]."
-                      " Choices: " + str(lookup_type_choices))
-    parser.add_option('--no-separate-lut-class', dest='separate_lut_class',
-                      action='store_false', default=True,
-                      help="don't put lookup tables in a separate class")
-    parser.add_option('--row-lookup-method',
-                      action='store_true', default=True,
-                      help="add and use a method to look up a whole row of a table")
-    parser.add_option('--no-row-lookup-method', dest='row_lookup_method',
-                      action='store_false',
-                      help="don't add and use a method to look up a whole row of a table")
-    parser.add_option('--combine-commutative-tables',
-                      action='store_true', default=False,
-                      help="optimise a special corner case to reduce the number of tables."
-                      " See documentation for details.")
-    parser.add_option('--lt-index-uses-floor',
-                      action='store_true', default=False,
-                      help="use floor() to calculate LT indices, instead of just casting")
-    parser.add_option('--constrain-table-indices',
-                      action='store_true', default=False,
-                      help="constrain lookup table index variables to remain"
-                      " within the bounds specified, rather than throwing an"
-                      " exception if they go outside the bounds")
-    parser.add_option('--no-check-lt-bounds', dest='check_lt_bounds',
-                      action='store_false', default=True,
-                      help="[unsafe] don't check for LT indexes going outside the table bounds")
+    group.add_option('--lookup-type', choices=lookup_type_choices,
+                     default='linear-interpolation',
+                     help="the type of table lookup to perform [default: %default]."
+                     " Choices: " + str(lookup_type_choices))
+    group.add_option('--no-separate-lut-class', dest='separate_lut_class',
+                     action='store_false', default=True,
+                     help="don't put lookup tables in a separate class")
+    group.add_option('--row-lookup-method',
+                     action='store_true', default=True,
+                     help="add and use a method to look up a whole row of a table")
+    group.add_option('--no-row-lookup-method', dest='row_lookup_method',
+                     action='store_false',
+                     help="don't add and use a method to look up a whole row of a table")
+    group.add_option('--combine-commutative-tables',
+                     action='store_true', default=False,
+                     help="optimise a special corner case to reduce the number of tables."
+                     " See documentation for details.")
+    group.add_option('--lt-index-uses-floor',
+                     action='store_true', default=False,
+                     help="use floor() to calculate LT indices, instead of just casting")
+    group.add_option('--constrain-table-indices',
+                     action='store_true', default=False,
+                     help="constrain lookup table index variables to remain within the bounds specified,"
+                     " rather than throwing an exception if they go outside the bounds")
+    group.add_option('--no-check-lt-bounds', dest='check_lt_bounds',
+                     action='store_false', default=True,
+                     help="[unsafe] don't check for LT indexes going outside the table bounds")
+    parser.add_option_group(group)
     # Settings for partial evaluation
-    parser.add_option('--member-vars', dest='kept_vars_as_members',
-                      action='store_true', default=True,
-                      help="store kept variables as members")
-    parser.add_option('--no-member-vars', dest='kept_vars_as_members',
-                      action='store_false',
-                      help="don't store kept variables as members")
-    parser.add_option('--pe-convert-power',
-                      action='store_true', default=False,
-                      help="convert pow(x,3) to x*x*x; similarly for powers 2 & 4.")
-    parser.add_option('--no-partial-pe-commutative', dest='partial_pe_commutative',
-                      action='store_false', default=True,
-                      help="don't combine static operands of dynamic commutative associative applys")
-    parser.add_option('--no-pe-instantiate-tables', dest='pe_instantiate_tables',
-                      action='store_false', default=True,
-                      help="don't instantiate definitions that will be tables regardless of usage")
+    group = optparse.OptionGroup(parser, 'Partial evaluation options', "Options specific to the partial evaluation optimisation")
+    group.add_option('--member-vars', dest='kept_vars_as_members',
+                     action='store_true', default=True,
+                     help="store kept variables as members")
+    group.add_option('--no-member-vars', dest='kept_vars_as_members',
+                     action='store_false',
+                     help="don't store kept variables as members")
+    group.add_option('--pe-convert-power',
+                     action='store_true', default=False,
+                     help="convert pow(x,3) to x*x*x; similarly for powers 2 & 4.")
+    group.add_option('--no-partial-pe-commutative', dest='partial_pe_commutative',
+                     action='store_false', default=True,
+                     help="don't combine static operands of dynamic commutative associative applys")
+    group.add_option('--no-pe-instantiate-tables', dest='pe_instantiate_tables',
+                     action='store_false', default=True,
+                     help="don't instantiate definitions that will be tables regardless of usage")
+    parser.add_option_group(group)
 
     options, args = parser.parse_args(args, values=default_options)
     if len(args) != 1:
