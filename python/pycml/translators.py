@@ -6181,8 +6181,7 @@ class ConfigurationStore(object):
     def validate_metadata(self, assume_valid=False):
         """Check that the metadata annotations are 'sensible'.
         
-        Ensures that only names we know are used, and that the same name isn't used for multiple
-        variables.
+        Ensures that only names we know are used, and that the same name isn't used for multiple variables.
         """
         vars = cellml_metadata.find_variables(self.doc.model, ('bqbiol:is', NSS['bqbiol']))
         self.metadata_vars = filter(lambda v: v.oxmeta_name, vars)
@@ -6390,6 +6389,9 @@ def get_options(args, default_options=None):
                      help="specify a simulation protocol to apply to the model prior to translation")
     group.add_option('--protocol-options', action='store', type='string',
                      help="extra options for the protocol")
+    group.add_option('--expose-named-parameters',
+                     action='store_true', default=False,
+                     help="expose all constant variables with 'name' annotations for access as model parameters")
     parser.add_option_group(group)
     # Settings for lookup tables
     group = optparse.OptionGroup(parser, 'Lookup tables options', "Options specific to the lookup tables optimisation")

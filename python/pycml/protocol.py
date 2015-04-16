@@ -1248,6 +1248,11 @@ class Protocol(processors.ModelModifier):
                 assert var.get_type() in [VarTypes.State, VarTypes.Free], 'Bad var ' + str(var) + ' of type ' + str(var.get_type())
         for var in self.outputs:
             var.set_is_output_variable(True)
+        # Make constant variables with name annotations into model parameters if requested
+        if self.model.get_option('expose_named_parameters'):
+            for var in cellml_metadata.find_variables(self.model, ('bqbiol:is', NSS['bqbiol'])):
+                if var.get_type() == VarTypes.Constant:
+                    var.set_is_modifiable_parameter(True)
 
 def apply_protocol_file(doc, proto_file_path):
     """Apply the protocol defined in the given file to a model.
