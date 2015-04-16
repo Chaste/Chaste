@@ -63,18 +63,33 @@ endmacro()
 
     #Chaste Testing Macro. The predefined cxxtest_add_test is not suitable because of little control over
     #the test's working directory
-    macro(CHASTE_ADD_TEST _testname _test_output_filename)
-        set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_test_output_filename}")
-        add_custom_command(
-            OUTPUT "${_test_real_output_filename}"
-            DEPENDS ${ARGN}
-            COMMAND ${CXXTEST_TESTGEN_INTERPRETER} ${CXXTEST_TESTGEN_EXECUTABLE} ${CXXTEST_TESTGEN_ARGS} -o "${_test_real_output_filename}" ${ARGN}
-        )
+    macro(CHASTE_ADD_TEST _testTargetName )
+        string(REGEX MATCH "^.*Parallel$" foundParallel ${_testTargetName})
+        if (foundParallel)
+            set(parallel ON)
+            string(REGEX REPLACE "(Parallel)$" "" _testname "${_testTargetName}")
+        else()
+            set(parallel OFF)
+            set(_testname ${_testTargetName})
+        endif()
 
-        set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
-        add_executable("${_testname}" "${_test_real_output_filename}" ${ARGN})
+        set(_exeTargetName ${_testname}Runner)
 
-        if(${_testname} MATCHES "^.*Parallel$")
+        if (NOT TARGET ${exeTargetName})
+            set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_testname}.cpp")
+            add_custom_command(
+                OUTPUT "${_test_real_output_filename}"
+                DEPENDS ${ARGN}
+                COMMAND ${CXXTEST_TESTGEN_INTERPRETER} ${CXXTEST_TESTGEN_EXECUTABLE} ${CXXTEST_TESTGEN_ARGS} -o "${_test_real_output_filename}" ${ARGN}
+            )
+
+            set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
+
+            add_executable(${exeTargetName} "${_test_real_output_filename}" ${ARGN})
+        endif()
+
+
+        if(${parallel} OR NOT (${Chaste_NUM_CPUS_TEST} EQUAL 1))
             #Note: "${MPIEXEC} /np 1 master : subordinate" means that we run one master process and n subordinate processes
             # on the local host with n+1 cores.
             # Here we are using the form ${MPIEXEC} /np 2 ${test}.
@@ -82,13 +97,20 @@ endmacro()
             # See http://technet.microsoft.com/en-us/library/cc947675%28v=ws.10%29.aspx
             # Note the underscore appended to the test name, to match with the RUN_TESTS block above, and ensure we don't
             # run more tests than intended!
-            if (WIN32)
-                add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" /np 2 $<TARGET_FILE:${_testname}>)
+            if (${Chaste_NUM_CPUS_TEST} EQUAL 1)
+                set(num_cpus 2)
             else()
-                add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" -np 2 $<TARGET_FILE:${_testname}>)
+                set(num_cpus ${Chaste_NUM_CPUS_TEST})
             endif()
+            if (WIN32)
+                add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" /np ${num_cpus} $<TARGET_FILE:${exeTargetName}>)
+            else()
+                add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND "${MPIEXEC}" -np ${num_cpus} $<TARGET_FILE:${exeTargetName}>)
+            endif()
+            set_property(TEST ${testTargetName} PROPERTY PROCESSORS ${num_cpus})
         else()
-            add_test(NAME "${_testname}" WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${_testname}>)
+            add_test(NAME ${_testTargetName} WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/" COMMAND $<TARGET_FILE:${exeTargetName}>)
+            set_property(TEST ${testTargetName} PROPERTY PROCESSORS 1)
         endif()
     endmacro(CHASTE_ADD_TEST)
 
@@ -233,26 +255,29 @@ endmacro()
             file(STRINGS "${type}TestPack.txt" testpack)
             foreach(filename ${testpack})
                 string(STRIP ${filename} filename)
-                chaste_generate_test_name(${filename} "testName")
-                if (type STREQUAL "Parallel")
-                    set(targetName "${testName}Parallel")
-                else()
-                    set(targetName "${testName}Serial")
+                chaste_generate_test_name(${filename} "testTargetName")
+                set(parallel OFF)
+                set(exeTargetName ${testTargetName}Runner)
+                if (${type} STREQUAL "Parallel")
+                    set(testTargetName ${testTargetName}Parallel)
+                    set(parallel ON)
                 endif()
-                if (NOT TARGET ${targetName})
-                    chaste_add_test(${targetName} "${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
+                
+                if (NOT DEFINED ${testTargetName})
+                    set(${testTargetName} ON)
+                    chaste_add_test(${testTargetName} "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
                     #target_link_libraries(${targetName} ${COMPONENT_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
-                    target_link_libraries(${targetName} ${COMPONENT_LIBRARIES})
-                    set_target_properties(${targetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
-                    set_property(TEST ${targetName} PROPERTY LABELS ${component} ${type})
+                    target_link_libraries(${exeTargetName} ${COMPONENT_LIBRARIES})
+                    set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${component} ${type})
                     if(NOT(${component} MATCHES "^project"))
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
                             DESTINATION test/${component} COMPONENT  ${component}_tests)
                     endif(NOT(${component} MATCHES "^project"))
                 else()
-                    get_property(myLabels TEST ${targetName} PROPERTY LABELS)
+                    get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
                     list(APPEND myLabels ${type})
-                    set_property(TEST ${targetName} PROPERTY LABELS ${myLabels})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS ${myLabels})
                 endif()
             endforeach(filename ${testpack})
             endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${type}TestPack.txt")

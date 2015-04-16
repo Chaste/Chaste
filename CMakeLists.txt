@@ -13,8 +13,7 @@ set (Chaste_VERSION_MINOR 3)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/definitions.cmake)
 
-
-option(TEST_MPIEXEC_ENABLED OFF "Whether to run tests in parallel using mpiexec, or sequentially as normal executables.")
+set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
