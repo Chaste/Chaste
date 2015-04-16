@@ -142,8 +142,8 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
 template<unsigned DIM>
 void DiffusionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-	*rParamsFile << "\t\t\t<AbsoluteTemperature>" << mAbsoluteTemperature << "</AbsoluteTemperature> \n";
-	*rParamsFile << "\t\t\t<Viscosity>" << mViscosity << "</Viscosity> \n";
+    *rParamsFile << "\t\t\t<AbsoluteTemperature>" << mAbsoluteTemperature << "</AbsoluteTemperature> \n";
+    *rParamsFile << "\t\t\t<Viscosity>" << mViscosity << "</Viscosity> \n";
 
     // Call direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

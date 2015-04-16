@@ -1934,7 +1934,7 @@ public:
             }
 
             double correct_diffusion_coefficient =
-            		4.97033568e-7 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
+                    4.97033568e-7 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
             unsigned dim = 2;
             variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
@@ -2050,7 +2050,7 @@ public:
             }
 
             double correct_diffusion_coefficient =
-            		4.97033568e-7 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
+                    4.97033568e-7 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
             unsigned dim = 3;
             variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
