@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UblasVectorInclude.hpp"
 
-#include "ChasteParameters_3_3.hpp"
+#include "ChasteParameters_3_4.hpp"
 
 #include "AbstractStimulusFunction.hpp"
 #include "AbstractChasteRegion.hpp"
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/set.hpp>
 
-namespace cp = chaste::parameters::v3_3;
+namespace cp = chaste::parameters::v3_4;
 
 // Forward declaration to avoid circular includes
 class HeartFileFinder;

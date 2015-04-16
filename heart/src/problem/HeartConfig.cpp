@@ -298,10 +298,12 @@ void HeartConfig::Write(bool useArchiveLocationInfo, std::string subfolderName)
     map["cp30"].schema = "ChasteParameters_3_0.xsd";
     map["cp31"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
     map["cp31"].schema = "ChasteParameters_3_1.xsd";
+    map["cp33"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
+    map["cp33"].schema = "ChasteParameters_3_3.xsd";
     // We use 'cp' as prefix for the latest version to avoid having to change saved
     // versions for comparison at every release.
-    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
-    map["cp"].schema = "ChasteParameters_3_3.xsd";
+    map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
+    map["cp"].schema = "ChasteParameters_3_4.xsd";
 
     cp::ChasteParameters(*p_parameters_file, *mpParameters, map);
 
@@ -364,7 +366,7 @@ void HeartConfig::CopySchema(const std::string& rToDirectory)
     // in a situation where it can handle EXCEPTION()s nicely, e.g.
     // TRY_IF_MASTER(CopySchema(...));
 
-    std::string schema_name("ChasteParameters_3_3.xsd");
+    std::string schema_name("ChasteParameters_3_4.xsd");
     FileFinder schema_location("heart/src/io/" + schema_name, RelativeTo::ChasteSourceRoot);
     if (!schema_location.Exists())
     {
@@ -400,6 +402,7 @@ void HeartConfig::SetDefaultSchemaLocations()
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_0"] = root_dir + "ChasteParameters_3_0.xsd";
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"] = root_dir + "ChasteParameters_3_1.xsd";
     mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"] = root_dir + "ChasteParameters_3_3.xsd";
+    mSchemaLocations["https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"] = root_dir + "ChasteParameters_3_4.xsd";
 }
 
 unsigned HeartConfig::GetVersionFromNamespace(const std::string& rNamespaceUri)
@@ -493,10 +496,13 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
         {
             XmlTransforms::MoveConductivityHeterogeneities(p_doc.get(), p_root_elt);
         }
-        if (version < 3003) // Not the latest release
+        if (version < 3003) // Changes made in release 3.3
         {
             XmlTransforms::SetDefaultVisualizer(p_doc.get(), p_root_elt);
-            XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3");
+        }
+        if (version < 3004) // Not the latest release
+        {
+            XmlTools::SetNamespace(p_doc.get(), p_root_elt, "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4");
         }
         // Parse DOM to object model
         std::auto_ptr<cp::chaste_parameters_type> p_params(cp::ChasteParameters(*p_doc, ::xml_schema::flags::dont_initialize, props));

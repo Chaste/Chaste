@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"
-  xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_3" elementFormDefault="qualified">
+  targetNamespace="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"
+  xmlns="https://chaste.comlab.ox.ac.uk/nss/parameters/3_4" elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>This is the schema for Chaste cardiac (monodomain or bidomain)
       simulations</xs:documentation>
@@ -261,12 +261,15 @@
       <xs:documentation xml:lang="en"> An attribute for path_type elements that describes how to
         interpret the path value. It can be relative to the current working directory, relative to
         $CHASTE_TEST_OUTPUT, relative to the parameters file, relative to the Chaste source
-        code root, or an absolute path. </xs:documentation>
+        code root, relative to the directory Chaste was built in (which for SCons builds is the same
+        as the source root, but may differ for CMake builds), or an absolute path. It can also be
+        specified as a path relative to the XML configuration file. </xs:documentation>
     </xs:annotation>
     <xs:restriction base="xs:string">
       <xs:enumeration value="cwd"/>
       <xs:enumeration value="chaste_test_output"/>
       <xs:enumeration value="chaste_source_root"/>
+      <xs:enumeration value="chaste_build_root"/>
       <xs:enumeration value="absolute"/>
       <xs:enumeration value="this_file"/>
     </xs:restriction>

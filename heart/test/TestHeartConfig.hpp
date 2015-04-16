@@ -1391,7 +1391,7 @@ public:
         }
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
-                         "Unable to locate schema file ChasteParameters_3_3.xsd. You will need to ensure it is available when resuming from the checkpoint.");
+                         "Unable to locate schema file ChasteParameters_3_4.xsd. You will need to ensure it is available when resuming from the checkpoint.");
     }
 
     void TestArchiving() throw (Exception)
@@ -1546,6 +1546,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_0"), 3000u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_1"), 3001u);
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_3"), 3003u);
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/3_4"), 3004u);
         // and exceptions
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetVersionFromNamespace("https://chaste.comlab.ox.ac.uk/nss/parameters/1__1"),
                               "https://chaste.comlab.ox.ac.uk/nss/parameters/1__1 is not a recognised Chaste parameters namespace.");
@@ -1645,7 +1646,6 @@ public:
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease2_3.xml");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetVisualizerOutputPrecision(), 0u);
 
-
         // Check that release 3.0 xml can be loaded with release 3.0 schema
         HeartConfig::Reset();
         HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
@@ -1673,7 +1673,19 @@ public:
         HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
         HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_1.xml");
         TS_ASSERT(HeartConfig::Instance()->GetVisualizeWithMeshalyzer());
-    }
+
+        // Check that release 3.3 xml can be loaded with release 3.3 schema
+        HeartConfig::Reset();
+        HeartConfig::Instance()->SetUseFixedSchemaLocation(false);
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_3.xml");
+        TS_ASSERT(HeartConfig::Instance()->GetVisualizeWithMeshalyzer());
+
+        // Check that release 3.3 xml can be loaded with latest schema
+        HeartConfig::Reset();
+        HeartConfig::Instance()->SetUseFixedSchemaLocation(true);
+        HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParametersRelease3_3.xml");
+        TS_ASSERT(HeartConfig::Instance()->GetVisualizeWithMeshalyzer());
+}
 
     /**
      * Test whether we can use a schema that has spaces in the pathname.
@@ -1942,8 +1954,10 @@ private:
         map["cp30"].schema = "ChasteParameters_3_0.xsd";
         map["cp31"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_1";
         map["cp31"].schema = "ChasteParameters_3_1.xsd";
-        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
-        map["cp"].schema = "ChasteParameters_3_3.xsd";
+        map["cp33"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_3";
+        map["cp33"].schema = "ChasteParameters_3_3.xsd";
+        map["cp"].name = "https://chaste.comlab.ox.ac.uk/nss/parameters/3_4";
+        map["cp"].schema = "ChasteParameters_3_4.xsd";
         cp::ChasteParameters(*p_parameters_file, *pParams, map);
     }
 
