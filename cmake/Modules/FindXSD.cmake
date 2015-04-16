@@ -74,7 +74,7 @@ MACRO( XSD_SCHEMA NAME FILE )
   # Add the source files to the NAME variable, which presumably will be used to
   # define the source of another target.
   #
-  LIST( APPEND ${NAME} ${xs_CPP} )
+  LIST( APPEND ${NAME} ${xs_CPP} ${xs_HPP} )
 
   #
   # Set up a generator for the output files from the given schema file using

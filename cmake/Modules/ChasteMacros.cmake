@@ -49,6 +49,10 @@ macro(CHASTE_DO_CELLML output_sources cellml_file dynamic)
     string(REGEX MATCHALL "[^\n]*\\.hpp" output_files_hpp "${ConvertCellModelDepends}")
     string(REGEX MATCHALL "[^\n]*\\.cpp" output_files_cpp "${ConvertCellModelDepends}")
 
+    if (NOT Chaste_VERBOSE)
+        set(pycml_args ${pycml_args} "--quiet")
+    endif()
+
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp} 
         COMMAND "${PYTHON_EXECUTABLE}" ${Chaste_PYTHON_DIR}/ConvertCellModel.py ${pycml_args} ${cellml_file}
         DEPENDS ${depends}
@@ -56,7 +60,7 @@ macro(CHASTE_DO_CELLML output_sources cellml_file dynamic)
         VERBATIM
         )
 
-    list(APPEND ${output_sources} ${output_files_cpp})
+    list(APPEND ${output_sources} ${output_files_cpp} ${output_files_hpp})
 endmacro()
     
 

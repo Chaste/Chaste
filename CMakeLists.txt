@@ -15,6 +15,12 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/definitions.cmake)
 
 set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
+option(Chaste_VERBOSE OFF "Provide extra information when building Chaste")
+if (Chaste_VERBOSE AND MSVC)
+    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
+    set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
+endif()
+
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
 set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;ProfileAssembly;Profile")
