@@ -1872,21 +1872,13 @@ public:
         diffusion_force.AddForceContribution(cell_population);
 
         // Test Set and Get methods for the diffusion force
-        TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 10.0, 1e-10);
-        TS_ASSERT_DELTA(diffusion_force.GetDiffusionConstant(), 0.01, 1e-10);
         TS_ASSERT_DELTA(diffusion_force.GetViscosity(), 3.204e-6, 1e-10);
         TS_ASSERT_DELTA(diffusion_force.GetAbsoluteTemperature(), 296.0, 1e-10);
 
-        diffusion_force.SetCutOffLength(20.0);
-        diffusion_force.SetDiffusionConstant(0.1);
         diffusion_force.SetViscosity(0.01);
         diffusion_force.SetAbsoluteTemperature(100.0);
-        TS_ASSERT_DELTA(diffusion_force.GetCutOffLength(), 20.0, 1e-10);
-        TS_ASSERT_DELTA(diffusion_force.GetDiffusionConstant(), 0.1, 1e-10);
         TS_ASSERT_DELTA(diffusion_force.GetViscosity(), 0.01, 1e-10);
         TS_ASSERT_DELTA(diffusion_force.GetAbsoluteTemperature(), 100.0, 1e-10);
-        diffusion_force.SetCutOffLength(10.0);
-        diffusion_force.SetDiffusionConstant(0.01);
         diffusion_force.SetViscosity(3.204e-6);
         diffusion_force.SetAbsoluteTemperature(296.0);
     }
@@ -1942,7 +1934,7 @@ public:
             }
 
             double correct_diffusion_coefficient =
-                    1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
+            		4.97033568e-7 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
             unsigned dim = 2;
             variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
@@ -2057,9 +2049,8 @@ public:
                 variance += pow(norm_2(mesh.GetNodeIteratorBegin()->rGetAppliedForce()),2);
             }
 
-
             double correct_diffusion_coefficient =
-                            1.3806488e-23 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
+            		4.97033568e-7 * force.GetAbsoluteTemperature() / (6 * M_PI * force.GetViscosity() * mesh.GetNodeIteratorBegin()->GetRadius() );
             unsigned dim = 3;
             variance /= num_iterations*2*dim*correct_diffusion_coefficient*SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(variance, 1.0, 1e-1);
@@ -2103,8 +2094,6 @@ public:
             input_arch >> p_force;
 
             // Test member variables
-            TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetCutOffLength(), 10.0, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetDiffusionConstant(), 0.01, 1e-6);
             TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetAbsoluteTemperature(), 296.0, 1e-6);
             TS_ASSERT_DELTA((static_cast<DiffusionForce<2>*>(p_force))->GetViscosity(), 3.204e-6, 1e-6);
 

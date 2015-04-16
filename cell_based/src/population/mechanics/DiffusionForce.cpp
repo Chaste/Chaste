@@ -38,47 +38,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //Static constant is instantiated here.
 template<unsigned DIM>
-const double DiffusionForce<DIM>::msBoltzmannConstant = 1.3806488e-23;
+const double DiffusionForce<DIM>::msBoltzmannConstant = 4.97033568e-7;
 
 template<unsigned DIM>
 DiffusionForce<DIM>::DiffusionForce()
     : AbstractForce<DIM>(),
-      mDiffusionConstant(0.01),
       mAbsoluteTemperature(296.0), // default to room temperature
-      mViscosity(3.204e-6), // default to viscosity of water at room temperature in (using microns and hours)
-      mMechanicsCutOffLength(10.0)
+      mViscosity(3.204e-6) // default to viscosity of water at room temperature in (using 10 microns and hours)
 {
 }
 
 template<unsigned DIM>
 DiffusionForce<DIM>::~DiffusionForce()
 {
-}
-
-template<unsigned DIM>
-void DiffusionForce<DIM>::SetCutOffLength(double cutOffLength)
-{
-    assert(cutOffLength > 0.0);
-    mMechanicsCutOffLength = cutOffLength;
-}
-
-template<unsigned DIM>
-double DiffusionForce<DIM>::GetCutOffLength()
-{
-    return mMechanicsCutOffLength;
-}
-
-template<unsigned DIM>
-void DiffusionForce<DIM>::SetDiffusionConstant(double diffusionConstant)
-{
-    assert(diffusionConstant > 0.0);
-    mDiffusionConstant = diffusionConstant;
-}
-
-template<unsigned DIM>
-double DiffusionForce<DIM>::GetDiffusionConstant()
-{
-    return mDiffusionConstant;
 }
 
 template<unsigned DIM>
@@ -170,8 +142,8 @@ void DiffusionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
 template<unsigned DIM>
 void DiffusionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<DiffusionConstant>" << mDiffusionConstant << "</DiffusionConstant> \n";
-    *rParamsFile << "\t\t\t<MechanicsCutOffLength>" << mMechanicsCutOffLength << "</MechanicsCutOffLength> \n";
+	*rParamsFile << "\t\t\t<AbsoluteTemperature>" << mAbsoluteTemperature << "</AbsoluteTemperature> \n";
+	*rParamsFile << "\t\t\t<Viscosity>" << mViscosity << "</Viscosity> \n";
 
     // Call direct parent class
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);

@@ -1,2 +1,2 @@
-			<DiffusionConstant>0.01</DiffusionConstant> 
-			<MechanicsCutOffLength>10</MechanicsCutOffLength> 
+			<AbsoluteTemperature>296</AbsoluteTemperature> 
+			<Viscosity>3.204e-06</Viscosity> 

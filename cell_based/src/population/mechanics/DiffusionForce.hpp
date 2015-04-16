@@ -54,29 +54,20 @@ class DiffusionForce : public AbstractForce<DIM>
 private :
 
     /**
-     * Diffusion constant.
-     */
-    double mDiffusionConstant;
-
-    /**
      * Absolute temperature (in Kelvin).
      */
     double mAbsoluteTemperature;
 
     /**
      * Viscosity of media. We assume that this is measured in units of
-     * kg microns^(-1) h^(-1), and that cell diameters are scaled with
-     * a characteristic length of 1 micron.
+     * kg (10 microns)^(-1) h^(-1), and that cell diameters are scaled with
+     * a characteristic length of 10 microns.
      */
     double mViscosity;
 
     /**
-     * Mechanics cut off length.
-     */
-    double mMechanicsCutOffLength;
-
-    /**
-     * The boltzmann constant
+     * The Boltzmann constant, which takes the value 4.97033568e-7
+     * (10 microns)^2 kg h^(-2) K^(-1).
      */
     static const double msBoltzmannConstant;
 
@@ -95,10 +86,8 @@ private :
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractForce<DIM> >(*this);
-        archive & mDiffusionConstant;
         archive & mAbsoluteTemperature;
         archive & mViscosity;
-        archive & mMechanicsCutOffLength;
     }
 
 public :
@@ -137,21 +126,6 @@ public :
     void SetViscosity(double viscosity);
 
     /**
-     * Use a cutoff point, i.e. specify zero force if two cells are greater
-     * than the cutoff distance apart.
-     *
-     * @param cutOffLength the cutoff to use
-     */
-    void SetCutOffLength(double cutOffLength);
-
-    /**
-     * Get the diffusion coefficient.
-     *
-     * @return mDiffusionConstant
-     */
-    double GetDiffusionConstant();
-
-    /**
      * Get the absolute temperature.
      *
      * @return mAbsoluteTemperature
@@ -173,17 +147,10 @@ public :
     double GetDiffusionScalingConstant();
 
     /**
-     * Get the cutoff length.
-     *
-     * @return mCutOffLenght
-     */
-    double GetCutOffLength();
-
-    /**
      * Overridden AddForceContribution() method.
      * Note that this method requires cell/node radii to be set.
-     * @param rCellPopulation reference to the tissue
      *
+     * @param rCellPopulation reference to the tissue
      */
     void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
