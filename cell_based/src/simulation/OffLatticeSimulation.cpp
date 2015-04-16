@@ -74,7 +74,9 @@ OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPo
     }
     else
     {
-        // All classes derived from  AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes)
+        // All classes derived from AbstractOffLatticeCellPopulation are covered by the above (except user-derived classes),
+    	// i.e. if you want to use this class with your own subclass of AbstractOffLatticeCellPopulation, then simply
+    	// comment out the line below
         NEVER_REACHED;
     }
 }
