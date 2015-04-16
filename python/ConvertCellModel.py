@@ -125,6 +125,8 @@ parser.add_option('-y', '--dll', '--dynamically-loadable',
 parser.add_option('--assume-valid',
                   action='store_true', default=False,
                   help="skip some of the model validation checks")
+parser.add_option('-q', '--quiet', action='store_true', default=False,
+                  help="don't print the command(s) being run, and pass the option through to pycml")
 options, args = parser.parse_args()
 
 option_names = ['opt', 'normal', 'cvode', 'backward_euler', 'rush_larsen', 'grl1', 'grl2']
@@ -233,6 +235,8 @@ pycml_options = filter(lambda a: a.startswith('-'), args)
 if not pycml_options:
     pycml_options = default_options
 pycml_options.extend(essential_options)
+if options.quiet:
+    pycml_options.append('--quiet')
 
 # Models to process
 models = []
@@ -256,7 +260,8 @@ def do_cmd(cmd, outputs):
         for output in outputs:
             print output
     else:
-        print ' '.join(cmd)
+        if not options.quiet:
+            print ' '.join(cmd)
         rc = subprocess.call(cmd)
         if rc:
             for output in outputs:
