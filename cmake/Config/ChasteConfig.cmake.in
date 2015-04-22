@@ -64,8 +64,10 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
     include("${Chaste_CMAKE_DIR}/ChasteTargets.cmake")
 endif()
 
-set(Chaste_INCLUDE_DIRS "${CHASTE_INCLUDES}")
-set(Chaste_LIBRARIES "${CHASTE_LINK_LIBRARIES}")
+set(Chaste_THIRD_PARTY_INCLUDE_DIRS "${CHASTE_INCLUDES}")
+set(Chaste_THIRD_PARTY_LIBRARIES "${CHASTE_LINK_LIBRARIES}")
+set(Chaste_LIBRARIES "")
+set(Chaste_INCLUDE_DIRS "")
 set(Chaste_COMPONENTS "")
 
 

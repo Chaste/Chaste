@@ -154,7 +154,15 @@ endmacro()
         header_dirs(${CHASTE_${component}_SOURCE_DIR} CHASTE_${component}_INCLUDE_DIRS)
     endif()
 
-    include_directories("${CHASTE_${component}_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}")
+    if (Chaste_THIRD_PARTY_INCLUDE_DIRS)
+        include_directories(SYSTEM "${Chaste_THIRD_PARTY_INCLUDE_DIRS}")
+    endif()
+    if (CHASTE_${component}_INCLUDE_DIRS)
+        include_directories("${CHASTE_${component}_INCLUDE_DIRS}")
+    endif()
+    if (Chaste_INCLUDE_DIRS)
+        include_directories("${Chaste_INCLUDE_DIRS}")
+    endif()
     
     # Make component library
     file(GLOB_RECURSE CHASTE_${component}_SOURCES 
@@ -163,7 +171,7 @@ endmacro()
 			${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
 
     add_library(${component} ${CHASTE_${component}_SOURCES} ${ARGN})
-    target_link_libraries(${component} ${Chaste_LIBRARIES})
+    target_link_libraries(${component} ${Chaste_THIRD_PARTY_LIBRARIES} ${Chaste_LIBRARIES})
 
     if(NOT(${component} MATCHES "^project"))
         install(TARGETS ${component} 
@@ -200,7 +208,7 @@ endmacro()
             message("Configuring app ${app} named ${appName}.")
             #message("Libraries=${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES}")
 			add_executable(${appName} ${app})
-			target_link_libraries(${appName} ${component} ${CHASTE_DEPENDS_${component}} ${CHASTE_LINK_LIBRARIES})
+            target_link_libraries(${appName} ${component} ${CHASTE_DEPENDS_${component}} ${Chaste_THIRD_PARTY_LIBRARIES} ${CHASTE_LINK_LIBRARIES})
             if(MSVC)
 			    set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
             endif()

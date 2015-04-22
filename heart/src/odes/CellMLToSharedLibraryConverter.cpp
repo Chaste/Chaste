@@ -206,7 +206,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" << 
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
-                                      "include_directories(${Chaste_INCLUDE_DIRS})\n" <<
+                                      "include_directories(${Chaste_THIRD_PARTY_INCLUDE_DIRS} ${Chaste_INCLUDE_DIRS})\n" <<
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n"
                                       //"target_link_libraries(" << cellml_leaf_name << " ${Chaste_LIBRARIES})\n"
                                       ;

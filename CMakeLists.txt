@@ -2,16 +2,17 @@ cmake_minimum_required(VERSION 2.8.10)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 include(CheckIncludeFile)
-include(ChasteMacros)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 
 project(Chaste)
 
+include(ChasteBuildTypes)
+include(ChasteCompilerFlags)
+include(ChasteMacros)
+
 set (Chaste_VERSION_MAJOR 3)
 set (Chaste_VERSION_MINOR 3)
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/definitions.cmake)
 
 set(Chaste_NUM_CPUS_TEST 1 CACHE STRING  "Number of cpus to use when running tests.")
 
@@ -19,6 +20,15 @@ option(Chaste_VERBOSE OFF "Provide extra information when building Chaste")
 if (Chaste_VERBOSE AND MSVC)
     set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
     set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS} "/VERBOSE")
+endif()
+
+option(Chaste_USE_VTK "Compile Chaste with VTK support" ON)
+option(Chaste_USE_CVODE "Compile Chaste with CVODE support" ON)
+
+if (NOT (WIN32 OR CYGWIN))
+    option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" ON)
+else()
+    option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
 endif()
 
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
@@ -114,11 +124,13 @@ if(CHASTE_AUTO_INSTALL_DEPS)
 endif()
 
 #Locate VTK
-#set(VTK_FIND_QUIETLY ON)
-find_package(VTK REQUIRED)
-list(APPEND CHASTE_INCLUDES "${VTK_INCLUDE_DIRS}")
-list(APPEND CHASTE_LINK_LIBRARIES "${VTK_LIBRARIES}")
-add_definitions(-DCHASTE_VTK)
+if (Chaste_USE_VTK)
+    #set(VTK_FIND_QUIETLY ON)
+    find_package(VTK REQUIRED)
+    list(APPEND CHASTE_INCLUDES "${VTK_INCLUDE_DIRS}")
+    list(APPEND CHASTE_LINK_LIBRARIES "${VTK_LIBRARIES}")
+    add_definitions(-DCHASTE_VTK)
+endif()
 
 #find Boost
 add_definitions( -DBOOST_ALL_NO_LIB )
@@ -159,21 +171,23 @@ if (NOT ("${PETSC_LIBRARIES}" MATCHES ".*parmetis.*"))
 endif()
 
 #Locate Sundials
-if(BUILD_SHARED_LIBS)
-	set(SUNDIALS_USE_STATIC_LIBRARIES OFF)
-else()
-	set(SUNDIALS_USE_STATIC_LIBRARIES ON)
+if (Chaste_USE_CVODE)
+    if(BUILD_SHARED_LIBS)
+	    set(SUNDIALS_USE_STATIC_LIBRARIES OFF)
+    else()
+	    set(SUNDIALS_USE_STATIC_LIBRARIES ON)
+    endif()
+    find_package(SUNDIALS REQUIRED)
+    list(APPEND CHASTE_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
+    list(APPEND CHASTE_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
+    add_definitions(-DCHASTE_CVODE)
+    math(EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
+    add_definitions(-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
 endif()
-find_package(SUNDIALS REQUIRED)
-list(APPEND CHASTE_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
-list(APPEND CHASTE_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
-add_definitions(-DCHASTE_CVODE)
-math(EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
-add_definitions(-DCHASTE_SUNDIALS_VERSION=${Chaste_SUNDIALS_VERSION})
 
 
 #Locate Xerces and XSD
-if (NOT (WIN32 OR CYGWIN))
+if (Chaste_USE_XERCES)
 	find_package(Xerces REQUIRED)
 	find_package(XSD REQUIRED)
 	list(APPEND CHASTE_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
@@ -214,9 +228,9 @@ endif()
 ###########################################
 
 # List the available Chaste components
-set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
-if (NOT (WIN32 OR CYGWIN))
-    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} lung heart)
+set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt lung)
+if (Chaste_USE_XERCES)
+    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} heart)
 endif()
 
 # Find any projects
@@ -266,7 +280,7 @@ set(Chaste_PYTHON_DIR "${Chaste_SOURCE_DIR}/python")
 configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
     "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
 
-export(PACKAGE Chaste)
+set(Chaste_DIR ${Chaste_BINARY_DIR})
 
 ####################
 # BUILD COMPONENTS #
@@ -293,6 +307,8 @@ endforeach(projectName)
 ########################################
 # EXPORT CONFIG FOR OUT-OF-TREE BUILDS #
 ########################################
+
+export(PACKAGE Chaste)
 
 export(TARGETS ${CHASTE_COMPONENTS}
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
