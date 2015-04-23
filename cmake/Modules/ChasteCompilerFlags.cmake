@@ -1,14 +1,16 @@
 message("* Adding compiler flags...")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+# default flags added to all compilers except MSVC
+set(default_flags "-Wall")
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     message("\t...for GNU compiler")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     message("\t... for Clang compiler")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wno-unused-variable -ftemplate-depth-512")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     message("\t... for Intel compiler")
     set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
@@ -64,8 +66,8 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
          #2305: declaration of 'explicit' constructor without a single argument is redundant
         )
     string (REPLACE ";" " " Intel_flags_str "${Intel_flags}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Intel_flags_str}") 
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${Intel_flags_str}") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}") 
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} ${Intel_flags_str}") 
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
     message("\t... for MSVC compiler")
     #For GUI configs. Change C, and CXX compiler flags dynamically to static, debug build.
