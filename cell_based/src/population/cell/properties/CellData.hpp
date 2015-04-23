@@ -52,11 +52,12 @@ class CellData;
 /**
  * CellData class.
  *
- * This cell property allows each cell to store one or more 'named' variables associated with it,
+ * This cell property allows each cell to store one or more 'named' doubles associated with it,
  * for example corresponding to the intracellular oxygen concentration. Other classes may interrogate
  * or modify the values stored in this class.
  *
- * Each Cell owns a CellData property.
+ * Within the Cell constructor, an empty CellData object is created and passed to the Cell
+ * (unless there is already a CellData object present in mCellPropertyCollection).
  */
 class CellData : public AbstractCellProperty
 {
@@ -93,7 +94,7 @@ public:
     /**
      * This assigns the cell data.
      *
-     * @param variableName the index of the data to be set.
+     * @param variableName the name of the data to be set.
      * @param data the value to set it to.
      */
     void SetItem(const std::string& variableName, double data);
