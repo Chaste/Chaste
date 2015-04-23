@@ -1410,7 +1410,6 @@ public:
         vertex_nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         vertex_nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
 
-
         std::vector<std::vector<Node<2>*> > nodes_elements(3);
         nodes_elements[0].push_back(vertex_nodes[0]);
         nodes_elements[0].push_back(vertex_nodes[1]);
@@ -1450,8 +1449,6 @@ public:
         // Check the correct number of boundary elements (the same as the vertex mesh but we don't store boundary edges for Vertexmeshes)
         TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumBoundaryElements(), 4u);
 
-
-
         // The first 5 Nodes of the TetrahedralMesh should overlap with those of the VertexMesh and have the same boundaryness.
         for (unsigned i=0; i<5; i++)
         {
@@ -1463,8 +1460,6 @@ public:
             TS_ASSERT_DELTA(p_tetrahedral_node->rGetLocation()[1], p_vertex_node->rGetLocation()[1], 1e-3);
 
             TS_ASSERT_EQUALS(p_tetrahedral_node->IsBoundaryNode(), p_vertex_node->IsBoundaryNode());
-
-
         }
 
         // The last 3 Nodes of the TetrahedralMesh should be located at the centroids of the 3 VertexElements and will all be non boundary nodes.

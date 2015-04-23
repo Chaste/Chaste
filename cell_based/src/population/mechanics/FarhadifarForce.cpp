@@ -245,7 +245,6 @@ void FarhadifarForce<DIM>::SetBoundaryLineTensionParameter(double boundaryLineTe
     mBoundaryLineTensionParameter = boundaryLineTensionParameter;
 }
 
-
 template<unsigned DIM>
 void FarhadifarForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
@@ -258,10 +257,7 @@ void FarhadifarForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class FarhadifarForce<1>;
 template class FarhadifarForce<2>;
 template class FarhadifarForce<3>;
