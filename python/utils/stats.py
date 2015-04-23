@@ -75,24 +75,27 @@ def file_stats(file_pairs):
 
 def print_stats():
     """Calulate and display stats about the checkout in the current directory."""
-    rev1_epoch=1113991642
+    rev1_epoch = 1113991642
     svn_info = os.popen('svn info').read().split('\n')
-    rev_line=svn_info[4]
-    revision = rev_line.split()[1]
-    date_line = svn_info[9].split()
-    date_time=date_line[3]+' '+date_line[4]
+    for line in svn_info:
+        if line.startswith('Last Changed Date:'):
+            date_line = line.split()
+            date_time = date_line[3]+' '+date_line[4]
+        elif line.startswith('Revision:'):
+            rev_line = line
+            revision = rev_line.split()[1]
     pattern = '%Y-%m-%d %H:%M:%S'
     epoch = int(time.mktime(time.strptime(date_time, pattern))) - rev1_epoch
     epoch_weeks = epoch / (3600*7*24.0)
   
-    source_dirs=glob.glob('*/src')
-    test_dirs=glob.glob('*/test')+glob.glob('*/tests')
+    source_dirs = glob.glob('*/src')
+    test_dirs = glob.glob('*/test')+glob.glob('*/tests')
   
-    test_files=get_files(test_dirs)
-    source_files=get_files(source_dirs)
+    test_files = get_files(test_dirs)
+    source_files = get_files(source_dirs)
 
-    test_stats=file_stats(test_files)
-    source_stats=file_stats(source_files)
+    test_stats = file_stats(test_files)
+    source_stats = file_stats(source_files)
 
     print revision,'\t',epoch_weeks,'\t',source_stats[0],'\t',source_stats[1],\
         '\t',test_stats[0],'\t',test_stats[1],'\t',test_stats[2],'\t',test_stats[3],\
@@ -130,7 +133,7 @@ def run(startRev):
         sys.stdout.flush()
 
 if __name__ == '__main__':
- start_rev = 10
+ start_rev = 24090
  if len(sys.argv) > 1:
      start_rev = int(sys.argv[1])
      start_rev -= start_rev%10
