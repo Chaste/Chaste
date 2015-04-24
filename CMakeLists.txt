@@ -228,9 +228,9 @@ endif()
 ###########################################
 
 # List the available Chaste components
-set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt lung)
-if (Chaste_USE_XERCES)
-    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} heart)
+set(CHASTE_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
+if (NOT (WIN32 OR CYGWIN))
+    set(CHASTE_COMPONENTS ${CHASTE_COMPONENTS} lung heart)
 endif()
 
 # Find any projects
