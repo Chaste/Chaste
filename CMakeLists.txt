@@ -197,6 +197,8 @@ endif()
 
 set(CXXTEST_INCLUDES "${CMAKE_SOURCE_DIR}/cxxtest")
 
+add_definitions(-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
+
 if (WIN32 OR CYGWIN)
 	#MS Includes
 	set(MS_MPI_INCLUDES "C:/MS_HPC_PACK_2012/Inc" CACHE PATH "Path to MS HPC Pack header files.")
