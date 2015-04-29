@@ -99,9 +99,6 @@ set(CHASTE_LINK_LIBRARIES "")
 #Locate Python
 find_package(PythonInterp REQUIRED)
 
-#Locate MPI
-find_package(MPI REQUIRED)
-
 if(CHASTE_AUTO_INSTALL_DEPS)
 	set(CHASTE_DEPS_ROOT_DIR "${Chaste_BINARY_DIR}/../install/third_party_libs" CACHE PATH "Root directory for installed third party libraries")
 	  FILE(GLOB children RELATIVE ${CHASTE_DEPS_ROOT_DIR} ${CHASTE_DEPS_ROOT_DIR}/*)
@@ -144,15 +141,30 @@ find_package(Boost COMPONENTS filesystem system serialization REQUIRED)
 list(APPEND CHASTE_INCLUDES "${Boost_INCLUDE_DIR}")
 list(APPEND CHASTE_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
-#find HDF5
-find_package(HDF5 REQUIRED)
-list(APPEND CHASTE_INCLUDES "${HDF5_C_INCLUDE_DIR}")
 
 #find PETSc
-find_package(PETSc COMPONENTS CXX)
-if (NOT PETSC_FOUND)
-    find_package(PETSc REQUIRED)
+find_package(PETSc REQUIRED COMPONENTS CXX)
+if (NOT ${CMAKE_CXX_COMPILER} STREQUAL ${PETSC_COMPILER})
+    message(WARNING "Requested CXX compiler ${CMAKE_CXX_COMPILER} not the same as that used to compile PETSC (${PETSC_COMPILER}).")
 endif()
+
+#find HDF5 (prefer PETSC hdf5 if exist)
+set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
+find_program( HDF5_C_COMPILER_EXECUTABLE
+    NAMES h5cc h5pcc
+    PATHS ENV HDF5_ROOT
+    PATH_SUFFIXES bin Bin
+    NO_DEFAULT_PATH
+    DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
+find_program( HDF5_CXX_COMPILER_EXECUTABLE
+    NAMES h5c++ h5pc++
+    PATHS ENV HDF5_ROOT
+    PATH_SUFFIXES bin Bin
+    NO_DEFAULT_PATH
+    DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
+
+find_package(HDF5 MODULE REQUIRED)
+list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
 
 list(APPEND CHASTE_INCLUDES "${PETSC_INCLUDES}")
 list(APPEND CHASTE_LINK_LIBRARIES 
@@ -160,19 +172,16 @@ list(APPEND CHASTE_LINK_LIBRARIES
     "${HDF5_LIBRARIES}"
 )
 
-if (NOT ("${PETSC_LIBRARIES}" MATCHES ".*parmetis.*"))
-    #find ParMETIS
-    find_package(ParMETIS REQUIRED)
-    list(APPEND CHASTE_INCLUDES "${PARMETIS_INCLUDE_DIR}")
-    list(APPEND CHASTE_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
+#Locate MPI 
+set(MPI_CXX_COMPILER ${PETSC_COMPILER})
+find_package(MPI REQUIRED)
 
-    if (NOT ("${PETSC_LIBRARIES}" MATCHES ".*metis.*"))
-        #find METIS
-        find_package(METIS REQUIRED)
-        list(APPEND CHASTE_INCLUDES "${METIS_INCLUDE_DIR}")
-        list(APPEND CHASTE_LINK_LIBRARIES "${METIS_LIBRARIES}")
-    endif()
-endif()
+#if (NOT ("${PETSC_LIBRARIES}" MATCHES ".*parmetis.*"))
+    #find ParMETIS and METIS
+    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}")
+    find_package(ParMETIS REQUIRED)
+    list(APPEND CHASTE_LINK_LIBRARIES "${METIS_LIBRARY}" "${PARMETIS_LIBRARY}" "${PARMETIS_LIBRARIES}")
+#endif()
 
 #Locate Sundials
 if (Chaste_USE_CVODE)

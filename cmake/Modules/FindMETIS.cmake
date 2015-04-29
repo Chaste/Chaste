@@ -19,7 +19,7 @@
 
 # search metis header
 find_path(METIS_INCLUDE_DIR metis.h
-  PATHS ${METIS_DIR} ${METIS_ROOT}
+    PATHS ${METIS_DIR} ${METIS_ROOT} "${PETSC_DIR}/${PETSC_ARCH}"
   PATH_SUFFIXES metis include include/metis Lib METISLib
   NO_DEFAULT_PATH
   DOC "Include directory of metis")
