@@ -68,6 +68,13 @@ typedef std::pair<std::string, std::string> StringPair;
 
 #ifdef CHASTE_CVODE
 #include <sundials/sundials_config.h>
+#if CHASTE_SUNDIALS_VERSION >= 20600
+// SUNDIALS 2.6 defined SUNDIALS_PACKAGE_VERSION without quotes...
+#  include <boost/preprocessor/stringize.hpp>
+#  define CHASTE_SUNDIALS_PACKAGE_VERSION BOOST_PP_STRINGIZE(SUNDIALS_PACKAGE_VERSION)
+#else
+#  define CHASTE_SUNDIALS_PACKAGE_VERSION SUNDIALS_PACKAGE_VERSION
+#endif // SUNDIALS >= 2.6.0
 #endif
 
 // Note: the following are not a requirement for cell-based Chaste so may not be present!
@@ -379,7 +386,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
 
     output << "\t\t<Optional>\n";
 #ifdef CHASTE_CVODE
-    output << "\t\t\t<SUNDIALS>" << SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
+    output << "\t\t\t<SUNDIALS>" << CHASTE_SUNDIALS_PACKAGE_VERSION << "</SUNDIALS> <!-- includes Cvode of a different version number --> \n";
 #else
     output << "\t\t\t<SUNDIALS>no</SUNDIALS>\n";
 #endif

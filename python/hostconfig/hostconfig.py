@@ -229,7 +229,7 @@ def DetermineCvodeVersion(includePath):
     CheckPathExists(includePath, 'CVODE')
     config_h = os.path.join(includePath, 'sundials', 'sundials_config.h')
     if os.path.exists(config_h):
-        version_re = re.compile(r'#define SUNDIALS_PACKAGE_VERSION "(\d+).(\d+).(\d+)"')
+        version_re = re.compile(r'#define SUNDIALS_PACKAGE_VERSION "?(\d+).(\d+).(\d+)"?')
         for line in open(config_h):
             m = version_re.match(line)
             if m:
