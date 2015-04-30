@@ -141,7 +141,15 @@ public:
             if (PetscTools::AmMaster())
             {
                 test_folder.Remove();
+                // If we've not written anything else to the testoutput folder, remove that too
+                // rather than leaving an empty folder lieing around in the source tree!
+                FileFinder output_root("", RelativeTo::ChasteTestOutput);
+                if (output_root.IsEmpty())
+                {
+                    output_root.DangerousRemove();
+                }
             }
+            PetscTools::Barrier("TestOutputFileHandler-2c");
         }
 
         {
@@ -235,7 +243,7 @@ public:
         test_folder = "can_delete_me";
         OutputFileHandler handler(test_folder);
         out_stream p_file_stream = handler.OpenOutputFile("test_file");
-        p_file_stream->close(); //Windows does not like deleting open files
+        p_file_stream->close(); // Windows does not like deleting open files
 
         // Test file is present
         FileFinder test_file = handler.FindFile("test_file");
@@ -254,6 +262,15 @@ public:
         TS_ASSERT(!test_file.Exists());
         PetscTools::Barrier("TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves-4");
 
+        // Check we can delete the test_folder too
+        if (PetscTools::AmMaster())
+        {
+            FileFinder folder = handler.FindFile("");
+            TS_ASSERT(folder.Exists());
+            folder.Remove();
+            TS_ASSERT(!folder.Exists());
+        }
+
         // Test we can make a directory of folders and delete them all
         OutputFileHandler handler4("what_about_me/and_me/and_me/and_da_da_da", true);
 
@@ -266,6 +283,16 @@ public:
 
         // Check we have wiped the sub-directories
         TS_ASSERT(!sub_folder.Exists());
+        PetscTools::Barrier("TestWeCanOnlyDeleteFoldersWeHaveMadeOurselves-6");
+
+        // Check we can delete the main directory too
+        if (PetscTools::AmMaster())
+        {
+            FileFinder folder = handler5.FindFile("");
+            TS_ASSERT(folder.Exists());
+            folder.Remove();
+            TS_ASSERT(!folder.Exists());
+        }
     }
 };
 
