@@ -66,7 +66,7 @@ CellVecData::CellVecData(std::map<std::string, Vec>& cellVecData)
 
 CellVecData::~CellVecData()
 {
-    // If the object was loaded from a checkpoint, the Vecs in the map need freeeing. Otherwise is the user's responsibility.
+    // If the object was loaded from a checkpoint, the Vecs in the map need freeing. Otherwise is the user's responsibility.
     if (mFreeVecs)
     {
         for (std::map<std::string, Vec>::iterator iter = mCellVecData.begin(); iter != mCellVecData.end(); ++iter)
@@ -94,11 +94,6 @@ Vec CellVecData::GetItem(const std::string& variableName) const
     {
         EXCEPTION("The item " << variableName << " is not stored");
     }
-    ///\todo #2663 find out what the equivalent of DOUBLE_UNSET is for Vecs
-//    if (it->second == DOUBLE_UNSET)
-//    {
-//        EXCEPTION("The item " << variableName << " has not yet been set");
-//    }
     return it->second;
 }
 
@@ -110,13 +105,12 @@ unsigned CellVecData::GetNumItems() const
 std::vector<std::string> CellVecData::GetKeys() const
 {
     std::vector<std::string> keys;
-    ///\todo Note: Does the order of the keys matter?  If so, then sort the vector + Doxygen
     for (std::map<std::string, Vec>::const_iterator it = mCellVecData.begin(); it != mCellVecData.end(); ++it)
     {
         keys.push_back(it->first);
     }
 
-    // We assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());
+    // From STL documentation we assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());
     return keys;
 }
 

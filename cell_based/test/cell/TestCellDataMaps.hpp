@@ -100,7 +100,7 @@ public:
         TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
     }
 
-    void TestWithCell() throw (Exception)
+    void TestCellVecData() throw (Exception)
     {
         SimulationTime* p_simulation_time = SimulationTime::Instance();
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
@@ -124,11 +124,12 @@ public:
         CellPropertyCollection parent_cell_property_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellVecData>();
         boost::shared_ptr<CellVecData> p_parent_cell_vec_data = boost::static_pointer_cast<CellVecData>(parent_cell_property_collection.GetProperty());
 
-        Vec item_1 = PetscTools::CreateAndSetVec(1, 17.3);
-        p_parent_cell_vec_data->SetItem("item 1", item_1);
+        Vec vec_item_1 = PetscTools::CreateAndSetVec(1, 17.3);
+        std::string i1 = "item 1";
+        p_parent_cell_vec_data->SetItem(i1, vec_item_1);
 
-        Vec item_2 = PetscTools::CreateAndSetVec(1, 3.58);
-        p_parent_cell_vec_data->SetItem("item 2", item_2);
+        Vec vec_item_2 = PetscTools::CreateAndSetVec(1, 3.58);
+        p_parent_cell_vec_data->SetItem("item 2", vec_item_2);
 
         p_simulation_time->IncrementTimeOneStep();
         p_simulation_time->IncrementTimeOneStep();
@@ -137,12 +138,12 @@ public:
 
         CellPtr p_daughter_cell = p_cell->Divide();
 
-        Vec replace_item_1 = PetscTools::CreateAndSetVec(1, -8.54);
+        Vec vec_replace_item_1 = PetscTools::CreateAndSetVec(1, -8.54);
 
         CellPropertyCollection parent_cell_property_collection_now = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellVecData>();
         boost::shared_ptr<CellVecData> p_parent_cell_vec_data_now = boost::static_pointer_cast<CellVecData>(parent_cell_property_collection_now.GetProperty());
 
-        p_parent_cell_vec_data_now->SetItem("item 1", replace_item_1);
+        p_parent_cell_vec_data_now->SetItem("item 1", vec_replace_item_1);
 
         ReplicatableVector rep_item_1_parent(p_parent_cell_vec_data_now->GetItem("item 1"));
         TS_ASSERT_EQUALS(rep_item_1_parent[0], -8.54);
@@ -164,6 +165,14 @@ public:
         ReplicatableVector rep_item_2_daughter(p_daughter_cell_vec_data->GetItem("item 2"));
         TS_ASSERT_EQUALS(rep_item_1_daughter[0], 17.3);
         TS_ASSERT_EQUALS(rep_item_2_daughter[0], 3.58);
+
+        // Free PETSc Vecs which were created in this test
+        PetscTools::Destroy(vec_item_1);
+        PetscTools::Destroy(vec_item_2);
+        PetscTools::Destroy(vec_replace_item_1);
+        // Vec vec_item2_parent isn't created here -- it's just pointing to an existing Vec
+        ///\todo #2663 This is a hack because the registry isn't cleared properly and there's a floating CellVecData
+        CellPropertyRegistry::Instance()->Clear();
     }
 };
 

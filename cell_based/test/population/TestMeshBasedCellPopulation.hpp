@@ -1347,11 +1347,6 @@ public:
             // Create the cell population
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
 
-            // Add cell data
-            p_cell_population->SetDataOnAllCells("nothing", DOUBLE_UNSET);
-
-            TS_ASSERT_THROWS_THIS(p_cell_population->Begin()->GetCellData()->GetItem("nothing"),
-                                "The item nothing has not yet been set");
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
@@ -1362,6 +1357,7 @@ public:
             {
                 cell_iter->ReadyToDivide();
                 cell_locations.push_back(p_cell_population->GetLocationOfCellCentre(*cell_iter));
+                // Add cell data
                 cell_iter->GetCellData()->SetItem("data", (double) index_for_data);
                 index_for_data++;
             }

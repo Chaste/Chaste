@@ -57,10 +57,6 @@ double CellData::GetItem(const std::string& variableName) const
     {
         EXCEPTION("The item " << variableName << " is not stored");
     }
-    if (it->second == DOUBLE_UNSET)
-    {
-        EXCEPTION("The item " << variableName << " has not yet been set");
-    }
     return(it->second);
 }
 
@@ -72,13 +68,12 @@ unsigned CellData::GetNumItems() const
 std::vector<std::string> CellData::GetKeys() const
 {
     std::vector<std::string> keys;
-    ///\todo Note: Does the order of the keys matter?  If so, then sort the vector + Doxygen
     for (std::map<std::string, double>::const_iterator it = mCellData.begin(); it != mCellData.end(); ++it)
     {
         keys.push_back(it->first);
     }
 
-    // We assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());
+    // From STL documentation we assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());
     return keys;
 }
 

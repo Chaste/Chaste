@@ -47,7 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/map.hpp>
 #include "Exception.hpp"
 
-class CellData;
+
+///\todo #2663 Tidy this class to obey naming conventions
 
 /**
  * CellData class.
@@ -103,6 +104,7 @@ public:
      * @return data.
      *
      * @param variableName the index of the data required.
+     * throws if variableName has not been stored
      */
     double GetItem(const std::string& variableName) const;
 
@@ -114,7 +116,7 @@ public:
     /**
      * @return all keys.
      *
-     * These are sorted in lexicographical/alphabetic order (so that the order is independent of any map iteration method).
+     * According to STL these are sorted in lexicographical/alphabetic order (so that the ordering here is predictable).
      */
     std::vector<std::string> GetKeys() const;
 };
