@@ -247,6 +247,26 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
     return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
 }
 
+bool Cell::HasCellVecData() const
+{
+    return mCellPropertyCollection.HasPropertyType<CellVecData>();
+}
+
+boost::shared_ptr<CellVecData> Cell::GetCellVecData() const
+{
+    assert(HasCellVecData());
+
+    CellPropertyCollection cell_data_collection = mCellPropertyCollection.GetPropertiesType<CellVecData>();
+
+    /*
+     * Note: In its current form the code requires each cell to have exactly
+     * one CellVecData object. This is reflected in the assertion below.
+     */
+    assert(cell_data_collection.GetSize() <= 1);
+
+    return boost::static_pointer_cast<CellVecData>(cell_data_collection.GetProperty());
+}
+
 CellPropertyCollection& Cell::rGetCellPropertyCollection()
 {
     return mCellPropertyCollection;
@@ -440,6 +460,18 @@ CellPtr Cell::Divide()
     // Create a new cell data object using the copy constructor and add this to the daughter cell
     MAKE_PTR_ARGS(CellData, p_daughter_cell_data, (*p_cell_data));
     daughter_property_collection.AddProperty(p_daughter_cell_data);
+
+    // Copy all cell Vec data (note we create a new object not just copying the pointer)
+    if (daughter_property_collection.HasPropertyType<CellVecData>())
+    {
+        // Get the existing copy of the cell data and remove it from the daughter cell
+        boost::shared_ptr<CellVecData> p_cell_vec_data = GetCellVecData();
+        daughter_property_collection.RemoveProperty(p_cell_vec_data);
+
+        // Create a new cell data object using the copy constructor and add this to the daughter cell
+        MAKE_PTR_ARGS(CellVecData, p_daughter_cell_vec_data, (*p_cell_vec_data));
+        daughter_property_collection.AddProperty(p_daughter_cell_vec_data);
+    }
 
     // Create daughter cell with modified cell property collection
     CellPtr p_new_cell(new Cell(GetMutationState(), mpCellCycleModel->CreateCellCycleModel(), false, daughter_property_collection));

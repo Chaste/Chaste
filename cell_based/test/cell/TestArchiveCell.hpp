@@ -57,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DefaultCellProliferativeType.hpp"
 #include "StemCellProliferativeType.hpp"
 #include "SmartPointers.hpp"
+#include "ReplicatableVector.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -71,6 +72,7 @@ public:
     void TestArchivingOfCell() throw(Exception)
     {
         OutputFileHandler handler("archive", false);
+        handler.SetArchiveDirectory();
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "cell.arch";
 
         // Archive a cell
@@ -104,9 +106,15 @@ public:
             p_cell->SetAncestor(p_cell_ancestor);
             TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
+            // Set CellVecData with some actual content
+            boost::shared_ptr<AbstractCellProperty> p_vec_data(CellPropertyRegistry::Instance()->Get<CellVecData>());
+            p_cell->AddCellProperty(p_vec_data);
+            Vec item_1 = PetscTools::CreateAndSetVec(2, -17.3); // <-17.3, -17.3>
+            p_cell->GetCellVecData()->SetItem("item 1", item_1);
+
             // Check properties set correctly
             CellPropertyCollection& final_collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(final_collection.GetSize(), 6u);
+            TS_ASSERT_EQUALS(final_collection.GetSize(), 7u);
             TS_ASSERT_EQUALS(final_collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(final_collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -126,9 +134,10 @@ public:
                 bool is_ancestor = (*it)->IsType<CellAncestor>();
                 bool is_cellid = (*it)->IsType<CellId>();
                 bool is_data = (*it)->IsType<CellData>();
+                bool is_vec_data = (*it)->IsType<CellVecData>();
                 bool is_stem = (*it)->IsType<StemCellProliferativeType>();
 
-                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_stem;
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
 
@@ -144,6 +153,7 @@ public:
 
             // Tidy up
             SimulationTime::Destroy();
+            PetscTools::Destroy(item_1);
         }
 
         // Restore CellPtr
@@ -176,7 +186,7 @@ public:
             TS_ASSERT_EQUALS(p_model->GetCell(), p_cell);
 
             CellPropertyCollection& collection = p_cell->rGetCellPropertyCollection();
-            TS_ASSERT_EQUALS(collection.GetSize(), 6u);
+            TS_ASSERT_EQUALS(collection.GetSize(), 7u);
             TS_ASSERT_EQUALS(collection.HasProperty<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcOneHitCellMutationState>(), false);
             TS_ASSERT_EQUALS(collection.HasProperty<ApcTwoHitCellMutationState>(), false);
@@ -187,6 +197,18 @@ public:
             TS_ASSERT_EQUALS(collection.HasPropertyType<CellId>(), true);
             TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
+            // Check explicitly for CellVecData as it is not available by default as CellData
+            TS_ASSERT_EQUALS(collection.HasPropertyType<CellVecData>(), true);
+
+            // Check that the Vec stored in CellVecData was unarchived correctly
+            boost::shared_ptr<CellVecData> p_cell_vec_data = boost::static_pointer_cast<CellVecData>(collection.GetPropertiesType<CellVecData>().GetProperty());
+            PetscInt vec_size;
+            VecGetSize(p_cell_vec_data->GetItem("item 1"), &vec_size);
+            TS_ASSERT_EQUALS(vec_size, 2);
+            ReplicatableVector rep_item_1(p_cell_vec_data->GetItem("item 1"));
+            TS_ASSERT_EQUALS(rep_item_1[0], -17.3);
+            TS_ASSERT_EQUALS(rep_item_1[1], -17.3);
+
             for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
             {
                 TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
@@ -196,9 +218,10 @@ public:
                 bool is_ancestor = (*it)->IsType<CellAncestor>();
                 bool is_cellid = (*it)->IsType<CellId>();
                 bool is_data = (*it)->IsType<CellData>();
+                bool is_vec_data = (*it)->IsType<CellVecData>();
                 bool is_stem = (*it)->IsType<StemCellProliferativeType>();
 
-                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_stem;
+                bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
         }

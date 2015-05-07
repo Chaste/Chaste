@@ -1156,45 +1156,6 @@ public:
         TS_ASSERT_EQUALS(p_cell2->GetCellId(), 1u);
     }
 
-    void TestCellData() throw (Exception)
-    {
-        SimulationTime* p_simulation_time = SimulationTime::Instance();
-        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(25, 2);
-
-        boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-
-        FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
-        CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
-        p_cell->SetCellProliferativeType(p_type);
-        p_cell->InitialiseCellCycleModel();
-
-        //Before adding the CellData to the cell
-        TS_ASSERT_THROWS_NOTHING(p_cell->GetCellData());
-
-        p_cell->GetCellData()->SetItem("something", 1.0);
-        p_cell->GetCellData()->SetItem("some other thing", 2.0);
-
-        p_simulation_time->IncrementTimeOneStep();
-        p_simulation_time->IncrementTimeOneStep();
-
-        TS_ASSERT_EQUALS(p_cell->ReadyToDivide(), true);
-
-        CellPtr p_cell2 = p_cell->Divide();
-
-        CellPropertyCollection cell_data_collection = p_cell->rGetCellPropertyCollection().GetPropertiesType<CellData>();
-        boost::shared_ptr<CellData> p_parentcell_data = boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
-        p_parentcell_data->SetItem("something", 3.0);
-
-        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("something"), 3.0);
-        TS_ASSERT_EQUALS(p_cell->GetCellData()->GetItem("some other thing"), 2.0);
-
-        CellPropertyCollection cell2_data_collection = p_cell2->rGetCellPropertyCollection().GetPropertiesType<CellData>();
-        boost::shared_ptr<CellData> p_daughtercell_data = boost::static_pointer_cast<CellData>(cell2_data_collection.GetProperty());
-
-        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("something"), 1.0);
-        TS_ASSERT_EQUALS(p_daughtercell_data->GetItem("some other thing"), 2.0);
-    }
 };
 
 #endif /*TESTCELL_HPP_*/

@@ -50,6 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellAncestor.hpp"
 #include "CellId.hpp"
 #include "CellData.hpp"
+#include "CellVecData.hpp"
 
 #include "ApoptoticCellProperty.hpp"
 #include "AbstractCellCycleModel.hpp"
@@ -225,6 +226,20 @@ public:
      * @return a pointer to the cell data
      */
     boost::shared_ptr<CellData> GetCellData() const;
+
+    /**
+     * Checks whether there is CellVecData associated with this cell
+     *
+     * @return whether the current cell stores CellVecData
+     */
+    bool HasCellVecData() const;
+
+    /**
+     * Get the CellVecData associated with the cell.
+     *
+     * @return a pointer to the cell Vec data
+     */
+    boost::shared_ptr<CellVecData> GetCellVecData() const;
 
     /**
      * Set the cell's mutation state.
