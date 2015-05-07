@@ -95,14 +95,16 @@ public:
     CellVecData();
 
     /**
-     * Copy constructor used to perform a deep copy of mCellVecData
+     * Copy constructor used to perform a deep copy of rAnotherCellVecData
+     * @param rAnotherCellVecData  the class to copy
      */
-    CellVecData(CellVecData& anotherCellVecData);
+    CellVecData(const CellVecData& rAnotherCellVecData);
 
     /**
      * Constructor required for serialisation. Avoid using otherwise.
+     * @param rCellVecDataMap the internal map which needs to be copied
      */
-    CellVecData(std::map<std::string, Vec>& cellVecData);
+    CellVecData(const std::map<std::string, Vec>& rCellVecDataMap);
 
     /**
      * We need the empty virtual destructor in this class to ensure Boost

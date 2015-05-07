@@ -40,15 +40,15 @@ CellVecData::CellVecData()
 {
 }
 
-CellVecData::CellVecData(CellVecData& anotherCellVecData)
+CellVecData::CellVecData(const CellVecData& rAnotherCellVecData)
     : mFreeVecs(true)
 {
-    std::vector<std::string> keys = anotherCellVecData.GetKeys();
+    std::vector<std::string> keys = rAnotherCellVecData.GetKeys();
 
     for (std::vector<std::string>::iterator iter = keys.begin(); iter != keys.end(); ++iter)
     {
         std::string map_key = *iter;
-        Vec map_value = anotherCellVecData.GetItem(map_key);
+        Vec map_value = rAnotherCellVecData.GetItem(map_key);
 
         Vec map_value_copy;
         VecDuplicate(map_value, &map_value_copy);
@@ -58,8 +58,8 @@ CellVecData::CellVecData(CellVecData& anotherCellVecData)
     }
 }
 
-CellVecData::CellVecData(std::map<std::string, Vec>& cellVecData)
-    : mCellVecData(cellVecData),
+CellVecData::CellVecData(const std::map<std::string, Vec>& rCellVecDataMap)
+    : mCellVecData(rCellVecDataMap),
       mFreeVecs(true)
 {
 }
