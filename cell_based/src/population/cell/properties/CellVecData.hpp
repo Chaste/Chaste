@@ -164,6 +164,8 @@ inline void save_construct_data(
         std::string key = *iter;
         ar << key;
 
+        ///\todo #2663 File name is unique for this archive and this key -- What happens when two cells with CellVecData are archived?
+        /// Doesn't DumpPetscObject open the file fresh each time?
         std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + key + ".vec";
         PetscTools::DumpPetscObject(t->GetItem(key), archive_filename);
     }
