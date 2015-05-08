@@ -85,7 +85,7 @@ private:
      *  mesh (eg the right ventricular endo-cardial surface) and collects all the nodes
      *  on that surface in one vector.
      *
-     *  @param surfaceFile  The surface file, lists global node indices on this surface.
+     *  @param rSurfaceFileName  The surface file, lists global node indices on this surface.
      *         The number of lines in this file and entries per line doesn't matter. Just have to
      *         be separated by whitespace and returns. But these files would tend to be:
      *         EITHER: multiple entries on one line -- all nodes in each boundary element,
@@ -93,17 +93,17 @@ private:
      *  @param rSurfaceNodes  The returned vector of nodes indices on this surface
      *  @param indexFromZero  True for native triangles files. False for Memfem files which are indexed from 1.
      */
-    void GetNodesAtSurface(const std::string& surfaceFile,
+    void GetNodesAtSurface(const std::string& rSurfaceFileName,
                            std::vector<unsigned>& rSurfaceNodes,
                            bool indexFromZero=true) const;
 
     /**
      *  Helper function for GetNodesAtSurface
-     *  @param line  A line in a surface file.
+     *  @param rLineFromFile  A line in a surface file.
      *  @param rSurfaceNodeIndexSet  The nodes in the element corresponding to this line.
      *  @param offset  is the lowest index of a node in the original mesh (0 for native triangles or 1 for MEMFEM).
      */
-    void ProcessLine(const std::string& line,
+    void ProcessLine(const std::string& rLineFromFile,
                      std::set<unsigned>& rSurfaceNodeIndexSet,
                      unsigned offset) const;
 

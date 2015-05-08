@@ -170,9 +170,9 @@ StreeterFibreGenerator<SPACE_DIM>::~StreeterFibreGenerator()
 
 template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::SetSurfaceFiles(
-            const std::string &rEpicardiumFile,
-            const std::string &rRightVentricleFile,
-            const std::string &rLeftVentricleFile,
+            const std::string& rEpicardiumFile,
+            const std::string& rRightVentricleFile,
+            const std::string& rLeftVentricleFile,
             bool indexFromZero)
 {
     // Compute the distance map of each surface

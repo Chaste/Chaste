@@ -76,23 +76,23 @@ CellVecData::~CellVecData()
     }
 }
 
-void CellVecData::SetItem(const std::string& variableName, Vec data)
+void CellVecData::SetItem(const std::string& rVariableName, Vec data)
 {
-    mCellVecData[variableName] = data;
+    mCellVecData[rVariableName] = data;
 }
 
-Vec CellVecData::GetItem(const std::string& variableName) const
+Vec CellVecData::GetItem(const std::string& rVariableName) const
 {
     /*
-     * Note that mCellVecData[variableName] is not const. If variableName is not
-     * a key, then mCellVecData[variableName] will create a new item in the map
+     * Note that mCellVecData[rVariableName] is not const. If rVariableName is not
+     * a key, then mCellVecData[rVariableName] will create a new item in the map
      * and increase the size by one.  Using a const_iterator ensures that the
      * map remains const.
      */
-    std::map<std::string, Vec>::const_iterator it = mCellVecData.find(variableName);
+    std::map<std::string, Vec>::const_iterator it = mCellVecData.find(rVariableName);
     if (it == mCellVecData.end())
     {
-        EXCEPTION("The item " << variableName << " is not stored");
+        EXCEPTION("The item " << rVariableName << " is not stored");
     }
     return it->second;
 }

@@ -126,7 +126,7 @@ public:
      * @param rProbeElectrode The location of the recording electrode
      * @param rDirectory  The directory where the simulation results are stored
      * @param hdf5File The file name  where the simulation results are stored
-     * @param variableName  The name of the voltage variable (is V by default)
+     * @param rVariableName  The name of the voltage variable (is V by default)
      * @param timestepStride The number of timesteps in a stride (so that we don't
      *        have to compute all the ECGs).  This defaults to 1.
      *
@@ -134,8 +134,8 @@ public:
     PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                         const ChastePoint<SPACE_DIM>& rProbeElectrode,
                         const FileFinder& rDirectory,
-                        std::string hdf5File,
-                        std::string variableName = "V",
+                        const std::string& rHdf5FileName,
+                        const std::string& rVariableName = "V",
                         unsigned timestepStride = 1);
 
     /**

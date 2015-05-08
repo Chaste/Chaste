@@ -60,11 +60,11 @@ private:
     /**
      * Helper method to construct a string containing a dump of the vector
      *
-     * @param message  a string to prefix (e.g. an error or the name of the vector)
+     * @param rMessage  a string to prefix (e.g. an error or the name of the vector)
      * @param Y  a vector
      * @return  a string containing the contents of the vector.
      */
-    std::string GetStateMessage(const std::string& message, VECTOR Y);
+    std::string GetStateMessage(const std::string& rMessage, VECTOR Y);
 
 protected:
     /** Vector containing the current values of the state variables. */

@@ -155,11 +155,11 @@ HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (std::string nodeH
 
 template<unsigned SPACE_DIM>
 void HeartGeometryInformation<SPACE_DIM>::ProcessLine(
-        const std::string& line,
+        const std::string& rLineFromFile,
         std::set<unsigned>& rSurfaceNodeIndexSet,
         unsigned offset) const
 {
-    std::stringstream line_stream(line);
+    std::stringstream line_stream(rLineFromFile);
     while (!line_stream.eof())
     {
         unsigned item;
@@ -176,7 +176,7 @@ void HeartGeometryInformation<SPACE_DIM>::ProcessLine(
 
 template<unsigned SPACE_DIM>
 void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
-        const std::string& surfaceFile,
+        const std::string& rSurfaceFileName,
         std::vector<unsigned>& rSurfaceNodes,
         bool indexFromZero) const
 {
@@ -188,10 +188,10 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
         offset=1;
     }
 
-    file_stream.open(surfaceFile.c_str());
+    file_stream.open(rSurfaceFileName.c_str());
     if (!file_stream.is_open())
     {
-        EXCEPTION("Wrong surface definition file name " + surfaceFile);
+        EXCEPTION("Wrong surface definition file name " + rSurfaceFileName);
     }
 
     // Temporary storage for the nodes, helps discarding repeated values

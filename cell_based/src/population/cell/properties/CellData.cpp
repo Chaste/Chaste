@@ -39,23 +39,23 @@ CellData::~CellData()
 {
 }
 
-void CellData::SetItem(const std::string& variableName, double data)
+void CellData::SetItem(const std::string& rVariableName, double data)
 {
-    mCellData[variableName] = data;
+    mCellData[rVariableName] = data;
 }
 
-double CellData::GetItem(const std::string& variableName) const
+double CellData::GetItem(const std::string& rVariableName) const
 {
     /*
-     * Note that mCellData[variableName] is not const. If variableName is not
-     * a key, then mCellData[variableName] will create a new item in the map
+     * Note that mCellData[rVariableName] is not const. If rVariableName is not
+     * a key, then mCellData[rVariableName] will create a new item in the map
      * and increase the size by one.  Using a const_iterator ensures that the
      * map remains const.
      */
-    std::map<std::string, double>::const_iterator it = mCellData.find(variableName);
+    std::map<std::string, double>::const_iterator it = mCellData.find(rVariableName);
     if (it == mCellData.end())
     {
-        EXCEPTION("The item " << variableName << " is not stored");
+        EXCEPTION("The item " << rVariableName << " is not stored");
     }
     return(it->second);
 }

@@ -124,8 +124,8 @@ std::vector<std::vector<double> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::Toke
     std::vector<std::string>::const_iterator the_iterator;
     for (the_iterator = rRawData.begin(); the_iterator != rRawData.end(); the_iterator++ )
     {
-        const std::string& line_of_data = *the_iterator;
-        std::stringstream line_stream(line_of_data);
+        const std::string& r_line_of_data = *the_iterator;
+        std::stringstream line_stream(r_line_of_data);
 
         if (the_iterator != rRawData.begin()) // Ignore the header string
         {
@@ -158,8 +158,8 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
     std::vector<std::string>::const_iterator the_iterator;
     for (the_iterator = rRawData.begin(); the_iterator != rRawData.end(); the_iterator++ )
     {
-        const std::string& line_of_data = *the_iterator;
-        std::stringstream line_stream(line_of_data);
+        const std::string& r_line_of_data = *the_iterator;
+        std::stringstream line_stream(r_line_of_data);
 
         if ( readHeader == false || the_iterator != rRawData.begin() )
         {

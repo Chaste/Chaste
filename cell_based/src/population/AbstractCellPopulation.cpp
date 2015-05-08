@@ -116,13 +116,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(const std::string& dataName, double dataValue)
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(const std::string& rDataName, double dataValue)
 {
     for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
          cell_iter!=this->End();
          ++cell_iter)
     {
-        cell_iter->GetCellData()->SetItem(dataName, dataValue);
+        cell_iter->GetCellData()->SetItem(rDataName, dataValue);
     }
 }
 

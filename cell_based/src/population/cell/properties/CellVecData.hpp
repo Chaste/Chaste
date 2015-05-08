@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveLocationInfo.hpp"
 
 
-///\todo #2663 Tidy this class to obey naming conventions
 /**
  * CellVecData class.
  *
@@ -115,19 +114,19 @@ public:
     /**
      * This assigns the cell data.
      *
-     * @param variableName the name of the data to be set.
+     * @param rVariableName the name of the data to be set.
      * @param data the value to set it to.
      */
-    void SetItem(const std::string& variableName, Vec data);
+    void SetItem(const std::string& rVariableName, Vec data);
 
     /**
      * @return data.
      *
-     * @param variableName the index of the data required.
-     * throws if variableName has not been stored
+     * @param rVariableName the index of the data required.
+     * throws if rVariableName has not been stored
      *
      */
-    Vec GetItem(const std::string& variableName) const;
+    Vec GetItem(const std::string& rVariableName) const;
 
     /**
      * @return number of data items
@@ -183,8 +182,8 @@ inline void load_construct_data(
     {
         std::string key;
         ar >> key;
-
         Vec archived_vec;
+
         std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + key + ".vec";
         PetscTools::ReadPetscObject(archived_vec, archive_filename);
 

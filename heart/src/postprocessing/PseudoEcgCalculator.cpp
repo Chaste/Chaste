@@ -62,15 +62,15 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
                                                                               const ChastePoint<SPACE_DIM>& rProbeElectrode,
                                                                               const FileFinder& rDirectory,
-                                                                              std::string hdf5File,
-                                                                              std::string variableName,
+                                                                              const std::string& rHdf5FileName,
+                                                                              const std::string& rVariableName,
                                                                               unsigned timestepStride)
   : mrMesh(rMesh),
     mProbeElectrode(rProbeElectrode),
-    mVariableName(variableName),
+    mVariableName(rVariableName),
     mTimestepStride(timestepStride)
 {
-    mpDataReader = new Hdf5DataReader(rDirectory, hdf5File);
+    mpDataReader = new Hdf5DataReader(rDirectory, rHdf5FileName);
     mNumberOfNodes = mpDataReader->GetNumberOfRows();
     mNumTimeSteps = mpDataReader->GetVariableOverTime(mVariableName, 0u).size();
     mDiffusionCoefficient = 1.0;

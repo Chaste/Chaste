@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 
-///\todo #2663 Tidy this class to obey naming conventions
 
 /**
  * CellData class.
@@ -95,18 +94,18 @@ public:
     /**
      * This assigns the cell data.
      *
-     * @param variableName the name of the data to be set.
+     * @param rVariableName the name of the data to be set.
      * @param data the value to set it to.
      */
-    void SetItem(const std::string& variableName, double data);
+    void SetItem(const std::string& rVariableName, double data);
 
     /**
      * @return data.
      *
-     * @param variableName the index of the data required.
-     * throws if variableName has not been stored
+     * @param rVariableName the index of the data required.
+     * throws if rVariableName has not been stored
      */
-    double GetItem(const std::string& variableName) const;
+    double GetItem(const std::string& rVariableName) const;
 
     /**
      * @return number of data items

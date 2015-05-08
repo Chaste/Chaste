@@ -51,34 +51,34 @@ AbstractParameterisedSystem<VECTOR>::AbstractParameterisedSystem(unsigned number
 }
 
 template<typename VECTOR>
-std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& message)
+std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& rMessage)
 {
-    return GetStateMessage(message, mStateVariables);
+    return GetStateMessage(rMessage, mStateVariables);
 }
 
 template<typename VECTOR>
-std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& message,
+std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& rMessage,
                                                            VECTOR Y)
 {
-    return GetStateMessage(message, Y);
+    return GetStateMessage(rMessage, Y);
 }
 
 template<typename VECTOR>
-std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& message,
+std::string AbstractParameterisedSystem<VECTOR>::DumpState(const std::string& rMessage,
                                                            VECTOR Y,
                                                            double time)
 {
     std::stringstream extra_message;
     extra_message << std::endl << "At independent variable (usually time) = " << time;
-    std::string new_message = message + extra_message.str();
+    std::string new_message = rMessage + extra_message.str();
     return GetStateMessage(new_message, Y);
 }
 
 template<typename VECTOR>
-std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::string& message, VECTOR Y)
+std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::string& rMessage, VECTOR Y)
 {
     std::stringstream res;
-    res << message << std::endl << "State:" << std::endl;
+    res << rMessage << std::endl << "State:" << std::endl;
     assert(rGetStateVariableNames().size()==GetVectorSize(Y));
     const std::vector<std::string>& r_units = rGetStateVariableUnits();
     for (unsigned i=0; i<GetVectorSize(Y); i++)

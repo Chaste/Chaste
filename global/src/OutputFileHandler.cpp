@@ -115,7 +115,7 @@ OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
 }
 
 
-void OutputFileHandler::CommonConstructor(const std::string &rDirectory,
+void OutputFileHandler::CommonConstructor(const std::string& rDirectory,
                                           bool cleanOutputDirectory)
 {
     // Is it a valid request for a directory?

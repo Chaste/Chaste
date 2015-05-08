@@ -98,8 +98,8 @@ std::vector < std::vector<double> >
     for (the_iterator = rRawData.begin(); the_iterator != rRawData.end();
          the_iterator++)
     {
-        const std::string& line_of_data = *the_iterator;
-        std::stringstream line_stream (line_of_data);
+        const std::string& r_line_of_data = *the_iterator;
+        std::stringstream line_stream (r_line_of_data);
 
         if (dimension_count == 0)
         {
@@ -147,8 +147,8 @@ std::vector < std::vector < unsigned > >
     // There are dimensionOfObject lines to be read
     for (unsigned i = 0; i < dimensionOfObject; i++)
     {
-        const std::string& line_of_data = rRawData[i];
-        std::stringstream line_stream (line_of_data);
+        const std::string& r_line_of_data = rRawData[i];
+        std::stringstream line_stream (r_line_of_data);
 
         if (i == 0)
         {

@@ -69,8 +69,8 @@ struct MeshWriterIterators
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralMeshWriter(const std::string &rDirectory,
-                   const std::string &rBaseName,
+AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralMeshWriter(const std::string& rDirectory,
+                   const std::string& rBaseName,
                    const bool clearOutputDir)
     : AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
       mpNodeMap(NULL),

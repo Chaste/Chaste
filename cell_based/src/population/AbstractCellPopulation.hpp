@@ -214,10 +214,10 @@ public:
 
     /**
      * Add an item of cell data to every cell in the population
-     * @param dataName is the name associated with the data
+     * @param rDataName is the name associated with the data
      * @param dataValue is the value of the data, initially the same for each cell
      */
-    void SetDataOnAllCells(const std::string& dataName, double dataValue);
+    void SetDataOnAllCells(const std::string& rDataName, double dataValue);
 
     /**
      * @return reference to the mesh, mrMesh.

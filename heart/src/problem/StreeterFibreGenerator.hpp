@@ -153,9 +153,9 @@ public:
      * wedge preparation for left or right ventricle, respectively.  That is, the ventricle with a non-empty string.
      * If both are empty strings then throws exception in HeartGeometryInformation.
      */
-    void SetSurfaceFiles(const std::string &rEpicardiumFile,
-                         const std::string &rRightVentricleFile,
-                         const std::string &rLeftVentricleFile,
+    void SetSurfaceFiles(const std::string& rEpicardiumFile,
+                         const std::string& rRightVentricleFile,
+                         const std::string& rLeftVentricleFile,
                          bool indexFromZero);
 
 
