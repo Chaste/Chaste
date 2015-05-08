@@ -65,7 +65,8 @@ protected:
     {
         SimulationTime::Instance()->SetStartTime(0.0);
         RandomNumberGenerator::Instance()->Reseed(0);
-        CellPropertyRegistry::Instance()->Clear();
+        // //Unnecessary since previous test's tearDown will have cleared:
+        // CellPropertyRegistry::Instance()->Clear();
         CellId::ResetMaxCellId();
     }
 
@@ -76,6 +77,7 @@ protected:
     {
         SimulationTime::Destroy();
         RandomNumberGenerator::Destroy();
+        CellPropertyRegistry::Instance()->Clear(); // Destroys properties which are still held by a shared pointer
     }
 };
 

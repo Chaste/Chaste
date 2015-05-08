@@ -171,8 +171,6 @@ public:
         PetscTools::Destroy(vec_item_2);
         PetscTools::Destroy(vec_replace_item_1);
         // Vec vec_item2_parent isn't created here -- it's just pointing to an existing Vec
-        ///\todo #2663 This is a hack because the registry isn't cleared properly and there's a floating CellVecData
-        CellPropertyRegistry::Instance()->Clear();
     }
 };
 
