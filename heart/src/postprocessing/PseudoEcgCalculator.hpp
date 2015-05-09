@@ -125,7 +125,7 @@ public:
      * @param rMesh A reference to the mesh
      * @param rProbeElectrode The location of the recording electrode
      * @param rDirectory  The directory where the simulation results are stored
-     * @param hdf5File The file name  where the simulation results are stored
+     * @param rHdf5FileName The file name  where the simulation results are stored
      * @param rVariableName  The name of the voltage variable (is V by default)
      * @param timestepStride The number of timesteps in a stride (so that we don't
      *        have to compute all the ECGs).  This defaults to 1.

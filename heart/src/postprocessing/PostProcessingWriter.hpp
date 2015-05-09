@@ -75,14 +75,14 @@ public:
      *
      * @param rMesh A reference to the mesh used to calculate the distance map to pass to the conduction velocity calculator.
      * @param rDirectory The directory the data is in. The output is written to \<directory\>/output
-     * @param hdf5File The file the data is in.
-     * @param voltageName  (Optional) The name of the variable representing the
+     * @param rHdf5FileName The file the data is in.
+     * @param rVoltageName  (Optional) The name of the variable representing the
      *     membrane potential. It is used in the creation of the PropagationPropertiesCalculator object. Defaults to "V".
      */
     PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                          const FileFinder& rDirectory,
-                         std::string hdf5File,
-                         std::string voltageName = "V");
+                         const std::string& rHdf5FileName,
+                         const std::string& rNoltageName = "V");
 
     /**
      *  Write out data files. The data that is written depends on which maps have been requested using
