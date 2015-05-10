@@ -4691,7 +4691,7 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                 input_names.add(name)
                 self.writeln('self.stateVarMap["', name, '"] = ', i)
             init_val = getattr(var, u'initial_value', None)
-            init_comm = ' # ' + var.units
+            init_comm = ' # ' + var.fullname() + ' ' + var.units
             if init_val is None:
                 init_comm += '; value not given in model'
                 # Don't want compiler error, but shouldn't be a real number
@@ -4707,7 +4707,8 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
                 input_names.add(name)
                 self.writeln('self.parameterMap["', name, '"] = ', var._cml_param_index)
             self.writeln(self.vector_index('self.parameters', var._cml_param_index),
-                         self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ', self.COMMENT_START, var.units)
+                         self.EQ_ASSIGN, var.initial_value, self.STMT_END, ' ',
+                         self.COMMENT_START, var.fullname(), ' ', var.units)
         # List outputs, and create objects for the GetOutputs method
         self.writeln()
         self.writeln('self.outputNames = []')
