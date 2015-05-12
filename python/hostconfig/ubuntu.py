@@ -79,6 +79,13 @@ icpc = 'icpc'
 
 other_includepaths = ['/usr/include/metis/']
 other_libpaths = []
+
+if ubuntu_ver >= [15,04]:
+    hdf5_lib = 'hdf5_openmpi'
+    other_includepaths.append('/usr/include/hdf5/openmpi/')
+else:
+    hdf5_lib = 'hdf5'
+
 libs_for_petsc = ['petsccontrib', 'X11',
                   'HYPRE', 'spooles', 'superlu',
                   'umfpack', 'amd' # Both for Umfpack
@@ -116,7 +123,7 @@ else:
 
 other_libraries = libs_for_petsc + boost_libs + \
                   [xerces_lib,
-                   'hdf5', 'z',
+                   hdf5_lib, 'z',
                    'parmetis', 'metis']
 
 # Figure out which lapack/blas packages are actually installed!
