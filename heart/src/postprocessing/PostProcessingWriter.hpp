@@ -82,7 +82,7 @@ public:
     PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                          const FileFinder& rDirectory,
                          const std::string& rHdf5FileName,
-                         const std::string& rNoltageName = "V");
+                         const std::string& rVoltageName = "V");
 
     /**
      *  Write out data files. The data that is written depends on which maps have been requested using
