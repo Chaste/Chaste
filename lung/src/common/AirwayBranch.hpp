@@ -202,6 +202,11 @@ public:
      */
     c_vector<double, 3> GetBranchCentroid();
 
+    /**
+     * @return True if this is a terminal airway branch
+     */
+    bool IsTerminal();
+
 private:
     /**
      * A list of elements that make up this branch

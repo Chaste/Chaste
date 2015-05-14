@@ -127,6 +127,10 @@ public:
 
         TS_ASSERT_DELTA(branch_two.GetBranchAngle(), M_PI/2.0, 1e-6);
         TS_ASSERT_DELTA(branch_two.GetRotationAngle(), M_PI/2.0, 1e-6);
+
+        TS_ASSERT(!branch_one.IsTerminal());
+        TS_ASSERT(branch_two.IsTerminal());
+        TS_ASSERT(branch_three.IsTerminal());
     }
 
     void TestBranchIndexing() throw(Exception)

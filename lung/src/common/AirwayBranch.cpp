@@ -397,3 +397,11 @@ c_vector<double, 3> AirwayBranch::GetBranchCentroid()
 
     return centroid / volume;
 }
+
+bool AirwayBranch::IsTerminal()
+{
+    Node<3>* p_distal_node = GetDistalNode();
+
+    return p_distal_node->IsBoundaryNode();
+}
+
