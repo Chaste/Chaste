@@ -278,7 +278,69 @@ std::vector<double> AirwayPropertiesCalculator::GetUpstreamPoiseuilleResistances
     return mUpstreamPathPoiseuilleResistances;
 }
 
+unsigned AirwayPropertiesCalculator::GetMaximumTerminalGeneration()
+{
+    unsigned max_generation = 0;
 
+    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+        iter != mBranches.end();
+        ++iter)
+    {
+        if ((*iter)->IsTerminal())
+        {
+            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
+            if(generation > max_generation)
+            {
+                max_generation = generation;
+            }
+        }
+    }
+
+    return max_generation;
+}
+
+unsigned AirwayPropertiesCalculator::GetMinimumTerminalGeneration()
+{
+    unsigned min_generation = std::numeric_limits<unsigned>::max();
+
+    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+        iter != mBranches.end();
+        ++iter)
+    {
+        if ((*iter)->IsTerminal())
+        {
+            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
+            if(generation < min_generation)
+            {
+                min_generation = generation;
+            }
+        }
+    }
+
+    return min_generation;
+}
+
+unsigned AirwayPropertiesCalculator::GetMeanTerminalGeneration()
+{
+    unsigned mean_generation = 0;
+    unsigned terminal_branches_count = 0;
+
+    for(std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+        iter != mBranches.end();
+        ++iter)
+    {
+        if ((*iter)->IsTerminal())
+        {
+            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
+
+            mean_generation += generation;
+            terminal_branches_count++;
+        }
+    }
+
+    mean_generation /= terminal_branches_count;
+    return mean_generation;
+}
 
 void AirwayPropertiesCalculator::CalculateBranchProperties()
 {

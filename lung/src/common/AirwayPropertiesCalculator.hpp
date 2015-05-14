@@ -173,6 +173,16 @@ public:
     /** @return A vector of upstream Poiseuille resistances, defined for each branch of the tree */
     std::vector<double> GetUpstreamPoiseuilleResistances();
 
+    /** @return The maximum generation number of the terminal branches */
+    unsigned GetMaximumTerminalGeneration();
+
+    /** @return The minimum generation number of the terminal branches */
+    unsigned GetMinimumTerminalGeneration();
+
+    /** @return The mean generation number of the terminal branches */
+    unsigned GetMeanTerminalGeneration();
+
+
     /**
      * Calculates the properties of all branches.
      *

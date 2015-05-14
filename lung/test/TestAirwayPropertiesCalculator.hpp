@@ -87,6 +87,10 @@ public:
         {
             TS_ASSERT_EQUALS(branch_idx, branches[branch_idx]->GetIndex());
         }
+
+        TS_ASSERT_EQUALS(properties_calculator.GetMaximumTerminalGeneration(), 29u);
+        TS_ASSERT_EQUALS(properties_calculator.GetMinimumTerminalGeneration(), 10u);
+        TS_ASSERT_EQUALS(properties_calculator.GetMeanTerminalGeneration(), 17u);
     }
 
 
