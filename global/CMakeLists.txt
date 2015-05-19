@@ -121,6 +121,7 @@ configure_file (
   ${generate_dir}/ChasteBuildInfo.cpp
   )
 
+if (Chaste_UPDATE_PROVENANCE)
 add_custom_target(generateTimestamp ALL
     COMMAND "$<TARGET_FILE:timekeeper>"
     COMMAND ${CMAKE_COMMAND}
@@ -134,9 +135,24 @@ add_custom_target(generateTimestamp ALL
         "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateChasteBuildInfo.cmake"
     WORKING_DIRECTORY "${generate_dir}"
     DEPENDS timekeeper
+    COMMENT "Generating Build Config and Updating Provenance"
+    VERBATIM
+)
+else()
+add_custom_target(generateTimestamp ALL
+    COMMAND ${CMAKE_COMMAND} 
+        "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
+        "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
+        "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
+        "-DChaste_BUILD_TYPE=$<CONFIGURATION>"
+        "-DMSVC=${MSVC}"
+        "-P" "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteGenerateChasteBuildInfo.cmake"
+    WORKING_DIRECTORY "${generate_dir}"
+    DEPENDS timekeeper
     COMMENT "Generating Build Config"
     VERBATIM
 )
+endif()
 
 
 # compile global component

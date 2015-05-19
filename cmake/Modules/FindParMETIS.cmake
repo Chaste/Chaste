@@ -88,9 +88,9 @@ cmake_pop_check_state()
 
 if(PARMETIS_FOUND)
   set(PARMETIS_INCLUDES ${PARMETIS_INCLUDE_DIR})
-  set(PARMETIS_LIBRARIES "${PARMETIS_LIBRARY};${METIS_LIBRARY};${MPI_C_LIBRARIES}"
+  set(PARMETIS_LIBRARIES "${PARMETIS_LIBRARY};${METIS_LIBRARY}"
       CACHE FILEPATH "ParMETIS libraries needed for linking")
-  set(PARMETIS_LINK_FLAGS "${MPI_C_LINK_FLAGS}"
+  set(PARMETIS_LINK_FLAGS "${MPI_CXX_LINK_FLAGS}"
       CACHE STRING "ParMETIS link flags")
   # log result
   file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeOutput.log
@@ -99,10 +99,3 @@ if(PARMETIS_FOUND)
     "Library directory: ${PARMETIS_LIBRARIES}\n\n")
 endif(PARMETIS_FOUND)
 
-#add all parmetis related flags to ALL_PKG_FLAGS, this must happen regardless of a target using add_C_parmetis_flags
-if(PARMETIS_FOUND)
-  foreach(dir ${PARMETIS_INCLUDES})
-    set_property(GLOBAL APPEND PROPERTY ALL_PKG_FLAGS "-I${dir}")
-  endforeach()
-  set_property(GLOBAL APPEND PROPERTY ALL_PKG_LIBS "${PARMETIS_LIBRARIES}")
-endif()

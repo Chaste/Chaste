@@ -77,10 +77,17 @@ if (NOT Chaste_FIND_COMPONENTS)
 endif()
 
 # Setup dependent components in case they are not specified
+set(remaining_components ${Chaste_FIND_COMPONENTS})
 foreach(component ${Chaste_FIND_COMPONENTS})
+    list(REMOVE_AT remaining_components 0)
     if (NOT(Chaste_FIND_COMPONENTS STREQUAL "none"))
         list(APPEND Chaste_COMPONENTS ${component}) 
-        list(APPEND Chaste_COMPONENTS ${CHASTE_DEPENDS_${component}})
+        foreach(dependant_component ${CHASTE_DEPENDS_${component}})
+            list(FIND remaining_components ${dependant_component} dep_component_found)
+            if (dep_component_found EQUAL -1)
+                list(APPEND Chaste_COMPONENTS ${CHASTE_DEPENDS_${component}})
+            endif()
+        endforeach()
     endif()
 endforeach(component)
 

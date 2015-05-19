@@ -33,6 +33,12 @@ else()
     option(Chaste_USE_XERCES "Compile Chaste with XERCES and XSD support" OFF)
 endif()
 
+option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
+option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
+option(Chaste_LINK_LIBRARIES_WITH_UNRESOLVED_SYMBOLS "All Chaste libraries will have unresolved symbols. User must link in all dependencies (third party and Chaste internal)" OFF)
+
+option(Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
+
 option(RUN_TESTS OFF "This option simply runs Chaste tests. You should also set the test family.")
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
 set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;ProfileAssembly;Profile")
@@ -147,34 +153,43 @@ list(APPEND CHASTE_LINK_LIBRARIES "${Boost_LIBRARIES}")
 #find PETSc
 find_package(PETSc REQUIRED COMPONENTS CXX)
 
-#find HDF5 (prefer PETSC hdf5 if exist)
-if (NOT DEFINED ENV{HDF5_ROOT})
-    set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
-endif()
-find_program( HDF5_C_COMPILER_EXECUTABLE
-    NAMES h5cc h5pcc
-    PATHS ENV HDF5_ROOT
-    PATH_SUFFIXES bin Bin
-    NO_DEFAULT_PATH
-    DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
-find_program( HDF5_CXX_COMPILER_EXECUTABLE
-    NAMES h5c++ h5pc++
-    PATHS ENV HDF5_ROOT
-    PATH_SUFFIXES bin Bin
-    NO_DEFAULT_PATH
-    DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
-
-find_package(HDF5 MODULE REQUIRED)
-list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
-
 list(APPEND CHASTE_INCLUDES "${PETSC_INCLUDES}")
 list(APPEND CHASTE_LINK_LIBRARIES 
     "${PETSC_LIBRARIES}"
+)
+
+#find HDF5
+if (Chaste_USE_PETSC_HDF5)
+    if (NOT DEFINED ENV{HDF5_ROOT})
+        set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
+    endif()
+    find_program( HDF5_C_COMPILER_EXECUTABLE
+        NAMES h5cc h5pcc
+        PATHS ENV HDF5_ROOT
+        PATH_SUFFIXES bin Bin
+        NO_DEFAULT_PATH
+        DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
+    find_program( HDF5_CXX_COMPILER_EXECUTABLE
+        NAMES h5c++ h5pc++
+        PATHS ENV HDF5_ROOT
+        PATH_SUFFIXES bin Bin
+        NO_DEFAULT_PATH
+        DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
+endif()
+find_package(HDF5 MODULE REQUIRED)
+list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
+list(APPEND CHASTE_LINK_LIBRARIES 
     "${HDF5_LIBRARIES}"
 )
 
 #Locate MPI 
 set(MPI_CXX_COMPILER ${PETSC_COMPILER})
+find_program(MPIEXEC
+  NAMES mpiexec mpirun lamexec srun
+  PATHS ${PETSC_DIR}/${PETSC_ARCH}
+  PATH_SUFFIXES bin
+  DOC "Executable for running MPI programs."
+  NO_DEFAULT_PATH)
 find_package(MPI REQUIRED)
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}" )
 SET( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}" )
@@ -182,14 +197,14 @@ SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}" )
 list(APPEND CHASTE_INCLUDES "${MPI_INCLUDES}")
 list(APPEND CHASTE_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
-if (NOT ("${PETSC_LIBRARIES}" MATCHES ".*parmetis.*"))
-    #find ParMETIS and METIS
+#find ParMETIS and METIS
+if (Chaste_USE_PETSC_PARMETIS)
     if (NOT DEFINED PARMETIS_ROOT)
         set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}")
     endif()
-    find_package(ParMETIS REQUIRED)
-    list(APPEND CHASTE_LINK_LIBRARIES "${METIS_LIBRARY}" "${PARMETIS_LIBRARY}" "${PARMETIS_LIBRARIES}")
 endif()
+find_package(ParMETIS REQUIRED)
+list(APPEND CHASTE_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
 
 #Locate Sundials
 if (Chaste_USE_CVODE)
