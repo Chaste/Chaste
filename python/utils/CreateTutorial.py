@@ -38,15 +38,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Notes: 
 1. The script starts converting everything after the first #define line
-2. The script stops converting after an #endif. If this isn't the last
-   line the script needs changing.
+2. The script stops converting after the final #endif.  It is assumed that there
+   will be a #if line immediately after the first #define, and a count is kept of
+   #if and #endif lines seen in order to allow matching #if/endif blocks within
+   the converted section.
 3. All C-style block comments '/*' to '*/' are converted to wiki text.
 4. All other lines, including C++ style comments '//', are kept as code lines
 5. In C-block comments (ie wiki text), whitespace is removed. Bulleted lists 
    will work but nested bulleted lists won't.
-6. To print an empty line in the wiki page, write EMPTYLINE in the block
-   comment, with nothing else, or (better) just leave a blank line between
-   paragraphs in the comment, as for wiki pages.
+6. To print an empty line in the wiki page, just leave a blank line between paragraphs
+   in the comment, as for wiki pages.  The older style of writing EMPTYLINE in a
+   paragraph by itself also works, but is deprecated.
 7. Lines inside a block comment which start with a '*', i.e.
      /* my comment is
       * two lines long */
@@ -61,7 +63,7 @@ import sys
 # This had better match GenerateHowTo.py!
 HOWTO_TAG = "HOW_TO_TAG"
 
-def ConvertFileToWikiText(fileobj):
+def ConvertFileToWikiText(fileobj, filepath):
     """Convert a single tutorial source file to wiki markup, returning the page source."""
     # "State machine" state variables
     parsing = False
@@ -69,6 +71,20 @@ def ConvertFileToWikiText(fileobj):
     status = ST_NONE
     in_list = False
     ifdefs_seen = 0
+    # Configuration based on file type
+    if filepath.endswith('.py'):
+        StartsComment = lambda stripped_line: stripped_line.startswith('##')
+        IsStillComment = lambda stripped_line: stripped_line.startswith('#')
+        EndsComment = lambda stripped_line: not stripped_line.startswith('#')
+        CleanEndComment = lambda stripped_line: stripped_line
+        end_can_be_start = False # Whether EndsComment and StartsComment can apply to the same line
+    else:
+        StartsComment = lambda stripped_line: stripped_line.startswith('/*') and not stripped_line.startswith('/**') # Ignore Doxygen comments
+        IsStillComment = lambda stripped_line: stripped_line.startswith('*')
+        EndsComment = lambda stripped_line: stripped_line.endswith('*/') or stripped_line == '/'
+        CleanEndComment = lambda stripped_line: stripped_line[:-2].strip()
+        end_can_be_start = True
+    code_block_opener = CodeBlockOpener(filepath)
     # Output
     output = []
     code_store = [] # A store of every code-line, to print at the end
@@ -99,30 +115,30 @@ def ConvertFileToWikiText(fileobj):
                 line = stripped_line
             
             # Check if the line is a new text line
-            if stripped_line.startswith('/*') and not stripped_line.startswith('/**'): # Ignore Doxygen comments
-                # assert not already text
-                assert status not in [ST_TEXT, ST_HOWTO], 'Nested comment' 
+            comment_started = False
+            if StartsComment(stripped_line):
+                comment_started = True
                 # remove all whitespace and the '/*'
                 stripped_line = line = stripped_line[2:].strip()
-                # if the last line was code, print }}}
+                # if the last line was code, close the output code block
                 if status is ST_CODE:
                     output.append('}}}\n')
                 # set the status as text
                 status = ST_TEXT
-            elif status in [ST_TEXT, ST_HOWTO] and stripped_line.startswith('*'):
+            elif status in [ST_TEXT, ST_HOWTO] and IsStillComment(stripped_line):
                 # we are in a comment, so get rid of whitespace and the initial '*'
                 stripped_line = line = line[1:].strip()
             elif status is ST_NONE and len(stripped_line) > 0:
                 # Line has content and isn't a comment => it's code
-                output.append('{{{\n#!cpp\n')
+                output.append(code_block_opener)
                 status = ST_CODE
             
             # Check if comment ends
-            if stripped_line.endswith('*/') or stripped_line == '/':
+            if EndsComment(stripped_line) and (not comment_started or end_can_be_start):
                 # If it's not a Doxygen comment, switch state to unknown
                 if status in [ST_TEXT, ST_HOWTO]:
                     # get rid of whitespace and '*/'
-                    stripped_line = line = stripped_line[:-2].strip()
+                    stripped_line = line = CleanEndComment(stripped_line)
                     status = ST_NONE
             
             # Check for (and strip) HOWTO tagging
@@ -163,16 +179,20 @@ def ConvertFileToWikiText(fileobj):
         last_line = stripped_line
     
     if not output:
-        # It's probably not C++, so let's include it all just as raw 'code'
+        # It's probably not C++ or Python, so let's include it all just as raw 'code'
         code_store = line_store
 
     return ''.join(output), code_store
 
+def CodeBlockOpener(file_name):
+    """Return the opener string for a Trac wiki code block with syntax highlighting based on file extension."""
+    ext = os.path.splitext(file_name)[1]
+    highlight_code = {'.hpp': '#!cpp\n', '.cpp': '#!cpp\n', '.py': '#!python\n', '.sh': '#!sh\n'}.get(ext, '')
+    return '{{{\n' + highlight_code
+
 def AddCodeOutput(file_name, code, output):
     output.append('\n\n== File name `%s` ==\n\n' % file_name)
-    output.append('{{{\n')
-    if file_name.endswith('pp'):
-        output.append('#!cpp\n')
+    output.append(CodeBlockOpener(file_name))
     output.append('\n'.join(code))
     output.append('\n}}}\n\n')
 
@@ -192,11 +212,11 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     output.append('This tutorial is automatically generated from the file ' + test_file_path + revision + '.\n')
     output.append('Note that the code is given in full at the bottom of the page.\n\n\n')
     # Convert each file in turn
-    test_output, test_code = ConvertFileToWikiText(test_file)
+    test_output, test_code = ConvertFileToWikiText(test_file, test_file_path)
     output.append(test_output)
     other_code = {}
     for other_file in other_files:
-        file_output, file_code = ConvertFileToWikiText(other_file[1])
+        file_output, file_code = ConvertFileToWikiText(other_file[1], other_file[0])
         if file_output:
             output.append('\n\n= Extra file %s =\n' % other_file[0])
             output.append(file_output)
@@ -239,8 +259,8 @@ if __name__ == '__main__':
     if test_file == '-':
         # Read from stdin (pipe mode)
         in_file = sys.stdin
-    elif test_file[-4:] != '.hpp' or os.path.basename(test_file)[:4] != 'Test':
-        print >>sys.stderr, "Syntax error:",test_file,"does not appear to be a test file"
+    elif test_file[-3:] not in ['hpp', '.py'] or os.path.basename(test_file)[:4] != 'Test':
+        print >>sys.stderr, "Syntax error:", test_file, "does not appear to be a test file"
         sys.exit(1)
     else:
         in_file = open(test_file)
