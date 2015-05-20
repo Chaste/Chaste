@@ -160,9 +160,7 @@ list(APPEND CHASTE_LINK_LIBRARIES
 
 #find HDF5
 if (Chaste_USE_PETSC_HDF5)
-    if (NOT DEFINED ENV{HDF5_ROOT})
-        set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
-    endif()
+    set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}" "${PETSC_DIR}/externalpackages")
     find_program( HDF5_C_COMPILER_EXECUTABLE
         NAMES h5cc h5pcc
         PATHS ENV HDF5_ROOT
@@ -199,9 +197,7 @@ list(APPEND CHASTE_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 #find ParMETIS and METIS
 if (Chaste_USE_PETSC_PARMETIS)
-    if (NOT DEFINED PARMETIS_ROOT)
-        set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}")
-    endif()
+    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" "${PETSC_DIR}/externalpackages")
 endif()
 find_package(ParMETIS REQUIRED)
 list(APPEND CHASTE_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
