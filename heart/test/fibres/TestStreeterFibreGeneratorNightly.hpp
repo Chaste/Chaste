@@ -79,9 +79,9 @@ private:
         {
             for (unsigned j = 0; j< 3u ; j++)
             {
-                TS_ASSERT_DELTA(fibres1[i][j], fibres2[i][j], 1e-14);
-                TS_ASSERT_DELTA(second1[i][j], second2[i][j], 1e-14);
-                TS_ASSERT_DELTA(third1[i][j], third2[i][j], 1e-14);
+                TS_ASSERT_DELTA(fibres1[i][j], fibres2[i][j], 1e-10);
+                TS_ASSERT_DELTA(second1[i][j], second2[i][j], 1e-10);
+                TS_ASSERT_DELTA(third1[i][j], third2[i][j], 1e-10);
             }
         }
     }
