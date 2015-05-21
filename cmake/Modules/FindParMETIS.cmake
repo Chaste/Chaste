@@ -21,7 +21,7 @@
 
 find_path(PARMETIS_INCLUDE_DIR parmetis.h
           PATHS ${PARMETIS_DIR} ${PARMETIS_ROOT}
-          PATH_SUFFIXES include parmetis
+          PATH_SUFFIXES include parmetis include/parametis
           NO_DEFAULT_PATH
           DOC "Include directory of ParMETIS")
 find_path(PARMETIS_INCLUDE_DIR parmetis.h
@@ -41,8 +41,12 @@ include(CMakePushCheckState)
 cmake_push_check_state() # Save variables
 set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${MPI_CXX_INCLUDE_PATH} ${PARMETIS_INCLUDE_DIR})
 set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
-find_file(METIS_FOUND metis.h)
-find_file(PARMETIS_FOUND parmetis.h)
+find_file(METIS_FOUND metis.h
+    HINTS ${PARMETIS_INCLUDE_DIR} 
+    )
+find_file(PARMETIS_FOUND parmetis.h
+    HINTS ${PARMETIS_INCLUDE_DIR} 
+    )
 
 if(PARMETIS_FOUND)
   set(ParMETIS_INCLUDE_PATH ${CMAKE_REQUIRED_INCLUDES})

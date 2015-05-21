@@ -197,7 +197,9 @@ list(APPEND CHASTE_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 #find ParMETIS and METIS
 if (Chaste_USE_PETSC_PARMETIS)
-    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" "${PETSC_DIR}/externalpackages")
+    set(PARMETIS_ROOT "${PETSC_DIR}/${PETSC_ARCH}" 
+                      "${PETSC_DIR}/externalpackages"
+                      )
 endif()
 find_package(ParMETIS REQUIRED)
 list(APPEND CHASTE_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
