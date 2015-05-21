@@ -145,10 +145,13 @@ public:
             boost::shared_ptr<AbstractCellProperty> p_another_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
             FixedDurationGenerationBasedCellCycleModel* p_another_cell_model = new FixedDurationGenerationBasedCellCycleModel();
             CellPtr p_another_cell(new Cell(p_another_healthy_state, p_another_cell_model, false, collection));
-            boost::shared_ptr<AbstractCellProperty> p_another_vec_data(CellPropertyRegistry::Instance()->Get<CellVecData>());
-            p_cell->AddCellProperty(p_another_vec_data);
+            boost::shared_ptr<AbstractCellProperty> p_another_vec_data(new CellVecData);
+            p_another_cell->AddCellProperty(p_another_vec_data);
+            TS_ASSERT_EQUALS(p_cell->GetCellVecData()->GetNumItems(), 1u);
+            TS_ASSERT_EQUALS(p_another_cell->GetCellVecData()->GetNumItems(), 0u);
             Vec another_item_1 = PetscTools::CreateAndSetVec(2, 42.0); // <42, 42>
-            p_cell->GetCellVecData()->SetItem("item 1", another_item_1);
+
+            p_another_cell->GetCellVecData()->SetItem("item 1", another_item_1);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
@@ -219,11 +222,7 @@ public:
             VecGetSize(p_cell_vec_data->GetItem("item 1"), &vec_size);
             TS_ASSERT_EQUALS(vec_size, 2);
             ReplicatableVector rep_item_1(p_cell_vec_data->GetItem("item 1"));
-
-            ///\todo #2663 Archive file name is unique for the archive and the key (item 1)
-            ///            It is not currently unique for the cell.  If p_another_cell (with item_1=42 is archived
-            ///            after the first cell then the vector data gets overwritten
-            // Uncomment for failing test... TS_ASSERT_EQUALS(rep_item_1[0], -17.3);
+            TS_ASSERT_DELTA(rep_item_1[0], -17.3, 2e-14);
 
             for (CellPropertyCollection::Iterator it = collection.Begin(); it != collection.End(); ++it)
             {
@@ -240,6 +239,14 @@ public:
                 bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
             }
+
+            // Try another cell
+            CellPtr p_another_cell;
+            input_arch >> p_another_cell;
+            ReplicatableVector rep_another_item_1(p_another_cell->GetCellVecData()->GetItem("item 1"));
+            TS_ASSERT_DELTA(rep_another_item_1[0], 42.0, 2e-14);
+
+
         }
     }
 };

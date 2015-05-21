@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/array.hpp>
 #include "Exception.hpp"
 #include "ArchiveLocationInfo.hpp"
 
@@ -163,11 +164,22 @@ inline void save_construct_data(
     {
         std::string key = *iter;
         ar << key;
+        Vec vec_data = t->GetItem(key);
 
-        ///\todo #2663 File name is unique for this archive and this key -- What happens when two cells with CellVecData are archived?
-        /// Doesn't DumpPetscObject open the file fresh each time?
-        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + key + ".vec";
-        PetscTools::DumpPetscObject(t->GetItem(key), archive_filename);
+        // Machinery for archiving a sequential PETSc Vec as a boost make_array.
+        double *p_vec_data;
+        VecGetArray(vec_data, &p_vec_data);
+        PetscInt size, local_size;
+        VecGetSize(vec_data, &size);
+        VecGetLocalSize(vec_data, &local_size);
+        // This will fail if we run in parallel and the vector is shared MPI (size is global)
+        assert( local_size == size);
+        ar << size;
+        ar << make_array(p_vec_data, size);
+        VecRestoreArray(vec_data, &p_vec_data);
+
+        //std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + key + ".vec";
+        //PetscTools::DumpPetscObject(t->GetItem(key), archive_filename);
     }
 
 }
@@ -184,10 +196,18 @@ inline void load_construct_data(
     {
         std::string key;
         ar >> key;
-        Vec archived_vec;
 
-        std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + key + ".vec";
-        PetscTools::ReadPetscObject(archived_vec, archive_filename);
+        // Un-archive vector data and construct a new PETSc Vec for it
+        PetscInt size;
+        ar >> size;
+        Vec archived_vec = PetscTools::CreateVec(size);
+        double *p_archived_vec;
+        VecGetArray(archived_vec, &p_archived_vec);
+        ar >> make_array<double>(p_archived_vec, size);
+        VecRestoreArray(archived_vec, &p_archived_vec);
+
+        //std::string archive_filename = ArchiveLocationInfo::GetArchiveDirectory() + key + ".vec";
+        //PetscTools::ReadPetscObject(archived_vec, archive_filename);
 
         archived_cell_vec_data[key] = archived_vec;
     }
