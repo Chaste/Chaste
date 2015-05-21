@@ -801,6 +801,12 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(VertexElementMap& rElemen
         }
 
         RemoveDeletedNodes();
+
+        /*
+         * This is handled in a separate method to allow child classes to implement additional ReMeshing functionality
+         * (see #2664).
+         */
+        this->HandleAdditionalReMeshingBehaviour();
     }
     else // 3D
     {
@@ -2488,6 +2494,15 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleAdditionalRemodellingBehav
     {
         EXCEPTION("No functionality for this case yet");
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleAdditionalReMeshingBehaviour()
+{
+    /*
+     * This is handled in a separate method to allow child classes to implement additional ReMeshing functionality
+     * (see #2664).
+     */
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

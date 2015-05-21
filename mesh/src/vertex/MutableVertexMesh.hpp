@@ -258,6 +258,14 @@ protected:
     virtual void HandleAdditionalRemodellingBehaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elemIndices, unsigned caseNumber);
 
     /**
+     * Helper method called by ReMesh().
+     *
+     * Handles any additional ReMeshing operations beyond CheckForSwapsFromShortEdges() and CheckForIntersections().
+     * This is implemented in a separate method to allow child classes to override the standard behaviour (see #2664).
+     */
+    virtual void HandleAdditionalReMeshingBehaviour();
+
+    /**
      * Helper method for ReMesh(), called by PerformT3Swap(). During T3 swaps nodes are merged onto edges. This
      * method checks if the edge is too short and moves its vertices apart if necessary in order to prevent T1 swaps
      * from happening right away. The method also checks that the location where the merged node is going to end up at
