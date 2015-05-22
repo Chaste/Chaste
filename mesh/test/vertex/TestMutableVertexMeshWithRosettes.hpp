@@ -527,27 +527,7 @@ public:
         // Let us first create a protorosette
         MutableVertexMeshWithRosettes<2,2>* p_mesh = ConstructFiveCellRosette();
 
-        /* Seem to be unused, commented out for now.
-        VertexElement<2,2>* p_elem_0 = p_mesh->GetElement(0);
-        VertexElement<2,2>* p_elem_1 = p_mesh->GetElement(1);
-        VertexElement<2,2>* p_elem_2 = p_mesh->GetElement(2);
-        VertexElement<2,2>* p_elem_3 = p_mesh->GetElement(3);
-        VertexElement<2,2>* p_elem_4 = p_mesh->GetElement(4);
-        */
-
         Node<2>* p_node_0 = p_mesh->GetNode(0);
-        /*
-        Node<2>* p_node_1 = p_mesh->GetNode(1);
-        Node<2>* p_node_2 = p_mesh->GetNode(2);
-        Node<2>* p_node_3 = p_mesh->GetNode(3);
-        Node<2>* p_node_4 = p_mesh->GetNode(4);
-        Node<2>* p_node_5 = p_mesh->GetNode(5);
-        Node<2>* p_node_6 = p_mesh->GetNode(6);
-        Node<2>* p_node_7 = p_mesh->GetNode(7);
-        Node<2>* p_node_8 = p_mesh->GetNode(8);
-        Node<2>* p_node_9 = p_mesh->GetNode(9);
-        Node<2>* p_node_10 = p_mesh->GetNode(10);
-		*/
 
         // Perform the protorosette resolution
         p_mesh->PerformRosetteRankDecrease(p_node_0);
