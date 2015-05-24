@@ -459,7 +459,7 @@ public:
          */
 
         // The number of nodes in the mesh should have increase by one (from 9 to 10)
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 10);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 10u);
         Node<2>* p_node_9 = p_mesh->GetNode(9);
 
         // Two elements (either 0 & 2, or 1 & 3) should now have five nodes, while the other two should still have four
@@ -476,12 +476,12 @@ public:
         TS_ASSERT_DELTA(norm_2(node_9_pos - node_0_pos), node_spacing, 1e-10);
 
         // Because the division axis is random, we are left with two possible cases
-        if (p_elem_0->GetNumNodes() == 4)
+        if (p_elem_0->GetNumNodes() == 4u)
         {
-            TS_ASSERT_EQUALS(p_elem_0->GetNumNodes(), 4);
-            TS_ASSERT_EQUALS(p_elem_2->GetNumNodes(), 4);
-            TS_ASSERT_EQUALS(p_elem_1->GetNumNodes(), 5);
-            TS_ASSERT_EQUALS(p_elem_3->GetNumNodes(), 5);
+            TS_ASSERT_EQUALS(p_elem_0->GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(p_elem_2->GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(p_elem_1->GetNumNodes(), 5u);
+            TS_ASSERT_EQUALS(p_elem_3->GetNumNodes(), 5u);
 
             if (node_0_pos[0] > 0)
             {
@@ -500,10 +500,10 @@ public:
         }
         else //p_elem_0->GetNumNodes() == 5
         {
-            TS_ASSERT_EQUALS(p_elem_0->GetNumNodes(), 5);
-            TS_ASSERT_EQUALS(p_elem_2->GetNumNodes(), 5);
-            TS_ASSERT_EQUALS(p_elem_1->GetNumNodes(), 4);
-            TS_ASSERT_EQUALS(p_elem_3->GetNumNodes(), 4);
+            TS_ASSERT_EQUALS(p_elem_0->GetNumNodes(), 5u);
+            TS_ASSERT_EQUALS(p_elem_2->GetNumNodes(), 5u);
+            TS_ASSERT_EQUALS(p_elem_1->GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(p_elem_3->GetNumNodes(), 4u);
 
             if (node_0_pos[0] > 0)
             {
@@ -537,7 +537,7 @@ public:
          */
 
         // The number of nodes in the mesh should have increase by one (from 11 to 12)
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 12u);
         Node<2>* p_node_11 = p_mesh->GetNode(11);
 
         // Two elements should now have five nodes, and the other three should have four
