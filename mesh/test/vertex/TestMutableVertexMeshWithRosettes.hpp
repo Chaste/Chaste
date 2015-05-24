@@ -562,8 +562,8 @@ public:
             }
         }
 
-        TS_ASSERT_EQUALS(five_node_elems.size(), 2);
-        TS_ASSERT_EQUALS(four_node_elems.size(), 3);
+        TS_ASSERT_EQUALS(five_node_elems.size(), 2u);
+        TS_ASSERT_EQUALS(four_node_elems.size(), 3u);
 
         // The five-node elements should be separated by one (0,2 or 1,3 or 2,4 or 3,0)
         TS_ASSERT( ( (five_node_elems[0]->GetIndex() + 2) % 5 == five_node_elems[1]->GetIndex() ) ||
