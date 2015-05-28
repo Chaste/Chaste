@@ -54,7 +54,7 @@ private:
 
     MutableVertexMeshWithRosettes<2,2>* ConstructFiveCellRosette()
     {
-        //Make 11 nodes
+        // Make 11 nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 1.00000, 0.00000));
@@ -68,7 +68,7 @@ private:
         nodes.push_back(new Node<2>(9, true, 0.30902, -0.95106));
         nodes.push_back(new Node<2>(10, true, 0.80902, -0.58779));
 
-        //Make 5 quadrangular cells
+        // Make 5 quadrangular cells
         std::vector<Node<2>*> nodes_elem_1;
         nodes_elem_1.push_back(nodes[0]);
         nodes_elem_1.push_back(nodes[1]);
@@ -95,7 +95,7 @@ private:
         nodes_elem_5.push_back(nodes[10]);
         nodes_elem_5.push_back(nodes[1]);
 
-        //Make 5 vertex elements
+        // Make 5 vertex elements
         std::vector<VertexElement<2,2>* > vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
@@ -108,7 +108,7 @@ private:
 
     MutableVertexMeshWithRosettes<2,2>* ConstructProtorosette()
     {
-        //Make 9 nodes
+        // Make 9 nodes
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, true, 1.00000, 0.00000));
@@ -120,7 +120,7 @@ private:
         nodes.push_back(new Node<2>(7, true, 0.00000, -1.00000));
         nodes.push_back(new Node<2>(8, true, 0.70711, -0.70711));
 
-        //Make 4 quadrangular cells
+        // Make 4 quadrangular cells
         std::vector<Node<2>*> nodes_elem_1;
         nodes_elem_1.push_back(nodes[0]);
         nodes_elem_1.push_back(nodes[1]);
@@ -142,7 +142,7 @@ private:
         nodes_elem_4.push_back(nodes[8]);
         nodes_elem_4.push_back(nodes[1]);
 
-        //Make 4 vertex elements
+        // Make 4 vertex elements
         std::vector<VertexElement<2,2>*> vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
@@ -176,6 +176,8 @@ public:
         TS_ASSERT_THROWS_THIS(p_mesh->SetProtorosetteFormationProbability(1.0123), "Attempting to assign a probability greater than one.");
         TS_ASSERT_THROWS_THIS(p_mesh->SetProtorosetteResolutionProbabilityPerTimestep(1.0234), "Attempting to assign a probability greater than one.");
         TS_ASSERT_THROWS_THIS(p_mesh->SetRosetteResolutionProbabilityPerTimestep(1.0345), "Attempting to assign a probability greater than one.");
+
+        delete p_mesh;
     }
 
     void TestArchiving() throw (Exception)
@@ -437,6 +439,8 @@ public:
 
         // The node with global index 0 should now be included in the new element
         TS_ASSERT_LESS_THAN(p_elem_n->GetNodeLocalIndex(0), UINT_MAX);
+
+        delete p_mesh;
     }
 
     void TestPerformProtorosetteResolution() throw (Exception)
@@ -520,6 +524,8 @@ public:
                 TS_ASSERT_DELTA(node_0_pos[1], node_spacing * sqrt(2.0) * 0.25, 1e-10);
             }
         }
+
+        delete p_mesh;
     }
 
     void TestPerformRosetteRankDecrease() throw (Exception)
@@ -577,6 +583,8 @@ public:
 
         TS_ASSERT_DELTA(norm_2(node_0_pos), 0.0, 1e-10);
         TS_ASSERT_DELTA(norm_2(node_11_pos), node_spacing, 1e-10);
+
+        delete p_mesh;
     }
 
     void TestCheckForRosettes() throw (Exception)
@@ -650,6 +658,11 @@ public:
             TS_ASSERT_DELTA(current_ref_node->rGetLocation()[0], current_node->rGetLocation()[0], 1e-10);
             TS_ASSERT_DELTA(current_ref_node->rGetLocation()[1], current_node->rGetLocation()[1], 1e-10);
         }
+
+        delete p_ref_rosette;
+        delete p_ref_protorosette;
+        delete p_rosette;
+        delete p_protorosette;
     }
 };
 
