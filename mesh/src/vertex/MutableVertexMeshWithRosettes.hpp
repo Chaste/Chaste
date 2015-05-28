@@ -138,7 +138,7 @@ protected:
      * Create new node and redistribute nodes along line joining
      * centres of randomly selected cell and cell opposite it.
      *
-     * @param pProtorosetteNode, node at centre of protorosette
+     * @param pProtorosetteNode node at centre of protorosette
      */
     void PerformProtorosetteResolution(Node<SPACE_DIM>* pProtorosetteNode);
 
@@ -150,7 +150,7 @@ protected:
      * rosette node and centre of randomly selected cell.
      * Rosette node will remain unmoved.
      *
-     * @param pProtorosetteNode, node at centre of protorosette
+     * @param pRosetteNode node at centre of rosette
      */
     void PerformRosetteRankDecrease(Node<SPACE_DIM>* pRosetteNode);
 
@@ -221,21 +221,21 @@ public:
     /**
      * Set method for mProtoRosetteFormationProbability.
      *
-     * @param protoRosetteFormationProbability
+     * @param protorosetteFormationProbability the new value of mProtoRosetteFormationProbability
      */
     void SetProtorosetteFormationProbability(double protorosetteFormationProbability);
 
     /**
      * Set method for mProtoRosetteResolutionProbabilityPerTimestep.
      *
-     * @param protoRosetteResolutionProbabilityPerTimestep
+     * @param protorosetteResolutionProbabilityPerTimestep the new value of mProtoRosetteResolutionProbabilityPerTimestep
      */
     void SetProtorosetteResolutionProbabilityPerTimestep(double protorosetteResolutionProbabilityPerTimestep);
 
     /**
      * Set method for mRosetteResolutionProbabilityPerTimestep.
      *
-     * @param rosetteResolutionProbabilityPerTimestep
+     * @param rosetteResolutionProbabilityPerTimestep the new value of mRosetteResolutionProbabilityPerTimestep
      */
     void SetRosetteResolutionProbabilityPerTimestep(double rosetteResolutionProbabilityPerTimestep);
 

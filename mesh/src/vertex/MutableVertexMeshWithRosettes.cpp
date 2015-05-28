@@ -177,7 +177,7 @@ void MutableVertexMeshWithRosettes<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIn
      *       \   /
      *        \ /
      *     B   X   C
-     *        / \______
+     *        / \ ______
      *       /   \
      *      /  D  \  E
      */
