@@ -368,6 +368,16 @@ public:
             TS_ASSERT_THROWS_THIS(mesh.HandleAdditionalRemodellingBehaviour(p_node_a, p_node_b, empty_set, case_num),
                                   "No functionality for this case yet");
         }
+
+        /**
+         * Check case 4
+         */
+
+        // With ProtorosetteFormationProbability set at 1.0, a node-merge should occur
+        mesh.SetProtorosetteFormationProbability(1.0);
+//        mesh.HandleAdditionalRemodellingBehaviour(p_node_a, p_node_b, empty_set, 4);
+//        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocdation()[0], 0.5, 1e-10);
+//        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[1], 0.5, 1e-10);
     }
 
     void TestPerformRosetteRankIncrease() throw (Exception)
