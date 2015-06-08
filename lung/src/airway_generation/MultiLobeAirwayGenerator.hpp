@@ -70,8 +70,9 @@ public:
      * Constructor
      *
      * @param rAirwaysMesh Mesh of the major airways. The generated airways will be appended to this mesh
+     * @param pointDistanceLimit Specifies whether to limit the size of terminal generations using a heuristic limit
      */
-    MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh);
+    MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh, bool pointDistanceLimit = false);
 
     /**
      * Destructor
@@ -205,6 +206,9 @@ private:
 
     /** The scaling factor for generated airway diameters */
     double mDiameterRatio;
+
+    /** A flag to turn on the point distance limit heuristic */
+    bool mPointDistanceLimit;
 };
 
 #endif // (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6

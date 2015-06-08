@@ -55,9 +55,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh) : mAirwaysMesh(rAirwaysMesh),
+MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh, bool pointDistanceLimit) :
+                                                                                         mAirwaysMesh(rAirwaysMesh),
                                                                                          mNumberOfPointsPerLung(0),
-                                                                                         mPointVolume(-1)
+                                                                                         mPointVolume(-1),
+                                                                                         mPointDistanceLimit(pointDistanceLimit)
 
 {
 
@@ -82,7 +84,8 @@ void MultiLobeAirwayGenerator::AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface
                                                             mMinimumBranchLength,
                                                             mPointLimit,
                                                             mAngleLimit,
-                                                            mBranchingFraction);
+                                                            mBranchingFraction,
+                                                            mPointDistanceLimit);
 
     mLobeGenerators.push_back(std::make_pair(p_lobe_generator, lungLocation));
 }
