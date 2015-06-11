@@ -678,8 +678,10 @@ public:
         delete p_mesh;
     }
 
-    void TestCheckForRosettes() throw (Exception)
+    void TestHandleAdditionalReMeshingBehaviour() throw (Exception)
     {
+        // HandleAdditionalReMeshingBehaviour() calls CheckForRosettes(), so no need for an additional test for that
+
         // Let us first create reference meshes for four and five cell rosettes
         MutableVertexMeshWithRosettes<2,2>* p_ref_rosette = ConstructFiveCellRosette();
         MutableVertexMeshWithRosettes<2,2>* p_ref_protorosette = ConstructProtorosette();
@@ -754,6 +756,31 @@ public:
         delete p_ref_protorosette;
         delete p_rosette;
         delete p_protorosette;
+    }
+
+    void TestEnsureCoverangeWhenHandlingAdditionalReMeshingBehaviour() throw (Exception)
+    {
+        /**
+         * When checking for set intersections, there is a 50/50 chance of the correct element being selected first.
+         * To ensure test coverage, both parts of the if/else statement must be triggered, so we can call
+         * HandleAdditionalReMeshingBehaviour() a few times to ensure both scenarios happen.
+         */
+
+        for (unsigned i = 0 ; i < 5 ; i++)
+        {
+            // We also need to create meshes which we will CheckForRosettes
+            MutableVertexMeshWithRosettes<2, 2>* p_rosette = ConstructFiveCellRosette();
+            p_rosette->SetRosetteResolutionProbabilityPerTimestep(1.0);
+
+            MutableVertexMeshWithRosettes<2, 2>* p_protorosette = ConstructProtorosette();
+            p_protorosette->SetProtorosetteResolutionProbabilityPerTimestep(1.0);
+
+            p_rosette->HandleAdditionalReMeshingBehaviour();
+            p_protorosette->HandleAdditionalReMeshingBehaviour();
+
+            delete p_rosette;
+            delete p_protorosette;
+        }
     }
 };
 

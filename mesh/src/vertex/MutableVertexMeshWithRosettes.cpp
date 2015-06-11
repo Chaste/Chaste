@@ -582,9 +582,6 @@ void MutableVertexMeshWithRosettes<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankDe
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMeshWithRosettes<ELEMENT_DIM, SPACE_DIM>::CheckForRosettes()
 {
-    // Rosettes are currently only allowed in two dimensions
-    assert(ELEMENT_DIM==2 && SPACE_DIM==2);
-
     /**
      * First, we loop over each node and populate vectors of protorosette and rosette nodes which need to undergo
      * resolution.
