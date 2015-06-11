@@ -57,7 +57,10 @@ public:
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
-    AbstractFileComparison(const FileFinder& rFileFinder1, const FileFinder& rFileFinder2, bool calledCollectively, bool suppressOutput):
+    AbstractFileComparison(const FileFinder& rFileFinder1,
+                           const FileFinder& rFileFinder2,
+                           bool calledCollectively,
+                           bool suppressOutput):
         mFilename1(rFileFinder1.GetAbsolutePath()),
         mFilename2(rFileFinder2.GetAbsolutePath()),
         mCalledCollectively(calledCollectively),
@@ -75,7 +78,10 @@ public:
      * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
      * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
      */
-    AbstractFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively, bool suppressOutput):
+    AbstractFileComparison(std::string fileName1,
+                           std::string fileName2,
+                           bool calledCollectively,
+                           bool suppressOutput):
         mFilename1(fileName1),
         mFilename2(fileName2),
         mCalledCollectively(calledCollectively),

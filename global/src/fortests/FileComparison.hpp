@@ -268,6 +268,7 @@ public:
             if (failures > 0u && !mSuppressOutput)
             {
 #define COVERAGE_IGNORE
+                // Report the paths to the files
                 TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " differ.");
 #undef COVERAGE_IGNORE
             }
