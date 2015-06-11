@@ -68,7 +68,7 @@ private:
         nodes.push_back(new Node<2>(9, true, 0.30902, -0.95106));
         nodes.push_back(new Node<2>(10, true, 0.80902, -0.58779));
 
-        // Make 5 quadrangular cells
+        // Make 5 quadrangular elements
         std::vector<Node<2>*> nodes_elem_1;
         nodes_elem_1.push_back(nodes[0]);
         nodes_elem_1.push_back(nodes[1]);
@@ -120,7 +120,7 @@ private:
         nodes.push_back(new Node<2>(7, true, 0.00000, -1.00000));
         nodes.push_back(new Node<2>(8, true, 0.70711, -0.70711));
 
-        // Make 4 quadrangular cells
+        // Make 4 quadrangular elements
         std::vector<Node<2>*> nodes_elem_1;
         nodes_elem_1.push_back(nodes[0]);
         nodes_elem_1.push_back(nodes[1]);
@@ -144,6 +144,67 @@ private:
 
         // Make 4 vertex elements
         std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
+
+        return new MutableVertexMeshWithRosettes<2,2>(nodes, vertex_elements);
+    }
+
+    MutableVertexMeshWithRosettes<2,2>* ConstructT1Scenario()
+    {
+        // Make 16 nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 2.0));
+        nodes.push_back(new Node<2>(1, true, 1.0, 1.0));
+        nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 3.0, 2.0));
+        nodes.push_back(new Node<2>(4, true, 2.0, 3.0));
+        nodes.push_back(new Node<2>(5, true, 1.0, 3.0));
+        nodes.push_back(new Node<2>(6, true, 3.0, 0.0));
+        nodes.push_back(new Node<2>(7, true, 4.0, 0.0));
+        nodes.push_back(new Node<2>(8, true, 5.0, 1.0));
+        nodes.push_back(new Node<2>(9, false, 4.0, 2.0));
+        nodes.push_back(new Node<2>(10, true, 5.0, 3.0));
+        nodes.push_back(new Node<2>(11, true, 4.0, 4.0));
+        nodes.push_back(new Node<2>(12, true, 3.0, 4.0));
+        nodes.push_back(new Node<2>(13, true, 6.0, 1.0));
+        nodes.push_back(new Node<2>(14, true, 7.0, 2.0));
+        nodes.push_back(new Node<2>(15, true, 6.0, 3.0));
+
+        // Make 4 quadrangular elements
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[3]);
+        nodes_elem_1.push_back(nodes[4]);
+        nodes_elem_1.push_back(nodes[5]);
+        std::vector<Node<2>*> nodes_elem_2;
+        nodes_elem_2.push_back(nodes[6]);
+        nodes_elem_2.push_back(nodes[7]);
+        nodes_elem_2.push_back(nodes[8]);
+        nodes_elem_2.push_back(nodes[9]);
+        nodes_elem_2.push_back(nodes[3]);
+        nodes_elem_2.push_back(nodes[2]);
+        std::vector<Node<2>*> nodes_elem_3;
+        nodes_elem_3.push_back(nodes[9]);
+        nodes_elem_3.push_back(nodes[10]);
+        nodes_elem_3.push_back(nodes[11]);
+        nodes_elem_3.push_back(nodes[12]);
+        nodes_elem_3.push_back(nodes[4]);
+        nodes_elem_3.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_4;
+        nodes_elem_4.push_back(nodes[13]);
+        nodes_elem_4.push_back(nodes[14]);
+        nodes_elem_4.push_back(nodes[15]);
+        nodes_elem_4.push_back(nodes[10]);
+        nodes_elem_4.push_back(nodes[9]);
+        nodes_elem_4.push_back(nodes[8]);
+
+        // Make 5 vertex elements
+        std::vector<VertexElement<2,2>* > vertex_elements;
         vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
@@ -370,14 +431,34 @@ public:
         }
 
         /**
-         * Check case 4
+         * Check case 4 part 1 (node merge)
          */
+        MutableVertexMeshWithRosettes<2,2>* p_t1_mesh = this->ConstructT1Scenario();
 
         // With ProtorosetteFormationProbability set at 1.0, a node-merge should occur
         mesh.SetProtorosetteFormationProbability(1.0);
-//        mesh.HandleAdditionalRemodellingBehaviour(p_node_a, p_node_b, empty_set, 4);
-//        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocdation()[0], 0.5, 1e-10);
-//        TS_ASSERT_DELTA(mesh.GetNode(0)->rGetLocation()[1], 0.5, 1e-10);
+        p_t1_mesh->HandleAdditionalRemodellingBehaviour(p_t1_mesh->GetNode(3), p_t1_mesh->GetNode(9), empty_set, 4);
+
+        TS_ASSERT_DELTA(p_t1_mesh->GetNode(3)->rGetLocation()[0], 3.5, 1e-10);
+        TS_ASSERT_DELTA(p_t1_mesh->GetNode(3)->rGetLocation()[1], 2.0, 1e-10);
+
+        delete p_t1_mesh;
+
+        /**
+         * Check case 4 part 1 (T1 Swap)
+         */
+        p_t1_mesh = this->ConstructT1Scenario();
+
+        std::set<unsigned> t1_set;
+        t1_set.insert(0);
+        t1_set.insert(1);
+        t1_set.insert(2);
+
+        // With ProtorosetteFormationProbability set at 0.0, a T1 swap should occur
+        p_t1_mesh->SetProtorosetteFormationProbability(0.0);
+        p_t1_mesh->HandleAdditionalRemodellingBehaviour(p_t1_mesh->GetNode(3), p_t1_mesh->GetNode(9), t1_set, 4);
+
+        delete p_t1_mesh;
     }
 
     void TestPerformRosetteRankIncrease() throw (Exception)
@@ -614,8 +695,8 @@ public:
         p_protorosette->SetProtorosetteResolutionProbabilityPerTimestep(0.0);
 
         // Check for rosettes, and then verify that nothing has yet changed
-        p_rosette->CheckForRosettes();
-        p_protorosette->CheckForRosettes();
+        p_rosette->HandleAdditionalReMeshingBehaviour();
+        p_protorosette->HandleAdditionalReMeshingBehaviour();
 
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes(), p_rosette->GetNumNodes());
         for( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
@@ -644,8 +725,8 @@ public:
         p_protorosette->SetProtorosetteResolutionProbabilityPerTimestep(1.0);
 
         // Check for rosettes, and then verify that the number of nodes in each mesh has increased by one
-        p_rosette->CheckForRosettes();
-        p_protorosette->CheckForRosettes();
+        p_rosette->HandleAdditionalReMeshingBehaviour();
+        p_protorosette->HandleAdditionalReMeshingBehaviour();
 
         // In the rosette mesh, all nodes should remain in the same place, except the new one
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes() + 1, p_rosette->GetNumNodes());
