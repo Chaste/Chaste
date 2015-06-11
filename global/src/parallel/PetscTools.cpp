@@ -137,11 +137,12 @@ void PetscTools::Barrier(const std::string callerId)
     if (mPetscIsInitialised && !mIsolateProcesses)
     {
 #ifdef DEBUG_BARRIERS
-        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Pre " << callerId << " Barrier " << mNumBarriers << "." << std::endl << std::flush;
+        // "Before" is alphabetically before "Post" so that one can sort the output on process/event/barrier
+        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Before " << "Barrier " << mNumBarriers << " \""<< callerId <<  "\"." << std::endl << std::flush;
 #endif
         PetscBarrier(PETSC_NULL);
 #ifdef DEBUG_BARRIERS
-        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Post " << callerId << " Barrier " << mNumBarriers++ << "." << std::endl << std::flush;
+        std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Post " << "Barrier " << mNumBarriers++ << " \""<< callerId <<  "\"." << std::endl << std::flush;
 #endif
     }
 }

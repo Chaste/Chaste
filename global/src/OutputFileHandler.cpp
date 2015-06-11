@@ -187,6 +187,8 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
         rel_path.remove_leaf();
     }
 
+    // Make master wait (because other processes may be checking whether a directory exists)
+    PetscTools::Barrier("OutputFileHandler::MakeFoldersAndReturnFullPathBeforeCreation");
     // Are we the master process? Only the master should make any new directories
     if (PetscTools::AmMaster())
     {
