@@ -33,12 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef TESTMUTABLEVERTEXMESHWITHROSETTES_HPP_
-#define TESTMUTABLEVERTEXMESHWITHROSETTES_HPP_
+#ifndef TESTMUTABLEVERTEXMESHROSETTEMETHODS_HPP_
+#define TESTMUTABLEVERTEXMESHROSETTEMETHODS_HPP_
 
 #include <cxxtest/TestSuite.h>
 
-#include "MutableVertexMeshWithRosettes.hpp"
+#include "MutableVertexMesh.hpp"
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -48,11 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-class TestMutableVertexMeshWithRosettes : public CxxTest::TestSuite
+class TestMutableVertexMeshRosetteMethods : public CxxTest::TestSuite
 {
 private:
 
-    MutableVertexMeshWithRosettes<2,2>* ConstructFiveCellRosette()
+    MutableVertexMesh<2,2>* ConstructFiveCellRosette()
     {
         // Make 11 nodes
         std::vector<Node<2>*> nodes;
@@ -103,10 +103,10 @@ private:
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
         vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_5));
 
-        return new MutableVertexMeshWithRosettes<2,2>(nodes, vertex_elements);
+        return new MutableVertexMesh<2,2>(nodes, vertex_elements);
     }
 
-    MutableVertexMeshWithRosettes<2,2>* ConstructProtorosette()
+    MutableVertexMesh<2,2>* ConstructProtorosette()
     {
         // Make 9 nodes
         std::vector<Node<2>*> nodes;
@@ -149,29 +149,29 @@ private:
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
 
-        return new MutableVertexMeshWithRosettes<2,2>(nodes, vertex_elements);
+        return new MutableVertexMesh<2,2>(nodes, vertex_elements);
     }
 
-    MutableVertexMeshWithRosettes<2,2>* ConstructT1Scenario()
+    MutableVertexMesh<2,2>* ConstructT1Scenario()
     {
         // Make 16 nodes
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.0, 2.0));
-        nodes.push_back(new Node<2>(1, true, 1.0, 1.0));
-        nodes.push_back(new Node<2>(2, true, 2.0, 1.0));
-        nodes.push_back(new Node<2>(3, false, 3.0, 2.0));
-        nodes.push_back(new Node<2>(4, true, 2.0, 3.0));
-        nodes.push_back(new Node<2>(5, true, 1.0, 3.0));
-        nodes.push_back(new Node<2>(6, true, 3.0, 0.0));
-        nodes.push_back(new Node<2>(7, true, 4.0, 0.0));
-        nodes.push_back(new Node<2>(8, true, 5.0, 1.0));
-        nodes.push_back(new Node<2>(9, false, 4.0, 2.0));
-        nodes.push_back(new Node<2>(10, true, 5.0, 3.0));
-        nodes.push_back(new Node<2>(11, true, 4.0, 4.0));
-        nodes.push_back(new Node<2>(12, true, 3.0, 4.0));
-        nodes.push_back(new Node<2>(13, true, 6.0, 1.0));
-        nodes.push_back(new Node<2>(14, true, 7.0, 2.0));
-        nodes.push_back(new Node<2>(15, true, 6.0, 3.0));
+        nodes.push_back(new Node<2>(0, false, 0.0, 2.0));
+        nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
+        nodes.push_back(new Node<2>(2, false, 2.0, 1.0));
+        nodes.push_back(new Node<2>(3, false, 3.499, 2.0));
+        nodes.push_back(new Node<2>(4, false, 2.0, 3.0));
+        nodes.push_back(new Node<2>(5, false, 1.0, 3.0));
+        nodes.push_back(new Node<2>(6, false, 3.0, 0.0));
+        nodes.push_back(new Node<2>(7, false, 4.0, 0.0));
+        nodes.push_back(new Node<2>(8, false, 5.0, 1.0));
+        nodes.push_back(new Node<2>(9, false, 3.501, 2.0));
+        nodes.push_back(new Node<2>(10, false, 5.0, 3.0));
+        nodes.push_back(new Node<2>(11, false, 4.0, 4.0));
+        nodes.push_back(new Node<2>(12, false, 3.0, 4.0));
+        nodes.push_back(new Node<2>(13, false, 6.0, 1.0));
+        nodes.push_back(new Node<2>(14, false, 7.0, 2.0));
+        nodes.push_back(new Node<2>(15, false, 6.0, 3.0));
 
         // Make 4 quadrangular elements
         std::vector<Node<2>*> nodes_elem_1;
@@ -210,14 +210,14 @@ private:
         vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
         vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
 
-        return new MutableVertexMeshWithRosettes<2,2>(nodes, vertex_elements);
+        return new MutableVertexMesh<2,2>(nodes, vertex_elements);
     }
 
 public:
 
     void TestSetAndGetMethods() throw (Exception)
     {
-        MutableVertexMeshWithRosettes<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
         // Use all three set methods
         p_mesh->SetProtorosetteFormationProbability(0.123);
@@ -249,7 +249,7 @@ public:
         ArchiveLocationInfo::SetMeshFilename("mvmwr");
 
         // Create mesh
-        MutableVertexMeshWithRosettes<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
         // Set member variables
         p_mesh->SetProtorosetteFormationProbability(0.123);
@@ -293,8 +293,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_abstract_mesh_2;
 
-            MutableVertexMeshWithRosettes<2,2>* p_mesh_original = static_cast<MutableVertexMeshWithRosettes<2,2>*>(p_abstract_mesh);
-            MutableVertexMeshWithRosettes<2,2>* p_mesh_loaded = static_cast<MutableVertexMeshWithRosettes<2,2>*>(p_abstract_mesh_2);
+            MutableVertexMesh<2,2>* p_mesh_original = static_cast<MutableVertexMesh<2,2>*>(p_abstract_mesh);
+            MutableVertexMesh<2,2>* p_mesh_loaded = static_cast<MutableVertexMesh<2,2>*>(p_abstract_mesh_2);
 
             // Test member variables were archived correctly
             TS_ASSERT_DELTA(p_mesh_original->GetProtorosetteFormationProbability(), 0.123, 1e-10);
@@ -345,8 +345,13 @@ public:
 
     void TestHandleHighOrderJunctions() throw (Exception)
     {
+        /*
+         * We test the method HandleHighOrderJunctions by calling IdentifySwapType on a mesh with suitable nodes,
+         * i.e. when at least one node is contained in more than three elements.
+         */
+
         // Make an empty mesh
-        MutableVertexMeshWithRosettes<2,2> mesh;
+        MutableVertexMesh<2,2> mesh;
 
         // Add 6 nodes, three each for two triangular elements
         mesh.AddNode(new Node<2>(0, true, 0.0, 0.0));
@@ -367,104 +372,38 @@ public:
         nodes_elem_2.push_back(mesh.GetNode(4));
         nodes_elem_2.push_back(mesh.GetNode(5));
 
-        // Add three copies of each element to the mesh
+        // Add four copies of each element to the mesh
         mesh.AddElement(new VertexElement<2,2>(0, nodes_elem_1));
         mesh.AddElement(new VertexElement<2,2>(1, nodes_elem_1));
         mesh.AddElement(new VertexElement<2,2>(2, nodes_elem_1));
+        mesh.AddElement(new VertexElement<2,2>(3, nodes_elem_1));
 
-        mesh.AddElement(new VertexElement<2,2>(3, nodes_elem_2));
         mesh.AddElement(new VertexElement<2,2>(4, nodes_elem_2));
         mesh.AddElement(new VertexElement<2,2>(5, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2,2>(6, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2,2>(7, nodes_elem_2));
 
         // Get pointers to our two test-nodes
         Node<2>* p_node_0 = mesh.GetNode(0);
         Node<2>* p_node_5 = mesh.GetNode(5);
 
         /**
-         * At this point, nodes 0 and 5, say, are in three elements and HandleHighOrderJunctions() should
-         * throw an exception
+         * Both node 0 and node 5 will be contained in four elements, and we expect an exception to be thrown
          */
-        TS_ASSERT_THROWS_THIS(mesh.HandleHighOrderJunctions(p_node_0, p_node_5), "Neither node is high order");
-
-        /**
-         * If we now make a further copy of each element containing, both node 0 and node 5 will be contained in four
-         * elements, and we expect an exception to be thrown
-         */
-        mesh.AddElement(new VertexElement<2,2>(6, nodes_elem_1));
-        mesh.AddElement(new VertexElement<2,2>(7, nodes_elem_2));
-        TS_ASSERT_THROWS_THIS(mesh.HandleHighOrderJunctions(p_node_0, p_node_5), "Both nodes involved in a swap event are contained in more than three elements");
+        TS_ASSERT_THROWS_THIS(mesh.IdentifySwapType(p_node_0, p_node_5), "Both nodes involved in a swap event are contained in more than three elements");
 
         /**
          * If we now delete element 7, node 0 will still be contained in four elements while node 5 will only be
          * contained in three.  This is expected behaviour and so no exception should be thrown.
          */
         mesh.DeleteElementPriorToReMesh(7);
-        TS_ASSERT_THROWS_NOTHING(mesh.HandleHighOrderJunctions(p_node_0, p_node_5));
-    }
-
-    void TestHandleAdditionalRemodellingBehaviour() throw (Exception)
-    {
-        // Make an empty mesh
-        MutableVertexMeshWithRosettes<2,2> mesh;
-
-        // Add 2 nodes
-        mesh.AddNode(new Node<2>(0, true, 0.0, 0.0));
-        mesh.AddNode(new Node<2>(1, true, 1.0, 0.0));
-
-        // Get pointers to the two nodes
-        Node<2>* p_node_a = mesh.GetNode(0);
-        Node<2>* p_node_b = mesh.GetNode(1);
-
-        // Create an empty set
-        std::set<unsigned> empty_set;
-
-        // Check that, for all case numbers not equal to four, we trigger the exception
-        for( unsigned case_num = 0 ; case_num < 10 ; case_num++ )
-        {
-            if(case_num == 4)
-            {
-                continue;
-            }
-
-            TS_ASSERT_THROWS_THIS(mesh.HandleAdditionalRemodellingBehaviour(p_node_a, p_node_b, empty_set, case_num),
-                                  "No functionality for this case yet");
-        }
-
-        /**
-         * Check case 4 part 1 (node merge)
-         */
-        MutableVertexMeshWithRosettes<2,2>* p_t1_mesh = this->ConstructT1Scenario();
-
-        // With ProtorosetteFormationProbability set at 1.0, a node-merge should occur
-        mesh.SetProtorosetteFormationProbability(1.0);
-        p_t1_mesh->HandleAdditionalRemodellingBehaviour(p_t1_mesh->GetNode(3), p_t1_mesh->GetNode(9), empty_set, 4);
-
-        TS_ASSERT_DELTA(p_t1_mesh->GetNode(3)->rGetLocation()[0], 3.5, 1e-10);
-        TS_ASSERT_DELTA(p_t1_mesh->GetNode(3)->rGetLocation()[1], 2.0, 1e-10);
-
-        delete p_t1_mesh;
-
-        /**
-         * Check case 4 part 1 (T1 Swap)
-         */
-        p_t1_mesh = this->ConstructT1Scenario();
-
-        std::set<unsigned> t1_set;
-        t1_set.insert(0);
-        t1_set.insert(1);
-        t1_set.insert(2);
-
-        // With ProtorosetteFormationProbability set at 0.0, a T1 swap should occur
-        p_t1_mesh->SetProtorosetteFormationProbability(0.0);
-        p_t1_mesh->HandleAdditionalRemodellingBehaviour(p_t1_mesh->GetNode(3), p_t1_mesh->GetNode(9), t1_set, 4);
-
-        delete p_t1_mesh;
+        TS_ASSERT_THROWS_NOTHING(mesh.IdentifySwapType(p_node_0, p_node_5));
     }
 
     void TestPerformRosetteRankIncrease() throw (Exception)
     {
         // Create the standard five-cell rosette
-        MutableVertexMeshWithRosettes<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
         /**
          * Modify the mesh to incorporate an additional element which will go on to increase the rosette rank
@@ -537,7 +476,7 @@ public:
     void TestPerformProtorosetteResolution() throw (Exception)
     {
         // Let us first create a protorosette
-        MutableVertexMeshWithRosettes<2,2>* p_mesh = ConstructProtorosette();
+        MutableVertexMesh<2,2>* p_mesh = ConstructProtorosette();
 
         VertexElement<2,2>* p_elem_0 = p_mesh->GetElement(0);
         VertexElement<2,2>* p_elem_1 = p_mesh->GetElement(1);
@@ -622,7 +561,7 @@ public:
     void TestPerformRosetteRankDecrease() throw (Exception)
     {
         // Let us first create a protorosette
-        MutableVertexMeshWithRosettes<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
 
         Node<2>* p_node_0 = p_mesh->GetNode(0);
 
@@ -678,17 +617,15 @@ public:
         delete p_mesh;
     }
 
-    void TestHandleAdditionalReMeshingBehaviour() throw (Exception)
+    void TestCheckForRosettes() throw (Exception)
     {
-        // HandleAdditionalReMeshingBehaviour() calls CheckForRosettes(), so no need for an additional test for that
-
         // Let us first create reference meshes for four and five cell rosettes
-        MutableVertexMeshWithRosettes<2,2>* p_ref_rosette = ConstructFiveCellRosette();
-        MutableVertexMeshWithRosettes<2,2>* p_ref_protorosette = ConstructProtorosette();
+        MutableVertexMesh<2,2>* p_ref_rosette = ConstructFiveCellRosette();
+        MutableVertexMesh<2,2>* p_ref_protorosette = ConstructProtorosette();
 
         // We also need to create meshes which we will CheckForRosettes
-        MutableVertexMeshWithRosettes<2,2>* p_rosette = ConstructFiveCellRosette();
-        MutableVertexMeshWithRosettes<2,2>* p_protorosette = ConstructProtorosette();
+        MutableVertexMesh<2,2>* p_rosette = ConstructFiveCellRosette();
+        MutableVertexMesh<2,2>* p_protorosette = ConstructProtorosette();
 
         /**
          * Initially, set the parameters such that nothing should happen when we check for rosettes
@@ -697,8 +634,8 @@ public:
         p_protorosette->SetProtorosetteResolutionProbabilityPerTimestep(0.0);
 
         // Check for rosettes, and then verify that nothing has yet changed
-        p_rosette->HandleAdditionalReMeshingBehaviour();
-        p_protorosette->HandleAdditionalReMeshingBehaviour();
+        p_rosette->CheckForRosettes();
+        p_protorosette->CheckForRosettes();
 
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes(), p_rosette->GetNumNodes());
         for( unsigned node_idx = 0 ; node_idx < p_ref_rosette->GetNumNodes() ; node_idx++ )
@@ -727,8 +664,8 @@ public:
         p_protorosette->SetProtorosetteResolutionProbabilityPerTimestep(1.0);
 
         // Check for rosettes, and then verify that the number of nodes in each mesh has increased by one
-        p_rosette->HandleAdditionalReMeshingBehaviour();
-        p_protorosette->HandleAdditionalReMeshingBehaviour();
+        p_rosette->CheckForRosettes();
+        p_protorosette->CheckForRosettes();
 
         // In the rosette mesh, all nodes should remain in the same place, except the new one
         TS_ASSERT_EQUALS(p_ref_rosette->GetNumNodes() + 1, p_rosette->GetNumNodes());
@@ -758,30 +695,47 @@ public:
         delete p_protorosette;
     }
 
-    void TestEnsureCoverangeWhenHandlingAdditionalReMeshingBehaviour() throw (Exception)
+    void TestEnsureCoverangeWhenCheckingForRosettes() throw (Exception)
     {
         /**
          * When checking for set intersections, there is a 50/50 chance of the correct element being selected first.
          * To ensure test coverage, both parts of the if/else statement must be triggered, so we can call
-         * HandleAdditionalReMeshingBehaviour() a few times to ensure both scenarios happen.
+         * CheckForRosettes() a few times to ensure both scenarios happen.
          */
 
-        for (unsigned i = 0 ; i < 5 ; i++)
+        for (unsigned i = 0 ; i < 7 ; i++)
         {
             // We also need to create meshes which we will CheckForRosettes
-            MutableVertexMeshWithRosettes<2, 2>* p_rosette = ConstructFiveCellRosette();
+            MutableVertexMesh<2, 2>* p_rosette = ConstructFiveCellRosette();
             p_rosette->SetRosetteResolutionProbabilityPerTimestep(1.0);
 
-            MutableVertexMeshWithRosettes<2, 2>* p_protorosette = ConstructProtorosette();
+            MutableVertexMesh<2, 2>* p_protorosette = ConstructProtorosette();
             p_protorosette->SetProtorosetteResolutionProbabilityPerTimestep(1.0);
 
-            p_rosette->HandleAdditionalReMeshingBehaviour();
-            p_protorosette->HandleAdditionalReMeshingBehaviour();
+            p_rosette->CheckForRosettes();
+            p_protorosette->CheckForRosettes();
 
             delete p_rosette;
             delete p_protorosette;
         }
     }
+
+    void TestPerformProtorosetteFormationInIdentifySwapType() throw (Exception)
+    {
+        MutableVertexMesh<2, 2>* p_mesh = this->ConstructT1Scenario();
+
+        // This will ensure the test against a random number will pass
+        p_mesh->SetProtorosetteFormationProbability(1.0);
+
+        Node<2>* p_node_3 = p_mesh->GetNode(3);
+        Node<2>* p_node_9 = p_mesh->GetNode(9);
+
+        // We should now be in Case 4 of IdentifySwapType, and a node merge should be triggered
+        p_mesh->IdentifySwapType(p_node_3, p_node_9);
+
+        TS_ASSERT_DELTA(p_node_3->rGetLocation()[0], 3.5, 1e-10);
+        TS_ASSERT_DELTA(p_node_3->rGetLocation()[1], 2.0, 1e-10);
+    }
 };
 
-#endif /*TESTMUTABLEVERTEXMESHWITHROSETTES_HPP_*/
+#endif /*TESTMUTABLEVERTEXMESHROSETTEMETHODS_HPP_*/

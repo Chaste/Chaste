@@ -1120,59 +1120,6 @@ public:
         TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "There are non-boundary nodes contained only in two elements; something has gone wrong.");
     }
 
-    void TestReMeshExceptionWhenNodeIsContainedInMoreThanThreeElements() throw(Exception)
-    {
-        /*
-         * Create a mesh in which a node is contained in four elements, as shown below. We will test that
-         * the correct exception is thrown when ReMesh() is called on this mesh when we attempt to merge
-         * this node with its close neighbour to the right.
-         *  _________
-         * |    |   /
-         * |    |  /
-         * |____|_/
-         * |    | \
-         * |    |  \
-         * |____|___\
-         */
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true,  0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true,  1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true,  2.0, 0.0));
-        nodes.push_back(new Node<2>(3, true,  1.1, 1.0));
-        nodes.push_back(new Node<2>(4, true,  2.0, 2.0));
-        nodes.push_back(new Node<2>(5, true,  1.0, 2.0));
-        nodes.push_back(new Node<2>(6, true,  0.0, 2.0));
-        nodes.push_back(new Node<2>(7, true,  0.0, 1.0));
-        nodes.push_back(new Node<2>(8, false, 1.0, 1.0));
-
-        std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3;
-        unsigned node_indices_element_0[4] = {0, 1, 8, 7};
-        unsigned node_indices_element_1[4] = {1, 2, 3, 8};
-        unsigned node_indices_element_2[4] = {8, 3, 4, 5};
-        unsigned node_indices_element_3[4] = {7, 8, 5, 6};
-        for (unsigned i=0; i<4; i++)
-        {
-            nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
-            nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
-            nodes_in_element2.push_back(nodes[node_indices_element_2[i]]);
-            nodes_in_element3.push_back(nodes[node_indices_element_3[i]]);
-        }
-
-        std::vector<VertexElement<2,2>* > elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
-
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
-        vertex_mesh.SetCellRearrangementThreshold(0.2);
-
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 9u);
-        TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 4u);
-
-        TS_ASSERT_THROWS_THIS(vertex_mesh.ReMesh(), "A node is contained in more than three elements");
-    }
-
     void TestIdentifySwapTypeExceptionWhenBoundaryNodeIsContainedInThreeElements() throw(Exception)
     {
         /*

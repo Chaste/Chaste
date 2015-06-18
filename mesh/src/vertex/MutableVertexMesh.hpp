@@ -49,6 +49,7 @@ class VertexMeshWriter;
 #include <boost/serialization/split_member.hpp>
 
 #include "VertexMesh.hpp"
+#include "RandomNumberGenerator.hpp"
 
 /**
  * A mutable vertex-based mesh class, which inherits from VertexMesh and allows for local
@@ -65,6 +66,7 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMutableVertexMesh;
     friend class TestMutableVertexMeshReMesh;
+    friend class TestMutableVertexMeshRosetteMethods;
 
 protected:
 
@@ -79,6 +81,15 @@ protected:
 
     /** The area threshold at which T2 swaps occur in an apoptotic, triangular cell/element. */
     double mT2Threshold;
+
+    /** The probability that, instead of a T1 swap, the relevant nodes merge to form a protorosette */
+    double mProtorosetteFormationProbability;
+
+    /** The probability that, in a given timestep, a protorosette node resolves into two rank-3 nodes */
+    double mProtorosetteResolutionProbabilityPerTimestep;
+
+    /** The probability that, in a given timestep, a rosette node resolves into two lower-rank nodes */
+    double mRosetteResolutionProbabilityPerTimestep;
 
     /** Whether to check for edges intersections (true) or not (false). */
     bool mCheckForInternalIntersections;
@@ -244,26 +255,48 @@ protected:
     virtual void HandleHighOrderJunctions(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
     /**
-     * Helper method for ReMesh(), called by IdentifySwapType().
+     * Helper method for ReMesh(), called by HandleHighOrderJunctions().
      *
-     * Handles different cases where the nodes involved in a potential swap are both
-     * contained in three or fewer elements. This is implemented in a separate method
-     * to allow child classes to override the standard behaviour (see #2664).
+     * Merge a node of a non-rosette cell with the central node
+     * of a rosette, by replacing the node in the non-rosette
+     * cell with that of the rosette centre, keeping the rosette
+     * centre in the same position.
      *
-     * @param pNodeA one of the nodes to perform the swap with
-     * @param pNodeB the other node to perform the swap
-     * @param elemIndices indices of elements touching nodes potentially involved in swap
-     * @param caseNumber the case corresponding to location within IdentifySwapType()
+     * @param pNodeA one of the nodes to perform the merge with
+     * @param pNodeB the other node to perform the merge with
      */
-    virtual void HandleAdditionalRemodellingBehaviour(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB, std::set<unsigned> elemIndices, unsigned caseNumber);
+    void PerformRosetteRankIncrease(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB);
 
     /**
-     * Helper method called by ReMesh().
+     * Helper method for ReMesh(), called by CheckForRosettes().
      *
-     * Handles any additional ReMeshing operations beyond CheckForSwapsFromShortEdges() and CheckForIntersections().
-     * This is implemented in a separate method to allow child classes to override the standard behaviour (see #2664).
+     * Split protorosette in random direction.
+     * Create new node and redistribute nodes along line joining
+     * centres of randomly selected cell and cell opposite it.
+     *
+     * @param pProtorosetteNode node at centre of protorosette
      */
-    virtual void HandleAdditionalReMeshingBehaviour();
+    void PerformProtorosetteResolution(Node<SPACE_DIM>* pProtorosetteNode);
+
+    /**
+     * Helper method for ReMesh(), called by CheckForRosettes().
+     *
+     * Split rosette by removing one cell at random.
+     * Create new node positioned along line joining
+     * rosette node and centre of randomly selected cell.
+     * Rosette node will remain unmoved.
+     *
+     * @param pRosetteNode node at centre of rosette
+     */
+    void PerformRosetteRankDecrease(Node<SPACE_DIM>* pRosetteNode);
+
+    /**
+     * Helper method for ReMesh().
+     *
+     * Check whether the mesh contains rosettes or protorosettes, and implement resolution events
+     * if necessary.
+     */
+    void CheckForRosettes();
 
     /**
      * Helper method for ReMesh(), called by PerformT3Swap(). During T3 swaps nodes are merged onto edges. This
@@ -299,6 +332,9 @@ protected:
         archive & mCellRearrangementThreshold;
         archive & mCellRearrangementRatio;
         archive & mT2Threshold;
+        archive & mProtorosetteFormationProbability;
+        archive & mProtorosetteResolutionProbabilityPerTimestep;
+        archive & mRosetteResolutionProbabilityPerTimestep;
         archive & mCheckForInternalIntersections;
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
@@ -323,7 +359,10 @@ public:
                       std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
                       double cellRearrangementThreshold=0.01,
                       double t2Threshold=0.001,
-                      double cellRearrangementRatio=1.5);
+                      double cellRearrangementRatio=1.5,
+                      double protorosetteFormationProbability=0.0,
+                      double protorosetteResolutionProbabilityPerTimestep=0.0,
+                      double rosetteResolutionProbabilityPerTimestep=0.0);
 
     /**
      * Default constructor for use by serializer.
@@ -357,6 +396,27 @@ public:
     void SetCellRearrangementRatio(double cellRearrangementRatio);
 
     /**
+     * Set method for mProtoRosetteFormationProbability.
+     *
+     * @param protorosetteFormationProbability the new value of mProtoRosetteFormationProbability
+     */
+    void SetProtorosetteFormationProbability(double protorosetteFormationProbability);
+
+    /**
+     * Set method for mProtoRosetteResolutionProbabilityPerTimestep.
+     *
+     * @param protorosetteResolutionProbabilityPerTimestep the new value of mProtoRosetteResolutionProbabilityPerTimestep
+     */
+    void SetProtorosetteResolutionProbabilityPerTimestep(double protorosetteResolutionProbabilityPerTimestep);
+
+    /**
+     * Set method for mRosetteResolutionProbabilityPerTimestep.
+     *
+     * @param rosetteResolutionProbabilityPerTimestep the new value of mRosetteResolutionProbabilityPerTimestep
+     */
+    void SetRosetteResolutionProbabilityPerTimestep(double rosetteResolutionProbabilityPerTimestep);
+
+    /**
      * Move the node with a particular index to a new point in space.
      *
      * @param nodeIndex the index of the node to be moved
@@ -385,6 +445,27 @@ public:
      * @return mCellRearrangementRatio
      */
     double GetCellRearrangementRatio() const;
+
+    /**
+     * Get method for mProtoRosetteFormationProbability.
+     *
+     * @return mProtoRosetteFormationProbability
+     */
+    double GetProtorosetteFormationProbability() const;
+
+    /**
+     * Get method for mProtoRosetteResolutionProbabilityPerTimestep.
+     *
+     * @return mProtoRosetteResolutionProbabilityPerTimestep
+     */
+    double GetProtorosetteResolutionProbabilityPerTimestep() const;
+
+    /**
+     * Get method for mRosetteResolutionProbabilityPerTimestep.
+     *
+     * @return mRosetteResolutionProbabilityPerTimestep
+     */
+    double GetRosetteResolutionProbabilityPerTimestep() const;
 
     /**
      * @return the number of Nodes in the mesh.

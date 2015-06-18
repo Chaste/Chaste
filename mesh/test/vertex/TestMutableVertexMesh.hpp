@@ -1807,47 +1807,7 @@ public:
 
     void TestHandleHighOrderJunctions()
     {
-        /*
-         * Create simple mesh to test exception in HandleHighOrderJunnctions()
-         */
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 0.1, 0.0));
-        nodes.push_back(new Node<2>(2, false, 0.1, 0.1));
-        nodes.push_back(new Node<2>(3, false, 0.0, 0.1));
-
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
-
-        MutableVertexMesh<2,2> mesh(nodes, elements);
-
-        TS_ASSERT_THROWS_THIS(mesh.HandleHighOrderJunctions(nodes[0],nodes[1]), "A node is contained in more than three elements");
-    }
-
-    void TestHandleAdditionalRemodellingBehaviour()
-    {
-        /*
-         * Create simple mesh to test exception in HandleAdditionalRemodellingBehavour()
-         */
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, false, 0.1, 0.0));
-        nodes.push_back(new Node<2>(2, false, 0.1, 0.1));
-        nodes.push_back(new Node<2>(3, false, 0.0, 0.1));
-
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
-
-        MutableVertexMesh<2,2> mesh(nodes, elements);
-
-        std::set<unsigned> set;
-
-        // Test that case 4 doesn't throw exception
-        TS_ASSERT_THROWS_NOTHING(mesh.HandleAdditionalRemodellingBehaviour(nodes[0], nodes[1], set, 4));
-
-        // Test that case 3 does throw exception
-        TS_ASSERT_THROWS_THIS(mesh.HandleAdditionalRemodellingBehaviour(nodes[0], nodes[1], set, 3),
-            "No functionality for this case yet");
+        //\todo need to re-implement this
     }
 };
 
