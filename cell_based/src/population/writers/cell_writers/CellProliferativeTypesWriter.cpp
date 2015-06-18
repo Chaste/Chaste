@@ -86,7 +86,7 @@ void CellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCe
     }
     if (pCell->HasCellProperty<ApoptoticCellProperty>() || pCell->HasApoptosisBegun())
     {
-        ///\todo: replace this hard-coded 6 with the ApoptoticCellProperty member mColour?
+        ///\todo: replace this hard-coded 6 with the ApoptoticCellProperty member mColour? (#2512)
         colour = 6;
     }
 

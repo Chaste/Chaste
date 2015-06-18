@@ -573,17 +573,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
                 AcceptPopulationWriter(*pop_writer_iter);
             }
 
-            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
-                 cell_iter != this->End();
-                 ++cell_iter)
-            {
-                for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
-                     cell_writer_iter != mCellWriters.end();
-                     ++cell_writer_iter)
-                {
-                    AcceptCellWriter(*cell_writer_iter, *cell_iter);
-                }
-            }
+            AcceptCellWritersAcrossPopulation();
 
             // The top-most process adds a newline
             if (PetscTools::AmTopMost())
@@ -635,6 +625,22 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
     if (SPACE_DIM > 1)
     {
        WriteVtkResultsToFile(rDirectory);
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWritersAcrossPopulation()
+{
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = mCellWriters.begin();
+             cell_writer_iter != mCellWriters.end();
+             ++cell_writer_iter)
+        {
+            AcceptCellWriter(*cell_writer_iter, *cell_iter);
+        }
     }
 }
 

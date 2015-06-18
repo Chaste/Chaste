@@ -185,6 +185,14 @@ protected:
      */
     AbstractCellPopulation(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
+    /**
+     * Call #AcceptCellWriter across the whole population.
+     *
+     * By default the implementation here iterates over the cell population,
+     * but this is overridden in some classes that need to go over nodes.
+     */
+    virtual void AcceptCellWritersAcrossPopulation();
+
 public:
 
     /**

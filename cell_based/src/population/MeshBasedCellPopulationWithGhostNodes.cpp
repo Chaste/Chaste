@@ -303,6 +303,27 @@ std::set<unsigned> MeshBasedCellPopulationWithGhostNodes<DIM>::GetNeighbouringLo
 }
 
 template<unsigned DIM>
+void MeshBasedCellPopulationWithGhostNodes<DIM>::AcceptCellWritersAcrossPopulation()
+{
+    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        // If it isn't a ghost node then there might be cell writers attached
+        if (! this->IsGhostNode(node_iter->GetIndex()))
+        {
+            for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+                 cell_writer_iter != this->mCellWriters.end();
+                 ++cell_writer_iter)
+            {
+                CellPtr cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
+                this->AcceptCellWriter(*cell_writer_iter, cell_from_node);
+            }
+        }
+    }
+}
+
+template<unsigned DIM>
 void MeshBasedCellPopulationWithGhostNodes<DIM>::UpdateNodeLocations(double dt)
 {
     // First update ghost positions first because they do not affect the real cells

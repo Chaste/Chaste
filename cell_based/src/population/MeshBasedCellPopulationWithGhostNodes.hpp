@@ -108,6 +108,15 @@ private:
      */
     void Validate();
 
+protected:
+    /**
+     * Overridden method
+     *
+     * Calls #AcceptCellWriter across the whole population,
+     * iterating in an appropriate way to skip ghost nodes.
+     */
+    virtual void AcceptCellWritersAcrossPopulation();
+
 public:
 
     /**

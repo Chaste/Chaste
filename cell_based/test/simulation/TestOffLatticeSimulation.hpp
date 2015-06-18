@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "ChemotacticForce.hpp"
 #include "RandomCellKiller.hpp"
@@ -495,7 +496,7 @@ public:
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
-        // Load Mesh
+        // Load mesh
         TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
         MutableMesh<2,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -526,7 +527,7 @@ public:
 
         simulator.Solve();
 
-        // Check that nodes are all sat at resting length  (1.0) apart.
+        // Check that nodes are all sat at resting length (1.0) apart
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(0)->rGetLocation()-simulator.rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(1)->rGetLocation()-simulator.rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
         TS_ASSERT_DELTA(norm_2(simulator.rGetCellPopulation().GetNode(2)->rGetLocation()-simulator.rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
@@ -1146,6 +1147,71 @@ public:
 
         // Check that the number of nodes is equal to the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
+    }
+
+    void TestWriterIteratorsWithCellDeath() throw(Exception)
+    {
+        /*
+         * This test was added because of the issue raised by #2422 and #2689,
+         * where cell mutation state labels appear to flip between cells when
+         * the output of a cell-based simulation is visualized.
+         *
+         * This issue occurred because, for a MeshBasedCellPopulation, the
+         * NodeLocationWriter wrote each line of its file using the NodeIterator
+         * on pCellPopulation->rGetMesh(), while the CellProliferativeTypesWriter
+         * writes each line using the AbstractCellPopulation iterator.
+         */
+        EXIT_IF_PARALLEL;
+
+        HoneycombMeshGenerator generator(10,10);
+        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(5);
+
+        MAKE_PTR(ApcOneHitCellMutationState, p_mute_state);
+        MAKE_PTR(WildTypeCellMutationState, p_wild_state);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+
+        std::vector<CellPtr> cells;
+
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        {
+            StochasticDurationCellCycleModel* p_model = new StochasticDurationCellCycleModel();
+            p_model->SetDimension(2);
+            CellPtr p_cell(new Cell(p_wild_state, p_model));
+            p_cell->SetCellProliferativeType(p_transit_type);
+            cells.push_back(p_cell);
+        }
+
+        cells[27]->SetMutationState(p_mute_state);
+        cells[34]->SetMutationState(p_mute_state);
+        cells[55]->SetMutationState(p_mute_state);
+
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestWriterIteratorsWithCellDeath");
+        simulator.SetSamplingTimestepMultiple(12);
+        simulator.SetEndTime(15);
+
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(3);
+        simulator.AddForce(p_linear_force);
+
+        MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&cell_population, 0.01));
+        simulator.AddCellKiller(p_killer);
+
+        simulator.Solve();
+
+        FileFinder generated_type_file("TestWriterIteratorsWithCellDeath/results_from_time_0/results.vizcelltypes", RelativeTo::ChasteTestOutput);
+        FileFinder generated_node_file("TestWriterIteratorsWithCellDeath/results_from_time_0/results.viznodes", RelativeTo::ChasteTestOutput);
+
+        FileFinder reference_type_file("cell_based/test/data/TestWriterIteratorsWithCellDeath/results.vizcelltypes",RelativeTo::ChasteSourceRoot);
+        FileFinder reference_node_file("cell_based/test/data/TestWriterIteratorsWithCellDeath/results.viznodes",RelativeTo::ChasteSourceRoot);
+
+        FileComparison type_files(generated_type_file,reference_type_file);
+        FileComparison node_files(generated_node_file,reference_node_file);
+
+        TS_ASSERT(type_files.CompareFiles());
+        TS_ASSERT(node_files.CompareFiles());
     }
 };
 
