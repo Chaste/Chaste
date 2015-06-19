@@ -735,6 +735,8 @@ public:
 
         TS_ASSERT_DELTA(p_node_3->rGetLocation()[0], 3.5, 1e-10);
         TS_ASSERT_DELTA(p_node_3->rGetLocation()[1], 2.0, 1e-10);
+
+        delete p_mesh;
     }
 };
 
