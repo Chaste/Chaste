@@ -158,7 +158,7 @@ std::vector<c_vector<double, 2> > VoronoiVertexMeshGenerator::GetElementCentroid
 
         // Account for possible wrap-around in the y-direction
         if (this_centroid[1] < 0.0)
-        {#
+        {
             this_centroid[1] += mMultiplierInY;
         }
         else if (this_centroid[1] > mMultiplierInY)
