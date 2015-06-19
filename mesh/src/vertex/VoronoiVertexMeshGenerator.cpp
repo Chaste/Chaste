@@ -158,7 +158,7 @@ std::vector<c_vector<double, 2> > VoronoiVertexMeshGenerator::GetElementCentroid
 
         // Account for possible wrap-around in the y-direction
         if (this_centroid[1] < 0.0)
-        {
+        {#
             this_centroid[1] += mMultiplierInY;
         }
         else if (this_centroid[1] > mMultiplierInY)
@@ -192,8 +192,8 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
     for (unsigned point_idx = 0 ; point_idx < rSeedLocations.size() ; point_idx++)
     {
         // Calculate the correct integer gridpoints
-        int point_x = int(round(rSeedLocations[point_idx][0] * mSamplingMultiplier));
-        int point_y = int(round(rSeedLocations[point_idx][1] * mSamplingMultiplier));
+        int point_x = int( floor( (rSeedLocations[point_idx][0] * mSamplingMultiplier) + 0.5) );
+        int point_y = int( floor( (rSeedLocations[point_idx][1] * mSamplingMultiplier) + 0.5) );
 
         points.push_back( boost_point(point_x, point_y) );
     }
@@ -363,8 +363,8 @@ void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()
     mSamplingMultiplier = 0.5 * double(INT_MAX);
 
     // The max integer that a seed point could be mapped to when discretising
-    mMaxIntX = int(round(mMultiplierInX * mSamplingMultiplier));
-    mMaxIntY = int(round(mMultiplierInY * mSamplingMultiplier));
+    mMaxIntX = int( floor( (mMultiplierInX * mSamplingMultiplier) + 0.5 ) );
+    mMaxIntY = int( floor( (mMultiplierInY * mSamplingMultiplier) + 0.5 ) );
 }
 
 void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<double, 2> >& rSeedLocations)
