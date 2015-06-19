@@ -354,6 +354,12 @@ public:
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
      * @param cellRearrangementRatio ratio between the minimum threshold distance for element
      *                                rearrangement node separation after remeshing (defaults to 1.5)
+     * @param protorosetteFormationProbability the probability of a protorosette formation event happening instead of
+     *                                a T1 swap
+     * @param protorosetteResolutionProbabilityPerTimestep the probability that, in a given timestep, a protorosette
+     *                                will resolve (similar to the completion of a T1 swap)
+     * @param rosetteResolutionProbabilityPerTimestep the probability that, in a given timestep, a rosette will
+     *                                resolve (reduce the number of cells sharing a common vertex by 1)
      */
     MutableVertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                       std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> vertexElements,
