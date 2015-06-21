@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "Debug.hpp"
 
@@ -211,6 +212,40 @@ public:
         TS_ASSERT_DELTA(points[0][1], 1.0, 1e-10);
         TS_ASSERT_DELTA(points[1][0], 1.5 / (sampling_multiplier * sqrt(2.0)), 1e-10);
         TS_ASSERT_DELTA(points[1][1], 1.5 / (sampling_multiplier * sqrt(2.0)), 1e-10);
+
+#endif // BOOST_VERSION >= 105200
+    }
+
+    void TestGetToroidalMesh() throw(Exception)
+    {
+#if BOOST_VERSION >= 105200
+
+        // Generate and get a Toroidal mesh
+        VoronoiVertexMeshGenerator generator(19, 11, 7, 1.0);
+        Toroidal2dVertexMesh* p_tor_mesh = generator.GetToroidalMesh();
+
+        // Check nothing happens when we ReMesh()
+        TS_ASSERT_THROWS_NOTHING(p_tor_mesh->ReMesh());
+
+#endif // BOOST_VERSION >= 105200
+    }
+
+    void TestRepositionNodes() throw(Exception)
+    {
+#if BOOST_VERSION >= 105200
+
+        // Get a mesh
+        VoronoiVertexMeshGenerator generator(9, 9, 1, 1.0);
+        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
+        // Verify that all node locations have been moved to be >= 0
+        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetNumNodes() ; node_idx++ )
+        {
+            c_vector<double, 2> this_location = p_mesh->GetNode(node_idx)->rGetLocation();
+
+            TS_ASSERT(this_location[0] >= 0.0);
+            TS_ASSERT(this_location[1] >= 0.0);
+        }
 
 #endif // BOOST_VERSION >= 105200
     }

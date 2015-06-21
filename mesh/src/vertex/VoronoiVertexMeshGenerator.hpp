@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 #include "MutableVertexMesh.hpp"
+#include "Toroidal2dVertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 
 #include <boost/version.hpp>
@@ -61,6 +62,9 @@ protected:
 
     /** A pointer to the mesh that this class creates */
     MutableVertexMesh<2,2>* mpMesh;
+
+    /** A pointer to an optionally created toroidal vertex mesh (allowing for periodic boundaries */
+    Toroidal2dVertexMesh* mpTorMesh;
 
     /** The number of elements requested across the mesh */
     unsigned mNumElementsX;
@@ -95,6 +99,9 @@ protected:
     /** A floating point representation of MAX_INT/2 */
     double mSamplingMultiplier;
 
+    /** The floating-point tolerance used for checking equality of node locations */
+    double mTol;
+
     /**
      * Helper method for the constructor.
      *
@@ -128,10 +135,10 @@ protected:
     /**
      * Helper method for the constructor.
      *
-     * This function is called when all Lloyd's Relaxation steps are complete.  Loops through all nodes in the mesh
-     * and sets them as boundary nodes if they are contained in fewer than three elements.
-     *
-     * \todo There may be a more robust method for identifying which nodes are boundary nodes
+     * This function is called when all Lloyd's Relaxation steps are complete.  It is insufficient to check for nodes
+     * contained in fewer than three elements - this is a sufficient but not necessary condition for being on the
+     * boundary.  Instead, we can rely on the boundary periodicity by tagging nodes that are part of a congruent pair on
+     * each side of the mesh.
      */
     void TagBoundaryNodes();
 
@@ -152,6 +159,15 @@ protected:
      * @param rSeedLocations The vector of random seed locations
      */
     void ValidateSeedLocations(std::vector<c_vector<double, 2> >& rSeedLocations);
+
+    /**
+     * Helper method for the constructor.
+     *
+     * After the final iteration of Lloyd's Relaxation, some nodes may have x or y position < 0.0. This method
+     * repositions all nodes so that they have x and y coordinates are >= 0.0. This helps when identifying boundary
+     * nodes and if the user requests a Toroidal mesh.
+     */
+    void RepositionNodes();
 
 public:
 
@@ -189,6 +205,11 @@ public:
      * @return A 2D Mutable Vertex Mesh, after ReMesh() has been called to remove short edges
      */
     virtual MutableVertexMesh<2,2>* GetMeshAfterReMesh();
+
+    /**
+     * @return A 2D Toroidal Mutable Vertex Mesh with periodic boundaries
+     */
+    virtual Toroidal2dVertexMesh* GetToroidalMesh();
 };
 
 #endif // BOOST_VERSION >= 105200
