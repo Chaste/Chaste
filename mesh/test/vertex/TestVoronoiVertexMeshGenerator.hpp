@@ -40,8 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
+#include "Warnings.hpp"
 #include "PetscSetupAndFinalize.hpp"
-#include "Debug.hpp"
 
 class TestVoronoiVertexMeshGenerator : public CxxTest::TestSuite
 {
@@ -256,7 +256,7 @@ public:
 
         TS_ASSERT_THROWS_THIS(VoronoiVertexMeshGenerator generator,
                 "This is a dummy class. Build with Boost version 1.52 or above for functionality.");
-
+        WARNING("Build with Boost version 1.52 or above for functionality.");
 #endif // BOOST_VERSION < 105200
     }
 };

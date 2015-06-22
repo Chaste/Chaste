@@ -755,3 +755,15 @@ void VoronoiVertexMeshGenerator::RepositionNodes()
 }
 
 #endif // BOOST_VERSION >= 105200
+#if BOOST_VERSION < 105200
+
+/**
+ * This is a fake class to suppress coverage warnings. To get the real class
+ * you must build with Boost version 1.52 or above.
+ */
+VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator()
+{
+	EXCEPTION("This is a dummy class. Build with Boost version 1.52 or above for functionality.");
+}
+
+#endif // BOOST_VERSION < 105200
