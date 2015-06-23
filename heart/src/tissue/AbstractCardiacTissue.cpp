@@ -437,7 +437,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
     if (mExchangeHalos)
     {
         mpMesh->CalculateNodeExchange(mNodesToSendPerProcess, mNodesToReceivePerProcess);
-        //Note that the following call will not work for a TetrahedralMesh which has no concept of halo nodes.
+        // Note that the following call will not work for a TetrahedralMesh which has
+        // no concept of halo nodes.
         //mpMesh->GetHaloNodeIndices( mHaloNodes );
         CalculateHaloNodesFromNodeExchange();
         unsigned num_halo_nodes = mHaloNodes.size();
@@ -453,7 +454,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
         }
         // No need to call FinaliseCellCreation() as halo node cardiac cells will
         // never be stimulated (their values are communicated from the process that
-        // owns them.
+        // owns them).
     }
 }
 
