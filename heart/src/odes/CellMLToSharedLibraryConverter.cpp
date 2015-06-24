@@ -170,7 +170,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             std::stringstream folder_name;
             folder_name << "dynamic/tmp_" << getpid() << "_" << time(NULL);
 
-#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition 
+#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
 #define COVERAGE_IGNORE
             tmp_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
             build_folder.SetPath(component_dir.GetAbsolutePath() + "/" + folder_name.str(), RelativeTo::Absolute);
@@ -198,13 +198,13 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                 r_cellml_file.CopyTo(tmp_folder);
             }
 
-#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition 
+#ifdef CHASTE_CMAKE ///todo: #2656 - ignoring all cmake-specific code, revise after cmake transition
 #define COVERAGE_IGNORE
             std::string cmake_lists_filename = tmp_folder.GetAbsolutePath() + "/CMakeLists.txt";
             std::ofstream cmake_lists_filestream(cmake_lists_filename.c_str());
-            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.10)\n" << 
+            cmake_lists_filestream << "cmake_minimum_required(VERSION 2.8.10)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
-                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" << 
+                                      "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON)\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
                                       "include_directories(${Chaste_THIRD_PARTY_INCLUDE_DIRS} ${Chaste_INCLUDE_DIRS})\n" <<
                                       "add_library(" << cellml_leaf_name << " SHARED " << "${sources})\n"

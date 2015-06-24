@@ -380,7 +380,7 @@ void FileFinder::PrivateRemove(bool dangerous) const
             {
                 EXCEPTION("Cannot remove location '" << mAbsPath
                           << "' as it is not located within the Chaste test output folder ("
-                          << test_output_path << "), the Chaste source folder (" 
+                          << test_output_path << "), the Chaste source folder ("
                           << source_folder_path <<") or the Chaste build folder ("
                           << build_folder_path <<").");
             }

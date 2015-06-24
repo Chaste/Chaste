@@ -763,7 +763,7 @@ void VoronoiVertexMeshGenerator::RepositionNodes()
  */
 VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator()
 {
-	EXCEPTION("This is a dummy class. Build with Boost version 1.52 or above for functionality.");
+    EXCEPTION("This is a dummy class. Build with Boost version 1.52 or above for functionality.");
 }
 
 #endif // BOOST_VERSION < 105200

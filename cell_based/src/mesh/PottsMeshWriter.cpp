@@ -54,8 +54,8 @@ struct MeshPottsWriterIterators
 
 template<unsigned SPACE_DIM>
 PottsMeshWriter<SPACE_DIM>::PottsMeshWriter(const std::string& rDirectory,
-                                                           const std::string& rBaseName,
-                                                           const bool clearOutputDir)
+                                            const std::string& rBaseName,
+                                            const bool clearOutputDir)
     : AbstractMeshWriter<SPACE_DIM, SPACE_DIM>(rDirectory, rBaseName, clearOutputDir),
       mpMesh(NULL),
       mpIters(new MeshPottsWriterIterators<SPACE_DIM>),

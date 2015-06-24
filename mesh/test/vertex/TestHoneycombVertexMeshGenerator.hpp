@@ -93,7 +93,7 @@ public:
 
         for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-        	TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(elem_index), 2.456, 1e-3);
+            TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(elem_index), 2.456, 1e-3);
         }
     }
 };

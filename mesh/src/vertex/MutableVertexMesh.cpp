@@ -2821,7 +2821,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(No
 
     // Calculate new node locations
     c_vector<double, SPACE_DIM> new_location_of_protorosette_node = pProtorosetteNode->rGetLocation() + (0.5 * swap_distance) * node_to_elem_a_centre;
-    c_vector<double, SPACE_DIM> location_of_new_node 			  = pProtorosetteNode->rGetLocation() + (0.5 * swap_distance) * node_to_elem_c_centre;
+    c_vector<double, SPACE_DIM> location_of_new_node = pProtorosetteNode->rGetLocation() + (0.5 * swap_distance) * node_to_elem_c_centre;
 
     // Move protorosette node to new location
     pProtorosetteNode->rGetModifiableLocation() = new_location_of_protorosette_node;

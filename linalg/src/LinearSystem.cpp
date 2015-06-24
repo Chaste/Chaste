@@ -753,7 +753,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         KSPGetPC(mKspSolver, &prec);
 
         // Turn off pre-conditioning if the system size is very small
-        if (is_small) 
+        if (is_small)
         {
             PCSetType(prec, PCNONE);
         }
