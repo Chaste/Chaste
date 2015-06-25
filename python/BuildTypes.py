@@ -943,6 +943,8 @@ class GccOptNative(GccOpt):
     """
     gcc compiler with optimisations for the machine doing the compilation.
     """
+    # NB There's not much point adding to this list, as 'native' now picks up most options
+    # for most CPUs automatically.
     supported_flags = {(4,4): ['avx'],
                        (4,3): ['sse4a', 'abm', 'popcnt', 'ssse3', 'sse4'],
                        (4,2): ['sse3'],
@@ -964,6 +966,10 @@ class GccOptNative(GccOpt):
             gcc_version = self.GetGccVersion()
             if gcc_version >= (4,2):
                 self._cc_flags.append('-march=native')
+            if gcc_version >= (4,7):
+                # This flag causes a compiler bug which leads 
+                # to hanging tests. See Chaste issue #2693.
+                self._cc_flags.append('-mno-fma')
             if gcc_version >= (3,1):
                 self._cc_flags.append('-mfpmath=sse')
             for minver in self.supported_flags.iterkeys():
