@@ -967,7 +967,7 @@ class GccOptNative(GccOpt):
             if gcc_version >= (4,2):
                 self._cc_flags.append('-march=native')
             if gcc_version >= (4,7):
-                # This flag causes a compiler bug which leads 
+                # The 'fma' flag causes a compiler bug which leads 
                 # to hanging tests. See Chaste issue #2693.
                 self._cc_flags.append('-mno-fma')
             if gcc_version >= (3,1):
