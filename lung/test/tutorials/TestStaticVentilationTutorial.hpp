@@ -64,6 +64,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* !MatrixVentilationProblem does most of the work in calculating a ventilation distribution. */
 #include "MatrixVentilationProblem.hpp"
 
+/* Note that this tutorial only works with UMFPACK -- we need to warn the user if it's not installed */
+#include "Warnings.hpp"
+
 /* !MatrixVentilationProblem uses the Petsc solver library. This setups up Petsc ready for use. */
 #include "PetscSetupAndFinalize.hpp"
 
@@ -89,7 +92,7 @@ public: // Tests should be public!
 #ifdef LUNG_USE_UMFPACK
         MatrixVentilationProblem problem("lung/test/data/simplified_airways", 0u);
 #else
-        std::cout << "Warning: using non-realistic airway tree. " << std::endl;
+        WARNING("Not compiled with UMFPACK.  Using non-realistic airway tree.");
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh", 0u);
 #endif
 

@@ -33,12 +33,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef MatrixVentilationProblem_HPP_
-#define MatrixVentilationProblem_HPP_
+#ifndef MATRIXVENTILATIONPROBLEM_HPP_
+#define MATRIXVENTILATIONPROBLEM_HPP_
 
 //#define LUNG_USE_UMFPACK 1 //Uncomment to use a direct solver
 
-#include "TetrahedralMesh.hpp"
+#include "AbstractVentilationProblem.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
@@ -53,12 +53,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Works in 3D <1,3>
  * Current functionality: pressure boundary conditions are set on each of the boundary nodes
  * Solves for pressure at internal nodes and flux on edges
+ *
+ * In this subclass all node pressures and edge fluxes are solved simultaneously using a direct matrix solution.
  */
-class MatrixVentilationProblem
+class MatrixVentilationProblem : public AbstractVentilationProblem
 {
 private:
-    TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
-    unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
     LinearSystem* mpLinearSystem; /**< Linear system for pressure (at nodes) and flux (in edges).  Allocated by constructor */
     bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
     bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
@@ -301,4 +301,4 @@ public:
 
 };
 
-#endif /* MatrixVentilationProblem_HPP_ */
+#endif /* MATRIXVENTILATIONPROBLEM_HPP_ */

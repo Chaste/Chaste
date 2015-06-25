@@ -34,14 +34,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "MatrixVentilationProblem.hpp"
-#include "TrianglesMeshReader.hpp"
+
 #include "ReplicatableVector.hpp"
 #include "Warnings.hpp"
 //#include "Debug.hpp"
 
 MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
-    : mOutletNodeIndex(rootIndex),
-      mpLinearSystem(NULL),
+    : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
+	  mpLinearSystem(NULL),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
@@ -49,13 +49,6 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
       mSolution(NULL),
       mLengthScaling(1)
 {
-    TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
-    mMesh.ConstructFromMeshReader(mesh_reader);
-
-    if (mMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
-    {
-        EXCEPTION("Outlet node is not a boundary node");
-    }
 
     // We solve for flux at every edge and for pressure at each node/bifurcation
     // Note pipe flow equation has 3 variables and flux balance has 3 variables (at a bifurcation)

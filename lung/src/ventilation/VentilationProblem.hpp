@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VENTILATIONPROBLEM_HPP_
 
 #include <map>
+#include "AbstractVentilationProblem.hpp"
 #include "AbstractAcinarUnitFactory.hpp"
 #include "TetrahedralMesh.hpp"
 #include "LinearSystem.hpp"
@@ -53,17 +54,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Works in 3D <1,3>
  * Current functionality: pressure boundary conditions are set on each of the boundary nodes
  * Solves for pressure at internal nodes and flux on edges
+ *
+ * In this subclass fluxes are propagated up the tree and pressures are propagated down the tree.
+ * If pressure boundary conditions are given at the bottom of the tree then this is done iteratively
+ * (a KSP matrix solution is used to estimate corrections to the fluxes on the terminal edges).
  */
-class VentilationProblem
+class VentilationProblem : public AbstractVentilationProblem
 {
 private:
     friend class TestVentilationProblem;
-
-    /**< The 1d in 3d branching tree mesh */
-    TetrahedralMesh<1,3> mMesh;
-
-    /**< The outlet node is the root of the branching tree structure */
-    unsigned mOutletNodeIndex;
 
     /**< Use dynamic (flux related) resistance and a nonlinear solver */
     bool mDynamicResistance;
@@ -228,7 +227,7 @@ public:
      */
     VentilationProblem();
 
-    /** Constructor
+    /** Main constructor
      * Loads a mesh from file(s)
      * Identifies the outlet node (a.k.a root of tree or the mouth end)
      *   A check is made that it is a boundary node.

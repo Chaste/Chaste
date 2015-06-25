@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "Debug.hpp"
 //#include "Timer.hpp"
 VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
-    : mOutletNodeIndex(rootIndex),
+    : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
@@ -58,8 +58,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
 VentilationProblem::VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFactory,
                                        const std::string& rMeshDirFilePath,
                                        unsigned rootIndex) :
-                                               mOutletNodeIndex(rootIndex),
-                                               mDynamicResistance(false),
+                                       	   	   AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
+                                       	   	   mDynamicResistance(false),
                                                mRadiusOnEdge(false),
                                                mViscosity(1.92e-5),
                                                mDensity(1.51e-6),
@@ -103,14 +103,6 @@ VentilationProblem::VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFac
 
 void VentilationProblem::Initialise(const std::string& rMeshDirFilePath)
 {
-    TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
-    mMesh.ConstructFromMeshReader(mesh_reader);
-
-    if (mMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
-    {
-        EXCEPTION("Outlet node is not a boundary node");
-    }
-
     mFlux.resize(mMesh.GetNumElements());
     mPressure.resize(mMesh.GetNumNodes());
 }
