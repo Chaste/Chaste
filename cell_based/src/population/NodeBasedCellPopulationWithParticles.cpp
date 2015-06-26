@@ -230,6 +230,28 @@ void NodeBasedCellPopulationWithParticles<DIM>::UpdateNodeLocations(double dt)
 }
 
 template<unsigned DIM>
+void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulation()
+{
+    for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        // If it isn't a particle then there might be cell writers attached
+        if (! this->IsParticle(node_iter->GetIndex()))
+        {
+            for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+                 cell_writer_iter != this->mCellWriters.end();
+                 ++cell_writer_iter)
+            {
+                CellPtr cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
+                this->AcceptCellWriter(*cell_writer_iter, cell_from_node);
+            }
+        }
+    }
+}
+
+
+template<unsigned DIM>
 void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
