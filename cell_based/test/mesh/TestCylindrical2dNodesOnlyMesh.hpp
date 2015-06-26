@@ -61,7 +61,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds = p_mesh->CalculateBoundingBox();
@@ -84,6 +84,24 @@ public:
         delete p_mesh;
     }
 
+    void TestExceptions()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
+
+        // Create generating mesh
+        HoneycombMeshGenerator generator(4, 4);
+        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a Cylindrical2dNodesOnlyMesh
+        double periodic_width = 4.0;
+        Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
+        TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5),
+        		              "Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
+
+        // Avoid memory leak
+        delete p_mesh;
+    }
+
     void TestGetVectorFromAtoB() throw (Exception)
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
@@ -95,7 +113,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
 
         c_vector<double, 2> node10_location = p_mesh->GetNode(10)->rGetLocation();
         c_vector<double, 2> node11_location = p_mesh->GetNode(11)->rGetLocation();
@@ -139,7 +157,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
 
         // Move one of the nodes to past the periodic boundary
         c_vector<double, 2> new_point_location;
@@ -179,7 +197,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
 
         // ReMesh to make the box collection big enough to accommodate new nodes.
         p_mesh->ResizeBoxCollection();
@@ -228,11 +246,12 @@ public:
     {
         EXIT_IF_PARALLEL;    // Cylindrical2dNodesOnlyMesh doesn't work in parallel.
 
-        double cut_off = 0.5;
-
+        double cut_off = 2.0; // Need to have a cut off larger than the width in Cylindrical2dNodesOnlyMesh
+        double periodic_width = 2.0;
         /*
          * Nodes chosen so to test the cases that the domain width in x is
          * "divisible" by the cut_off, the y-dimension is not "divisible"..
+         * This adds an extra box in the x dimennsion.
          */
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, -1.0, 0.0));
@@ -240,15 +259,14 @@ public:
         nodes.push_back(new Node<2>(2, false, 0.0, 1.1));
         nodes.push_back(new Node<2>(3, false, 1.0, 1.0));
 
-        double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(nodes, cut_off);
 
 
-        // Call SetupBoxCollection method not called unless EnlargeBOxCollection is called
+        // Call SetupBoxCollection method not called unless EnlargeBoxCollection is called
         c_vector<double, 2*2> domain_size;
-        domain_size[0]=-2.0;
-        domain_size[1]=2.5;
+        domain_size[0]=-1.0;
+        domain_size[1]=1.1; // Add extra box in x and contains nodes 1 and 3
         domain_size[2]=-2.0;
         domain_size[3]=2.5;
         p_mesh->SetUpBoxCollection(cut_off,domain_size);
@@ -258,12 +276,12 @@ public:
         TS_ASSERT(p_box_collection != NULL);
 
         // 5x5x1 box collection
-        TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), 81u);
+        TS_ASSERT_EQUALS(p_box_collection->GetNumBoxes(), 6u);
 
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(0)), 38u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(1)), 15u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(2)), 58u);
-        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(3)), 60u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(0)), 2u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(1)), 1u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(2)), 2u);
+        TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(3)), 3u);
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
@@ -292,7 +310,7 @@ public:
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
-        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
 
         AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
 

@@ -131,7 +131,7 @@ Node<DIM>* NodeBasedCellPopulation<DIM>::GetNode(unsigned index)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-    mpNodesOnlyMesh->GetNode(nodeIndex)->SetPoint(rNewLocation);
+    mpNodesOnlyMesh->SetNode(nodeIndex, rNewLocation, false);
 }
 
 template<unsigned DIM>

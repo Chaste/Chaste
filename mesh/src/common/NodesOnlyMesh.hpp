@@ -381,6 +381,15 @@ public:
     void ClearHaloNodes();
 
     /**
+	* Overridden SetNode() method
+	*
+	* @param nodeIndex is the index of the node to be moved
+	* @param point is the new target location of the node
+	* @param concreteMove is set to false if we want to skip the signed area tests in the parent Class Note this should always be false here
+	*/
+    void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove = false);
+
+    /**
      * Overridden AddNode() method.
      *
      * @param pNewNode  pointer to the new node.
