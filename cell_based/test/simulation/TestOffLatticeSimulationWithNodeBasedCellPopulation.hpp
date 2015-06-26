@@ -130,12 +130,11 @@ public:
         TS_ASSERT(min_distance_between_cells > 0.999);
     }
 
-
     /**
 	 * Create a simulation of a NodeBasedCellPopulation with a Cylindrical2dNodesOnlyMesh
-	 * to test periodicity
+	 * to test periodicity.
 	 */
-	void  TestSimplePeriodicMonolayer() throw (Exception)
+	void TestSimplePeriodicMonolayer() throw (Exception)
 	{
 		EXIT_IF_PARALLEL;    // HoneycombMeshGenereator does not work in parallel.
 
@@ -144,14 +143,11 @@ public:
 		unsigned num_cells_width = 3;
 		HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
 		TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
-		//p_generating_mesh->Translate(-1.0,0.0);
-		//p_generating_mesh->Scale(0.9,1.2);
 
 		// Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh mesh(periodic_width);
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, periodic_width);
-
 
 		// Create cells
 		std::vector<CellPtr> cells;
@@ -222,25 +218,21 @@ public:
 			double x_1 = simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
 			double x_2 = simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0];
 
-			if (x_1< x_offset)
+			if (x_1 < x_offset)
 			{
-				TS_ASSERT_DELTA(x_1+x_offset,x_2,1e-6)
+				TS_ASSERT_DELTA(x_1+x_offset, x_2, 1e-6)
 			}
 			else
 			{
-				TS_ASSERT_DELTA(x_1-x_offset,x_2,1e-6)
+				TS_ASSERT_DELTA(x_1-x_offset, x_2, 1e-6)
 			}
 
-			//TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[0],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[0],1e-6);
-
 			TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(i)->rGetLocation()[1],simulator_2.rGetCellPopulation().GetNode(i)->rGetLocation()[1],1e-6);
-
 		}
 	}
 
-
     /**
-     * Create a simulation of a NodeBasedCellPopulation with different cell radii
+     * Create a simulation of a NodeBasedCellPopulation with different cell radii.
      */
     void TestSimpleMonolayerWithDifferentRadii() throw (Exception)
     {
@@ -280,9 +272,6 @@ public:
         p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
         simulator.AddForce(p_linear_force);
 
-//        MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_cell_killer,(&node_based_cell_population, 5.0*unit_vector<double>(2,0), unit_vector<double>(2,1)));
-//        simulator.AddCellKiller(p_cell_killer);
-
         simulator.Solve();
 
         // Check that the radii of all the cells are correct
@@ -308,7 +297,7 @@ public:
     }
 
     /**
-     * Create a simulation of a NodeBasedCellPopulation with variable cell radii
+     * Create a simulation of a NodeBasedCellPopulation with variable cell radii.
      */
     void TestSimpleMonolayerWithVariableRadii() throw (Exception)
     {
@@ -351,7 +340,7 @@ public:
 
         simulator.Solve();
 
-        // Check the Radii of all the cells are correct cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
+        // Check the radii of all the cells are correct; cell 0 divided into 0 and 3 and cell 1 divided into 1 and 2.
         // This testing is designed for sequential code.
         if (PetscTools::IsSequential())
         {
@@ -501,7 +490,7 @@ public:
         TS_ASSERT_DELTA(node_3_location[0], 2.9895, 1e-4);
         TS_ASSERT_DELTA(node_3_location[1], 0.3105, 1e-4);
 
-        //Test the results are written correctly
+        // Test the results are written correctly
         FileFinder generated_type_file("TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results_from_time_0/results.vizcelltypes", RelativeTo::ChasteTestOutput);
 		FileFinder generated_node_file("TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results_from_time_0/results.viznodes", RelativeTo::ChasteTestOutput);
 
@@ -510,7 +499,6 @@ public:
 
 		FileComparison type_files(generated_type_file,reference_type_file);
 		FileComparison node_files(generated_node_file,reference_node_file);
-
     }
 
     double mNode3x, mNode4x, mNode3y, mNode4y; // To preserve locations between the below test and test load.

@@ -43,9 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include "ArchiveOpener.hpp"
-#include "Debug.hpp"
 
-//This test is always run sequentially (never in parallel)
+// This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
 class TestMutableVertexMeshRosetteMethods : public CxxTest::TestSuite

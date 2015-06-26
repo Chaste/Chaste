@@ -381,7 +381,7 @@ public:
     void ClearHaloNodes();
 
     /**
-	* Overridden SetNode() method
+	* Overridden SetNode() method.
 	*
 	* @param nodeIndex is the index of the node to be moved
 	* @param point is the new target location of the node

@@ -57,11 +57,10 @@ protected:
      */
     void Validate();
 
-protected:
     /**
-     * Overridden method
+     * Overridden AcceptCellWritersAcrossPopulation() method.
      *
-     * Calls #AcceptCellWriter across the whole population,
+     * Calls #AcceptCellWriter() across the whole population,
      * iterating in an appropriate way to skip particle nodes.
      */
     virtual void AcceptCellWritersAcrossPopulation();

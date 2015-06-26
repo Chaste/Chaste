@@ -374,13 +374,12 @@ unsigned NodesOnlyMesh<SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::NodesOnlyMesh::SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove)
 {
-    // concreteMove should always be false for NodesOnlyMesh as no elements to check
+    // concreteMove should always be false for a NodesOnlyMesh as there are no elements to check
     assert(!concreteMove);
 
     // Update the node's location
     this->GetNode(nodeIndex)->SetPoint(point);
 }
-
 
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > pMovedNode)

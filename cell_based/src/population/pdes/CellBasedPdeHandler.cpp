@@ -373,9 +373,9 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
 
         if (using_coarse_pde_mesh)
         {
-            /* We call Update mCellPdeElementMap here to speed up finding cells for AveragedSourcePdes.
-            * We also use this with  non AveragedSourcePdes whrn using CaBasedCellPopulations
-            */
+            // We update mCellPdeElementMap before setting up source terms to speed up
+            // finding cells in the case of AveragedSourcePdes. This is also used with
+            // non-AveragedSourcePdes when using a CaBasedCellPopulation.
             this->UpdateCellPdeElementMap();
         }
 
@@ -385,7 +385,6 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             // When using a coarse PDE mesh, we must set up the source terms before solving the PDE.
             // Pass in already updated CellPdeElementMap to speed up finding cells.
             p_pde_and_bc->SetUpSourceTermsForAveragedSourcePde(p_mesh, &mCellPdeElementMap);
-
 
             SimpleLinearEllipticSolver<DIM,DIM> solver(p_mesh, p_pde_and_bc->GetPde(), p_bcc.get());
 
