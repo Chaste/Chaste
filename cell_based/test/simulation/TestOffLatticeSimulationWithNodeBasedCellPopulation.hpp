@@ -56,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "SmartPointers.hpp"
 #include "CellVolumesWriter.hpp"
+#include "FileComparison.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -499,6 +500,17 @@ public:
         std::vector<double> node_3_location = simulator.GetNodeLocation(3);
         TS_ASSERT_DELTA(node_3_location[0], 2.9895, 1e-4);
         TS_ASSERT_DELTA(node_3_location[1], 0.3105, 1e-4);
+
+        //Test the results are written correctly
+        FileFinder generated_type_file("TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results_from_time_0/results.vizcelltypes", RelativeTo::ChasteTestOutput);
+		FileFinder generated_node_file("TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results_from_time_0/results.viznodes", RelativeTo::ChasteTestOutput);
+
+		FileFinder reference_type_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results.vizcelltypes",RelativeTo::ChasteSourceRoot);
+		FileFinder reference_node_file("cell_based/test/data/TestOffLatticeSimulationWithNodeBasedCellPopulationCellPtrDeath/results.viznodes",RelativeTo::ChasteSourceRoot);
+
+		FileComparison type_files(generated_type_file,reference_type_file);
+		FileComparison node_files(generated_node_file,reference_node_file);
+
     }
 
     double mNode3x, mNode4x, mNode3y, mNode4y; // To preserve locations between the below test and test load.

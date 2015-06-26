@@ -160,13 +160,6 @@ protected:
      */
     virtual void Validate();
 
-    /**
-     * Call #AcceptCellWriter across the whole population,
-     * iterating in an appropriate way for this type of
-     * cell population.
-     */
-    virtual void AcceptCellWritersAcrossPopulation();
-
 public:
 #define COVERAGE_IGNORE // Avoid prototypes being treated as code by gcov
 

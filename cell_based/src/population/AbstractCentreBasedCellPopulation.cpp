@@ -230,6 +230,23 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetMeinekeDivisi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::AcceptCellWritersAcrossPopulation()
+{
+    for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
+         node_iter != this->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        for (typename std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+             cell_writer_iter != this->mCellWriters.end();
+             ++cell_writer_iter)
+        {
+            CellPtr cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
+            this->AcceptCellWriter(*cell_writer_iter, cell_from_node);
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<MeinekeDivisionSeparation>" << mMeinekeDivisionSeparation << "</MeinekeDivisionSeparation>\n";

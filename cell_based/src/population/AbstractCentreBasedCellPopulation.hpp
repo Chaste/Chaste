@@ -93,6 +93,13 @@ protected:
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory)=0;
 
+    /**
+     * Call #AcceptCellWriter across the whole population,
+     * iterating in an appropriate way for this type of
+     * cell population.
+     */
+    virtual void AcceptCellWritersAcrossPopulation();
+
 public:
 
     /**
