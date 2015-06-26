@@ -371,12 +371,19 @@ void CellBasedPdeHandler<DIM>::SolvePdeAndWriteResultsToFile(unsigned samplingTi
             }
         }
 
+        if (using_coarse_pde_mesh)
+        {
+            /* We call Update mCellPdeElementMap here to speed up finding cells for AveragedSourcePdes.
+            * We also use this with  non AveragedSourcePdes whrn using CaBasedCellPopulations
+            */
+            this->UpdateCellPdeElementMap();
+        }
+
         // Create a PDE solver and solve the PDE on the (population-level or coarse) mesh
         if (p_pde_and_bc->HasAveragedSourcePde())
         {
             // When using a coarse PDE mesh, we must set up the source terms before solving the PDE.
-            // Pass in mCellPdeElementMap to speed up finding cells.
-            this->UpdateCellPdeElementMap();
+            // Pass in already updated CellPdeElementMap to speed up finding cells.
             p_pde_and_bc->SetUpSourceTermsForAveragedSourcePde(p_mesh, &mCellPdeElementMap);
 
 

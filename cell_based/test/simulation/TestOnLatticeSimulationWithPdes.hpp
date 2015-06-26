@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OnLatticeSimulation.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "CellwiseSourcePde.hpp"
 #include "ConstBoundaryCondition.hpp"
 #include "PetscSetupAndFinalize.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -325,7 +324,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
     }
 
-    // In this test there are only 50 cells but 100 lattice sites
+    // In this test there are only 9 cells but 100 lattice sites
     void TestCaBasedWithCellwiseSourcePde() throw(Exception)
     {
         EXIT_IF_PARALLEL;
@@ -334,23 +333,25 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, 50);
-
         std::vector<unsigned> location_indices;
-        for (unsigned i=0; i<50; i++)
+        for (unsigned i=3; i<6; i++)
         {
-            location_indices.push_back(i);
+            location_indices.push_back(i+30);
+            location_indices.push_back(i+40);
+            location_indices.push_back(i+50);
         }
+
+        // Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdesOnNaturalMesh");
+        simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdeOnNaturalMesh");
         simulator.SetDt(0.1);
         simulator.SetEndTime(1);
 
@@ -369,7 +370,8 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
                 node_iter != p_mesh->GetNodeIteratorEnd();
                 ++node_iter)
         {
-            if (node_iter->GetIndex()<50)
+
+        	if(std::find(location_indices.begin(), location_indices.end(), node_iter->GetIndex())!=location_indices.end())
             {
                 TS_ASSERT_DELTA(non_trivial_pde.ComputeLinearInUCoeffInSourceTermAtNode(*node_iter), non_trivial_pde_coefficient, 1e-3);
             }
@@ -398,6 +400,65 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
         }
     }
+
+    // In this test there are only 50 cells but 100 lattice sites
+	void TestCaBasedWithCellwiseSourcePdeWithTightBoundaries() throw(Exception)
+	{
+		EXIT_IF_PARALLEL;
+
+		// Create a simple 2D PottsMesh
+		PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
+		PottsMesh<2>* p_mesh = generator.GetMesh();
+
+		std::vector<unsigned> location_indices;
+		for (unsigned i=2; i<8; i++)
+		{
+			location_indices.push_back(i+20);
+			location_indices.push_back(i+30);
+			location_indices.push_back(i+40);
+			location_indices.push_back(i+50);
+			location_indices.push_back(i+60);
+			location_indices.push_back(i+70);
+		}
+
+		// Create cells
+		std::vector<CellPtr> cells;
+		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+		cells_generator.GenerateBasic(cells, location_indices.size());
+
+		// Create cell population
+		CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+		// Set up cell-based simulation
+		OnLatticeSimulation<2> simulator(cell_population);
+		simulator.SetOutputDirectory("TestCaBasedCellPopulationWithPdeOnNaturalMeshTightBoundaries");
+		simulator.SetDt(0.1);
+		simulator.SetEndTime(1);
+
+		CellwiseSourcePde<2> pde(cell_population, 0.0);
+		ConstBoundaryCondition<2> bc(1.0);
+		PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+		pde_and_bc.SetDependentVariableName("nutrient");
+
+		CellBasedPdeHandler<2> pde_handler(&cell_population);
+		pde_handler.AddPdeAndBc(&pde_and_bc);
+		pde_handler.SetImposeBcsOnCoarseBoundary(true);
+
+		simulator.SetCellBasedPdeHandler(&pde_handler);
+
+		simulator.Solve();
+
+		// Test solution is constant
+		for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+			 cell_iter != cell_population.End();
+			 ++cell_iter)
+		{
+			double analytic_solution = 1.0;
+			// Test that PDE solver is working correctly
+			TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
+		}
+	}
+
 
 
     /*
