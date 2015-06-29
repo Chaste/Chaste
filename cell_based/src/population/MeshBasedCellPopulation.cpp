@@ -289,18 +289,18 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
      *
      * \todo There may be a better way of checking if node radii are set (#2694)
      */
-    std::map<unsigned, double> old_node_radius_map;
-    old_node_radius_map.clear();
-    if (this->mrMesh.GetNodeIteratorBegin()->GetRadius() > 0.0)
-    {
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
-             node_iter != this->mrMesh.GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            unsigned node_index = node_iter->GetIndex();
-            old_node_radius_map[node_index] = node_iter->GetRadius();
-        }
-    }
+//    std::map<unsigned, double> old_node_radius_map;
+//    old_node_radius_map.clear();
+//    if (this->mrMesh.GetNodeIteratorBegin()->GetRadius() > 0.0)
+//    {
+//        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrMesh.GetNodeIteratorBegin();
+//             node_iter != this->mrMesh.GetNodeIteratorEnd();
+//             ++node_iter)
+//        {
+//            unsigned node_index = node_iter->GetIndex();
+//            old_node_radius_map[node_index] = node_iter->GetRadius();
+//        }
+//    }
 
     std::map<unsigned, c_vector<double, SPACE_DIM> > old_node_applied_force_map;
     old_node_applied_force_map.clear();
@@ -346,10 +346,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
             unsigned new_node_index = node_map.GetNewIndex(old_node_index);
             this->SetCellUsingLocationIndex(new_node_index,*it);
 
-            if (old_node_radius_map[old_node_index] > 0.0)
-            {
-                this->GetNode(new_node_index)->SetRadius(old_node_radius_map[old_node_index]);
-            }
+//            if (old_node_radius_map[old_node_index] > 0.0)
+//            {
+//                this->GetNode(new_node_index)->SetRadius(old_node_radius_map[old_node_index]);
+//            }
             if (output_node_velocities)
             {
                 this->GetNode(new_node_index)->AddAppliedForceContribution(old_node_applied_force_map[old_node_index]);
@@ -360,14 +360,14 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
     }
     else
     {
-        if (old_node_radius_map[this->mCellLocationMap[(*(this->mCells.begin())).get()]] > 0.0)
-        {
-            for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
-            {
-                unsigned node_index = this->mCellLocationMap[(*it).get()];
-                this->GetNode(node_index)->SetRadius(old_node_radius_map[node_index]);
-            }
-        }
+//        if (old_node_radius_map[this->mCellLocationMap[(*(this->mCells.begin())).get()]] > 0.0)
+//        {
+//            for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
+//            {
+//                unsigned node_index = this->mCellLocationMap[(*it).get()];
+//                this->GetNode(node_index)->SetRadius(old_node_radius_map[node_index]);
+//            }
+//        }
         if (output_node_velocities)
         {
             for (std::list<CellPtr>::iterator it = this->mCells.begin(); it != this->mCells.end(); ++it)
