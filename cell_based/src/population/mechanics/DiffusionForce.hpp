@@ -103,13 +103,6 @@ public :
     ~DiffusionForce();
 
     /**
-     * Set the diffusion constant for the cells.
-     *
-     * @param diffusionConstant the diffusion constant to use
-     */
-    void SetDiffusionConstant(double diffusionConstant);
-
-    /**
      * Set the absolute temperature, which affects the
      * diffusion constant.
      *
