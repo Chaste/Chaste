@@ -2051,7 +2051,7 @@ public:
         }
 
 		// ...and check that AddForceContribution() still throws no error
-		force.AddForceContribution(cell_population);
+        TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
 
 		// Tidy up
 		SimulationTime::Destroy();
