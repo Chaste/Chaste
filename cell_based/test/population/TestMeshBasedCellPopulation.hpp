@@ -525,6 +525,12 @@ public:
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
+        // Specify node radii
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->SetRadius(i + 0.5);
+        }
+
         // Specify node velocities to be output, and set non-zero applied forces on some nodes
         cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
@@ -578,7 +584,17 @@ public:
 
         cell_population.Update();
 
-        // Test that, node velocities are to be output, the Update() preserved the applied force on each node
+        // Test that, since node radii were set, the Update() preserved them
+        for (unsigned i=0; i<26; i++)
+        {
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 0.5, 1e-6);
+        }
+        for (unsigned i=27; i<cell_population.GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 1.5, 1e-6);
+        }
+
+        // Test that, since node velocities are to be output, the Update() preserved the applied force on each node
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 4.5, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[1], 4.8, 1e-6);
         TS_ASSERT_DELTA(cell_population.GetNode(1)->rGetAppliedForce()[0], 0.0, 1e-6);

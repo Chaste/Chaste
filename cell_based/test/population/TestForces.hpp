@@ -2040,18 +2040,23 @@ public:
 		// ...and check that AddForceContribution() throws no error
 		TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
 
-		// Now call ReMesh on the mesh ...
-		p_mesh->ReMesh();
+		// Now update the cell population, which in turn calls ReMesh() on the mesh...
+		cell_population.Update();
 
-		// ...and check that AddForceContribution() throws no error
-	    //TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
+        for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            TS_ASSERT_DELTA(node_iter->GetRadius(), 1.0, 1e-6);
+        }
 
+		// ...and check that AddForceContribution() still throws no error
+		force.AddForceContribution(cell_population);
 
 		// Tidy up
 		SimulationTime::Destroy();
 		RandomNumberGenerator::Destroy();
 	}
-
 
     void TestDiffusionForceIn3D()
     {
