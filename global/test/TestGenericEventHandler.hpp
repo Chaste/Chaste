@@ -133,7 +133,8 @@ public:
         {
             dummy += 2;
         }
-        TS_ASSERT_LESS_THAN(0l, dummy); // try to avoid the loop being optimised away
+        std::cout << "Printing variable to slow test down!: dummy = " << dummy << std::endl;
+        TS_ASSERT_EQUALS(2000000001l, dummy); // try to avoid the loop being optimised away
         TS_ASSERT_LESS_THAN(0.0, AnEventHandler::GetElapsedTime(AnEventHandler::TEST1));
         AnEventHandler::EndEvent(AnEventHandler::TEST1);
         TS_ASSERT_LESS_THAN(0.0, AnEventHandler::GetElapsedTime(AnEventHandler::TEST1));
