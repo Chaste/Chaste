@@ -22,6 +22,8 @@
 
 #include "PetscSetupAndFinalize.hpp"
 
+#ifndef TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_
+#define TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_
 
 /*
  * In this test suite we check the solution of the CellwiseParabolicPdes
@@ -425,3 +427,5 @@ public:
 
     // Note not ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopultions
 };
+
+#endif /*TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_*/
