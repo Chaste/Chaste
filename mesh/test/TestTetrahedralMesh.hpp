@@ -151,13 +151,23 @@ public:
         TS_ASSERT_EQUALS( num_halo_nodes, 0u );
     }
 
-    void TestMeshMoreStatistics() throw(Exception)
+    void TestMeshMoreStatisticsHeart() throw(Exception)
     {
         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 22U);
         TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  15U);
+    }
+    ///\todo #2690
+    void failingTestMeshMoreStatisticsTumour() throw(Exception)
+    {
+        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/FromTumourSpheroid");
+        TetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+        TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 28U);
+        // Node 76 (which is a boundary node) has only 20 containing elements but has a connectivity of 18
+        TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  18U);
     }
 
     void TestMeshConstructionFromMeshReaderIndexedFromOne() throw(Exception)
