@@ -228,6 +228,61 @@ public:
         }
     }
 
+
+    void TestMeshBasedMonolayerWithParabolicPdeAndNeumannBcs() throw (Exception)
+    {
+    	EXIT_IF_PARALLEL;
+
+    	TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+		MutableMesh<2,2> mesh;
+		mesh.ConstructFromMeshReader(mesh_reader);
+
+		std::vector<CellPtr> cells;
+		MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+		CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+	    cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_differentiated_type);
+
+	    // Set initial condition for pde
+	    for (unsigned i=0; i<cells.size(); i++)
+		{
+			cells[i]->GetCellData()->SetItem("variable",1.0);
+		}
+
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
+
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, 1, 1, 1);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, true);
+        pde_and_bc.SetDependentVariableName("variable");
+
+        // Create a PDE Modifier object using this pde and bcs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshNeumanBcs");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+		{
+        	SimulationTime::Instance()->IncrementTimeOneStep();
+        	p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+        	p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+ 		}
+
+        /*
+         * Test the solution against the an approximate constant solution.
+         */
+
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+        	double u_approx = 3071;
+            TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_approx, 1.0);
+        }
+    }
     // Now test on a square with half appoptotic cells to compare all the population types
 
     void TestMeshBasedSquareMonolayer() throw (Exception)
