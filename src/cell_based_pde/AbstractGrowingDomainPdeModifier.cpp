@@ -65,6 +65,7 @@ AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+#ifdef CHASTE_VTK
     if (DIM>1)
     {
         std::ostringstream time_string;
@@ -84,6 +85,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(Abstract
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;
     }
+#endif //CHASTE_VTK
 }
 
 template<unsigned DIM>
