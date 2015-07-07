@@ -84,6 +84,8 @@ public:
 
     void TestMeshBasedMonolayerWithEllipticPde() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
     	TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 		MutableMesh<2,2> mesh;
 		mesh.ConstructFromMeshReader(mesh_reader);
@@ -134,8 +136,10 @@ public:
      *
      *
      */
-    void NoTestMeshBasedHeterogeneousMonolayerWithEllipticPde() throw (Exception)
+    void TestMeshBasedHeterogeneousMonolayerWithEllipticPde() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
     	TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 		MutableMesh<2,2> mesh;
 		mesh.ConstructFromMeshReader(mesh_reader);
@@ -202,8 +206,10 @@ public:
 
     // Now test on a square with half appoptotic cells to compare all the population types
 
-    void NoTestMeshBasedSquareMonolayer() throw (Exception)
+    void TestMeshBasedSquareMonolayer() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
 		HoneycombMeshGenerator generator(20,20,0);
 		MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -248,8 +254,10 @@ public:
 		TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-4);
 	}
 
-    void NoTestNodeBasedSquareMonolayer() throw (Exception)
+    void TestNodeBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
 		HoneycombMeshGenerator generator(20,20,0);
 		MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
 		NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
@@ -297,8 +305,10 @@ public:
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-4);
 	}
 
-    void NoTestVertexBasedSquareMonolayer() throw (Exception)
+    void TestVertexBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
     	HoneycombVertexMeshGenerator generator(20,20);
     	MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -346,8 +356,10 @@ public:
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4654, 1e-4);
   	}
 
-    void NoTestPottsBasedSquareMonolayer() throw (Exception)
+    void TestPottsBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
     	PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
     	PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -397,8 +409,10 @@ public:
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-4);
 	}
 
-    void NoTestCaBasedSquareMonolayer() throw (Exception)
+    void TestCaBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
     	PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
     	PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -453,6 +467,6 @@ public:
   		//Checking it doesn't change for this cell population
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-4);
 	}
+};
 
 #endif /*TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_*/
-};

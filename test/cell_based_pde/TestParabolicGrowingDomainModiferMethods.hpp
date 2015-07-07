@@ -83,6 +83,8 @@ public:
 
     void TestMeshBasedMonolayerWithParabolicPde() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
     	TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 		MutableMesh<2,2> mesh;
 		mesh.ConstructFromMeshReader(mesh_reader);
@@ -149,6 +151,8 @@ public:
      */
     void TestMeshBasedHeterogeneousMonolayerWithParabolicPde() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
     	TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
 		MutableMesh<2,2> mesh;
 		mesh.ConstructFromMeshReader(mesh_reader);
@@ -228,6 +232,8 @@ public:
 
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
+    	EXIT_IF_PARALLEL;
+
    		HoneycombMeshGenerator generator(20,20,0);
    		MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -283,6 +289,8 @@ public:
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
 		HoneycombMeshGenerator generator(20,20,0);
 		MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
 		NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
@@ -342,6 +350,8 @@ public:
 
     void TestVertexBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
     	HoneycombVertexMeshGenerator generator(20,20);
 		MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -401,6 +411,8 @@ public:
 
     void TestPottsBasedSquareMonolayer() throw (Exception)
 	{
+    	EXIT_IF_PARALLEL;
+
     	PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
 		PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -460,7 +472,7 @@ public:
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
 	}
 
-    // Note not ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopultions
+    // Note: ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopultions
 };
 
 #endif /*TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_*/
