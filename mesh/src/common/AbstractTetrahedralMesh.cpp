@@ -33,11 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractTetrahedralMesh.hpp"
-#include "Debug.hpp"
 #include <limits>
-#include "TrianglesMeshWriter.hpp"
-#include "VtkMeshWriter.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
