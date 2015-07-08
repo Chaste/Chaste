@@ -92,9 +92,9 @@ template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Get FE mesh from Cell Population different for each type of Cell Population
-    if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation))
+    if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) )
     {
-    	if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation))
+    	if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
 		{
         	EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
 		}
@@ -103,7 +103,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         	mpFeMesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh());
     	}
     }
-    else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))
+    else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
         std::vector<Node<DIM> *> nodes;
 
@@ -119,11 +119,11 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
 
     }
-    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation))
+    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
         mpFeMesh = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->GetTetrahedralMeshUsingVertexMesh();
     }
-    else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+    else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
         std::vector<Node<DIM> *> nodes;
 
@@ -138,7 +138,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
         mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
-    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation))
+    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
         std::vector<Node<DIM> *> nodes;
 
