@@ -303,6 +303,9 @@ public:
 		TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 1e-2);// Lower tolerance as slightly different meshes
   		//Checking it doesn't change for this cell population
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4476, 1e-4);
+
+  		// Clear Memory
+  		delete p_mesh;
 	}
 
     void TestVertexBasedSquareMonolayer() throw (Exception)

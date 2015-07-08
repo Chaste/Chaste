@@ -401,6 +401,9 @@ public:
 		TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-2);
   		//Checking it doesn't change for this cell population
   		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6296, 1e-4);
+
+  		// Clear Memory
+  		delete p_mesh;
 	}
 
     void TestVertexBasedSquareMonolayer() throw (Exception)
