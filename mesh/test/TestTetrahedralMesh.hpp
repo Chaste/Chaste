@@ -159,8 +159,8 @@ public:
         TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 22U);
         TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  15U);
     }
-    ///\todo #2690
-    void failingTestMeshMoreStatisticsTumour() throw(Exception)
+
+    void TestMeshMoreStatisticsTumour() throw(Exception)
     {
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/FromTumourSpheroid");
         TetrahedralMesh<3,3> mesh;

@@ -34,8 +34,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractTetrahedralMesh.hpp"
-
+#include "Debug.hpp"
 #include <limits>
+#include "TrianglesMeshWriter.hpp"
+#include "VtkMeshWriter.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -740,58 +742,88 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 #undef COVERAGE_IGNORE
     }
 
-    unsigned max_num = 0u;
-    unsigned connected_node_index = 0u;
-    unsigned boundary_max_num = 0u;
-    unsigned boundary_connected_node_index = 0u;
+    unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case
+    if (ELEMENT_DIM <= 2u)
+    {
+        unsigned max_num = 0u;
+        unsigned boundary_max_num = 0u;
+        for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
+        {
+            unsigned num = this->mNodes[local_node_index]->GetNumContainingElements();
+            if (this->mNodes[local_node_index]->IsBoundaryNode()==false && num>max_num)
+            {
+                max_num = num;
+            }
+            if (this->mNodes[local_node_index]->IsBoundaryNode() && num>boundary_max_num)
+            {
+                boundary_max_num = num;
+            }
+        }
+        bool linear = (nodes_per_element == ELEMENT_DIM + 1);
+    	/*
+    	 * In 1d each containing element is connected to one node (or 2 if quadratic), add to this the node itself
+    	 * and the connectivity is GetNumContainingElements() + 1 or 2*GetNumContainingElements() + 1
+    	 */
+        if (ELEMENT_DIM == 1)
+        {
+        	if (linear)
+        	{
+        		return max_num+1;
+        	}
+        	else
+        	{
+        		return 2*max_num+1;
+        	}
+        }
+        // Not returned ...else if  (ELEMENT_DIM == 2)
+    	/*
+    	 * In 2d each containing element adds one connected node (since one node will be shared by a previous element)
+    	 * this leads to a connectivity of GetNumContainingElements() + 1 (or 3*GetNumContainingElements() + 1) in the quadratic case
+    	 *
+    	 * If the node is on a boundary then the one elements will have an unpaired node and the connectivity is
+         * GetNumContainingElements() + 1 (or 3*(GetNumContainingElements() + 3 for quadratic)
+         */
+        if (linear)
+        {
+        	return std::max(max_num+1, boundary_max_num+2);
+        }
+        else
+        {
+        	return std::max(3*max_num+1, 3*boundary_max_num+3);
+        }
+    }
+
+    /*
+     * In 3d there are many more cases.  In general a non-boundary node has fewer connecting nodes than it has elements.
+     * A node on the boundary may have even fewer, unless it is on a corner and has more faces than it has elements.
+     * We can, in the linear case estimate an upper bound as max(elements, faces)+2.
+     * However for the sake of accuracy we are going for a brute force solution.
+     *
+     * This may prove to be a bottle-neck...
+     */
+
+    std::set<unsigned> forward_star_nodes; // Used to collect each node's neighbours
+    unsigned max_connectivity = 0u;
     for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
     {
-        unsigned num = this->mNodes[local_node_index]->GetNumContainingElements();
-        if (this->mNodes[local_node_index]->IsBoundaryNode()==false && num>max_num)
-        {
-            max_num = num;
-            connected_node_index = local_node_index;
-        }
-        if (this->mNodes[local_node_index]->IsBoundaryNode() && num>boundary_max_num)
-        {
-            boundary_max_num = num;
-            boundary_connected_node_index = local_node_index;
-        }
-    }
-    assert (max_num != 0u || boundary_max_num != 0u);
-    // connected_node_index now has the index of a maximally connected internal node
-    // boundary_connected_node_index now has the index of a maximally connected boundary node
-    std::set<unsigned> forward_star_nodes;
-    unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case
+    	forward_star_nodes.clear();
 
-    for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[connected_node_index]->ContainingElementsBegin();
-        it != this->mNodes[connected_node_index]->ContainingElementsEnd();
-        ++it)
-    {
-        Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
-        for (unsigned i=0; i<nodes_per_element; i++)
-        {
-            forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
-        }
+    	for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[local_node_index]->ContainingElementsBegin();
+    			it != this->mNodes[local_node_index]->ContainingElementsEnd();
+    			++it)
+    	{
+    		Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
+    		for (unsigned i=0; i<nodes_per_element; i++)
+    		{
+    			forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
+    		}
+    	}
+    	if (forward_star_nodes.size() > max_connectivity)
+    	{
+    		max_connectivity = forward_star_nodes.size();
+    	}
     }
-
-    std::set<unsigned> boundary_forward_star_nodes;
-    for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[boundary_connected_node_index]->ContainingElementsBegin();
-        it != this->mNodes[boundary_connected_node_index]->ContainingElementsEnd();
-        ++it)
-    {
-        Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
-        for (unsigned i=0; i<nodes_per_element; i++)
-        {
-            boundary_forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
-        }
-    }
-
-    if (boundary_forward_star_nodes.size() > forward_star_nodes.size())
-    {
-        return boundary_forward_star_nodes.size();
-    }
-    return forward_star_nodes.size();
+    return max_connectivity;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
