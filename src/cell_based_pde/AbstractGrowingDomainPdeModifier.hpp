@@ -77,6 +77,12 @@ private:
     }
 
 protected:
+    /**
+     * Whether to delete the mesh when we are destroyed.
+     * Needed if to free memory if creating meshes.
+     */
+    bool mDeleteMesh;
+
 
     /** The solution to the PDE problem at the current timestep. */
     Vec mSolution; ///\todo NEED TO ARCHIVE THIS see PdeandBoundaryCondidtion (#2687)

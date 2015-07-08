@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
+	  mDeleteMesh(false),
       mSolution(NULL),
       mpFeMesh(NULL),
       mOutputDirectory(""),
@@ -60,6 +61,10 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
+    if (this->mDeleteMesh)
+    {
+        delete mpFeMesh;
+    }
 }
 
 template<unsigned DIM>
@@ -115,6 +120,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
                 nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
         }
 
+        mDeleteMesh=true;
         mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
 
@@ -135,6 +141,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
             nodes.push_back(new Node<DIM>(rCellPopulation.GetLocationIndexUsingCell(*cell_iter), rCellPopulation.GetLocationOfCellCentre(*cell_iter)));
         }
 
+        mDeleteMesh=true;
         mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
@@ -152,6 +159,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
             cell_index++;
         }
 
+        mDeleteMesh=true;
         mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
     }
