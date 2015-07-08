@@ -92,7 +92,7 @@ template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     // Get FE mesh from Cell Population different for each type of Cell Population
-    if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) )
+    if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
     	if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
 		{
