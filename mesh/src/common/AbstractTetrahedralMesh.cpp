@@ -742,7 +742,13 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
     unsigned nodes_per_element = this->mElements[0]->GetNumNodes(); //Usually ELEMENT_DIM+1, except in Quadratic case
     if (ELEMENT_DIM <= 2u)
     {
-        unsigned max_num = 0u;
+        /*
+         *  Note that we start assuming that each internal node is connected to 1 element.
+         *  This is to avoid the trivial situation in which there are no internal nodes (a
+         *  single line or a single triangle.  We need the minimum connectivity to be 2 (in 1D) or
+         *  3 (in 2D) even if there is only one element.
+         */
+    	unsigned max_num = 1u; // See note above.
         unsigned boundary_max_num = 0u;
         for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
         {

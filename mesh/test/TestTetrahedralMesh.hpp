@@ -166,10 +166,20 @@ public:
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 28U);
-        // Node 76 (which is a boundary node) has only 20 containing elements but has a connectivity of 18
         TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  18U);
     }
 
+    void TestMeshStatisticsSimple() throw (Exception)
+	{
+        TetrahedralMesh<1,1> mesh;
+        mesh.ConstructLinearMesh(1);
+
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 2u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
+        TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 1U);
+        TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  2U);
+
+	}
     void TestMeshConstructionFromMeshReaderIndexedFromOne() throw(Exception)
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
