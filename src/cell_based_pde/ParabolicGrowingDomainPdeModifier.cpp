@@ -62,7 +62,7 @@ ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-	this->GenerateFeMesh(rCellPopulation);
+    this->GenerateFeMesh(rCellPopulation);
 
     // Set up boundary conditions
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer();
@@ -91,9 +91,9 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-	// Temporarily cache the variable name until we create a ParaolicPdeAndBcs object and move it to the Abstract class
+    // Temporarily cache the variable name until we create a ParaolicPdeAndBcs object and move it to the Abstract class
     ///\todo this comment doesn't quite make sense (#2687)
-	this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
+    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
 
     // Cache the Output Directory
     this->mOutputDirectory = outputDirectory;
@@ -115,23 +115,23 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
 
     if (mpPdeAndBcs->IsNeumannBoundaryCondition())
     {
-    	// Impose any Neumann boundary conditions
-		for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
-			 elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
-			 ++elem_iter)
-		{
-			p_bcc->AddNeumannBoundaryCondition(*elem_iter, mpPdeAndBcs->GetBoundaryCondition());
-		}
+        // Impose any Neumann boundary conditions
+        for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
+             elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
+             ++elem_iter)
+        {
+            p_bcc->AddNeumannBoundaryCondition(*elem_iter, mpPdeAndBcs->GetBoundaryCondition());
+        }
     }
     else
     {
-    	// Impose any Dirichlet boundary conditions
-		for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-						 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-						 ++node_iter)
-		{
-			p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
-		}
+        // Impose any Dirichlet boundary conditions
+        for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+                         node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
+                         ++node_iter)
+        {
+            p_bcc->AddDirichletBoundaryCondition(*node_iter, mpPdeAndBcs->GetBoundaryCondition());
+        }
     }
 
     return p_bcc;
@@ -169,33 +169,33 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
             }
             else
             {
-            	///\todo Work out a better way to do the nodes not associated with cells (#2687)
-            	if (node_iter->IsBoundaryNode() && !mpPdeAndBcs->IsNeumannBoundaryCondition())
-            	{
-            		// We need to impose the Dirichlet boundaries again here as not represented in cell data
-            		solution_at_node = mpPdeAndBcs->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
-            	}
-            	else
-            	{
-					assert(node_index<num_vertex_nodes);
-					Node<DIM>* p_vertex_node = rCellPopulation.rGetMesh().GetNode(node_index);
+                ///\todo Work out a better way to do the nodes not associated with cells (#2687)
+                if (node_iter->IsBoundaryNode() && !mpPdeAndBcs->IsNeumannBoundaryCondition())
+                {
+                    // We need to impose the Dirichlet boundaries again here as not represented in cell data
+                    solution_at_node = mpPdeAndBcs->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
+                }
+                else
+                {
+                    assert(node_index<num_vertex_nodes);
+                    Node<DIM>* p_vertex_node = rCellPopulation.rGetMesh().GetNode(node_index);
 
-					// Average over data from containing elements (cells)
-					std::set<unsigned> containing_elelments  = p_vertex_node->rGetContainingElementIndices();
+                    // Average over data from containing elements (cells)
+                    std::set<unsigned> containing_elelments  = p_vertex_node->rGetContainingElementIndices();
 
-					solution_at_node = 0.0;
+                    solution_at_node = 0.0;
 
-					for (std::set<unsigned>::iterator index_iter = containing_elelments.begin();
-						  index_iter != containing_elelments.end();
-						 ++index_iter)
-					{
+                    for (std::set<unsigned>::iterator index_iter = containing_elelments.begin();
+                          index_iter != containing_elelments.end();
+                         ++index_iter)
+                    {
 
-						assert(*index_iter<num_vertex_nodes);
-						CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(*index_iter);
-						solution_at_node += p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
-					}
-					solution_at_node /= containing_elelments.size();
-            	}
+                        assert(*index_iter<num_vertex_nodes);
+                        CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(*index_iter);
+                        solution_at_node += p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+                    }
+                    solution_at_node /= containing_elelments.size();
+                }
             }
         }
         else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation)||
@@ -208,9 +208,9 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
         }
         else
         {
-        	// To do this would need to iterate over cells instead of loop over nodes.
-        	assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
-			EXCEPTION("ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
+            // To do this would need to iterate over cells instead of loop over nodes.
+            assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
+            EXCEPTION("ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
         }
 
         PetscVecTools::SetElement(this->mSolution,node_index,solution_at_node);
@@ -221,7 +221,7 @@ template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-	AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation

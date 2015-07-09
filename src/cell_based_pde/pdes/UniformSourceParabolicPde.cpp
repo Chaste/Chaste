@@ -50,19 +50,19 @@ double UniformSourceParabolicPde<DIM>::GetCoefficient() const
 template<unsigned DIM>
 double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
-	return mCoefficient;
+    return mCoefficient;
 }
 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> UniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
-	return identity_matrix<double>(DIM);
+    return identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>
 double UniformSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX)
 {
-	return 1.0;
+    return 1.0;
 }
 
 // Explicit instantiation

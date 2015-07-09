@@ -83,64 +83,64 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
 
     unsigned tet_node_index = rNode.GetIndex();
 
-	bool is_cell_apoptotic = false;
+    bool is_cell_apoptotic = false;
 
-	if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) ||
-		dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) )
-	{
-		if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
-		{
-			// For centre based this tet node is the same as the node in the population and attached to the cell
-			// For potts this tet node corresponds to the element attached to the cell
-			is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(tet_node_index)->template HasCellProperty<ApoptoticCellProperty>();
-		}
-		else
-		{
-			// no cell at node
-			return 0.0;
-		}
-	}
-	else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
-	{
-		VertexBasedCellPopulation<DIM>* static_cast_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
+    if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) ||
+        dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) )
+    {
+        if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
+        {
+            // For centre based this tet node is the same as the node in the population and attached to the cell
+            // For potts this tet node corresponds to the element attached to the cell
+            is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(tet_node_index)->template HasCellProperty<ApoptoticCellProperty>();
+        }
+        else
+        {
+            // no cell at node
+            return 0.0;
+        }
+    }
+    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    {
+        VertexBasedCellPopulation<DIM>* static_cast_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
 
-		if (rNode.GetIndex() < static_cast_cell_population->GetNumNodes())
-		{
-			std::set<unsigned> containing_element_indices = static_cast_cell_population->GetNode(tet_node_index)->rGetContainingElementIndices();
+        if (rNode.GetIndex() < static_cast_cell_population->GetNumNodes())
+        {
+            std::set<unsigned> containing_element_indices = static_cast_cell_population->GetNode(tet_node_index)->rGetContainingElementIndices();
 
-			for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
-					 iter != containing_element_indices.end();
-					 iter++)
-			{
-				if (static_cast_cell_population->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
-				{
-					is_cell_apoptotic = true;
-					break;
-				}
-			}
-		}
-		else
-		{
-			// tet node is in the centre of element so can use offset to calculate the cell
-			is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex()-static_cast_cell_population->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>();
-		}
-	}
-	else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) )
-	{
-		// Cant use for CA Based due to interpolating onto cells See CellwiseSourceEllipticPde for how to calculate source
-		NEVER_REACHED;
-	}
-	else
-	{
-		NEVER_REACHED;
-	}
+            for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+                     iter != containing_element_indices.end();
+                     iter++)
+            {
+                if (static_cast_cell_population->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
+                {
+                    is_cell_apoptotic = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // tet node is in the centre of element so can use offset to calculate the cell
+            is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex()-static_cast_cell_population->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>();
+        }
+    }
+    else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) )
+    {
+        // Cant use for CA Based due to interpolating onto cells See CellwiseSourceEllipticPde for how to calculate source
+        NEVER_REACHED;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 
-	if (!is_cell_apoptotic)
-	{
-		coefficient = mUptakeCoefficient;
-	}
+    if (!is_cell_apoptotic)
+    {
+        coefficient = mUptakeCoefficient;
+    }
 
-	// The source term is C*u
+    // The source term is C*u
     return coefficient*u;
 }
 

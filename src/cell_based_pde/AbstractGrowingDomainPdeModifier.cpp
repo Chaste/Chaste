@@ -49,11 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
-	  mDeleteMesh(false),
+      mDeleteMesh(false),
       mSolution(NULL),
       mpFeMesh(NULL),
       mOutputDirectory(""),
-	  mCachedDependentVariableName("")
+      mCachedDependentVariableName("")
 {
     assert(DIM==2);
 }
@@ -99,14 +99,14 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
     // Get FE mesh from Cell Population different for each type of Cell Population
     if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
-    	if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
-		{
-        	EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
-		}
-    	else
-    	{
-        	mpFeMesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh());
-    	}
+        if(dynamic_cast<MeshBasedCellPopulationWithGhostNodes<DIM>*>(&rCellPopulation) != NULL)
+        {
+            EXCEPTION("Currently can't solve PDEs on meshes with ghost nodes");
+        }
+        else
+        {
+            mpFeMesh = &(static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh());
+        }
     }
     else if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {

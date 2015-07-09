@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class EllipticGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
 {
-	friend class TestGrowingDomainPdeModifiers;
+    friend class TestGrowingDomainPdeModifiers;
 
 private:
 

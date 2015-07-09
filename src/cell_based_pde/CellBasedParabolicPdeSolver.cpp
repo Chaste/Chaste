@@ -60,7 +60,7 @@ c_vector<double, 1*(DIM+1)> CellBasedParabolicPdeSolver<DIM>::ComputeVectorTerm(
         Element<DIM, DIM>* pElement)
 {
   return (mInterpolatedSourceTerm
-	    + PdeSimulationTime::GetPdeTimeStepInverse() * this->mpParabolicPde->ComputeDuDtCoefficientFunction(rX) * rU(0)) * rPhi;
+        + PdeSimulationTime::GetPdeTimeStepInverse() * this->mpParabolicPde->ComputeDuDtCoefficientFunction(rX) * rU(0)) * rPhi;
 }
 
 template<unsigned DIM>
@@ -85,17 +85,17 @@ c_matrix<double, 1*(DIM+1), 1*(DIM+1)> CellBasedParabolicPdeSolver<DIM>::Compute
 template<unsigned DIM>
 void CellBasedParabolicPdeSolver<DIM>::ResetInterpolatedQuantities()
 {
-	mInterpolatedSourceTerm = 0;
+    mInterpolatedSourceTerm = 0;
 }
 
 template<unsigned DIM>
 void CellBasedParabolicPdeSolver<DIM>::IncrementInterpolatedQuantities(double phiI, const Node<DIM>* pNode)
 {
 
-	unsigned index_of_unknown = 0;
-	double u_at_node = this->GetCurrentSolutionOrGuessValue(pNode->GetIndex(), index_of_unknown);
+    unsigned index_of_unknown = 0;
+    double u_at_node = this->GetCurrentSolutionOrGuessValue(pNode->GetIndex(), index_of_unknown);
 
-	mInterpolatedSourceTerm += phiI*this->mpParabolicPde->ComputeSourceTermAtNode(*pNode,u_at_node);
+    mInterpolatedSourceTerm += phiI*this->mpParabolicPde->ComputeSourceTermAtNode(*pNode,u_at_node);
 }
 
 //////////////////////////////////////////////////////////////////////

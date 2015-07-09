@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class AbstractGrowingDomainPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {
-	friend class TestGrowingDomainPdeModifiers;
+    friend class TestGrowingDomainPdeModifiers;
 
 private:
 
@@ -137,11 +137,11 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)=0;
 
     /**
-	 * Helper method to generate the mesh from the Cell population.
-	 *
-	 * @param rCellPopulation reference to the cell population
-	 */
-	void GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+     * Helper method to generate the mesh from the Cell population.
+     *
+     * @param rCellPopulation reference to the cell population
+     */
+    void GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Helper method to copy the PDE solution to CellData

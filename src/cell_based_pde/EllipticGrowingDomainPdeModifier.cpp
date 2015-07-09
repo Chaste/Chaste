@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(PdeAndBoundaryConditions<DIM>* pPdeAndBcs)
     : AbstractGrowingDomainPdeModifier<DIM>(),
-	  mpPdeAndBcs(pPdeAndBcs)
+      mpPdeAndBcs(pPdeAndBcs)
 {
     assert(DIM==2);
 }
@@ -62,7 +62,7 @@ EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-	this->GenerateFeMesh(rCellPopulation);
+    this->GenerateFeMesh(rCellPopulation);
 
     // Add the BCs to the BCs container
     std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = this->ConstructBoundaryConditionsContainer();
@@ -79,12 +79,12 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
 template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-	// Temporarily cache the variable name until we create a a ParaolicPdeAndBcs object
-	// and move to the abstract class.
-	this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
+    // Temporarily cache the variable name until we create a a ParaolicPdeAndBcs object
+    // and move to the abstract class.
+    this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
 
     // Cache the output directory
-	this->mOutputDirectory = outputDirectory;
+    this->mOutputDirectory = outputDirectory;
 
     // Call these  methods to solve the PDE on the initial step and Output the results.
     UpdateAtEndOfTimeStep(rCellPopulation);
@@ -113,7 +113,7 @@ template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
 {
     // No parameters to output, so just call method on direct parent class
-	AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+    AbstractGrowingDomainPdeModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
 }
 
 // Explicit instantiation

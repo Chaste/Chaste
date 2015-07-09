@@ -149,22 +149,22 @@ public:
 
             ChastePoint<2> point;
 
-			Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
-			TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
-			TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-			c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
-			for (unsigned i=0; i<2; i++)
-			{
-				for (unsigned j=0; j<2; j++)
-				{
-					double value = 0.0;
-					if (i == j)
-					{
-						value = 0.2;
-					}
-					TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
-				}
-			}
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
+            TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
+            TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
+            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
+            for (unsigned i=0; i<2; i++)
+            {
+                for (unsigned j=0; j<2; j++)
+                {
+                    double value = 0.0;
+                    if (i == j)
+                    {
+                        value = 0.2;
+                    }
+                    TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
+                }
+            }
 
 
 
@@ -176,75 +176,75 @@ public:
 
 
     void TestUniformSourceParabolicPdeMethods() throw(Exception)
-	{
-		EXIT_IF_PARALLEL;
+    {
+        EXIT_IF_PARALLEL;
 
-		// Create a PDE object
-		UniformSourceParabolicPde<2> pde(0.1);
+        // Create a PDE object
+        UniformSourceParabolicPde<2> pde(0.1);
 
-		// Test that the member variables have been initialised correctly
-		TS_ASSERT_EQUALS(pde.GetCoefficient(),0.1);
+        // Test that the member variables have been initialised correctly
+        TS_ASSERT_EQUALS(pde.GetCoefficient(),0.1);
 
-		// Test methods
-		ChastePoint<2> point;
-		TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
-		TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
-		c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-		for (unsigned i=0; i<2; i++)
-		{
-			for (unsigned j=0; j<2; j++)
-			{
-				double value = 0.0;
-				if (i == j)
-				{
-					value = 1.0;
-				}
-				TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
-			}
-		}
-	}
+        // Test methods
+        ChastePoint<2> point;
+        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        for (unsigned i=0; i<2; i++)
+        {
+            for (unsigned j=0; j<2; j++)
+            {
+                double value = 0.0;
+                if (i == j)
+                {
+                    value = 1.0;
+                }
+                TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
+            }
+        }
+    }
 
-	void TestUniformSourceParabolicPdeArchiving() throw(Exception)
-	{
-		EXIT_IF_PARALLEL;
+    void TestUniformSourceParabolicPdeArchiving() throw(Exception)
+    {
+        EXIT_IF_PARALLEL;
 
-		// Set up simulation time
-		SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
+        // Set up simulation time
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-		FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-		std::string archive_file = "UniformSourceParabolicPde.arch";
-		ArchiveLocationInfo::SetMeshFilename("UniformSourceParabolicPde");
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "UniformSourceParabolicPde.arch";
+        ArchiveLocationInfo::SetMeshFilename("UniformSourceParabolicPde");
 
-		{
-			// Create a PDE object
-			AbstractLinearParabolicPde<2,2>* const p_pde = new UniformSourceParabolicPde<2>(0.1);
+        {
+            // Create a PDE object
+            AbstractLinearParabolicPde<2,2>* const p_pde = new UniformSourceParabolicPde<2>(0.1);
 
-			// Create output archive and archive PDE object
-			ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-			boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
-			(*p_arch) << p_pde;
+            // Create output archive and archive PDE object
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+            (*p_arch) << p_pde;
 
-			delete p_pde;
-		}
+            delete p_pde;
+        }
 
-		{
-			AbstractLinearParabolicPde<2,2>* p_pde;
+        {
+            AbstractLinearParabolicPde<2,2>* p_pde;
 
-			// Create an input archive and restore PDE object from archive
-			ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-			boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-			(*p_arch) >> p_pde;
+            // Create an input archive and restore PDE object from archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+            (*p_arch) >> p_pde;
 
-			// Test that the PDE and its member variables were archived correctly
-			TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
+            // Test that the PDE and its member variables were archived correctly
+            TS_ASSERT(dynamic_cast<UniformSourceParabolicPde<2>*>(p_pde) != NULL);
 
-			UniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<UniformSourceParabolicPde<2>*>(p_pde);
-			TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(),0.1);
+            UniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<UniformSourceParabolicPde<2>*>(p_pde);
+            TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(),0.1);
 
-			// Avoid memory leaks
-			delete p_pde;
-		}
-	}
+            // Avoid memory leaks
+            delete p_pde;
+        }
+    }
 };
 
 #endif /*TESTCELLBASEDPARABOLICPDES_HPP_*/

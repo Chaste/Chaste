@@ -117,7 +117,7 @@ public:
 
     void TestParabolicGrowingDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
         // Create mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
@@ -172,16 +172,16 @@ public:
 
         // Test nothing's changed
         std::vector<double> node_5_location = simulator.GetNodeLocation(5);
-		TS_ASSERT_DELTA(node_5_location[0], 1.9108, 1e-4);
-		TS_ASSERT_DELTA(node_5_location[1], 0.3625, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[0], 1.9108, 1e-4);
+        TS_ASSERT_DELTA(node_5_location[1], 0.3625, 1e-4);
 
-		// Note this is cell associated with element 5 not node 5
-		TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9941, 1e-4);
+        // Note this is cell associated with element 5 not node 5
+        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9941, 1e-4);
     }
 
     void TestParabolicGrowingDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -206,15 +206,15 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-		// Make the PDE and BCs
-		CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-		ConstBoundaryCondition<2> bc(1.0);
-		ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-		pde_and_bc.SetDependentVariableName("oxygen");
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
-		// Create a PDE modifier object using this PDE and BCs object
-		MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
-		simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
@@ -223,16 +223,16 @@ public:
 
         // Test nothing's changed
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
-		TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
-		TS_ASSERT_DELTA(node_4_location[1], sqrt(3)/2.0, 1e-4);
-		TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], sqrt(3)/2.0, 1e-4);
+        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
 
         delete p_mesh; // to stop memory leaks
     }
 
     void TestParabolicGrowingDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -261,15 +261,15 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-		// Make the PDE and BCs
-		CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
         ConstBoundaryCondition<2> bc(1.0);
-		ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-		pde_and_bc.SetDependentVariableName("oxygen");
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
-		// Create a PDE Modifier object using this PDE and BCs object
-		MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
-		simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE Modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
@@ -278,62 +278,62 @@ public:
 
         // Test nothing's changed
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
-		TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
-		TS_ASSERT_DELTA(node_4_location[1], sqrt(3)/2.0, 1e-4);
-		TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], sqrt(3)/2.0, 1e-4);
+        TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
     }
 
     void TestParabolicGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
-    	HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
-		MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-		// Get location indices corresponding to real cells
+        // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
-		// Create cell population
-		std::vector<CellPtr> cells;
-		GenerateCells(location_indices.size(),cells,1.0);
+        // Create cell population
+        std::vector<CellPtr> cells;
+        GenerateCells(location_indices.size(),cells,1.0);
 
-		MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
-		// Set population to output all data to results files
-		cell_population.AddCellWriter<CellIdWriter>();
-		cell_population.AddCellWriter<CellMutationStatesWriter>();
+        // Set population to output all data to results files
+        cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellMutationStatesWriter>();
 
-		cell_population.SetWriteVtkAsPoints(true);
-		cell_population.AddPopulationWriter<VoronoiDataWriter>();
+        cell_population.SetWriteVtkAsPoints(true);
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
 
-		OffLatticeSimulation<2> simulator(cell_population);
-		simulator.SetOutputDirectory("ParabolicGrowingMonolayers/MeshWithGhosts");
-		simulator.SetDt(1.0/120.0);
-		simulator.SetSamplingTimestepMultiple(120);
-		simulator.SetEndTime(M_TIME_FOR_SIMULATION);
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("ParabolicGrowingMonolayers/MeshWithGhosts");
+        simulator.SetDt(1.0/120.0);
+        simulator.SetSamplingTimestepMultiple(120);
+        simulator.SetEndTime(M_TIME_FOR_SIMULATION);
 
-		MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-		p_force->SetCutOffLength(1.5);
-		simulator.AddForce(p_force);
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
-		// Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
+        // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-		// Make the PDE and BCs
-		CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-		ConstBoundaryCondition<2> bc(1.0);
-		ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-		pde_and_bc.SetDependentVariableName("oxygen");
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
-		// Create a PDE Modifier object using this PDE and BCs object
-		MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
-		simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE Modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
-		TS_ASSERT_THROWS_THIS(simulator.Solve(),"Currently can't solve PDEs on meshes with ghost nodes");
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"Currently can't solve PDEs on meshes with ghost nodes");
     }
 
     void TestParabolicGrowingDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
         unsigned cell_width = 4;
         unsigned domain_width = 200;
@@ -365,15 +365,15 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-		// Make the PDE and BCs
-		CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-		ConstBoundaryCondition<2> bc(1.0);
-		ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-		pde_and_bc.SetDependentVariableName("oxygen");
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
-		// Create a PDE modifier object using this PDE and BCs object
-		MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
-		simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         simulator.Solve();
 
@@ -387,7 +387,7 @@ public:
 
     void TestParabolicGrowingDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
     {
-    	EXIT_IF_PARALLEL;
+        EXIT_IF_PARALLEL;
 
         // Create a simple 2D PottsMesh
         unsigned domain_wide = 5*M_NUM_CELLS_ACROSS;
@@ -430,18 +430,18 @@ public:
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
-		// Make the PDE and BCs
-		CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
-		ConstBoundaryCondition<2> bc(1.0);
-		ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
-		pde_and_bc.SetDependentVariableName("oxygen");
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("oxygen");
 
-		// Create a PDE Modifier object using this PDE and BCs object
-		MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
-		simulator.AddSimulationModifier(p_pde_modifier);
+        // Create a PDE Modifier object using this PDE and BCs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        simulator.AddSimulationModifier(p_pde_modifier);
 
         // Run simulation
-		TS_ASSERT_THROWS_THIS(simulator.Solve(),"ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
+        TS_ASSERT_THROWS_THIS(simulator.Solve(),"ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
     }
 };
 
