@@ -103,19 +103,19 @@ public:
         EXIT_IF_PARALLEL;
 
         // Make the Pde and BCS
-        SimplePdeForTesting<2> pde(-0.1);
+        SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
         PdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
         pde_and_bc.SetDependentVariableName("averaged quantity");
-TS_ASSERT_EQUALS(1,1);
+
         // Create an Elliptic PDE Modifier object using this pde and bcs object
-        //MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
 
         // Test that member variables are initialised correctly
-        //TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
+        TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
     }
 
-    void noTestParabolicConstructor() throw(Exception)
+    void TestParabolicConstructor() throw(Exception)
 	{
 		EXIT_IF_PARALLEL;
 
@@ -135,7 +135,7 @@ TS_ASSERT_EQUALS(1,1);
        // delete p_generating_mesh;  ///\todo stop memory leaks (#2687)
     }
 
-    void noTestMeshGeneration() throw(Exception)
+    void TestMeshGeneration() throw(Exception)
 	{
     	EXIT_IF_PARALLEL;
 
@@ -288,7 +288,7 @@ TS_ASSERT_EQUALS(1,1);
 		}
 	}
 
-    void noTestArchiveEllipticGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveEllipticGrowingDomainPdeModifier() throw(Exception)
 	{
 		// Create a file for archiving
 		OutputFileHandler handler("archive", false);
@@ -335,7 +335,7 @@ TS_ASSERT_EQUALS(1,1);
 	}
 
 
-    void noTestArchiveParabolicGrowingDomainPdeModifier() throw(Exception)
+    void TestArchiveParabolicGrowingDomainPdeModifier() throw(Exception)
 	{
 		// Create a file for archiving
 		OutputFileHandler handler("archive", false);
