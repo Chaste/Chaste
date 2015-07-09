@@ -45,10 +45,10 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
 
 void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, bool isPeriodic)
 {
-	if (cutOffLength < mWidth)
-	{
-		EXCEPTION("Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
-	}
+    if (cutOffLength < mWidth)
+    {
+        EXCEPTION("Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
+    }
 
     NodesOnlyMesh<2>::SetUpBoxCollection(cutOffLength, domainSize, PETSC_DECIDE, true);    // Only difference is that this "true" makes the boxes periodic.
 

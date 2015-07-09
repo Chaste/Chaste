@@ -58,8 +58,8 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
 VentilationProblem::VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFactory,
                                        const std::string& rMeshDirFilePath,
                                        unsigned rootIndex) :
-                                       	   	   AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
-                                       	   	   mDynamicResistance(false),
+                                                     AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
+                                                     mDynamicResistance(false),
                                                mRadiusOnEdge(false),
                                                mViscosity(1.92e-5),
                                                mDensity(1.51e-6),

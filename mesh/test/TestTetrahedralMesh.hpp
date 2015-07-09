@@ -170,7 +170,7 @@ public:
     }
 
     void TestMeshStatisticsSimple() throw (Exception)
-	{
+    {
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructLinearMesh(1);
 
@@ -179,7 +179,7 @@ public:
         TS_ASSERT_EQUALS(mesh.CalculateMaximumContainingElementsPerProcess(), 1U);
         TS_ASSERT_EQUALS(mesh.CalculateMaximumNodeConnectivityPerProcess(),  2U);
 
-	}
+    }
     void TestMeshConstructionFromMeshReaderIndexedFromOne() throw(Exception)
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");

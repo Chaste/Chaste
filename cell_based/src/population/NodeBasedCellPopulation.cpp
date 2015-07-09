@@ -418,7 +418,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
         EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
     }
 
-    std::set<unsigned> 	neighbouring_node_indices;
+    std::set<unsigned>     neighbouring_node_indices;
 
     // Get location and radius of node
     Node<DIM>* p_node_i = this->GetNode(index);

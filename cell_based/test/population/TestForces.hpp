@@ -1999,49 +1999,49 @@ public:
     }
 
     void DONOTTestDiffusionForceWithMeshBasedCellPopulation()
-	{
-		// Define the seed
-		RandomNumberGenerator::Instance()->Reseed(0);
+    {
+        // Define the seed
+        RandomNumberGenerator::Instance()->Reseed(0);
 
-		// Set up time parameters
-		SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+        // Set up time parameters
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
-		// Create a simple MeshBasedCellPopulation
-		HoneycombMeshGenerator mesh_generator(4, 6, 0);
-		MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
-		for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-			 node_iter != p_mesh->GetNodeIteratorEnd();
-			 ++node_iter)
-		{
-			node_iter->ClearAppliedForce();
-		}
+        // Create a simple MeshBasedCellPopulation
+        HoneycombMeshGenerator mesh_generator(4, 6, 0);
+        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+             node_iter != p_mesh->GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_iter->ClearAppliedForce();
+        }
 
-		std::vector<CellPtr> cells;
-		boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes(), std::vector<unsigned>(), p_diff_type);
-		MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::vector<CellPtr> cells;
+        boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes(), std::vector<unsigned>(), p_diff_type);
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-		// Create DiffusionForce object
-		DiffusionForce<2> force;
+        // Create DiffusionForce object
+        DiffusionForce<2> force;
 
-		// Check that AddForceContribution() throws the right error if the node radii have not been set
-		TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
-			"SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
+        // Check that AddForceContribution() throws the right error if the node radii have not been set
+        TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
+            "SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
 
-		// Now set each node radius...
-		for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
-			 node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
-			 ++node_iter)
-		{
-			node_iter->SetRadius(1.0);
-		}
+        // Now set each node radius...
+        for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_iter->SetRadius(1.0);
+        }
 
-		// ...and check that AddForceContribution() throws no error
-		TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
+        // ...and check that AddForceContribution() throws no error
+        TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
 
-		// Now update the cell population, which in turn calls ReMesh() on the mesh...
-		cell_population.Update();
+        // Now update the cell population, which in turn calls ReMesh() on the mesh...
+        cell_population.Update();
 
         for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
@@ -2050,13 +2050,13 @@ public:
             TS_ASSERT_DELTA(node_iter->GetRadius(), 1.0, 1e-6);
         }
 
-		// ...and check that AddForceContribution() still throws no error
+        // ...and check that AddForceContribution() still throws no error
         TS_ASSERT_THROWS_NOTHING(force.AddForceContribution(cell_population));
 
-		// Tidy up
-		SimulationTime::Destroy();
-		RandomNumberGenerator::Destroy();
-	}
+        // Tidy up
+        SimulationTime::Destroy();
+        RandomNumberGenerator::Destroy();
+    }
 
     void TestDiffusionForceIn3D()
     {

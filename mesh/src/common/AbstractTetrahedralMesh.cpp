@@ -748,7 +748,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
          *  single line or a single triangle.  We need the minimum connectivity to be 2 (in 1D) or
          *  3 (in 2D) even if there is only one element.
          */
-    	unsigned max_num = 1u; // See note above.
+        unsigned max_num = 1u; // See note above.
         unsigned boundary_max_num = 0u;
         for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
         {
@@ -763,36 +763,36 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
             }
         }
         bool linear = (nodes_per_element == ELEMENT_DIM + 1);
-    	/*
-    	 * In 1d each containing element is connected to one node (or 2 if quadratic), add to this the node itself
-    	 * and the connectivity is GetNumContainingElements() + 1 or 2*GetNumContainingElements() + 1
-    	 */
+        /*
+         * In 1d each containing element is connected to one node (or 2 if quadratic), add to this the node itself
+         * and the connectivity is GetNumContainingElements() + 1 or 2*GetNumContainingElements() + 1
+         */
         if (ELEMENT_DIM == 1)
         {
-        	if (linear)
-        	{
-        		return max_num+1;
-        	}
-        	else
-        	{
-        		return 2*max_num+1;
-        	}
+            if (linear)
+            {
+                return max_num+1;
+            }
+            else
+            {
+                return 2*max_num+1;
+            }
         }
         // Not returned ...else if  (ELEMENT_DIM == 2)
-    	/*
-    	 * In 2d each containing element adds one connected node (since one node will be shared by a previous element)
-    	 * this leads to a connectivity of GetNumContainingElements() + 1 (or 3*GetNumContainingElements() + 1) in the quadratic case
-    	 *
-    	 * If the node is on a boundary then the one elements will have an unpaired node and the connectivity is
+        /*
+         * In 2d each containing element adds one connected node (since one node will be shared by a previous element)
+         * this leads to a connectivity of GetNumContainingElements() + 1 (or 3*GetNumContainingElements() + 1) in the quadratic case
+         *
+         * If the node is on a boundary then the one elements will have an unpaired node and the connectivity is
          * GetNumContainingElements() + 1 (or 3*(GetNumContainingElements() + 3 for quadratic)
          */
         if (linear)
         {
-        	return std::max(max_num+1, boundary_max_num+2);
+            return std::max(max_num+1, boundary_max_num+2);
         }
         else
         {
-        	return std::max(3*max_num+1, 3*boundary_max_num+3);
+            return std::max(3*max_num+1, 3*boundary_max_num+3);
         }
     }
 
@@ -809,22 +809,22 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
     unsigned max_connectivity = 0u;
     for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
     {
-    	forward_star_nodes.clear();
+        forward_star_nodes.clear();
 
-    	for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[local_node_index]->ContainingElementsBegin();
-    			it != this->mNodes[local_node_index]->ContainingElementsEnd();
-    			++it)
-    	{
-    		Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
-    		for (unsigned i=0; i<nodes_per_element; i++)
-    		{
-    			forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
-    		}
-    	}
-    	if (forward_star_nodes.size() > max_connectivity)
-    	{
-    		max_connectivity = forward_star_nodes.size();
-    	}
+        for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[local_node_index]->ContainingElementsBegin();
+                it != this->mNodes[local_node_index]->ContainingElementsEnd();
+                ++it)
+        {
+            Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
+            for (unsigned i=0; i<nodes_per_element; i++)
+            {
+                forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
+            }
+        }
+        if (forward_star_nodes.size() > max_connectivity)
+        {
+            max_connectivity = forward_star_nodes.size();
+        }
     }
     return max_connectivity;
 }

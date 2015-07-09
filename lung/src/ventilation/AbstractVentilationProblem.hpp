@@ -70,7 +70,7 @@ public:
      * @param rMeshDirFilePath  the path and root name of the .node and .edge files for the mesh
      * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
      */
-	AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex=0u);
+    AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex=0u);
  };
 
 #endif /* ABSTRACTVENTILATIONPROBLEM_HPP_ */

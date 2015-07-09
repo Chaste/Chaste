@@ -96,7 +96,7 @@ public:
         double periodic_width = 4.0;
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5),
-        		              "Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
+                              "Need to specify a cut off length larger than the width with Cylindrical2dNodesOnlyMeshes.");
 
         // Avoid memory leak
         delete p_mesh;

@@ -267,69 +267,69 @@ public:
     }
 
     void TestSimpleUniformSourceParabolicPdeMethods() throw(Exception)
-	{
-		// Create a PDE object
-		SimpleUniformSourceParabolicPde<2> pde(0.1);
+    {
+        // Create a PDE object
+        SimpleUniformSourceParabolicPde<2> pde(0.1);
 
-		// Test that the member variables have been initialised correctly
-		TS_ASSERT_EQUALS(pde.GetCoefficient(),0.1);
+        // Test that the member variables have been initialised correctly
+        TS_ASSERT_EQUALS(pde.GetCoefficient(),0.1);
 
-		// Test methods
-		ChastePoint<2> point;
-		TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
-		TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
-		c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-		for (unsigned i=0; i<2; i++)
-		{
-			for (unsigned j=0; j<2; j++)
-			{
-				double value = 0.0;
-				if (i == j)
-				{
-					value = 1.0;
-				}
-				TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
-			}
-		}
-	}
+        // Test methods
+        ChastePoint<2> point;
+        TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
+        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        for (unsigned i=0; i<2; i++)
+        {
+            for (unsigned j=0; j<2; j++)
+            {
+                double value = 0.0;
+                if (i == j)
+                {
+                    value = 1.0;
+                }
+                TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
+            }
+        }
+    }
 
-	void TestSimpleUniformSourceParabolicPdeArchiving() throw(Exception)
-	{
+    void TestSimpleUniformSourceParabolicPdeArchiving() throw(Exception)
+    {
 
-		FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
-		std::string archive_file = "SimpleUniformSourceParabolicPde.arch";
-		ArchiveLocationInfo::SetMeshFilename("SimpleUniformSourceParabolicPde");
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "SimpleUniformSourceParabolicPde.arch";
+        ArchiveLocationInfo::SetMeshFilename("SimpleUniformSourceParabolicPde");
 
-		{
-			// Create a PDE object
-			AbstractLinearParabolicPde<2,2>* const p_pde = new SimpleUniformSourceParabolicPde<2>(0.1);
+        {
+            // Create a PDE object
+            AbstractLinearParabolicPde<2,2>* const p_pde = new SimpleUniformSourceParabolicPde<2>(0.1);
 
-			// Create output archive and archive PDE object
-			ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
-			boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
-			(*p_arch) << p_pde;
+            // Create output archive and archive PDE object
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+            (*p_arch) << p_pde;
 
-			delete p_pde;
-		}
+            delete p_pde;
+        }
 
-		{
-			AbstractLinearParabolicPde<2,2>* p_pde;
+        {
+            AbstractLinearParabolicPde<2,2>* p_pde;
 
-			// Create an input archive and restore PDE object from archive
-			ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
-			boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-			(*p_arch) >> p_pde;
+            // Create an input archive and restore PDE object from archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+            (*p_arch) >> p_pde;
 
-			// Test that the PDE and its member variables were archived correctly
-			TS_ASSERT(dynamic_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde) != NULL);
+            // Test that the PDE and its member variables were archived correctly
+            TS_ASSERT(dynamic_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde) != NULL);
 
-			SimpleUniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde);
-			TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(),0.1);
+            SimpleUniformSourceParabolicPde<2>* p_static_cast_pde = static_cast<SimpleUniformSourceParabolicPde<2>*>(p_pde);
+            TS_ASSERT_EQUALS(p_static_cast_pde->GetCoefficient(),0.1);
 
-			// Avoid memory leaks
-			delete p_pde;
-		}
-	}
+            // Avoid memory leaks
+            delete p_pde;
+        }
+    }
 
 };
 

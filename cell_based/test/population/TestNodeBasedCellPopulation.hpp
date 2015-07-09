@@ -839,31 +839,31 @@ public:
 
          if (PetscTools::AmMaster())
          {
-        	 //Normally corner Node should have no neighbours with small radius
-        	 std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.65);
+             //Normally corner Node should have no neighbours with small radius
+             std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.65);
 
-        	 std::set<unsigned> expected_node_0_neighbours;
+             std::set<unsigned> expected_node_0_neighbours;
 
-        	 TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
-        	 TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
+             TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
+             TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
 
-        	 //For this radiuis, the corner node would have exactly one neighbour
-        	 //But since the search radius is too small, it will have have 0
-        	 std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 0.72);
+             //For this radiuis, the corner node would have exactly one neighbour
+             //But since the search radius is too small, it will have have 0
+             std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 0.72);
 
-        	 std::set<unsigned> expected_node_1_neighbours;
+             std::set<unsigned> expected_node_1_neighbours;
 
-        	 TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
-        	 TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
+             TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
+             TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
 
 
-        	 //Test Centre node would normally have four neighbours with a large enough radius
-        	 std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4, 2.0);
+             //Test Centre node would normally have four neighbours with a large enough radius
+             std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4, 2.0);
 
-        	 std::set<unsigned> expected_node_4_neighbours;
+             std::set<unsigned> expected_node_4_neighbours;
 
-        	 TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
-        	 TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+             TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
+             TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
          }
 
          //Now test with a bigger box
@@ -874,36 +874,36 @@ public:
 
          if (PetscTools::AmMaster())
          {
-        	 //Test corner Node should have no neighbours with small radius
-        	 std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.65);
+             //Test corner Node should have no neighbours with small radius
+             std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.65);
 
-        	 std::set<unsigned> expected_node_0_neighbours;
+             std::set<unsigned> expected_node_0_neighbours;
 
-        	 TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
-        	 TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
+             TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
+             TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
 
-        	 //Test corner node would have exactly one neighbour with this radius,
-        	 // as distance from corner to centre is 0.5*sqrt(2) ~ 0.71
-        	 std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 0.72);
+             //Test corner node would have exactly one neighbour with this radius,
+             // as distance from corner to centre is 0.5*sqrt(2) ~ 0.71
+             std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 0.72);
 
-        	 std::set<unsigned> expected_node_1_neighbours;
-        	 expected_node_1_neighbours.insert(4);
+             std::set<unsigned> expected_node_1_neighbours;
+             expected_node_1_neighbours.insert(4);
 
-        	 TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
-        	 TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
+             TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
+             TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
 
 
-        	 //Test Centre node would normally have four neighbours with a large enough radius
-        	 std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4, 0.72);
+             //Test Centre node would normally have four neighbours with a large enough radius
+             std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4, 0.72);
 
-        	 std::set<unsigned> expected_node_4_neighbours;
-        	 expected_node_4_neighbours.insert(0);
-        	 expected_node_4_neighbours.insert(1);
-        	 expected_node_4_neighbours.insert(2);
-        	 expected_node_4_neighbours.insert(3);
+             std::set<unsigned> expected_node_4_neighbours;
+             expected_node_4_neighbours.insert(0);
+             expected_node_4_neighbours.insert(1);
+             expected_node_4_neighbours.insert(2);
+             expected_node_4_neighbours.insert(3);
 
-        	 TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
-        	 TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+             TS_ASSERT_EQUALS(node_4_neighbours.size(), expected_node_4_neighbours.size());
+             TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
          }
 
          //Now test with a particular box that works for some but not the rest
@@ -914,31 +914,31 @@ public:
 
          if (PetscTools::AmMaster())
          {
-        	 //Test corner Node should have no neighbours with small radius
-        	 std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.65);
+             //Test corner Node should have no neighbours with small radius
+             std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.65);
 
-        	 std::set<unsigned> expected_node_0_neighbours;
+             std::set<unsigned> expected_node_0_neighbours;
 
-        	 TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
-        	 TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
+             TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
+             TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
 
-        	 //Test corner node will have exactly one neighbour
-        	 std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 0.72);
+             //Test corner node will have exactly one neighbour
+             std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 0.72);
 
-        	 std::set<unsigned> expected_node_1_neighbours;
-        	 expected_node_1_neighbours.insert(4);
+             std::set<unsigned> expected_node_1_neighbours;
+             expected_node_1_neighbours.insert(4);
 
-        	 TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
-        	 TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
+             TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
+             TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
 
-        	 //Test corner node will still only have one neighbour, despite larger search radius
-        	 std::set<unsigned> node_2_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 2.0);
+             //Test corner node will still only have one neighbour, despite larger search radius
+             std::set<unsigned> node_2_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1, 2.0);
 
-        	 std::set<unsigned> expected_node_2_neighbours;
-        	 expected_node_2_neighbours.insert(4);
+             std::set<unsigned> expected_node_2_neighbours;
+             expected_node_2_neighbours.insert(4);
 
-        	 TS_ASSERT_EQUALS(node_2_neighbours.size(), expected_node_2_neighbours.size());
-        	 TS_ASSERT_EQUALS(node_2_neighbours, expected_node_2_neighbours);
+             TS_ASSERT_EQUALS(node_2_neighbours.size(), expected_node_2_neighbours.size());
+             TS_ASSERT_EQUALS(node_2_neighbours, expected_node_2_neighbours);
 
          }
     }

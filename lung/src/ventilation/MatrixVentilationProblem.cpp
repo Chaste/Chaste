@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
-	  mpLinearSystem(NULL),
+      mpLinearSystem(NULL),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
       mViscosity(1.92e-5),
