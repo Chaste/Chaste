@@ -353,7 +353,7 @@ public:
     /**
      * Set all entries in a given row of a matrix to a certain value.
      * This must be called by the process who owns the row, (but other
-     * processors will treat it as a null-op
+     * processors will treat it as a null-op)
      *
      * @param row  the row index
      * @param value  the value to set each entry in this row

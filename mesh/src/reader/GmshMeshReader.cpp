@@ -130,8 +130,19 @@ void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
     assert(this_line == "$EndMeshFormat");
 
     ReadNodeHeader();
-    ReadElementHeader();
+    ReadElementHeader(); // This reads the total number of elements in the file into mTotalNumElementsAndFaces
     ReadFaceHeader();
+
+    if (mTotalNumElementsAndFaces != mNumElements + mNumFaces)
+    {
+        EXCEPTION("Unrecognised element types present in the .msh file: check mesh generation settings in gmsh.");
+        // If you hit this, then the .msh file lists elements that are not simply
+        // in 2D:
+        //   linear/quadratic lines for faces, triangles for elements
+        // in 3D:
+        //   linear/quadratic traingles for faces, tets for elements.
+        // which probably means something funny happened in the mesh generation.
+    }
 }
 
 
@@ -165,7 +176,10 @@ void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadElementHeader()
     {
         getline(mElementFile, this_line);
     }
-    getline(mElementFile, this_line); //Throw away the number of elements specified in the file
+    getline(mElementFile, this_line); //Throw away the line that says the number of elements specified in the file
+    line.clear();
+    line.str(this_line);
+    line >> mTotalNumElementsAndFaces;
     int ele_start = mElementFile.tellg(); //Pointer to the start of the element block.
 
     mNumElements = 0u;
@@ -207,8 +221,8 @@ void GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadFaceHeader()
     {
         getline(mFaceFile, this_line);
     }
-    getline(mFaceFile, this_line); //Throw away the number of elements specified in the file
-    int face_start = mFaceFile.tellg(); //Pointer to the start of the element block.
+    getline(mFaceFile, this_line); // Throw away the line that says the number of elements specified in the file
+    int face_start = mFaceFile.tellg(); // Pointer to the start of the element block.
 
     mNumFaces = 0u;
     getline(mFaceFile, this_line);

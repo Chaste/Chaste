@@ -187,6 +187,7 @@ private:
     unsigned mNumNodes; /**< Number of nodes in the mesh. */
     unsigned mNumElements; /**< Number of elements in the mesh. */
     unsigned mNumFaces; /**< Number of faces in the mesh. */
+    unsigned mTotalNumElementsAndFaces; /**<Total number of elements and faces in the mesh. */
     unsigned mNumElementAttributes; /**< Is the number of attributes stored for each element. */
     unsigned mNumFaceAttributes; /**< Is the number of attributes stored for each face. */
     unsigned mOrderOfElements; /**< The order of each element (1 for linear, 2 for quadratic). */

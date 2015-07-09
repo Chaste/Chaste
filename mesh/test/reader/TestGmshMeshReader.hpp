@@ -57,13 +57,21 @@ public:
     void TestFilesOpen(void) throw(Exception)
     {
         TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements_gmsh.msh"));
-        TS_ASSERT_THROWS_ANYTHING(READER_2D("mesh/test/data/no_file.msh"));
+        TS_ASSERT_THROWS_THIS(READER_2D("mesh/test/data/no_file.msh"),
+                              "Could not open data file: mesh/test/data/no_file.msh");
     }
 
     void TestCorrectVersion(void) throw(Exception)
     {
        TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements_gmsh.msh"));
-       TS_ASSERT_THROWS_ANYTHING(READER_2D("mesh/test/data/square_4_elements_bad_version.msh"));
+       TS_ASSERT_THROWS_THIS(READER_2D("mesh/test/data/square_4_elements_bad_version.msh"),
+                             "Only .msh version 2.2 files are supported.");
+    }
+
+    void TestErrorIfMeshContainsNodesInWeirdElements(void) throw(Exception)
+    {
+        TS_ASSERT_THROWS_THIS(READER_3D reader_3d("mesh/test/data/simple_cube_gmsh_bad.msh"),
+                              "Unrecognised element types present in the .msh file: check mesh generation settings in gmsh.");
     }
 
     void TestReadHeaders(void) throw(Exception)
@@ -165,6 +173,7 @@ public:
 
         //3D faces
         expected_node_indices.resize(3);
+
         expected_node_indices[0] = 0; expected_node_indices[1] = 1; expected_node_indices[2] = 8;
         data = reader_3d.GetNextFaceData();
         TS_ASSERT_EQUALS(data.NodeIndices, expected_node_indices);
