@@ -185,13 +185,13 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     {
         unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation))
+        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
             // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh.
             tet_node_index += rCellPopulation.GetNumNodes();
         }
 
-        if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation))
+        if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
         {
             // here local cell index corresponds to tet node
             tet_node_index = cell_index;
