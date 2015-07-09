@@ -468,8 +468,7 @@ public:
   		TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
   		TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.4542, 2e-1);//low error as mesh is slightlty larger than for centre based models.
   		//Checking it doesn't change for this cell population
-  		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-4);
-	}
+  		TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.4338, 1e-3); // Not lower as slightly different answer with intel compiler.	}
 };
 
 #endif /*TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_*/
