@@ -360,7 +360,7 @@ c_vector<double, DIM> NodeBasedCellPopulation<DIM>::GetSizeOfCellPopulation()
 }
 
 template<unsigned DIM>
-std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
+std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadius(unsigned index, double neighbourhoodRadius)
 {
     // Check the mNodeNeighbours has been set up correctly
     if (mNodeNeighbours.empty())
@@ -369,6 +369,56 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     }
 
     std::set<unsigned> neighbouring_node_indices;
+
+    // Get location
+    Node<DIM>* p_node_i = this->GetNode(index);
+    c_vector<double, DIM> node_i_location = p_node_i->rGetLocation();
+
+    // Get set of 'candidate' neighbours.
+    std::set<unsigned> near_nodes = mNodeNeighbours.find(index)->second;
+
+    // Find which ones are actually close
+    for (std::set<unsigned>::iterator iter = near_nodes.begin();
+            iter != near_nodes.end();
+            ++iter)
+    {
+        // Be sure not to return the index itself.
+        if ((*iter) != index)
+        {
+            Node<DIM>* p_node_j = this->GetNode((*iter));
+
+            // Get the location of this node
+            c_vector<double, DIM> node_j_location = p_node_j->rGetLocation();
+
+            // Get the vector the two nodes (using GetVectorFromAtoB to catch periodicities etc.)
+            c_vector<double, DIM> node_to_node_vector = mpNodesOnlyMesh->GetVectorFromAtoB(node_j_location,node_i_location);
+
+            // Calculate the distance between the two nodes
+            double distance_between_nodes = norm_2(node_to_node_vector);
+
+            // If the cell j is within the neighbourhood of radius neighbourhoodRadius
+            // of cell i
+            if (distance_between_nodes <= neighbourhoodRadius)// + DBL_EPSILSON)
+            {
+                // ...then add this node index to the set of neighbouring node indices
+                neighbouring_node_indices.insert((*iter));
+            }
+        }
+    }
+
+    return neighbouring_node_indices;
+}
+
+template<unsigned DIM>
+std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
+{
+    // Check the mNodeNeighbours has been set up correctly
+    if (mNodeNeighbours.empty())
+    {
+        EXCEPTION("mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
+    }
+
+    std::set<unsigned> 	neighbouring_node_indices;
 
     // Get location and radius of node
     Node<DIM>* p_node_i = this->GetNode(index);

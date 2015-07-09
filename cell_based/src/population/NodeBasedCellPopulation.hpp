@@ -425,6 +425,17 @@ public:
      */
     c_vector<double, DIM> GetSizeOfCellPopulation();
 
+    /*
+     * Method to return nodes within a given radius of a node
+     *
+     * @param index the node index
+     * @param neighbourhoodRadius
+     *
+     * @return the set of neighbouring node indices within radius of
+     * length neighbourhoodRadius.
+     */
+    std::set<unsigned> GetNodesWithinNeighbourhoodRadius(unsigned index, double neighbourhoodRadius);
+
     /**
      * Overridden GetNeighbouringNodeIndices() method.
      *
