@@ -58,6 +58,15 @@ class AbstractVentilationProblem
 protected:
     TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
+    /** (Dynamic) viscosity in kg/(mm*second).
+     * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
+     *  mu = 1.92e-5 Pa*s <-- USED HERE
+           = 1.92e-5 kg/(m*s)
+           = 1.92e-8 kg/(mm*s) or kPa.s
+     * Consider http://en.wikipedia.org/wiki/Viscosity#Air which gives
+     * mu = 1.81x10^(-5) kg/(m*s) -- 1.86x10^(-5) kg/(m*s)
+     */
+    double mViscosity;
 
 public:
     /** Main constructor
@@ -71,6 +80,23 @@ public:
      * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
      */
     AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex=0u);
+
+    /**
+     * @return the viscosity in kg/(mm*sec)
+     */
+    double GetViscosity() const
+    {
+        return mViscosity;
+    }
+
+    /**
+     * @param viscosity  the viscosity in kg/(mm*sec)
+     */
+    void SetViscosity(double viscosity)
+    {
+        mViscosity = viscosity;
+    }
+
  };
 
 #endif /* ABSTRACTVENTILATIONPROBLEM_HPP_ */

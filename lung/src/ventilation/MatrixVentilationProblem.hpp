@@ -63,16 +63,6 @@ private:
     bool mDynamicResistance; /**< Use dynamic (flux related) resistance and a nonlinear solver */
     bool mRadiusOnEdge; /**< False by default (conical pipes with radius defined at nodes).  When true pipes are cylindrical.*/
 
-    /** (Dynamic) viscosity in kg/(mm*second).
-     * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
-     *  mu = 1.92e-5 Pa*s <-- USED HERE
-           = 1.92e-5 kg/(m*s)
-           = 1.92e-8 kg/(mm*s) or kPa.s
-     * Consider http://en.wikipedia.org/wiki/Viscosity#Air which gives
-     * mu = 1.81x10^(-5) kg/(m*s) -- 1.86x10^(-5) kg/(m*s)
-     */
-    double mViscosity;
-
     /** Density in kg/(mm^3).
      *  rho (for dry air) ~ 1.2041 kg/m^3 = 1.2e-9 kg/mm^3
      *
@@ -258,22 +248,6 @@ public:
      * @param rOutFileName  Name for VTK output
      */
     void SolveProblemFromFile(const std::string& rInFilePath, const std::string& rOutFileDir,const std::string& rOutFileName);
-
-    /**
-     * @return the viscosity in kg/(mm*sec)
-     */
-    double GetViscosity() const
-    {
-        return mViscosity;
-    }
-
-    /**
-     * @param viscosity  the viscosity in kg/(mm*sec)
-     */
-    void SetViscosity(double viscosity)
-    {
-        mViscosity = viscosity;
-    }
 
     /**
      * @return the density in kg/(m^3)

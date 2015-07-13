@@ -44,7 +44,6 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
       mpLinearSystem(NULL),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
-      mViscosity(1.92e-5),
       mDensity(1.15),
       mSolution(NULL),
       mLengthScaling(1)
