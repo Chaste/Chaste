@@ -36,8 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_
 #define TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_
 
-#include <boost/math/special_functions/bessel.hpp>
 #include <cxxtest/TestSuite.h>
+
+#include <boost/math/special_functions/bessel.hpp>
+
 #include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -61,6 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+
 /*
  * In this test suite we check the solution of the CellwisePdes
  * against exact solutions.
@@ -69,9 +72,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We solve unit disc where the solutions are Bessels functions and logs.
  */
-
-
-
 class TestEllipticGrowingDomainModiferMethods : public AbstractCellBasedWithTimingsTestSuite
 {
 
@@ -82,7 +82,6 @@ public:
      * u = J0(r)/J0(1)
      * where J0 is the zeroth order bessel fn
      */
-
     void TestMeshBasedMonolayerWithEllipticPde() throw (Exception)
     {
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
@@ -131,7 +130,6 @@ public:
      *     A*ln(r) + 1 for r in [0.5,1]
      *
      *  where J0 is the zeroth order bessel fn and C and A are constants
-     *
      *
      */
     void TestMeshBasedHeterogeneousMonolayerWithEllipticPde() throw (Exception)
@@ -203,7 +201,6 @@ public:
     }
 
     // Now test on a square with half appoptotic cells to compare all the population types
-
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
         EXIT_IF_PARALLEL;
@@ -254,8 +251,6 @@ public:
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombMeshGenerator generator(20,20,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
@@ -308,8 +303,6 @@ public:
 
     void TestVertexBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombVertexMeshGenerator generator(20,20);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -359,8 +352,6 @@ public:
 
     void TestPottsBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -412,8 +403,6 @@ public:
 
     void TestCaBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 

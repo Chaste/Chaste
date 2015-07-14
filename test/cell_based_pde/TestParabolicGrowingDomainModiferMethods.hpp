@@ -37,6 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_
 
 #include <cxxtest/TestSuite.h>
+
+#include <boost/math/special_functions/bessel.hpp>
+
 #include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
@@ -57,8 +60,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "CaBasedCellPopulation.hpp"
 
-
-#include "PetscSetupAndFinalize.hpp"
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 /*
  * In this test suite we check the solution of the CellwiseParabolicPdes
@@ -83,8 +86,6 @@ public:
 
     void TestMeshBasedMonolayerWithParabolicPde() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -151,8 +152,6 @@ public:
      */
     void TestMeshBasedHeterogeneousMonolayerWithParabolicPde() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -231,8 +230,6 @@ public:
 
     void TestMeshBasedMonolayerWithParabolicPdeAndNeumannBcs() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -287,32 +284,30 @@ public:
 
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
+        HoneycombMeshGenerator generator(20,20,0);
+        MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-           HoneycombMeshGenerator generator(20,20,0);
-           MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
 
-           std::vector<CellPtr> cells;
-           MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
-           CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-           cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_differentiated_type);
+        // Make cells with x<10.0 appoptotic (so no source term)
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+                       cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+        for (unsigned i =0; i<cells.size(); i++)
+        {
+           c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+        if (cell_location(0)<10.0)
+        {
+            cells[i]->AddCellProperty(p_apoptotic_property);
+        }
+        // Set initial condition for pde
+        cells[i]->GetCellData()->SetItem("variable",1.0);
+        }
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
 
-           // Make cells with x<10.0 appoptotic (so no source term)
-           boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
-                           cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
-           for (unsigned i =0; i<cells.size(); i++)
-           {
-               c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
-            if (cell_location(0)<10.0)
-            {
-                cells[i]->AddCellProperty(p_apoptotic_property);
-            }
-            // Set initial condition for pde
-            cells[i]->GetCellData()->SetItem("variable",1.0);
-           }
-           TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
-
-           MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Set up simulation time for file output
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
@@ -335,16 +330,15 @@ public:
                p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
         }
 
-           // Test the solution at some fixed points to compare with other cell populations
-           CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
-           TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-           TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
-           TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-4);
-       }
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-4);
+    }
 
     void TestNodeBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(20,20,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
@@ -399,17 +393,15 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-2);
-          //Checking it doesn't change for this cell population
-          TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6296, 1e-4);
+        //Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6296, 1e-4);
 
-          // Clear Memory
-          delete p_mesh;
+        // Clear Memory
+        delete p_mesh;
     }
 
     void TestVertexBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombVertexMeshGenerator generator(20,20);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -469,8 +461,6 @@ public:
 
     void TestPottsBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -526,8 +516,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
-          //Checking it doesn't change for this cell population
-          TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
+        //Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
     }
 
     // Note: ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopultions
