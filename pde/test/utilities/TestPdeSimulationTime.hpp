@@ -54,6 +54,23 @@ public:
 
         TS_ASSERT_EQUALS(PdeSimulationTime::GetNextTime(), 1.0453346+0.025);
     }
+    void TestAssertionWithNonRationalTimeStep()
+    {
+        PdeSimulationTime::SetTime(5.0);
+        for (unsigned i=1; i<100; i++)
+        {
+            double end_time = 5.0+0.1*i;
+            /*
+             *  With non-rational floating point time step we expect a small "error" in
+             *  time-step (or end-points).  We simulate the worse possible situation (or something
+             *  like it but slightly worse since neither 0.1 or 0.1+0.1*epsilon are exactly representable).
+             *
+             */
+
+            PdeSimulationTime::SetPdeTimeStepAndNextTime((1.0+DBL_EPSILON)*0.1, end_time);
+            PdeSimulationTime::SetTime(end_time);
+        }
+    }
 };
 
 #endif /*TESTPDESIMULATIONTIME_HPP_*/
