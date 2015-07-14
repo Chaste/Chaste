@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_
 #define TESTELLIPTICGROWINGDOMAINMODIFIERMETHODS_HPP_
 
+#include <boost/math/special_functions/bessel.hpp>
 #include <cxxtest/TestSuite.h>
 #include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
@@ -57,8 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "CaBasedCellPopulation.hpp"
 
-
-#include "PetscSetupAndFinalize.hpp"
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 /*
  * In this test suite we check the solution of the CellwisePdes
@@ -84,8 +85,6 @@ public:
 
     void TestMeshBasedMonolayerWithEllipticPde() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
