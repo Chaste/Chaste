@@ -135,16 +135,6 @@ protected:
     /**
      * Helper method for the constructor.
      *
-     * This function is called when all Lloyd's Relaxation steps are complete.  It is insufficient to check for nodes
-     * contained in fewer than three elements - this is a sufficient but not necessary condition for being on the
-     * boundary.  Instead, we can rely on the boundary periodicity by tagging nodes that are part of a congruent pair on
-     * each side of the mesh.
-     */
-    void TagBoundaryNodes();
-
-    /**
-     * Helper method for the constructor.
-     *
      * Validates the input parameters, and sets up remaining member variables.
      */
     void ValidateInputAndSetMembers();
@@ -161,11 +151,10 @@ protected:
     void ValidateSeedLocations(std::vector<c_vector<double, 2> >& rSeedLocations);
 
     /**
-     * Helper method for the constructor.
+     * Helper method for the GetToroidalMesh().
      *
      * After the final iteration of Lloyd's Relaxation, some nodes may have x or y position < 0.0. This method
-     * repositions all nodes so that they have x and y coordinates are >= 0.0. This helps when identifying boundary
-     * nodes and if the user requests a Toroidal mesh.
+     * repositions all nodes so that they have x and y coordinates >= 0.0. This helps when generating a Toroidal mesh.
      */
     void RepositionNodes();
 

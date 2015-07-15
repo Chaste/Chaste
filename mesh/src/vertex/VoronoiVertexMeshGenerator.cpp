@@ -88,13 +88,6 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
         c_vector<double, 2>& node_location = mpMesh->GetNode(node_idx)->rGetModifiableLocation();
         node_location *= scale_factor;
     }
-
-    // We reposition every node so that its x and y coordinates are >= 0.0. This helps tagging boundary nodes
-    this->RepositionNodes();
-
-    // Finally, we tag the boundary nodes to ensure the mesh properties are correct
-    this->TagBoundaryNodes();
-
 }
 
 VoronoiVertexMeshGenerator::~VoronoiVertexMeshGenerator()
@@ -136,8 +129,8 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
      *    mpMesh, some of which have been modified to replace nodes by their congruent partners.
      */
 
-    // This method should only ever be called after mpMesh has been created
-    assert(mpMesh != NULL);
+    // To help in identifying congruence later, we move all nodes into the positive quadrant
+    this->RepositionNodes();
 
     // The width and height of the mesh for periodicity purposes
     double width = mNumElementsX * sqrt(mElementTargetArea);
@@ -203,7 +196,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
     }
 
     /*
-     * We now need to identify congruent boundary nodes. This process in inverse to the process used to identify
+     * We now need to identify congruent boundary nodes. This process is inverse to the process used to identify
      * boundary nodes. Instead of considering those boundary nodes with locations >= (width, hight), we identify those
      * with locations <= (width, hight).  Each one of these nodes will be congruent to at least one other boundary node,
      * and will replace each of those that it's congruent to in any elements containing those congruent nodes.
@@ -342,6 +335,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
 
     // We can now create the mesh with new_elements and the subset of new_nodes
     mpTorMesh = new Toroidal2dVertexMesh(width, hight, nodes_for_mesh, new_elems);
+    mpTorMesh->ReMesh();
 
     return mpTorMesh;
 }
@@ -465,13 +459,17 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
      * We then loop over the cells in the Voronoi diagram corresponding only to the points from the centre of the
      * 3x3 tessellation.  These cells will correspond to the elements in the MutableVertexMesh.  From these cells,
      * we find the nodes which will correspond to nodes in the MutableVertexMesh.
+     *
+     * We then loop over the cells again, this time only those corresponding to points not in the centre of the 3x3
+     * tessellation.  This allows us to tag boundary nodes, by finding those nodes in outer voronoi cells that coincide
+     * in location with the nodes we have already identified.
      */
 
     // Construct the Voronoi tessellation of these 9 x mTotalNumElements points
     voronoi_diagram<double> vd;
     construct_voronoi(points.begin(), points.end(), &vd);
 
-    // Loop over the cells in the voronoi diagram
+    // Loop over the cells in the voronoi diagram to find nodes for our mesh
     for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
          it != vd.cells().end();
          ++it)
@@ -480,6 +478,7 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
         const voronoi_diagram<double>::cell_type& cell = *it;
 
         // The cells we care about are exactly those whose source_index is less than the size of the locations vector
+        // (i.e. those cells in the central portion of the 3x3 tessellation of source points)
         if (cell.source_index() < rSeedLocations.size())
         {
             // We create a vector of nodes, which will be used to create a MutableElement
@@ -548,86 +547,72 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
         }
     }
 
+    // Loop over the cells in the voronoi diagram to identify boundary nodes
+    for (voronoi_diagram<double>::const_cell_iterator it = vd.cells().begin();
+         it != vd.cells().end();
+         ++it)
+    {
+        // Get a reference to the current cell
+        const voronoi_diagram<double>::cell_type& cell = *it;
+
+        // The cells we care about are exactly those whose source_index is greater than the size of the locations vector
+        // (i.e. those cells in the outside eight portions of the 3x3 tessellation of source points)
+        if (cell.source_index() >= rSeedLocations.size())
+        {
+            // Loop over the edges of the current cell
+            const voronoi_diagram<double>::edge_type *edge = cell.incident_edge();
+
+            do
+            {
+                /*
+                 * Break out of the do-while if there is an infinite edge; we needn't care about cells at the very edge.
+                 */
+                if (edge->is_infinite())
+                {
+                    break;
+                }
+
+                if (edge->is_primary())
+                {
+                    c_vector<double, 2> vertex_location;
+
+                    // Get the location of vertex0 of the current edge
+                    vertex_location[0] = (edge->vertex0()->x()) / mSamplingMultiplier;
+                    vertex_location[1] = (edge->vertex0()->y()) / mSamplingMultiplier;
+
+                    /*
+                     * Check whether this location coincides with one of our nodes; if it does, it must be a boundary
+                     * node
+                     */
+                    for (unsigned node_idx = 0 ; node_idx < nodes.size() ; node_idx++)
+                    {
+                        // Grab the existing node location
+                        c_vector<double, 2> existing_node_location = nodes[node_idx]->rGetLocation();
+
+                        // Equality here is determined entirely on coincidence of position
+                        if ( fabs(existing_node_location[0] - vertex_location[0]) < DBL_EPSILON )
+                        {
+                            if ( fabs(existing_node_location[1] - vertex_location[1]) < DBL_EPSILON )
+                            {
+                                // If the locations match, tag the node as being on the boundary
+                                nodes[node_idx]->SetAsBoundaryNode(true);
+                            }
+                        }
+                    }
+                    // Move to the next edge
+                    edge = edge->next();
+                }
+
+            } while (edge != cell.incident_edge());
+        }
+    }
+
     // Create a new mesh with the current vector of nodes and elements
     if (mpMesh)
     {
         delete mpMesh;
     }
     mpMesh = new MutableVertexMesh<2,2>(nodes, elements);
-}
-
-void VoronoiVertexMeshGenerator::TagBoundaryNodes()
-{
-    /*
-     * The nodes have already been repositioned to have non-negative x and y coords.  This means that each boundary
-     * node is now congruent to at least one boundary node that has x-coord or y-coord greater than the mesh width
-     * or height.
-     */
-    double width = mNumElementsX * sqrt(mElementTargetArea);
-    double hight = mNumElementsY * sqrt(mElementTargetArea);
-
-    for (unsigned node_a_idx = 0 ; node_a_idx < mpMesh->GetNumNodes() ; node_a_idx++)
-    {
-        Node<2>* p_node_a = mpMesh->GetNode(node_a_idx);
-        c_vector<double, 2> node_a_location = p_node_a->rGetLocation();
-
-        if ( (node_a_location[0] < width - mTol) && (node_a_location[1] < hight - mTol) )
-        {
-            // Most nodes will be within the width and height
-            continue;
-        }
-
-        // There are three possible congruent locations for each candidate boundary node
-        c_vector<double, 2> congruent_location_1 = node_a_location;
-        congruent_location_1[0] -= width;
-
-        c_vector<double, 2> congruent_location_2 = node_a_location;
-        congruent_location_2[1] -= hight;
-
-        c_vector<double, 2> congruent_location_3 = node_a_location;
-        congruent_location_3[0] -= width;
-        congruent_location_3[1] -= hight;
-
-        /*
-         * Loop over all other nodes and check if any have the same location up to mTol
-         */
-        std::vector<Node<2>*> congruent_nodes;
-
-        for (unsigned node_b_idx = 0 ; node_b_idx < mpMesh->GetNumNodes() ; node_b_idx++)
-        {
-            if (node_a_idx == node_b_idx)
-            {
-                continue;
-            }
-
-            Node<2>* p_node_b = mpMesh->GetNode(node_b_idx);
-            c_vector<double, 2> node_b_location = p_node_b->rGetLocation();
-
-            if (norm_2(congruent_location_1 - node_b_location) < mTol)
-            {
-                congruent_nodes.push_back(p_node_b);
-            }
-            else if (norm_2(congruent_location_2 - node_b_location) < mTol)
-            {
-                congruent_nodes.push_back(p_node_b);
-            }
-            else if (norm_2(congruent_location_3 - node_b_location) < mTol)
-            {
-                congruent_nodes.push_back(p_node_b);
-            }
-        }
-
-        // If there is at least one congruent location, we must nodes as being on the boundary
-        if (congruent_nodes.size() > 0)
-        {
-            p_node_a->SetAsBoundaryNode(true);
-
-            for (unsigned idx = 0 ; idx < congruent_nodes.size() ; idx++)
-            {
-                congruent_nodes[idx]->SetAsBoundaryNode(true);
-            }
-        }
-    }
 }
 
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()

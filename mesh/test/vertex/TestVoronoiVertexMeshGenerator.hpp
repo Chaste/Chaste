@@ -234,9 +234,12 @@ public:
     {
 #if BOOST_VERSION >= 105200
 
-        // Get a mesh
+        // Get a mesh and call RepositionNodes()
         VoronoiVertexMeshGenerator generator(9, 9, 1, 1.0);
+        generator.RepositionNodes();
+
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+
 
         // Verify that all node locations have been moved to be >= 0
         for (unsigned node_idx = 0 ; node_idx < p_mesh->GetNumNodes() ; node_idx++ )
