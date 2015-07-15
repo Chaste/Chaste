@@ -561,9 +561,16 @@ public:
         // variables going out of range. An exception should be thrown in the
         // EvaluateYDerivatives() method of the cell model
 
+
         TS_ASSERT_THROWS_CONTAINS(monodomain_problem.Solve(),
-                "State variable fast_sodium_current_m_gate__m has gone out of range. "
-                "Check numerical parameters, for example time and space stepsizes");
+#ifndef NDEBUG
+            // VerifyStateVariables is only called when debug is on
+            "State variable fast_sodium_current_m_gate__m has gone out of range. "
+            "Check numerical parameters, for example time and space stepsizes");
+#else
+            // This test hits a later assert(!isnan) if we do a ndebug build.
+            "Assertion tripped: !std::isnan(i_ionic)");
+#endif // NDEBUG
     }
 
 };
