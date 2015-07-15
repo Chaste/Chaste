@@ -86,7 +86,7 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
     bool is_cell_apoptotic = false;
 
     if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL ||
-        dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) )
+        dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL)
     {
         if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
         {
