@@ -425,21 +425,23 @@ public:
      */
     c_vector<double, DIM> GetSizeOfCellPopulation();
 
-    /*
-     * Method to return nodes within a given radius of a node
+    /**
+     * Method to return nodes within a given radius of a node.
+     * Note this is independent of cell radius and returns
+     * all nodes within a given radius.
      *
      * @param index the node index
-     * @param neighbourhoodRadius
+     * @param neighbourhoodRadius the radius to find neighbours in.
+     * Note must be less than the MaximumInteractionDistance in the NodesOnlyMesh
      *
-     * @return the set of neighbouring node indices within radius of
-     * length neighbourhoodRadius.
+     * @return the set of neighbouring node indices within neighbourhoodRadius of the specified node.
      */
     std::set<unsigned> GetNodesWithinNeighbourhoodRadius(unsigned index, double neighbourhoodRadius);
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
      *
-     * Only returns nodes that are strictly touching each other.
+     * Not that this method only returns node indices for cells that are strictly touching each other.
      *
      * @param index the node index
      * @return the set of neighbouring node indices.
