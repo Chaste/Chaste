@@ -227,14 +227,14 @@ c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeights(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    //Can only test if it's a tetrahedal mesh in 3d, triangles in 2d...
+    // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
     assert(ELEMENT_DIM == SPACE_DIM);
 
     c_vector<double, SPACE_DIM+1> weights;
 
     c_vector<double, SPACE_DIM> xi=CalculateXi(rTestPoint);
 
-    //Copy 3 weights and compute the fourth weight
+    // Copy 3 weights and compute the fourth weight
     weights[0]=1.0;
     for (unsigned i=1; i<=SPACE_DIM; i++)
     {
@@ -247,7 +247,7 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeightsWithProjection(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    //Can only test if it's a tetrahedal mesh in 3d, triangles in 2d...
+    //Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
     assert(ELEMENT_DIM == SPACE_DIM);
 
     c_vector<double, SPACE_DIM+1> weights = CalculateInterpolationWeights(rTestPoint);
@@ -289,7 +289,7 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    //Can only test if it's a tetrahedal mesh in 3d, triangles in 2d...
+    //Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
     assert(ELEMENT_DIM == SPACE_DIM);
 
     // Find the location with respect to node 0
@@ -312,18 +312,18 @@ c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const C
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>& rTestPoint, bool strict)
 {
-    //Can only test if it's a tetrahedal mesh in 3d, triangles in 2d...
+    // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
     assert(ELEMENT_DIM == SPACE_DIM);
 
     c_vector<double, SPACE_DIM+1> weights=CalculateInterpolationWeights(rTestPoint);
 
-    //If the point is in the simplex then all the weights should be positive
+    // If the point is in the simplex then all the weights should be positive.
 
     for (unsigned i=0; i<=SPACE_DIM; i++)
     {
         if (strict)
         {
-            //Points can't be close to a face
+            // Points can't be close to a face
             if (weights[i] <= 2*DBL_EPSILON)
             {
                 return false;
@@ -331,7 +331,7 @@ bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>
         }
         else
         {
-            //Allow point to be close to a face
+            // Allow point to be close to a face
             if (weights[i] < -2*DBL_EPSILON)
             {
                 return false;
