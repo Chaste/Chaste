@@ -84,8 +84,8 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
 
     bool is_cell_apoptotic = false;
 
-    if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) ||
-        dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) )
+    if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL ||
+        dynamic_cast<PottsBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL)
     {
         if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
         {
@@ -99,7 +99,7 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
             return 0.0;
         }
     }
-    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)))
+    else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL)
     {
         VertexBasedCellPopulation<DIM>* static_cast_cell_population = static_cast<VertexBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
 
