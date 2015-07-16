@@ -96,6 +96,13 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(Abstract
 template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    if (mDeleteMesh)
+    {
+        // If a mesh has been created on a previous time-step then we need to tidy it up
+        assert (mpFeMesh != NULL);
+        delete mpFeMesh;
+    }
+
     // Get FE mesh from Cell Population different for each type of Cell Population
     if(dynamic_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
