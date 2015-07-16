@@ -64,7 +64,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleUniformSourcePde.hpp"
 #include "UniformSourceParabolicPde.hpp"
 #include "ConstBoundaryCondition.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "ReplicatableVector.hpp"
 #include "WildTypeCellMutationState.hpp"
 #include "AveragedSourcePde.hpp"
@@ -74,6 +73,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ArchiveOpener.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
+
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
@@ -100,8 +102,6 @@ class TestGrowingDomainPdeModifiers : public AbstractCellBasedWithTimingsTestSui
 public:
     void TestEllipticConstructor() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Make the Pde and BCS
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
@@ -117,8 +117,6 @@ public:
 
     void TestParabolicConstructor() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Make the Pde and BCS
         UniformSourceParabolicPde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
@@ -130,15 +128,10 @@ public:
 
         // Test that member variables are initialised correctly
         TS_ASSERT_EQUALS(p_pde_modifier->mpPdeAndBcs->rGetDependentVariableName(), "averaged quantity");
-
-
-       // delete p_generating_mesh;  ///\todo stop memory leaks (#2687)
     }
 
     void TestMeshGeneration() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Create a PDE and BCs object to be used by all cell populations
         SimpleUniformSourcePde<2> pde(-0.1);
         ConstBoundaryCondition<2> bc(1.0);
@@ -194,8 +187,6 @@ public:
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], node_mesh.GetNode(i)->rGetLocation()[0],1e-5);
                 TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], node_mesh.GetNode(i)->rGetLocation()[1],1e-5);
             }
-
-            // delete p_generating_mesh;  ///\todo stop memory leaks (#2687)
         }
 
         {
@@ -350,6 +341,11 @@ public:
             ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
             pde_and_bc.SetDependentVariableName("averaged quantity");
 
+            ///\todo #2687
+            // Make a dummy solution (because the archiver expects to be able to read/write PETSc Vecs).
+            Vec vector = PetscTools::CreateAndSetVec(10, -42.0);
+            pde_and_bc.SetSolution(vector);
+
             // Initialise a Parabolic PDE Modifier object using this pde and bcs object
             AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new ParabolicGrowingDomainPdeModifier<2>(&pde_and_bc);
 
@@ -372,11 +368,13 @@ public:
 
             input_arch >> p_modifier2;
 
-            // See whether we read out the correct variable name area
+            // See whether we read out the correct variable name
             std::string variable_name = (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs->rGetDependentVariableName();
             // Test that member variables are initialised correctly
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
+            ///\todo #2687 Did the archive created a new PDE object?
+            ///delete (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }
