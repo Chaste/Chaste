@@ -57,6 +57,11 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(PdeAndBo
 template<unsigned DIM>
 EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
 {
+    // Destroy the most recent solution vector
+    if (this->mSolution != NULL)
+    {
+        PetscTools::Destroy(this->mSolution);
+    }
 }
 
 template<unsigned DIM>
@@ -88,7 +93,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DI
 
     // Call these  methods to solve the PDE on the initial step and Output the results.
     UpdateAtEndOfTimeStep(rCellPopulation);
-    this-> UpdateAtEndOfOutputTimeStep(rCellPopulation);
+    this->UpdateAtEndOfOutputTimeStep(rCellPopulation);
 }
 
 template<unsigned DIM>

@@ -134,8 +134,6 @@ public:
      */
     void TestMeshBasedHeterogeneousMonolayerWithEllipticPde() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
         MutableMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -203,8 +201,6 @@ public:
     // Now test on a square with half appoptotic cells to compare all the population types
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombMeshGenerator generator(20,20,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 

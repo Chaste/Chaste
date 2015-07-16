@@ -56,6 +56,11 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(Parabo
 template<unsigned DIM>
 ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
 {
+    // It we have used this modifier, then we will have created a solution vector
+    if (this->mSolution)
+    {
+        PetscTools::Destroy(this->mSolution);
+    }
 }
 
 
@@ -141,8 +146,11 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Clear and resize the solution vector
-    PetscTools::Destroy(this->mSolution);
+    // Clear (if it's not the first time) and resize the solution vector
+    if (this->mSolution)
+    {
+        PetscTools::Destroy(this->mSolution);
+    }
     this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
 
     // Loop over nodes and get appropriate solution value from CellData
