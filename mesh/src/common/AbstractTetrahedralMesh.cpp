@@ -1053,8 +1053,8 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
         iter != testElements.end();
         iter++)
     {
-        c_vector<double, ELEMENT_DIM+1> weight=this->mElements[*iter]->CalculateInterpolationWeights(rTestPoint);
-        double neg_weight_sum=0.0;
+        c_vector<double, ELEMENT_DIM+1> weight = this->mElements[*iter]->CalculateInterpolationWeights(rTestPoint);
+        double neg_weight_sum = 0.0;
         for (unsigned j=0; j<=ELEMENT_DIM; j++)
         {
             if (weight[j] < 0.0)

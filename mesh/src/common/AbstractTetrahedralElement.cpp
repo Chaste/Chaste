@@ -116,9 +116,31 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateJacobian(c_mat
         rJacobianDeterminant = Determinant(rJacobian);
         if (rJacobianDeterminant <= DBL_EPSILON)
         {
-            EXCEPTION("Jacobian determinant is non-positive: "
-                          << "determinant = " << rJacobianDeterminant
-                          << " for element " << this->mIndex);
+            std::stringstream message;
+            message << "Jacobian determinant is non-positive: "
+                    << "determinant = " << rJacobianDeterminant
+                    << " for element " << this->mIndex << " (" << ELEMENT_DIM
+                    << "D element in " << SPACE_DIM << "D space). Nodes are at:" << std::endl;
+
+            for (unsigned local_node_index=0u; local_node_index != ELEMENT_DIM+1; local_node_index++)
+            {
+                c_vector<double, SPACE_DIM> location = this->GetNodeLocation(local_node_index);
+                message << "Node " << this->GetNodeGlobalIndex(local_node_index) << ":\t";
+
+                for (unsigned i=0; i<SPACE_DIM; i++)
+                {
+                    message << location[i];
+                    if (i==SPACE_DIM - 1u)
+                    {
+                        message << std::endl;
+                    }
+                    else
+                    {
+                        message << "\t";
+                    }
+                }
+            }
+            EXCEPTION(message.str());
         }
     }
 }

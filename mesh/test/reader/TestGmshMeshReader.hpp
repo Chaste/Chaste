@@ -185,43 +185,44 @@ public:
         TS_ASSERT_EQUALS(data.AttributeValue, 2u);
     }
 
-    void TestReadMeshes(void) throw(Exception)
+    void TestRead2dMeshes(void) throw(Exception)
     {
-        {
-            READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
-            TetrahedralMesh<2,2> mesh;
-            mesh.ConstructFromMeshReader(reader);
-            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
-            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
-        }
+        READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(reader);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
+    }
 
-        {
-            READER_3D reader("mesh/test/data/simple_cube_gmsh.msh");
-            TetrahedralMesh<3,3> mesh;
-            mesh.ConstructFromMeshReader(reader);
-            TS_ASSERT_EQUALS(mesh.GetNumNodes(), 14u);
-            TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
-            TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
-        }
+    void TestRead2dQuadraticMeshes(void) throw(Exception)
+    {
+       READER_2D reader("mesh/test/data/quad_square_4_elements_gmsh.msh",2,2);
+       QuadraticMesh<2> mesh;
+       mesh.ConstructFromMeshReader(reader);
+       TS_ASSERT_EQUALS(mesh.GetNumNodes(), 13u);
+       TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
+       TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
+    }
 
-        {
-           READER_2D reader("mesh/test/data/quad_square_4_elements_gmsh.msh",2,2);
-           QuadraticMesh<2> mesh;
-           mesh.ConstructFromMeshReader(reader);
-           TS_ASSERT_EQUALS(mesh.GetNumNodes(), 13u);
-           TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
-           TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
-        }
+    void TestRead3dMeshes(void) throw(Exception)
+    {
+        READER_3D reader("mesh/test/data/simple_cube_gmsh.msh");
+        TetrahedralMesh<3,3> mesh;
+        mesh.ConstructFromMeshReader(reader);
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), 14u);
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
+        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
+    }
 
-        {
-           READER_3D reader("mesh/test/data/quad_cube_gmsh.msh",2,2);
-           QuadraticMesh<3> mesh;
-           mesh.ConstructFromMeshReader(reader);
-           TS_ASSERT_EQUALS(mesh.GetNumNodes(), 63u);
-           TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
-           TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
-        }
+    void TestRead3dQuadraticMeshes(void) throw(Exception)
+    {
+       READER_3D reader("mesh/test/data/quad_cube_gmsh.msh",2,2);
+       QuadraticMesh<3> mesh;
+       mesh.ConstructFromMeshReader(reader);
+       TS_ASSERT_EQUALS(mesh.GetNumNodes(), 63u);
+       TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
+       TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
     }
 };
 

@@ -1066,8 +1066,6 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
          */
         bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
 
-
-
         if (!PetscTools::AmMaster())
         {
             //Allow for a halo node
