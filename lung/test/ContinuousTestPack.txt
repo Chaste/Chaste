@@ -6,6 +6,8 @@ TestSimpleImpedanceProblem.hpp
 TestLobePropertiesCalculator.hpp
 airway_generation/TestAirwayGeneration.hpp
 airway_generation/TestAirwayGenerator.hpp
+airway_generation/TestAirwayRemesher.hpp
+airway_generation/TestMajorAirwaysCentreLinesCleaner.hpp
 airway_generation/TestMultiLobeAirwayGenerator.hpp
 ventilation/TestAcinarUnitModels.hpp
 ventilation/TestMatrixVentilationProblem.hpp
