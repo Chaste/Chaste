@@ -70,8 +70,8 @@ private:
     {
         archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
 
-        // Note that archiving of mSolution is handled by the methods save/load_construct_data
-        archive & mpFeMesh;
+        // Note that archiving of mSolution is ~~~handled by the methods save/load_construct_data~~~ NOT YET DONE
+        // archive & mpFeMesh;
         archive & mOutputDirectory;
         archive & mCachedDependentVariableName;
     }
@@ -88,7 +88,7 @@ protected:
     Vec mSolution; ///\todo NEED TO ARCHIVE THIS see PdeandBoundaryCondidtion (#2687)
 
     /** Pointer to the finite element mesh on which to solve the PDE. **/
-    TetrahedralMesh<DIM,DIM>* mpFeMesh;
+    TetrahedralMesh<DIM,DIM>* mpFeMesh;  ///\todo #2687 NEED TO ARCHIVE THIS
 
     /** Store the output directory name. */
     std::string mOutputDirectory;

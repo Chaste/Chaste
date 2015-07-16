@@ -70,7 +70,6 @@ private:
     {
         archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
 
-        // Note that archiving of mSolution is handled by the methods save/load_construct_data
         archive & mpPdeAndBcs;
     }
 
