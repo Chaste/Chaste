@@ -224,7 +224,12 @@ public:
      * @param pMesh  a pointer to the AbstractTetrahedral mesh (recovered from archive).
      * @param intracellularConductivitiesSecondCell a vector with the orthotropic conductivities for the second cell (this is needed because the second cell values may not be taken from HeartConfig as the the ones for the first cell are).
      */
-    ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed, std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed, std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed, std::vector<double>& rGgapsDistributed, AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh, c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell);
+    ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
+                           std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
+                           std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
+                           std::vector<double>& rGgapsDistributed,
+                           AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
+                           c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell);
 
     /**
      * Destructor
