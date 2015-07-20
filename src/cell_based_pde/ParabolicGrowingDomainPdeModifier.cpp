@@ -161,7 +161,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
         unsigned node_index = node_iter->GetIndex();
         double solution_at_node;
 
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL) // Intel compiler wants the "!= NULL"
         {
             // Cells correspond to nodes in the Center of the vertex element
             // nodes on vertices have averaged values from containing cells
@@ -207,7 +207,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
             }
         }
         else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL ||
-                 dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
+                 dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL) // Intel compiler wants the "!= NULL"
 
         {
             // Simple 1-1 correspondence between cells and nodes in the finite element mesh
@@ -217,7 +217,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
         else
         {
             // To do this would need to iterate over cells instead of loop over nodes.
-            assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
+            assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL); // Intel compiler wants the "!= NULL"
             EXCEPTION("ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
         }
 
