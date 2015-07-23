@@ -347,4 +347,8 @@ class RdfProcessor(object):
 # Instantiate a processor instance that pretends to be this module
 ####################################################################################
 
-RdfProcessor(__name__)
+p = RdfProcessor(__name__)
+
+if __name__ == '__main__':
+    # Just load the ontology to trigger TTL -> RDF/XML conversion if needed
+    p._load_ontology()
