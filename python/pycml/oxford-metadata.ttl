@@ -43,7 +43,6 @@
     a :Category ;
     rdfs:label "Physical properties" .
 
-
 :CellMembraneCurrent
     a :Category ;
     rdfs:label "Membrane currents" ;
@@ -56,15 +55,18 @@
 
 :MembranePump
     a :CellMembraneCurrent ;
-    rdfs:label "Pumps" .
+    rdfs:label "Pumps" ;
+    rdfs:comment "Proteins that use energy in ATP to pump ions against their electrochemical gradients." .
 
 :MembraneExchanger
     a :CellMembraneCurrent ;
-    rdfs:label "Exchangers" .
+    rdfs:label "Exchangers" ;
+    rdfs:comment "Proteins that use the energy of one ionic species moving down an electrochemical gradient, to move another species against its gradient." .
 
 :MembraneIonChannel
     a :CellMembraneCurrent ;
-    rdfs:label "Ion channels" .
+    rdfs:label "Ion channels" ;
+    rdfs:comment "Proteins allowing certain ions to flow down their electrochemical gradients." .
 
 :MembranePotassiumChannel
     a :MembraneIonChannel ;
@@ -87,7 +89,6 @@
     rdfs:label "Mixed ion channels" ;
     rdfs:comment "Membrane ion channels that don't fit a more specific categorisation, or transport multiple species." .
 
-
 :SRCurrent
     a :Category ;
     rdfs:label "SR currents" ;
@@ -104,7 +105,6 @@
 :SRIonChannel
     a :SRCurrent ;
     rdfs:label "Ion channels" .
-
 
 :Concentration
     a :Category ;
@@ -126,7 +126,6 @@
     a :Concentration ;
     rdfs:label "Ionic concentrations in the cleft / dyadic space" .
 
-
 :ChasteMetadata
     a :Category ;
     rdfs:label "Basic Chaste metadata" ;
@@ -144,6 +143,7 @@
 :time
     a :Annotation ;
     a :PhysicalProperty ;
+    a :ChasteMetadata ;
     rdfs:label "Time" ;
     rdfs:comment "The independent variable, the simulation time." .
 
@@ -151,6 +151,18 @@
     a :Annotation ;
     a :PhysicalProperty ;
     rdfs:label "Temperature" .
+
+:gas_constant
+    a :Annotation ;
+    a :Constant ;
+    rdfs:label "Ideal Gas Constant - R" ;
+    rdfs:comment "Also known as the Molar or Universal gas constant." .
+
+:faraday_constant
+    a :Annotation ;
+    a :Constant ;
+    rdfs:label "Faraday's constant - F" ;
+    rdfs:comment "Equal to the electical charge on one mole of electrons." .
 
 # ======================================================================
 # Cardiac-Specific Labels
