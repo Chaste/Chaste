@@ -1515,10 +1515,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.writeln(self.vector_create('dqs', len(dqs)))
             for i, var in enumerate(dqs):
                 self.writeln(self.vector_index('dqs', i), self.EQ_ASSIGN, self.code_name(var), self.STMT_END)
-#                 self.writeln('std::cout << ">>> Output ', self.code_name(var), ' = " << ', self.code_name(var), ' << std::endl;')
-#             if self.use_protocol:
-#                 self.writeln('std::cout << ">>> m=" << var_fast_sodium_current_m_gate__m << ", h=" << var_fast_sodium_current_h_gate__h << ", j=" << var_fast_sodium_current_j_gate__j << std::endl;')
-#                 self.writeln('std::cout << ">>> Params[2 Nai,4 Nao,5 gNa,8 V] = [" << NV_Ith_S(this->mParameters, 2) << "," << NV_Ith_S(this->mParameters, 4) << "," << NV_Ith_S(this->mParameters, 5) << "," << NV_Ith_S(this->mParameters, 8) << "]" << std::endl;')
             self.writeln('return dqs', self.STMT_END)
             self.close_block(blank_line=True)
     
@@ -4845,7 +4841,6 @@ class CellMLToPythonTranslator(CellMLToChasteTranslator):
             for i, var in enumerate(vars):
                 self.writeln('outputs[', output_count, '][', i, '] = ', self.code_name(var))
             output_count += 1
-#         self.writeln('print ">>> Model outputs:", outputs')
         self.writeln('return outputs')
         self.close_block()
 
@@ -5062,7 +5057,6 @@ ext_modules=[
               ["%(filebase)s.pyx"],
               include_dirs=[numpy.get_include(), '%(fcpath)s'],
               #library_dirs=['%(fcpath)s/fc/sundials'],
-              extra_compile_args=["-O3"],
               libraries=['sundials_cvode', 'sundials_nvecserial', 'm'])
               # users can set CFLAGS and LDFLAGS in their env if needed
 ]
