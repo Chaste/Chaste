@@ -170,7 +170,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     }
     else
     {
-        // As of 10671 fibre orientation can only be defined when loading a mesh from disc.
+        // As of r10671 fibre orientation can only be defined when loading a mesh from disc.
         mFibreFilePathNoExtension = "";
     }
     CreateIntracellularConductivityTensor();
@@ -744,7 +744,7 @@ template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::ReplicateCaches()
 {
     // ReplicateCaches only needed for SVI (and non-matrix based assembly which is no longer in code)
-    // which is not implemented with purkinje. See commented code below if introducing this.
+    // which is not implemented with Purkinje. See commented code below if introducing this.
     assert(!mHasPurkinje);
 
     mIionicCacheReplicated.Replicate(mpDistributedVectorFactory->GetLow(), mpDistributedVectorFactory->GetHigh());
@@ -781,7 +781,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetConductivityModifier(Abstr
 {
     assert(pModifier!=NULL);
     assert(mpConductivityModifier==NULL); // shouldn't be called twice for example, or with two different modifiers (remove this assert
-                                          // if for whatever reason want to be able to overwrite modifiers
+                                          // if for whatever reason want to be able to overwrite modifiers)
     mpConductivityModifier = pModifier;
 }
 

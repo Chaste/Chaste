@@ -253,12 +253,12 @@
     rdfs:label "Membrane slow inward current conductance" ;
     rdfs:comment "Historial metadata - only for early models lacking components." .
 
-:leakage_current
+:membrane_leakage_current
     a :Annotation ;
     rdfs:label "Leakage current" ;
     rdfs:comment "Historial metadata - only for early models lacking components." .
 
-:leakage_current_conductance
+:membrane_leakage_current_conductance
     a :Annotation ;
     rdfs:label "Leakage current conductance" ;
     rdfs:comment "Historial metadata - only for early models lacking components." .

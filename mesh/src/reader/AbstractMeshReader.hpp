@@ -364,7 +364,6 @@ public:
     /**
      * An iterator class for node data.
      */
-
     ///\todo #1930.  We could roll most iterator functionality into a base class here
     class NodeIterator : public boost::iterator_facade<NodeIterator, const std::vector<double>,
                                                        boost::single_pass_traversal_tag>
@@ -406,7 +405,7 @@ public:
          *
          */
         NodeIterator(const std::set<unsigned>& rIndices,
-                        AbstractMeshReader* pReader);
+                     AbstractMeshReader* pReader);
 
         /**
          * @return the index of the item pointed at.
