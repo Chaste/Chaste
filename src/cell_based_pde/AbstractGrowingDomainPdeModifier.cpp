@@ -127,13 +127,15 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
                 nodes.push_back(new Node<DIM>(node_iter->GetIndex(), node_iter->rGetLocation()));
         }
 
-        mDeleteMesh=true;
+        mDeleteMesh = true;
         mpFeMesh = new MutableMesh<DIM,DIM>(nodes);
         assert(mpFeMesh->GetNumNodes() == rCellPopulation.GetNumRealCells());
 
     }
     else if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
     {
+        // GetTetrahedralMeshUsingVertexMesh will '''make''' a new mesh so we better be sure to delete it
+        mDeleteMesh = true;
         mpFeMesh = static_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation)->GetTetrahedralMeshUsingVertexMesh();
     }
     else if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
