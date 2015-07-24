@@ -86,10 +86,13 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     solver.SetTimeStep(dt);
 
     // Use previous solution as the initial condition
-    solver.SetInitialCondition(this->mSolution);
+    Vec previous_solution = this->mSolution;
+    solver.SetInitialCondition(previous_solution);
 
+    // Note that the linear solver creates a vector, so we have to keep a handle on the old one
+    // in order to destroy it.
     this->mSolution = solver.Solve();
-
+    PetscTools::Destroy(previous_solution);
     this->UpdateCellData(rCellPopulation);
 }
 
