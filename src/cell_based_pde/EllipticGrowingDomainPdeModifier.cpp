@@ -76,8 +76,11 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     CellBasedPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
     ///\todo Use initial guess when solving the system (#2687)
+    Vec old_solution_copy = this->mSolution;
     this->mSolution = solver.Solve();
-
+    // Note that the linear solver creates a vector, so we have to keep a handle on the old one
+    // in order to destroy it.
+    PetscTools::Destroy(old_solution_copy);
     this->UpdateCellData(rCellPopulation);
 }
 
