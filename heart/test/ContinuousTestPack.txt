@@ -16,6 +16,7 @@ fibres/TestFibreWriter.hpp
 fibres/TestPapillaryFibreCalculator.hpp
 fibres/TestStreeterFibreGenerator.hpp
 ionicmodels/TestCvodeCells.hpp
+ionicmodels/TestCvodeCellsWithDataClamp.hpp
 ionicmodels/TestCvodeWithJacobian.hpp
 ionicmodels/TestDynamicallyLoadedCellModels.hpp
 ionicmodels/TestGeneralizedRushLarsen.hpp
