@@ -415,13 +415,13 @@
 :membrane_leakage_current
     a :Annotation ;
     a :MembraneMixedChannel ;
-    rdfs:label "Leakage current" ;
+    rdfs:label "Membrane leakage current" ;
     rdfs:comment "Historical metadata - only for early models lacking components." .
 
 :membrane_leakage_current_conductance
     a :Annotation ;
     a :MembraneMixedChannel ;
-    rdfs:label "Leakage current conductance" ;
+    rdfs:label "Membrane leakage current conductance" ;
     rdfs:comment "Historical metadata - only for early models lacking components." .
 
 # Following entries are MODERN metadata - labels all new models should be able to use.
