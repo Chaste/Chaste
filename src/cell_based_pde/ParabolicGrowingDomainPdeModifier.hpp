@@ -74,6 +74,7 @@ private:
     }
 
     /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
+    ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
     ParabolicPdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
 
 public:

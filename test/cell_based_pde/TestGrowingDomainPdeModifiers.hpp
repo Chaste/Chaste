@@ -321,6 +321,8 @@ public:
             // Test that member variables are initialised correctly
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
+            ///\todo #2687 The archive created a new PDE object. Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
+            delete (static_cast<EllipticGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }
@@ -373,8 +375,8 @@ public:
             // Test that member variables are initialised correctly
             TS_ASSERT_EQUALS(variable_name, "averaged quantity");
 
-            ///\todo #2687 Did the archive created a new PDE object?
-            ///delete (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
+            ///\todo #2687 The archive created a new PDE object. Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
+            delete (static_cast<ParabolicGrowingDomainPdeModifier<2>*>(p_modifier2))->mpPdeAndBcs;
             delete p_modifier2;
         }
     }
