@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include "AbstractVentilationProblem.hpp"
 #include "AbstractAcinarUnitFactory.hpp"
-#include "TetrahedralMesh.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
@@ -72,11 +71,13 @@ private:
 
     /** Density in kg/(mm^3).
      *  rho (for dry air) ~ 1.2041 kg/m^3 = 1.2e-9 kg/mm^3
+     *  Swan has a typo in the paper, actual value is 1.15e-6 g/mm^3 not 1.51e-6 g/mm^3!
      *  Default to Swan (page 224)
-     *  rho = 1.51e-6 g/mm^3 <-- USED HERE
-     *      = 1.51e-9 kg/mm^3
-     *      = 1.51e-6 kg/(m s^2) * s^2 / (mm)^2
-     *      - 1.51e-6 Pa s^2 /mm^2
+     *  rho = 1.15    kg/m^3
+     *      = 1.15e-6 g/mm^3 <-- USED HERE
+     *      = 1.15e-9 kg/mm^3
+     *      = 1.15e-6 kg/(m s^2) * s^2 / (mm)^2
+     *      - 1.15e-6 Pa s^2 /mm^2
      *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;

@@ -204,7 +204,7 @@ public:
         //These values are equivalent to Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
         TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-5, 1e-12);
         problem.SetViscosity(1.0);
-        TS_ASSERT_DELTA(problem.GetDensity(), 1.51e-6, 1e-10);
+        TS_ASSERT_DELTA(problem.GetDensity(), 1.15e-6, 1e-10);
         problem.SetDensity(1.0);
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(100);
@@ -349,15 +349,15 @@ public:
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6687.89,   1e-2);
-        TS_ASSERT_DELTA(pressure[2], 12229.3, 1e-2);
-        TS_ASSERT_DELTA(pressure[3], 12229.3, 1e-2);
+        TS_ASSERT_DELTA(pressure[1], 6666.66,   1e-2);
+        TS_ASSERT_DELTA(pressure[2], 12222.2222, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 12222.2222, 1e-2);
         TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-4); //BC
         TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-4); //BC
         TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-4); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-4); //BC
 
-        TS_ASSERT_DELTA(flux[6], -70.8367, 1e-4);
+        TS_ASSERT_DELTA(flux[6], -71.0176, 1e-4);
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
@@ -366,21 +366,22 @@ public:
     {
         VentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowFluxes(-70.8367); //Needed to increase the resistance in these artificial airways
+        // See previous test for boundary condition
+        problem.SetConstantInflowFluxes(-71.0176); //Needed to increase the resistance in these artificial airways
         problem.SetDynamicResistance();
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6687.89,   1e-2);
-        TS_ASSERT_DELTA(pressure[2], 12229.3, 1e-2);
-        TS_ASSERT_DELTA(pressure[3], 12229.3, 1e-2);
+        TS_ASSERT_DELTA(pressure[1], 6666.66,   1e-2);
+        TS_ASSERT_DELTA(pressure[2], 12222.2222, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 12222.2222, 1e-2);
         TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-2);
         TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-2);
         TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-2);
         TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-2);
 
-        TS_ASSERT_DELTA(flux[6], -70.8367, 1e-4); //BC
+        TS_ASSERT_DELTA(flux[6], -71.0176, 1e-4); //BC
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
@@ -535,7 +536,7 @@ public:
         {
             // Poiseuille
             TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.975182e6, 1.0);
-            TS_ASSERT_DELTA(top_reynolds_number, 49591, 1.0);
+            TS_ASSERT_DELTA(top_reynolds_number, 37768, 1.0);
         }
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "patient_data");

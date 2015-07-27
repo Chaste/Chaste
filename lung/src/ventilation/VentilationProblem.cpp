@@ -42,7 +42,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
-      mDensity(1.51e-6),
+      mDensity(1.15e-6),
       mFluxGivenAtInflow(false),
       mTerminalInteractionMatrix(NULL),
       mNumNonZeroesPerRow(25u), //See note in header definition
