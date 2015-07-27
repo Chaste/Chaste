@@ -1563,6 +1563,12 @@ class CellMLToChasteTranslator(CellMLTranslator):
             kept_vars = list(set(kept_vars) - set(self.cell_parameters))
         else:
             kept_vars = []
+
+        # The data clamp generates a variable that looks like a function and needs removing from 
+        # the member variables of the generated classes.
+        if hasattr(self.config, 'i_data_clamp_data') and (self.config.i_data_clamp_data in kept_vars):
+            kept_vars.remove(self.config.i_data_clamp_data)
+        
         # Reduce intra-run variation
         kept_vars.sort(key=self.var_display_name)
         self.cell_parameters.sort(key=self.var_display_name)
@@ -1589,7 +1595,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
         # Generate member variable declarations
         self.set_access('private')
-        if kept_vars or self.metadata_vars:
+        if kept_vars: # or self.metadata_vars:
             self.output_comment('\nSettable parameters and readable variables\n', subsidiary=True)
         for var in kept_vars:
             self.writeln_hpp(self.TYPE_DOUBLE, self.code_name(var), self.STMT_END)
@@ -1607,14 +1613,14 @@ class CellMLToChasteTranslator(CellMLTranslator):
         self.use_lookup_tables = False
         for var in self.metadata_vars:
             if var.is_statically_const(ignore_annotations=True):
-                self.output_method_start('Get_' + var.oxmeta_name + '_constant', [], self.TYPE_DOUBLE)
-                self.open_block()
-                self.output_comment('Constant value given in CellML')
-                nodeset = self.calculate_extended_dependencies([var])
-                self.output_equations(nodeset)
-                self.writeln('return ', self.code_name(var), self.STMT_END)
-                self.close_block()
-                self.writeln()
+#                 self.output_method_start('Get_' + var.oxmeta_name + '_constant', [], self.TYPE_DOUBLE)
+#                 self.open_block()
+#                 self.output_comment('Constant value given in CellML')
+#                 nodeset = self.calculate_extended_dependencies([var])
+#                 self.output_equations(nodeset)
+#                 self.writeln('return ', self.code_name(var), self.STMT_END)
+#                 self.close_block()
+#                 self.writeln()
                 if var in self.cell_parameters and var in self.modifier_vars:
                     # 'Forget' its index, so normal code generation occurs (#1647)
                     var._cml_has_modifier = True
@@ -3394,6 +3400,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # print 'Conductance units:', conductance_units, conductance_units.description()
             i_data_clamp_conductance = generator.add_variable(iface_comp, 'membrane_data_clamp_current_conductance', conductance_units, initial_value='0.0')
             i_data_clamp_conductance._set_type(VarTypes.Constant)
+            i_data_clamp_conductance.set_pe_keep(True) # This prevents it becoming 'chaste_interface__membrane_data_clamp_current_conductance'
             config.i_data_clamp_conductance = generator.add_input(i_data_clamp_conductance, conductance_units)
             # Create V_clamp
             data_var = config.i_data_clamp_data = generator.add_variable(iface_comp, 'experimental_data_voltage', mV, initial_value='0.0')

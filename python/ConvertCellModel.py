@@ -227,8 +227,10 @@ else:
 
 # Check for .so creation
 if options.dynamically_loadable:
-    if number_of_options > 1 and not dyn_opt:
+    if number_of_options > 1 and not dyn_opt and not options.cvode_data_clamp:
+        print 'You asked for ', options
         parser.error("Only one output type may be specified if creating a dynamic library")
+        
     essential_options.append('-y')
 
 # What options should be passed on to PyCml?
@@ -344,7 +346,7 @@ def convert(model, output_dir):
             do_cmd(cmd, outputs)
             
     if options.cvode_data_clamp:
-        # For use with CVODE
+        # For use with CVODE and a data clamp
         if not dyn_opt:
             cmd, outputs = add_out_opts(command_base + ['--use-data-clamp', '-t', 'CVODE'] + maple_options,
                                         output_dir,
