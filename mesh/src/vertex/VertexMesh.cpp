@@ -860,7 +860,7 @@ void VertexMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshRead
 
     rMeshReader.Reset();
 
-    // Reserve memory for nodes
+    // Reserve memory for elements
     mElements.reserve(rMeshReader.GetNumElements());
 
     // Add elements
