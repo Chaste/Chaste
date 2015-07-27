@@ -1339,6 +1339,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
                       'convert_interfaces': False,
                       'kept_vars_as_members': True,
                       'use_modifiers': False,
+                      'use_data_clamp': False,
                       'dynamically_loadable': False,
                       'use_protocol': False
                       }
@@ -1502,7 +1503,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 i_stim = [self.doc._cml_config.i_stim_var]
             else:
                 i_stim = []
-            nodeset = self.calculate_extended_dependencies(dqs, prune_deps=i_stim)
+            if self.use_data_clamp:
+                prune = [self.config.i_data_clamp_data]
+            else:
+                prune = []
+            nodeset = self.calculate_extended_dependencies(dqs, prune_deps=i_stim, prune=prune)
             # State variable inputs
             self.output_state_assignments(assign_rY=False, nodeset=nodeset)
             self.writeln()
@@ -1593,6 +1598,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         if self.use_modifiers:
             for var in self.modifier_vars:
                 self.writeln_hpp('boost::shared_ptr<AbstractModifier> mp_' + var.oxmeta_name + '_modifier', self.STMT_END)    
+        
         # Generate Set & Get methods
         self.set_access('public')
         for var in kept_vars:
@@ -1699,6 +1705,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
             return self.vector_index('mParameters', var._cml_param_index)
         elif var is getattr(self.model, u'_cml_Chaste_Cm', None):
             return 'HeartConfig::Instance()->GetCapacitance()'
+        elif hasattr(var, '_cml_code_name'):
+            return var._cml_code_name % {'time': self.code_name(self.free_vars[0])}
         else:
             return super(CellMLToChasteTranslator, self).code_name(var, *args, **kwargs)
 
@@ -1860,6 +1868,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             for var in self.modifier_vars:
                 self.writeln('this->AddModifier("' + var.oxmeta_name + '",')
                 self.writeln('                  mp_' + var.oxmeta_name + '_modifier)', self.STMT_END)        
+        
         #666 - initialise parameters
         for var in self.cell_parameters:
             if var.get_type() == VarTypes.Constant:
@@ -2491,7 +2500,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
             i_stim = []
         nonv_nodeset = self.calculate_extended_dependencies(derivs|extra_nodes, prune_deps=i_stim)
         if dvdt:
-            v_nodeset = self.calculate_extended_dependencies([dvdt], prune=nonv_nodeset, prune_deps=i_stim)
+            if self.use_data_clamp:
+                prune = set([self.config.i_data_clamp_data]) | nonv_nodeset
+            else:
+                prune = nonv_nodeset
+            v_nodeset = self.calculate_extended_dependencies([dvdt], prune=prune, prune_deps=i_stim)
         else:
             v_nodeset = set()
         # State variable inputs
@@ -2506,6 +2519,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         # Output mathematics required for non-dV/dt derivatives (which may include dV/dt)
         self.output_equations(nonv_nodeset - table_index_nodes_used)
         self.writeln()
+        
         #907: Calculation of dV/dt
         if dvdt:
             self.writeln('if (mSetVoltageDerivativeToZero)')
@@ -2516,6 +2530,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             self.open_block()
             self.output_equations(v_nodeset - table_index_nodes_used)
             self.close_block()
+            
         return all_nodes | table_index_nodes_used
 
     def output_backward_euler_mathematics(self):
@@ -3298,7 +3313,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             converter.add_special_conversion(chaste_units, microamps,
                     lambda expr: converter.divide_rhs_by(converter.times_rhs_by(expr, model_Cm),
                                                          Chaste_Cm))
-
+        
     @staticmethod
     def generate_interface(doc, solver_info):
         """Generate an interface component connecting the model to Chaste.
@@ -3354,6 +3369,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             config.dt_variable = generator.add_input(fake_dt, t.get_units())
             config.dt_variable.set_is_modifiable_parameter(False)
             config.dt_variable.set_pe_keep(True)
+
         if config.options.use_chaste_stimulus and config.i_stim_var:
             # We need to make it a constant so add_input doesn't complain, then make it computed
             # again so that exposing metadata-annotated variables doesn't make it a parameter!
@@ -3379,6 +3395,57 @@ class CellMLToChasteTranslator(CellMLTranslator):
         if ionic_vars:
             i_ionic = generator.add_output_function('i_ionic', 'plus', ionic_vars, current_units)
             config.i_ionic_vars = [i_ionic]
+
+        if doc.model.get_option('use_data_clamp'):
+            print 'TRYING TO ADD A NEW VARIABLE'
+            assert config.V_variable and ionic_vars
+            # Create g_clamp
+            conductance_units = current_units.quotient(mV).simplify()
+            print 'Conductance units:', conductance_units, conductance_units.description()
+            i_data_clamp_conductance = generator.add_variable(iface_comp, 'membrane_data_clamp_current_conductance', conductance_units, initial_value='0.0')
+            i_data_clamp_conductance._set_type(VarTypes.Constant)
+            config.i_data_clamp_conductance = generator.add_input(i_data_clamp_conductance, conductance_units)
+            # Create V_clamp
+            data_var = config.i_data_clamp_data = generator.add_variable(iface_comp, 'experimental_data_voltage', mV, initial_value='0.0')
+            data_var._set_type(VarTypes.Constant)
+            data_var.set_pe_keep(True)
+            data_var._cml_code_name = 'GetExperimentalVoltageAtTimeT(%(time)s)'
+            # Create the current: I = g_clamp * (V - V_clamp)
+            current_var = config.i_data_clamp_current = generator.add_variable(iface_comp, 'membrane_data_clamp_current', current_units)
+            current_var._set_type(VarTypes.Computed)
+            current_var.set_is_derived_quantity(True)
+            sub = mathml_apply.create_new(model, u'minus', [config.V_variable.name, data_var.name])
+            times = mathml_apply.create_new(model, u'times', [config.i_data_clamp_conductance.name, sub])
+            assign = mathml_apply.create_new(model, u'eq', [current_var.name, times])
+            generator.add_expr_to_comp(iface_comp, assign)
+            # Make dV/dt use the new current
+            def process_ci(elt):
+                # Add reference to new current after first existing ionic current
+                ref = mathml_ci.create_new(model, local_current_var.name)
+                elt.xml_parent.xml_insert_after(elt, ref)
+                print 'found', ref, elt.xml_parent.xml()
+            if hasattr(ionic_vars[0], '_cml_ref_in_dvdt'):
+                print 'ref', ionic_vars[0]._cml_ref_in_dvdt
+                local_current_var = generator.connect_variables(current_var, (ionic_vars[0]._cml_ref_in_dvdt.component.name, current_var.name))
+                print 'i', local_current_var
+                process_ci(ionic_vars[0]._cml_ref_in_dvdt)
+            else:
+                dVdt = config.V_variable.get_all_expr_dependencies()[0]
+                print 'dvdt', dVdt.xml()
+                local_current_var = generator.connect_variables(current_var, (config.V_variable.component.name, current_var.name))
+                print 'i', local_current_var
+                def process_ci_elts(elt):
+                    """Recursively process any ci elements in the tree rooted at elt."""
+                    print 'proc', elt
+                    if isinstance(elt, mathml_ci):
+                        print 'var', elt.variable
+                        if elt.variable is ionic_vars[0]:
+                            process_ci(elt)
+                    else:
+                        for child in getattr(elt, 'xml_children', []):
+                            process_ci_elts(child)
+                process_ci_elts(dVdt)
+
         # Finish up
         def errh(errors):
             raise TranslationError("Creation of Chaste interface component failed:\n  " + str(errors))
@@ -3432,8 +3499,14 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
 
         self.include_serialization = not self.use_modifiers # TODO: Implement
         self.use_backward_euler = False
-        self.use_analytic_jacobian = (self.model.get_option('maple_output') and hasattr(self.model.solver_info, u'jacobian'))
-        self.output_includes(base_class='AbstractCvodeCell')
+        
+        if self.use_data_clamp:
+            self.use_analytic_jacobian = False # Todo - data current not included in analytic jacobian yet.
+            self.output_includes(base_class='AbstractCvodeCellWithDataClamp')
+        else:
+            self.use_analytic_jacobian = (self.model.get_option('maple_output') and hasattr(self.model.solver_info, u'jacobian'))
+            self.output_includes(base_class='AbstractCvodeCell')
+        
         # Separate class for lookup tables?
         if self.use_lookup_tables and self.separate_lut_class:
             self.output_lut_class()
@@ -5572,6 +5645,8 @@ class ConfigurationStore(object):
         self.i_stim_negated = False
         # Other variables that may be set by other code, for example an InterfaceGenerator
         self.dt_variable = None
+        self.i_data_clamp_current = None
+        self.i_data_clamp_conductance = None
         return
 
     def read_configuration_file(self, config_file):
@@ -5812,8 +5887,7 @@ class ConfigurationStore(object):
         If self.V_variable is not set, returns the empty list.
         """
         if not self.V_variable:
-            DEBUG('config', "Transmembrane potential not configured, so can't "
-                  "determine currents from its ODE")
+            DEBUG('config', "Transmembrane potential not configured, so can't determine currents from its ODE")
             return []
         if self.i_stim_var:
             current_units = [self.i_stim_var.component.get_units_by_name(self.i_stim_var.units)]
@@ -5870,6 +5944,7 @@ class ConfigurationStore(object):
                 u = v.component.get_units_by_name(v.units)
                 if find_units_match(u, current_units, keep_only_match=True):
                     ionic_vars.append(v.get_source_variable(recurse=True))
+                    ionic_vars[-1]._cml_ref_in_dvdt = ci_elt # Hack for data clamp support (#2708)
             # Fake this variable being 1 so we can check the sign of GetIIonic
             if not v.is_statically_const(ignore_annotations=True):
                 v.set_value(1.0)
@@ -6368,6 +6443,10 @@ def get_options(args, default_options=None):
                      action='store_true', default=False,
                      help="[experimental] add modifier functions for certain"
                      " metadata-annotated variables for use in sensitivity analysis (only works if -t Chaste is used)")
+    group.add_option('--use-data-clamp',
+                     action='store_true', default=False,
+                     help="[experimental] generate a data clamp subclass of CVODE cells"
+                     " which contains data clamp currents for fitting experimental data (only works if -t CVODE is used)")
     group.add_option('--expose-annotated-variables',
                      action='store_true', default=False,
                      help="expose all oxmeta-annotated variables for access via the GetAnyVariable functionality")
@@ -6684,6 +6763,7 @@ def run():
             transargs['convert_interfaces'] = options.convert_interfaces
             transargs['kept_vars_as_members'] = options.kept_vars_as_members
             transargs['use_modifiers'] = options.use_modifiers
+            transargs['use_data_clamp'] = options.use_data_clamp
             transargs['dynamically_loadable'] = options.dynamically_loadable
             transargs['use_protocol'] = bool(options.protocol)
         t = translator_klass(**initargs)

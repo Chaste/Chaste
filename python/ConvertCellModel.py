@@ -91,6 +91,9 @@ parser.add_option('--normal', action='store_true', default=False,
 parser.add_option('--cvode', action='store_true', default=False,
                   help="generate a subclass of AbstractCvodeCell,"
                   " i.e. that can be simulated with CVODE")
+parser.add_option('--cvode-data-clamp', action='store_true', default=False,
+                  help="generate a subclass of AbstractCvodeCellWithDataClamp,"
+                  " i.e. that can be simulated with CVODE, and clamped to experimental data")
 parser.add_option('--backward-euler', action='store_true', default=False,
                   help="generate a version of the cell model that can be"
                   " solved using a backward Euler method.  Requires the"
@@ -129,10 +132,9 @@ parser.add_option('-q', '--quiet', action='store_true', default=False,
                   help="don't print the command(s) being run, and pass the option through to pycml")
 options, args = parser.parse_args()
 
-option_names = ['opt', 'normal', 'cvode', 'backward_euler', 'rush_larsen', 'grl1', 'grl2']
+option_names = ['opt', 'normal', 'cvode', 'cvode_data_clamp', 'backward_euler', 'rush_larsen', 'grl1', 'grl2']
 def arg2name(arg):
     return str(arg)[2:].replace('-', '_')
-
 
 
 # Use external PyCml if requested
@@ -152,7 +154,6 @@ essential_options = ['--conf=' + os.path.join(pycml_dir, 'config.xml'),
 #essential_options.append('--profile')
 # Options supplied if the user doesn't give a config file
 default_options = []
-
 
 
 # Read further arguments from config file?
@@ -340,6 +341,22 @@ def convert(model, output_dir):
                                         output_dir,
                                         class_name + 'CvodeOpt',
                                         model_base, 'CvodeOpt')
+            do_cmd(cmd, outputs)
+            
+    if options.cvode_data_clamp:
+        # For use with CVODE
+        if not dyn_opt:
+            cmd, outputs = add_out_opts(command_base + ['--use-data-clamp', '-t', 'CVODE'] + maple_options,
+                                        output_dir,
+                                        class_name + 'CvodeDataClamp', model_base, 'CvodeDataClamp')
+            do_cmd(cmd, outputs)
+
+        if options.opt:
+            # With optimisation
+            cmd, outputs = add_out_opts(command_base + ['--use-data-clamp', '-p', '-l', '-t', 'CVODE'] + maple_options,
+                                        output_dir,
+                                        class_name + 'CvodeDataClampOpt',
+                                        model_base, 'CvodeDataClampOpt')
             do_cmd(cmd, outputs)
     
     if options.backward_euler:
