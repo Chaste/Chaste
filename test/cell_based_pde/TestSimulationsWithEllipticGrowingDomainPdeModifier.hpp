@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTSIMULATIONSWITHELLIPTICGROWINGDOMAINPDEMODIFIER_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "CellBasedSimulationArchiver.hpp"
-#include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
 #include "TransitCellProliferativeType.hpp"
@@ -77,7 +75,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaBasedCellPopulation.hpp"
 #include "DiffusionCaUpdateRule.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 static const double M_TIME_FOR_SIMULATION = 1.0;
 
@@ -110,8 +109,6 @@ public:
 
     void TestEllipticGrowingDomainPdeModifierWithVertexBasedMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Create Mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
@@ -174,8 +171,6 @@ public:
 
     void TestEllipticGrowingDomainPdeModifierWithNodeBasedMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
@@ -223,8 +218,6 @@ public:
 
     void TestEllipticGrowingDomainPdeModifierWithMeshBasedMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -274,8 +267,6 @@ public:
 
     void TestEllipticGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -320,8 +311,6 @@ public:
 
     void TestEllipticGrowingDomainPdeModifierWithPottsBasedMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
-
         unsigned cell_width = 4;
         unsigned domain_width = 200;
         PottsMeshGenerator<2> generator(domain_width, M_NUM_CELLS_ACROSS, cell_width, domain_width, M_NUM_CELLS_ACROSS, cell_width);
@@ -372,7 +361,6 @@ public:
 
     void TestEllipticGrowingDomainPdeModifierWithCaBasedMonolayer() throw (Exception)
     {
-        EXIT_IF_PARALLEL;
         // Create a simple 2D PottsMesh
         unsigned domain_wide = 5*M_NUM_CELLS_ACROSS;
 

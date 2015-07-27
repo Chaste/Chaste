@@ -54,7 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 /**
  * This test suite covers any parabolic PDE classes defined in cell_based_pdes/src.
@@ -65,8 +66,6 @@ public:
 
     void TestCellwiseSourceParabolicPdeMethods() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -104,8 +103,6 @@ public:
 
     void TestCellwiseSourceParabolicPdeArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
@@ -177,8 +174,6 @@ public:
 
     void TestUniformSourceParabolicPdeMethods() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Create a PDE object
         UniformSourceParabolicPde<2> pde(0.1);
 
@@ -206,8 +201,6 @@ public:
 
     void TestUniformSourceParabolicPdeArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 

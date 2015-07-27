@@ -46,19 +46,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformSourceParabolicPde.hpp"
 #include "FunctionalBoundaryCondition.hpp"
 #include "MeshBasedCellPopulation.hpp"
-#include "NodesOnlyMesh.hpp"
-#include "NodeBasedCellPopulation.hpp"
-//#include "AveragedSourcePde.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "ReplicatableVector.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "PetscTools.hpp"
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "VolumeDependentAveragedSourcePde.hpp"
+
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 template <int SPACE_DIM>
 class HeatEquation : public AbstractLinearParabolicPde<SPACE_DIM>
@@ -279,8 +278,6 @@ public:
 
     void TestArchivingWithoutSolution() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // Avoid all processes writing the same archive and hence potential race condition
-
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicPdeAndBoundaryConditions.arch";
@@ -328,8 +325,6 @@ public:
 
     void TestArchivingWithSolution() throw(Exception)
     {
-        EXIT_IF_PARALLEL; // Avoid all processes writing the same archive and hence potential race condition
-
         OutputFileHandler handler("archive", false);
         handler.SetArchiveDirectory();
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ParabolicPdeAndBoundaryConditions.arch";

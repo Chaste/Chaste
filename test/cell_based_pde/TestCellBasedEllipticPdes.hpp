@@ -52,7 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
+// This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 /**
  * This test suite covers any Elliptic PDE classes defined in cell_based_pdes/src.
@@ -64,8 +65,6 @@ public:
 
     void TestCellwiseSourceEllipticPdeMethods() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
@@ -103,8 +102,6 @@ public:
 
     void TestCellwiseSourceEllipticPdeArchiving() throw(Exception)
     {
-        EXIT_IF_PARALLEL;
-
         // Set up simulation time
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 

@@ -40,7 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/math/special_functions/bessel.hpp>
 
-#include "CellBasedSimulationArchiver.hpp"
 #include "SmartPointers.hpp"
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 
@@ -280,7 +279,7 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_approx, 1.0);
         }
     }
-    // Now test on a square with half appoptotic cells to compare all the population types
+    // Now test on a square with half apoptotic cells to compare all the population types
 
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
@@ -520,7 +519,7 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
     }
 
-    // Note: ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopultions
+    // Note: ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopulations
 };
 
 #endif /*TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_*/
