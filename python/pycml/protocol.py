@@ -245,7 +245,7 @@ class Protocol(processors.ModelModifier):
         modified (if needed) and in particular after the input variable declarations have been processed.  This
         ordering is necessary to allow a variable to be both an input and an output.
         """
-        self._output_specifications.append({'prefixed_name': prefixed_name, 'units': units})
+        self._output_specifications.append({'prefixed_name': prefixed_name, 'units': units, 'optional': prefixed_name in self._optional_vars})
 
     def process_output_declarations(self):
         """Finish processing output variable declarations after modifying the model equations and processing inputs.
@@ -268,10 +268,12 @@ class Protocol(processors.ModelModifier):
             prefixed_name = output_spec['prefixed_name']
             units = output_spec['units']
             try:
-                vars = self._lookup_ontology_term(prefixed_name, False)
+                vars = self._lookup_ontology_term(prefixed_name, enforce_uniqueness=False, check_optional=True)
             except ValueError, e:
                 raise ProtocolError(str(e))
-            if len(vars) > 1:
+            if vars is None:
+                print >>sys.stderr, 'Ignoring missing optional output', prefixed_name
+            elif len(vars) > 1:
                 self._vector_outputs_detail.append((prefixed_name, units))
             else:
                 var = vars[0]
@@ -1122,14 +1124,14 @@ class Protocol(processors.ModelModifier):
             print >>sys.stderr, "Warning: optional model variables missing, so not using model interface equation:"
             if hasattr(expr, 'loc'):
                 print >>sys.stderr, "  ", expr.loc
-            # Check, however, whether it defines an output or the default value for an optional variable, since this is then an error.
+            # Check, however, whether it defines a (non-optional) output or the default value for an optional variable, since this is then an error.
             if lhs.localName == u'ci':
                 vname = unicode(lhs)
                 if u':' in vname:
                     if vname in self._optional_vars:
                         raise ProtocolError("Cannot give a value to optional variable '%s' as not all variables used in its default clause are present." % vname)
                     for output_spec in self._output_specifications:
-                        if output_spec['prefixed_name'] == vname:
+                        if output_spec['prefixed_name'] == vname and not output_spec['optional']:
                             raise ProtocolError("At least one optional variable required to override the definition of model output '%s' was not found and has no default value." % vname)
             self.inputs.remove(expr)
             return
