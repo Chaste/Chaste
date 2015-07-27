@@ -1599,15 +1599,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
             for var in self.modifier_vars:
                 self.writeln_hpp('boost::shared_ptr<AbstractModifier> mp_' + var.oxmeta_name + '_modifier', self.STMT_END)    
         
-        # Generate Set & Get methods
-        self.set_access('public')
-        for var in kept_vars:
-            # Generate Get method
-            self.output_method_start('Get_' + self.code_name(var, prefix=''), [], self.TYPE_DOUBLE)
-            self.open_block()
-            self.writeln('return ', self.code_name(var), ';')
-            self.close_block()
-        
         # Methods associated with oxmeta annotated variables
         # Don't use LT & modifiers for the const methods
         use_modifiers = self.use_modifiers
@@ -1696,8 +1687,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         
     def code_name(self, var, *args, **kwargs):
         """
-        Return the full name of var in a form suitable for inclusion in a
-        source file.
+        Return the full name of var in a form suitable for inclusion in a source file.
         
         Overrides the base class version to access mParameters for parameters.
         """
@@ -3397,11 +3387,11 @@ class CellMLToChasteTranslator(CellMLTranslator):
             config.i_ionic_vars = [i_ionic]
 
         if doc.model.get_option('use_data_clamp'):
-            print 'TRYING TO ADD A NEW VARIABLE'
+            # print 'TRYING TO ADD A NEW VARIABLE'
             assert config.V_variable and ionic_vars
             # Create g_clamp
             conductance_units = current_units.quotient(mV).simplify()
-            print 'Conductance units:', conductance_units, conductance_units.description()
+            # print 'Conductance units:', conductance_units, conductance_units.description()
             i_data_clamp_conductance = generator.add_variable(iface_comp, 'membrane_data_clamp_current_conductance', conductance_units, initial_value='0.0')
             i_data_clamp_conductance._set_type(VarTypes.Constant)
             config.i_data_clamp_conductance = generator.add_input(i_data_clamp_conductance, conductance_units)
@@ -3423,22 +3413,22 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 # Add reference to new current after first existing ionic current
                 ref = mathml_ci.create_new(model, local_current_var.name)
                 elt.xml_parent.xml_insert_after(elt, ref)
-                print 'found', ref, elt.xml_parent.xml()
+                #print 'found', ref, elt.xml_parent.xml()
             if hasattr(ionic_vars[0], '_cml_ref_in_dvdt'):
-                print 'ref', ionic_vars[0]._cml_ref_in_dvdt
+                #print 'ref', ionic_vars[0]._cml_ref_in_dvdt
                 local_current_var = generator.connect_variables(current_var, (ionic_vars[0]._cml_ref_in_dvdt.component.name, current_var.name))
-                print 'i', local_current_var
+                #print 'i', local_current_var
                 process_ci(ionic_vars[0]._cml_ref_in_dvdt)
             else:
                 dVdt = config.V_variable.get_all_expr_dependencies()[0]
-                print 'dvdt', dVdt.xml()
+                #print 'dvdt', dVdt.xml()
                 local_current_var = generator.connect_variables(current_var, (config.V_variable.component.name, current_var.name))
-                print 'i', local_current_var
+                #print 'i', local_current_var
                 def process_ci_elts(elt):
                     """Recursively process any ci elements in the tree rooted at elt."""
                     print 'proc', elt
                     if isinstance(elt, mathml_ci):
-                        print 'var', elt.variable
+                        #print 'var', elt.variable
                         if elt.variable is ionic_vars[0]:
                             process_ci(elt)
                     else:
@@ -6543,6 +6533,8 @@ def get_options(args, default_options=None):
         options.grl2 = False
     if options.rush_larsen or options.backward_euler or options.grl1 or options.grl2:
         options.translate_type = 'Chaste'
+    if options.use_data_clamp and not options.translate_type=='CVODE':
+        parser.error("Data clamp option '--use-data-clamp' also requires CVODE ('-t CVODE'). If you are calling this via ConvertCellModel use '--cvode-data-clamp'.")
     # Numba may not be available
     if options.numba:
         try:
