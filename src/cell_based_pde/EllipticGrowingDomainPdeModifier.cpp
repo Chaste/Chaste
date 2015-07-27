@@ -80,7 +80,12 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     this->mSolution = solver.Solve();
     // Note that the linear solver creates a vector, so we have to keep a handle on the old one
     // in order to destroy it.
-    PetscTools::Destroy(old_solution_copy);
+    ///\todo #2687 This will change when initial guess is used.
+    /// On the first go round the vector has yet to be initialised, so we don't destroy it.
+    if (old_solution_copy != NULL)
+    {
+        PetscTools::Destroy(old_solution_copy);
+    }
     this->UpdateCellData(rCellPopulation);
 }
 
