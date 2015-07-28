@@ -84,12 +84,25 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
     }
 
     std::vector<double>::iterator low;
-    low = std::upper_bound (mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
+    low = std::upper_bound(mExperimentalTimes.begin(), mExperimentalTimes.end(), rTime);
+
+    // Special case - here the lower bound is equal to upper bound and both are pointing to end!
+    if (low == mExperimentalTimes.end())
+    {
+    	return mExperimentalVoltages.back();
+    }
 
     unsigned upper_index = low - mExperimentalTimes.begin();
+
+    if (upper_index == 0u)
+    {
+        // Special case - here the lower bound is equal to upper bound and no interpolation needed
+    	return mExperimentalVoltages[0];
+    }
+
     double lower_time = mExperimentalTimes[upper_index-1];
     double increment = rTime - lower_time;
-    double time_step = mExperimentalTimes[1] - mExperimentalTimes[0];
+    double time_step = mExperimentalTimes[upper_index] - mExperimentalTimes[upper_index-1];
     double voltage_step = mExperimentalVoltages[upper_index] - mExperimentalVoltages[upper_index-1];
     return mExperimentalVoltages[upper_index-1] + increment * voltage_step / time_step;
 
