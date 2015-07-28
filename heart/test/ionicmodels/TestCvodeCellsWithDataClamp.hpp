@@ -96,6 +96,16 @@ public:
 
             TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, 2e-3);
 
+            // So turn it off again
+            mpModel->TurnOffDataClamp();
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 0.0, 1e-12);
+            mpModel->TurnOnDataClamp(200.0);
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 200.0, 1e-12);
+            mpModel->TurnOffDataClamp();
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 0.0, 1e-12);
+            mpModel->TurnOnDataClamp();
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 100.0, 1e-12); // the default
+
             // Test a couple of times where no interpolation is needed (on data points).
             time = 116.0;
             double v_at_116 = 1.53670634e+01;
