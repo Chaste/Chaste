@@ -48,7 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
+#ifdef CHASTE_CVODE
     boost::shared_ptr<AbstractCvodeCellWithDataClamp> mpModel;
+#endif
 
 public:
     void TestInterpolatorTimesAndGenerateReferenceTrace() throw(Exception)
