@@ -94,19 +94,19 @@ public:
             // So now turn on the data clamp
             mpModel->TurnOnDataClamp();
 
-            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, 1e-4);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, 2e-3);
 
             // Test a couple of times where no interpolation is needed (on data points).
             time = 116.0;
             double v_at_116 = 1.53670634e+01;
-            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116, 1e-4);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116, 2e-3);
             time = 116.2;
             double v_at_116_2 = 1.50089546e+01;
-            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116_2, 1e-4);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116_2, 2e-3);
 
             // Now test a time where interpolation is required.
             time = 116.1;
-            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), 0.5*(v_at_116 + v_at_116_2), 1e-4);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), 0.5*(v_at_116 + v_at_116_2), 2e-3);
 
             // Test ends
             TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(0.0), expt_data[0], 1e-4);
