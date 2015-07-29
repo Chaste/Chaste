@@ -310,11 +310,29 @@
     rdfs:label "Concentration of calcium in the network sarcoplasmic reticulum" ;
     rdfs:comment "The network SR is the non-junctional part of the SR." .
 
-:diadicspace_calcium_concentration
+:dyadic_space_calcium_concentration
     a :Annotation ;
     a :CleftConcentration ;
-    rdfs:label "Concentration of calcium in the diadic sub-space" ;
-    rdfs:comment "Some models also have a separate diadic sub-space (cytosol between JSR and t-tubules)." .
+    rdfs:label "Concentration of calcium in the dyadic sub-space" ;
+    rdfs:comment "Some models also have a separate dyadic sub-space (cytosol between JSR and t-tubules)." .
+    
+:dyadic_space_potassium_concentration
+    a :Annotation ;
+    a :CleftConcentration ;
+    rdfs:label "Concentration of potassium in the dyadic sub-space" ;
+    rdfs:comment "Some models also have a separate dyadic sub-space (cytosol between JSR and t-tubules)." .
+    
+:dyadic_space_sodium_concentration
+    a :Annotation ;
+    a :CleftConcentration ;
+    rdfs:label "Concentration of sodium in the dyadic sub-space" ;
+    rdfs:comment "Some models also have a separate dyadic sub-space (cytosol between JSR and t-tubules)." .
+    
+:dyadic_space_chloride_concentration
+    a :Annotation ;
+    a :CleftConcentration ;
+    rdfs:label "Concentration of chloride ions in the dyadic sub-space" ;
+    rdfs:comment "Some models also have a separate dyadic sub-space (cytosol between JSR and t-tubules)." .
 
 # Others
 :bath_potassium_concentration
@@ -586,10 +604,11 @@
     a :MembranePotassiumChannel ;
     rdfs:label "Membrane inward rectifier potassium current conductance" .
 
-# I to, sometimes fast and slow components, sometimes not.
+# I to, (a.k.a. I_to1) sometimes fast and slow components, sometimes not.
 :membrane_transient_outward_current
     a :Annotation ;
     a :MembranePotassiumChannel ;
+    rdfs:comment "I_to is a potassium current, sometimes subdivided into fast and slow components (a.k.a. I_to1)" ;
     rdfs:label "Membrane transient outward current" .
 
 :membrane_transient_outward_current_conductance
@@ -600,6 +619,7 @@
 :membrane_fast_transient_outward_current
     a :Annotation ;
     a :MembranePotassiumChannel ;
+    rdfs:comment "I_to fast is a potassium current, (a.k.a. I_to1 fast)" ;
     rdfs:label "Membrane fast transient outward current" .
 
 :membrane_transient_outward_current_r_gate
@@ -615,6 +635,7 @@
 :membrane_slow_transient_outward_current
     a :Annotation ;
     a :MembranePotassiumChannel ;
+    rdfs:comment "I_to slow is a potassium current, (a.k.a. I_to1 slow)" ;
     rdfs:label "Membrane slow transient outward current" .
 
 :membrane_transient_outward_current_s_gate
@@ -654,6 +675,34 @@
     a :MembranePotassiumChannel ;
     rdfs:label "Membrane background potassium current conductance" .
 
+
+# ========================================================================
+# Chloride currents
+# ========================================================================
+
+# Ito,2 or Ito2
+:membrane_transient_outward_chloride_current
+    a :Annotation ;
+    a :MembraneChlorideChannel ;
+    rdfs:comment "Calcium activated transient outward chloride current, commonly known as Ito2" ;
+    rdfs:label "Membrane transient outward chloride current" .
+    
+:membrane_transient_outward_chloride_current_conductance
+    a :Annotation ;
+    a :MembraneChlorideChannel ;
+    rdfs:label "Membrane transient outward chloride current conductance" .
+
+
+# I Cl,b (background)
+:membrane_background_chloride_current
+    a :Annotation ;
+    a :MembraneChlorideChannel ;
+    rdfs:label "Membrane background chloride current" .
+
+:membrane_background_chloride_current_conductance
+    a :Annotation ;
+    a :MembraneChlorideChannel ;
+    rdfs:label "Membrane background chloride current conductance" .
 
 # ========================================================================
 # Mixed Currents
@@ -825,26 +874,26 @@
     rdfs:label "Sarcoplasmic reticulum release current" ;
     rdfs:comment "Also known as Jrel or RyR channel current" .
 
+:SR_release_current_max
+    a :Annotation ;
+    a :SRIonChannel ;
+    rdfs:label "Sarcoplasmic reticulum release current max" .
+
 :SR_uptake_current
     a :Annotation ;
     a :SRPump ;
     rdfs:label "Sarcoplasmic reticulum uptake current" ;
     rdfs:comment "Also known as Jup or SERCA current" .
 
-:SR_leak_current
-    a :Annotation ;
-    a :SRIonChannel ;
-    rdfs:label "Sarcoplasmic reticulum leak current" .
-
-:SR_release_current_max
-    a :Annotation ;
-    a :SRIonChannel ;
-    rdfs:label "Sarcoplasmic reticulum release current max" .
-
 :SR_uptake_current_max
     a :Annotation ;
     a :SRPump ;
     rdfs:label "Sarcoplasmic reticulum uptake current max" .
+
+:SR_leak_current
+    a :Annotation ;
+    a :SRIonChannel ;
+    rdfs:label "Sarcoplasmic reticulum leak current" .
 
 :SR_leak_current_max
     a :Annotation ;
@@ -877,15 +926,16 @@
     rdfs:label "Membrane sodium-calcium exchanger current conductance" ;
     rdfs:comment "Also known as permeability" .
 
-:SR_sodium_calcium_exchanger_current
+:membrane_sodium_calcium_exchanger_dyadic_space_current
     a :Annotation ;
     a :MembraneExchanger ;
-    rdfs:label "Sarcoplasmic reticulum sodium-calcium exchanger current" .
+    rdfs:comment "NaCa exchanger current across the cell membrane adjacent to dyadic space (i.e near SR)." ;
+    rdfs:label "Sodium-calcium exchanger current into dyadic space" .
 
-:SR_sodium_calcium_exchanger_current_conductance
+:membane_sodium_calcium_exchanger_dyadic_space_current_conductance
     a :Annotation ;
     a :MembraneExchanger ;
-    rdfs:label "Sarcoplasmic reticulum sodium-calcium exchanger current conductance" ;
+    rdfs:label "Sodium-calcium exchanger current into dyadic space conductance" ;
     rdfs:comment "Also known as permeability" .
 
 # INaK
