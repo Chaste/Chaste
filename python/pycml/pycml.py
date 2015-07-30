@@ -2209,8 +2209,7 @@ class cellml_variable(Colourable, element_base):
         We need a separate method for this to bypass Amara's property setting checks.
         """
         if is_param and self.get_type() != VarTypes.Constant:
-            raise ValueError("A non-constant variable (%s) cannot be set as a parameter"
-                             % (self.fullname(),))
+            raise ValueError("A non-constant variable (%s) cannot be set as a parameter" % (self.fullname(),))
         self.set_rdf_annotation_from_boolean(('pycml:modifiable-parameter', NSS[u'pycml']), is_param)
 
     @property
@@ -2340,7 +2339,7 @@ class cellml_variable(Colourable, element_base):
                  (u'name', None): unicode(name)}
         if id:
             attrs[(u'cmeta:id', NSS[u'cmeta'])] = unicode(id)
-        if initial_value:
+        if initial_value is not None and initial_value != u'':
             attrs[(u'initial_value', None)] = unicode(initial_value)
         for iface, val in interfaces.items():
             attrs[(iface + u'_interface', None)] = unicode(val)

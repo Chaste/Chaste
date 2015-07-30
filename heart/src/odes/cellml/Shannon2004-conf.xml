@@ -11,7 +11,6 @@
   <arg>--normal</arg>
   <!-- Test for #1647 -->
   <arg>--expose-annotated-variables</arg>
-  <arg>--no-member-vars</arg>
 </command_line_args>
 
 <for_model id="shannon_2004">

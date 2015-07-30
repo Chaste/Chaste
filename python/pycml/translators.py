@@ -1337,7 +1337,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
         our_kwargs = {'use_chaste_stimulus': False,
                       'separate_lut_class': True,
                       'convert_interfaces': False,
-                      'kept_vars_as_members': True,
                       'use_modifiers': False,
                       'use_data_clamp': False,
                       'dynamically_loadable': False,
@@ -1545,10 +1544,6 @@ class CellMLToChasteTranslator(CellMLTranslator):
         pycml:modifiable-parameter.  These use the mParameters functionality in
         Chaste.
         
-        Also handles variables annotated with pe:keep (see #666).
-        They can be real parameters, which have both set & get methods,
-        or computed variables, which just have get methods.
-        
         Also collects any variables annotated with an RDF oxmeta name into
         self.metadata_vars. Only constants and state variables are included.
         """
@@ -1558,21 +1553,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
             cellml_metadata.find_variables(self.model,
                                            ('pycml:modifiable-parameter', NSS['pycml']),
                                            'yes'))
-        if self.kept_vars_as_members:
-            kept_vars = filter(lambda v: v.pe_keep, self.model.get_all_variables())
-            kept_vars = list(set(kept_vars) - set(self.cell_parameters))
-        else:
-            kept_vars = []
 
-        # The data clamp generates a variable that looks like a function and needs removing from 
-        # the member variables of the generated classes.
-        if hasattr(self.config, 'i_data_clamp_data') and (self.config.i_data_clamp_data in kept_vars):
-            kept_vars.remove(self.config.i_data_clamp_data)
-        
         # Reduce intra-run variation
-        kept_vars.sort(key=self.var_display_name)
         self.cell_parameters.sort(key=self.var_display_name)
-        
+
         for i, var in enumerate(self.cell_parameters):
             # Remember the var's index
             var._cml_param_index = i
@@ -1595,10 +1579,8 @@ class CellMLToChasteTranslator(CellMLTranslator):
 
         # Generate member variable declarations
         self.set_access('private')
-        if kept_vars: # or self.metadata_vars:
+        if self.metadata_vars:
             self.output_comment('\nSettable parameters and readable variables\n', subsidiary=True)
-        for var in kept_vars:
-            self.writeln_hpp(self.TYPE_DOUBLE, self.code_name(var), self.STMT_END)
         
         # Write out the modifier member variables. 
         if self.use_modifiers:
@@ -2270,13 +2252,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Special-case the stimulus current
             if self.use_chaste_stimulus or zero_stimulus:
                 if isinstance(expr, cellml_variable) and expr is self.doc._cml_config.i_stim_var:
-                    clear_type = (self.kept_vars_as_members and expr.pe_keep)
-                    if clear_type:
-                        self.TYPE_CONST_DOUBLE = ''
                     self.writeln(self.TYPE_CONST_DOUBLE, stim_assignment)
-                    if clear_type:
-                        # Remove the instance attribute, thus reverting to the class member
-                        del self.TYPE_CONST_DOUBLE
                 elif not (isinstance(expr, mathml_apply) and
                           isinstance(expr.operator(), mathml_eq) and
                           isinstance(expr.eq.lhs, mathml_ci) and
@@ -2289,13 +2265,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
     def output_assignment(self, expr):
         """Output an assignment statement.
 
-        Variables annotated with pe:keep should be stored as member
-        variables (#666) so they can be read/set by users.  Hence if
-        the variable assigned to is such a one, temporarily clear
-        self.TYPE_DOUBLE and self.TYPE_CONST_DOUBLE before calling the
-        base class method.
-        
-        Also has overrides for modifiable parameters and modifier calls.
+        Has overrides for various special cases.
         """
         clear_type = False
         # Figure out what is being assigned to
@@ -2313,10 +2283,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         has_modifier = self.use_modifiers and getattr(assigned_var, '_cml_has_modifier', False)
         if assigned_var in self.cell_parameters and not has_modifier:
             return
-        # Is the variable assigned to stored as a class member?
-        clear_type = (clear_type or
-                      (self.kept_vars_as_members and assigned_var and assigned_var.pe_keep
-                       and not assigned_var.is_derived_quantity and not has_modifier))
+        # Is the variable declared elsewhere?
         if clear_type:
             self.TYPE_DOUBLE = self.TYPE_CONST_DOUBLE = ''
         elif getattr(assigned_var, '_cml_modifiable', False):
@@ -3358,8 +3325,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
             # Backward Euler code generation requires access to the time step
             model_dt = solver_info.create_dt(generator, t.component, t.get_units())
             config.dt_variable = generator.add_input(model_dt, ms)
+            config.dt_variable.set_pe_keep(True)
         elif doc.model.get_option('maple_output'):
-            # CVODE Jacobians need to be able to scale for time too 
+            # CVODE Jacobians need to be able to scale for time too
             fake_dt = generator.add_variable(t.component, 'fake_dt', ms, initial_value='1.0')
             fake_dt._set_type(VarTypes.Constant)
             config.dt_variable = generator.add_input(fake_dt, t.get_units())
@@ -3393,11 +3361,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
             config.i_ionic_vars = [i_ionic]
 
         if doc.model.get_option('use_data_clamp'):
-            # print 'TRYING TO ADD A NEW VARIABLE'
             assert config.V_variable and ionic_vars
             # Create g_clamp
             conductance_units = current_units.quotient(mV).simplify()
-            # print 'Conductance units:', conductance_units, conductance_units.description()
             i_data_clamp_conductance = generator.add_variable(iface_comp, 'membrane_data_clamp_current_conductance', conductance_units, initial_value='0.0')
             i_data_clamp_conductance._set_type(VarTypes.Constant)
             i_data_clamp_conductance.set_pe_keep(True) # This prevents it becoming 'chaste_interface__membrane_data_clamp_current_conductance'
@@ -3420,22 +3386,15 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 # Add reference to new current after first existing ionic current
                 ref = mathml_ci.create_new(model, local_current_var.name)
                 elt.xml_parent.xml_insert_after(elt, ref)
-                #print 'found', ref, elt.xml_parent.xml()
             if hasattr(ionic_vars[0], '_cml_ref_in_dvdt'):
-                #print 'ref', ionic_vars[0]._cml_ref_in_dvdt
                 local_current_var = generator.connect_variables(current_var, (ionic_vars[0]._cml_ref_in_dvdt.component.name, current_var.name))
-                #print 'i', local_current_var
                 process_ci(ionic_vars[0]._cml_ref_in_dvdt)
             else:
                 dVdt = config.V_variable.get_all_expr_dependencies()[0]
-                #print 'dvdt', dVdt.xml()
                 local_current_var = generator.connect_variables(current_var, (config.V_variable.component.name, current_var.name))
-                #print 'i', local_current_var
                 def process_ci_elts(elt):
                     """Recursively process any ci elements in the tree rooted at elt."""
-                    print 'proc', elt
                     if isinstance(elt, mathml_ci):
-                        #print 'var', elt.variable
                         if elt.variable is ionic_vars[0]:
                             process_ci(elt)
                     else:
@@ -6503,12 +6462,6 @@ def get_options(args, default_options=None):
     parser.add_option_group(group)
     # Settings for partial evaluation
     group = optparse.OptionGroup(parser, 'Partial evaluation options', "Options specific to the partial evaluation optimisation")
-    group.add_option('--member-vars', dest='kept_vars_as_members',
-                     action='store_true', default=True,
-                     help="store kept variables as members")
-    group.add_option('--no-member-vars', dest='kept_vars_as_members',
-                     action='store_false',
-                     help="don't store kept variables as members")
     group.add_option('--pe-convert-power',
                      action='store_true', default=False,
                      help="convert pow(x,3) to x*x*x; similarly for powers 2 & 4.")
@@ -6760,7 +6713,6 @@ def run():
             transargs['use_chaste_stimulus'] = options.use_chaste_stimulus
             transargs['separate_lut_class'] = options.separate_lut_class
             transargs['convert_interfaces'] = options.convert_interfaces
-            transargs['kept_vars_as_members'] = options.kept_vars_as_members
             transargs['use_modifiers'] = options.use_modifiers
             transargs['use_data_clamp'] = options.use_data_clamp
             transargs['dynamically_loadable'] = options.dynamically_loadable

@@ -516,7 +516,9 @@ class ModelModifier(object):
         If there is no initial value, returns None.
         If there is no units converter, leaves the initial_value unchanged.
         """
-        value = getattr(var, u'initial_value', None)
+        if not hasattr(var, u'initial_value'):
+            return None
+        value = var.initial_value
         if value and self._units_converter and do_conversion:
             if not var.get_units().equals(units):
                 try:
@@ -524,7 +526,7 @@ class ModelModifier(object):
                 except EvaluationError, e:
                     raise ModelModificationError("Cannot units-convert initial value as requires run-time information:\n"
                                                  + str(e))
-        return value
+        return unicode(value)
 
 
 
@@ -568,8 +570,7 @@ class InterfaceGenerator(ModelModifier):
         # Check that the variable has a suitable type to be an input
         t = var.get_type()
         if t == VarTypes.Computed:
-            raise ModelModificationError("Cannot specify computed variable " + var.fullname()
-                                         + " as an input")
+            raise ModelModificationError("Cannot specify computed variable " + var.fullname() + " as an input")
         elif t not in [VarTypes.Constant, VarTypes.Free, VarTypes.State]:
             raise ModelModificationError("Variable " + var.fullname() + " has unexpected type " + str(t))
         # Add a new variable with desired units to the interface component
