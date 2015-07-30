@@ -2942,10 +2942,10 @@ http://www.cellml.org/
       </variable>	 	  
       <variable name="Ca_o" units="millimolar" initial_value="2" public_interface="out"/>
       <variable name="Ca_SR" units="millimolar" initial_value="3.10836886659417"/>
-	  <variable name="Ca_ss" units="millimolar" initial_value="0.000446818714055411" public_interface="out" cmeta:id="diadicspace_calcium_concentration">
+	  <variable name="Ca_ss" units="millimolar" initial_value="0.000446818714055411" public_interface="out" cmeta:id="dyadic_space_calcium_concentration">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
-            <rdf:Description rdf:about="#diadicspace_calcium_concentration">
-               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#diadicspace_calcium_concentration"/>
+            <rdf:Description rdf:about="#dyadic_space_calcium_concentration">
+               <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#dyadic_space_calcium_concentration"/>
             </rdf:Description>
          </rdf:RDF>
       </variable>		  
