@@ -51,6 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class AbstractCvodeCellWithDataClamp : public AbstractCvodeCell
 {
 private:
+    /** For testing the interpolation method */
+    friend class TestCvodeCellsWithDataClamp;
+
     /** Needed for serialization. */
     friend class boost::serialization::access;
 
@@ -86,9 +89,6 @@ protected:
 
     /** Whether the data clamp is active at the moment */
     bool mDataClampIsOn;
-
-    /** For testing the interpolation method */
-    friend class TestCvodeCellsWithDataClamp;
 
     /**
      * Linear interpolation method to work out the voltage at any given time the ODE solver requests.
