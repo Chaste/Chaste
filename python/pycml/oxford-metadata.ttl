@@ -932,7 +932,7 @@
     rdfs:comment "NaCa exchanger current across the cell membrane adjacent to dyadic space (i.e near SR)." ;
     rdfs:label "Sodium-calcium exchanger current into dyadic space" .
 
-:membane_sodium_calcium_exchanger_dyadic_space_current_conductance
+:membrane_sodium_calcium_exchanger_dyadic_space_current_conductance
     a :Annotation ;
     a :MembraneExchanger ;
     rdfs:label "Sodium-calcium exchanger current into dyadic space conductance" ;
