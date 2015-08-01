@@ -82,11 +82,6 @@ private:
         archive & mHeight;
     }
 
-    /**
-     * Constructor - used for serialization only.
-     */
-    Toroidal2dVertexMesh();
-
 public:
 
     /**
@@ -105,6 +100,11 @@ public:
                          std::vector<VertexElement<2,2>*> vertexElements,
                          double cellRearrangementThreshold=0.01,
                          double t2Threshold=0.001);
+
+    /**
+     * Constructor.
+     */
+    Toroidal2dVertexMesh();
 
     /**
      * Destructor.
@@ -163,6 +163,15 @@ public:
      * @return a non-periodic vertex mesh
      */
      MutableVertexMesh<2, 2>* GetMeshForVtk();
+
+     /**
+      * Construct the mesh using a MeshReader.
+      *
+      * @param rMeshReader the mesh reader
+      * @param width the mesh width
+      * @param height the mesh height
+      */
+     void ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader, double width, double height);
 };
 
 #include "SerializationExportWrapper.hpp"

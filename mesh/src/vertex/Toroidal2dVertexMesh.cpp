@@ -262,6 +262,84 @@ MutableVertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
     return p_mesh;
 }
 
+void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader, double width, double height)
+{
+    assert(rMeshReader.HasNodePermutation() == false);
+
+    // Store numbers of nodes and elements
+    unsigned num_nodes = rMeshReader.GetNumNodes();
+    unsigned num_elements = rMeshReader.GetNumElements();
+
+    // Reserve memory for nodes
+    this->mNodes.reserve(num_nodes);
+
+    rMeshReader.Reset();
+
+    // Add nodes
+    std::vector<double> node_data;
+    for (unsigned node_idx = 0 ; node_idx < num_nodes ; node_idx++)
+    {
+        node_data = rMeshReader.GetNextNode();
+        node_data.pop_back();
+        this->mNodes.push_back(new Node<2>(node_idx, node_data, false));
+    }
+
+    rMeshReader.Reset();
+
+    // Reserve memory for elements
+    mElements.reserve(rMeshReader.GetNumElements());
+
+    // Add elements
+    for (unsigned elem_idx = 0 ; elem_idx < num_elements ; elem_idx++)
+    {
+        // Get the data for this element
+        ElementData element_data = rMeshReader.GetNextElementData();
+
+        // Get the nodes owned by this element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes_in_element = element_data.NodeIndices.size();
+        for (unsigned j=0; j<num_nodes_in_element; j++)
+        {
+            assert(element_data.NodeIndices[j] < this->mNodes.size());
+            nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
+        }
+
+        // Use nodes and index to construct this element
+        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_idx, nodes);
+        mElements.push_back(p_element);
+
+        if (rMeshReader.GetNumElementAttributes() > 0)
+        {
+            assert(rMeshReader.GetNumElementAttributes() == 1);
+            unsigned attribute_value = (unsigned) element_data.AttributeValue;
+            p_element->SetAttribute(attribute_value);
+        }
+    }
+
+    /*
+     * Set width and height from function arguments, and validate by checking area is correct
+     */
+    this->mWidth = width;
+    this->mHeight = height;
+
+    double total_surface_area = 0.0;
+    for (unsigned elem_idx = 0 ; elem_idx < num_elements ; elem_idx++)
+    {
+        total_surface_area += this->GetVolumeOfElement(elem_idx);
+    }
+
+    if (fabs(mWidth * mHeight - total_surface_area) > 1e-6)
+    {
+        EXCEPTION("Mesh width and height do not match sheet surface area.");
+    }
+
+    // Set default parameter values
+    this->mCellRearrangementRatio = 1.5;
+    this->mCellRearrangementThreshold = 0.01;
+    this->mT2Threshold = 0.001;
+    this->mMeshChangesDuringSimulation = true;
+}
+
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(Toroidal2dVertexMesh)

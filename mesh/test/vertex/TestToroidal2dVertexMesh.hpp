@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include "VertexMeshWriter.hpp"
+#include "VertexMeshReader.hpp"
 #include "ArchiveOpener.hpp"
 
 //This test is always run sequentially (never in parallel)
@@ -705,6 +706,20 @@ public:
 
         // Avoid memory leak
         delete p_mesh_for_vtk;
+    }
+
+    void TestConstructFromMeshReader()
+    {
+        // Create mesh reader and mesh
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/toroidal_2d_mesh");
+        Toroidal2dVertexMesh mesh;
+
+        // Check nothing is thrown when width and height are input correctly
+        TS_ASSERT_THROWS_NOTHING(mesh.ConstructFromMeshReader(mesh_reader, 4.0, 3.0));
+
+        // Check exception is tripped when width and height are input incorrectly
+        TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader, 4.0, 2.0),
+                              "Mesh width and height do not match sheet surface area.");
     }
 };
 

@@ -1,0 +1,15 @@
+12	1
+0	6	0	1	2	3	4	5	0
+1	5	1	6	7	8	2	0
+2	5	9	10	0	5	11	0
+3	6	12	13	9	11	7	6	0
+4	7	14	15	12	6	1	0	10	0
+5	6	16	17	14	10	9	13	0
+6	6	18	19	16	13	12	15	0
+7	6	20	21	18	15	14	17	0
+8	6	22	23	20	17	16	19	0
+9	7	2	8	22	19	18	21	3	0
+10	5	4	3	21	20	23	0
+11	7	7	11	5	4	23	22	8	0
+# Created by Chaste version 3.3.24858 (with uncommitted modifications) on Sat, 01 Aug 2015 22:26:50 +0000.  Chaste was built on Sat, 01 Aug 2015 22:26:28 +0000 by machine (uname) 'Linux fergus-laptop 3.13.0-43-generic #72-Ubuntu SMP Mon Dec 8 19:35:06 UTC 2014 x86_64' using settings: GccOpt, shared libraries.  Checked-out project versions: DanH=23169M; Harvey2014=23167; airprom=22212; fcooper=24810:24856M; kursawe=22330.
+
