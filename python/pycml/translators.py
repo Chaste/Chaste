@@ -1788,18 +1788,24 @@ class CellMLToChasteTranslator(CellMLTranslator):
                 self.writeln('const double tol = 100*this->mAbsTol;')
                             
             self.output_state_assignments(nodeset=nodeset)
-            error_template = 'EXCEPTION(DumpState("State variable %s has gone out of range. Check numerical parameters, for example time and space stepsizes, and/or solver tolerances"));'
+            error_template = 'EXCEPTION(DumpState("State variable {0} has gone out of range. Check numerical parameters, for example time and space stepsizes, and/or solver tolerances"));'
             additional_tolerance_adjustment = ''
             for var in low_range_vars:
                 if using_cvode:
                     additional_tolerance_adjustment = ' - tol'
                 self.writeln('if (', self.code_name(var), ' < ', var.get_rdf_annotation(low_prop), additional_tolerance_adjustment, ')')
-                self.writeln(error_template % self.var_display_name(var), indent_offset=1)
+                self.open_block()
+                #self.writeln('std::cout << "Too small: ', self.code_name(var), ' = " << ', self.code_name(var) , ' << std::endl << std::flush;')
+                self.writeln(error_template.format(self.var_display_name(var)))
+                self.close_block(False)
             for var in high_range_vars:
                 if using_cvode:
                     additional_tolerance_adjustment = ' + tol'            
                 self.writeln('if (', self.code_name(var), ' > ', var.get_rdf_annotation(high_prop), additional_tolerance_adjustment, ')')
-                self.writeln(error_template % self.var_display_name(var), indent_offset=1)
+                self.open_block()
+                #self.writeln('std::cout << "Too large: ', self.code_name(var), ' = " << ', self.code_name(var) , ' << std::endl << std::flush;')
+                self.writeln(error_template.format(self.var_display_name(var)))
+                self.close_block(False)
             self.close_block(True)
   
     def output_constructor(self, params, base_class_params):
@@ -2268,17 +2274,27 @@ class CellMLToChasteTranslator(CellMLTranslator):
         Has overrides for various special cases.
         """
         clear_type = False
+        writing_data_clamp_current = False
         # Figure out what is being assigned to
         if isinstance(expr, cellml_variable):
             assigned_var = expr
         else:
             if expr.eq.lhs.localName == 'ci':
                 assigned_var = expr.eq.lhs.variable
+                if assigned_var is self.config.i_data_clamp_current:
+                    writing_data_clamp_current = True
+                    self.output_comment('Special handling of data clamp current here (see #2708)')
+                    self.output_comment('(we want to save expense of calling the interpolation method if possible.)')
+                    self.writeln(self.TYPE_DOUBLE, self.code_name(assigned_var), self.EQ_ASSIGN, '0.0' , self.STMT_END)
+                    self.writeln('if (mDataClampIsOn)')
+                    self.open_block()
+                    clear_type = True
             else:
                 assigned_var = None # We don't store derivatives as members
                 #907: Check if this is the derivative of the transmembrane potential
                 if not self.use_backward_euler and expr.eq.lhs.diff.dependent_variable == self.v_variable:
                     clear_type = True
+                    
         # Parameters don't need assigning
         has_modifier = self.use_modifiers and getattr(assigned_var, '_cml_has_modifier', False)
         if assigned_var in self.cell_parameters and not has_modifier:
@@ -2322,6 +2338,10 @@ class CellMLToChasteTranslator(CellMLTranslator):
             del self.TYPE_CONST_DOUBLE
         elif getattr(assigned_var, '_cml_modifiable', False):
             del self.TYPE_CONST_DOUBLE
+            
+        if writing_data_clamp_current:
+            self.close_block(False)
+            
         return
 
     def output_mathematics(self):
