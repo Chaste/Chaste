@@ -33,43 +33,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef MODIFIERS_HPP_
-#define MODIFIERS_HPP_
+#ifndef TIME_MODIFIER_HPP_
+#define TIME_MODIFIER_HPP_
 
 #include "AbstractModifier.hpp"
 #include <cmath>
 
-/**
- * This class allows modification of parameters by a scale factor.
- */
-class FactorModifier : public AbstractModifier
-{
-private:
-    /** Factor to multiply parameter of interest by. */
-    double mFactor;
-
-public:
-    /**
-     * Constructor
-     * @param factor  scale factor to use, defaults to 1 (i.e. no effect)
-     */
-    FactorModifier(double factor=1)
-        : mFactor(factor)
-    {
-    }
-
-    /**
-     * Perform the modification.
-     *
-     * @param param  the current value of the quantity which is being modified
-     * @param time  the current simulation time
-     * @return the new value for the quantity which is being modified
-     */
-    virtual double Calc(double param, double time)
-    {
-        return (param * mFactor);
-    }
-};
+// Serialization headers
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /**
  * This is just an example class to show how you might specify a custom
@@ -78,6 +50,22 @@ public:
  */
 class TimeModifier : public AbstractModifier
 {
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the member variables.
+     *
+     * @param archive
+     * @param version
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractModifier>(*this);
+        // No member variables at present.
+    }
+
 public:
     /**
      * Constructor
@@ -93,71 +81,10 @@ public:
      * @param time  the current simulation time
      * @return the new value for the quantity which is being modified
      */
-    virtual double Calc(double param, double time)
-    {
-        return param * sin(time);
-    }
+    virtual double Calc(double param, double time);
 };
 
-/**
- * This class just returns a fixed value, regardless of the parameter's default or the time.
- */
-class FixedModifier : public AbstractModifier
-{
-private:
-    /** Fixed value to clamp parameter at */
-    double mValue;
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(TimeModifier)
 
-public:
-    /**
-     * Constructor
-     * @param value  The fixed value to use.
-     */
-    FixedModifier(double value)
-        : mValue(value)
-    {
-    }
-
-    /**
-     * Perform the modification.
-     *
-     * @param param  the current value of the quantity which is being modified
-     * @param time  the current simulation time
-     * @return  the fixed value (ignores inputs)
-     */
-    virtual double Calc(double param, double time)
-    {
-        return mValue;
-    }
-};
-
-/**
- * This class returns the parameter's default value and does not modify it.
- */
-class DummyModifier : public AbstractModifier
-{
-private:
-
-public:
-    /**
-     * Default constructor
-     */
-    DummyModifier()
-    {
-    }
-
-    /**
-     * This calculate does nothing and returns the parameter 'unharmed'.
-     *
-     * @param param  the current value of the quantity which is being modified
-     * @param time  the current simulation time
-     * @return the new value for the quantity which is being modified
-     */
-    virtual double Calc(double param, double time)
-    {
-        return param;
-    }
-};
-
-
-#endif  //MODIFIERS_HPP_
+#endif  //TIME_MODIFIER_HPP_

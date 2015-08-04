@@ -34,7 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractCardiacCellWithModifiers.hpp"
-#include "Modifiers.hpp"
+#include "AbstractCvodeCellWithDataClamp.hpp"
+#include "DummyModifier.hpp"
 
 template<class CARDIAC_CELL>
 void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::AddModifier(std::string modifierName, boost::shared_ptr<AbstractModifier>& pModifier)
@@ -83,6 +84,7 @@ void AbstractCardiacCellWithModifiers<CARDIAC_CELL>::SetModifier(const std::stri
 template class AbstractCardiacCellWithModifiers<AbstractCardiacCell>;
 #ifdef CHASTE_CVODE
 template class AbstractCardiacCellWithModifiers<AbstractCvodeCell>;
+template class AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>;
 #endif
 
 

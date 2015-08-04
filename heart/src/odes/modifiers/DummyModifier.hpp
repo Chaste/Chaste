@@ -33,47 +33,57 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef ABSTRACTMODIFIER_HPP_
-#define ABSTRACTMODIFIER_HPP_
+#ifndef DUMMY_MODIFIER_HPP_
+#define DUMMY_MODIFIER_HPP_
+
+#include "AbstractModifier.hpp"
+#include <cmath>
+
+// Serialization headers
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /**
- * This family of classes are used to add simple functions into cell models to modify
- * particular quantities on the fly.  Rather than the model using the quantity directly
- * in computing its right-hand side, it calls calc() with the current value and uses
- * the result of that instead.
- *
- * Clearly for this to work the cell model must be modified to include calls to instances
- * of these classes.  PyCml has some experimental support for this, generating subclasses
- * of AbstractCardiacCellWithModifiers.
+ * This class returns the parameter's default value and does not modify it.
  */
-class AbstractModifier
+class DummyModifier : public AbstractModifier
 {
-  public:
+private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
     /**
-     * Default constructor.
+     * Archive the member variables.
+     *
+     * @param archive
+     * @param version
      */
-    AbstractModifier(void)
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        archive & boost::serialization::base_object<AbstractModifier>(*this);
+        // No member variables.
+    }
+
+public:
+    /**
+     * Default constructor
+     */
+    DummyModifier()
     {
     }
 
     /**
-     * Default destructor.
-     */
-    virtual ~AbstractModifier()
-    {
-    }
-
-    /**
-     * Pure virtual function which must be overridden in subclasses to actually
-     * perform the modification.
+     * This calculate does nothing and returns the parameter 'unharmed'.
      *
      * @param param  the current value of the quantity which is being modified
      * @param time  the current simulation time
      * @return the new value for the quantity which is being modified
      */
-    virtual double Calc(double param, double time) = 0;
+    virtual double Calc(double param, double time);
 };
 
 
-#endif  //ABSTRACTMODIFIER_HPP_
+#include "SerializationExportWrapper.hpp"
+CHASTE_CLASS_EXPORT(DummyModifier)
 
+#endif  //DUMMY_MODIFIER_HPP_

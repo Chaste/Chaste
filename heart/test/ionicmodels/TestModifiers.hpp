@@ -39,11 +39,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include <boost/shared_ptr.hpp>
+
+#include "DummyModifier.hpp"
+#include "TimeModifier.hpp"
+#include "FixedModifier.hpp"
+#include "FactorModifier.hpp"
+
 #include "Exception.hpp"
 #include "EulerIvpOdeSolver.hpp"
 #include "ZeroStimulus.hpp"
-#include "Modifiers.hpp"
 #include "Shannon2004.hpp"
+
+#include "OutputFileHandler.hpp"
+#include "CheckpointArchiveTypes.hpp"
+#include "ArchiveLocationInfo.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -138,6 +147,67 @@ public:
             TS_ASSERT_DELTA(parameter*sin(time), returned, 1e-9);
         }
     }
+
+    void TestArchivingModifiers(void) throw(Exception)
+    {
+        //Archive
+        OutputFileHandler handler("archive", false);
+        // The next two lines ensure that different processes read/write different archive files when running in parallel
+        ArchiveLocationInfo::SetArchiveDirectory(handler.FindFile(""));
+        std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("Modifiers.arch");
+
+        double factor = 4.0;
+        double fixed_value = 58.2;
+
+        // Save
+        {
+            // Check Standard
+            AbstractModifier* const p_dummy = new DummyModifier;
+            AbstractModifier* const p_factor = new FactorModifier(factor);
+            AbstractModifier* const p_fixed = new FixedModifier(fixed_value);
+            AbstractModifier* const p_time = new TimeModifier;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_dummy;
+            output_arch << p_factor;
+            output_arch << p_fixed;
+            output_arch << p_time;
+
+            delete p_dummy;
+            delete p_factor;
+            delete p_fixed;
+            delete p_time;
+        }
+        // Load
+        {
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            AbstractModifier* p_dummy;
+            AbstractModifier* p_factor;
+            AbstractModifier* p_fixed;
+            AbstractModifier* p_time;
+
+            input_arch >> p_dummy;
+            input_arch >> p_factor;
+            input_arch >> p_fixed;
+            input_arch >> p_time;
+
+            double time = 1.0;
+            double param = 123.0;
+            TS_ASSERT_DELTA(p_dummy ->Calc(param, time), param,           1e-12); // Dummy doesn't do anything.
+            TS_ASSERT_DELTA(p_factor->Calc(param, time), factor*param,    1e-12); // Factor gives back a multiple
+            TS_ASSERT_DELTA(p_fixed ->Calc(param, time), fixed_value,     1e-12); // Fixed gives back a fixed value
+            TS_ASSERT_DELTA(p_time  ->Calc(param, time), param*sin(time), 1e-12); // Time is an example of time dependent function
+
+            delete p_dummy;
+            delete p_factor;
+            delete p_fixed;
+            delete p_time;
+        }
+     }
 
 };
 
