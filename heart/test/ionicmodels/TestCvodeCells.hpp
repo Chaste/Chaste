@@ -45,7 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "Shannon2004.hpp"
 #include "Shannon2004Cvode.hpp"
-#include "Modifiers.hpp"
+#include "FixedModifier.hpp"
+#include "DummyModifier.hpp"
 #include "SmartPointers.hpp"
 
 #include "HeartConfig.hpp"
