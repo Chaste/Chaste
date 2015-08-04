@@ -81,6 +81,14 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
     }
     catch (const Exception &e)
     {
+#if CHASTE_SUNDIALS_VERSION <= 20300 
+        // Really old CVODE used to solve past the requested time points and could trigger this exception unnecessarily...
+        if (e.CheckShortMessageContains("is outside the times stored in the data clamp")=="")
+        {
+            return 1; // This may be a recoverable error!
+        }
+#endif
+
         std::cerr << "CVODE RHS Exception: " << e.GetMessage()
                   << std::endl << std::flush;
         return -1;
