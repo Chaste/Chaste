@@ -167,7 +167,6 @@ public:
             p_model->SetParameter("membrane_data_clamp_current_conductance",0.001);
 
             double clamp_conductance;
-            std::string output_file;
             std::vector<double> data_clamp_times;
             std::vector<double> data_clamp_voltage;
             out_stream data_clamp_voltage_results_file;
@@ -176,14 +175,15 @@ public:
             {
                 clamp_conductance = pow(10,i);
                 std::cout << "clamp_conductance = " << clamp_conductance << std::endl << std::flush;
-                output_file = "Shannon_test_solution_with_data_clamp_conductance_exponent_" + boost::lexical_cast<std::string>(i) + ".dat";
+                std::stringstream output_file;
+                output_file << "Shannon_test_solution_with_data_clamp_conductance_exponent_" << i << ".dat";
 
                 p_model->ResetToInitialConditions();
                 p_model->SetParameter("membrane_data_clamp_current_conductance",clamp_conductance);
                 solution = p_model->Compute(0, 400, 0.2);
                 data_clamp_times = solution.rGetTimes();
                 data_clamp_voltage = solution.GetAnyVariable("membrane_voltage");
-                data_clamp_voltage_results_file = handler.OpenOutputFile(output_file);
+                data_clamp_voltage_results_file = handler.OpenOutputFile(output_file.str());
                 for (unsigned j=0; j<data_clamp_voltage.size(); j++)
                 {
                     *data_clamp_voltage_results_file << data_clamp_times[j] << "\t" << data_clamp_voltage[j] << "\n";
