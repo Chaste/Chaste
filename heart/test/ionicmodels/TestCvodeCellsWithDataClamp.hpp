@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellMLLoader.hpp"
 #include "AbstractCvodeCellWithDataClamp.hpp"
+#include "Shannon2004CvodeDataClamp.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "ArchiveLocationInfo.hpp"
@@ -51,103 +52,100 @@ class TestCvodeCellsWithDataClamp : public CxxTest::TestSuite
 {
 private:
 #ifdef CHASTE_CVODE
-    boost::shared_ptr<AbstractCvodeCell> mpModel;
+    boost::shared_ptr<CellShannon2004FromCellMLCvodeDataClamp> mpModel;
 #endif
 
 public:
     void TestInterpolatorTimesAndGenerateReferenceTrace() throw(Exception)
     {
 #ifdef CHASTE_CVODE
-        // Test generation of a clamp model.
-
-        FileFinder shannon_cellml("heart/src/odes/cellml/Shannon2004.cellml", RelativeTo::ChasteSourceRoot);
         OutputFileHandler handler("CvodeCellsWithDataClamp");
-        std::vector<std::string> options;
-        options.push_back("--cvode-data-clamp");
-        options.push_back("--expose-annotated-variables");
 
-        CellMLLoader loader(shannon_cellml, handler, options);
-        mpModel = loader.LoadCvodeCell();
+        boost::shared_ptr<AbstractIvpOdeSolver> p_empty_solver;
+        boost::shared_ptr<AbstractStimulusFunction> p_empty_stimulus;
 
-        boost::shared_ptr<AbstractCvodeCellWithDataClamp> p_model = boost::static_pointer_cast<AbstractCvodeCellWithDataClamp>(mpModel);
+        // N.B. Because we use the Shannon model as a lot of examples,
+        // here it is actually a Shannon->WithModifiers->WithDataClamp->CvodeCell
+        // (the WithModifiers doesn't need to be there to use the data clamp!)
+        mpModel.reset(new CellShannon2004FromCellMLCvodeDataClamp(p_empty_solver,p_empty_stimulus));
 
-        TS_ASSERT_EQUALS(p_model->HasParameter("membrane_data_clamp_current_conductance"), true);
+        TS_ASSERT_EQUALS(mpModel->HasParameter("membrane_data_clamp_current_conductance"), true);
 
-        p_model->SetMaxSteps(5000);
-        p_model->UseCellMLDefaultStimulus();
+        mpModel->SetMaxSteps(5000);
+        mpModel->UseCellMLDefaultStimulus();
 
         // Run a simulation without clamping switched on
 
         Timer::Reset();
         double end_time = 400.0;
-        OdeSolution solution = p_model->Compute(0, end_time, 0.2);
+        OdeSolution solution = mpModel->Compute(0, end_time, 0.2);
         Timer::Print("OdeSolution");
         std::vector<double> expt_times = solution.rGetTimes();
         std::vector<double> expt_data = solution.GetAnyVariable("membrane_voltage");
         solution.WriteToFile("CvodeCellsWithDataClamp","shannon_original_no_clamp", "ms", 1, false); // false to clean
 
-        TS_ASSERT_THROWS_THIS(p_model->TurnOnDataClamp(),
+        TS_ASSERT_THROWS_THIS(mpModel->TurnOnDataClamp(),
             "Before calling TurnOnDataClamp(), please provide experimental data via the SetExperimentalData() method.");
 
         // Test the interpolation methods.
         {
-            p_model->SetExperimentalData(expt_times, expt_data);
+            mpModel->SetExperimentalData(expt_times, expt_data);
 
             // Note - unless the data clamp is switched on the below method just returns DOUBLE_UNSET to save time interpolating.
             double time = 100.0;
-            TS_ASSERT_EQUALS(p_model->GetExperimentalVoltageAtTimeT(time), DOUBLE_UNSET);
+            TS_ASSERT_EQUALS(mpModel->GetExperimentalVoltageAtTimeT(time), DOUBLE_UNSET);
 
             // So now turn on the data clamp
-            p_model->TurnOnDataClamp();
+            mpModel->TurnOnDataClamp();
 
 # if CHASTE_SUNDIALS_VERSION >= 20400
             double tol = 2e-3; // mV
 #else
             double tol = 0.2; // mV
 #endif
-
-            TS_ASSERT_DELTA(p_model->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, tol);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), -8.55863245e+01, tol);
 
             // So turn it off again
-            p_model->TurnOffDataClamp();
-            TS_ASSERT_DELTA(p_model->GetParameter("membrane_data_clamp_current_conductance"), 0.0, 1e-12);
-            p_model->TurnOnDataClamp(200.0);
-            TS_ASSERT_DELTA(p_model->GetParameter("membrane_data_clamp_current_conductance"), 200.0, 1e-12);
-            p_model->TurnOffDataClamp();
-            TS_ASSERT_DELTA(p_model->GetParameter("membrane_data_clamp_current_conductance"), 0.0, 1e-12);
-            p_model->TurnOnDataClamp();
-            TS_ASSERT_DELTA(p_model->GetParameter("membrane_data_clamp_current_conductance"), 100.0, 1e-12); // the default
+            mpModel->TurnOffDataClamp();
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 0.0, 1e-12);
+            mpModel->TurnOnDataClamp(200.0);
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 200.0, 1e-12);
+            mpModel->TurnOffDataClamp();
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 0.0, 1e-12);
+            mpModel->TurnOnDataClamp();
+            TS_ASSERT_DELTA(mpModel->GetParameter("membrane_data_clamp_current_conductance"), 100.0, 1e-12); // the default
 
             // Test a couple of times where no interpolation is needed (on data points).
             time = 116.0;
             double v_at_116 = 1.53670634e+01;
-            TS_ASSERT_DELTA(p_model->GetExperimentalVoltageAtTimeT(time), v_at_116, tol);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116, tol);
+
             time = 116.2;
             double v_at_116_2 = 1.50089546e+01;
-            TS_ASSERT_DELTA(p_model->GetExperimentalVoltageAtTimeT(time), v_at_116_2, tol);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), v_at_116_2, tol);
 
             // Now test a time where interpolation is required.
             time = 116.1;
-            TS_ASSERT_DELTA(p_model->GetExperimentalVoltageAtTimeT(time), 0.5*(v_at_116 + v_at_116_2), tol);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(time), 0.5*(v_at_116 + v_at_116_2), tol);
 
             // Test ends
-            TS_ASSERT_DELTA(p_model->GetExperimentalVoltageAtTimeT(0.0), expt_data[0], 1e-4);
-            TS_ASSERT_DELTA(p_model->GetExperimentalVoltageAtTimeT(end_time), expt_data.back(), 1e-4);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(0.0), expt_data[0], 1e-4);
+            TS_ASSERT_DELTA(mpModel->GetExperimentalVoltageAtTimeT(end_time), expt_data.back(), 1e-4);
 
             // Test exceptions
-            TS_ASSERT_THROWS_CONTAINS(p_model->GetExperimentalVoltageAtTimeT(-1e-12),
+            TS_ASSERT_THROWS_CONTAINS(mpModel->GetExperimentalVoltageAtTimeT(-1e-12),
                                       "is outside the times stored in the data clamp");
-            TS_ASSERT_THROWS_CONTAINS(p_model->GetExperimentalVoltageAtTimeT(end_time+1e-12),
+            TS_ASSERT_THROWS_CONTAINS(mpModel->GetExperimentalVoltageAtTimeT(end_time+1e-12),
                                       "is outside the times stored in the data clamp");
 
-            //std::cout << "membrane_data_clamp_current_conductance = " << p_model->GetParameter("membrane_data_clamp_current_conductance") << std::endl << std::flush;
-            //std::cout << "mpModel->GetExperimentalVoltageAtTimeT(time) = " << p_model->GetExperimentalVoltageAtTimeT(time) << std::endl << std::flush;
+            //std::cout << "membrane_data_clamp_current_conductance = " << mpModel->GetParameter("membrane_data_clamp_current_conductance") << std::endl << std::flush;
+            //std::cout << "mpModel->GetExperimentalVoltageAtTimeT(time) = " << mpModel->GetExperimentalVoltageAtTimeT(time) << std::endl << std::flush;
 
-            unsigned how_many = 10000;
+            unsigned how_many = 10000u;
             Timer::Reset();
             for (unsigned i=0; i<how_many; i++)
             {
-                p_model->GetExperimentalVoltageAtTimeT(time);
+                mpModel->GetExperimentalVoltageAtTimeT(time);
             }
             Timer::PrintAndReset("GetExperimentalVoltageAtTimeT");
         }
@@ -166,30 +164,29 @@ public:
         // In this half of the test, try running simulations with the clamp.
         {
             // Now solve with data clamp to the noisy data
-            p_model->SetExperimentalData(expt_times, expt_data);
-            p_model->ResetToInitialConditions();
-            p_model->TurnOnDataClamp();
+            mpModel->SetExperimentalData(expt_times, expt_data);
+            mpModel->ResetToInitialConditions();
+            mpModel->TurnOnDataClamp();
 
-            p_model->SetParameter("membrane_data_clamp_current_conductance",0.001);
+            mpModel->SetParameter("membrane_data_clamp_current_conductance",0.001);
 
-            double clamp_conductance;
             std::vector<double> data_clamp_times;
             std::vector<double> data_clamp_voltage;
-            out_stream data_clamp_voltage_results_file;
 
             for (int i = -4; i < 3; i++)
             {
-                clamp_conductance = pow(10,i);
+                double clamp_conductance = pow(10,i);
                 std::cout << "clamp_conductance = " << clamp_conductance << std::endl << std::flush;
                 std::stringstream output_file;
                 output_file << "Shannon_test_solution_with_data_clamp_conductance_exponent_" << i << ".dat";
 
-                p_model->ResetToInitialConditions();
-                p_model->SetParameter("membrane_data_clamp_current_conductance",clamp_conductance);
-                solution = p_model->Compute(0, 400, 0.2);
+                mpModel->ResetToInitialConditions();
+                mpModel->SetParameter("membrane_data_clamp_current_conductance",clamp_conductance);
+                solution = mpModel->Compute(0, 400, 0.2);
                 data_clamp_times = solution.rGetTimes();
                 data_clamp_voltage = solution.GetAnyVariable("membrane_voltage");
-                data_clamp_voltage_results_file = handler.OpenOutputFile(output_file.str());
+
+                out_stream data_clamp_voltage_results_file = handler.OpenOutputFile(output_file.str());
                 for (unsigned j=0; j<data_clamp_voltage.size(); j++)
                 {
                     *data_clamp_voltage_results_file << data_clamp_times[j] << "\t" << data_clamp_voltage[j] << "\n";
@@ -204,6 +201,7 @@ public:
 
     void TestArchivingCvodeCellsWithDataClamp() throw(Exception)
     {
+        // We also hijack this test to test the archiving and restoration of modifiers.
 #ifdef CHASTE_CVODE
        //Archive
        OutputFileHandler handler("archive", false);
@@ -220,24 +218,22 @@ public:
            std::ofstream ofs(archive_filename.c_str());
            boost::archive::text_oarchive output_arch(ofs);
 
-           boost::shared_ptr<AbstractCvodeCellWithDataClamp> p_data_clamp_cell =
-                   boost::static_pointer_cast<AbstractCvodeCellWithDataClamp>(mpModel);
-
            // Archive as an AbstractCvodeCell pointer (not via boost shared pointer)
            AbstractCvodeCell* const p_cell = mpModel.get();
            output_arch <<  p_cell;
 
            // Using friend status to directly look at member variables.
-           data_clamp_state = p_data_clamp_cell->mDataClampIsOn;
-           data_available = p_data_clamp_cell->mDataAvailable;
-           times = p_data_clamp_cell->mExperimentalTimes;
-           voltages = p_data_clamp_cell->mExperimentalVoltages;
+           data_clamp_state = mpModel->mDataClampIsOn;
+           data_available = mpModel->mDataAvailable;
+           times = mpModel->mExperimentalTimes;
+           voltages = mpModel->mExperimentalVoltages;
 
            // Check we are actually checking something!
            TS_ASSERT_EQUALS(data_clamp_state, true);
            TS_ASSERT_EQUALS(data_available, true);
            TS_ASSERT(times.size()>10u);
            TS_ASSERT_EQUALS(times.size(), voltages.size());
+           TS_ASSERT_EQUALS(mpModel->HasModifier("membrane_slow_delayed_rectifier_potassium_current"), true);
        }
 
        // This should free up the memory and delete cell model.
@@ -253,6 +249,19 @@ public:
 
            TS_ASSERT_EQUALS(p_cell->GetNumberOfStateVariables(), 39u);
 
+           // Check modifiers were archived correctly
+           if (dynamic_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* >(p_cell) == NULL)
+           {
+               // Pointer could not be cast as the right kind, so throw error.
+               TS_ASSERT(false);
+           }
+
+           AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* p_modifiers_cell = static_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>*>(p_cell);
+           TS_ASSERT_EQUALS(p_modifiers_cell->HasModifier("membrane_slow_delayed_rectifier_potassium_current"),true);
+           boost::shared_ptr<AbstractModifier> p_modifier = p_modifiers_cell->GetModifier("membrane_slow_delayed_rectifier_potassium_current");
+           TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), 2, 1e-12); // Dummy modifier returns param.
+
+           // Check data clamp was archived correctly.
            if (dynamic_cast<AbstractCvodeCellWithDataClamp*>(p_cell) == NULL)
            {
                // Pointer could not be cast as the right kind, so throw error.

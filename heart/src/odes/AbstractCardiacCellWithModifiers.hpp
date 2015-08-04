@@ -40,13 +40,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 
-// These come first to avoid compiler errors on Boost 1.33.1/PETSc 2.2
 #include "AbstractCvodeCell.hpp"
+#include "AbstractCvodeCellWithDataClamp.hpp"
 #include "AbstractCardiacCell.hpp"
 
 #include "AbstractModifier.hpp"
 #include "AbstractIvpOdeSolver.hpp"
 #include "AbstractStimulusFunction.hpp"
+
+#include "ChasteSerialization.hpp"
+#include "ClassIsAbstract.hpp"
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/base_object.hpp>
 
 /**
  * A base class for cardiac cells that have been altered to include calls to subclasses
@@ -56,6 +62,22 @@ template<class CARDIAC_CELL>
 class AbstractCardiacCellWithModifiers : public CARDIAC_CELL
 {
 private:
+    /** Needed for serialization. */
+    friend class boost::serialization::access;
+    /**
+     * Archive the member variables.
+     *
+     * @param archive
+     * @param version
+     */
+    template<class Archive>
+    void serialize(Archive & archive, const unsigned int version)
+    {
+        // This calls serialize on the base class.
+        archive & boost::serialization::base_object<CARDIAC_CELL>(*this);
+        archive & mModifiersMap;
+    }
+
     /** A map between a string description and the location of the relevant modifier in concrete classes. */
     std::map<std::string, boost::shared_ptr<AbstractModifier>* > mModifiersMap;
 
@@ -111,5 +133,20 @@ public:
     void SetModifier(const std::string& rModifierName, boost::shared_ptr<AbstractModifier>& pNewModifier);
 
 };
+
+// Special case of archiving an abstract class that's templated over Chaste classes.
+// See the comments in the top of global/src/checkpointing/ClassIsAbstract.hpp
+namespace boost {
+namespace serialization {
+
+    template<class C>
+    struct is_abstract<AbstractCardiacCellWithModifiers<C> >
+        TEMPLATED_CLASS_IS_ABSTRACT_DEFN
+
+    template<class C>
+    struct is_abstract<const AbstractCardiacCellWithModifiers<C> >
+        TEMPLATED_CLASS_IS_ABSTRACT_DEFN
+}}
+
 
 #endif // ABSTRACTCARDIACCELLWITHMODIFIERS_HPP_

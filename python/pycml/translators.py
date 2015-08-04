@@ -1535,6 +1535,9 @@ class CellMLToChasteTranslator(CellMLTranslator):
                              ' >(*this);')
             if self.dynamically_loadable:
                 self.writeln_hpp('archive & boost::serialization::base_object<AbstractDynamicallyLoadableEntity>(*this);')
+            if self.use_modifiers:
+                self.output_comment('Despite this class having modifier member variables, they are all added to the', subsidiary=True)
+                self.output_comment('abstract class by the constructor, and archived via that, instead of here.', subsidiary=True) 
             self.close_block(subsidiary=True)
        
     def output_cell_parameters(self):
@@ -1695,7 +1698,7 @@ class CellMLToChasteTranslator(CellMLTranslator):
         class, and also lookup table declarations and lookup methods.
         It also calls output_verify_state_variables.
         """
-        self.include_serialization = not self.use_modifiers # TODO: Implement
+        self.include_serialization = True
 
         # Check if we're generating a Backward Euler model
         self.use_backward_euler = self.model.get_option('backward_euler')
@@ -3473,7 +3476,7 @@ class CellMLToCvodeTranslator(CellMLToChasteTranslator):
         self.writeln("#ifdef CHASTE_CVODE")
         self.writeln_hpp("#ifdef CHASTE_CVODE")
 
-        self.include_serialization = not self.use_modifiers # TODO: Implement
+        self.include_serialization = True
         self.use_backward_euler = False
         
         if self.use_data_clamp:

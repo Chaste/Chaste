@@ -69,6 +69,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *     struct is_abstract<const AbstractTemplatedClass<C, U> >
  *         TEMPLATED_CLASS_IS_ABSTRACT_DEFN
  *     }}
+ *
+ * (see AbstractCardiacCellWithModifiers for an example of this last case).
  */
 
 #include <boost/version.hpp>
