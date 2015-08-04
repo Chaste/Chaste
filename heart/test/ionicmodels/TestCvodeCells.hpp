@@ -270,9 +270,9 @@ public:
         lr91_cvode_system.SetVoltage(old_v);
 
         // Cover errors
-        std::cout << "Testing Error Handling...\n";
+        std::cout << "Testing Error Handling... don't worry about diasters below if this passes!\n";
         lr91_cvode_system.SetMaxSteps(2);
-        TS_ASSERT_THROWS_THIS(lr91_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time),
+        TS_ASSERT_THROWS_CONTAINS(lr91_cvode_system.Solve(start_time, end_time, max_timestep, sampling_time),
                               "CVODE failed to solve system: CV_TOO_MUCH_WORK");
         // Kill the cell -- will trigger exp overflow if FPE exceptions are on
         boost::shared_ptr<SimpleStimulus> p_boom_stimulus(new SimpleStimulus(-50000, 2.0, 1.0));
@@ -287,10 +287,10 @@ public:
 #endif // TEST_FOR_FPE
         // Nasty cell
         ExceptionalCell bad_cell(p_solver, p_boom_stimulus);
-        TS_ASSERT_THROWS_THIS(bad_cell.Solve(start_time, end_time, max_timestep, sampling_time),
+        TS_ASSERT_THROWS_CONTAINS(bad_cell.Solve(start_time, end_time, max_timestep, sampling_time),
                               "CVODE failed to solve system: CV_RHSFUNC_FAIL");
         bad_cell.ResetToInitialConditions();
-        TS_ASSERT_THROWS_THIS(bad_cell.Solve(start_time, end_time, max_timestep),
+        TS_ASSERT_THROWS_CONTAINS(bad_cell.Solve(start_time, end_time, max_timestep),
                               "CVODE failed to solve system: CV_RHSFUNC_FAIL");
 
         // This should work now that metadata has been added to the LuoRudy1991 cellML.

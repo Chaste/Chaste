@@ -164,7 +164,6 @@ int CvodeRootAdaptor(realtype t, N_Vector y, realtype* pGOut, void* pData)
 // }
 
 
-
 void CvodeErrorHandler(int errorCode, const char *module, const char *function,
                        char *message, void* pData)
 {
@@ -175,7 +174,6 @@ void CvodeErrorHandler(int errorCode, const char *module, const char *function,
     // Throwing the exception here causes termination on Maverick (g++ 4.4)
     //EXCEPTION(err.str());
 }
-
 
 
 void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,

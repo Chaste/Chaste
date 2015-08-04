@@ -234,8 +234,9 @@ private:
      *
      * @param flag  CVODE error code
      * @param msg  Our description of the error
+     * @param rTime  The time that the solver got to
      */
-    void CvodeError(int flag, const char * msg);
+    void CvodeError(int flag, const char * msg, const double& rTime);
 
     /** Remember where the last solve got to so we know whether to re-initialise. */
     N_Vector mLastSolutionState;

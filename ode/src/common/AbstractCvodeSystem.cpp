@@ -85,6 +85,18 @@ int AbstractCvodeSystemRhsAdaptor(realtype t, N_Vector y, N_Vector ydot, void *p
                   << std::endl << std::flush;
         return -1;
     }
+
+//    // Something like this might help CVODE when things are a bit unstable...
+//    try
+//    {
+//        p_ode_system->VerifyStateVariables();
+//    }
+//    catch (const Exception &e)
+//    {
+//        std::cout << "t = " << t << ":\t" <<  e.GetMessage() << std::endl << std::flush;
+//        return 1; // A positive return flag to CVODE tells it there's been an error but it might be recoverable.
+//    }
+
     return 0;
 }
 
@@ -198,7 +210,7 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
         if (ierr<0)
         {
 //            DebugSteps(mpCvodeMem, this);
-            CvodeError(ierr, "CVODE failed to solve system");
+            CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at);
         }
         // Not root finding, so should have reached requested time
         assert(fabs(cvode_stopped_at - stepper.GetNextTime()) < DBL_EPSILON);
@@ -239,7 +251,7 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     if (ierr<0)
     {
 //        DebugSteps(mpCvodeMem, this);
-        CvodeError(ierr, "CVODE failed to solve system");
+        CvodeError(ierr, "CVODE failed to solve system", cvode_stopped_at);
     }
     // Not root finding, so should have reached requested time
     assert(fabs(cvode_stopped_at - tEnd) < DBL_EPSILON);
@@ -442,9 +454,8 @@ void AbstractCvodeSystem::FreeCvodeMemory()
 }
 
 
-void AbstractCvodeSystem::CvodeError(int flag, const char * msg)
+void AbstractCvodeSystem::CvodeError(int flag, const char * msg, const double& rTime)
 {
-
     std::stringstream err;
     char* p_flag_name = CVodeGetReturnFlagName(flag);
     err << msg << ": " << p_flag_name;
@@ -467,6 +478,16 @@ void AbstractCvodeSystem::CvodeError(int flag, const char * msg)
         err << " (LS flag=" << ls_flag << ":" << p_ls_flag_name << ")";
         free(p_ls_flag_name);
     }
+
+    err << "\nGot to time " << rTime << "\n";
+    err << "\nState variables are now:\n";
+    std::vector<double> state_vars = MakeStdVec(mStateVariables);
+    std::vector<std::string> state_var_names = rGetStateVariableNames();
+    for (unsigned i=0; i<state_vars.size(); i++)
+    {
+        err << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << std::endl;
+    }
+
     FreeCvodeMemory();
     std::cerr << err.str() << std::endl << std::flush;
     EXCEPTION(err.str());
