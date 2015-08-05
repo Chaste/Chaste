@@ -824,6 +824,77 @@ public:
         TS_ASSERT_EQUALS(element_neighbours, expected_element_neighbours);
     }
 
+    void TestGetRosetteRankOfElement() throw(Exception)
+    {
+        // Test method on a honeycomb mesh
+        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
+        VertexMesh<2,2> regular_mesh;
+        regular_mesh.ConstructFromMeshReader(mesh_reader);
+
+        // The rosette rank of each element should be 3
+        for (unsigned elem_idx = 0 ; elem_idx < regular_mesh.GetNumElements() ; elem_idx++)
+        {
+            TS_ASSERT_EQUALS(regular_mesh.GetRosetteRankOfElement(elem_idx), 3u);
+        }
+
+        // Generate a five-element rosette
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 1.00000, 0.00000));
+        nodes.push_back(new Node<2>(2, true, 0.80902, 0.58779));
+        nodes.push_back(new Node<2>(3, true, 0.30902, 0.95106));
+        nodes.push_back(new Node<2>(4, true, -0.30902, 0.95106));
+        nodes.push_back(new Node<2>(5, true, -0.80902, 0.58779));
+        nodes.push_back(new Node<2>(6, true, -1.00000, 0.00000));
+        nodes.push_back(new Node<2>(7, true, -0.80902, -0.58779));
+        nodes.push_back(new Node<2>(8, true, -0.30902, -0.95106));
+        nodes.push_back(new Node<2>(9, true, 0.30902, -0.95106));
+        nodes.push_back(new Node<2>(10, true, 0.80902, -0.58779));
+
+        // Make 5 quadrangular cells
+        std::vector<Node<2>*> nodes_elem_1;
+        nodes_elem_1.push_back(nodes[0]);
+        nodes_elem_1.push_back(nodes[1]);
+        nodes_elem_1.push_back(nodes[2]);
+        nodes_elem_1.push_back(nodes[3]);
+        std::vector<Node<2>*> nodes_elem_2;
+        nodes_elem_2.push_back(nodes[0]);
+        nodes_elem_2.push_back(nodes[3]);
+        nodes_elem_2.push_back(nodes[4]);
+        nodes_elem_2.push_back(nodes[5]);
+        std::vector<Node<2>*> nodes_elem_3;
+        nodes_elem_3.push_back(nodes[0]);
+        nodes_elem_3.push_back(nodes[5]);
+        nodes_elem_3.push_back(nodes[6]);
+        nodes_elem_3.push_back(nodes[7]);
+        std::vector<Node<2>*> nodes_elem_4;
+        nodes_elem_4.push_back(nodes[0]);
+        nodes_elem_4.push_back(nodes[7]);
+        nodes_elem_4.push_back(nodes[8]);
+        nodes_elem_4.push_back(nodes[9]);
+        std::vector<Node<2>*> nodes_elem_5;
+        nodes_elem_5.push_back(nodes[0]);
+        nodes_elem_5.push_back(nodes[9]);
+        nodes_elem_5.push_back(nodes[10]);
+        nodes_elem_5.push_back(nodes[1]);
+
+        // Make 5 vertex elements
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_5));
+
+        VertexMesh<2,2> rosette_mesh(nodes, vertex_elements);
+
+        // The rosette rank of each element should be five
+        for (unsigned elem_idx = 0 ; elem_idx < rosette_mesh.GetNumElements() ; elem_idx++)
+        {
+            TS_ASSERT_EQUALS(rosette_mesh.GetRosetteRankOfElement(elem_idx), 5u);
+        }
+    }
+
     void TestGetCentroidOfElement() throw(Exception)
     {
         // Test method with a 1D mesh

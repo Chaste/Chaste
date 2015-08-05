@@ -356,6 +356,17 @@ public:
     unsigned GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(unsigned nodeIndex);
 
     /**
+     * Compute the rosette rank of an element.
+     *
+     * This is defined as the maximum number of elements sharing a particular node in the specified element.
+     *
+     * @param index  the global index of a specified vertex element
+     *
+     * @return the rosette rank of the element
+     */
+    unsigned GetRosetteRankOfElement(unsigned index);
+
+    /**
      * Overridden GetVectorFromAtoB() method. Returns a vector between two points in space.
      *
      * If the mesh is being used to represent a Voronoi tessellation, and mpDelaunayMesh

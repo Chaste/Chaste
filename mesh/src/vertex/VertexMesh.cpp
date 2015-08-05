@@ -557,6 +557,31 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiElementIndexCorresponding
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteRankOfElement(unsigned index)
+{
+    assert (SPACE_DIM == 2 || SPACE_DIM == 3);
+
+    // Get pointer to this element
+    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
+
+    // Loop over nodes in the current element and find which is contained in the most elements
+    unsigned rosette_rank = 0;
+    for (unsigned node_idx = 0 ; node_idx < p_element->GetNumNodes() ; node_idx++)
+    {
+        unsigned num_elems_this_node = p_element->GetNode(node_idx)->rGetContainingElementIndices().size();
+
+        if (num_elems_this_node > rosette_rank)
+        {
+            rosette_rank = num_elems_this_node;
+        }
+    }
+
+    // Return the rosette rank
+    return rosette_rank;
+}
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     // Delete elements
