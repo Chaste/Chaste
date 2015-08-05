@@ -146,6 +146,14 @@ public:
             TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), sqrt(3.0)/2, 1e-6);
         }
 
+        // For coverage of GetRosetteRankOfCell()
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_population.GetRosetteRankOfCell(*cell_iter), 3u);
+        }
+
         // Test GetNeighbouringLocationIndices() method
         std::set<unsigned> expected_neighbours_of_cell_0;
         expected_neighbours_of_cell_0.insert(1);

@@ -346,6 +346,14 @@ public:
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
+     * Method to get the Rosette Rank of a cell.
+     *
+     * @param pCell boost shared pointer to a cell
+     * @return rosette rank via associated mesh element
+     */
+    unsigned GetRosetteRankOfCell(CellPtr pCell);
+
+    /**
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell boost shared pointer to a cell

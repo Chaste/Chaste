@@ -389,6 +389,18 @@ void VertexBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<Abstract
 }
 
 template<unsigned DIM>
+unsigned VertexBasedCellPopulation<DIM>::GetRosetteRankOfCell(CellPtr pCell)
+{
+    // Get the vertex element index corresponding to this cell
+    unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
+
+    // Get the element rosette rank from the vertex mesh
+    unsigned rosette_rank = mpMutableVertexMesh->GetRosetteRankOfElement(elem_index);
+
+    return rosette_rank;
+}
+
+template<unsigned DIM>
 double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 {
     // Get the vertex element index corresponding to this cell
