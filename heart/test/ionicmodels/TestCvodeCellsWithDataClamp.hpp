@@ -38,12 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include "CellMLLoader.hpp"
 #include "AbstractCvodeCellWithDataClamp.hpp"
 #include "Shannon2004CvodeDataClamp.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "OutputFileHandler.hpp"
 #include <Timer.hpp>
 
 #include "FakePetscSetup.hpp"

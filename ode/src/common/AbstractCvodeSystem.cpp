@@ -212,7 +212,7 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
         int ierr = CVodeSetStopTime(mpCvodeMem, stepper.GetNextTime());
         assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
 
-        double cvode_stopped_at;
+        double cvode_stopped_at = stepper.GetTime();
         ierr = CVode(mpCvodeMem, stepper.GetNextTime(), mStateVariables,
                          &cvode_stopped_at, CV_NORMAL);
         if (ierr<0)
@@ -254,7 +254,7 @@ void AbstractCvodeSystem::Solve(realtype tStart,
     int ierr = CVodeSetStopTime(mpCvodeMem, tEnd);
     assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
 
-    double cvode_stopped_at;
+    double cvode_stopped_at = tStart;
     ierr = CVode(mpCvodeMem, tEnd, mStateVariables, &cvode_stopped_at, CV_NORMAL);
     if (ierr<0)
     {
