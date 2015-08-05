@@ -50,9 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
-#include <boost/serialization/map.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/split_member.hpp>
 
 /**
  * A base class for cardiac cells that have been altered to include calls to subclasses
@@ -71,12 +71,61 @@ private:
      * @param version
      */
     template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    void save(Archive & archive, const unsigned int version) const
     {
         // This calls serialize on the base class.
         archive & boost::serialization::base_object<CARDIAC_CELL>(*this);
-        archive & mModifiersMap;
+
+        // This is a bit unusual - as it contains pointers to member variables in the subclasses.
+        // So we deal with it specially on reloading below.
+        // The map is always set up in the same way, so should be in the same order, but we'll
+        // archive the names as well for testing on load to be on the safe side.
+        std::map<std::string, boost::shared_ptr<AbstractModifier>* >::const_iterator iter;
+        for (iter = mModifiersMap.begin(); iter!= mModifiersMap.end(); ++iter)
+        {
+            const boost::shared_ptr<AbstractModifier>* p_to_smart_pointer = (*iter).second;
+            const boost::shared_ptr<AbstractModifier> p_modifier = *p_to_smart_pointer;
+            archive & (*iter).first; // Name of the modifier
+            archive & p_modifier;    // Modifier
+        }
     }
+    /**
+     * Unarchive the member variables.
+     *
+     * @param archive
+     * @param version
+     */
+    template<class Archive>
+    void load(Archive & archive, const unsigned int version)
+    {
+        // This calls serialize on the base class.
+        archive & boost::serialization::base_object<CARDIAC_CELL>(*this);
+
+        // We have made new smart pointers to dummy modifiers via the constructor, so instead of overwriting
+        // these pointers with new pointers (leaving a memory leak), go through and make the existing pointers
+        // point to the correct modifiers again!
+        std::map<std::string, boost::shared_ptr<AbstractModifier>* >::iterator iter;
+        for (iter = mModifiersMap.begin(); iter!= mModifiersMap.end(); ++iter)
+        {
+            boost::shared_ptr<AbstractModifier>* p_to_constructed_smart_pointer = (*iter).second;
+            boost::shared_ptr<AbstractModifier> p_loaded;
+            std::string modifier_name;
+            archive & modifier_name;  // Name of the modifier
+            archive & p_loaded;       // Modifier
+
+            // Paranoia check that this is the modifier we think it is.
+            if ((*iter).first != modifier_name)
+            {
+                NEVER_REACHED; // You're in trouble.
+                // If this breaks, perhaps change this loop to do the right number and
+                // use modifier_name as mModifiersMap key instead.
+            }
+
+            // Set the constructed smart pointer to be the same as the loaded one.
+            *(p_to_constructed_smart_pointer) = p_loaded;
+        }
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
     /** A map between a string description and the location of the relevant modifier in concrete classes. */
     std::map<std::string, boost::shared_ptr<AbstractModifier>* > mModifiersMap;

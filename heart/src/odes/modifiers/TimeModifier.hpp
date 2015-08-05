@@ -75,6 +75,13 @@ public:
     }
 
     /**
+     * Default destructor.
+     */
+    virtual ~TimeModifier()
+    {
+    }
+
+    /**
      * Perform the modification.
      *
      * @param param  the current value of the quantity which is being modified

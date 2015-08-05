@@ -81,6 +81,13 @@ public:
     }
 
     /**
+     * Default destructor.
+     */
+    virtual ~FixedModifier()
+    {
+    }
+
+    /**
      * Perform the modification.
      *
      * @param param  the current value of the quantity which is being modified

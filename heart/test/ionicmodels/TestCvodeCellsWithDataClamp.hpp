@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "OutputFileHandler.hpp"
+#include "FixedModifier.hpp" // We are using this test to test archiving cells with modifiers too.
 #include <Timer.hpp>
 
 #include "FakePetscSetup.hpp"
@@ -210,6 +211,7 @@ public:
 
        bool data_clamp_state;
        bool data_available;
+       double fixed_modifier_value = 56.0;
        std::vector<double> times;
        std::vector<double> voltages;
 
@@ -217,10 +219,6 @@ public:
        {
            std::ofstream ofs(archive_filename.c_str());
            boost::archive::text_oarchive output_arch(ofs);
-
-           // Archive as an AbstractCvodeCell pointer (not via boost shared pointer)
-           AbstractCvodeCell* const p_cell = mpModel.get();
-           output_arch <<  p_cell;
 
            // Using friend status to directly look at member variables.
            data_clamp_state = mpModel->mDataClampIsOn;
@@ -234,6 +232,16 @@ public:
            TS_ASSERT(times.size()>10u);
            TS_ASSERT_EQUALS(times.size(), voltages.size());
            TS_ASSERT_EQUALS(mpModel->HasModifier("membrane_slow_delayed_rectifier_potassium_current"), true);
+           TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), 0.0, 1e-12);
+
+           boost::shared_ptr<AbstractModifier> p_fixed(new FixedModifier(fixed_modifier_value));
+           mpModel->SetModifier("membrane_slow_delayed_rectifier_potassium_current", p_fixed);
+
+           TS_ASSERT_DELTA(mpModel->GetModifier("membrane_slow_delayed_rectifier_potassium_current")->Calc(0,1), fixed_modifier_value, 1e-12);
+
+           // Archive as an AbstractCvodeCell pointer (not via boost shared pointer)
+           AbstractCvodeCell* const p_cell = mpModel.get();
+           output_arch <<  p_cell;
        }
 
        // This should free up the memory and delete cell model.
@@ -259,7 +267,7 @@ public:
            AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>* p_modifiers_cell = static_cast<AbstractCardiacCellWithModifiers<AbstractCvodeCellWithDataClamp>*>(p_cell);
            TS_ASSERT_EQUALS(p_modifiers_cell->HasModifier("membrane_slow_delayed_rectifier_potassium_current"),true);
            boost::shared_ptr<AbstractModifier> p_modifier = p_modifiers_cell->GetModifier("membrane_slow_delayed_rectifier_potassium_current");
-           TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), 2, 1e-12); // Dummy modifier returns param.
+           TS_ASSERT_DELTA(p_modifier->Calc(2 /*param*/,3 /*time*/), fixed_modifier_value, 1e-12); // Fixed modifier returns 56 from above..
 
            // Check data clamp was archived correctly.
            if (dynamic_cast<AbstractCvodeCellWithDataClamp*>(p_cell) == NULL)
@@ -280,6 +288,10 @@ public:
                TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalTimes[i], times[i], 1e-12);
                TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalVoltages[i], voltages[i], 1e-12);
            }
+
+           // Check we have a functioning unarchived cell (this will check that all internal member variables that pointed to modifiers still work).
+           p_cell->Compute(0, 100, 1);
+
            delete p_cell;
        }
 #else

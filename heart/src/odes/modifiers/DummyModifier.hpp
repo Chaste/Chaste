@@ -73,6 +73,13 @@ public:
     }
 
     /**
+     * Default destructor.
+     */
+    virtual ~DummyModifier()
+    {
+    }
+
+    /**
      * This calculate does nothing and returns the parameter 'unharmed'.
      *
      * @param param  the current value of the quantity which is being modified
