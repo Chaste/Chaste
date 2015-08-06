@@ -100,7 +100,7 @@ public:
             mpModel->TurnOnDataClamp();
 
 # if CHASTE_SUNDIALS_VERSION >= 20400
-            double tol = 2e-3; // mV
+            double tol = 5e-3; // mV
 #else
             double tol = 0.2; // mV
 #endif
