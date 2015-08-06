@@ -346,7 +346,9 @@ public:
     virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
 
     /**
-     * Method to get the Rosette Rank of a cell.
+     * Get the "rosette rank" of a cell.
+     *
+     * This is defined as the maximum number of cells shared by any node in the cell's corresponding element.
      *
      * @param pCell boost shared pointer to a cell
      * @return rosette rank via associated mesh element
@@ -362,14 +364,14 @@ public:
     double GetVolumeOfCell(CellPtr pCell);
 
     /**
-     * Return all locations of T2 Swaps since the last sampling time step.
+     * Return all locations of T2 swaps since the last sampling time step.
      *
      * @return mLocationsOfT2Swaps
      */
     std::vector< c_vector< double, DIM > > GetLocationsOfT2Swaps();
 
      /**
-     * Return all IDs of cells undergoing T2 Swaps since the last sampling time step.
+     * Return all IDs of cells undergoing T2 swaps since the last sampling time step.
      *
      * @return mLocationsOfT2Swaps
      */

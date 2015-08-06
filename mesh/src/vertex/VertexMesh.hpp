@@ -356,9 +356,9 @@ public:
     unsigned GetVoronoiElementIndexCorrespondingToDelaunayNodeIndex(unsigned nodeIndex);
 
     /**
-     * Compute the rosette rank of an element.
+     * Get the "rosette rank" of an element.
      *
-     * This is defined as the maximum number of elements sharing a particular node in the specified element.
+     * This is defined as the maximum number of elements shared by any node in the specified element.
      *
      * @param index  the global index of a specified vertex element
      *
