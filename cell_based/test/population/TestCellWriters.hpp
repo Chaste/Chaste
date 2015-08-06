@@ -74,6 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellCycleModelProteinConcentrationsWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "CellRosetteRankWriter.hpp"
 #include "CellRadiusWriter.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
@@ -1171,7 +1172,129 @@ public:
             input_arch >> p_cell_writer_2;
 
             delete p_cell_writer_2;
-       }
+        }
+    }
+
+    void TestCellRosetteRankWriter() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        /*
+         * Test regular functionality
+         */
+        {
+            // Resetting the maximum cell ID to zero (to account for previous tests)
+            CellId::ResetMaxCellId();
+
+            // Create a simple vertex-based cell population
+            HoneycombVertexMeshGenerator generator(4, 6);
+            MutableVertexMesh<2, 2> *p_mesh = generator.GetMesh();
+
+            std::vector<CellPtr> cells;
+            boost::shared_ptr<AbstractCellProperty> p_diff_type(
+                    CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
+
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            // Create output directory
+            std::string output_directory = "TestCellRosetteRankWriter";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create cell writer and output data for each cell to file
+            CellRosetteRankWriter<2, 2> cell_writer;
+            cell_writer.OpenOutputFile(output_file_handler);
+            cell_writer.WriteTimeStamp();
+            for (AbstractCellPopulation<2, 2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+            {
+                cell_writer.VisitCell(*cell_iter, &cell_population);
+            }
+            cell_writer.CloseFile();
+
+            // Test that the data are output correctly
+            FileComparison(results_dir + "cellrosetterank.dat",
+                           "cell_based/test/data/TestCellWriters/cellrosetterank.dat").CompareFiles();
+
+            // Test the correct data are returned for VTK output for the first cell
+            double vtk_data = cell_writer.GetCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
+            TS_ASSERT_DELTA(vtk_data, 3.0, 1e-6);
+
+            // Test GetVtkCellDataName() method
+            TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "Cell rosette rank");
+        }
+
+        /*
+         * Test exception for non-vertex-based cell populations
+         */
+        {
+            // Create a simple CA-based cell population
+            PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+            PottsMesh<2>* p_mesh = generator.GetMesh();
+
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, 5u);
+
+            std::vector<unsigned> location_indices;
+            location_indices.push_back(7);
+            location_indices.push_back(11);
+            location_indices.push_back(12);
+            location_indices.push_back(13);
+            location_indices.push_back(17);
+
+            CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+            // Create output directory
+            std::string output_directory = "TestCellRosetteRankWriter";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create cell writer and output data for each cell to file
+            CellRosetteRankWriter<2, 2> cell_writer;
+            cell_writer.OpenOutputFile(output_file_handler);
+            cell_writer.WriteTimeStamp();
+            for (AbstractCellPopulation<2, 2>::Iterator cell_iter = cell_population.Begin();
+                 cell_iter != cell_population.End();
+                 ++cell_iter)
+            {
+                TS_ASSERT_THROWS_THIS(cell_writer.VisitCell(*cell_iter, &cell_population),
+                                      "Rosettte rank is only associated with vertex-based cell populations");
+            }
+            cell_writer.CloseFile();
+        }
+    }
+
+    void TestCellRosetteRankWriterArchiving() throw (Exception)
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellRosetteRankWriter.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellRosetteRankWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+        PetscTools::Barrier(); //Processes read after last process has (over-)written archive
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
     }
 
     void TestCellRadiusWriter() throw (Exception)
