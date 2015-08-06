@@ -53,9 +53,24 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
           mElementTargetArea(elementTargetArea),
           mTol(1e-7)
 {
-
     this->ValidateInputAndSetMembers();
+    this->GenerateVoronoiMesh();
+}
 
+VoronoiVertexMeshGenerator::~VoronoiVertexMeshGenerator()
+{
+    if (mpMesh)
+    {
+        delete mpMesh;
+    }
+    if (mpTorMesh)
+    {
+        delete mpTorMesh;
+    }
+}
+
+void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
+{
     /**
      * The initial points will be randomly distributed in the box [0.0, mMultiplierInX] x [0.0, mMultiplierInY], which
      * is a subset of the box [0.0, 1.0] x [0.0, 1.0].  At least one of mMultiplierInX and mMultiplierInY will equal
@@ -90,18 +105,6 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
     }
 }
 
-VoronoiVertexMeshGenerator::~VoronoiVertexMeshGenerator()
-{
-    if (mpMesh)
-    {
-        delete mpMesh;
-    }
-    if (mpTorMesh)
-    {
-        delete mpTorMesh;
-    }
-}
-
 MutableVertexMesh<2,2>* VoronoiVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
@@ -118,30 +121,24 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
     /*
      * METHOD OUTLINE:
      *
-     * 1. Copy nodes and elements from mpMesh so no data is shared between the MutableVertexMesh and the
-     *    ToroidalVertexMesh. There are no available copy constructors, so this is done from scratch.
+     * 1. Copy nodes and elements from mpMesh into a new MutableVertexMesh, so no data is shared between mpMesh and the
+     *    nodes and elements we will be working with.  There are no available copy constructors, so this is done from
+     *    scratch.
      *
-     * 2. Identify which nodes on the boundary are congruent to each other. Nodes on the left and bottom edges of the
-     *    boundary, WLOG, can replace those on the top and right edges. Those we are discarding must be removed from
-     *    all elements they are contained in, and replaced by their congruent partner.
+     * 2. Identify which nodes on the boundary are congruent to each other.  This is done by recursively using the
+     *    helper function CheckForCongruentNodes().
      *
-     * 3. Create mpTorMesh with the subset of the node we copied from mpMesh and all of the elements we copied from
-     *    mpMesh, some of which have been modified to replace nodes by their congruent partners.
+     * 3. Create mpTorMesh by copying the subset of remaining nodes and all elements in the new MutableVertexMesh.
+     *    Some elements have been modified to replace nodes by congruent partner nodes and some nodes have been deleted.
      */
 
-    // To help in identifying congruence later, we move all nodes into the positive quadrant
-    this->RepositionNodes();
-
     // The width and height of the mesh for periodicity purposes
-    double width = mNumElementsX * sqrt(mElementTargetArea);
-    double hight = mNumElementsY * sqrt(mElementTargetArea);
+    double width  = mNumElementsX * sqrt(mElementTargetArea);
+    double height = mNumElementsY * sqrt(mElementTargetArea);
 
     // We need to construct new nodes and elements so we don't have mpTorMesh sharing data with mpMesh
     std::vector<Node<2>*> new_nodes(mpMesh->GetNumNodes());
     std::vector<VertexElement<2,2>*> new_elems(mpMesh->GetNumElements());
-
-    // Only boundary nodes need be identified with their congruent partners, so we will keep track of them separately
-    std::vector<Node<2>*> boundary_nodes;
 
     // Copy nodes
     for (unsigned node_counter = 0 ; node_counter < mpMesh->GetNumNodes() ; node_counter++)
@@ -157,13 +154,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         assert(copy_index < mpMesh->GetNumNodes());
 
         // Create a new node and place it in index order. Every node in a periodic mesh is non-boundary.
-        new_nodes[copy_index] = new Node<2>(copy_index, copy_location, false);
-
-        // If the original node was boundary, we will keep a separate copy for use later
-        if (copy_is_boundary)
-        {
-            boundary_nodes.push_back(new_nodes[copy_index]);
-        }
+        new_nodes[copy_index] = new Node<2>(copy_index, copy_location, copy_is_boundary);
     }
 
     // Copy elements
@@ -195,149 +186,234 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
     }
 
+    // We can now create the mesh with new_elements and the subset of new_nodes
+    MutableVertexMesh<2,2>* p_mvm = new MutableVertexMesh<2,2>(new_nodes, new_elems);
+
     /*
-     * We now need to identify congruent boundary nodes. This process is inverse to the process used to identify
-     * boundary nodes. Instead of considering those boundary nodes with locations >= (width, hight), we identify those
-     * with locations <= (width, hight).  Each one of these nodes will be congruent to at least one other boundary node,
-     * and will replace each of those that it's congruent to in any elements containing those congruent nodes.
+     * Recursively associate congruent nodes.
      *
-     * The positions must be checked up to some tolerance, and we use mTol, the same value as when identifying
-     * boundary nodes.
+     * For each node currently on the boundary, we loop through all other boundary nodes and check against all eight
+     * possible congruent locations.  If any one coincides, we replace the identified node with its congruent partner,
+     * delete and remove the identified node from the mesh, and start again from scratch.
+     *
+     * If a node has no congruent partners, we simply mark it as non-boundary, as it is then a node that needs to appear
+     * in the final toroidal mesh.
+     *
+     * This recursion is guaranteed to terminate as the number of boundary nodes decreases by precisely one each time
+     * CheckForCongruentNodes() is called, and CheckForCongruentNodes() returns false if there are no boundary nodes.
      */
+    bool re_check = true;
 
-    // We need to keep a track of which nodes will make it into the final mesh
-    std::vector<bool> nodes_to_keep(new_nodes.size(), true);
-
-    // Loop through boundary nodes to decide if we need to check for congruence
-    for (unsigned node_a_idx = 0 ; node_a_idx < boundary_nodes.size() ; node_a_idx++)
+    while (re_check)
     {
-        Node<2>* p_node_a = boundary_nodes[node_a_idx];
-        c_vector<double, 2> node_a_location = p_node_a->rGetLocation();
+        re_check = this->CheckForCongruentNodes(p_mvm, width, height);
+    }
 
-        // We consider only boundary nodes inside [0, width] x [0, hight]
-        if ( (node_a_location[0] > width - mTol) || (node_a_location[1] > hight - mTol) )
+    /*
+     * We now copy the nodes and elements into a new toroidal mesh, and delete p_mvm
+     */
+    new_nodes.clear();
+    new_nodes.resize(p_mvm->GetNumNodes());
+
+    new_elems.clear();
+    new_elems.resize(p_mvm->GetNumElements());
+
+    // Copy nodes
+    for (unsigned node_counter = 0 ; node_counter < p_mvm->GetNumNodes() ; node_counter++)
+    {
+        Node<2>* p_node_to_copy = p_mvm->GetNode(node_counter);
+
+        // Get all the information about the node we are copying
+        unsigned            copy_index       = p_node_to_copy->GetIndex();
+        c_vector<double, 2> copy_location    = p_node_to_copy->rGetLocation();
+        bool                copy_is_boundary = p_node_to_copy->IsBoundaryNode();
+
+        // No nodes should be boundary nodes
+        assert(!copy_is_boundary);
+
+        // There should not be any 'gaps' in node numbering, but we will assert just to make sure
+        assert(copy_index < p_mvm->GetNumNodes());
+
+        // Create a new node and place it in index order. Every node in a periodic mesh is non-boundary.
+        new_nodes[copy_index] = new Node<2>(copy_index, copy_location, false);
+    }
+
+    // Copy elements
+    for (unsigned elem_counter = 0 ; elem_counter < p_mvm->GetNumElements() ; elem_counter++)
+    {
+        VertexElement<2,2>* p_elem_to_copy = p_mvm->GetElement(elem_counter);
+
+        // Get the information relating to the element we are copying
+        unsigned copy_index     = p_elem_to_copy->GetIndex();
+        unsigned copy_num_nodes = p_elem_to_copy->GetNumNodes();
+
+        // There should not be any 'gaps' in element numbering, but we will assert just to make sure
+        assert(copy_index < p_mvm->GetNumElements());
+
+        // The vertex element is created from a vector of nodes
+        std::vector<Node<2>*> nodes_this_elem;
+
+        // Loop through the nodes in p_elem_to_copy and add the corresponding nodes that we have already copied
+        for (unsigned node_local_idx = 0 ; node_local_idx < copy_num_nodes ; node_local_idx++)
+        {
+            Node<2>* p_local_node = p_elem_to_copy->GetNode(node_local_idx);
+
+            unsigned local_node_global_idx = p_local_node->GetIndex();
+
+            nodes_this_elem.push_back(new_nodes[local_node_global_idx]);
+        }
+
+        // Create a new node and place it in index order
+        new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
+    }
+
+    delete p_mvm;
+
+    /*
+     * We now create the mesh with new_elements and new_nodes.  We immediately call ReMesh() to tidy up any short edges.
+     *
+     * We then reposition all nodes to be within the box [0, width]x[0, height] to make mesh look nicer when visualised.
+     */
+    mpTorMesh = new Toroidal2dVertexMesh(width, height, new_nodes, new_elems);
+    mpTorMesh->ReMesh();
+
+    c_vector<double, 2> min_x_y;
+    min_x_y[0] = DBL_MAX;
+    min_x_y[1] = DBL_MAX;
+
+    // First loop is to calculate the correct offset, min_x_y
+    for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
+    {
+        c_vector<double, 2> this_node_location = mpTorMesh->GetNode(node_idx)->rGetLocation();
+
+        if(this_node_location[0] < min_x_y[0])
+        {
+            min_x_y[0] = this_node_location[0];
+        }
+        if(this_node_location[1] < min_x_y[1])
+        {
+            min_x_y[1] = this_node_location[1];
+        }
+    }
+
+    // Second loop applies the offset, min_x_y, to each node in the mesh
+    for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
+    {
+        mpTorMesh->GetNode(node_idx)->rGetModifiableLocation() -= min_x_y;
+    }
+
+    // Third loop is to reposition any nodes that are now outside the bounding rectangle
+    for (unsigned node_idx = 0 ; node_idx < mpTorMesh->GetNumNodes() ; node_idx++)
+    {
+        if (mpTorMesh->GetNode(node_idx)->rGetLocation()[0] >= width)
+        {
+            mpTorMesh->GetNode(node_idx)->rGetModifiableLocation()[0] -= width;
+        }
+        if (mpTorMesh->GetNode(node_idx)->rGetLocation()[1] >= height)
+        {
+            mpTorMesh->GetNode(node_idx)->rGetModifiableLocation()[1] -= height;
+        }
+    }
+
+    return mpTorMesh;
+}
+
+bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height)
+{
+    // First find all the current boundary nodes in pMesh
+    std::vector<Node<2>*> boundary_nodes;
+    for (unsigned node_idx = 0 ; node_idx < pMesh->GetNumNodes() ; node_idx++)
+    {
+        Node<2>* p_node = pMesh->GetNode(node_idx);
+
+        if (p_node->IsBoundaryNode())
+        {
+            boundary_nodes.push_back(p_node);
+        }
+    }
+
+    // If there are no boundary nodes, return false (we're done checking congruencies)
+    if (boundary_nodes.empty())
+    {
+        return false;
+    }
+
+    // Otherwise, calculate the eight possible congruent locations for the current node
+    Node<2>* p_node_a = *(boundary_nodes.begin());
+    c_vector<double, 2> node_a_pos = p_node_a->rGetLocation();
+    std::vector<c_vector<double,2> > congruent_locations(8, node_a_pos);
+
+    congruent_locations[0][0] += width;
+
+    congruent_locations[1][1] += height;
+
+    congruent_locations[2][0] -= width;
+
+    congruent_locations[3][1] -= height;
+
+    congruent_locations[4][0] += width;
+    congruent_locations[4][1] += height;
+
+    congruent_locations[5][0] -= width;
+    congruent_locations[5][1] += height;
+
+    congruent_locations[6][0] -= width;
+    congruent_locations[6][1] -= height;
+
+    congruent_locations[7][0] += width;
+    congruent_locations[7][1] -= height;
+
+    // Loop over all other boundary nodes
+    for (unsigned node_b_counter = 0 ; node_b_counter < boundary_nodes.size() ; node_b_counter++)
+    {
+
+        // Get the index of the current boundary node, and the corresponding node from the mesh
+        unsigned node_b_idx = boundary_nodes[node_b_counter]->GetIndex();
+        Node<2>* p_mesh_node_b = pMesh->GetNode(node_b_idx);
+
+        if (p_node_a == p_mesh_node_b)
         {
             continue;
         }
 
-        // There are three possible congruent locations for each candidate boundary node
-        c_vector<double, 2> congruent_location_1 = node_a_location;
-        congruent_location_1[0] += width;
+        c_vector<double, 2> node_b_pos = p_mesh_node_b->rGetLocation();
 
-        c_vector<double, 2> congruent_location_2 = node_a_location;
-        congruent_location_2[1] += hight;
-
-        c_vector<double, 2> congruent_location_3 = node_a_location;
-        congruent_location_3[0] += width;
-        congruent_location_3[1] += hight;
-
-        // Loop over all other boundary nodes and keep track of any in the same position as a congruent location
-        std::vector<Node<2>*> congruent_nodes;
-
-        for (unsigned node_b_idx = 0 ; node_b_idx < boundary_nodes.size() ; node_b_idx++)
+        // Loop over the eight possible congruent locations and check for coincidence of location
+        for (unsigned pos = 0 ; pos < congruent_locations.size() ; pos++)
         {
-            if (node_a_idx == node_b_idx)
+            if (norm_inf(node_b_pos - congruent_locations[pos]) < mTol)
             {
-                continue;
-            }
+                // Once we find a congruent location, we replace that node in all containing elements
+                std::set<unsigned> containing_elems = p_mesh_node_b->rGetContainingElementIndices();
 
-            Node<2>* p_node_b = boundary_nodes[node_b_idx];
-            c_vector<double, 2> node_b_location = p_node_b->rGetLocation();
+                assert(containing_elems.size() > 0);
 
-            if (norm_2(congruent_location_3 - node_b_location) < mTol)
-            {
-                congruent_nodes.push_back(p_node_b);
-            }
-            else if (norm_2(congruent_location_2 - node_b_location) < mTol)
-            {
-                congruent_nodes.push_back(p_node_b);
-            }
-            else if (norm_2(congruent_location_1 - node_b_location) < mTol)
-            {
-                congruent_nodes.push_back(p_node_b);
-            }
-        }
-
-        // Each of these node_a should be congruent to at least one node_b
-        assert(congruent_nodes.size() > 0);
-
-        // We now replace each node_b we found by node_a in all elements containing node_b
-        for (unsigned idx = 0 ; idx < congruent_nodes.size() ; idx++)
-        {
-            Node<2>* p_congruent_node = congruent_nodes[idx];
-            unsigned congruent_idx = p_congruent_node->GetIndex();
-
-            // Tag this node as one not to include in the final mesh
-            nodes_to_keep[congruent_idx] = false;
-
-            // Identify which elements contain the current congruent node
-            std::vector<VertexElement<2,2>*> containing_elems;
-
-            for (unsigned elem_idx = 0 ; elem_idx < new_elems.size() ; elem_idx++)
-            {
-                VertexElement<2,2>* p_this_elem = new_elems[elem_idx];
-
-                // GetNodeLocalIndex() returns UINT_MAX if the test-node is not in the element
-                unsigned congruent_node_local_idx = p_this_elem->GetNodeLocalIndex(congruent_idx);
-
-                if (congruent_node_local_idx < UINT_MAX)
+                for (std::set<unsigned>::iterator it = containing_elems.begin() ; it != containing_elems.end() ; ++it)
                 {
-                    containing_elems.push_back(p_this_elem);
+                    VertexElement<2,2>* p_this_elem = pMesh->GetElement(*it);
+                    unsigned local_idx = p_this_elem->GetNodeLocalIndex(p_mesh_node_b->GetIndex());
+
+                    assert(local_idx < UINT_MAX);
+
+                    p_this_elem->AddNode(p_node_a, local_idx);
+                    p_this_elem->DeleteNode(local_idx);
                 }
-            }
 
-            // Loop over containing elements and replace node_b with node_a
-            for (unsigned containing_elem_idx = 0 ; containing_elem_idx < containing_elems.size() ; containing_elem_idx++)
-            {
-                VertexElement<2,2>* p_this_elem = containing_elems[containing_elem_idx];
-                unsigned local_idx = p_this_elem->GetNodeLocalIndex(congruent_idx);
-
-                assert(local_idx < UINT_MAX);
-
-                p_this_elem->AddNode(p_node_a, local_idx);
-                p_this_elem->DeleteNode(local_idx);
+                // Delete the node_b and remove it from the mesh, and return true to start checking again from scratch
+                pMesh->DeleteNodePriorToReMesh(p_mesh_node_b->GetIndex());
+                pMesh->RemoveDeletedNodes();
+                return true;
             }
         }
     }
 
     /*
-     * We recreate a vector of nodes that only includes those that have not been deleted above.
-     *
-     * There may also be interior nodes still outside the box [0, width] x [0, hight], so we move those to their
-     * congruent location.
+     * If we have checked p_node_a against all node_b candidates and have not found a congruent location, p_node_a can
+     * be re-tagged as a non-boundary node, and so will not get checked again next time this function is called.
      */
-    std::vector<Node<2>* > nodes_for_mesh;
+    p_node_a->SetAsBoundaryNode(false);
 
-    for (unsigned node_counter = 0 ; node_counter < new_nodes.size() ; node_counter++)
-    {
-        Node<2>* p_this_node = new_nodes[node_counter];
-
-        if ( nodes_to_keep[node_counter] )
-        {
-            if (p_this_node->rGetLocation()[0] > width)
-            {
-                p_this_node->rGetModifiableLocation()[0] -= width;
-            }
-
-            if (p_this_node->rGetLocation()[1] > hight)
-            {
-                p_this_node->rGetModifiableLocation()[1] -= hight;
-            }
-
-            nodes_for_mesh.push_back(p_this_node);
-            nodes_for_mesh.back()->SetIndex(nodes_for_mesh.size() - 1);
-        }
-        else
-        {
-            delete p_this_node;
-        }
-    }
-
-    // We can now create the mesh with new_elements and the subset of new_nodes
-    mpTorMesh = new Toroidal2dVertexMesh(width, hight, nodes_for_mesh, new_elems);
-    mpTorMesh->ReMesh();
-
-    return mpTorMesh;
+    return true;
 }
 
 std::vector<c_vector<double, 2> > VoronoiVertexMeshGenerator::GetInitialPointLocations()
@@ -707,35 +783,75 @@ void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<doub
     }
 }
 
-void VoronoiVertexMeshGenerator::RepositionNodes()
+std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 {
     assert(mpMesh != NULL);
-    assert(mpMesh->GetNumNodes() > 0);
 
-    c_vector<double, 2> min_x_y;
-    min_x_y[0] = DBL_MAX;
-    min_x_y[1] = DBL_MAX;
+    // Number of elements in the mesh
+    unsigned num_elems = mpMesh->GetNumElements();
 
-    // First loop is to calculate the correct offset, min_x_y
-    for (unsigned node_idx = 0 ; node_idx < mpMesh->GetNumNodes() ; node_idx++)
+    // Store the number of each class of polygons
+    std::vector<unsigned> num_polygons(15, 0);
+
+    // Container to return the polygon distribution
+    std::vector<double> polygon_dist;
+
+    // Loop over elements in the mesh to get the number of each class of polygon
+    for (unsigned elem_idx = 0 ; elem_idx < num_elems ; elem_idx++)
     {
-        c_vector<double, 2> this_node_location = mpMesh->GetNode(node_idx)->rGetLocation();
+        unsigned num_nodes_this_elem = mpMesh->GetElement(elem_idx)->GetNumNodes();
 
-        if(this_node_location[0] < min_x_y[0])
+        // All polygons are assumed to have 3, 4, 5, ..., 14 sides, which is 12 options
+        assert(num_nodes_this_elem > 2);
+        assert(num_nodes_this_elem < 18);
+
+        // Increment correct place in counter - triangles in place 0, squares in 1, etc
+        num_polygons[num_nodes_this_elem - 3]++;
+    }
+
+    // Loop over the vector of polygon numbers and calculate the distribution vector to return
+    unsigned elems_accounted_for = 0;
+    for (unsigned polygon = 0 ; polygon < num_polygons.size() ; polygon++)
+    {
+        elems_accounted_for += num_polygons[polygon];
+
+        polygon_dist.push_back(static_cast<double>(num_polygons[polygon]) / static_cast<double>(num_elems));
+
+        // Only fill the vector of polygon distributions to the point where there are none of higher class in the mesh
+        if (elems_accounted_for == num_elems)
         {
-            min_x_y[0] = this_node_location[0];
-        }
-        if(this_node_location[1] < min_x_y[1])
-        {
-            min_x_y[1] = this_node_location[1];
+            break;
         }
     }
 
-    // Second loop applies the offset, min_x_y, to each node in the mesh
-    for (unsigned node_idx = 0 ; node_idx < mpMesh->GetNumNodes() ; node_idx++)
+    return polygon_dist;
+}
+
+double VoronoiVertexMeshGenerator::GetAreaCoefficientOfVariation()
+{
+    assert(mpMesh != NULL);
+
+    // Number of elements in the mesh, and check there are at least two
+    unsigned num_elems = mpMesh->GetNumElements();
+    assert(num_elems > 1);
+
+    double var = 0.0;
+
+    // Loop over elements in the mesh to get the contributions to the variance
+    for (unsigned elem_idx = 0 ; elem_idx < num_elems ; elem_idx++)
     {
-        mpMesh->GetNode(node_idx)->rGetModifiableLocation() -= min_x_y;
+        double deviation = mpMesh->GetVolumeOfElement(elem_idx) - mElementTargetArea;
+        var += deviation * deviation;
     }
+
+    var /= static_cast<double>(num_elems - 1);
+
+    return sqrt(var) / mElementTargetArea;
+}
+
+void VoronoiVertexMeshGenerator::RefreshSeedsAndRegenerateMesh()
+{
+    this->GenerateVoronoiMesh();
 }
 
 #endif // BOOST_VERSION >= 105200

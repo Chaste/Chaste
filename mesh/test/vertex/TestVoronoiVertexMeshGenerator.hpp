@@ -36,14 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTVORONOIVERTEXMESHGENERATOR_HPP_
 #define TESTVORONOIVERTEXMESHGENERATOR_HPP_
 
-#include <cxxtest/TestSuite.h>
+#include <cxTest/TestSuite.h>
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
-#include "Warnings.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-class TestVoronoiVertexMeshGenerator : public CxxTest::TestSuite
+class TestVoronoiVertexMeshGenerator : public CxTest::TestSuite
 {
 public:
 
@@ -230,25 +229,80 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
-    void TestRepositionNodes() throw(Exception)
+    void TestNodesAreRepositionedInToroidalMesh() throw(Exception)
     {
 #if BOOST_VERSION >= 105200
 
-        // Get a mesh and call RepositionNodes()
-        VoronoiVertexMeshGenerator generator(9, 9, 1, 1.0);
-        generator.RepositionNodes();
+        // Generate a toroidal mesh, which should have all nodes within a prescribed bounding box
+        unsigned num_x = 9;
+        unsigned num_y = 11;
+        unsigned num_relaxation_steps = 1;
+        double area = 1.23;
 
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        double width = num_x * sqrt(area);
+        double height = num_y * sqrt(area);
 
+        VoronoiVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+        Toroidal2dVertexMesh* p_tor_mesh = generator.GetToroidalMesh();
 
-        // Verify that all node locations have been moved to be >= 0
-        for (unsigned node_idx = 0 ; node_idx < p_mesh->GetNumNodes() ; node_idx++ )
+        // Verify that all node locations have been moved to be >= 0 and <= width & height
+        for (unsigned node_idx = 0 ; node_idx < p_tor_mesh->GetNumNodes() ; node_idx++ )
         {
-            c_vector<double, 2> this_location = p_mesh->GetNode(node_idx)->rGetLocation();
+            c_vector<double, 2> this_location = p_tor_mesh->GetNode(node_idx)->rGetLocation();
 
             TS_ASSERT(this_location[0] >= 0.0);
             TS_ASSERT(this_location[1] >= 0.0);
+            TS_ASSERT(this_location[0] < width);
+            TS_ASSERT(this_location[1] < height);
         }
+
+#endif // BOOST_VERSION >= 105200
+    }
+
+    void TestGetPolygonDistributionAndAreaVariation() throw(Exception)
+    {
+#if BOOST_VERSION >= 105200
+
+        unsigned num_x = 3;
+        unsigned num_y = 4;
+        unsigned num_relaxation_steps = 1;
+        double area = 1.23;
+
+        VoronoiVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+
+        // Get the polgyon distribution and check it
+        std::vector<double> polygon_dist = generator.GetPolygonDistribution();
+
+        TS_ASSERT(polygon_dist.size() > 0);
+
+        double cumulative_proportion = 0.0;
+        for (unsigned poly_idx = 0 ; poly_idx < polygon_dist.size() ; poly_idx++)
+        {
+            cumulative_proportion += polygon_dist[poly_idx];
+        }
+
+        TS_ASSERT_DELTA(cumulative_proportion, 1.0, 1e-6);
+
+        // Get the area variation coefficient and check it
+        double area_variation = generator.GetAreaCoefficientOfVariation();
+
+        TS_ASSERT_DELTA(area_variation, 0.3902318115, 1e-6);
+
+#endif // BOOST_VERSION >= 105200
+    }
+
+    void TestRefreshSeedsAndRegenerateMeshCoverage() throw(Exception)
+    {
+#if BOOST_VERSION >= 105200
+
+        unsigned num_x = 3;
+        unsigned num_y = 4;
+        unsigned num_relaxation_steps = 1;
+        double area = 1.23;
+
+        VoronoiVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+
+        generator.RefreshSeedsAndRegenerateMesh();
 
 #endif // BOOST_VERSION >= 105200
     }
