@@ -22,7 +22,7 @@ IF( XSD_EXECUTABLE )
   # Obtain the include directory that one can use with INCLUDE_DIRECTORIES() to
   # access the xsd include files.
   #
-  FIND_PATH( XSD_INCLUDE_DIR xsd/cxx/config.hxx
+  FIND_PATH( XSD_INCLUDE_DIR xsd/cxx/version.hxx
       HINTS  "${XSD_ROOT_DIR}/libxsd"
       PATHS /usr/include
       )

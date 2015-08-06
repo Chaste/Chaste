@@ -36,6 +36,10 @@ endif()
 option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
 option(Chaste_LINK_LIBRARIES_WITH_UNRESOLVED_SYMBOLS "All Chaste libraries will have unresolved symbols. User must link in all dependencies (third party and Chaste internal)" OFF)
+option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
+if (Chaste_COVERAGE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(SEND_ERROR "CMAKE_BUILD_TYPE must be \"Debug\" to build Chaste with coverage (Chaste_COVERAGE=ON)")
+endif()
 
 option(Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
@@ -388,6 +392,17 @@ install(FILES
 install(DIRECTORY ${Chaste_SOURCE_DIR}/python
     DESTINATION .
     COMPONENT Python)
+
+####################
+#    COVERAGE      #
+####################
+
+
+if (Chaste_COVERAGE)
+    include(CodeCoverage)
+    setup_target_for_coverage(coverage "${Chaste_SOURCE_DIR}/cmake/coverage_script.sh" coverage)
+endif()
+
 
 ####################
 #    PACKAGING     #
