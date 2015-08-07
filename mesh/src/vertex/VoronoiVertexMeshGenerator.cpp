@@ -81,11 +81,11 @@ void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
     std::vector<c_vector<double, 2> > seed_locations = this->GetInitialPointLocations();
     this->ValidateSeedLocations(seed_locations);
 
-    // We now create the initial Voronoi tessellation.  This method updates mpMesh.
+    // We now create the initial Voronoi tessellation. This method updates mpMesh.
     this->CreateVoronoiTessellation(seed_locations);
 
     /**
-     * Next, we perform the relaxation steps.  The points used as seeds in the new Voronoi tessellation are the
+     * Next, we perform the relaxation steps. The points used as seeds in the new Voronoi tessellation are the
      * centroids of the elements which are currently in the mesh.
      */
     for (unsigned relaxation = 0 ; relaxation < mNumRelaxationSteps ; relaxation++)
@@ -158,7 +158,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
     }
 
     // Copy elements
-    for (unsigned elem_counter = 0 ; elem_counter < mpMesh->GetNumElements() ; elem_counter++)
+    for (unsigned elem_counter = 0; elem_counter < mpMesh->GetNumElements(); elem_counter++)
     {
         VertexElement<2,2>* p_elem_to_copy = mpMesh->GetElement(elem_counter);
 
@@ -176,9 +176,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         for (unsigned node_local_idx = 0 ; node_local_idx < copy_num_nodes ; node_local_idx++)
         {
             Node<2>* p_local_node = p_elem_to_copy->GetNode(node_local_idx);
-
             unsigned local_node_global_idx = p_local_node->GetIndex();
-
             nodes_this_elem.push_back(new_nodes[local_node_global_idx]);
         }
 
@@ -187,7 +185,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
     }
 
     // We can now create the mesh with new_elements and the subset of new_nodes
-    MutableVertexMesh<2,2>* p_mvm = new MutableVertexMesh<2,2>(new_nodes, new_elems);
+    MutableVertexMesh<2,2>* p_temp_mesh = new MutableVertexMesh<2,2>(new_nodes, new_elems);
 
     /*
      * Recursively associate congruent nodes.
@@ -206,22 +204,20 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
 
     while (re_check)
     {
-        re_check = this->CheckForCongruentNodes(p_mvm, width, height);
+        re_check = this->CheckForCongruentNodes(p_temp_mesh, width, height);
     }
 
-    /*
-     * We now copy the nodes and elements into a new toroidal mesh, and delete p_mvm
-     */
+    // We now copy the nodes and elements into a new toroidal mesh, and delete p_temp_mesh
     new_nodes.clear();
-    new_nodes.resize(p_mvm->GetNumNodes());
+    new_nodes.resize(p_temp_mesh->GetNumNodes());
 
     new_elems.clear();
-    new_elems.resize(p_mvm->GetNumElements());
+    new_elems.resize(p_temp_mesh->GetNumElements());
 
     // Copy nodes
-    for (unsigned node_counter = 0 ; node_counter < p_mvm->GetNumNodes() ; node_counter++)
+    for (unsigned node_counter = 0 ; node_counter < p_temp_mesh->GetNumNodes() ; node_counter++)
     {
-        Node<2>* p_node_to_copy = p_mvm->GetNode(node_counter);
+        Node<2>* p_node_to_copy = p_temp_mesh->GetNode(node_counter);
 
         // Get all the information about the node we are copying
         unsigned            copy_index       = p_node_to_copy->GetIndex();
@@ -232,23 +228,23 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         assert(!copy_is_boundary);
 
         // There should not be any 'gaps' in node numbering, but we will assert just to make sure
-        assert(copy_index < p_mvm->GetNumNodes());
+        assert(copy_index < p_temp_mesh->GetNumNodes());
 
         // Create a new node and place it in index order. Every node in a periodic mesh is non-boundary.
         new_nodes[copy_index] = new Node<2>(copy_index, copy_location, false);
     }
 
     // Copy elements
-    for (unsigned elem_counter = 0 ; elem_counter < p_mvm->GetNumElements() ; elem_counter++)
+    for (unsigned elem_counter = 0; elem_counter < p_temp_mesh->GetNumElements(); elem_counter++)
     {
-        VertexElement<2,2>* p_elem_to_copy = p_mvm->GetElement(elem_counter);
+        VertexElement<2,2>* p_elem_to_copy = p_temp_mesh->GetElement(elem_counter);
 
         // Get the information relating to the element we are copying
         unsigned copy_index     = p_elem_to_copy->GetIndex();
         unsigned copy_num_nodes = p_elem_to_copy->GetNumNodes();
 
         // There should not be any 'gaps' in element numbering, but we will assert just to make sure
-        assert(copy_index < p_mvm->GetNumElements());
+        assert(copy_index < p_temp_mesh->GetNumElements());
 
         // The vertex element is created from a vector of nodes
         std::vector<Node<2>*> nodes_this_elem;
@@ -267,7 +263,7 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
         new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
     }
 
-    delete p_mvm;
+    delete p_temp_mesh;
 
     /*
      * We now create the mesh with new_elements and new_nodes.  We immediately call ReMesh() to tidy up any short edges.
@@ -364,9 +360,8 @@ bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* 
     congruent_locations[7][1] -= height;
 
     // Loop over all other boundary nodes
-    for (unsigned node_b_counter = 0 ; node_b_counter < boundary_nodes.size() ; node_b_counter++)
+    for (unsigned node_b_counter = 0; node_b_counter < boundary_nodes.size(); node_b_counter++)
     {
-
         // Get the index of the current boundary node, and the corresponding node from the mesh
         unsigned node_b_idx = boundary_nodes[node_b_counter]->GetIndex();
         Node<2>* p_mesh_node_b = pMesh->GetNode(node_b_idx);
@@ -440,7 +435,7 @@ std::vector<c_vector<double, 2> > VoronoiVertexMeshGenerator::GetElementCentroid
     std::vector<c_vector<double, 2> > element_centroids;
 
     // Loop over all elements in the mesh
-    for (unsigned elem_idx = 0 ; elem_idx < mpMesh->GetNumElements() ; elem_idx++)
+    for (unsigned elem_idx = 0; elem_idx < mpMesh->GetNumElements(); elem_idx++)
     {
         // Get the current centroid of the element
         c_vector<double, 2> this_centroid = mpMesh->GetCentroidOfElement(elem_idx);
@@ -516,10 +511,10 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
 
     // Add all the points in the tessellation to the vector of boost points so in total there are 9 copies of each
     // seed location, suitably tiled.
-    for (unsigned rep = 0 ; rep < offsets.size() ; rep++)
+    for (unsigned rep = 0; rep < offsets.size(); rep++)
     {
         boost_point offset = offsets[rep];
-        for (unsigned point_idx = 0 ; point_idx < rSeedLocations.size() ; point_idx++)
+        for (unsigned point_idx = 0; point_idx < rSeedLocations.size(); point_idx++)
         {
             boost_point new_point = boost_point(points[point_idx].x() + offset.x(), points[point_idx].y() + offset.y());
             points.push_back(new_point);
@@ -583,7 +578,7 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
                      */
                     unsigned existing_node_idx = UINT_MAX;
 
-                    for (unsigned node_idx = 0 ; node_idx < nodes.size() ; node_idx++)
+                    for (unsigned node_idx = 0; node_idx < nodes.size(); node_idx++)
                     {
                         // Grab the existing node location
                         c_vector<double, 2> existing_node_location = nodes[node_idx]->rGetLocation();
@@ -728,6 +723,7 @@ void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<doub
 
     // Seeds at least 1.0 / mSamplingMultiplier are acceptable, but we use 1.5 to be absolutely safe
     double safe_distance = 1.5 / mSamplingMultiplier;
+    ///\todo 2683 - Consider replacing the hardcoded value of 1.5 with a member variable
 
     // If we find a seed that needs to move position, we will move it and start checking again from the beginning
     bool recheck = true;
@@ -792,12 +788,13 @@ std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
 
     // Store the number of each class of polygons
     std::vector<unsigned> num_polygons(15, 0);
+    ///\todo 2683 - Consider replacing the hardcoded value of 15 with a member variable
 
     // Container to return the polygon distribution
     std::vector<double> polygon_dist;
 
     // Loop over elements in the mesh to get the number of each class of polygon
-    for (unsigned elem_idx = 0 ; elem_idx < num_elems ; elem_idx++)
+    for (unsigned elem_idx = 0; elem_idx < num_elems; elem_idx++)
     {
         unsigned num_nodes_this_elem = mpMesh->GetElement(elem_idx)->GetNumNodes();
 

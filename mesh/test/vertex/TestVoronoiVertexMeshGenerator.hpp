@@ -51,7 +51,7 @@ public:
     {
 #if BOOST_VERSION >= 105200
 
-        // 20 cells wide, 12 high, 4 Lloyd's Relaxation steps, target average element area 1.23
+        // Generate a mesh that is 20 cells wide, 12 high, with 4 Lloyd's relaxation steps and target average element area 1.23
         VoronoiVertexMeshGenerator generator(20, 12, 4, 1.23);
         MutableVertexMesh<2,2>* p_mesh_a = generator.GetMesh();
         MutableVertexMesh<2,2>* p_mesh_b = generator.GetMeshAfterReMesh();
@@ -80,7 +80,7 @@ public:
     {
 #if BOOST_VERSION >= 105200
 
-        // 3 cells wide, 2 high, 3 Lloyd's Relaxation steps, target average element area 100.0
+        // Generate a mesh that is 3 cells wide, 2 high, with 3 Lloyd's relaxation steps and target average element area 100.0
         VoronoiVertexMeshGenerator generator(3, 2, 3, 100.0);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
@@ -144,9 +144,7 @@ public:
         // Vector of points that will be passed to ValidateSeedLocations()
         std::vector<c_vector<double, 2> > points;
 
-        /*
-         * Test two points at 0,0 are moved as expected
-         */
+        // Test two points at 0,0 are moved as expected
         points.push_back(zero_vector<double>(2));
         points.push_back(zero_vector<double>(2));
 
@@ -157,9 +155,7 @@ public:
         TS_ASSERT_DELTA(points[1][0], 1.5 / sampling_multiplier, 1e-10);
         TS_ASSERT_DELTA(points[1][1], 0.0, 1e-10);
 
-        /*
-         * Test three points at 0,0 are moved as expected
-         */
+        // Test three points at 0,0 are moved as expected
         points.clear();
         points.push_back(zero_vector<double>(2));
         points.push_back(zero_vector<double>(2));
@@ -174,9 +170,7 @@ public:
         TS_ASSERT_DELTA(points[2][0], 3.0 / sampling_multiplier, 1e-10);
         TS_ASSERT_DELTA(points[2][1], 0.0, 1e-10);
 
-        /*
-         * Test that periodicity is working correctly
-         */
+        // Test that periodicity is working correctly
         points.clear();
         points.push_back(one_one);
         points.push_back(one_one);
@@ -187,9 +181,7 @@ public:
         TS_ASSERT_DELTA(points[1][0], 1.5 / sampling_multiplier, 1e-10);
         TS_ASSERT_DELTA(points[1][1], 1.0, 1e-10);
 
-        /*
-         * Test that two close non-equal points are moved correctly
-         */
+        // Test that two close non-equal points are moved correctly
         points.clear();
         points.push_back(zero_vector<double>(2));
         points.push_back( (2.0 * DBL_EPSILON) * one_one );
@@ -200,9 +192,7 @@ public:
         TS_ASSERT_DELTA(points[1][0], 1.5 / (sampling_multiplier * sqrt(2.0)), 1e-10);
         TS_ASSERT_DELTA(points[1][1], 1.5 / (sampling_multiplier * sqrt(2.0)), 1e-10);
 
-        /*
-         * Test that periodicity for two close non-equal points is working as expected
-         */
+        // Test that periodicity for two close non-equal points is working as expected
         points.clear();
         points.push_back(one_one);
         points.push_back((1.0 + 2.0 * DBL_EPSILON) * one_one);
@@ -220,7 +210,7 @@ public:
     {
 #if BOOST_VERSION >= 105200
 
-        // Generate and get a Toroidal mesh
+        // Generate and get a toroidal mesh
         VoronoiVertexMeshGenerator generator(19, 11, 7, 1.0);
         Toroidal2dVertexMesh* p_tor_mesh = generator.GetToroidalMesh();
 
@@ -234,7 +224,7 @@ public:
     {
 #if BOOST_VERSION >= 105200
 
-        // Generate a toroidal mesh, which should have all nodes within a prescribed bounding box
+        // Generate a toroidal mesh, all of whose nodes should lie within a prescribed bounding box
         unsigned num_x = 9;
         unsigned num_y = 11;
         unsigned num_relaxation_steps = 1;

@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Mesh generator that creates a 2D Voronoi tessellation using a number
- * of Lloyd's Relaxation steps (http://en.wikipedia.org/wiki/Lloyd%27s_algorithm).
+ * of Lloyd's relaxation steps (http://en.wikipedia.org/wiki/Lloyd%27s_algorithm).
  *
  * NOTE: the user should delete the mesh after use to manage memory.
  */
@@ -60,54 +60,54 @@ class VoronoiVertexMeshGenerator
 
 protected:
 
-    /** A pointer to the mesh that this class creates */
+    /** A pointer to the mesh that this class creates. */
     MutableVertexMesh<2,2>* mpMesh;
 
-    /** A pointer to an optionally created toroidal vertex mesh (allowing for periodic boundaries) */
+    /** A pointer to a toroidal vertex mesh (allowing for doubly periodic boundaries), whose creation is optional. */
     Toroidal2dVertexMesh* mpTorMesh;
 
-    /** The number of elements requested across the mesh */
+    /** The number of elements requested across the mesh. */
     unsigned mNumElementsX;
 
-    /** The number of elements requested up the mesh */
+    /** The number of elements requested up the mesh. */
     unsigned mNumElementsY;
 
-    /** The total number of elements requested in the mesh */
+    /** The total number of elements requested in the mesh. */
     unsigned mTotalNumElements;
 
-    /** The number of Lloyd's Relaxation steps requested in the Voronoi iteration */
+    /** The number of Lloyd's relaxation steps requested in the Voronoi iteration. */
     unsigned mNumRelaxationSteps;
 
-    /** The number of elements requested across or up the mesh, whichever is greater */
+    /** The number of elements requested across or up the mesh, whichever is greater. */
     unsigned mMaxNumElems;
 
-    /** The maximum integer position in the x-direction that a seed point could occupy after discretisation  */
+    /** The maximum integer position in the x-direction that a seed point could occupy after discretisation.  */
     int mMaxIntX;
 
-    /** The maximum integer position in the y-direction that a seed point could occupy after discretisation */
+    /** The maximum integer position in the y-direction that a seed point could occupy after discretisation. */
     int mMaxIntY;
 
-    /** The requested average target area of elements in the mesh */
+    /** The requested average target area of elements in the mesh. */
     double mElementTargetArea;
 
-    /** The scaling factor necessary to ensure the x-component of seed locations is between 0.0 and 1.0 */
+    /** The scaling factor necessary to ensure that the x-component of seed locations lies between 0.0 and 1.0. */
     double mMultiplierInX;
 
-    /** The scaling factor necessary to ensure the y-component of seed locations is between 0.0 and 1.0 */
+    /** The scaling factor necessary to ensure that the y-component of seed locations lies between 0.0 and 1.0. */
     double mMultiplierInY;
 
     /** A floating point representation of MAX_INT/2 */
     double mSamplingMultiplier;
 
-    /** The floating-point tolerance used for checking equality of node locations */
+    /** The floating-point tolerance used for checking equality of node locations. */
     double mTol;
 
     /**
      * Helper method for the constructor.
      *
-     * Function that produces random seed points, with some validation, that lie in the rectangle
-     * [0.0, mMultiplierInX] x [0.0, mMultiplierInY].  These seeds are used for the initial
-     * Voronoi diagram construction, before any steps of Lloyd's Relaxation.
+     * Produces a vector of random seed points, with some validation, that lie in the rectangle
+     * [0.0, mMultiplierInX] x [0.0, mMultiplierInY]. These seeds are used for the initial
+     * Voronoi diagram construction, before any steps of Lloyd's relaxation.
      *
      * @return A vector of seed points
      */
@@ -123,8 +123,8 @@ protected:
     /**
      * Helper method for the constructor.
      *
-     * Function that takes seed locations and updates mpMesh with Nodes and VertexElements corresponding to a
-     * Voronoi diagram derived from the seed points.  Boundary effects are eliminated by considering a 3x3 tessellation
+     * Takes seed locations and updates mpMesh with Nodes and VertexElements corresponding to a
+     * Voronoi diagram derived from the seed points. Boundary effects are eliminated by considering a 3x3 tessellation
      * of the seed points and only keeping those Voronoi cells corresponding to seed points in the centre tile.
      * Each seed point must lie in [0.0, mMultiplierInX] x [0.0, mMultiplierInY] for the tessellation to be valid.
      *
@@ -143,7 +143,7 @@ protected:
      * Helper method for the constructor.
      *
      * Validates the initial random seed locations, making minute adjustments to seed locations if two points would be
-     * mapped to the same integer lattice point after discretisation. This is in a separate method to allow effective
+     * mapped to the same integer lattice point after discretisation. This functionality is in a separate method to allow effective
      * unit testing.
      *
      * @param rSeedLocations The vector of random seed locations
@@ -153,7 +153,7 @@ protected:
     /**
      * Helper method for GetToroidalMesh().
      *
-     * Takes the first boundary node, A, and checks it for congruence in position with all other boundary nodes.  If a
+     * Takes the first boundary node, A, and checks it for congruence in position with all other boundary nodes. If a
      * congruent location is found, then A replaces the congruent node and this function returns true.  If none are
      * found, A is tagged as no longer being a boundary node.
      *
@@ -171,7 +171,7 @@ public:
      * @param numElementsX  The number of elements requested across the mesh
      * @param numElementsY  The number of elements requested up the mesh
      * @param numRelaxationSteps  The number of Lloyd's Relaxation steps in the Voronoi iteration
-     * @param elementTargetArea The requested average target area of elements in the mesh, which has default value 1.0
+     * @param elementTargetArea The requested average target area of elements in the mesh (defaults to 1.0)
      */
     VoronoiVertexMeshGenerator(unsigned numElementsX,
                                unsigned numElementsY,
@@ -197,38 +197,39 @@ public:
     void GenerateVoronoiMesh();
 
     /**
-     * @return A 2D Mutable Vertex Mesh
+     * @return A pointer to a 2D mutable vertex mesh
      */
     virtual MutableVertexMesh<2,2>* GetMesh();
 
     /**
-     * @return A 2D Mutable Vertex Mesh, after ReMesh() has been called to remove short edges
+     * @return A pointer to a 2D mutable vertex mesh, after ReMesh() has been called to remove short edges
      */
     virtual MutableVertexMesh<2,2>* GetMeshAfterReMesh();
 
     /**
-     * @return A 2D Toroidal Mutable Vertex Mesh with periodic boundaries
+     * @return A pointer to a 2D toroidal vertex mesh with periodic boundaries
      */
     virtual Toroidal2dVertexMesh* GetToroidalMesh();
 
     /**
-     * @return a vector representing the polygon distribution of the generated mesh, triangles upwards
+     * @return A vector representing the polygon distribution of the generated mesh, triangles upwards
      */
     std::vector<double> GetPolygonDistribution();
 
     /**
-     * We calculate the coefficient of variation of the areas of elements in the mesh, defined as the sample standard
+     * Computes the coefficient of variation of the areas of elements in the mesh, defined to be the sample standard
      * deviation in area divided by the mean area.
      *
-     * @return a the coefficient of variation of the area of elements in the mesh
+     * @return The coefficient of variation of the area of elements in the mesh
      */
     double GetAreaCoefficientOfVariation();
 
     /**
-     * Allow the user to make a new mesh - for instance if trying to generate a specific polygon distribution
+     * Call GenerateVoronoiMesh().
+     *
+     * Allows the user to make a new mesh, for instance if trying to generate a specific polygon distribution.
      */
     void RefreshSeedsAndRegenerateMesh();
-
 };
 
 #endif // BOOST_VERSION >= 105200
