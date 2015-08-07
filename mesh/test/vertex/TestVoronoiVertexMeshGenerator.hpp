@@ -36,7 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTVORONOIVERTEXMESHGENERATOR_HPP_
 #define TESTVORONOIVERTEXMESHGENERATOR_HPP_
 
-#include <cxxTest/TestSuite.h>
+#include <cxxtest/TestSuite.h>
+
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
