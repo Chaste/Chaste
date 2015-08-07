@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Toroidal2dVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-class TestVoronoiVertexMeshGenerator : public CxTest::TestSuite
+class TestVoronoiVertexMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
