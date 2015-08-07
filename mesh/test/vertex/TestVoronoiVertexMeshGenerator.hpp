@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
+#include "Warnings.hpp"
 
 class TestVoronoiVertexMeshGenerator : public CxxTest::TestSuite
 {
