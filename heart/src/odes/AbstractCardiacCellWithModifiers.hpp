@@ -116,7 +116,8 @@ private:
             // Paranoia check that this is the modifier we think it is.
             if ((*iter).first != modifier_name)
             {
-                NEVER_REACHED; // You're in trouble.
+                NEVER_REACHED;
+                // You're in trouble.
                 // If this breaks, perhaps change this loop to do the right number and
                 // use modifier_name as mModifiersMap key instead.
             }
