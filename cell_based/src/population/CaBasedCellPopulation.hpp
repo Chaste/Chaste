@@ -40,10 +40,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractCaUpdateRule.hpp"
+#include "AbstractCaBasedDivisionRule.hpp"
+
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+
+template<unsigned DIM> class AbstractCaBasedDivisionRule; // Circular definition thing.
 
 template<unsigned DIM>
 class AbstractCaUpdateRule; // Circular definition
@@ -77,6 +81,10 @@ private:
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
 
+    /** A pointer to a division rule that is used to specify how cells divide. I.e do they move other cells out of the way.
+     * This is a specialisation for Ca models. */
+    boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > mpCaBasedDivisionRule;
+
     /**
      * Set the empty sites by taking in a set of which nodes indices are empty sites.
      *
@@ -104,6 +112,7 @@ private:
         archive & mLatticeCarryingCapacity;
         archive & mUpdateRuleCollection;
         archive & mAvailableSpaces;
+        archive & mpCaBasedDivisionRule;
 #undef COVERAGE_IGNORE
     }
 
@@ -149,7 +158,7 @@ public:
     /**
      * Constructor for use by the de-serializer.
      *
-     * @param rMesh a vertex mesh.
+     * @param rMesh a Ca mesh.
      */
     CaBasedCellPopulation(PottsMesh<DIM>& rMesh);
 
@@ -404,6 +413,21 @@ public:
      * @return whether the cell has any free neighbouring sites
      */
     bool IsRoomToDivide(CellPtr pCell);
+
+
+    /**
+	 * @return The Ca division rule that is currently being used.
+	 */
+	boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > GetCaBasedDivisionRule();
+
+	/**
+	 * Set the division rule for this population.
+	 *
+	 * @param pCaBasedDivisionRule  pointer to the new division rule
+	 */
+	void SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule);
+
+
 };
 
 #include "SerializationExportWrapper.hpp"

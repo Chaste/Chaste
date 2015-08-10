@@ -53,6 +53,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Cell population writers
 #include "CellMutationStatesWriter.hpp"
 
+//Ca division rules
+#include "ExclusionCaBasedDivisionRule.hpp"
+
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
@@ -73,6 +76,7 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(PottsMesh<DIM>& rMesh,
       mLatticeCarryingCapacity(latticeCarryingCapacity)
 {
     mAvailableSpaces = std::vector<unsigned>(this->GetNumNodes(), latticeCarryingCapacity);
+    mpCaBasedDivisionRule.reset(new ExclusionCaBasedDivisionRule<DIM>());
 
     // This must always be true
     assert(this->mCells.size() <= this->mrMesh.GetNumNodes()*latticeCarryingCapacity);
@@ -211,94 +215,15 @@ void CaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(unsigned index, Ce
 template<unsigned DIM>
 bool CaBasedCellPopulation<DIM>::IsRoomToDivide(CellPtr pCell)
 {
-    bool is_room = false;
-
-    // Get node index corresponding to this cell
-    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
-
-    // Get the set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
-
-    // Iterate through the neighbours to see if there are any available sites
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-         neighbour_iter != neighbouring_node_indices.end();
-         ++neighbour_iter)
-    {
-        if (IsSiteAvailable(*neighbour_iter, pCell))
-        {
-            is_room = true;
-            break;
-        }
-    }
-
-    return is_room;
+    return mpCaBasedDivisionRule->IsRoomToDivide(pCell, *this);
 }
 
 template<unsigned DIM>
 CellPtr CaBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, const c_vector<double,DIM>& rCellDivisionVector, CellPtr pParentCell)
 {
-    // Get node index corresponding to the parent cell
-    unsigned parent_node_index = this->GetLocationIndexUsingCell(pParentCell);
+	unsigned daughter_node_index = mpCaBasedDivisionRule->CalculateDaughterNodeIndex(pNewCell,pParentCell,*this);
 
-    // Get the set of neighbouring node indices
-    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(parent_node_index);
-    unsigned num_neighbours = neighbouring_node_indices.size();
-
-    // Each node must have at least one neighbour
-    assert(!neighbouring_node_indices.empty());
-
-    std::vector<double> neighbouring_node_propensities;
-    std::vector<unsigned> neighbouring_node_indices_vector;
-
-    double total_propensity = 0.0;
-
-    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            neighbour_iter != neighbouring_node_indices.end();
-         ++neighbour_iter)
-    {
-        neighbouring_node_indices_vector.push_back(*neighbour_iter);
-
-        double propensity_dividing_into_neighbour = EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
-
-        if (!IsSiteAvailable(*neighbour_iter, pParentCell))
-        {
-            propensity_dividing_into_neighbour = 0.0;
-        }
-        neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
-        total_propensity += propensity_dividing_into_neighbour;
-    }
-
-    assert(total_propensity>0); // if this trips the cell cant divided so need to include this in the IsSiteAvailable method
-
-    for (unsigned i=0; i<num_neighbours; i++)
-    {
-        neighbouring_node_propensities[i] /= total_propensity;
-    }
-
-     // Sample random number to specify which move to make
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-    double random_number = p_gen->ranf();
-
-    double total_probability = 0.0;
-    unsigned daughter_node_index = UNSIGNED_UNSET;
-
-    unsigned counter;
-    for (counter=0; counter < num_neighbours; counter++)
-    {
-        total_probability += neighbouring_node_propensities[counter];
-        if (total_probability >= random_number)
-        {
-            // Divide the parent cell to this neighbour location
-            daughter_node_index = neighbouring_node_indices_vector[counter];
-            break;
-        }
-    }
-    // This loop should always break as sum(neighbouring_node_propensities) = 1
-
-    assert(daughter_node_index != UNSIGNED_UNSET);
-    assert(daughter_node_index < this->mrMesh.GetNumNodes());
-
-    // Associate the new cell with the element
+    // Associate the new cell with the neighboring node
     this->mCells.push_back(pNewCell);
 
     // Update location cell map
@@ -508,8 +433,25 @@ const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& CaBasedCellPo
 }
 
 template<unsigned DIM>
+boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > CaBasedCellPopulation<DIM>::GetCaBasedDivisionRule()
+{
+    return mpCaBasedDivisionRule;
+}
+
+template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule)
+{
+    mpCaBasedDivisionRule = pCaBasedDivisionRule;
+}
+
+template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
+    // Add the division rule parameters
+    *rParamsFile << "\t\t<CaBasedDivisionRule>\n";
+    mpCaBasedDivisionRule->OutputCellCaBasedDivisionRuleInfo(rParamsFile);
+    *rParamsFile << "\t\t</CaBasedDivisionRule>\n";
+
     // Call method on direct parent class
     AbstractOnLatticeCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
