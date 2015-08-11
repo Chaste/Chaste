@@ -559,7 +559,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiElementIndexCorresponding
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteRankOfElement(unsigned index)
 {
-    assert (SPACE_DIM == 2 || SPACE_DIM == 3);
+    assert(SPACE_DIM == 2 || SPACE_DIM == 3);
 
     // Get pointer to this element
     VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
