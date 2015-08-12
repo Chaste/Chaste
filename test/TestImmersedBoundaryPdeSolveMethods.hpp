@@ -33,30 +33,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-// Includes needed for test framework
+// Needed for test framework
 #include <cxxtest/TestSuite.h>
-
-#include <fftw3.h>
 #include "AbstractCellBasedTestSuite.hpp"
+
+// Needed for Immersed Boundary simulations
+#include <fftw3.h>
+
+// Includes from trunk
+#include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
+
+
+// Includes from projects/ImmersedBoundary
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryMeshWriter.hpp"
+#include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
-#include "RandomNumberGenerator.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "SuperellipseGenerator.hpp"
+
 #include "Debug.hpp"
 
-#include "CellsGenerator.hpp"
-#include "ImmersedBoundaryCellPopulation.hpp"
-#include "ImmersedBoundaryCellCycleModel.hpp"
-#include "ImmersedBoundaryMesh.hpp"
-#include "ImmersedBoundaryElement.hpp"
-#include "ImmersedBoundarySimulationModifier.hpp"
-#include "OffLatticeSimulation.hpp"
-#include <vector>
-
+// This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
 class TestImmersedBoundaryPdeSolveMethods : public AbstractCellBasedTestSuite
 {
 public:
+
     void xTestForcePropagation() throw(Exception)
     {
         // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
@@ -83,9 +92,9 @@ public:
         p_mesh->SetNumGridPtsY(10);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -159,8 +168,10 @@ public:
         }
 
         // As the system is symmetric, we only need two distances for the 1D delta function
-        double small_delta = (1.0 / 4.0) * (1.0 + cos(M_PI * 0.05 / 0.2));
-        double large_delta = (1.0 / 4.0) * (1.0 + cos(M_PI * 0.15 / 0.2));
+        double spacing = 1.0 / 10.0;
+
+        double small_delta = (0.25 * (1.0 + cos(M_PI * 0.05 / (2 * spacing)))) / spacing;
+        double large_delta = (0.25 * (1.0 + cos(M_PI * 0.15 / (2 * spacing)))) / spacing;
 
         // Test 1D delta function
         TS_ASSERT_DELTA(small_delta, p_mod->Delta1D(0.05, 0.1), 1e-10);
@@ -177,9 +188,10 @@ public:
         // Test third grid point
         TS_ASSERT_DELTA(force_grid_x[2][4], 1.0 * small_delta * small_delta, 1e-10);
         TS_ASSERT_DELTA(force_grid_y[2][4], 2.0 * small_delta * small_delta, 1e-10);
+
     }
 
-    void xTestUpwindSchemeImplementation() throw(Exception)
+    void TestUpwindSchemeImplementation() throw(Exception)
     {
         MAKE_PTR(ImmersedBoundarySimulationModifier < 2 > , p_mod);
 
@@ -204,7 +216,7 @@ public:
 
         // Read in vel_x
         ifstream f_vel_x;
-        f_vel_x.open("projects/fcooper/test/ib/data/vel_x.dat");
+        f_vel_x.open("projects/ImmersedBoundary/test/data/vel_x.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -216,7 +228,7 @@ public:
 
         // Read in vel_y
         ifstream f_vel_y;
-        f_vel_y.open("projects/fcooper/test/ib/data/vel_y.dat");
+        f_vel_y.open("projects/ImmersedBoundary/test/data/vel_y.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -228,7 +240,7 @@ public:
 
         // Read in hand_upwind_x
         ifstream f_hand_upwind_x;
-        f_hand_upwind_x.open("projects/fcooper/test/ib/data/upwind_x.dat");
+        f_hand_upwind_x.open("projects/ImmersedBoundary/test/data/upwind_x.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -240,7 +252,7 @@ public:
 
         // Read in hand_upwind_y
         ifstream f_hand_upwind_y;
-        f_hand_upwind_y.open("projects/fcooper/test/ib/data/upwind_y.dat");
+        f_hand_upwind_y.open("projects/ImmersedBoundary/test/data/upwind_y.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -271,7 +283,7 @@ public:
         }
     }
 
-    void xTestFourierTransformMethods() throw(Exception)
+    void TestFourierTransformMethods() throw(Exception)
     {
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_mod);
 
@@ -298,7 +310,7 @@ public:
 
         // Read in matrix_a
         ifstream f_randn_mat_a;
-        f_randn_mat_a.open("projects/fcooper/test/ib/data/matrix_a.dat");
+        f_randn_mat_a.open("projects/ImmersedBoundary/test/data/matrix_a.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -310,7 +322,7 @@ public:
 
         // Read in matrix_b
         ifstream f_randn_mat_b;
-        f_randn_mat_b.open("projects/fcooper/test/ib/data/matrix_b.dat");
+        f_randn_mat_b.open("projects/ImmersedBoundary/test/data/matrix_b.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -322,8 +334,8 @@ public:
 
         // Read in the fft of matrix_a
         ifstream f_real, f_imag;
-        f_real.open("projects/fcooper/test/ib/data/ffta_real.dat");
-        f_imag.open("projects/fcooper/test/ib/data/ffta_imag.dat");
+        f_real.open("projects/ImmersedBoundary/test/data/ffta_real.dat");
+        f_imag.open("projects/ImmersedBoundary/test/data/ffta_imag.dat");
         double real_temp;
         double imag_temp;
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
@@ -340,7 +352,7 @@ public:
 
         // Read in real part of the inverse transform of mat_a + i * mat_b;
         ifstream f_ifft;
-        f_ifft.open("projects/fcooper/test/ib/data/ifftaplusib_real.dat");
+        f_ifft.open("projects/ImmersedBoundary/test/data/ifftaplusib_real.dat");
         for(unsigned y = 0 ; y < num_gridpts_y ; y++)
         {
             for(unsigned x = 0 ; x < num_gridpts_x ; x++)
@@ -402,7 +414,7 @@ public:
         }
     }
 
-    void xTestFluidSolve() throw(Exception)
+    void TestFluidSolve() throw(Exception)
     {
         // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
         double irrational = 0.01 * sqrt(2); // ensure our point of interest isn't on a gird point
@@ -428,9 +440,9 @@ public:
         p_mesh->SetNumGridPtsY(16);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -497,157 +509,6 @@ public:
 
 
         cell_population.UpdateNodeLocations(SimulationTime::Instance()->GetTimeStep());
-
-
-    }
-
-    void TestFluidDependenceOnGridSpacing() throw(Exception)
-    {
-        {
-            SimulationTime::Instance()->Destroy();
-            SimulationTime::Instance()->SetStartTime(0.0);
-
-            std::vector<Node<2> *> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.501, 0.501));
-            nodes.push_back(new Node<2>(1, true, 0.8, 0.8));
-            nodes.push_back(new Node<2>(2, true, 0.5, 0.8));
-
-            // Create a vector of immersed boundary elements and create an element with the nodes above
-            std::vector<ImmersedBoundaryElement < 2, 2>*> ib_element;
-            ib_element.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-
-            // Create a mesh with the nodes and elements vectors
-            ImmersedBoundaryMesh <2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, ib_element);
-            p_mesh->SetNumGridPtsXAndY(256);
-
-            // Set element parameters
-            ImmersedBoundaryElement <2, 2> *p_elem_0 = p_mesh->GetElement(0u);
-            Node<2> *p_node_0 = p_mesh->GetNode(0u);
-
-            c_vector<double, 2> force_on_node_0;
-            force_on_node_0[0] = 1.0;
-            force_on_node_0[1] = 0.0;
-
-            std::vector<CellPtr> cells;
-            MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-            CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
-
-            ImmersedBoundaryCellPopulation <2> cell_population(*p_mesh, cells);
-
-            OffLatticeSimulation<2> simulator(cell_population);
-
-            // Add main immersed boundary simulation modifier
-            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_mod);
-            simulator.AddSimulationModifier(p_mod);
-            simulator.SetDt(1.0);
-
-            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.000000001, 1);
-
-            // Calculate the perimeter elastic forces and ensure they match with by-hand calculations
-            p_mod->SetupConstantMemberVariables(cell_population);
-//            p_mod->ClearForces();
-
-            for (unsigned i = 0 ; i < 10 ; i++)
-            {
-                p_mod->ClearForces();
-                p_node_0->AddAppliedForceContribution(force_on_node_0);
-
-                std::vector<std::vector<double> >& force_grid = p_mod->mFluidForceGridX;
-//                force_grid[0][0] = 100.0;
-//            // Check that there is no force propagated in the y-direction
-//            for (unsigned y = 0; y < force_grid.size(); y++)
-//            {
-//                for (unsigned x = 0; x < force_grid[0].size()/2; x++)
-//                {
-//                    force_grid[y][x] = 1.0;
-//                }
-//            }
-
-                p_mod->PropagateForcesToFluidGrid();
-                p_mod->SolveNavierStokesSpectral();
-            }
-
-            cell_population.UpdateNodeLocations(SimulationTime::Instance()->GetTimeStep());
-
-            PRINT_VARIABLE(norm_2(p_node_0->rGetLocation()));
-
-            delete p_mesh;
-        }
-
-        {
-            SimulationTime::Instance()->Destroy();
-            SimulationTime::Instance()->SetStartTime(0.0);
-
-            std::vector<Node<2> *> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.501, 0.501));
-            nodes.push_back(new Node<2>(1, true, 0.8, 0.8));
-            nodes.push_back(new Node<2>(2, true, 0.5, 0.8));
-
-            // Create a vector of immersed boundary elements and create an element with the nodes above
-            std::vector<ImmersedBoundaryElement < 2, 2>*> ib_element;
-            ib_element.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-
-            // Create a mesh with the nodes and elements vectors
-            ImmersedBoundaryMesh <2, 2> *p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, ib_element);
-            p_mesh->SetNumGridPtsXAndY(512);
-
-            // Set element parameters
-            ImmersedBoundaryElement <2, 2> *p_elem_0 = p_mesh->GetElement(0u);
-            Node<2> *p_node_0 = p_mesh->GetNode(0u);
-
-            c_vector<double, 2> force_on_node_0;
-            force_on_node_0[0] = 1.0;
-            force_on_node_0[1] = 0.0;
-
-            std::vector<CellPtr> cells;
-            MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-            CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
-
-            ImmersedBoundaryCellPopulation <2> cell_population(*p_mesh, cells);
-
-            OffLatticeSimulation<2> simulator(cell_population);
-
-            // Add main immersed boundary simulation modifier
-            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_mod);
-            simulator.AddSimulationModifier(p_mod);
-            simulator.SetDt(1.0);
-
-            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.000000001, 1);
-
-            // Calculate the perimeter elastic forces and ensure they match with by-hand calculations
-            p_mod->SetupConstantMemberVariables(cell_population);
-
-//            p_mod->mDiffusionCoef = 4000.0;
-
-            for (unsigned i = 0 ; i < 10 ; i++)
-            {
-                p_mod->ClearForces();
-                p_node_0->AddAppliedForceContribution(force_on_node_0);
-
-                std::vector<std::vector<double> >& force_grid = p_mod->mFluidForceGridX;
-//                force_grid[0][0] = 100.0;
-//            // Check that there is no force propagated in the y-direction
-//            for (unsigned y = 0; y < force_grid.size(); y++)
-//            {
-//                for (unsigned x = 0; x < force_grid[0].size()/2; x++)
-//                {
-//                    force_grid[y][x] = 1.0;
-//                }
-//            }
-
-                p_mod->PropagateForcesToFluidGrid();
-                p_mod->SolveNavierStokesSpectral();
-            }
-
-
-            cell_population.UpdateNodeLocations(SimulationTime::Instance()->GetTimeStep());
-
-            PRINT_VARIABLE(norm_2(p_node_0->rGetLocation()));
-
-            delete p_mesh;
-        }
 
 
     }

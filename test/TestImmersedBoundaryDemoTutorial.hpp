@@ -56,13 +56,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fftw3.h>
 
 /* Required for core elements of the Chaste simulation environment */
-#include "SmartPointers.hpp"
 #include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
 
 /* Required for the Immersed Boundary functionality */
 #include "ImmersedBoundaryCellPopulation.hpp"
-#include "ImmersedBoundaryCellCycleModel.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
@@ -126,12 +127,12 @@ public:
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the
          * proliferative behaviour of the cell by choosing a {{{CellCycleModel}}}. Here we choose an
-         * {{{ImmersedBoundaryCellCycleModel}}} which currently does not allow proliferation. For an Immersed Boundary
+         * {{{StochasticDurationCellCycleModel}}} which does not allow proliferation. For an Immersed Boundary
          * simulation we need as may cells as elements in the mesh. */
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells
          * together. Here we use an {{{ImmersedBoundaryCellPopulation}}} and the dimension is <2>.*/

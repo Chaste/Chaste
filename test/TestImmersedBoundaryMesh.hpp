@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2012, University of Oxford.
+Copyright (c) 2005-2014, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -33,63 +33,42 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/**
- * @file
- *
- * This file gives an example of how you can create your own executable
- * in a user project.
- */
+// Needed for test framework
+#include <cxxtest/TestSuite.h>
+#include "AbstractCellBasedTestSuite.hpp"
 
-#include <iostream>
-#include <string>
+// Needed for Immersed Boundary simulations
+#include <fftw3.h>
 
-#include "ExecutableSupport.hpp"
-#include "Exception.hpp"
-#include "PetscTools.hpp"
-#include "PetscException.hpp"
+// Includes from trunk
+#include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
 
-#include "Hello.hpp"
 
-int main(int argc, char *argv[])
+// Includes from projects/ImmersedBoundary
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryMeshWriter.hpp"
+#include "ImmersedBoundaryMeshReader.hpp"
+#include "ImmersedBoundarySimulationModifier.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "SuperellipseGenerator.hpp"
+
+#include "Debug.hpp"
+
+// This test is never run in parallel
+#include "FakePetscSetup.hpp"
+
+class TestImmersedBoundaryMesh : public AbstractCellBasedTestSuite
 {
-    // This sets up PETSc and prints out copyright information, etc.
-    ExecutableSupport::StandardStartup(&argc, &argv);
+public:
 
-    int exit_code = ExecutableSupport::EXIT_OK;
-
-    // You should put all the main code within a try-catch, to ensure that
-    // you clean up PETSc before quitting.
-    try
+    void TestNothingMuch() throw(Exception)
     {
-        if (argc<2)
-        {
-            ExecutableSupport::PrintError("Usage: ExampleApp arguments ...", true);
-            exit_code = ExecutableSupport::EXIT_BAD_ARGUMENTS;
-        }
-        else
-        {
-            for (int i=1; i<argc; i++)
-            {
-                if (PetscTools::AmMaster())
-                {
-                    std::string arg_i(argv[i]);
-                    Hello world(arg_i);
-                    std::cout << "Argument " << i << " is " << world.GetMessage() << std::endl << std::flush;
-                }
-            }
-        }
-    }
-    catch (const Exception& e)
-    {
-        ExecutableSupport::PrintError(e.GetMessage());
-        exit_code = ExecutableSupport::EXIT_ERROR;
-    }
 
-	// Optional - write the machine info to file.
-    ExecutableSupport::WriteMachineInfoFile("machine_info");
+    }
     
-    // End by finalizing PETSc, and returning a suitable exit code.
-    // 0 means 'no error'
-    ExecutableSupport::FinalizePetsc();
-    return exit_code;
-}
+};

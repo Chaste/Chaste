@@ -1,4 +1,6 @@
-"""Copyright (c) 2005-2012, University of Oxford.
+/*
+
+Copyright (c) 2005-2014, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -28,27 +30,24 @@ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
 
-# Example SCons build script for user projects.
+*/
 
-import os
+// Needed for test framework
+#include <cxxtest/TestSuite.h>
 
-# Get variables exported from the SConstruct file
-Import("*")
+#include "Debug.hpp"
 
-# Get our project directory name.
-# This assumes that this project is located at <chasteRoot>/projects/<project>.
-# Other things will probably go wrong if this is not the case...
-project_name = os.path.basename(os.path.dirname(os.path.dirname(os.getcwd())))
+// This test is never run in parallel
+#include "FakePetscSetup.hpp"
 
-# Chaste libraries used by this project.
-# Select which line to uncomment based on what your project needs, or alter as required.
-chaste_libs_used = ['core']
-chaste_libs_used = ['cell_based']
-#chaste_libs_used = ['heart']
-#chaste_libs_used = ['cell_based', 'heart']
+class TestSuperellipseGenerator : public CxxTest::TestSuite
+{
+public:
 
-# Do the build magic
-result = SConsTools.DoProjectSConscript(project_name, chaste_libs_used, globals())
-Return("result")
+    void TestNothingMuch() throw(Exception)
+    {
+
+    }
+    
+};

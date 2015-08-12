@@ -31,35 +31,42 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- */
+*/
 
-// Includes needed for test framework
+// Needed for test framework
 #include <cxxtest/TestSuite.h>
-
-#include <fftw3.h>
-#include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-#include "OffLatticeSimulation.hpp"
+// Needed for Immersed Boundary simulations
+#include <fftw3.h>
 
-#include "SmartPointers.hpp"
+// Includes from trunk
 #include "CellsGenerator.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
+#include "OffLatticeSimulation.hpp"
+#include "SmartPointers.hpp"
+#include "StochasticDurationCellCycleModel.hpp"
+
+
+// Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryCellPopulation.hpp"
-#include "ImmersedBoundaryCellCycleModel.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryMeshReader.hpp"
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "SuperellipseGenerator.hpp"
+
 #include "Debug.hpp"
 
+// This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-class TestImmersedBoundary : public AbstractCellBasedTestSuite
+class TestImmersedBoundarySimulation : public AbstractCellBasedTestSuite
 {
 public:
-    void xTestImmersedBoundaryMeshArchiving() throw(Exception)
+
+    void TestImmersedBoundaryMeshArchiving() throw(Exception)
     {
         // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
         std::vector<Node<2>*> nodes;
@@ -100,10 +107,10 @@ public:
         mesh_writer.WriteFilesUsingMesh(*p_mesh);
     }
 
-    void xTestImmersedBoundaryMeshReading() throw(Exception)
+    void TestImmersedBoundaryMeshReading() throw(Exception)
     {
         // Load immersed boundary mesh
-        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/fcooper/test/ib/mesh/ib_mesh_one_square_element");
+        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_mesh_one_square_element");
 
         // Construct the immersed boundary mesh from the mesh reader
         ImmersedBoundaryMesh<2,2> mesh;
@@ -113,10 +120,10 @@ public:
         TS_ASSERT_DELTA(mesh.rGetFluidVelocityGridX()[5][3], 12.0, 1e-6);
     }
 
-    void xTestRetrieveElementProperties() throw(Exception)
+    void TestRetrieveElementProperties() throw(Exception)
     {
         // Load immersed boundary mesh
-        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/fcooper/test/ib/mesh/ib_mesh_one_square_element");
+        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_mesh_one_square_element");
 
         // Construct the immersed boundary mesh from the mesh reader
         ImmersedBoundaryMesh<2,2> mesh;
@@ -138,7 +145,7 @@ public:
         TS_ASSERT_EQUALS(spring_constant, 3.5);
     }
 
-    void xTestSuperellipseGenerator() throw(Exception)
+    void TestSuperellipseGenerator() throw(Exception)
     {
         SuperellipseGenerator* p_gen = new SuperellipseGenerator(100, 0.2, 0.2, 0.6, 0.2, 0.2);
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
@@ -162,9 +169,9 @@ public:
         p_elem->SetMembraneSpringConstant(10000.0);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -190,17 +197,29 @@ public:
 
     void TestPalisadeGenerator() throw(Exception)
     {
+        unsigned num_cells_wide    = 5;
+        unsigned nodes_per_cell    = 100;
+        double   ellipse_exponent  = 0.2;
+        double   cell_aspect_ratio = 2.0;
+        double   random_y_mult     = 0.15;
+        bool     membrane          = true;
 
-        ImmersedBoundaryPalisadeMeshGenerator* p_gen = new ImmersedBoundaryPalisadeMeshGenerator(5, 100, 0.2, 2.0, 0.15, true);
-        ImmersedBoundaryMesh<2,2>* p_mesh = p_gen->GetMesh();
+        ImmersedBoundaryPalisadeMeshGenerator gen(num_cells_wide,
+                                                  nodes_per_cell,
+                                                  ellipse_exponent,
+                                                  cell_aspect_ratio,
+                                                  random_y_mult,
+                                                  membrane);
+
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
         p_mesh->GetMembraneElement()->SetMembraneSpringConstant(100000.0);
         p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0001);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
@@ -212,18 +231,19 @@ public:
 
         // Set simulation properties
         simulator.SetOutputDirectory("IB/TestPalisadeGenerator");
-        simulator.SetDt(0.03);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(00210.00);
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.02);
 
         // Run the simulation
-        simulator.Solve();
+        //simulator.Solve();
+
     }
 
-    void xTestImmersedBoundarySimulation() throw(Exception)
+    void TestImmersedBoundarySimpleSimulation() throw(Exception)
     {
         // Load immersed boundary mesh
-        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/fcooper/test/ib/mesh/ib_square_16");
+        ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_square_16");
 
         // Construct the immersed boundary mesh from the mesh reader
         ImmersedBoundaryMesh<2,2> mesh;
@@ -237,9 +257,9 @@ public:
         p_elem->SetMembraneSpringConstant(1000.0);
 
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        CellsGenerator<ImmersedBoundaryCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
@@ -252,8 +272,8 @@ public:
         // Set simulation properties
         simulator.SetOutputDirectory("IB/TestImmersedBoundary");
         simulator.SetDt(0.01);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(100.0);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.02);
 
         // Run the simulation
         simulator.Solve();
