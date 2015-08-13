@@ -45,7 +45,7 @@ class TestTimer : public CxxTest::TestSuite
 public:
 
     // Can't really test the timer, this is just for coverage and to illustrate usage
-    void TestIt()
+    void TestTheTimer()
     {
         Timer::Print("What time is it?");
 
@@ -61,7 +61,9 @@ public:
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
 
         double current_time = Timer::GetWallTime();
-        TS_ASSERT_LESS_THAN(1.0e5, current_time);
+        // Note: on some systems this is seconds since the epoch, on others
+        // it is seconds since last reboot!  So it might be quite small...
+        TS_ASSERT_LESS_THAN(10.0, current_time);
     }
 };
 
