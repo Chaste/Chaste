@@ -106,8 +106,8 @@ public:
         double non_cached_construction_time = Timer::GetElapsedTime();
 
         // Constructing the non cached object should be quicker
-        // Note: this does occasionally fail, due to other activity on the machine
-        TS_ASSERT_LESS_THAN( non_cached_construction_time, cached_construction_time );
+        // Note: this does occasionally fail, due to other activity on the machine, so we allow some slack
+        TS_ASSERT_LESS_THAN( non_cached_construction_time, cached_construction_time * 1.2 );
 
         // compare mem usage
         TS_ASSERT( cached_mem_usage >= non_cached_mem_usage );
