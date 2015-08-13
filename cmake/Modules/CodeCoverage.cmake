@@ -142,7 +142,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 
 		# Capturing lcov counters and generating report
 		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${_outputname}.info
-		COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'build/*' 'cxxtest/*' '*/test/*' '/usr/*' --output-file ${_outputname}.info.cleaned
+		COMMAND ${LCOV_PATH} --remove ${_outputname}.info  'cxxtest/*' '/usr/*' '/home/*' --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
 
