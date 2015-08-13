@@ -279,7 +279,7 @@ public:
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), u_approx, 1.0);
         }
     }
-    // Now test on a square with half apoptotic cells to compare all the population types
+    // Now test on a square with half appoptotic cells to compare all the population types
 
     void TestMeshBasedSquareMonolayer() throw (Exception)
     {
@@ -519,7 +519,73 @@ public:
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
     }
 
-    // Note: ParabolicGrowingDomainPdeModifier is not implemented for CaBasedCellPopulations
+    void TestCaBasedSquareMonolayer() throw (Exception)
+    {
+        PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Scale so cells are on top of those in the above centre based tests.
+        p_mesh->Scale(1.0,sqrt(3)*0.5);
+
+        // Specify where cells lie
+        std::vector<unsigned> location_indices;
+        for (unsigned i=0; i<400; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_differentiated_type);
+
+        // Make cells with x<10.0 appoptotic (so no source term)
+        boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
+                cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
+        for (unsigned i =0; i<cells.size(); i++)
+        {
+            c_vector<double,2> cell_location = p_mesh->GetNode(i)->rGetLocation();
+            if (cell_location(0)<10.0)
+            {
+                cells[i]->AddCellProperty(p_apoptotic_property);
+            }
+            // Set initial condition for pde
+            cells[i]->GetCellData()->SetItem("variable",1.0);
+        }
+        TS_ASSERT_EQUALS(p_apoptotic_property->GetCellCount(),200u);
+
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Set up simulation time for file output
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
+
+        // Make the PDE and BCs
+        CellwiseSourceParabolicPde<2> pde(cell_population, 0.1, 1, -0.1);
+        ConstBoundaryCondition<2> bc(1.0);
+        ParabolicPdeAndBoundaryConditions<2> pde_and_bc(&pde, &bc, false);
+        pde_and_bc.SetDependentVariableName("variable");
+
+        // Create a PDE Modifier object using this pde and bcs object
+        MAKE_PTR_ARGS(ParabolicGrowingDomainPdeModifier<2>, p_pde_modifier, (&pde_and_bc));
+        p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithCaOnSquare");
+
+        // Run for 10 timesteps
+        for (unsigned i=0; i<10; i++)
+        {
+            SimulationTime::Instance()->IncrementTimeOneStep();
+            p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
+            p_pde_modifier->UpdateAtEndOfOutputTimeStep(cell_population);
+        }
+
+        // Test the solution at some fixed points to compare with other cell populations
+        CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
+        //Checking it doesn't change for this cell population
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
+    }
+
 };
 
 #endif /*TESTPARABOLICGROWINGDOMAINMODIFIERMETHODS_HPP_*/

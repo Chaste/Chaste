@@ -156,76 +156,96 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     }
     this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
 
-    // Loop over nodes and get appropriate solution value from CellData
-    for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-          node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-          ++node_iter)
+    if (!dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation))
     {
-        unsigned node_index = node_iter->GetIndex();
-        double solution_at_node;
-
-        if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL) // Intel compiler wants the "!= NULL"
+        // Loop over nodes and get appropriate solution value from CellData
+        for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
+        node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+        ++node_iter)
         {
-            // Cells correspond to nodes in the Center of the vertex element
-            // nodes on vertices have averaged values from containing cells
+            unsigned node_index = node_iter->GetIndex();
+            double solution_at_node;
 
-            unsigned num_vertex_nodes = rCellPopulation.GetNumNodes();
-            if (node_index >= num_vertex_nodes)
+            if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation))
             {
-                // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
-                assert(node_index-num_vertex_nodes < num_vertex_nodes);
+                // Cells correspond to nodes in the Center of the vertex element
+                // nodes on vertices have averaged values from containing cells
 
-                CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(node_index-num_vertex_nodes);
+                unsigned num_vertex_nodes = rCellPopulation.GetNumNodes();
+                if (node_index >= num_vertex_nodes)
+                {
+                    // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
+                    assert(node_index-num_vertex_nodes < num_vertex_nodes);
+
+                    CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(node_index-num_vertex_nodes);
+                    solution_at_node = p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+                }
+                else
+                {
+                    ///\todo Work out a better way to do the nodes not associated with cells (#2687)
+                    if (node_iter->IsBoundaryNode() && !mpPdeAndBcs->IsNeumannBoundaryCondition())
+                    {
+                        // We need to impose the Dirichlet boundaries again here as not represented in cell data
+                        solution_at_node = mpPdeAndBcs->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
+                    }
+                    else
+                    {
+                        assert(node_index<num_vertex_nodes);
+                        Node<DIM>* p_vertex_node = rCellPopulation.rGetMesh().GetNode(node_index);
+
+                        // Average over data from containing elements (cells)
+                        std::set<unsigned> containing_elelments  = p_vertex_node->rGetContainingElementIndices();
+
+                        solution_at_node = 0.0;
+
+                        for (std::set<unsigned>::iterator index_iter = containing_elelments.begin();
+                        index_iter != containing_elelments.end();
+                        ++index_iter)
+                        {
+
+                            assert(*index_iter<num_vertex_nodes);
+                            CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(*index_iter);
+                            solution_at_node += p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+                        }
+                        solution_at_node /= containing_elelments.size();
+                    }
+                }
+            }
+            else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation)||
+            dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+
+            {
+                // Simple 1-1 correspondence between cells and nodes in the finite element mesh
+                CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(node_index);
                 solution_at_node = p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
             }
             else
             {
-                ///\todo Work out a better way to do the nodes not associated with cells (#2687)
-                if (node_iter->IsBoundaryNode() && !mpPdeAndBcs->IsNeumannBoundaryCondition())
-                {
-                    // We need to impose the Dirichlet boundaries again here as not represented in cell data
-                    solution_at_node = mpPdeAndBcs->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
-                }
-                else
-                {
-                    assert(node_index<num_vertex_nodes);
-                    Node<DIM>* p_vertex_node = rCellPopulation.rGetMesh().GetNode(node_index);
-
-                    // Average over data from containing elements (cells)
-                    std::set<unsigned> containing_elelments  = p_vertex_node->rGetContainingElementIndices();
-
-                    solution_at_node = 0.0;
-
-                    for (std::set<unsigned>::iterator index_iter = containing_elelments.begin();
-                          index_iter != containing_elelments.end();
-                         ++index_iter)
-                    {
-
-                        assert(*index_iter<num_vertex_nodes);
-                        CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(*index_iter);
-                        solution_at_node += p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
-                    }
-                    solution_at_node /= containing_elelments.size();
-                }
+                NEVER_REACHED;
             }
-        }
-        else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL ||
-                 dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL) // Intel compiler wants the "!= NULL"
 
-        {
-            // Simple 1-1 correspondence between cells and nodes in the finite element mesh
-            CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(node_index);
-            solution_at_node = p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+            PetscVecTools::SetElement(this->mSolution,node_index,solution_at_node);
         }
-        else
-        {
-            // To do this would need to iterate over cells instead of loop over nodes.
-            assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL); // Intel compiler wants the "!= NULL"
-            EXCEPTION("ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
-        }
-
-        PetscVecTools::SetElement(this->mSolution,node_index,solution_at_node);
     }
+    else
+    {
+        assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
+
+        // 1-1 correspondance between node index (in FEM mesh) and position of the cell in the cell vector.
+        unsigned node_index=0;
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+        cell_iter != rCellPopulation.End();
+        ++cell_iter)
+        {
+            double solution_at_node = cell_iter->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
+
+            PetscVecTools::SetElement(this->mSolution,node_index,solution_at_node);
+
+            node_index++;
+        }
+    }
+
+
 }
 
 template<unsigned DIM>

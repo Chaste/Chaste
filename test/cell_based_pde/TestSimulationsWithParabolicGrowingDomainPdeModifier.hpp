@@ -408,7 +408,7 @@ public:
         simulator.SetOutputDirectory("ParabolicGrowingMonolayers/CA");
         simulator.SetDt(0.1);
         simulator.SetSamplingTimestepMultiple(10);
-        simulator.SetEndTime(2.5*M_TIME_FOR_SIMULATION);
+        simulator.SetEndTime(M_TIME_FOR_SIMULATION);
 
         // Adding update rule(s).
         MAKE_PTR(DiffusionCaUpdateRule<2u>, p_diffusion_update_rule);
@@ -429,7 +429,19 @@ public:
         simulator.AddSimulationModifier(p_pde_modifier);
 
         // Run simulation
-        TS_ASSERT_THROWS_THIS(simulator.Solve(),"ParabolicGrowingDomainPde Modifier doesn't work with CaBasedCellPopulations yet");
+        simulator.Solve();
+
+        // Test some simulation stats
+		TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 9u); // No births yet
+
+        // Test nothing's changed
+        AbstractCellPopulation<2, 2>::Iterator cell_iter=simulator.rGetCellPopulation().Begin();
+        TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 1, 1e-4);
+        ++cell_iter;
+        ++cell_iter;
+        ++cell_iter;
+        ++cell_iter;
+        TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 0.9866, 1e-4);
     }
 };
 

@@ -127,8 +127,15 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
     }
     else if (dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation)) != NULL)
     {
-        // Cant use for CA Based due to interpolating onto cells See CellwiseSourceEllipticPde for how to calculate source
-        NEVER_REACHED;
+    	// Here tet_node_index corresponds to position of the cell in the vector of cells
+		typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->mrCellPopulation.Begin();
+
+		assert(tet_node_index < this->mrCellPopulation.GetNumRealCells());
+		for (unsigned i=0; i<tet_node_index; i++)
+		{
+			++cell_iter;
+		}
+		is_cell_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
     }
     else
     {
