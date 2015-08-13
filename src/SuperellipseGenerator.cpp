@@ -42,16 +42,14 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
                                              double height,
                                              double botLeftX,
                                              double botLeftY)
-        : mTargetNodeSpacing(-1.0),
-          mpMesh(NULL)
 {
-    // Check parameter values are sane
+    // Validate input
     assert(numPoints > 1);
     assert(ellipseExponent > 0.0);
     assert(width > 0.0);
     assert(height > 0.0);
 
-    // Set up member vector
+    // Set up member variables
     mPoints.resize(numPoints);
 
     /*
@@ -107,7 +105,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     // Helper variables for loop
     unsigned dense_it = 0;
 
-    mTargetNodeSpacing = total_arc_length / (double)numPoints;
+    mTargetNodeSpacing = total_arc_length / double(numPoints);
 
     double target_arclength = 0.0;
     double interpolant;
@@ -118,7 +116,7 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
     // Fill in all other locations
     for(unsigned point = 1 ; point < numPoints ; point++)
     {
-        target_arclength = (double)point * mTargetNodeSpacing;
+        target_arclength = double(point) * mTargetNodeSpacing;
 
         while(cumulative_arc_length[dense_it] < target_arclength && dense_it < dense_pts)
         {
@@ -135,7 +133,6 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
         // Calculate the location of the new point
         mPoints[point] = (1.0 - interpolant) * dense_locations[dense_it - 1] + interpolant * dense_locations[dense_it];
     }
-
 
     /*
      * Rescale all points to match parameters
@@ -160,11 +157,6 @@ SuperellipseGenerator::SuperellipseGenerator(unsigned numPoints,
 SuperellipseGenerator::~SuperellipseGenerator()
 {
     mPoints.clear();
-
-    if (mpMesh)
-    {
-        delete mpMesh;
-    }
 }
 
 double SuperellipseGenerator::GetTargetNodeSpacing()
@@ -189,28 +181,4 @@ const std::vector<ChastePoint<2> > SuperellipseGenerator::GetPointsAsChastePoint
     }
 
     return chaste_points;
-}
-
-ImmersedBoundaryMesh<2,2>* SuperellipseGenerator::GetMesh()
-{
-    if (mPoints.empty())
-    {
-        EXCEPTION("No points have been generated - cannot return a mesh");
-    }
-
-    // Turn the vector of points into a vector of nodes
-    std::vector<Node<2>*> nodes;
-    for (unsigned point = 0 ; point < mPoints.size() ; point++)
-    {
-        c_vector<double, 2> temp_location(mPoints[point]);
-        nodes.push_back(new Node<2>(point, temp_location, true));
-    }
-
-    // Create a vector of immersed boundary elements and create an element with the nodes above
-    std::vector<ImmersedBoundaryElement < 2, 2>*> ib_element;
-    ib_element.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-
-    // Create and return a mesh made with the nodes and elements vectors
-    mpMesh = new ImmersedBoundaryMesh<2, 2>(nodes, ib_element);
-    return mpMesh;
 }

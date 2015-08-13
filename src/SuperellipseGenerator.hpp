@@ -38,11 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <vector>
+
 #include "ChastePoint.hpp"
-#include "Node.hpp"
-#include "ImmersedBoundaryElement.hpp"
-#include "ImmersedBoundaryMesh.hpp"
 #include "Exception.hpp"
+#include "Node.hpp"
 
 /**
  * Class to generate roughly equally spaced points around a 2D superellipse (x/a)^n + (y/b)^n = 1
@@ -57,9 +56,6 @@ private:
 
     /** Vector to store the points */
     std::vector<c_vector<double, 2> > mPoints;
-
-    /** Immersed boundary mesh that can optionally be returned */
-    ImmersedBoundaryMesh<2,2>* mpMesh;
 
 public:
 
@@ -83,7 +79,7 @@ public:
                           double botLeftY=0.0);
 
     /**
-     * Destructor - clears mPoints.
+     * Destructor - clears mPoints
      */
     virtual ~SuperellipseGenerator();
 
@@ -102,10 +98,6 @@ public:
      */
     const std::vector<ChastePoint<2> > GetPointsAsChastePoints() const;
 
-    /**
-     * @return an ImmersedBoundaryMesh based on generated locations
-     */
-    ImmersedBoundaryMesh<2,2>* GetMesh();
 };
 
 #endif /*SUPERELLIPSEGENERATOR_HPP_*/
