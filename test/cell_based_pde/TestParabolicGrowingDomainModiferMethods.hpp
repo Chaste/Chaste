@@ -583,7 +583,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
         //Checking it doesn't change for this cell population
-        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
+        TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 2e-3);// Low threshold as slightly different on Intel.
     }
 
 };
