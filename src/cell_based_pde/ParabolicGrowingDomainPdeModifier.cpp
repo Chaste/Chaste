@@ -166,7 +166,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
             unsigned node_index = node_iter->GetIndex();
             double solution_at_node;
 
-            if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation))
+            if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL)
             {
                 // Cells correspond to nodes in the Center of the vertex element
                 // nodes on vertices have averaged values from containing cells
@@ -229,7 +229,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     }
     else
     {
-        assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation));
+        assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
 
         // 1-1 correspondance between node index (in FEM mesh) and position of the cell in the cell vector.
         unsigned node_index=0;
