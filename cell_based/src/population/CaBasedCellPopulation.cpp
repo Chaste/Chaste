@@ -470,10 +470,11 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
     unsigned num_cell_data_items = 0u;
+    std::vector<std::string> cell_data_names;
     if (num_cells > 0u)
     {
         num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-    // Not used here: std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+        cell_data_names = this->Begin()->GetCellData()->GetKeys();
     }
     std::vector<std::vector<double> > cell_data;
     for (unsigned var=0; var<num_cell_data_items; var++)
@@ -560,6 +561,23 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
         }
 
         mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+    }
+
+    // Loop over cells to output the cell data
+    unsigned cell_index = 0;
+    for (typename AbstractCellPopulation<DIM,DIM>::Iterator cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        for (unsigned var=0; var<num_cell_data_items; var++)
+        {
+            cell_data[var][cell_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
+        }
+        cell_index++;
+    }
+    for (unsigned var=0; var<num_cell_data_items; var++)
+    {
+        mesh_writer.AddPointData(cell_data_names[var], cell_data[var]);
     }
 
     /*

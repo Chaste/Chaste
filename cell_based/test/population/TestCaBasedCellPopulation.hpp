@@ -335,6 +335,18 @@ public:
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
+
+        // Coverage of writing CellData to VTK
+        double index = 0.0;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            index++;
+            cell_iter->GetCellData()->SetItem("var1", 3.0);
+            cell_iter->GetCellData()->SetItem("var2", index);
+        }
+
         // For coverage, label one cell
         boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(location_indices[0])->AddCellProperty(p_label);
@@ -444,6 +456,25 @@ public:
         TS_ASSERT_DELTA(ancestors_data[2], 12.0, 1e-9);
         TS_ASSERT_DELTA(ancestors_data[3], 13.0, 1e-9);
         TS_ASSERT_DELTA(ancestors_data[4], 17.0, 1e-9);
+
+        // Test that the correct CellData were recorded
+        std::vector<double> var1_data;
+        vtk_reader.GetPointData("var1", var1_data);
+        TS_ASSERT_EQUALS(var1_data.size(), 5u);
+        TS_ASSERT_DELTA(var1_data[0], 3.0, 1e-9);
+        TS_ASSERT_DELTA(var1_data[1], 3.0, 1e-9);
+        TS_ASSERT_DELTA(var1_data[2], 3.0, 1e-9);
+        TS_ASSERT_DELTA(var1_data[3], 3.0, 1e-9);
+        TS_ASSERT_DELTA(var1_data[4], 3.0, 1e-9);
+
+        std::vector<double> var2_data;
+        vtk_reader.GetPointData("var2", var2_data);
+        TS_ASSERT_EQUALS(var2_data.size(), 5u);
+        TS_ASSERT_DELTA(var2_data[0], 1.0, 1e-9);
+        TS_ASSERT_DELTA(var2_data[1], 2.0, 1e-9);
+        TS_ASSERT_DELTA(var2_data[2], 3.0, 1e-9);
+        TS_ASSERT_DELTA(var2_data[3], 4.0, 1e-9);
+        TS_ASSERT_DELTA(var2_data[4], 5.0, 1e-9);
 #endif
     }
 
