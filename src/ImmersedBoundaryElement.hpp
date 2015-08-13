@@ -96,7 +96,7 @@ public:
      * @param rNodes vector of Nodes associated with the element
      */
     ImmersedBoundaryElement(unsigned index,
-                  const std::vector<Node<SPACE_DIM>*>& rNodes);
+                            const std::vector<Node<SPACE_DIM>*>& rNodes);
 
     /**
      * Destructor.
@@ -108,28 +108,28 @@ public:
      *
      * @param the new spring constant
      */
-    void SetMembraneSpringConstant(double spring_constant);
+    void SetMembraneSpringConstant(double springConstant);
 
     /**
      * Set mRestLength
      *
      * @param the new rest length
      */
-    void SetMembraneRestLength(double rest_length);
+    void SetMembraneRestLength(double restLength);
 
     /**
      * Set mCellCellSpringConstant
      *
      * @param the new spring constant
      */
-    void SetCellCellSpringConstant(double spring_constant);
+    void SetCellCellSpringConstant(double springConstant);
 
     /**
      * Set mRestLength
      *
      * @param the new rest length
      */
-    void SetCellCellRestLength(double rest_length);
+    void SetCellCellRestLength(double restLength);
 
     /**
      * Get mMembraneSpringConstant
@@ -190,28 +190,28 @@ public:
      *
      * @param the new spring constant
      */
-    void SetMembraneSpringConstant(double spring_constant);
+    void SetMembraneSpringConstant(double springConstant);
 
     /**
      * Set mRestLength
      *
      * @param the new rest length
      */
-    void SetMembraneRestLength(double rest_length);
+    void SetMembraneRestLength(double restLength);
 
     /**
      * Set mCellCellSpringConstant
      *
      * @param the new spring constant
      */
-    void SetCellCellSpringConstant(double spring_constant);
+    void SetCellCellSpringConstant(double springConstant);
 
     /**
      * Set mRestLength
      *
      * @param the new rest length
      */
-    void SetCellCellRestLength(double rest_length);
+    void SetCellCellRestLength(double restLength);
 
     /**
      * Get mMembraneSpringConstant

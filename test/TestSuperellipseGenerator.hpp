@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 #include "SuperellipseGenerator.hpp"
-#include "Debug.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
