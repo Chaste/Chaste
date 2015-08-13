@@ -4,15 +4,19 @@ message("* Adding compiler flags...")
 set(default_flags "-Wall")
 set(default_exe_linker_flags "")
 
-if (Chaste_COVERAGE)
-    set(default_flags "${default_flags} -fprofile-arcs -ftest-coverage")
-    set(default_exe_linker_flags "${default_exe_linker_flags} -fprofile-arcs -ftest-coverage")
-endif()
-
 if (NOT Chaste_LINK_LIBRARIES_WITH_UNRESOLVED_SYMBOLS)
     set(default_shared_link_flags "-Wl,--no-undefined")
 else()
     set(default_shared_link_flags "")
+endif()
+
+if (Chaste_COVERAGE)
+    #--coverage seems to be the preferred flag
+    #set(default_flags "${default_flags} -fprofile-arcs -ftest-coverage")
+    #set(default_exe_linker_flags "${default_exe_linker_flags} -fprofile-arcs -ftest-coverage")
+    set(default_flags "${default_flags} --coverage")
+    set(default_shared_link_flags "${default_shared_link_flags} --coverage")
+    set(default_exe_linker_flags "${default_exe_linker_flags} --coverage")
 endif()
 
 
