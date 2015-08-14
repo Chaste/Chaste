@@ -119,39 +119,6 @@ protected:
     unsigned SolveBoundaryElementMapping(unsigned index) const;
 
     /**
-     * Test whether a given point lies inside a given element.
-     *
-     * We use a winding number test, which counts the number of times the
-     * polygon associated with the element winds around the given point.
-     * The point is outside only when this "winding number" vanishes;
-     * otherwise, the point is inside.
-     *
-     * One must decide whether a point on the polygon's boundary is inside
-     * or outside: we adopt the standard convention that a point on a left
-     * or bottom edge is inside, and a point on a right or top edge is outside.
-     * This way, if two distinct polygons share a common boundary segment,
-     * then a point on that segment will be in one polygon or the other, but
-     * not both at the same time.
-     *
-     * @param rTestPoint the point to test
-     * @param elementIndex global index of the element in the mesh
-     *
-     * @return if the point is included in the element.
-     */
-    bool ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex);
-
-    /**
-     * Get the local index of a given element which is the start vertex of the edge
-     * of the element that the overlapping point rTestPoint is closest to.
-     *
-     * @param rTestPoint the point to test
-     * @param elementIndex global index of the element in the mesh
-     *
-     * @return the local index
-     */
-    unsigned GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex);
-
-    /**
      * Reset the fluid velocity grids based on number of grid points
      */
     void SetupFluidVelocityGrids(void);

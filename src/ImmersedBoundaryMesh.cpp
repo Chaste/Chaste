@@ -36,29 +36,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
-#include "Debug.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                                                                    std::vector<ImmersedBoundaryElement<ELEMENT_DIM,SPACE_DIM>*> elements,
-                                                                   unsigned num_gridpts_x,
-                                                                   unsigned num_gridpts_y,
-                                                                   unsigned membrane_index)
+                                                                   unsigned numGridPtsX,
+                                                                   unsigned numGridPtsY,
+                                                                   unsigned membraneIndex)
 {
     // Reset member variables and clear mNodes and mElements
     Clear();
 
     // Set the number of grid points and initialise the grids accordingly
-    mNumGridPtsX = num_gridpts_x;
-    mNumGridPtsY = num_gridpts_y;
+    mNumGridPtsX = numGridPtsX;
+    mNumGridPtsY = numGridPtsY;
 
     this->SetupFluidVelocityGrids();
 
     // Set up the membrane element
-    mMembraneIndex = membrane_index;
+    mMembraneIndex = membraneIndex;
 
     // If the element is NULL, we have no membrane; if not, we do
-    if (membrane_index == UINT_MAX)
+    if (membraneIndex == UINT_MAX)
     {
         mMeshHasMembrane = false;
     }
@@ -126,7 +125,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfE
     return elongation_shape_factor;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh()
 {
@@ -134,13 +132,11 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh()
     Clear();
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryMesh()
 {
     Clear();
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SolveNodeMapping(unsigned index) const
@@ -149,7 +145,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SolveNodeMapping(unsigned
     return index;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SolveElementMapping(unsigned index) const
 {
@@ -157,13 +152,11 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SolveElementMapping(unsig
     return index;
 }
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SolveBoundaryElementMapping(unsigned index) const
 {
     return index;
 }
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
@@ -581,134 +574,6 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
 //////////////////////////////////////////////////////////////////////
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
-{
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
-    // Get the element
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
-    unsigned num_nodes = p_element->GetNumNodes();
-
-    // Initialise boolean
-    bool element_includes_point = false;
-
-    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses
-    c_vector<double, SPACE_DIM> first_vertex = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> test_point = GetVectorFromAtoB(first_vertex, rTestPoint);
-
-    // Loop over edges of the element
-    c_vector<double, SPACE_DIM> vertexA = zero_vector<double>(SPACE_DIM);
-    for (unsigned local_index=0; local_index<num_nodes; local_index++)
-    {
-        // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
-        c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
-
-        // Pathological case - test point coincides with vertexA
-        // (we will check vertexB next time we go through the for loop)
-        if (norm_2(vector_a_to_point) < DBL_EPSILON)
-        {
-            return false;
-        }
-
-        c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index+1)%num_nodes));
-        c_vector<double, SPACE_DIM> vector_b_to_point = GetVectorFromAtoB(vertexB, test_point);
-        c_vector<double, SPACE_DIM> vector_a_to_b = GetVectorFromAtoB(vertexA, vertexB);
-
-        // Pathological case - ray coincides with horizontal edge
-        if ( (fabs(vector_a_to_b[1]) < DBL_EPSILON) &&
-             (fabs(vector_a_to_point[1]) < DBL_EPSILON) &&
-             (fabs(vector_b_to_point[1]) < DBL_EPSILON) )
-        {
-            if ( (vector_a_to_point[0]>0) != (vector_b_to_point[0]>0) )
-            {
-                return false;
-            }
-        }
-
-        // Non-pathological case
-        // A and B on different sides of the line y = test_point[1]
-        if ( (vertexA[1] > test_point[1]) != (vertexB[1] > test_point[1]) )
-        {
-            // Intersection of y=test_point[1] and vector_a_to_b is on the right of test_point
-            if (test_point[0] < vertexA[0] + vector_a_to_b[0]*vector_a_to_point[1]/vector_a_to_b[1])
-            {
-                element_includes_point = !element_includes_point;
-            }
-        }
-
-        vertexA = vertexB;
-    }
-    return element_includes_point;
-}
-
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
-{
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2);
-    assert(ELEMENT_DIM == SPACE_DIM);
-
-    // Get the element
-    ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
-    unsigned num_nodes = p_element->GetNumNodes();
-
-    double min_squared_normal_distance = DBL_MAX;
-    unsigned min_distance_edge_index = UINT_MAX;
-
-    // Loop over edges of the element
-    for (unsigned local_index=0; local_index<num_nodes; local_index++)
-    {
-        // Get the end points of this edge
-        c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(local_index);
-        c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((local_index+1)%num_nodes);
-
-        c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, rTestPoint);
-        c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
-        double distance_a_to_b = norm_2(vector_a_to_b);
-
-        c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
-        double distance_parallel_to_edge = inner_prod(vector_a_to_point, edge_ab_unit_vector);
-
-        double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
-
-        /*
-         * If the point lies almost bang on the supporting line of the edge, then snap to the line.
-         * This allows us to do floating point tie-breaks when line is exactly at a node.
-         * We adopt a similar approach if the point is at the same position as a point in the
-         * element.
-         */
-        if (squared_distance_normal_to_edge < DBL_EPSILON)
-        {
-            squared_distance_normal_to_edge = 0.0;
-        }
-
-        if (fabs(distance_parallel_to_edge) < DBL_EPSILON)
-        {
-            distance_parallel_to_edge = 0.0;
-        }
-        else if (fabs(distance_parallel_to_edge-distance_a_to_b) < DBL_EPSILON)
-        {
-            distance_parallel_to_edge = distance_a_to_b;
-        }
-
-        // Make sure node is within the confines of the edge and is the nearest edge to the node \this breaks for convex elements
-        if (squared_distance_normal_to_edge < min_squared_normal_distance &&
-                distance_parallel_to_edge >=0 &&
-                distance_parallel_to_edge <= distance_a_to_b)
-        {
-            min_squared_normal_distance = squared_distance_normal_to_edge;
-            min_distance_edge_index = local_index;
-        }
-    }
-
-    assert(min_distance_edge_index < num_nodes);
-    return min_distance_edge_index;
-}
-
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 3> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
