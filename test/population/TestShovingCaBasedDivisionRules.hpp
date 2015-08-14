@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedTestSuite.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
 #include "ShovingCaBasedDivisionRule.hpp"
-#include "CryptShovingCaBasedDivisionRule.hpp"
 #include "PottsMeshGenerator.hpp"
 
 //This test is always run sequentially (never in parallel)
