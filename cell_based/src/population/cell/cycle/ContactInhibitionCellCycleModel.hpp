@@ -75,6 +75,8 @@ private:
         archive & mCurrentQuiescentOnsetTime;
     }
 
+protected:
+
     /**
      * The fraction of the cells' equilibrium volume in G1 phase below which these cells are quiescent.
      */
