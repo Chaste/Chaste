@@ -568,8 +568,6 @@ public:
          * Since there are 3 apoptotic cells, the correct apoptotic radius
          * is given by sqrt((3*sqrt(3.0)/2)/pi).
          */
-
-
         OutputFileHandler handler("TestSpheroidStatistics", false);
 
         std::string areas_results_file = handler.GetOutputDirectoryFullPath() + "results_from_time_0/cellpopulationareas.dat";

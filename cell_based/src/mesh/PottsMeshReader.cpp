@@ -267,10 +267,7 @@ void PottsMeshReader<SPACE_DIM>::GetNextLineFromStream(std::ifstream& fileStream
     while (line_is_blank);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class PottsMeshReader<1>;
 template class PottsMeshReader<2>;
 template class PottsMeshReader<3>;

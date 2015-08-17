@@ -156,7 +156,6 @@ public:
      */
     std::set<unsigned> GetParticleIndices();
 
-
     /**
      * Overridden AddCell() method.
      *

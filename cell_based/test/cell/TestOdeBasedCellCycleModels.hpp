@@ -432,7 +432,6 @@ public:
         // Set up oxygen_concentration
         double oxygen_concentration = 1.0;
 
-
         {
             // We must set up SimulationTime to avoid memory leaks
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);

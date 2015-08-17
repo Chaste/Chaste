@@ -262,7 +262,6 @@ public:
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(nodes, cut_off);
 
-
         // Call SetupBoxCollection method not called unless EnlargeBoxCollection is called
         c_vector<double, 2*2> domain_size;
         domain_size[0]=-1.0;
@@ -290,7 +289,6 @@ public:
 
         delete p_mesh;
     }
-
 
     // NB This checks that periodicity is maintained through archiving...
     void TestArchiving() throw (Exception)

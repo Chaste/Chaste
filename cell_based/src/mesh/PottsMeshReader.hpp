@@ -56,7 +56,7 @@ struct PottsElementData
 };
 
 /**
- * A mesh reader class for potts-based meshes. So far implemented in 2D only.
+ * A mesh reader class for Potts meshes. So far implemented in 2D only.
  */
 template<unsigned SPACE_DIM>
 class PottsMeshReader : public AbstractMeshReader<SPACE_DIM, SPACE_DIM>

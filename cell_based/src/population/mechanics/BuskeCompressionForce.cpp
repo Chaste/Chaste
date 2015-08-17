@@ -63,7 +63,6 @@ void BuskeCompressionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM
 
     NodeBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation);
 
-
     c_vector<double, DIM> unit_vector;
 
     // Loop over cells in the population
@@ -148,10 +147,7 @@ void BuskeCompressionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class BuskeCompressionForce<1>;
 template class BuskeCompressionForce<2>;
 template class BuskeCompressionForce<3>;

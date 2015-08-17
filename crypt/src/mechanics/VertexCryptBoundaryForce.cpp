@@ -95,14 +95,10 @@ void VertexCryptBoundaryForce<DIM>::OutputForceParameters(out_stream& rParamsFil
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class VertexCryptBoundaryForce<1>;
 template class VertexCryptBoundaryForce<2>;
 template class VertexCryptBoundaryForce<3>;
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

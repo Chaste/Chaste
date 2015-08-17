@@ -735,9 +735,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParamet
     *rParamsFile << "\t\t<OutputCellVelocities>" << mOutputCellVelocities << "</OutputCellVelocities>\n";
 }
 
-////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-////////////////////////////////////////////////////////////////////////////
+//////// Explicit instantiation//////
 
 template class AbstractCellBasedSimulation<1,1>;
 template class AbstractCellBasedSimulation<1,2>;

@@ -81,7 +81,6 @@ public:
         std::cout << RandomNumberGenerator::Instance()->NormalRandomDeviate(mean, 1.0) << "\n";
     }
 
-
     void TestCorrectBehaviour() throw(Exception)
     {
         // Set up the simulation time
@@ -311,7 +310,6 @@ public:
             double end_time = g1_duration + p_cell_model->GetSG2MDuration() + 5.0;
             unsigned num_timesteps = 50;
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_timesteps);
-
 
             while (p_cell_model->GetAge() < g1_duration + p_cell_model->GetSG2MDuration()
                     - p_simulation_time->GetTimeStep()) // minus one to match birth time.

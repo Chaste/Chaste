@@ -117,7 +117,6 @@ public:
      */
     virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
 
-
     /**
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.
      *

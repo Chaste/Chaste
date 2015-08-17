@@ -97,10 +97,7 @@ void RandomCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class RandomCellKiller<1>;
 template class RandomCellKiller<2>;
 template class RandomCellKiller<3>;

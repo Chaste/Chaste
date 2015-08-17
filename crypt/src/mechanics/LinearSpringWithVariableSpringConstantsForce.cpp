@@ -299,10 +299,7 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::OutputForceParameters(ou
     GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class LinearSpringWithVariableSpringConstantsForce<1>;
 template class LinearSpringWithVariableSpringConstantsForce<2>;
 template class LinearSpringWithVariableSpringConstantsForce<3>;

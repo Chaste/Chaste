@@ -141,8 +141,7 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > CellBasedPdeHandlerOnCubo
         }
     }
 
-
-    // Apply dirichlet Boundaries
+    // Apply Dirichlet boundaries
     for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = pMesh->GetBoundaryNodeIteratorBegin();
          node_iter != pMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
@@ -195,10 +194,7 @@ void CellBasedPdeHandlerOnCuboid<DIM>::OutputParameters(out_stream& rParamsFile)
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellBasedPdeHandlerOnCuboid)
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class CellBasedPdeHandlerOnCuboid<1>;
 template class CellBasedPdeHandlerOnCuboid<2>;
 template class CellBasedPdeHandlerOnCuboid<3>;

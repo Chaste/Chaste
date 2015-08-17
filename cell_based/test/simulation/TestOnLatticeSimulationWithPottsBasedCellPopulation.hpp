@@ -163,7 +163,6 @@ public:
         TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
 
-
         // Now remove the update rules and check nothing happens when the simulator runs again
         simulator.RemoveAllPottsUpdateRules();
         simulator.SetEndTime(0.2);

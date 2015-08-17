@@ -272,12 +272,11 @@ unsigned CaBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
-
     /*
      * Here we loop over the nodes and calculate the probability of moving
      * and then select the node to move to.
      */
-    if (mUpdateRuleCollection.size()>0)
+    if (!(mUpdateRuleCollection.empty()))
     {
         // Iterate over cells
         ///\todo make this sweep random
@@ -355,8 +354,6 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     }
                 }
                 // If loop completes with total_probability < random_number then stay in the same location
-
-
             }
             else
             {
@@ -370,7 +367,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
      * Here we loop over the nodes and select a neighbour to test if the cells (associated with the cells) should swap locations
      * Note this currently only works for latticeCarryingCapacity = 1
      */
-    if (mSwitchingUpdateRuleCollection.size()>0)
+    if (!(mSwitchingUpdateRuleCollection.empty()))
     {
         assert(mLatticeCarryingCapacity == 1);
 
@@ -394,7 +391,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             }
             else
             {
-                // Loop over nodes in index order.
+                // Loop over nodes in index order
                 node_index = i%num_nodes;
             }
 

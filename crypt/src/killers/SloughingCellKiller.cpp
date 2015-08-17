@@ -125,10 +125,7 @@ void SloughingCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFil
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class SloughingCellKiller<1>;
 template class SloughingCellKiller<2>;
 template class SloughingCellKiller<3>;

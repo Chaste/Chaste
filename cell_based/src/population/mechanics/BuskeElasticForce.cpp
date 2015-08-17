@@ -134,10 +134,7 @@ void BuskeElasticForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class BuskeElasticForce<1>;
 template class BuskeElasticForce<2>;
 template class BuskeElasticForce<3>;

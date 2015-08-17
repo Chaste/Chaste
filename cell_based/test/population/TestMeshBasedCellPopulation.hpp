@@ -585,14 +585,14 @@ public:
         cell_population.Update();
 
         // Test that, since node radii were set, the Update() preserved them
-//        for (unsigned i=0; i<26; i++)
-//        {
-//            TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 0.5, 1e-6);
-//        }
-//        for (unsigned i=27; i<cell_population.GetNumNodes(); i++)
-//        {
-//            TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 1.5, 1e-6);
-//        }
+        for (unsigned i=0; i<26; i++)
+        {
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 0.5, 1e-6);
+        }
+        for (unsigned i=27; i<cell_population.GetNumNodes(); i++)
+        {
+            TS_ASSERT_DELTA(cell_population.GetNode(i)->GetRadius(), i + 1.5, 1e-6);
+        }
 
         // Test that, since node velocities are to be output, the Update() preserved the applied force on each node
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetAppliedForce()[0], 4.5, 1e-6);
@@ -1362,7 +1362,6 @@ public:
 
             // Create the cell population
             MeshBasedCellPopulation<2>* const p_cell_population = new MeshBasedCellPopulation<2>(mesh, cells);
-
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;

@@ -802,10 +802,8 @@ public:
         // Test that this is correct by comparing with an existing results file
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-
         NumericFileComparison comparison(results_dir + "results.vizpdesolution", "cell_based/test/data/TestCellBasedPdeHandler/results.vizpdesolution");
         TS_ASSERT(comparison.CompareFiles());
-
 
         // Check the correct solution was obtained
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -818,7 +816,6 @@ public:
             // Test that PDE solver is working correctly
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("variable"), analytic_solution, 0.02);
         }
-
 
         // Now check the GetPdeSolutionAtPoint method
 
@@ -833,7 +830,6 @@ public:
 
             TS_ASSERT_DELTA(pde_handler.GetPdeSolutionAtPoint(cell_location,"variable"), cell_data_solution, 1e-6);
         }
-
 
         // Now choose some other points
 

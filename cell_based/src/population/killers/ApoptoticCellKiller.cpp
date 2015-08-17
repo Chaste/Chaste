@@ -69,10 +69,7 @@ void ApoptoticCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFil
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class ApoptoticCellKiller<1>;
 template class ApoptoticCellKiller<2>;
 template class ApoptoticCellKiller<3>;

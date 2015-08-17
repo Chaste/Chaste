@@ -57,11 +57,6 @@ class TestCaBasedDivisionRules : public AbstractCellBasedTestSuite
 {
 public:
 
-	void TestTest()
-	{
-		TS_ASSERT(true);
-	}
-
     void TestAddCellwithExclusionBasedDivisionRule()
     {
         /**
@@ -70,7 +65,7 @@ public:
          * are in the correct locations.
          */
 
-    	// Make a simple potts mesh
+    	// Make a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -87,7 +82,6 @@ public:
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
-
 
         CellPtr p_cell_0 = cell_population.GetCellUsingLocationIndex(0);
         MAKE_PTR(WildTypeCellMutationState, p_state);

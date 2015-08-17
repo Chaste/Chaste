@@ -62,7 +62,7 @@ public:
         PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
-        // Create a potts mesh writer
+        // Create a Potts mesh writer
         PottsMeshWriter<2> potts_mesh_writer("TestPottsMeshWriter2d", "potts_mesh_2d");
 
         // Write and check it's correct
@@ -90,7 +90,7 @@ public:
         PottsMeshGenerator<3> generator(2, 2, 1, 2, 1, 2, 2, 1, 2);
         PottsMesh<3>* p_mesh = generator.GetMesh();
 
-        // Create a potts mesh writer
+        // Create a Potts mesh writer
         PottsMeshWriter<3> potts_mesh_writer("TestPottsMeshWriter3d", "potts_mesh_3d");
 
         // Write and check it's correct

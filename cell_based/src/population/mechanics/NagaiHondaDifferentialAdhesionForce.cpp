@@ -175,10 +175,7 @@ void NagaiHondaDifferentialAdhesionForce<DIM>::OutputForceParameters(out_stream&
     NagaiHondaForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class NagaiHondaDifferentialAdhesionForce<1>;
 template class NagaiHondaDifferentialAdhesionForce<2>;
 template class NagaiHondaDifferentialAdhesionForce<3>;

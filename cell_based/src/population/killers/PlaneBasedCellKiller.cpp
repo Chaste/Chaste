@@ -95,10 +95,7 @@ void PlaneBasedCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFi
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class PlaneBasedCellKiller<1>;
 template class PlaneBasedCellKiller<2>;
 template class PlaneBasedCellKiller<3>;

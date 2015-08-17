@@ -59,7 +59,6 @@ double AdhesionPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned cu
     bool current_node_contained = !containing_elements.empty();
     bool target_node_contained = !new_location_containing_elements.empty();
 
-
     // Every node must each be in at most one element
     assert(new_location_containing_elements.size() < 2);
 
@@ -198,10 +197,7 @@ void AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParam
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class AdhesionPottsUpdateRule<1>;
 template class AdhesionPottsUpdateRule<2>;
 template class AdhesionPottsUpdateRule<3>;

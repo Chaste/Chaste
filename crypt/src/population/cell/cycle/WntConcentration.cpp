@@ -321,10 +321,7 @@ void WntConcentration<DIM>::SetCryptProjectionParameterB(double cryptProjectionP
     mCryptProjectionParameterB = cryptProjectionParameterB;
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class WntConcentration<1>;
 template class WntConcentration<2>;
 template class WntConcentration<3>;

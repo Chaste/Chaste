@@ -51,7 +51,7 @@ PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
     // Verify the same size of nodes and neighbour information.
     if ( (vonNeumannNeighbouringNodeIndices.size() != nodes.size()) || (mooreNeighbouringNodeIndices.size() != nodes.size()) )
     {
-        EXCEPTION("Nodes and neighbour information for a potts mesh need to be the same length.");
+        EXCEPTION("Nodes and neighbour information for a Potts mesh need to be the same length.");
     }
     mVonNeumannNeighbouringNodeIndices = vonNeumannNeighbouringNodeIndices;
     mMooreNeighbouringNodeIndices = mooreNeighbouringNodeIndices;
@@ -216,7 +216,7 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
         {
             std::set<unsigned> neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
 
-            if (neighbouring_node_element_indices.size()>0 && local_edges>0)
+            if (!(neighbouring_node_element_indices.empty()) && (local_edges!=0))
             {
                 unsigned neighbouring_node_element_index = *(neighbouring_node_element_indices.begin());
                 if (neighbouring_node_element_index == index)
@@ -294,7 +294,6 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
             assert(!mMooreNeighbouringNodeIndices[node_index].empty());
         }
     }
-
 
     // Remove node from mNodes and renumber all the elements and nodes
     delete this->mNodes[index];

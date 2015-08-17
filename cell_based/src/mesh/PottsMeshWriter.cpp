@@ -252,10 +252,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFiles()
     p_element_file->close();
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class PottsMeshWriter<1>;
 template class PottsMeshWriter<2>;
 template class PottsMeshWriter<3>;

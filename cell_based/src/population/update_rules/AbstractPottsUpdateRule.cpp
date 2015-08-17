@@ -61,10 +61,7 @@ void AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParam
     // No parameters to output
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class AbstractPottsUpdateRule<1>;
 template class AbstractPottsUpdateRule<2>;
 template class AbstractPottsUpdateRule<3>;

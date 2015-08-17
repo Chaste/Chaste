@@ -133,7 +133,6 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
             area_elasticity_contribution -= GetAreaElasticityParameter()*(element_areas[elem_index] -
                     target_areas[elem_index])*element_area_gradient;
 
-
             // Get the previous and next nodes in this element
             unsigned previous_node_local_index = (num_nodes_elem+local_index-1)%num_nodes_elem;
             Node<DIM>* p_previous_node = p_element->GetNode(previous_node_local_index);

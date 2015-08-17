@@ -64,7 +64,7 @@ public:
 
     void TestDiffusionCaUpdateRuleIn2d() throw (Exception)
     {
-        // timestep and size of domain to let us calculate the probabilities of movement.
+        // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
         double delta_x = 1;
         double diffusion_parameter = 0.1;
@@ -126,7 +126,7 @@ public:
 
     void TestDiffusionCaUpdateRuleIn2dWithMultipleCells() throw (Exception)
     {
-        // timestep and size of domain to let us calculate the probabilities of movement.
+        // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 1;
         double delta_x = 1;
         double diffusion_parameter = 0.1;
@@ -258,12 +258,11 @@ public:
     }
 
     /*
-     * Now test the switching rules
+     * Now test the switching rules.
      */
-
     void TestRandomCaSwitchingUpdateRuleIn2d() throw (Exception)
     {
-        // timestep and size of domain to let us calculate the probabilities of movement.
+        // Set the timestep and size of domain to let us calculate the probabilities of movement
         double delta_t = 0.1;
         double delta_x = 1;
         double switching_parameter = 0.1;

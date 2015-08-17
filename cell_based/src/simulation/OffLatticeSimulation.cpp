@@ -343,10 +343,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(out
     AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::OutputSimulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class OffLatticeSimulation<1,1>;
 template class OffLatticeSimulation<1,2>;
 template class OffLatticeSimulation<2,2>;

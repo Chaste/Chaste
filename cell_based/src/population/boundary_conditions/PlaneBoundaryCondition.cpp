@@ -209,10 +209,7 @@ void PlaneBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameter
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class PlaneBoundaryCondition<1>;
 template class PlaneBoundaryCondition<2>;
 template class PlaneBoundaryCondition<3>;

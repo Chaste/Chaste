@@ -68,10 +68,7 @@ void AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellP
     // No parameters to output
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractCellPopulationBoundaryCondition<1,1>;
 template class AbstractCellPopulationBoundaryCondition<1,2>;
 template class AbstractCellPopulationBoundaryCondition<2,2>;

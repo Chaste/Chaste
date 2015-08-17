@@ -199,7 +199,6 @@ public:
          */
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-
         /*
          * Next we instantiate an instance of the PDE class which we defined above.
          * This will be passed into the {{{OffLatticeSimulationWithPdes}}} object. The

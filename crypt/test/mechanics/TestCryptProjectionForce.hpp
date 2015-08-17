@@ -175,7 +175,6 @@ public:
         TS_ASSERT_DELTA(force_on_spring[0], -5.7594, 1e-4);
         TS_ASSERT_DELTA(force_on_spring[1],  0.0230, 1e-4);
 
-
         // Test force calculation with a cutoff
 
         double dist = norm_2(p_mesh->GetVectorFromAtoB(p_element->GetNode(0)->rGetLocation(),

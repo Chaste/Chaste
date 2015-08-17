@@ -45,12 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 
 /**
- * An abstract cell division rule for use in Ca-based simulations.
+ * An abstract cell division rule for use in CA-based simulations.
  *
  * The purpose of this class is to define how cells are added to the mesh
  *
- * i.e it allows you to move cells out of the way if necesary
- *
+ * i.e it allows you to move cells out of the way if necessary
  */
 template<unsigned SPACE_DIM>
 class AbstractCaBasedDivisionRule : public Identifiable
@@ -71,7 +70,7 @@ private:
 
 protected:
 
-/**
+    /**
      * Output any parameters associated with the division rule.
      * Currently empty since this class has no member variables. Should
      * be overridden by any child classes that have parameters.
@@ -95,8 +94,8 @@ public:
      * Return whether there is room to divide at all.
      *
      * @param pParentCell  The cell to divide
-     * @param rCellPopulation  The Ca-based cell population
-     * @return if the site is availiable.
+     * @param rCellPopulation  The CA-based cell population
+     * @return if the site is available.
      */
     virtual bool IsRoomToDivide(CellPtr pParentCell,
                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)=0;
@@ -107,7 +106,7 @@ public:
      *
      * @param pNewCell  The cell to new cell
      * @param pParentCell  The parent cell
-     * @param rCellPopulation  The Ca-based cell population
+     * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
     virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell,

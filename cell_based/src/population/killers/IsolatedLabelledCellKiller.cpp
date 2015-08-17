@@ -100,10 +100,7 @@ void IsolatedLabelledCellKiller<DIM>::OutputCellKillerParameters(out_stream& rPa
     AbstractCellKiller<DIM>::OutputCellKillerParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class IsolatedLabelledCellKiller<1>;
 template class IsolatedLabelledCellKiller<2>;
 template class IsolatedLabelledCellKiller<3>;

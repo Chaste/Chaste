@@ -337,7 +337,6 @@ public:
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_6);
         basic_von_neuman_neighbours.push_back(von_neuman_neighbours_7);
 
-
         // Make two elements out of these nodes leaving some sites free
         std::vector<std::vector<Node<3>*> > nodes_elements(2);
         nodes_elements[0].push_back(basic_nodes[1]);
@@ -421,7 +420,6 @@ public:
         von_neuman_neighbours_0.insert(1);
         von_neuman_neighbours_0.insert(3);
 
-
         std::vector< std::set<unsigned> > basic_moore_neighbours;
         basic_moore_neighbours.push_back(moore_neighbours_0);
 
@@ -436,10 +434,9 @@ public:
         std::vector<PottsElement<2>*> basic_potts_elements;
         basic_potts_elements.push_back(new PottsElement<2>(0, nodes_element));
 
-        // Make a PottsMesh
-
+        // Make a Potts mesh
         TS_ASSERT_THROWS_THIS(PottsMesh<2> basic_potts_mesh(basic_nodes, basic_potts_elements, basic_von_neuman_neighbours, basic_moore_neighbours),
-                              "Nodes and neighbour information for a potts mesh need to be the same length.");
+            "Nodes and neighbour information for a Potts mesh need to be the same length.");
 
         // Tidy up
         delete basic_nodes[0];
@@ -568,7 +565,7 @@ public:
 
     void TestGetMooreNeighbouringNodeIndices2d()
     {
-        /* Create a 2 simple potts-based mesh with one element, one of which is periodic in all dimension s
+        /* Create a 2 simple Potts mesh with one element, one of which is periodic in all dimension s
          * Numbering the nodes as follows:
          *
          *     6----7----8
@@ -625,7 +622,6 @@ public:
         periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(2);
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
 
-
         expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(1);
         expected_neighbouring_sites.insert(4);
@@ -643,7 +639,6 @@ public:
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 5u);
         periodic_neighbouring_sites = p_periodic_mesh->GetMooreNeighbouringNodeIndices(3);
         TS_ASSERT_EQUALS(periodic_neighbouring_sites.size(), 8u);
-
 
         expected_neighbouring_sites.clear();
         expected_neighbouring_sites.insert(0);
@@ -748,7 +743,7 @@ public:
 
     void TestGetMooreNeighbouringNodeIndices3d()
     {
-        /* Create a 3 simple potts-based mesh with one element, one of which is non periodic one of which is periodic in x and
+        /* Create a 3 simple Potts mesh with one element, one of which is non periodic one of which is periodic in x and
          * one of which is periodic in all dimensions.
          * Numbering the nodes as follows:
          *
@@ -769,7 +764,6 @@ public:
 
         PottsMeshGenerator<3> periodic_generator(3, 1, 3, 3, 1, 3, 3, 1, 3, false, true, true, true); // Last 3 variables are periodicity
         PottsMesh<3>* p_periodic_mesh = periodic_generator.GetMesh();
-
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
@@ -882,7 +876,6 @@ public:
         expected_neighbouring_sites.insert(26);
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites, expected_neighbouring_sites);
 
-
         // Test all nodes for fully periodic mesh
         for (unsigned node_index = 0; node_index<27; node_index++)
         {
@@ -902,7 +895,7 @@ public:
 
     void TestGetVonNeumannNeighbouringNodeIndices2d()
     {
-        /* * Create a 2 simple potts-based mesh with one element, one of which is periodic in all the dimensions.
+        /* * Create a 2 simple Potts mesh with one element, one of which is periodic in all the dimensions.
          * Numbering the nodes as follows:
          *
          *     6----7----8
@@ -1045,7 +1038,7 @@ public:
 
     void TestGetVonNeumannNeighbouringNodeIndices3d()
     {
-        /* Create a 3 simple potts-based mesh with one element, one of which is non periodic one of which is periodic in x and
+        /* Create a 3 simple Potts mesh with one element, one of which is non periodic one of which is periodic in x and
          * one of which is periodic in all dimensions.
          * Numbering the nodes as follows:
          *
@@ -1101,7 +1094,6 @@ public:
         expected_neighbouring_sites.insert(7);
         expected_neighbouring_sites.insert(19);
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
-
 
         // Test bottom right node
         neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(2);
@@ -1236,7 +1228,6 @@ public:
         expected_neighbouring_sites.insert(26);
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
 
-
         // Test middle middle node
         neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(13);
         TS_ASSERT_EQUALS(neighbouring_sites.size(), 6u);
@@ -1274,7 +1265,6 @@ public:
         TS_ASSERT_EQUALS(x_periodic_neighbouring_sites, expected_neighbouring_sites);
         expected_neighbouring_sites.insert(4);
         TS_ASSERT_EQUALS(periodic_neighbouring_sites, expected_neighbouring_sites);
-
 
         // Test top on the front
         neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(19);

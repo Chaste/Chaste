@@ -127,10 +127,7 @@ double AveragedSourcePde<DIM>::GetUptakeRateForElement(unsigned elementIndex)
     return this->mCellDensityOnCoarseElements[elementIndex];
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class AveragedSourcePde<1>;
 template class AveragedSourcePde<2>;
 template class AveragedSourcePde<3>;

@@ -198,7 +198,6 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     rest_length = a_rest_length + b_rest_length;
     //assert(rest_length <= 1.0+1e-12); ///\todo #1884 Magic number: would "<= 1.0" do?
 
-
     // Although in this class the 'spring constant' is a constant parameter, in
     // subclasses it can depend on properties of each of the cells
     double overlap = distance_between_nodes - rest_length;

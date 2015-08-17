@@ -136,10 +136,7 @@ std::string& PdeAndBoundaryConditions<DIM>::rGetDependentVariableName()
 {
     return mDependentVariableName;
 }
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class PdeAndBoundaryConditions<1>;
 template class PdeAndBoundaryConditions<2>;
 template class PdeAndBoundaryConditions<3>;

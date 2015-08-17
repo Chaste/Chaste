@@ -108,9 +108,7 @@ void CellBasedPdeSolver<DIM>::InitialiseForSolve(Vec initialSolution)
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
 }
 
-//////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-//////////////////////////////////////////////////////////////////////
 
 template class CellBasedPdeSolver<1>;
 template class CellBasedPdeSolver<2>;

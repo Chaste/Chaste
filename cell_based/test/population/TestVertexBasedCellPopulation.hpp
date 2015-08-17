@@ -1490,7 +1490,6 @@ public:
         TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(1), 1u);
         TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(2), 5u);
 
-
         // The Fifth Element of the TetrahedralMesh should contain the following Nodes
         Element<2,2>* p_element_4 = p_tetrahedral_mesh->GetElement(4);
 

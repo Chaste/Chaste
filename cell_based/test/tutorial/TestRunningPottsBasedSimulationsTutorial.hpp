@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize Potts-based simulations.
  * Full details of the mathematical model can be found in Graner, F. and Glazier, J. A. (1992). Simulation
- * of biological cell sorting using a two-dimensional extended potts model. Phys. Rev. Lett., 69(13):2013–2016.
+ * of biological cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2013–2016.
  *
  * EMPTYLINE
  *
@@ -220,7 +220,7 @@ public:
      * parameters specified, the cells sort into separate types.
      *
      * Parameters are taken from Graner, F. and Glazier, J. A. (1992). Simulation of biological
-     * cell sorting using a two-dimensional extended potts model. Phys. Rev. Lett., 69(13):2013–2016.
+     * cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2013–2016.
      *
      */
     void TestPottsMonolayerCellSorting() throw (Exception)

@@ -95,10 +95,7 @@ c_matrix<double,DIM,DIM> CellwiseSourcePde<DIM>::ComputeDiffusionTerm(const Chas
     return identity_matrix<double>(DIM);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class CellwiseSourcePde<1>;
 template class CellwiseSourcePde<2>;
 template class CellwiseSourcePde<3>;

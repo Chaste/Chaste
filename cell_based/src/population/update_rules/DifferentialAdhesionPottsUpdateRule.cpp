@@ -126,10 +126,7 @@ void DifferentialAdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_st
     AdhesionPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class DifferentialAdhesionPottsUpdateRule<1>;
 template class DifferentialAdhesionPottsUpdateRule<2>;
 template class DifferentialAdhesionPottsUpdateRule<3>;

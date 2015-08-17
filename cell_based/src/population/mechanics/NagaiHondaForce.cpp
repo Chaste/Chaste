@@ -249,10 +249,7 @@ void NagaiHondaForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class NagaiHondaForce<1>;
 template class NagaiHondaForce<2>;
 template class NagaiHondaForce<3>;

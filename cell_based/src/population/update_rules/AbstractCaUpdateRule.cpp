@@ -61,10 +61,7 @@ void AbstractCaUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rParamsFi
     // No parameters to output
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class AbstractCaUpdateRule<1>;
 template class AbstractCaUpdateRule<2>;
 template class AbstractCaUpdateRule<3>;

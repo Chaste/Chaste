@@ -855,10 +855,7 @@ bool CellBasedPdeHandler<DIM>::PdeSolveNeedsCoarseMesh()
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(CellBasedPdeHandler)
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class CellBasedPdeHandler<1>;
 template class CellBasedPdeHandler<2>;
 template class CellBasedPdeHandler<3>;

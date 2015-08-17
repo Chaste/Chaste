@@ -81,10 +81,7 @@ void ChemotaxisPottsUpdateRule<DIM>::OutputUpdateRuleParameters(out_stream& rPar
     AbstractPottsUpdateRule<DIM>::OutputUpdateRuleParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class ChemotaxisPottsUpdateRule<1>;
 template class ChemotaxisPottsUpdateRule<2>;
 template class ChemotaxisPottsUpdateRule<3>;

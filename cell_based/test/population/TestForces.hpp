@@ -1998,7 +1998,7 @@ public:
         RandomNumberGenerator::Destroy();
     }
 
-    void DONOTTestDiffusionForceWithMeshBasedCellPopulation()
+    void TestDiffusionForceWithMeshBasedCellPopulation()
     {
         // Define the seed
         RandomNumberGenerator::Instance()->Reseed(0);

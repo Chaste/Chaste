@@ -46,12 +46,11 @@ template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
 
 /**
- * A division rule for Ca-based cell populations to divide randomly into the availiable neighbours.
+ * A division rule for CA-based cell populations to divide randomly into the available neighbours.
  * If there are no spaces then the move is aborted.
- *
  */
 template <unsigned SPACE_DIM>
-class ExclusionCaBasedDivisionRule  : public AbstractCaBasedDivisionRule<SPACE_DIM>
+class ExclusionCaBasedDivisionRule : public AbstractCaBasedDivisionRule<SPACE_DIM>
 {
 private:
 
@@ -84,8 +83,8 @@ public:
      * Return whether there is room to divide at all.
      *
      * @param pParentCell  The cell to divide
-     * @param rCellPopulation  The Ca-based cell population
-     * @return if the site is availiable.
+     * @param rCellPopulation  The CA-based cell population
+     * @return if the site is available.
      */
     virtual bool IsRoomToDivide(CellPtr pParentCell,
                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
@@ -96,7 +95,7 @@ public:
      *
      * @param pNewCell  The cell to new cell
      * @param pParentCell  The parent cell
-     * @param rCellPopulation  The Ca-based cell population
+     * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
     virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell,

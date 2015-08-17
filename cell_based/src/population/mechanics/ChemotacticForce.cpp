@@ -95,10 +95,7 @@ void ChemotacticForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class ChemotacticForce<1>;
 template class ChemotacticForce<2>;
 template class ChemotacticForce<3>;

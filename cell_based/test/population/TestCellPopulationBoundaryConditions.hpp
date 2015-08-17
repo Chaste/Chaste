@@ -194,7 +194,6 @@ public:
         TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[0],2.00008,1e-5);
         TS_ASSERT_DELTA(cell_population.rGetMesh().GetNode(3)->rGetLocation()[1],sqrt(3.0)/2.0,1e-5);
 
-
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
     }
@@ -262,7 +261,6 @@ public:
         PlaneBoundaryCondition<1> plane_boundary_condition_1d(NULL, zero_vector<double>(1), unit_vector<double>(1,0));
         TS_ASSERT_THROWS_THIS(plane_boundary_condition_1d.VerifyBoundaryCondition(),
                               "PlaneBoundaryCondition is not implemented in 1D");
-
 
         // Now test with the jiggled nodes for coverage
         x_boundary = 0.8;
@@ -421,8 +419,6 @@ public:
             c_vector<double,3> old_direction =  old_locations[p_node] - centre_3d;
             old_direction /= norm_2(old_direction);
             TS_ASSERT_DELTA(norm_inf(new_direction-old_direction), 0.0, 1e-10);
-
-
         }
 
         // Test that the boundary condition was imposed correctly

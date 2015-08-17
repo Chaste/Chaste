@@ -497,7 +497,6 @@ public:
         p_stochastic_differentiated_cell->SetCellProliferativeType(p_diff_type);
         p_stochastic_differentiated_cell->InitialiseCellCycleModel();
 
-
         FixedDurationGenerationBasedCellCycleModel* p_transit_model = new FixedDurationGenerationBasedCellCycleModel();
         p_transit_model->SetGeneration(2);
         CellPtr p_transit_cell(new Cell(p_healthy_state, p_transit_model));
@@ -528,7 +527,6 @@ public:
 
         // SimulationTime = 36 hours
         TS_ASSERT_EQUALS(p_stochastic_stem_cell->ReadyToDivide(), true);
-
 
         CellPtr p_daughter_cell1 = p_stem_cell->Divide();
         TS_ASSERT(typeid(p_daughter_cell1->GetCellCycleModel()) == typeid(p_stem_cell->GetCellCycleModel()));
@@ -1104,7 +1102,6 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-
         FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
@@ -1137,7 +1134,6 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         boost::shared_ptr<AbstractCellProperty> p_type(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
 
-
         FixedDurationGenerationBasedCellCycleModel* p_cell_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_cell(new Cell(p_healthy_state, p_cell_model));
         p_cell->SetCellProliferativeType(p_type);
@@ -1155,7 +1151,6 @@ public:
         TS_ASSERT_EQUALS(p_cell->GetCellId(), 0u);
         TS_ASSERT_EQUALS(p_cell2->GetCellId(), 1u);
     }
-
 };
 
 #endif /*TESTCELL_HPP_*/

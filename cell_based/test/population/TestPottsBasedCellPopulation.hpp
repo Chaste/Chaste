@@ -158,7 +158,7 @@ public:
 
     void TestValidate() throw (Exception)
     {
-        // Create a simple potts-based mesh
+        // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 

@@ -203,7 +203,6 @@ public:
             TS_ASSERT_THROWS_CONTAINS(NodeBasedCellPopulation<2> cell_population(mesh, cells_copy),
                                   "does not appear to have a cell associated with it");
 
-
             // Add another cell
             MAKE_PTR(WildTypeCellMutationState, p_state);
             MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -789,8 +788,7 @@ public:
             TS_ASSERT_EQUALS(node_1_neighbours.size(), expected_node_1_neighbours.size());
             TS_ASSERT_EQUALS(node_1_neighbours, expected_node_1_neighbours);
 
-
-            //Test Centre node
+            // Test central node
             std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNeighbouringNodeIndices(4);
 
             std::set<unsigned> expected_node_4_neighbours;

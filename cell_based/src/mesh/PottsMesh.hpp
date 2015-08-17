@@ -191,7 +191,6 @@ public:
               std::vector< std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
               std::vector< std::set<unsigned> > mooreNeighbouringNodeIndices);
 
-
     /**
      * Default constructor for use by serializer.
      */
@@ -329,7 +328,6 @@ public:
      * @return its neighbouring element indices
      */
     std::set<unsigned> GetNeighbouringElementIndices(unsigned elementIndex);
-
 
     //////////////////////////////////////////////////////////////////////
     //                         Nested classes                           //

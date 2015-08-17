@@ -245,8 +245,6 @@ public:
             input_arch >> p_another_cell;
             ReplicatableVector rep_another_item_1(p_another_cell->GetCellVecData()->GetItem("item 1"));
             TS_ASSERT_DELTA(rep_another_item_1[0], 42.0, 2e-14);
-
-
         }
     }
 };

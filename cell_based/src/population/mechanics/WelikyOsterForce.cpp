@@ -157,10 +157,7 @@ void WelikyOsterForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     AbstractForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class WelikyOsterForce<1>;
 template class WelikyOsterForce<2>;
 template class WelikyOsterForce<3>;

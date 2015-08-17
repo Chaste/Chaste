@@ -180,10 +180,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(AbstractCellPopulation<DIM>& rCel
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class CellwiseDataGradient<1>;
 template class CellwiseDataGradient<2>;
 template class CellwiseDataGradient<3>;

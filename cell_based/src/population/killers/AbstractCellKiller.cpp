@@ -68,10 +68,7 @@ void AbstractCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile
     // No parameters to output
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractCellKiller<1>;
 template class AbstractCellKiller<2>;
 template class AbstractCellKiller<3>;

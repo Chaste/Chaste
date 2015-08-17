@@ -426,7 +426,6 @@ public:
         PottsMeshGenerator<3> generator(domain_size, element_number, element_size, domain_size, element_number, element_size, domain_size, element_number, element_size);
         PottsMesh<3>* p_mesh = generator.GetMesh();
 
-
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 64u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 1000u);
 

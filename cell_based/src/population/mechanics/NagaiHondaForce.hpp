@@ -190,7 +190,6 @@ public:
      */
     void SetNagaiHondaCellBoundaryAdhesionEnergyParameter(double nagaiHondaCellBoundaryAdhesionEnergyParameter);
 
-
     /**
      * Overridden OutputForceParameters() method.
      *

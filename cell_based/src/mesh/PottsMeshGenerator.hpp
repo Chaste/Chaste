@@ -98,7 +98,7 @@ public:
     }
 
     /**
-     * Destructor - deletes the mesh object and pointer
+     * Destructor - deletes the mesh object and pointer.
      */
     virtual ~PottsMeshGenerator();
 
@@ -108,7 +108,6 @@ public:
      * @param isPeriodicInX  If true then the mesh is periodic in the x dimension
      */
     void CaclulateNeighbouringNodeIndices(bool isPeriodicInX);
-
 
     /**
      * @return a Cuboid or rectangular Potts mesh.

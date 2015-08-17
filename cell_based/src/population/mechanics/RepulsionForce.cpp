@@ -101,10 +101,7 @@ void RepulsionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
     GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class RepulsionForce<1>;
 template class RepulsionForce<2>;
 template class RepulsionForce<3>;

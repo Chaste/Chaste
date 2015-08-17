@@ -103,18 +103,17 @@ public:
         MAKE_PTR_ARGS(SphereGeometryBoundaryCondition<3>, p_boundary_condition, (&node_based_cell_population, centre, radius)); // Circle radius 1 centre (0,0,1)
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
 
-
-       //  Kill all cells moving past z=1;
-       MAKE_PTR_ARGS(PlaneBasedCellKiller<3>, p_cell_killer,(&node_based_cell_population, unit_vector<double>(3,2), unit_vector<double>(3,2)));
-       simulator.AddCellKiller(p_cell_killer);
+        // Kill all cells moving past z=1;
+        MAKE_PTR_ARGS(PlaneBasedCellKiller<3>, p_cell_killer,(&node_based_cell_population, unit_vector<double>(3,2), unit_vector<double>(3,2)));
+        simulator.AddCellKiller(p_cell_killer);
 
         // Run simulation
         simulator.Solve();
 
         // Check some results
         for (AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
-                      cell_iter != simulator.rGetCellPopulation().End();
-                      ++cell_iter)
+             cell_iter != simulator.rGetCellPopulation().End();
+             ++cell_iter)
         {
             c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);

@@ -135,10 +135,7 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParamete
     AbstractForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractTwoBodyInteractionForce<1,1>;
 template class AbstractTwoBodyInteractionForce<1,2>;
 template class AbstractTwoBodyInteractionForce<2,2>;

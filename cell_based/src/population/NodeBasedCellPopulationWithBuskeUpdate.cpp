@@ -207,10 +207,7 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::OutputCellPopulationParameters
     NodeBasedCellPopulation<DIM>::OutputCellPopulationParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class NodeBasedCellPopulationWithBuskeUpdate<1>;
 template class NodeBasedCellPopulationWithBuskeUpdate<2>;
 template class NodeBasedCellPopulationWithBuskeUpdate<3>;

@@ -85,8 +85,6 @@ private:
 
 public:
 
-
-
     /**
      * Constructor.
      */

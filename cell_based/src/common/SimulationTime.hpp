@@ -135,7 +135,6 @@ public:
      */
     bool IsEndTimeAndNumberOfTimeStepsSetUp() const;
 
-
     /**
      * @return whether the simulation has finished.
      */
@@ -163,7 +162,6 @@ private:
      */
     static SimulationTime* mpInstance;
 
-
     /**
      * Delegate all time stepping to a TimeStepper class
      */
@@ -173,7 +171,6 @@ private:
      * Stores the time at which the simulation started
      */
     double mStartTime;
-
 
     /** Needed for serialization. */
     friend class boost::serialization::access;

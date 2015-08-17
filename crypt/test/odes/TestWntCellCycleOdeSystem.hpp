@@ -226,7 +226,6 @@ public:
 //        solutions = back_solver.Solve(&wnt_system_2, initial_conditions, 0.0, 100.0, h_value, h_value);
 //        Timer::Print("1. Backward Euler");
 
-
         // Testing RK4 solution
         // Test solutions are OK for a small time increase...
         int end = solutions_rk4.rGetSolutions().size() - 1;
@@ -243,7 +242,6 @@ public:
         TS_ASSERT_DELTA(solutions_rk4.rGetSolutions()[end][5], 4.975124378109454e-03, 1e-3);
         TS_ASSERT_DELTA(solutions_rk4.rGetSolutions()[end][6]+solutions_rk4.rGetSolutions()[end][7], 6.002649406788524e-01, 1e-3);
         TS_ASSERT_DELTA(solutions_rk4.rGetSolutions()[end][8], 1.00, 1e-3);
-
 
         // Testing RKF solution
         // Test solutions are OK for a small time increase...

@@ -141,10 +141,7 @@ void SphereGeometryBoundaryCondition<DIM>::OutputCellPopulationBoundaryCondition
     AbstractCellPopulationBoundaryCondition<DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class SphereGeometryBoundaryCondition<1>;
 template class SphereGeometryBoundaryCondition<2>;
 template class SphereGeometryBoundaryCondition<3>;

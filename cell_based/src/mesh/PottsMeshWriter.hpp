@@ -48,7 +48,7 @@ template<unsigned SPACE_DIM>
 struct MeshPottsWriterIterators;
 
 /**
- * A mesh writer class for potts-based meshes.
+ * A mesh writer class for Potts meshes.
  */
 template<unsigned SPACE_DIM>
 class PottsMeshWriter : public AbstractMeshWriter<SPACE_DIM, SPACE_DIM>
@@ -92,7 +92,7 @@ public:
     /**
      * Write files using a mesh.
      *
-     * @param rMesh reference to the potts-based mesh
+     * @param rMesh reference to the Potts mesh
      */
     void WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh);
 

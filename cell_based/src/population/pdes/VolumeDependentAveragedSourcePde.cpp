@@ -96,10 +96,7 @@ void VolumeDependentAveragedSourcePde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
+///////// Explicit instantiation
 template class VolumeDependentAveragedSourcePde<1>;
 template class VolumeDependentAveragedSourcePde<2>;
 template class VolumeDependentAveragedSourcePde<3>;
