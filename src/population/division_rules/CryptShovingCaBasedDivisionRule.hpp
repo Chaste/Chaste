@@ -97,8 +97,8 @@ public:
      * Return whether there is room to divide at all.
      *
      * @param pParentCell  The cell to divide
-     * @param rCellPopulation  The Ca-based cell population
-     * @return if the site is availiable.
+     * @param rCellPopulation  The CA-based cell population
+     * @return if the site is available.
      */
     virtual bool IsRoomToDivide(CellPtr pParentCell,
                                 CaBasedCellPopulation<2>& rCellPopulation);
@@ -111,10 +111,11 @@ public:
      *
      * @param pNewCell  The cell to new cell
      * @param pParentCell  The parent cell
-     * @param rCellPopulation  The Ca-based cell population
+     * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
-    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell,
+    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
+                                                CellPtr pParentCell,
                                                 CaBasedCellPopulation<2>& rCellPopulation);
 };
 

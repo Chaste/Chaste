@@ -285,10 +285,7 @@ void AbstractPeriodicTwoBodyInteractionForce<DIM>::OutputForceParameters(out_str
     AbstractTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class AbstractPeriodicTwoBodyInteractionForce<1>;
 template class AbstractPeriodicTwoBodyInteractionForce<2>;
 template class AbstractPeriodicTwoBodyInteractionForce<3>;

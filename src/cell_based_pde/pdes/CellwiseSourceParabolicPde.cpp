@@ -91,12 +91,12 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
         if (this->mrCellPopulation.IsCellAttachedToLocationIndex(tet_node_index))
         {
             // For centre based this tet node is the same as the node in the population and attached to the cell
-            // For potts this tet node corresponds to the element attached to the cell
+            // For Potts this tet node corresponds to the element attached to the cell
             is_cell_apoptotic = this->mrCellPopulation.GetCellUsingLocationIndex(tet_node_index)->template HasCellProperty<ApoptoticCellProperty>();
         }
         else
         {
-            // no cell at node
+            // No cell at node
             return 0.0;
         }
     }

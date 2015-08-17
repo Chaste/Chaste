@@ -185,10 +185,7 @@ void GeneralisedPeriodicLinearSpringForce<DIM>::OutputForceParameters(out_stream
     AbstractPeriodicTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
-/////////////////////////////////////////////////////////////////////////////
 // Explicit instantiation
-/////////////////////////////////////////////////////////////////////////////
-
 template class GeneralisedPeriodicLinearSpringForce<1>;
 template class GeneralisedPeriodicLinearSpringForce<2>;
 template class GeneralisedPeriodicLinearSpringForce<3>;
