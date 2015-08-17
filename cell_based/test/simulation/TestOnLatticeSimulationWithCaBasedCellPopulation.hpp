@@ -66,6 +66,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "DiffusionCaUpdateRule.hpp"
+#include "RandomCaSwitchingUpdateRule.hpp"
+#include "CellIdWriter.hpp"
 
 class TestOnLatticeSimulationWithCaBasedCellPopulation : public AbstractCellBasedWithTimingsTestSuite
 {
@@ -351,6 +353,83 @@ public:
             }
         }
     }
+
+    void TestCaMonolayerWithRandomSwitching() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;
+
+        // Reset the maximum cell ID to zero (to account for previous tests)
+        CellId::ResetMaxCellId();
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_diff_type);
+
+        // Specify where cells lie
+        std::vector<unsigned> location_indices;
+        for (unsigned index=0; index<p_mesh->GetNumNodes(); index++)
+        {
+            location_indices.push_back(index);
+        }
+        TS_ASSERT_EQUALS(location_indices.size(),p_mesh->GetNumNodes());
+
+        // Create cell population
+        CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+        cell_population.AddCellWriter<CellIdWriter>();
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestCaMonolayerWithRandomSwitching");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(0.2); // 2 steps so only 1 switch happens (Cells 5 and 11)
+
+        // Add switching Update Rule
+        MAKE_PTR(RandomCaSwitchingUpdateRule<2u>, p_switching_update_rule);
+        p_switching_update_rule->SetSwitchingParameter(0.5);
+        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+
+        // Coverage of remove method
+        simulator.RemoveAllCaSwitchingUpdateRules();
+        simulator.AddCaSwitchingUpdateRule(p_switching_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check the number of cells is still the same
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 25u);
+
+        // Test no deaths and some births
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+
+        // Loop over the cells and check their new positions
+        unsigned node_index = 0;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+             cell_iter != simulator.rGetCellPopulation().End();
+             ++cell_iter)
+        {
+            if (node_index ==5)
+            {
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter),11u);
+            }
+            else if (node_index ==11)
+            {
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter),5u);
+            }
+            else
+            {
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter),node_index);
+            }
+            node_index++;
+        }
+    }
+
 
     /*
      * RandomMovement has been tested in TestCaSingleCellRandomMovement for one cell

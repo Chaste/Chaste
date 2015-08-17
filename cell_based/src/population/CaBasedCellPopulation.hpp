@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMesh.hpp"
 #include "VertexMesh.hpp"
 #include "AbstractCaUpdateRule.hpp"
+#include "AbstractCaSwitchingUpdateRule.hpp"
 #include "AbstractCaBasedDivisionRule.hpp"
 
 
@@ -75,8 +76,13 @@ private:
     /** The carrying capacity (number of cells allowed per site). */
     unsigned mLatticeCarryingCapacity;
 
-    /** The update rules used to determine the new location of the cells. */
+    /** The update rules used to determine the new location of the cells.
+     * These rules specify how individual cells move into free spaces */
     std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > > mUpdateRuleCollection;
+
+    /** The update rules used to determine the new location of the cells.
+     * THese rules specify is cells switch locations*/
+    std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > mSwitchingUpdateRuleCollection;
 
     /** Records for each node the node the number of spaces available. */
     std::vector<unsigned> mAvailableSpaces;
@@ -393,6 +399,25 @@ public:
      * @return the update rule collection
      */
     const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& rGetUpdateRuleCollection() const;
+
+    /**
+     * Add a switching update rule to be used in this simulation (use this to set up how cells move).
+     *
+     * @param pUpdateRule pointer to an update rule
+     */
+    void AddSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Method to remove all the switching update rules
+     */
+    void RemoveAllSwitchingUpdateRules();
+
+    /**
+     * Get the collection of switching update rules to be used in this simulation.
+     *
+     * @return the update rule collection
+     */
+    const std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >& rGetSwitchingUpdateRuleCollection() const;
 
     /**
      * Outputs CellPopulation parameters to file

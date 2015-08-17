@@ -421,7 +421,7 @@ public:
      *
      * @param index the location index
      *
-     * @return the cell.
+     * @return whether there is a cell attached.
      */
     bool IsCellAttachedToLocationIndex(unsigned index);
 

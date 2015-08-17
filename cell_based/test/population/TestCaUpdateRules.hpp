@@ -32,8 +32,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef TESTMULTIPLLECAUPDATERULES_HPP_
-#define TESTMULTIPLLECAUPDATERULES_HPP_
+#ifndef TESTCAUPDATERULES_HPP_
+#define TESTCAUPDATERULES_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCaUpdateRule.hpp"
 #include "DiffusionCaUpdateRule.hpp"
+#include "AbstractCaSwitchingUpdateRule.hpp"
+#include "RandomCaSwitchingUpdateRule.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "CaBasedCellPopulation.hpp"
@@ -56,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-class TestMulitpleCaUpdateRules : public AbstractCellBasedTestSuite
+class TestCaUpdateRules : public AbstractCellBasedTestSuite
 {
 public:
 
@@ -254,6 +256,119 @@ public:
         FileComparison comparer(generated, reference);
         TS_ASSERT(comparer.CompareFiles());
     }
+
+    /*
+     * Now test the switching rules
+     */
+
+    void TestRandomCaSwitchingUpdateRuleIn2d() throw (Exception)
+    {
+        // timestep and size of domain to let us calculate the probabilities of movement.
+        double delta_t = 0.1;
+        double delta_x = 1;
+        double switching_parameter = 0.1;
+
+        // Create an update law system
+        RandomCaSwitchingUpdateRule<2> random_switching_update_rule;
+
+        // Test get/set methods
+        TS_ASSERT_DELTA(random_switching_update_rule.GetSwitchingParameter(), 0.5, 1e-12);
+
+        random_switching_update_rule.SetSwitchingParameter(1.0);
+
+        TS_ASSERT_DELTA(random_switching_update_rule.GetSwitchingParameter(), 1.0, 1e-12);
+
+        random_switching_update_rule.SetSwitchingParameter(switching_parameter);
+
+        // Test EvaluateProbability()
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, 6u, p_diff_type);
+
+        // Specify where cells lie here we have cells on the bottom two rows
+        std::vector<unsigned> location_indices;
+
+        for (unsigned i=0; i<6; i++)
+        {
+            location_indices.push_back(i);
+        }
+
+        // Create cell population
+        CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
+
+        TS_ASSERT_DELTA(random_switching_update_rule.EvaluateSwitchingProbability(0,1,cell_population, delta_t, delta_x),switching_parameter*delta_t,1e-6);
+        TS_ASSERT_DELTA(random_switching_update_rule.EvaluateSwitchingProbability(0,6,cell_population, delta_t, delta_x),switching_parameter*delta_t,1e-6);
+        TS_ASSERT_DELTA(random_switching_update_rule.EvaluateSwitchingProbability(0,5,cell_population, delta_t, delta_x),switching_parameter*delta_t,1e-6);
+        // Note this is independent of node index and population so even returns for nodes not in the mesh
+        TS_ASSERT_DELTA(random_switching_update_rule.EvaluateSwitchingProbability(UNSIGNED_UNSET,UNSIGNED_UNSET,cell_population, delta_t, delta_x),switching_parameter*delta_t,1e-6);
+    }
+
+    void TestArchiveRandomCaSwitchingUpdateRule() throw(Exception)
+    {
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RandomCaSwitchingUpdateRule.arch";
+
+        {
+            RandomCaSwitchingUpdateRule<2> update_rule;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            update_rule.SetSwitchingParameter(1.0);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractCaSwitchingUpdateRule<2>* const p_update_rule = &update_rule;
+            output_arch << p_update_rule;
+        }
+
+        {
+            AbstractCaSwitchingUpdateRule<2>* p_update_rule;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_update_rule;
+
+            // Test the member data
+            TS_ASSERT_DELTA((static_cast<RandomCaSwitchingUpdateRule<2>*>(p_update_rule))->GetSwitchingParameter(), 1.0, 1e-6);
+
+            // Tidy up
+            delete p_update_rule;
+        }
+    }
+
+    void TestSwitchingUpdateRuleOutputUpdateRuleInfo()
+    {
+        std::string output_directory = "TestCaSwitchingUpdateRulesOutputParameters";
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        // Test with RandomCaSwitchingUpdateRule
+        RandomCaSwitchingUpdateRule<2> random_switching_update_rule;
+        random_switching_update_rule.SetSwitchingParameter(1.0);
+
+        TS_ASSERT_EQUALS(random_switching_update_rule.GetIdentifier(), "RandomCaSwitchingUpdateRule-2");
+
+        out_stream random_switching_update_rule_parameter_file = output_file_handler.OpenOutputFile("random_switching_update_rule_results.parameters");
+        random_switching_update_rule.OutputUpdateRuleInfo(random_switching_update_rule_parameter_file);
+        random_switching_update_rule_parameter_file->close();
+
+        // Compare the generated file in test output with a reference copy in the source code.
+        FileFinder generated = output_file_handler.FindFile("random_switching_update_rule_results.parameters");
+        FileFinder reference("cell_based/test/data/TestCaUpdateRules/random_switching_update_rule_results.parameters",
+                RelativeTo::ChasteSourceRoot);
+        FileComparison comparer(generated, reference);
+        TS_ASSERT(comparer.CompareFiles());
+    }
 };
 
-#endif /*TESTPOTTSUPDATERULES_HPP_*/
+#endif /*TESTCAUPDATERULES_HPP_*/

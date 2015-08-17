@@ -272,87 +272,187 @@ unsigned CaBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 {
-    // Iterate over cells
-    ///\todo make this sweep random
-    for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
-         ++cell_iter)
+
+    /*
+     * Here we loop over the nodes and calculate the probability of moving
+     * and then select the node to move to.
+     */
+    if (mUpdateRuleCollection.size()>0)
     {
-        // Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
-        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-        // Find a random available neighbouring node to overwrite current site
-        std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
-        std::vector<double> neighbouring_node_propensities;
-        std::vector<unsigned> neighbouring_node_indices_vector;
-
-        if (!neighbouring_node_indices.empty())
+        // Iterate over cells
+        ///\todo make this sweep random
+        for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
+             cell_iter != this->mCells.end();
+             ++cell_iter)
         {
-            unsigned num_neighbours = neighbouring_node_indices.size();
-            double probability_of_not_moving = 1.0;
+            // Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
+            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-            for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-                 iter != neighbouring_node_indices.end();
-                 ++iter)
+            // Find a random available neighbouring node to overwrite current site
+            std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+            std::vector<double> neighbouring_node_propensities;
+            std::vector<unsigned> neighbouring_node_indices_vector;
+
+            if (!neighbouring_node_indices.empty())
             {
-                double probability_of_moving = 0.0;
+                unsigned num_neighbours = neighbouring_node_indices.size();
+                double probability_of_not_moving = 1.0;
 
-                neighbouring_node_indices_vector.push_back(*iter);
-
-                if (IsSiteAvailable(*iter, *cell_iter))
+                for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+                     iter != neighbouring_node_indices.end();
+                     ++iter)
                 {
-                    // Iterating over the update rule
-                    for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
-                         iterRule != mUpdateRuleCollection.end();
-                         ++iterRule)
+                    double probability_of_moving = 0.0;
+
+                    neighbouring_node_indices_vector.push_back(*iter);
+
+                    if (IsSiteAvailable(*iter, *cell_iter))
                     {
-                        probability_of_moving += (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
-                        if (probability_of_moving < 0)
+                        // Iterating over the update rule
+                        for (typename std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >::iterator iterRule = mUpdateRuleCollection.begin();
+                             iterRule != mUpdateRuleCollection.end();
+                             ++iterRule)
                         {
-                            EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+                            probability_of_moving += (*iterRule)->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
+                            if (probability_of_moving < 0)
+                            {
+                                EXCEPTION("The probability of cellular movement is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
+                            }
+
+                            if (probability_of_moving > 1)
+                            {
+                                EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
+                            }
                         }
 
-                        if (probability_of_moving > 1)
-                        {
-                            EXCEPTION("The probability of the cellular movement is bigger than one. In order to prevent it from happening you should change your time step and parameters");
-                        }
+                        probability_of_not_moving -= probability_of_moving;
+                        neighbouring_node_propensities.push_back(probability_of_moving);
                     }
-
-                    probability_of_not_moving -= probability_of_moving;
-                    neighbouring_node_propensities.push_back(probability_of_moving);
+                    else
+                    {
+                        neighbouring_node_propensities.push_back(0.0);
+                    }
                 }
-                else
+                if (probability_of_not_moving < 0)
                 {
-                    neighbouring_node_propensities.push_back(0.0);
+                    EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
                 }
-            }
-            if (probability_of_not_moving < 0)
-            {
-                EXCEPTION("The probability of the cell not moving is smaller than zero. In order to prevent it from happening you should change your time step and parameters");
-            }
 
-            // Sample random number to specify which move to make
-            RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-            double random_number = p_gen->ranf();
+                // Sample random number to specify which move to make
+                RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+                double random_number = p_gen->ranf();
 
-            double total_probability = 0.0;
-            for (unsigned counter=0; counter<num_neighbours; counter++)
-            {
-                total_probability += neighbouring_node_propensities[counter];
-                if (total_probability >= random_number)
+                double total_probability = 0.0;
+                for (unsigned counter=0; counter<num_neighbours; counter++)
                 {
-                    //Move the cell to this neighbour location
-                    unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter];
-                    this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
-                    break;
+                    total_probability += neighbouring_node_propensities[counter];
+                    if (total_probability >= random_number)
+                    {
+                        //Move the cell to this neighbour location
+                        unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter];
+                        this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
+                        break;
+                    }
                 }
+                // If loop completes with total_probability < random_number then stay in the same location
+
+
             }
-            // If loop completes with total_probability < random_number then stay in the same location
+            else
+            {
+                // Each node in the mesh must have at least one neighbour
+                NEVER_REACHED;
+            }
         }
-        else
+    }
+
+    /*
+     * Here we loop over the nodes and select a neighbour to test if the cells (associated with the cells) should swap locations
+     * Note this currently only works for latticeCarryingCapacity = 1
+     */
+    if (mSwitchingUpdateRuleCollection.size()>0)
+    {
+        assert(mLatticeCarryingCapacity == 1);
+
+        RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+        unsigned num_nodes = this->mrMesh.GetNumNodes();
+
+        // Randomly permute mUpdateRuleCollection if specified
+        if (this->mIterateRandomlyOverUpdateRuleCollection)
         {
-            // Each node in the mesh must have at least one neighbour
-            NEVER_REACHED;
+            // Randomly permute mUpdateRuleCollection
+            p_gen->Shuffle(mSwitchingUpdateRuleCollection);
+        }
+
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            unsigned node_index;
+
+            if (this->mUpdateNodesInRandomOrder)
+            {
+                node_index = p_gen->randMod(num_nodes);
+            }
+            else
+            {
+                // Loop over nodes in index order.
+                node_index = i%num_nodes;
+            }
+
+            Node<DIM>* p_node = this->mrMesh.GetNode(node_index);
+
+            // Find a random available neighbouring node to switch cells with the current site
+            std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
+
+            unsigned neighbour_location_index;
+
+            if (!neighbouring_node_indices.empty())
+            {
+                unsigned num_neighbours = neighbouring_node_indices.size();
+                unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
+
+                std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+                for (unsigned j=0; j<chosen_neighbour; j++)
+                {
+                    neighbour_iter++;
+                }
+                neighbour_location_index = *neighbour_iter;
+
+                bool is_cell_on_node_index = mAvailableSpaces[node_index] == 0 ? true : false;
+                bool is_cell_on_neighbour_location_index = mAvailableSpaces[neighbour_location_index] == 0 ? true : false;
+
+                if (is_cell_on_node_index && is_cell_on_neighbour_location_index)
+                {
+                    double probability_of_switch = 0.0;
+
+                    // Now add contributions to the probability  from each AbstractPottsUpdateRule
+                    for (typename std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >::iterator iter = mSwitchingUpdateRuleCollection.begin();
+                         iter != mSwitchingUpdateRuleCollection.end();
+                         ++iter)
+                    {
+                        probability_of_switch += (*iter)->EvaluateSwitchingProbability(node_index, neighbour_location_index, *this, dt, 1);
+                    }
+                    assert(probability_of_switch>=0);
+                    assert(probability_of_switch<=1);
+
+                    // Generate a uniform random number to do the random switch
+                    double random_number = p_gen->ranf();
+
+                    if (random_number < probability_of_switch)
+                    {
+                        // Swap the cells associated with the node and the neighbour node
+                        CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
+                        CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(neighbour_location_index);
+
+                        // Remove the cells from their current location
+                        RemoveCellUsingLocationIndex(node_index, p_cell);
+                        RemoveCellUsingLocationIndex(neighbour_location_index, p_neighbour_cell);
+
+                        // Add cells to their new locations
+                        AddCellUsingLocationIndex(node_index, p_neighbour_cell);
+                        AddCellUsingLocationIndex(neighbour_location_index, p_cell);
+                    }
+                }
+            }
         }
     }
 }
@@ -430,6 +530,24 @@ template<unsigned DIM>
 const std::vector<boost::shared_ptr<AbstractCaUpdateRule<DIM> > >& CaBasedCellPopulation<DIM>::rGetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
+}
+
+template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::AddSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule)
+{
+    mSwitchingUpdateRuleCollection.push_back(pUpdateRule);
+}
+
+template<unsigned DIM>
+void CaBasedCellPopulation<DIM>::RemoveAllSwitchingUpdateRules()
+{
+    mSwitchingUpdateRuleCollection.clear();
+}
+
+template<unsigned DIM>
+const std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >& CaBasedCellPopulation<DIM>::rGetSwitchingUpdateRuleCollection() const
+{
+    return mSwitchingUpdateRuleCollection;
 }
 
 template<unsigned DIM>

@@ -75,6 +75,25 @@ void OnLatticeSimulation<DIM>::RemoveAllCaUpdateRules()
     }
 }
 
+
+template<unsigned DIM>
+void OnLatticeSimulation<DIM>::AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule)
+{
+    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
+    {
+        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->AddSwitchingUpdateRule(pUpdateRule);
+    }
+}
+
+template<unsigned DIM>
+void OnLatticeSimulation<DIM>::RemoveAllCaSwitchingUpdateRules()
+{
+    if (bool(dynamic_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))))
+    {
+        static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->RemoveAllSwitchingUpdateRules();
+    }
+}
+
 template<unsigned DIM>
 void OnLatticeSimulation<DIM>::AddPottsUpdateRule(boost::shared_ptr<AbstractPottsUpdateRule<DIM> > pUpdateRule)
 {
@@ -175,10 +194,21 @@ void OnLatticeSimulation<DIM>::OutputAdditionalSimulationSetup(out_stream& rPara
         {
             (*iter)->OutputUpdateRuleInfo(rParamsFile);
         }
+
+        std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > > switching_collection =
+            static_cast<CaBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))->rGetSwitchingUpdateRuleCollection();
+
+        for (typename std::vector<boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > >::iterator iter = switching_collection.begin();
+             iter != switching_collection.end();
+             ++iter)
+        {
+            (*iter)->OutputUpdateRuleInfo(rParamsFile);
+        }
+
     }
     else
     {
-        //\todo define the method for `CaBasedCellPopulation`
+        NEVER_REACHED;
     }
     *rParamsFile << "\t</UpdateRules>\n";
 }

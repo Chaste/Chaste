@@ -136,6 +136,18 @@ public:
     void RemoveAllCaUpdateRules();
 
     /**
+     * Add a switching update rule to be used in this simulation.
+     *
+     * @param pUpdateRule shared pointer to a CA switching update rule law
+     */
+    void AddCaSwitchingUpdateRule(boost::shared_ptr<AbstractCaSwitchingUpdateRule<DIM> > pUpdateRule);
+
+    /**
+     * Method to remove all the CaSwitchingUpdateRules
+     */
+    void RemoveAllCaSwitchingUpdateRules();
+
+    /**
      * Add an update rule to be used in this simulation (use this to set the Hamiltonian).
      *
      * @param pUpdateRule shared pointer to a Potts update rule law
