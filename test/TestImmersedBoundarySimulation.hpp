@@ -187,12 +187,8 @@ public:
         simulator.SetSamplingTimestepMultiple(1);
         simulator.SetEndTime(0.02);
 
-        PRINT_VARIABLE(p_mesh->GetVolumeOfElement(0u));
-
         // Run the simulation
         simulator.Solve();
-
-        PRINT_VARIABLE(p_mesh->GetVolumeOfElement(0u));
     }
 
     void TestPalisadeGenerator() throw(Exception)

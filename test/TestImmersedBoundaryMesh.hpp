@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
+#include "ImmersedBoundaryMesh.hpp"
 #include "Debug.hpp"
 
 // This test is never run in parallel
@@ -45,10 +46,38 @@ class TestImmersedBoundaryMesh : public CxxTest::TestSuite
 {
 public:
 
-    void TestNothingMuch() throw(Exception)
+    void TestSolveNodeAndElementMapping() throw(Exception)
     {
     }
 
+    void TestClear() throw(Exception)
+    {
 
+    }
+
+    void TestSetupFluidVelocityGrids() throw(Exception)
+    {
+
+    }
+
+    void TestArchiving() throw(Exception)
+    {
+
+    }
+
+    void TestElementIterator() throw(Exception)
+    {
+
+    }
+
+    void TestSetAndGetMethods() throw(Exception)
+    {
+
+    }
+
+    void TestGetVectorFromAtoB() throw(Exception)
+    {
+
+    }
     
 };

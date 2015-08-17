@@ -63,7 +63,7 @@ class ImmersedBoundaryMeshWriter;
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class ImmersedBoundaryMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
-    //friend class TestVertexMesh;
+    friend class TestImmersedBoundaryMesh;
 
 protected:
 
@@ -72,6 +72,12 @@ protected:
 
     /** Number of grid points in y direction */
     unsigned mNumGridPtsY;
+
+    /** Whether there is a membrane */
+    bool mMeshHasMembrane;
+
+    /** A pointer to the immersed boundary membrane */
+    unsigned mMembraneIndex;
 
     /** Characteristic node spacing */
     double mCharacteristicNodeSpacing;
@@ -84,12 +90,6 @@ protected:
 
     /** Vector of pointers to ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
-
-    /** Whether there is a membrane */
-    bool mMeshHasMembrane;
-
-    /** A pointer to the immersed boundary membrane */
-    unsigned mMembraneIndex;
 
     /**
      * Solve node mapping method. This overridden method is required
@@ -121,7 +121,7 @@ protected:
     /**
      * Reset the fluid velocity grids based on number of grid points
      */
-    void SetupFluidVelocityGrids(void);
+    void SetupFluidVelocityGrids();
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -182,13 +182,16 @@ public:
      * Default constructor.
      *
      * @param nodes vector of pointers to nodes
-     * @param ImmersedBoundaryElements vector of pointers to ImmersedBoundaryElements
+     * @param elements vector of pointers to ImmersedBoundaryElements
+     * @param numGridPtsX the number of grid points in the x direction
+     * @param numGridPtsY the number of grid points in the y direction
+     * @param the index of the basement membrane element
      */
     ImmersedBoundaryMesh(std::vector<Node<SPACE_DIM>*> nodes,
                          std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> elements,
-                         unsigned num_gridpts_x=128,
-                         unsigned num_gridpts_y=128,
-                         unsigned membrane=UINT_MAX);
+                         unsigned numGridPtsX=128,
+                         unsigned numGridPtsY=128,
+                         unsigned membraneIndex=UINT_MAX);
 
     /**
      * Default constructor for use by serializer.
@@ -359,7 +362,7 @@ public:
      *
      * @param index  the global index of a specified immersed boundary element
      *
-     * @return the surfacearea of the element
+     * @return the surface area of the element
      */
     virtual double GetSurfaceAreaOfElement(unsigned index);
 

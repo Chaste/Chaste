@@ -71,6 +71,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* I'm not sure why we need this... */
 #include "FakePetscSetup.hpp"
 
+#include "Debug.hpp"
+
 /* In Chaste, every simulation is run as a 'test', and here we define a test class which inherits from
  * {{{AbstractCellBasedTestSuite}}}. The class {{{AbstractCellBasedTestSuite}}} sets up various parameters for us.  Of
  * particular use is that {{{RandomNumberGenerator}}} is re-seeded with zero.  This means any random numbers generated
@@ -98,8 +100,11 @@ public:
          *   * 0.15: the proportion of random variation in cell heights
          *   * true: whether the mesh should contain a basement membrane
          */
+
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        MARK;
 
         /* Here, we set the elastic parameters of the cells (here called elements) in the mesh. While these parameters
          * all have default values, this demonstrates how the parameters may be set differently per simulation.
@@ -107,23 +112,27 @@ public:
          * and rest length of the linear springs between points adjacent points on the cell perimeters.  We then use
          * the {{{SetCellCellXXX()}}} methods to alter parameters for the linear springs between nearby points in
          * neighbouring cells.*/
-        for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
-        {
-            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(100000.0);
-            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.005);
+//        for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+//        {
+//            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1000.0);
+//            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.1 * p_mesh->GetCharacteristicNodeSpacing());
+//
+//            p_mesh->GetElement(elem_idx)->SetCellCellSpringConstant(50.0);
+//            p_mesh->GetElement(elem_idx)->SetCellCellRestLength(p_mesh->GetCharacteristicNodeSpacing());
+//        }
+//
+//        MARK;
+//
+//        /* The membrane element (treated the same as other elements) can have parameters set independently by making use
+//         * of the mesh method {{{GetMembraneElement()}}}.  The following lines implement stiffer springs in the basement
+//         * membrane, and overwrite the values that have been assigned in the loop above.*/
+//        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(10000.0);
+//        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0001);
+//
+//        p_mesh->GetMembraneElement()->SetCellCellSpringConstant(50.0);
+//        p_mesh->GetMembraneElement()->SetCellCellRestLength(0.5 * p_mesh->GetCharacteristicNodeSpacing());
 
-            p_mesh->GetElement(elem_idx)->SetCellCellSpringConstant(50.0);
-            p_mesh->GetElement(elem_idx)->SetCellCellRestLength(0.01);
-        }
-
-        /* The membrane element (treated the same as other elements) can have parameters set independently by making use
-         * of the mesh method {{{GetMembraneElement()}}}.  The following lines implement stiffer springs in the basement
-         * membrane, and overwrite the values that have been assigned in the loop above.*/
-        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(100000.0);
-        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0001);
-
-        p_mesh->GetMembraneElement()->SetCellCellSpringConstant(50.0);
-        p_mesh->GetMembraneElement()->SetCellCellRestLength(0.01);
+        MARK;
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the
          * proliferative behaviour of the cell by choosing a {{{CellCycleModel}}}. Here we choose an
@@ -134,9 +143,13 @@ public:
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
+        MARK;
+
         /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells
          * together. Here we use an {{{ImmersedBoundaryCellPopulation}}} and the dimension is <2>.*/
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        MARK;
 
         /* We now create an {{{OffLatticeSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
          * options for the simulation like output directory, output multiple (so we don't visualize every timestep),
@@ -144,10 +157,14 @@ public:
          */
         OffLatticeSimulation<2> simulator(cell_population);
 
+        MARK;
+
         simulator.SetOutputDirectory("IB/TestPalisadeGenerator");
-        simulator.SetDt(0.03);
-        simulator.SetSamplingTimestepMultiple(100);
-        simulator.SetEndTime(1.00);
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(0.02);
+
+        MARK;
 
          /* All of the machinery for the Immersed Boundary method is handled in the following {{{SimulationModifier}}}.
           * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
@@ -155,8 +172,12 @@ public:
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
+        MARK;
+
         /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
         simulator.Solve();
+
+        MARK;
     }
 
 };

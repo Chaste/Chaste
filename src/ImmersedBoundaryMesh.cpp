@@ -43,28 +43,17 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
                                                                    unsigned numGridPtsX,
                                                                    unsigned numGridPtsY,
                                                                    unsigned membraneIndex)
+        : mNumGridPtsX(numGridPtsX),
+          mNumGridPtsY(numGridPtsY),
+          mMembraneIndex(membraneIndex)
 {
-    // Reset member variables and clear mNodes and mElements
+    // Clear mNodes and mElements
     Clear();
-
-    // Set the number of grid points and initialise the grids accordingly
-    mNumGridPtsX = numGridPtsX;
-    mNumGridPtsY = numGridPtsY;
 
     this->SetupFluidVelocityGrids();
 
-    // Set up the membrane element
-    mMembraneIndex = membraneIndex;
-
-    // If the element is NULL, we have no membrane; if not, we do
-    if (membraneIndex == UINT_MAX)
-    {
-        mMeshHasMembrane = false;
-    }
-    else
-    {
-        mMeshHasMembrane = true;
-    }
+    // If the membrane index is UINT_MAX, there is no membrane; if not, there is
+    mMeshHasMembrane = mMembraneIndex != UINT_MAX;
 
     // Populate mNodes and mElements
     for (unsigned node_index=0; node_index<nodes.size(); node_index++)
@@ -97,7 +86,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     unsigned total_nodes = 0;
     for (unsigned elem_index = 0 ; elem_index < elements.size() ; elem_index++)
     {
-        if (elem_index != membrane_index)
+        if (elem_index != mMembraneIndex)
         {
             total_perimeter += this->GetSurfaceAreaOfElement(elem_index);
             total_nodes += mElements[elem_index]->GetNumNodes();
