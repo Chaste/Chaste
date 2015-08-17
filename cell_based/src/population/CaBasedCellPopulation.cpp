@@ -398,8 +398,6 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 node_index = i%num_nodes;
             }
 
-            Node<DIM>* p_node = this->mrMesh.GetNode(node_index);
-
             // Find a random available neighbouring node to switch cells with the current site
             std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
 
