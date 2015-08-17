@@ -37,166 +37,160 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 template<unsigned SPACE_DIM>
-void ShovingCaBasedDivisionRule<SPACE_DIM>::IsNodeOnBoundary(
-     unsigned numNeighbours)
+void ShovingCaBasedDivisionRule<SPACE_DIM>::IsNodeOnBoundary(unsigned numNeighbours)
 {
-    // This logic currently only works for Moore Neighbourhood in 2D
+    // This logic currently only works for Moore neighbourhood in 2D
     bool is_central_node = false;
     if (SPACE_DIM == 2)
     {
-        if (numNeighbours==8)
+        if (numNeighbours == 8)
         {
             is_central_node = true;
         }
     }
-    else
+    else // Currently not tested in 3D
     {
-        // Currently not tested in 3D
         NEVER_REACHED;
     }
     if (!is_central_node)
     {
-        EXCEPTION("Cells reaching the boundary of the domain. Make the potts mesh larger.");
+        EXCEPTION("Cells reaching the boundary of the domain. Make the Potts mesh larger.");
     }
 }
 
 template<unsigned SPACE_DIM>
-bool ShovingCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
-	CellPtr pParentCell,
-    CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+bool ShovingCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-	return true;
+    return true;
 }
 
 template<unsigned SPACE_DIM>
-unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
-	CellPtr pNewCell,
-	CellPtr pParentCell,
+unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(CellPtr pNewCell,
+    CellPtr pParentCell,
     CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-	// Get node index corresponding to the parent cell
-	unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
+    // Get node index corresponding to the parent cell
+    unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
-	PottsMesh<SPACE_DIM>* static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
+    PottsMesh<SPACE_DIM>* p_static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
 
-	// Get the set of neighbouring node indices
-	std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
-	unsigned num_neighbours = neighbouring_node_indices.size();
+    // Get the set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
+    unsigned num_neighbours = neighbouring_node_indices.size();
 
-    //Check cell is not on the boundary
+    // Check cell is not on the boundary
     IsNodeOnBoundary(num_neighbours);
 
-	std::vector<double> neighbouring_node_propensities;
-	std::vector<unsigned> neighbouring_node_indices_vector;
+    std::vector<double> neighbouring_node_propensities;
+    std::vector<unsigned> neighbouring_node_indices_vector;
 
-	double total_propensity = 0.0;
+    double total_propensity = 0.0;
 
-	// Select Neighbour at random
-	for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-			neighbour_iter != neighbouring_node_indices.end();
-		 ++neighbour_iter)
-	{
-		neighbouring_node_indices_vector.push_back(*neighbour_iter);
+    // Select neighbour at random
+    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+         neighbour_iter != neighbouring_node_indices.end();
+         ++neighbour_iter)
+    {
+        neighbouring_node_indices_vector.push_back(*neighbour_iter);
 
-		double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+        double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
 
-		neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
-		total_propensity += propensity_dividing_into_neighbour;
-	}
-	assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
+        neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
+        total_propensity += propensity_dividing_into_neighbour;
+    }
+    assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
 
-	for (unsigned i=0; i<num_neighbours; i++)
-	{
-		neighbouring_node_propensities[i] /= total_propensity;
-	}
+    for (unsigned i=0; i<num_neighbours; i++)
+    {
+        neighbouring_node_propensities[i] /= total_propensity;
+    }
 
-	 // Sample random number to specify which move to make
-	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-	double random_number = p_gen->ranf();
+     // Sample random number to specify which move to make
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+    double random_number = p_gen->ranf();
 
-	double total_probability = 0.0;
-	unsigned daughter_node_index = UNSIGNED_UNSET;
+    double total_probability = 0.0;
+    unsigned daughter_node_index = UNSIGNED_UNSET;
 
-	unsigned counter;
-	for (counter=0; counter < num_neighbours; counter++)
-	{
-		total_probability += neighbouring_node_propensities[counter];
-		if (total_probability >= random_number)
-		{
-			// Divide the parent cell to this neighbour location
-			daughter_node_index = neighbouring_node_indices_vector[counter];
-			break;
-		}
-	}
-	// This loop should always break as sum(neighbouring_node_propensities) = 1
+    unsigned counter;
+    for (counter=0; counter < num_neighbours; counter++)
+    {
+        total_probability += neighbouring_node_propensities[counter];
+        if (total_probability >= random_number)
+        {
+            // Divide the parent cell to this neighbour location
+            daughter_node_index = neighbouring_node_indices_vector[counter];
+            break;
+        }
+    }
+    // This loop should always break as sum(neighbouring_node_propensities) = 1
 
-	assert(daughter_node_index != UNSIGNED_UNSET);
-	assert(daughter_node_index < static_cast_mesh->GetNumNodes());
+    assert(daughter_node_index != UNSIGNED_UNSET);
+    assert(daughter_node_index < p_static_cast_mesh->GetNumNodes());
 
-	//if daughter node is occupied then move the cell in the direction of counter
-	if (!(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell)))
-	{
-		std::list<std::pair<unsigned,unsigned> > cell_moves;
+    // If daughter node is occupied then move the cell in the direction of counter
+    if (!(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell)))
+    {
+        std::list<std::pair<unsigned,unsigned> > cell_moves;
 
+        bool is_neighbour_occupied = true;
+        int max_moves = 1000;
+        int move_number = 0;
+        unsigned current_node_index = parent_node_index;
+        unsigned target_node_index = daughter_node_index;
+        while (is_neighbour_occupied && move_number < max_moves)
+        {
+            move_number++;
+            current_node_index = target_node_index;
 
-		bool is_neighbour_occupied = true;
-		int max_moves = 1000;
-		int move_number = 0;
-		unsigned current_node_index = parent_node_index;
-		unsigned target_node_index = daughter_node_index;
-		while (is_neighbour_occupied && move_number < max_moves)
-		{
-			move_number++;
-			current_node_index = target_node_index;
+            std::set<unsigned> neighbouring_node_indices = p_static_cast_mesh->GetMooreNeighbouringNodeIndices(current_node_index);
 
-			std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetMooreNeighbouringNodeIndices(current_node_index);
+            // Check cell is not on the boundary
+            IsNodeOnBoundary(neighbouring_node_indices.size());
 
-		    //Check cell is not on the boundary
-		    IsNodeOnBoundary(neighbouring_node_indices.size());
+            // Select the appropriate neighbour
+            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            for (unsigned i=0; i<counter; i++)
+            {
+                ++neighbour_iter;
+            }
+            assert(neighbour_iter != neighbouring_node_indices.end());
 
-			// Select the appropriate neighbour
-			std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-			for (unsigned i=0; i<counter; i++)
-			{
-				++neighbour_iter;
-			}
-			assert(neighbour_iter != neighbouring_node_indices.end());
+            target_node_index = *neighbour_iter;
 
-			target_node_index = *neighbour_iter;
+            std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
 
-			std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
+            cell_moves.push_back(new_move);
 
-			cell_moves.push_back(new_move);
+            // If target node is unoccupied move the cell on the current node to the target node and stop shoving cells
+            if (rCellPopulation.IsSiteAvailable(target_node_index, pNewCell))
+            {
+                is_neighbour_occupied = false;
+            }
 
-			// If target node is unoccupied move the cell on the current node to the target node and stop shoving cells
-			if (rCellPopulation.IsSiteAvailable(target_node_index, pNewCell))
-			{
-				is_neighbour_occupied = false;
-			}
+            // If target node is occupied then keep shoving the cells out of the way
+            current_node_index = target_node_index;
 
-			// If target node is occupied then keep shoving the cells out of the way
-			current_node_index = target_node_index;
+        }
+        assert(move_number<max_moves);
 
-		}
-		assert(move_number<max_moves);
+        // Do moves to free up the daughter node index
+        for (std::list<std::pair<unsigned, unsigned> >::reverse_iterator reverse_iter = cell_moves.rbegin();
+             reverse_iter != cell_moves.rend();
+             ++reverse_iter)
+        {
+            assert(rCellPopulation.IsSiteAvailable(reverse_iter->second, pNewCell));
+            assert(!(rCellPopulation.IsSiteAvailable(reverse_iter->first, pNewCell)));
 
-		// Do Moves which will free up the daughter node index
-		for (std::list<std::pair<unsigned, unsigned> >::reverse_iterator reverse_iter=cell_moves.rbegin();
-			 reverse_iter!=cell_moves.rend();
-			 ++reverse_iter)
-		{
-			assert(rCellPopulation.IsSiteAvailable(reverse_iter->second, pNewCell));
-			assert(!(rCellPopulation.IsSiteAvailable(reverse_iter->first, pNewCell)));
+            // Move cell from first() to second()
+            rCellPopulation.MoveCellInLocationMap(rCellPopulation.GetCellUsingLocationIndex(reverse_iter->first), reverse_iter->first, reverse_iter->second);
+        }
 
-			// Move cell from first() to second()
-			rCellPopulation.MoveCellInLocationMap(rCellPopulation.GetCellUsingLocationIndex(reverse_iter->first), reverse_iter->first, reverse_iter->second);
-		}
+        // Check daughter site is now free
+        assert(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell));
 
-		// Check daughter site is now free
-		assert(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell));
-
-	}
-	return daughter_node_index;
+    }
+    return daughter_node_index;
 }
 
 // Explicit instantiation

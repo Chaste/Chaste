@@ -38,20 +38,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
-#include "AbstractCaBasedDivisionRule.hpp"
 
+#include "AbstractCaBasedDivisionRule.hpp"
 #include "CaBasedCellPopulation.hpp"
 
 template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
 
-
 /**
- * A division rule for Ca-based cell populations to say how cells divide.
- * Here they can divide North East or West Like Model 3 in Loefler 1986.
- * (Intestinal cell proliferation. I. A comprehensive model of steady- state proliferation in the crypt)
+ * A division rule for CA-based cell populations to say how cells divide.
+ * Here they can divide in a 'north-east' or 'west' direction, as in model
+ * 3 of the following paper:
+ *
+ * Loeffler et al (1986). Intestinal cell proliferation. I. A comprehensive
+ * model of steady‐state proliferation in the crypt. Cell Proliferation
+ * 19(6):627-645.
  */
-
 class CryptShovingCaBasedDivisionRule  : public AbstractCaBasedDivisionRule<2>
 {
 private:
@@ -82,7 +84,7 @@ public:
     virtual ~CryptShovingCaBasedDivisionRule(){};
 
     /**
-     * Helper Method to see if cells are on the base of the crpyt or not
+     * Helper method to see if cells are on the base of the crypt or not
      * Also throws exception if cells reach the top boundary of the crypt.
      *
      * @param NodeIndex  The node of interest
@@ -114,8 +116,6 @@ public:
      */
     virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell,
                                                 CaBasedCellPopulation<2>& rCellPopulation);
-
-
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -46,8 +46,9 @@ template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
 
 /**
- * A division rule for Ca-based cell populations Specify how cells divide
- * Here they can divide in any direction and shove other cells out of the way in that direction.
+ * A division rule for CA-based cell populations that specifies how cells divide.
+ * Here they can divide in any direction and shove other cells out of the way in
+ * that direction.
  */
 template <unsigned SPACE_DIM>
 class ShovingCaBasedDivisionRule  : public AbstractCaBasedDivisionRule<SPACE_DIM>
@@ -80,7 +81,7 @@ public:
     virtual ~ShovingCaBasedDivisionRule(){};
 
     /**
-     * Helper Method to see if cells are on the boundary of the domain.
+     * Helper method to see if cells are on the boundary of the domain.
      * Throws exception if cells boundary of the domain.
      *
      * @param numNeighbours the number of neighbours of the node.
@@ -98,7 +99,7 @@ public:
                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
 
     /**
-     * Return the index for the Daughter node.
+     * Return the index for the daughter node.
      * This method can be used to move cells out of the way as necessary.
      *
      * @param pNewCell  The cell to new cell
@@ -106,10 +107,9 @@ public:
      * @param rCellPopulation  The Ca-based cell population
      * @return the node index for the daughter cell.
      */
-    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell, CellPtr pParentCell,
+    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
+                                                CellPtr pParentCell,
                                                 CaBasedCellPopulation<SPACE_DIM>& rCellPopulation);
-
-
 };
 
 #include "SerializationExportWrapper.hpp"

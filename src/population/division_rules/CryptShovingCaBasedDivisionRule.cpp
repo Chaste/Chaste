@@ -36,142 +36,134 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptShovingCaBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
 
-bool CryptShovingCaBasedDivisionRule::IsNodeOnBase(
-	unsigned NodeIndex,
-	PottsMesh<2>* pPottsMesh)
+bool CryptShovingCaBasedDivisionRule::IsNodeOnBase(unsigned NodeIndex, PottsMesh<2>* pPottsMesh)
 {
-	std::set<unsigned> neighbouring_node_indices = pPottsMesh->GetVonNeumannNeighbouringNodeIndices(NodeIndex);
-	unsigned num_neighbours = neighbouring_node_indices.size();
+    std::set<unsigned> neighbouring_node_indices = pPottsMesh->GetVonNeumannNeighbouringNodeIndices(NodeIndex);
+    unsigned num_neighbours = neighbouring_node_indices.size();
 
-    // No strange neighbourhoods and in 2D so need 3 or 4 neighbours.
-	if (num_neighbours==4)
-	{
-		return true;
-	}
-	else if (num_neighbours==3)
-	{
-		// Quick and dirty check to see if cells are in bottom or top half of the domain
-		if (NodeIndex < 0.5*pPottsMesh->GetNumNodes())
-		{
-			return false;
-		}
-		else
-		{
-			EXCEPTION("Cells reaching the top of the Crypt need to increase length to at least double the sloughing height.");
-		}
-
-	}
-	else
-	{
-		// If here then have <2 or >4 neighbours and not possible for 2d periodic crypt
-		NEVER_REACHED;
-	}
+    // No strange neighbourhoods and in 2D so need 3 or 4 neighbours
+    if (num_neighbours == 4)
+    {
+        return true;
+    }
+    else if (num_neighbours == 3)
+    {
+        // Quick and dirty check to see if cells are in bottom or top half of the domain
+        if (NodeIndex < 0.5*pPottsMesh->GetNumNodes())
+        {
+            return false;
+        }
+        else
+        {
+            EXCEPTION("Cells reaching the top of the crypt need to increase length to at least double the sloughing height.");
+        }
+    }
+    else
+    {
+        // If here then have <2 or >4 neighbours and not possible for 2d periodic crypt
+        NEVER_REACHED;
+    }
 }
 
-bool CryptShovingCaBasedDivisionRule::IsRoomToDivide(
-	CellPtr pParentCell,
-    CaBasedCellPopulation<2>& rCellPopulation)
+bool CryptShovingCaBasedDivisionRule::IsRoomToDivide(CellPtr pParentCell, CaBasedCellPopulation<2>& rCellPopulation)
 {
-	return true;
+    return true;
 }
 
-unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(
-	CellPtr pNewCell,
-	CellPtr pParentCell,
+unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNewCell,
+    CellPtr pParentCell,
     CaBasedCellPopulation<2>& rCellPopulation)
 {
-	// Get node index corresponding to the parent cell
-	unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
+    // Get node index corresponding to the parent cell
+    unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
-	PottsMesh<2>* static_cast_mesh = static_cast<PottsMesh<2>*>(&(rCellPopulation.rGetMesh()));
+    PottsMesh<2>* static_cast_mesh = static_cast<PottsMesh<2>*>(&(rCellPopulation.rGetMesh()));
 
-	// this tracks if the cell is on the base of the crypt, and offsets the neighbours accordingly
-	bool is_not_on_base = IsNodeOnBase(parent_node_index,static_cast_mesh);
+    // This tracks if the cell is on the base of the crypt, and offsets the neighbours accordingly
+    bool is_not_on_base = IsNodeOnBase(parent_node_index,static_cast_mesh);
 
-	/* Select Neighbour at random
-	 * Sample random number to specify which move to make either 1 (E) 2 (W) or 3 (N)
-	 * This is as they are ordered in node index and that moves from south west to north east.
-	 */
-	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-	unsigned direction = p_gen->randMod(3)+ (unsigned) is_not_on_base;
+    /*
+     * Select a neighbour at random.
+     * Sample random number to specify which move to make either 1 (E) 2 (W) or 3 (N)
+     * This is as they are ordered in node index and that moves from south west to north east.
+     */
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+    unsigned direction = p_gen->randMod(3)+ (unsigned) is_not_on_base;
 
-	std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
+    std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
 
-	std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-	for (unsigned  i=0; i<direction; i++)
-	{
-		++neighbour_iter;
-	}
-	assert(neighbour_iter != neighbouring_node_indices.end());
+    std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+    for (unsigned  i=0; i<direction; i++)
+    {
+        ++neighbour_iter;
+    }
+    assert(neighbour_iter != neighbouring_node_indices.end());
 
-	unsigned daughter_node_index = *neighbour_iter;
+    unsigned daughter_node_index = *neighbour_iter;
 
-	assert(daughter_node_index < static_cast_mesh->GetNumNodes());
+    assert(daughter_node_index < static_cast_mesh->GetNumNodes());
 
-	//If daughter node is occupied then move the cell north (which is always the last one in the set of neighbours)
+    // If daughter node is occupied then move the cell north (which is always the last one in the set of neighbours)
+    if (!(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell)))
+    {
+        std::list<std::pair<unsigned,unsigned> > cell_moves;
 
-	if (!(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell)))
-	{
-		std::list<std::pair<unsigned,unsigned> > cell_moves;
+        bool is_neighbour_occupied = true;
 
-		bool is_neighbour_occupied = true;
+        unsigned current_node_index = parent_node_index;
+        unsigned target_node_index = daughter_node_index;
+        while (is_neighbour_occupied)
+        {
+            current_node_index = target_node_index;
 
-		unsigned current_node_index = parent_node_index;
-		unsigned target_node_index = daughter_node_index;
-		while (is_neighbour_occupied)
-		{
-			current_node_index = target_node_index;
+            std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(current_node_index);
+            unsigned num_neighbours = neighbouring_node_indices.size();
 
-			std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(current_node_index);
-			unsigned num_neighbours = neighbouring_node_indices.size();
+            // Check to see if the current node is on the boundary
+            bool is_not_on_base = IsNodeOnBase(current_node_index, static_cast_mesh);
+            assert(is_not_on_base || !is_not_on_base);
 
-			// Check to see if the current node is on the boundary.
-			bool is_not_on_base = IsNodeOnBase(current_node_index,static_cast_mesh);
-			assert(is_not_on_base|| !is_not_on_base);
+            // Select the appropriate neighbour
+            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            for (unsigned i=0; i<num_neighbours-1; i++)
+            {
+                ++neighbour_iter;
+            }
+            assert(neighbour_iter != neighbouring_node_indices.end());
 
+            target_node_index = *neighbour_iter;
 
-			// Select the appropriate neighbour
-			std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-			for (unsigned i=0; i<num_neighbours-1; i++)
-			{
-				++neighbour_iter;
-			}
-			assert(neighbour_iter != neighbouring_node_indices.end());
+            std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
 
-			target_node_index = *neighbour_iter;
+            cell_moves.push_back(new_move);
 
-			std::pair<unsigned, unsigned> new_move(current_node_index, target_node_index);
+            // If target node is unoccupied move the cell on the current node to the target node and stop shoving cells
+            if (rCellPopulation.IsSiteAvailable(target_node_index, pNewCell))
+            {
+                is_neighbour_occupied = false;
+            }
 
-			cell_moves.push_back(new_move);
+            // If target node is occupied then keep shoving the cells out of the way
+            current_node_index = target_node_index;
+        }
 
-			// If target node is unoccupied move the cell on the current node to the target node and stop shoving cells
-			if (rCellPopulation.IsSiteAvailable(target_node_index, pNewCell))
-			{
-				is_neighbour_occupied = false;
-			}
+        // Do moves to free up the daughter node index
+        for (std::list<std::pair<unsigned, unsigned> >::reverse_iterator reverse_iter = cell_moves.rbegin();
+             reverse_iter != cell_moves.rend();
+             ++reverse_iter)
+        {
+            assert(rCellPopulation.IsSiteAvailable(reverse_iter->second, pNewCell));
+            assert(!(rCellPopulation.IsSiteAvailable(reverse_iter->first, pNewCell)));
 
-			// If target node is occupied then keep shoving the cells out of the way
-			current_node_index = target_node_index;
+            // Move cell from first() to second()
+            rCellPopulation.MoveCellInLocationMap(rCellPopulation.GetCellUsingLocationIndex(reverse_iter->first), reverse_iter->first, reverse_iter->second);
+        }
 
-		}
+        // Check daughter site is now free
+        assert(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell));
 
-		// Do Moves which will free up the daughter node index
-		for (std::list<std::pair<unsigned, unsigned> >::reverse_iterator reverse_iter=cell_moves.rbegin();
-			 reverse_iter!=cell_moves.rend();
-			 ++reverse_iter)
-		{
-			assert(rCellPopulation.IsSiteAvailable(reverse_iter->second, pNewCell));
-			assert(!(rCellPopulation.IsSiteAvailable(reverse_iter->first, pNewCell)));
-
-			// Move cell from first() to second()
-			rCellPopulation.MoveCellInLocationMap(rCellPopulation.GetCellUsingLocationIndex(reverse_iter->first), reverse_iter->first, reverse_iter->second);
-		}
-
-		// Check daughter site is now free
-		assert(rCellPopulation.IsSiteAvailable(daughter_node_index, pNewCell));
-
-	}
-	return daughter_node_index;
+    }
+    return daughter_node_index;
 }
 
 // Serialization for Boost >= 1.36
