@@ -51,57 +51,64 @@ public:
 
     void TestSimpleBalloonAcinarUnitInspiration() throw (Exception)
     {
-        double viscosity = 1.92e-8;
-        double terminal_airway_radius = 0.5; //mm
-        double terminal_airway_length = 1.0;  //mm
+        double viscosity = 1.92e-5;               //Pa s
+        double terminal_airway_radius = 0.05;   //m
+        double terminal_airway_length  = 0.02;   //m
         double terminal_airway_resistance = 8*viscosity*terminal_airway_length/SmallPow(terminal_airway_radius, 4);
 
         SimpleBalloonAcinarUnit acinus;
         acinus.SetAirwayPressure(0.0);
-        acinus.SetAirwayPressure(0.0);
-        acinus.SetPleuralPressure(-490);
-        acinus.SetPleuralPressure(-490);
+        acinus.SetPleuralPressure(0.0);
         acinus.SetFlow(0.0);
-        double start_volume = 0.5;
-        acinus.SetUndeformedVolume(start_volume);                                    //Arbitrary
+        double compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
+        acinus.SetCompliance(compliance);
         acinus.SetTerminalBronchioleResistance(terminal_airway_resistance);
-        acinus.SetCompliance(0.1/98.0665*1e6/30000);
 
         acinus.SolveAndUpdateState(0.0, 0.2);
         TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);   //With no pressure change we expect no flow
-        TS_ASSERT_DELTA(acinus.GetVolume(), 0.5, 1e-2); //With no pressure change we expect no volume change
+        TS_ASSERT_DELTA(acinus.GetVolume(), 0.0, 1e-2); //With no pressure change we expect no volume change
 
-        //Sinussoidal inspiration followed by fixed pleural pressure
-        TimeStepper time_stepper(0.0, 2.0, 0.005);
-        double flow_integral = 0.0;
-        double airway_pressure = 0.0;
+        TimeStepper time_stepper(0.0, 4.0, 0.00001);
+        acinus.SetAirwayPressure(0.0);
         double pleural_pressure = 0.0;
+
+        double ode_volume = 0.0;
+        double flow_integral = 0.0;
+
         while (!time_stepper.IsTimeAtEnd())
         {
-            if(time_stepper.GetNextTime() <= 1.0) //breath in
-            {
-                pleural_pressure = -490 - 2400*(sin((M_PI)*(time_stepper.GetNextTime() - 0.5))+1)/2.0;
-                acinus.SetPleuralPressure(pleural_pressure);
-                acinus.SetAirwayPressure(airway_pressure);
+            pleural_pressure = - 2400*(sin((M_PI)*(time_stepper.GetNextTime())));
 
-                TS_ASSERT_DELTA(start_volume + flow_integral, acinus.GetVolume(), 1e-2); //Check for conservation of volume
+            //Solve the acinar problem coupled to a single bronchiole
+            acinus.SetPleuralPressure(pleural_pressure);
 
-                acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
+            //acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
+            acinus.ComputeExceptFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
 
-                airway_pressure = acinus.GetFlow()*terminal_airway_resistance;
-                flow_integral += acinus.GetFlow()*(time_stepper.GetNextTime() - time_stepper.GetTime());
-            }
-            else //constant pleural pressure
-            {
-                acinus.SetPleuralPressure(pleural_pressure);
-                acinus.SetAirwayPressure(airway_pressure);
-                acinus.SolveAndUpdateState(time_stepper.GetTime(), time_stepper.GetNextTime());
-                airway_pressure = acinus.GetFlow()*terminal_airway_resistance;
-            }
+            double airway_pressure = acinus.GetAirwayPressure();
+            double flow = -airway_pressure/terminal_airway_resistance;
+
+            flow_integral += (time_stepper.GetNextTime() - time_stepper.GetTime())*flow;
+
+            acinus.SetFlow(flow);
+            acinus.UpdateFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
+
+            //Solve the corresponding ODE problem using backward Euler for testing
+            // dv/dt = 1/R*(V/C - (Paw - Ppl))
+            // Discretise using backward euler and rearrange to obtain the below
+            double dt = time_stepper.GetNextTimeStep();
+            ode_volume = (ode_volume + dt*pleural_pressure/terminal_airway_resistance)/(1 - dt/(terminal_airway_resistance*compliance));
+
+            TS_ASSERT_DELTA(acinus.GetVolume(), ode_volume, 1e-7);
+
             time_stepper.AdvanceOneTimeStep();
         }
-        TS_ASSERT_DELTA(flow_integral, 81.5773, 1e-3);
+
+        TS_ASSERT_DELTA(ode_volume, -compliance*pleural_pressure, 1e-7);
+        TS_ASSERT_DELTA(acinus.GetVolume(), -compliance*pleural_pressure, 1e-8);
+        TS_ASSERT_DELTA(flow_integral, -compliance*pleural_pressure, 1e-8);
     }
+
 
     void TestSwan2012AcinarUnitCalculateMethods() throw(Exception)
     {

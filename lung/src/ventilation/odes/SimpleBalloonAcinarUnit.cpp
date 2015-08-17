@@ -41,12 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 SimpleBalloonAcinarUnit::SimpleBalloonAcinarUnit() : mQ(0.0),
                                                      mDt(-1),
                                                      mPaw(0.0),
-                                                     mPawOld(0.0),
                                                      mPpl(0.0),
-                                                     mPplOld(0.0),
                                                      mRaw(0.0),
-                                                     mCa(0.1/98.0665*1e6/30000),
-                                                     mV0(1.0)
+                                                     mCa(0.0),
+                                                     mV0(0.0)
 
 {
 
@@ -66,12 +64,17 @@ void SimpleBalloonAcinarUnit::SetTimestep(double dt)
 void SimpleBalloonAcinarUnit::SolveAndUpdateState(double tStart, double tEnd)
 {
     double dt = tEnd - tStart;
-    double nu = (mPaw - mPawOld)/dt;
-    double beta = (mPpl - mPplOld)/dt;
 
-    mQ = mCa*(nu - beta) + (mQ - mCa*(nu - beta))*std::exp(-dt/(mRaw*mCa));
+    mQ = (1 - std::exp(-dt/(mRaw*mCa)))*mQ*mRaw*mCa/dt;
     mV0 += dt*mQ;
+    mPaw = mV0/mCa + mPpl;
 }
+
+void SimpleBalloonAcinarUnit::ComputeExceptFlow(double tStart, double tEnd)
+{
+    mPaw = mV0/mCa + mPpl;
+}
+
 
 void SimpleBalloonAcinarUnit::SetFlow(double flow)
 {
@@ -83,16 +86,26 @@ double SimpleBalloonAcinarUnit::GetFlow()
     return mQ;
 }
 
+void SimpleBalloonAcinarUnit::UpdateFlow(double tStart, double tEnd)
+{
+    double dt = tEnd - tStart;
+    mQ = (1 - std::exp(-dt/(mRaw*mCa)))*mQ*mRaw*mCa/dt;
+    mV0 += dt*mQ;
+}
+
 void SimpleBalloonAcinarUnit::SetAirwayPressure(double pressure)
 {
-    mPawOld = mPaw;
     mPaw = pressure;
 }
 
 void SimpleBalloonAcinarUnit::SetPleuralPressure(double pressure)
 {
-    mPplOld = mPpl;
     mPpl = pressure;
+}
+
+double SimpleBalloonAcinarUnit::GetAirwayPressure()
+{
+    return mPaw;
 }
 
 void SimpleBalloonAcinarUnit::SetTerminalBronchioleResistance(double raw)
