@@ -133,6 +133,7 @@ public:
     void TestMatrixVentilationProblemOnBranch() throw(Exception)
     {
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh", 0u);
+        problem.SetMeshInMilliMetres();
         TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-5, 1e-12);
         problem.SetViscosity(1.0);
         problem.SetOutflowPressure(100);
@@ -141,9 +142,9 @@ public:
 
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
-        TS_ASSERT_DELTA(flux[0], 92813610, 1);
-        TS_ASSERT_DELTA(flux[1], 46406805, 1);
-        TS_ASSERT_DELTA(flux[2], 46406805, 1);
+        TS_ASSERT_DELTA(flux[0], 0.092813610, 1e-8);
+        TS_ASSERT_DELTA(flux[1], 0.046406805, 1e-8);
+        TS_ASSERT_DELTA(flux[2], 0.046406805, 1e-8);
         TS_ASSERT_DELTA(pressure[0], 100.0, 1e-6); //BC
         TS_ASSERT_DELTA(pressure[1], 84.5107, 1e-4);
         TS_ASSERT_DELTA(pressure[2], 0.0, 1e-6); //BC
@@ -155,6 +156,7 @@ public:
     void TestMatrixVentilationProblemCylindrical() throw(Exception)
     {
         MatrixVentilationProblem problem("mesh/test/data/y_branch_3d_mesh");
+        problem.SetMeshInMilliMetres();
         //These values are equivalent to Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
         TS_ASSERT_DELTA(problem.GetViscosity(), 1.92e-5, 1e-12);
         problem.SetViscosity(1.0);
@@ -167,9 +169,9 @@ public:
 
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
-        TS_ASSERT_DELTA(flux[0], 19932007, 1);
-        TS_ASSERT_DELTA(flux[1], 9966003, 1);
-        TS_ASSERT_DELTA(flux[2], 9966003, 1);
+        TS_ASSERT_DELTA(flux[0], 0.019932007, 1e-8);
+        TS_ASSERT_DELTA(flux[1], 0.009966003, 1e-8);
+        TS_ASSERT_DELTA(flux[2], 0.009966003, 1e-8);
         TS_ASSERT_DELTA(pressure[0], 100.0, 1e-6); //BC
         TS_ASSERT_DELTA(pressure[1], 91.8789, 1e-4);
         TS_ASSERT_DELTA(pressure[2], 0.0, 1e-6); //BC
@@ -179,11 +181,11 @@ public:
         problem.WriteVtk("TestVentilation", "small_cylindrical");
 #endif
     }
-private:
-public:
+
     void TestThreeBifurcationsWithRadiusOnEdgeFile() throw (Exception)
     {
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        problem.SetMeshInMilliMetres();
         problem.SetRadiusOnEdge();
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(0.00148608);
@@ -201,29 +203,34 @@ public:
         TS_ASSERT_DELTA(pressure[5], 0.00148608, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 0.00148608, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 0.00148608, 1e-8); //BC
+
+        // Total flux
+        // TS_ASSERT_DELTA(flux[0], -2.8143e-5, 1e-8); // Mesh in meters
+        TS_ASSERT_DELTA(flux[0], -2.8143e-14, 1e-15); //Mesh in millimeters
     }
 
     void TestThreeBifurcationsWithRadiusOnNodeFile() throw (Exception)
     {
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowPressures(15);
+        problem.SetConstantInflowPressures(15.0);
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
+        TS_ASSERT_DELTA(pressure[1], 6.66666,   1e-4);
         TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
         TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[3],  -0.0710, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[4],  -0.0710, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[5],  -0.0710, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[6],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(pressure[4], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 15.0, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[0], -2.8407e-10 , 1e-13); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[4], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[5], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[6], -7.102e-11, 1e-13); // (Inflow flux)
     }
 
     void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
@@ -292,9 +299,11 @@ public:
          */
         EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+//        PetscOptionsSetValue("-ksp_monitor", "");
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15000); //Needed to increase the resistance in these artificial airways
         problem.SetDynamicResistance();
+//        problem.SetMeshInMilliMetres();
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
@@ -306,12 +315,12 @@ public:
         TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-8); //BC
+//        TS_ASSERT_DELTA(flux[6], -71.0176, 1e-4);
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
 
         //For coverage
-        problem.SetMeshInMilliMetres();
         problem.SetOutflowFlux(0.0);
     }
 

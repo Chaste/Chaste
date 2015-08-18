@@ -67,6 +67,7 @@ private:
      *  rho (for dry air) ~ 1.2041 kg/m^3 = 1.2e-9 kg/mm^3
      *
      *  Swan has a typo in the paper, actual value is 1.15e-6 g/mm^3 not 1.51e-6 g/mm^3!
+     *  Default to Swan (page 224)
      *  rho = 1.15    kg/m^3 <-- USED HERE
      *      = 1.15e-6 g/mm^3
      *      = 1.15e-9 kg/mm^3
@@ -170,7 +171,7 @@ public:
      * time unless overwritten.
      *
      * @param rNode The node to set the boundary condition for
-     * @param flux The flux boundary condition in (mm^3)/s
+     * @param flux The flux boundary condition in (m^3)/s
      */
     void SetFluxAtBoundaryNode(const Node<3>& rNode, double flux);
 

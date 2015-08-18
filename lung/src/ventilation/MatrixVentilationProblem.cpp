@@ -56,18 +56,18 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
     mpLinearSystem = new LinearSystem(mSolution, 5u);
     mpLinearSystem->SetAbsoluteTolerance(1e-5);
 
-    #ifdef LUNG_USE_UMFPACK
-    #define COVERAGE_IGNORE
-        mpLinearSystem->SetPcType("lu");
-        PetscOptionsSetValue("-pc_factor_mat_solver_package", "umfpack");
-        mpLinearSystem->SetKspType("gmres");
-    #undef COVERAGE_IGNORE
-    #else
-        mpLinearSystem->SetPcType("jacobi");
-        PetscOptionsSetValue("-ksp_diagonal_scale","");
-        PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
-        mpLinearSystem->SetKspType("fgmres");
-    #endif
+#ifdef LUNG_USE_UMFPACK
+#define COVERAGE_IGNORE
+    mpLinearSystem->SetPcType("lu");
+    PetscOptionsSetValue("-pc_factor_mat_solver_package", "umfpack");
+    mpLinearSystem->SetKspType("gmres");
+#undef COVERAGE_IGNORE
+#else
+    mpLinearSystem->SetPcType("jacobi");
+    PetscOptionsSetValue("-ksp_diagonal_scale","");
+    PetscOptionsSetValue("-ksp_diagonal_scale_fix","");
+    mpLinearSystem->SetKspType("fgmres");
+#endif
 
     /*
      * Set up the Acinar units at the terminals
@@ -137,6 +137,17 @@ MatrixVentilationProblem::~MatrixVentilationProblem()
 void MatrixVentilationProblem::SetMeshInMilliMetres()
 {
     mLengthScaling = 1e-3;
+
+
+#ifdef LUNG_USE_UMFPACK
+// Use default absolute tolerance...
+#else
+    /* This is extreme.  In SI units, the flux is measured in m^3 (rather small amounts) but the
+     * pressure is measured in Pascal.  These differ by orders of magnitude at the top of the tree and
+     * even more at the bottom of the tree where resistance is greater
+     */
+    mpLinearSystem->SetRelativeTolerance(1e-13);
+#endif
 }
 
 
