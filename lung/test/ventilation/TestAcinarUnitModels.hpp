@@ -60,6 +60,7 @@ public:
         acinus.SetAirwayPressure(0.0);
         acinus.SetPleuralPressure(0.0);
         acinus.SetFlow(0.0);
+        acinus.SetUndeformedVolume(0.0);
         double compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
         acinus.SetCompliance(compliance);
         acinus.SetTerminalBronchioleResistance(terminal_airway_resistance);
