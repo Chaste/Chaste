@@ -452,6 +452,10 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
     // Reserve memory for nodes
     mElements.reserve(rIBMeshReader.GetNumElements());
 
+    // Initially ensure there is no boundary element - this will be updated in the next loop if there is
+    this->mMembraneIndex = UINT_MAX;
+    this->mMeshHasMembrane = false;
+
     // Add elements
     for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
     {
@@ -470,6 +474,12 @@ void ImmersedBoundaryMesh<2,2>::ConstructFromMeshReader(AbstractMeshReader<2,2>&
         // Use nodes and index to construct this element
         ImmersedBoundaryElement<2,2>* p_element = new ImmersedBoundaryElement<2,2>(elem_index, nodes);
         mElements.push_back(p_element);
+
+        if (element_data.MembraneElement)
+        {
+            this->mMeshHasMembrane = true;
+            this->mMembraneIndex = elem_index;
+        }
 
         if (rIBMeshReader.GetNumElementAttributes() > 0)
         {

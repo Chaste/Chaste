@@ -139,6 +139,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
     elem_data.SpringConstant = (*(mpIters->pElemIter))->GetMembraneSpringConstant();
     elem_data.RestLength = (*(mpIters->pElemIter))->GetMembraneRestLength();
+    elem_data.MembraneElement = bool( (*(mpIters->pElemIter))->GetIndex() == mMembraneIndex );
 
     ++(*(mpIters->pElemIter));
 
@@ -366,6 +367,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(Imm
 
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
+    this->mMembraneIndex = mpMesh->GetMembraneIndex();
 
     typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
@@ -445,6 +447,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
             *p_element_file << "\t" << elem_data.SpringConstant;
 
             *p_element_file << "\t" << elem_data.RestLength;
+
+            *p_element_file << "\t" << elem_data.MembraneElement;
 
             // New line
             *p_element_file << "\n";

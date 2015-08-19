@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "AbstractImmersedBoundaryForce.hpp"
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractCellBasedSimulationModifier.hpp"
@@ -126,6 +127,9 @@ private:
 
     /** Imaginary unit */
     std::complex<double> mI;
+
+    /** A list of force laws to determine the force applied to each node */
+    std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > > mForceCollection;
 
     /**
      * Helper method to calculate elastic forces, propagate these to the fluid grid
@@ -327,6 +331,13 @@ public:
      * @return the current number of time steps after which cell neighbours are re-calculated
      */
     unsigned GetCellNeighbourUpdateFrequency();
+
+    /**
+     * Add an immersed boundary force to be used in this modifier.
+     *
+     * @param pForce pointer to a force law
+     */
+    void AddImmersedBoundaryForce(boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce);
 
 };
 

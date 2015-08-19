@@ -155,7 +155,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryElementData()
 {
     // Create data structure for this element
-	ImmersedBoundaryElementData element_data;
+    ImmersedBoundaryElementData element_data;
 
     std::string buffer;
     GetNextLineFromStream(mElementsFile, buffer);
@@ -195,6 +195,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
 
     buffer_stream >> element_data.SpringConstant;
     buffer_stream >> element_data.RestLength;
+    buffer_stream >> element_data.MembraneElement;
 
     mElementsRead++;
     return element_data;

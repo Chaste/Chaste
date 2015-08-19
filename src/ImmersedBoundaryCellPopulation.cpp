@@ -41,20 +41,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "IsNan.hpp"
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 
-// Cell writers
-#include "CellAgesWriter.hpp"
-#include "CellAncestorWriter.hpp"
-#include "CellProliferativePhasesWriter.hpp"
-#include "CellProliferativeTypesWriter.hpp"
-#include "CellVolumesWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
 #include "CellPopulationElementWriter.hpp"
 
 #include "RandomNumberGenerator.hpp"
 
-#include "Debug.hpp"
 
 template<unsigned DIM>
 ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh,

@@ -49,10 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 struct ImmersedBoundaryElementData
 {
-	std::vector<unsigned> NodeIndices; /**< Vector of Node indices owned by the element. */
-	unsigned AttributeValue; /**< Attribute value associated with the element. */
-	double SpringConstant; /**< Spring constant associated with the element. */
-	double RestLength; /**< Spring rest length associated with the element. */
+    std::vector<unsigned> NodeIndices; /**< Vector of Node indices owned by the element. */
+    unsigned AttributeValue; /**< Attribute value associated with the element. */
+    double SpringConstant; /**< Spring constant associated with the element. */
+    double RestLength; /**< Spring rest length associated with the element. */
+    bool MembraneElement; /**< Whether element is the basement membrane. */
 };
 
 /**
@@ -63,165 +64,165 @@ class ImmersedBoundaryMeshReader : public AbstractMeshReader<ELEMENT_DIM, SPACE_
 {
 private:
 
-	/** The base name for mesh files. */
-	std::string mFilesBaseName;
+    /** The base name for mesh files. */
+    std::string mFilesBaseName;
 
-	/** The nodes file for the mesh. */
-	std::ifstream mNodesFile;
+    /** The nodes file for the mesh. */
+    std::ifstream mNodesFile;
 
-	/** The elements file for the mesh. */
-	std::ifstream mElementsFile;
+    /** The elements file for the mesh. */
+    std::ifstream mElementsFile;
 
-	/** The grid file for the mesh. */
-	std::ifstream mGridFile;
+    /** The grid file for the mesh. */
+    std::ifstream mGridFile;
 
-	/** True if input data are numbered from zero, false otherwise. */
-	bool mIndexFromZero;
+    /** True if input data are numbered from zero, false otherwise. */
+    bool mIndexFromZero;
 
-	/** Number of nodes in the mesh. */
-	unsigned mNumNodes;
+    /** Number of nodes in the mesh. */
+    unsigned mNumNodes;
 
-	/** Number of elements in the mesh. */
-	unsigned mNumElements;
+    /** Number of elements in the mesh. */
+    unsigned mNumElements;
 
-	/** Number of nodes read in by the reader. */
-	unsigned mNodesRead;
+    /** Number of nodes read in by the reader. */
+    unsigned mNodesRead;
 
-	/** Number of elements read in by the reader. */
-	unsigned mElementsRead;
+    /** Number of elements read in by the reader. */
+    unsigned mElementsRead;
 
-	/** Is the number of attributes stored at each node. */
-	unsigned mNumNodeAttributes;
+    /** Is the number of attributes stored at each node. */
+    unsigned mNumNodeAttributes;
 
-	/** Is the number of attributes stored for each element. */
-	unsigned mNumElementAttributes;
+    /** Is the number of attributes stored for each element. */
+    unsigned mNumElementAttributes;
 
-	/** Is the number of grid points in the x direction. */
-	unsigned mNumGridPtsX;
+    /** Is the number of grid points in the x direction. */
+    unsigned mNumGridPtsX;
 
-	/** Is the number of grid points in the y direction. */
-	unsigned mNumGridPtsY;
+    /** Is the number of grid points in the y direction. */
+    unsigned mNumGridPtsY;
 
-	/** The characteristic node spacing. */
-	double mCharacteristicNodeSpacing;
+    /** The characteristic node spacing. */
+    double mCharacteristicNodeSpacing;
 
-	/**
-	 * Open node and element files.
-	 */
-	void OpenFiles();
+    /**
+     * Open node and element files.
+     */
+    void OpenFiles();
 
-	/**
-	 * Open node file.
-	 */
-	void OpenNodeFile();
+    /**
+     * Open node file.
+     */
+    void OpenNodeFile();
 
-	/**
-	 * Open element file.
-	 */
-	void OpenElementsFile();
+    /**
+     * Open element file.
+     */
+    void OpenElementsFile();
 
-	/**
-	 * Open element file.
-	 */
-	void OpenGridFile();
+    /**
+     * Open element file.
+     */
+    void OpenGridFile();
 
-	/**
-	 * Read the file headers to determine node and element numbers and attributes.
-	 */
-	void ReadHeaders();
+    /**
+     * Read the file headers to determine node and element numbers and attributes.
+     */
+    void ReadHeaders();
 
-	/**
-	 * Close node and element files.
-	 */
-	void CloseFiles();
+    /**
+     * Close node and element files.
+     */
+    void CloseFiles();
 
-	/**
-	 * Get the next line from a given file stream.
-	 *
-	 * @param fileStream the file stream
-	 * @param rawLine the raw line (may contain comments)
-	 */
-	void GetNextLineFromStream(std::ifstream& fileStream, std::string& rawLine);
+    /**
+     * Get the next line from a given file stream.
+     *
+     * @param fileStream the file stream
+     * @param rawLine the raw line (may contain comments)
+     */
+    void GetNextLineFromStream(std::ifstream& fileStream, std::string& rawLine);
 
 public:
 
-	/**
-	 * Constructor.
-	 *
-	 * @param pathBaseName the base name for results files
-	 */
-	ImmersedBoundaryMeshReader(std::string pathBaseName);
+    /**
+     * Constructor.
+     *
+     * @param pathBaseName the base name for results files
+     */
+    ImmersedBoundaryMeshReader(std::string pathBaseName);
 
-	/**
-	 * Destructor.
-	 */
-	~ImmersedBoundaryMeshReader()
-	{}
+    /**
+     * Destructor.
+     */
+    ~ImmersedBoundaryMeshReader()
+    {}
 
-	/**
-	 * @return the number of elements in the mesh.
-	 */
-	unsigned GetNumElements() const;
+    /**
+     * @return the number of elements in the mesh.
+     */
+    unsigned GetNumElements() const;
 
-	/**
-	 * @return the number of nodes in the mesh.
-	 */
-	unsigned GetNumNodes() const;
+    /**
+     * @return the number of nodes in the mesh.
+     */
+    unsigned GetNumNodes() const;
 
-	/**
-	 * @return the number of grid points in the x direction
-	 */
-	unsigned GetNumGridPtsX() const;
+    /**
+     * @return the number of grid points in the x direction
+     */
+    unsigned GetNumGridPtsX() const;
 
-	/**
-	 * @return the number of grid points in the y direction
-	 */
-	unsigned GetNumGridPtsY() const;
+    /**
+     * @return the number of grid points in the y direction
+     */
+    unsigned GetNumGridPtsY() const;
 
-	/**
-	 * @return the number of attributes in the mesh
-	 */
-	unsigned GetNumElementAttributes() const;
+    /**
+     * @return the number of attributes in the mesh
+     */
+    unsigned GetNumElementAttributes() const;
 
-	/**
-	 * @return the characteristic node spacing in the mesh
-	 */
-	double GetCharacteristicNodeSpacing();
+    /**
+     * @return the characteristic node spacing in the mesh
+     */
+    double GetCharacteristicNodeSpacing();
 
-	/**
-	 * Reset pointers to beginning.
-	 */
-	void Reset();
+    /**
+     * Reset pointers to beginning.
+     */
+    void Reset();
 
-	/**
-	 * @return the coordinates of each node in turn.
-	 */
-	std::vector<double> GetNextNode();
+    /**
+     * @return the coordinates of each node in turn.
+     */
+    std::vector<double> GetNextNode();
 
-	/**
-	 * @return the next row of the fluid velocity grids.
-	 */
-	std::vector<double> GetNextGridRow();
+    /**
+     * @return the next row of the fluid velocity grids.
+     */
+    std::vector<double> GetNextGridRow();
 
-	/**
-	 * @return the nodes of each element (and any attribute information, if there is any) in turn.
-	 */
-	ImmersedBoundaryElementData GetNextImmersedBoundaryElementData();
+    /**
+     * @return the nodes of each element (and any attribute information, if there is any) in turn.
+     */
+    ImmersedBoundaryElementData GetNextImmersedBoundaryElementData();
 
-	/**
-	 * @return the number of faces in the mesh (synonym of GetNumEdges()).
-	 */
-	unsigned GetNumFaces() const;
+    /**
+     * @return the number of faces in the mesh (synonym of GetNumEdges()).
+     */
+    unsigned GetNumFaces() const;
 
-	/**
-	 * @return the nodes of each element (and any attribute information, if there is any) in turn.
-	 */
-	ElementData GetNextElementData();
+    /**
+     * @return the nodes of each element (and any attribute information, if there is any) in turn.
+     */
+    ElementData GetNextElementData();
 
-	/**
-	 * @return a vector of the nodes of each face in turn.
-	 */
-	ElementData GetNextFaceData();
+    /**
+     * @return a vector of the nodes of each face in turn.
+     */
+    ElementData GetNextFaceData();
 
 };
 

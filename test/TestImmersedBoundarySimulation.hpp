@@ -57,6 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "SuperellipseGenerator.hpp"
 
+// Immersed boundary forces
+#include "ImmersedBoundaryElasticityForce.hpp"
+
 #include "Debug.hpp"
 
 // This test is never run in parallel
@@ -66,7 +69,7 @@ class TestImmersedBoundarySimulation : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestImmersedBoundaryMeshArchiving() throw(Exception)
+    void xTestImmersedBoundaryMeshArchiving() throw(Exception)
     {
         // Create a vector of nodes forming a rectangle in (0,1)x(0,1)
         std::vector<Node<2>*> nodes;
@@ -107,7 +110,7 @@ public:
         mesh_writer.WriteFilesUsingMesh(*p_mesh);
     }
 
-    void TestImmersedBoundaryMeshReading() throw(Exception)
+    void xTestImmersedBoundaryMeshReading() throw(Exception)
     {
         // Load immersed boundary mesh
         ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_mesh_one_square_element");
@@ -120,7 +123,7 @@ public:
         TS_ASSERT_DELTA(mesh.rGetFluidVelocityGridX()[5][3], 12.0, 1e-6);
     }
 
-    void TestRetrieveElementProperties() throw(Exception)
+    void xTestRetrieveElementProperties() throw(Exception)
     {
         // Load immersed boundary mesh
         ImmersedBoundaryMeshReader<2,2> mesh_reader("projects/ImmersedBoundary/test/mesh/ib_mesh_one_square_element");
@@ -145,7 +148,7 @@ public:
         TS_ASSERT_EQUALS(spring_constant, 3.5);
     }
 
-    void TestSuperellipseGenerator() throw(Exception)
+    void xTestSuperellipseGenerator() throw(Exception)
     {
         SuperellipseGenerator* p_gen = new SuperellipseGenerator(100, 0.2, 0.2, 0.6, 0.2, 0.2);
         std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
@@ -181,6 +184,9 @@ public:
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
+//        MAKE_PTR(ImmersedBoundaryElasticityForce<2>, p_elas_force);
+//        p_main_modifier->AddImmersedBoundaryForce(p_elas_force);
+
         // Set simulation properties
         simulator.SetOutputDirectory("IB/TestSuperellipseGenerator");
         simulator.SetDt(0.01);
@@ -191,7 +197,7 @@ public:
         simulator.Solve();
     }
 
-    void TestPalisadeGenerator() throw(Exception)
+    void xTestPalisadeGenerator() throw(Exception)
     {
         unsigned num_cells_wide    = 5;
         unsigned nodes_per_cell    = 100;
@@ -243,10 +249,11 @@ public:
 
         // Construct the immersed boundary mesh from the mesh reader
         ImmersedBoundaryMesh<2,2> mesh;
+
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        mesh.SetNumGridPtsX(32);
-        mesh.SetNumGridPtsY(32);
+        mesh.SetNumGridPtsX(64);
+        mesh.SetNumGridPtsY(64);
 
         ImmersedBoundaryElement<2,2>* p_elem = mesh.GetElement(0u);
         p_elem->SetMembraneRestLength(0.005);
@@ -257,6 +264,8 @@ public:
         CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
 
+        PRINT_VARIABLE(cells.size());
+
         ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
         OffLatticeSimulation<2> simulator(cell_population);
@@ -264,6 +273,9 @@ public:
         // Add main immersed boundary simulation modifier
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
+
+        MAKE_PTR(ImmersedBoundaryElasticityForce<2>, p_elas_force);
+        p_main_modifier->AddImmersedBoundaryForce(p_elas_force);
 
         // Set simulation properties
         simulator.SetOutputDirectory("IB/TestImmersedBoundary");

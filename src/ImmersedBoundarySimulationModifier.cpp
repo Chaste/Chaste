@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
+#include "Exception.hpp"
 #include <complex>
 #include <fftw3.h>
 #include "Debug.hpp"
@@ -106,8 +107,13 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateFluidVelocityGrids(AbstractC
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    mpMesh = dynamic_cast<ImmersedBoundaryMesh<DIM, DIM> *>(&(rCellPopulation.rGetMesh()));
-    mpCellPopulation = dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation);
+    if (dynamic_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation) == NULL)
+    {
+        EXCEPTION("Cell population must be Immersed Boundary");
+    }
+
+    mpCellPopulation = static_cast<ImmersedBoundaryCellPopulation<DIM> *>(&rCellPopulation);
+    mpMesh = &(mpCellPopulation->rGetMesh());
 
     // Get the size of the mesh
     mNumGridPtsX = mpMesh->GetNumGridPtsX();
@@ -233,6 +239,7 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateCellNeighbours()
             mCellNeighbours[p_cell].erase(mCellNeighbours[p_cell].find(location_index));
         }
     }
+    MARK;
 }
 
 template<unsigned DIM>
@@ -385,6 +392,14 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCellCellInteractionElasti
                 }
             }
         }
+    }
+
+    // Now add force contributions from each AbstractForce
+    for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
+            iter != mForceCollection.end();
+            ++iter)
+    {
+        (*iter)->AddForceContribution(*(this->mpCellPopulation));
     }
 }
 
@@ -744,6 +759,12 @@ template<unsigned DIM>
 unsigned ImmersedBoundarySimulationModifier<DIM>::GetCellNeighbourUpdateFrequency()
 {
     return mCellNeighbourUpdateFrequency;
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForce(boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce)
+{
+    mForceCollection.push_back(pForce);
 }
 
 
