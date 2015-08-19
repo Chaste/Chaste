@@ -10,5 +10,6 @@ airway_generation/TestAirwayRemesher.hpp
 airway_generation/TestMajorAirwaysCentreLinesCleaner.hpp
 airway_generation/TestMultiLobeAirwayGenerator.hpp
 ventilation/TestAcinarUnitModels.hpp
+ventilation/TestDynamicVentilation.hpp
 ventilation/TestMatrixVentilationProblem.hpp
 ventilation/TestVentilationProblem.hpp
