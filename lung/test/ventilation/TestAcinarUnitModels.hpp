@@ -54,7 +54,7 @@ public:
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.05;   //m
         double terminal_airway_length  = 0.02;   //m
-        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/SmallPow(terminal_airway_radius, 4);
+        double terminal_airway_resistance = 8*viscosity*terminal_airway_length/(M_PI*SmallPow(terminal_airway_radius, 4));
 
         SimpleBalloonAcinarUnit acinus;
         acinus.SetAirwayPressure(0.0);
@@ -69,7 +69,7 @@ public:
         TS_ASSERT_DELTA(acinus.GetFlow(), 0.0, 1e-6);   //With no pressure change we expect no flow
         TS_ASSERT_DELTA(acinus.GetVolume(), 0.0, 1e-2); //With no pressure change we expect no volume change
 
-        TimeStepper time_stepper(0.0, 4.0, 0.00001);
+        TimeStepper time_stepper(0.0, 1.0, 0.0001);
         acinus.SetAirwayPressure(0.0);
         double pleural_pressure = 0.0;
 
@@ -95,17 +95,17 @@ public:
             acinus.UpdateFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
 
             //Solve the corresponding ODE problem using backward Euler for testing
-            // dv/dt = 1/R*(V/C - (Paw - Ppl))
+            // dv/dt = -1/R*(V/C - (Paw - Ppl))
             // Discretise using backward euler and rearrange to obtain the below
             double dt = time_stepper.GetNextTimeStep();
-            ode_volume = (ode_volume + dt*pleural_pressure/terminal_airway_resistance)/(1 - dt/(terminal_airway_resistance*compliance));
+            ode_volume = (ode_volume - dt*pleural_pressure/terminal_airway_resistance)/(1 + dt/(terminal_airway_resistance*compliance));
 
-            TS_ASSERT_DELTA(acinus.GetVolume(), ode_volume, 1e-7);
+            TS_ASSERT_DELTA(acinus.GetVolume(), ode_volume, 1e-8);
 
             time_stepper.AdvanceOneTimeStep();
         }
 
-        TS_ASSERT_DELTA(ode_volume, -compliance*pleural_pressure, 1e-7);
+        TS_ASSERT_DELTA(ode_volume, -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(acinus.GetVolume(), -compliance*pleural_pressure, 1e-8);
         TS_ASSERT_DELTA(flow_integral, -compliance*pleural_pressure, 1e-8);
     }
