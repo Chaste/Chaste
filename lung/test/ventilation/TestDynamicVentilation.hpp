@@ -155,9 +155,115 @@ public:
             time_stepper.AdvanceOneTimeStep();
         }
 #else
-        std::cout << "Warning: this test require UMFPACK to execute correctly. " << std::endl;
+        std::cout << "Warning: this test requires UMFPACK to execute correctly. " << std::endl;
 #endif
     }
+
+    void TestColemanDynamicVentilationThreeBifurcations() throw(Exception)
+        {
+#ifdef LUNG_USE_UMFPACK ///\todo This should really be runnable without UMFPACK, remove this if matrix solver is improved.
+        FileFinder mesh_finder("continuum_mechanics/test/data/three_bifurcations", RelativeTo::ChasteSourceRoot);
+        MatrixVentilationProblem problem(mesh_finder.GetAbsolutePath(), 0u);
+        TetrahedralMesh<1,3>& r_mesh = problem.rGetMesh();
+
+        //Initial conditions
+        problem.SetOutflowPressure(0.0);
+        problem.SetConstantInflowPressures(0.0);
+        problem.SetMeshInMilliMetres();
+
+        //The three bifurcation mesh defines a fully symmetric three bifurcation airway tree.
+        //The composite ventilation problem is then equivalent to a trumpet problem connected
+        //to an acinus with compliance equal to the total compliance of all the acini.
+        double total_compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung to four acinar compartments
+        double acinar_compliance = total_compliance/4.0;
+
+        double viscosity = 1.92e-5;               //Pa s
+        double terminal_airway_radius = 0.00005;   //m
+        double resistance_per_unit_length = 8*viscosity/(M_PI*SmallPow(terminal_airway_radius, 4));
+        //All airways in the mesh have radius 0.05 mm. The first branch is 3mm long, the others are 5mm.
+        double total_airway_resistance = (0.003 + 0.005/2 + 0.005/4)*resistance_per_unit_length;
+
+        std::vector<double> pressures(r_mesh.GetNumNodes(), -1);
+        std::vector<double> fluxes(r_mesh.GetNumNodes() - 1, -1);
+
+        double ode_volume;
+
+        VtkMeshWriter<1, 3> vtk_writer("TestDynamicVentilation", "single_branch", false);
+
+        //For create an acinar balloon for the terminal node
+        std::map<unsigned, SimpleBalloonAcinarUnit*> acinar_map;
+        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = r_mesh.GetBoundaryNodeIteratorBegin();
+                             iter != r_mesh.GetBoundaryNodeIteratorEnd();
+                             ++iter )
+        {
+            if ((*iter)->GetIndex() != 0u)
+            {
+                acinar_map[(*iter)->GetIndex()] = new SimpleBalloonAcinarUnit;
+                acinar_map[(*iter)->GetIndex()]->SetCompliance(acinar_compliance);
+            }
+        }
+
+        //Setup a simulation iterating between the flow solver and the acinar balloon.
+        TimeStepper time_stepper(0.0, 1.0, 0.001);
+
+        double pleural_pressure = 0.0;
+
+        while (!time_stepper.IsTimeAtEnd())
+        {
+            pleural_pressure =  -2400*(sin((M_PI)*(time_stepper.GetNextTime())));
+
+            //Solve corresponding backward Euler problem for testing
+            double dt = time_stepper.GetNextTimeStep();
+            ode_volume = (ode_volume - dt*pleural_pressure/total_airway_resistance)/(1 + dt/(total_airway_resistance*acinar_compliance));
+
+
+            //Solve coupled problem
+            for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = r_mesh.GetBoundaryNodeIteratorBegin();
+                     iter != r_mesh.GetBoundaryNodeIteratorEnd();
+                     ++iter )
+            {
+                if ((*iter)->GetIndex() != 0u)
+                {
+                    acinar_map[(*iter)->GetIndex()]->SetPleuralPressure(pleural_pressure);
+                    acinar_map[(*iter)->GetIndex()]->ComputeExceptFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
+
+                    problem.SetPressureAtBoundaryNode(*(*iter), acinar_map[(*iter)->GetIndex()]->GetAirwayPressure());
+                }
+            }
+
+            problem.Solve();
+            problem.GetSolutionAsFluxesAndPressures(fluxes, pressures);
+
+            for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = r_mesh.GetBoundaryNodeIteratorBegin();
+                                iter != r_mesh.GetBoundaryNodeIteratorEnd();
+                                ++iter )
+            {
+                if ((*iter)->GetIndex() != 0u)
+                {
+                    unsigned boundary_element_index = (*(*iter)->rGetContainingElementIndices().begin());
+
+                    acinar_map[(*iter)->GetIndex()]->SetFlow(fluxes[boundary_element_index]);
+
+                    double resistance = 0.0;
+                    if(fluxes[(*iter)->GetIndex()] != 0.0)
+                    {
+                        resistance = std::fabs(pressures[(*iter)->GetIndex()]/fluxes[boundary_element_index]);
+                    }
+                    acinar_map[(*iter)->GetIndex()]->SetTerminalBronchioleResistance(resistance);
+                    acinar_map[(*iter)->GetIndex()]->UpdateFlow(time_stepper.GetTime(), time_stepper.GetNextTime());
+                }
+            }
+
+            double total_acinar_volume = acinar_map[4]->GetVolume() + acinar_map[5]->GetVolume() + acinar_map[6]->GetVolume() + acinar_map[7]->GetVolume();
+            TS_ASSERT_DELTA(ode_volume, total_acinar_volume, 1e-12);
+
+            time_stepper.AdvanceOneTimeStep();
+        }
+#else
+        std::cout << "Warning: this test requires UMFPACK to execute correctly. " << std::endl;
+#endif
+        }
+
 };
 
 
