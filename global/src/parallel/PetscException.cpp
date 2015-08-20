@@ -39,7 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "Warnings.hpp"
 
-
 /*
  * Positive codes mean that there's an error.
  * Zero means success.
@@ -64,6 +63,7 @@ void PetscException(PetscInt petscError,
         {
             p_text=default_message;
         }
+
         EXCEPTION(p_text << " in function '" << funct  << "' on line "
                   << line << " of file " << file);
     }
@@ -137,16 +137,10 @@ void KspException(PetscInt kspError,
 {
     if (kspError < 0)
     {
-        std::string err_string = GetKspErrorMessage(kspError);
-
-        err_string += " in function '";
-        err_string += funct;
-        err_string += "' on line ";
-        err_string += line;
-        err_string += " of file ";
-        err_string += file;
-
-        EXCEPTION(err_string);
+        std::stringstream err_string_stream;
+        err_string_stream << GetKspErrorMessage(kspError) << " in function '" << funct << "' on line "
+                      << line << " of file " << file;
+        EXCEPTION(err_string_stream.str());
     }
 }
 
