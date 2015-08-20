@@ -165,19 +165,19 @@ list(APPEND CHASTE_LINK_LIBRARIES
 #find HDF5
 if (Chaste_USE_PETSC_HDF5)
     set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}" "${PETSC_DIR}/externalpackages")
-    find_program( HDF5_C_COMPILER_EXECUTABLE
-        NAMES h5cc h5pcc
-        PATHS ENV HDF5_ROOT
-        PATH_SUFFIXES bin Bin
-        NO_DEFAULT_PATH
-        DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
-    find_program( HDF5_CXX_COMPILER_EXECUTABLE
-        NAMES h5c++ h5pc++
-        PATHS ENV HDF5_ROOT
-        PATH_SUFFIXES bin Bin
-        NO_DEFAULT_PATH
-        DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 endif()
+find_program( HDF5_C_COMPILER_EXECUTABLE
+    NAMES h5cc h5pcc
+    PATHS ENV HDF5_ROOT
+    PATH_SUFFIXES bin Bin
+    NO_DEFAULT_PATH
+    DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags." )
+find_program( HDF5_CXX_COMPILER_EXECUTABLE
+    NAMES h5c++ h5pc++
+    PATHS ENV HDF5_ROOT
+    PATH_SUFFIXES bin Bin
+    NO_DEFAULT_PATH
+    DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 find_package(HDF5 MODULE REQUIRED)
 list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
 list(APPEND CHASTE_LINK_LIBRARIES 
