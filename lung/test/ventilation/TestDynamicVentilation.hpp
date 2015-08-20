@@ -62,6 +62,7 @@ public:
 
     void TestColemanDynamicVentilationSingleAirway() throw(Exception)
     {
+#ifdef LUNG_USE_UMFPACK ///\todo This should really be runnable without UMFPACK, remove this if matrix solver is improved.
         FileFinder mesh_finder("lung/test/data/single_branch", RelativeTo::ChasteSourceRoot);
         MatrixVentilationProblem problem(mesh_finder.GetAbsolutePath(), 0u);
         TetrahedralMesh<1,3>& r_mesh = problem.rGetMesh();
@@ -153,6 +154,9 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+#else
+        std::cout << "Warning: this test require UMFPACK to execute correctly. " << std::endl;
+#endif
     }
 };
 
