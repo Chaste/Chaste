@@ -45,9 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainer.hpp"
 #include "ConstBoundaryCondition.hpp"
 
-
 /**
- * A modifier class in which an Parabolic PDE is solved on a growing domain and the results are stored in CellData.
+ * A modifier class in which a parabolic PDE is solved on a growing domain and the results are stored in CellData.
  */
 template<unsigned DIM>
 class ParabolicGrowingDomainPdeModifier : public AbstractGrowingDomainPdeModifier<DIM>
@@ -69,11 +68,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractGrowingDomainPdeModifier<DIM> >(*this);
-
         archive & mpPdeAndBcs;
     }
 
-    /** Pointer to a linear elliptic PDE object with associated boundary conditions. */
+    /** Pointer to a linear parabolic PDE object with associated boundary conditions. */
     ///\todo #2687 Memory-management of mpPdeAndBcs is not enabled. Suggest using a shared-pointer.
     ParabolicPdeAndBoundaryConditions<DIM>* mpPdeAndBcs;
 

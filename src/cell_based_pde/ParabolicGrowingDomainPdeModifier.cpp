@@ -50,7 +50,7 @@ ParabolicGrowingDomainPdeModifier<DIM>::ParabolicGrowingDomainPdeModifier(Parabo
     : AbstractGrowingDomainPdeModifier<DIM>(),
       mpPdeAndBcs(pPdeAndBcs)
 {
-    assert(DIM==2);
+    assert(DIM == 2);
 }
 
 template<unsigned DIM>
@@ -62,7 +62,6 @@ ParabolicGrowingDomainPdeModifier<DIM>::~ParabolicGrowingDomainPdeModifier()
         PetscTools::Destroy(this->mSolution);
     }
 }
-
 
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
@@ -78,7 +77,7 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
     // Use CellBasedParabolicPdeSolver as cell wise PDE
     CellBasedParabolicPdeSolver<DIM> solver(this->mpFeMesh, mpPdeAndBcs->GetPde(), p_bcc.get());
 
-    ///\todo Investigate more than one PDE timestep per spatial step (#2687)
+    ///\todo Investigate more than one PDE time step per spatial step (#2687)
     SimulationTime* p_simulation_time = SimulationTime::Instance();
     double current_time = p_simulation_time->GetTime();
     double dt = p_simulation_time->GetTimeStep();
@@ -99,11 +98,11 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellP
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
 {
-    // Temporarily cache the variable name until we create a ParaolicPdeAndBcs object and move it to the Abstract class
+    // Temporarily cache the variable name until we create a ParaolicPdeAndBcs object and move it to the abstract class
     ///\todo this comment doesn't quite make sense (#2687)
     this->mCachedDependentVariableName = mpPdeAndBcs->rGetDependentVariableName();
 
-    // Cache the Output Directory
+    // Cache the output directory
     this->mOutputDirectory = outputDirectory;
 
     // Setup a finite element mesh on which to save the initial condition
@@ -144,7 +143,6 @@ std::auto_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainPde
 
     return p_bcc;
 }
-
 
 template<unsigned DIM>
 void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
@@ -194,15 +192,14 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
                         Node<DIM>* p_vertex_node = rCellPopulation.rGetMesh().GetNode(node_index);
 
                         // Average over data from containing elements (cells)
-                        std::set<unsigned> containing_elelments  = p_vertex_node->rGetContainingElementIndices();
+                        std::set<unsigned> containing_elelments = p_vertex_node->rGetContainingElementIndices();
 
                         solution_at_node = 0.0;
 
                         for (std::set<unsigned>::iterator index_iter = containing_elelments.begin();
-                        index_iter != containing_elelments.end();
-                        ++index_iter)
+                             index_iter != containing_elelments.end();
+                             ++index_iter)
                         {
-
                             assert(*index_iter<num_vertex_nodes);
                             CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(*index_iter);
                             solution_at_node += p_cell->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
@@ -213,7 +210,6 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
             }
             else if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(&rCellPopulation)||
             dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
-
             {
                 // Simple 1-1 correspondence between cells and nodes in the finite element mesh
                 CellPtr p_cell = rCellPopulation.GetCellUsingLocationIndex(node_index);
@@ -231,21 +227,17 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
     {
         assert(dynamic_cast<CaBasedCellPopulation<DIM>*>(&rCellPopulation) != NULL);
 
-        // 1-1 correspondance between node index (in FEM mesh) and position of the cell in the cell vector.
-        unsigned node_index=0;
+        // 1-1 correspondence between node index (in FEM mesh) and position of the cell in the cell vector.
+        unsigned node_index = 0;
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-        cell_iter != rCellPopulation.End();
-        ++cell_iter)
+             cell_iter != rCellPopulation.End();
+             ++cell_iter)
         {
             double solution_at_node = cell_iter->GetCellData()->GetItem(mpPdeAndBcs->rGetDependentVariableName());
-
             PetscVecTools::SetElement(this->mSolution,node_index,solution_at_node);
-
             node_index++;
         }
     }
-
-
 }
 
 template<unsigned DIM>
