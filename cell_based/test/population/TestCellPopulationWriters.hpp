@@ -575,6 +575,9 @@ public:
              * Thus the total length is 6*3 + 6*2 = 30 and the heterotypic boundary
              * length is 3*3 + 3*2 = 15.
              *
+             * Note the number of cell pairs is 12 and the number of heterotypic
+             * cell pairs is 6.
+             *
              * This can be verified by eyeballing the output file.
              */
 
@@ -592,6 +595,63 @@ public:
             labelled_boundary_writer.CloseFile();
 
             FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_potts").CompareFiles();
+        }
+
+        // Test with a CaBasedCellPopulation
+        {
+            // Create a simple 2D cell population
+            PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
+            PottsMesh<2>* p_mesh = generator.GetMesh();
+
+            std::vector<unsigned> location_indices;
+            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            {
+                location_indices.push_back(i);
+            }
+
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, location_indices.size());
+            CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
+            cell_population.InitialiseCells();
+
+            // Label a subset of the cells
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(4)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(5)->AddCellProperty(p_label);
+            cell_population.GetCellUsingLocationIndex(8)->AddCellProperty(p_label);
+
+            /*
+             * In this case, the group of labelled cells 0, 1, 4, 5 share 6  edges
+             * edges with unlabelled cells.
+             *
+             * Thus there are 5 edges shared between labelled and unlabelled cells.
+             *
+             * In total there are 12 shared edges in total (regardless of label).
+             * All edges have length 1.
+             *
+             * Thus the total length is 12 and the heterotypic boundary
+             * length is 5. Note the number of associated neighbour connections is the same.
+             *
+             * This can be verified by eyeballing the output file.
+             */
+
+            // Create an output directory for the writer
+            std::string output_directory = "TestHeterotypicBoundaryLengthWriterCa";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create a BoundaryNodeWriter and test that the correct output is generated
+            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            labelled_boundary_writer.OpenOutputFile(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_ca").CompareFiles();
         }
 
         // Test with a VertexBasedCellPopulation

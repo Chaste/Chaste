@@ -119,6 +119,67 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(MeshBasedCel
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
+    // Initialise helper variables
+    double heterotypic_boundary_length = 0.0;
+    double total_shared_edges_length = 0.0;
+    double num_heterotypic_pairs = 0.0;
+    double total_num_pairs = 0.0;
+
+    // Iterate over cells
+    for (typename AbstractCellPopulation<SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
+         cell_iter != pCellPopulation->End();
+         ++cell_iter)
+    {
+        // Get the location index corresponding to this cell
+        unsigned index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+
+        // Store whether this cell is labelled
+        bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
+
+
+        // Get this node's von Neumann neighbours (not Moore neighbours, since they must share an edge)
+        std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);
+
+        // Iterate over these neighbours
+        for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+             neighbour_iter != neighbour_node_indices.end();
+             ++neighbour_iter)
+        {
+            // Assume the lattice is comprised of uniform unit lattice sites
+            double edge_length = 1.0;
+
+            unsigned neighbour_index = *neighbour_iter;
+
+            if (pCellPopulation->IsCellAttachedToLocationIndex(neighbour_index))
+            {
+                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_index);
+
+                total_shared_edges_length += edge_length;
+                total_num_pairs += 1.0;
+
+                // Store whether this neighbour is labelled
+                bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
+
+                // If this cell is labelled and its neighbour is not, or vice versa...
+                if (cell_is_labelled != neighbour_is_labelled)
+                {
+                    // ... then increment the fractional boundary length
+                    heterotypic_boundary_length += edge_length;
+                    num_heterotypic_pairs += 1.0;
+                }
+            }
+        }
+    }
+
+    // We have counted each cell-cell edge twice
+    heterotypic_boundary_length *= 0.5;
+    total_shared_edges_length *= 0.5;
+
+    // We have counted each pair of neighbouring cells twice
+    num_heterotypic_pairs *= 0.5;
+    total_num_pairs *= 0.5;
+
+    *this->mpOutStream << heterotypic_boundary_length << "\t" << total_shared_edges_length << "\t" << num_heterotypic_pairs << "\t" << total_num_pairs;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -249,7 +310,6 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
                     {
                         // Edge is between two different elements
                         total_shared_edges_length += 1.0;
-                        total_num_pairs += 1.0;
 
                         // Store whether the cell corresponding to this element index is labelled
                         CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neigbour_elem_index);
@@ -260,15 +320,33 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCe
                         {
                             // ... then increment the fractional boundary length
                             heterotypic_boundary_length += 1.0;
-                            num_heterotypic_pairs += 1.0;
                         }
                     }
                 }
                 else
                 {
-                    // Original node is on boundary of mesh so edge only counted once
-                    total_shared_edges_length += 2.0;
+                    // Original node is on boundary of mesh so don't include in the edge calculation.
                 }
+            }
+        }
+
+        std::set<unsigned> neighbour_node_indices = pCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
+
+        // Iterate over these neighbours
+        for (std::set<unsigned>::iterator neighbour_iter = neighbour_node_indices.begin();
+             neighbour_iter != neighbour_node_indices.end();
+             ++neighbour_iter)
+        {
+            total_num_pairs += 1.0;
+
+            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+            bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
+
+            // If this cell is labelled and its neighbour is not, or vice versa...
+            if (cell_is_labelled != neighbour_is_labelled)
+            {
+                // ... then increment the fractional boundary length
+                num_heterotypic_pairs += 1.0;
             }
         }
     }
