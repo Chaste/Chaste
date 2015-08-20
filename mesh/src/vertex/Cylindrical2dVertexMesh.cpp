@@ -121,19 +121,14 @@ unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
 }
 
 void Cylindrical2dVertexMesh::Scale(const double xScale, const double yScale, const double zScale)
-
 {
+    assert(zScale == 1.0);
 
-    assert(zScale==1.0);
-
-    AbstractMesh<2, 2>::Scale(xScale,yScale);
+    AbstractMesh<2, 2>::Scale(xScale, yScale);
 
     // Also rescale the width of the mesh (this effectively scales the domain)
-    mWidth *=xScale;
-
+    mWidth *= xScale;
 }
-
-
 
 MutableVertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
 {
