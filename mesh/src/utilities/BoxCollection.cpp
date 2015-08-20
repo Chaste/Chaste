@@ -60,7 +60,7 @@ BoxCollection<DIM>::BoxCollection(double boxWidth, c_vector<double, 2*DIM> domai
      * Also create a helper vector of coefficients, whose first entry is 1 and whose i-th
      * entry (for i>1) is the i-th partial product of the vector mNumBoxesEachDirection. This
      * vector of coefficients will be used in the next code block to compute how many boxes
-     * along in each dimension each box, given its index.
+     * along in each dimension each box is, given its index.
      */
     unsigned num_boxes = 1;
     std::vector<unsigned> coefficients;

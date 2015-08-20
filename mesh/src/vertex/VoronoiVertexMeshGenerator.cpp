@@ -51,7 +51,8 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
           mNumElementsY(numElementsY),
           mNumRelaxationSteps(numRelaxationSteps),
           mElementTargetArea(elementTargetArea),
-          mTol(1e-7)
+          mTol(1e-7),
+          mMaxExpectedNumSidesPerPolygon(17)
 {
     this->ValidateInputAndSetMembers();
     this->GenerateVoronoiMesh();
@@ -721,9 +722,12 @@ void VoronoiVertexMeshGenerator::ValidateSeedLocations(std::vector<c_vector<doub
 {
     unsigned num_seeds = rSeedLocations.size();
 
-    // Seeds at least 1.0 / mSamplingMultiplier are acceptable, but we use 1.5 to be absolutely safe
+    /*
+     * Seeds at least 1.0 / mSamplingMultiplier apart from each other
+     * are acceptable; the 1.5 term below could just as well be any
+     * number that is strictly greater than 1.0.
+     */
     double safe_distance = 1.5 / mSamplingMultiplier;
-    ///\todo 2683 - Consider replacing the hardcoded value of 1.5 with a member variable
 
     // If we find a seed that needs to move position, we will move it and start checking again from the beginning
     bool recheck = true;
@@ -787,8 +791,7 @@ std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
     unsigned num_elems = mpMesh->GetNumElements();
 
     // Store the number of each class of polygons
-    std::vector<unsigned> num_polygons(15, 0);
-    ///\todo 2683 - Consider replacing the hardcoded value of 15 with a member variable
+    std::vector<unsigned> num_polygons(mMaxExpectedNumSidesPerPolygon - 2, 0);
 
     // Container to return the polygon distribution
     std::vector<double> polygon_dist;
@@ -798,9 +801,9 @@ std::vector<double> VoronoiVertexMeshGenerator::GetPolygonDistribution()
     {
         unsigned num_nodes_this_elem = mpMesh->GetElement(elem_idx)->GetNumNodes();
 
-        // All polygons are assumed to have 3, 4, 5, ..., 14 sides, which is 12 options
+        // All polygons are assumed to have 3, 4, 5, ..., mMaxExpectedNumSidesPerPolygon sides
         assert(num_nodes_this_elem > 2);
-        assert(num_nodes_this_elem < 18);
+        assert(num_nodes_this_elem <= mMaxExpectedNumSidesPerPolygon);
 
         // Increment correct place in counter - triangles in place 0, squares in 1, etc
         num_polygons[num_nodes_this_elem - 3]++;
@@ -849,6 +852,16 @@ double VoronoiVertexMeshGenerator::GetAreaCoefficientOfVariation()
 void VoronoiVertexMeshGenerator::RefreshSeedsAndRegenerateMesh()
 {
     this->GenerateVoronoiMesh();
+}
+
+void VoronoiVertexMeshGenerator::SetMaxExpectedNumSidesPerPolygon(unsigned maxExpectedNumSidesPerPolygon)
+{
+    mMaxExpectedNumSidesPerPolygon = maxExpectedNumSidesPerPolygon;
+}
+
+unsigned VoronoiVertexMeshGenerator::GetMaxExpectedNumSidesPerPolygon()
+{
+    return mMaxExpectedNumSidesPerPolygon;
 }
 
 #endif // BOOST_VERSION >= 105200

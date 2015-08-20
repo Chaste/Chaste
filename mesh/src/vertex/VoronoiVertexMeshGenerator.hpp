@@ -103,6 +103,13 @@ protected:
     double mTol;
 
     /**
+     * The maximum expected number of sides any polygon will have.
+     * Based on experience, we initialise this to the default value 17 in the constructor.
+     * It is theoretically possible that a polygon may be generated with more sides.
+     */
+    unsigned mMaxExpectedNumSidesPerPolygon;
+
+    /**
      * Helper method for the constructor.
      *
      * Produces a vector of random seed points, with some validation, that lie in the rectangle
@@ -230,6 +237,18 @@ public:
      * Allows the user to make a new mesh, for instance if trying to generate a specific polygon distribution.
      */
     void RefreshSeedsAndRegenerateMesh();
+
+    /**
+     * Set mMaxNumSidesPerPolygon.
+     *
+     * @param maxExpectedNumSidesPerPolygon the new value of mMaxNumSidesPerPolygon
+     */
+    void SetMaxExpectedNumSidesPerPolygon(unsigned maxExpectedNumSidesPerPolygon);
+
+    /**
+     * @return mMaxNumSidesPerPolygon
+     */
+    unsigned GetMaxExpectedNumSidesPerPolygon();
 };
 
 #endif // BOOST_VERSION >= 105200

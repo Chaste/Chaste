@@ -299,6 +299,23 @@ public:
 #endif // BOOST_VERSION >= 105200
     }
 
+    void TestSetAndGetMethods() throw(Exception)
+    {
+#if BOOST_VERSION >= 105200
+
+        unsigned num_x = 3;
+        unsigned num_y = 4;
+        unsigned num_relaxation_steps = 1;
+        double area = 1.23;
+
+        VoronoiVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
+
+        generator.SetMaxExpectedNumSidesPerPolygon(5);
+        TS_ASSERT_EQUALS(generator.GetMaxExpectedNumSidesPerPolygon(), 5u);
+
+#endif // BOOST_VERSION >= 105200
+    }
+
     void TestDummyClassCoverage()
     {
 #if BOOST_VERSION < 105200
