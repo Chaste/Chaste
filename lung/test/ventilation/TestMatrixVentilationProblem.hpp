@@ -220,8 +220,8 @@ public:
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[1], 6.66666,   1e-4);
-        TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.22223, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.22222, 1e-4);
         TS_ASSERT_DELTA(pressure[4], 15.0, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[5], 15.0, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 15.0, 1e-8); //BC
@@ -236,6 +236,7 @@ public:
     void TestThreeBifurcationsExtraLinkWithRadiusOnNodeFile() throw (Exception)
     {
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations_extra_links", 0u);
+        problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15);
         problem.Solve();
@@ -243,20 +244,20 @@ public:
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6.6666,   1e-4);
-        TS_ASSERT_DELTA(pressure[2], 12.2222, 1e-4);
-        TS_ASSERT_DELTA(pressure[3], 12.2222, 1e-4);
+        TS_ASSERT_DELTA(pressure[1], 6.66666,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.22223, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.22223, 1e-4);
         TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[10],  -0.0710, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[11],  -0.0710, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[12],  -0.0710, 1e-4); // (Inflow flux)
-        TS_ASSERT_DELTA(flux[13],  -0.0710, 1e-4); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[0], 2.8407e-10, 1e-4); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[10], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[11], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[12], -7.102e-11, 1e-13); // (Inflow flux)
+        TS_ASSERT_DELTA(flux[13], -7.102e-11, 1e-13); // (Inflow flux)
         //This is the extra node at the Trachea
-        TS_ASSERT_DELTA(pressure[8], 2.2222, 1e-4); //Between root and first bifurcation
+        TS_ASSERT_DELTA(pressure[8], 2.22225, 1e-4); //Between root and first bifurcation
 
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");
@@ -266,8 +267,9 @@ public:
     void TestThreeBifurcationsWithRadiusOnNodeFileFluxBoundaries() throw (Exception)
     {
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
+        problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowFluxes(-7.10176e-2);
+        problem.SetConstantInflowFluxes(-7.10176e-11);
         problem.Solve();
 
         std::vector<double> flux, pressure;
@@ -280,11 +282,11 @@ public:
         TS_ASSERT_DELTA(pressure[5], 15, 2e-4);
         TS_ASSERT_DELTA(pressure[6], 15, 2e-4);
         TS_ASSERT_DELTA(pressure[7], 15, 2e-4);
-        TS_ASSERT_DELTA(flux[0], -0.2840, 1e-4); // (Outflow flux)
-        TS_ASSERT_DELTA(flux[3],  -0.0710176, 1e-6); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[4],  -0.0710176, 1e-6); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[5],  -0.0710176, 1e-6); // BC (Inflow flux)
-        TS_ASSERT_DELTA(flux[6],  -0.0710176, 1e-6); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[0], -2.840704e-10, 1e-13); // (Outflow flux)
+        TS_ASSERT_DELTA(flux[3],  -7.10176e-11, 1e-16); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[4],  -7.10176e-11, 1e-16); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[5],  -7.10176e-11, 1e-16); // BC (Inflow flux)
+        TS_ASSERT_DELTA(flux[6],  -7.10176e-11, 1e-16); // BC (Inflow flux)
     }
 
     void TestThreeBifurcationsWithDynamicResistance() throw (Exception)
@@ -299,29 +301,28 @@ public:
          */
         EXIT_IF_PARALLEL; ///\todo #2300 There is a problem with the Windows parallel implementation
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
-//        PetscOptionsSetValue("-ksp_monitor", "");
+        problem.SetMeshInMilliMetres();
         problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowPressures(15000); //Needed to increase the resistance in these artificial airways
+        problem.SetConstantInflowPressures(150000); //Needed to increase the resistance in these artificial airways
         problem.SetDynamicResistance();
-//        problem.SetMeshInMilliMetres();
         problem.Solve();
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 9271.7947,   1e-2);
-        TS_ASSERT_DELTA(pressure[2], 13503.7705, 1e-2);
-        TS_ASSERT_DELTA(pressure[3], 13503.7705, 1e-2);
-        TS_ASSERT_DELTA(pressure[4], 1.5e4, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 1.5e4, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 1.5e4, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 1.5e4, 1e-8); //BC
-//        TS_ASSERT_DELTA(flux[6], -71.0176, 1e-4);
+        TS_ASSERT_DELTA(pressure[1], 91108.7409,   1e-1);
+        TS_ASSERT_DELTA(pressure[2], 132694.0014, 1e-2);
+        TS_ASSERT_DELTA(pressure[3], 132694.0014, 1e-2);
+        TS_ASSERT_DELTA(pressure[4], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 1.5e5, 1e-8); //BC
+        TS_ASSERT_DELTA(flux[6], -4.424511e-7, 1e-11);
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
 
-        //For coverage
-        problem.SetOutflowFlux(0.0);
+///\todo #2300 Is needed here?        //For coverage
+//        problem.SetOutflowFlux(0.0);
     }
 
     void TestTimeVaryingThreeBifurcations() throw (Exception)

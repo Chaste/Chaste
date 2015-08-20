@@ -138,16 +138,12 @@ void MatrixVentilationProblem::SetMeshInMilliMetres()
 {
     mLengthScaling = 1e-3;
 
-
-#ifdef LUNG_USE_UMFPACK
-// Use default absolute tolerance...
-#else
-    /* This is extreme.  In SI units, the flux is measured in m^3 (rather small amounts) but the
+    /* In SI units, the flux is measured in m^3 (rather small amounts) but the
      * pressure is measured in Pascal.  These differ by orders of magnitude at the top of the tree and
-     * even more at the bottom of the tree where resistance is greater
+     * even more at the bottom of the tree where resistance is greater.  Here we scale the flux up to get
+     * them closer in magnitude to the pressures
      */
-    mpLinearSystem->SetRelativeTolerance(1e-13);
-#endif
+    mFluxScaling = 1e10; // 1e9 would be enough to put the fluxes in mm^3/s rather than m^3/s we may scale further to account for small airways
 }
 
 
@@ -292,7 +288,7 @@ void MatrixVentilationProblem::Assemble(bool dynamicReassemble)
                 double reynolds_number = fabs( 2.0 * mDensity * flux / (mViscosity * M_PI * radius) );
                 double c = 1.85;
                 double z = (c/4.0) * sqrt(reynolds_number * radius / length);
-
+                ///\todo #2300 The "length" here should be the length of the airway segment (between bifurcations) which may be longer than the element...
                 // Pedley's method will only increase the resistance
                 if (z > 1.0)
                 {
@@ -350,8 +346,8 @@ void MatrixVentilationProblem::Solve()
     Assemble();
     mpLinearSystem->AssembleFinalLinearSystem();
     PetscVecTools::Finalise(mSolution);
-     //mpLinearSystem->DisplayMatrix();
-     //mpLinearSystem->DisplayRhs();
+    //mpLinearSystem->DisplayMatrix();
+    //mpLinearSystem->DisplayRhs();
 
     //This call is when the solution vector may have been used before (at the previous timestep for example)
     Vec last_solution = mSolution;
@@ -380,6 +376,7 @@ void MatrixVentilationProblem::Solve()
         while (relative_diff > DBL_EPSILON);
         PetscTools::Destroy(difference);
     }
+    //PetscVecTools::Display(mSolution);
 }
 
 Vec MatrixVentilationProblem::GetSolution()
