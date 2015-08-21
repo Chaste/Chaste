@@ -120,8 +120,7 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
             unsigned num_neighbours = neighbouring_node_indices.size();
 
             // Check to see if the current node is on the boundary
-            bool is_not_on_base = IsNodeOnBase(current_node_index, static_cast_mesh);
-            assert(is_not_on_base || !is_not_on_base);
+            IsNodeOnBase(current_node_index, static_cast_mesh);
 
             // Select the appropriate neighbour
             std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
