@@ -212,6 +212,10 @@ OdeSolution AbstractCvodeSystem::Solve(realtype tStart,
         int ierr = CVodeSetStopTime(mpCvodeMem, stepper.GetNextTime());
         assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
 
+//        // This parameter governs how many times we allow a recoverable right hand side failure
+//        int ierr = CVodeSetMaxConvFails(mpCvodeMem, 1000);
+//        assert(ierr == CV_SUCCESS); UNUSED_OPT(ierr); // avoid unused var warning
+
         double cvode_stopped_at = stepper.GetTime();
         ierr = CVode(mpCvodeMem, stepper.GetNextTime(), mStateVariables,
                          &cvode_stopped_at, CV_NORMAL);
