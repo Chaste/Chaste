@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * \todo Merge this test suite into cell_based/test/population/TestCaBasedDivisionRules once
  * the contents of notforrelease_cell_based/src/population/division_rules are moved into
- * cell_based/src/population/division_rules or crypt/src/population (#2716)
+ * cell_based/src/population/division_rules or crypt/src/population (#2731)
  */
 class TestShovingCaBasedDivisionRules : public AbstractCellBasedTestSuite
 {
@@ -187,8 +187,7 @@ public:
         // Select central cell
         CellPtr p_cell_12 = cell_population.GetCellUsingLocationIndex(12);
 
-        // Moves into node 13
-        ///\todo Check if the above comment makes sense (#2716)
+        // Try to divide but cant as hit boundary
         TS_ASSERT_THROWS_THIS(p_division_rule->CalculateDaughterNodeIndex(p_new_cell, p_cell_12, cell_population),
             "Cells reaching the boundary of the domain. Make the Potts mesh larger.");
     }
