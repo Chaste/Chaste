@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Shell script to create an mp4 format movie using ffmpeg from the 
+# image0*.png files in the folder
+
+#echo ‘You must have ffmpeg installed to use this (brew install ffmpeg)’
+
+# Encode movie
+ffmpeg  -f image2 -r 25 -pattern_type glob -i '*.png' -pix_fmt yuv420p output.mp4
