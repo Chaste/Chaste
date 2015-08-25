@@ -65,6 +65,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
     public static boolean drawCells = true;
     public static boolean drawSprings = false;
     public static boolean drawCircles = false;
+    public static boolean drawSquares = false;
     public static boolean drawPdeSolution = false;
     public static boolean drawBetaCatenin = false;
     public static boolean drawAverageStress = false;
@@ -125,6 +126,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
     public static Checkbox cells = new Checkbox("Cells");
     public static Checkbox ghost_nodes = new Checkbox("Ghosts");
     public static Checkbox circles = new Checkbox("Cells as circles");
+    public static Checkbox squares = new Checkbox("Cells as squares");
     public static Checkbox pde_solution = new Checkbox("PDE solution");
     public static Checkbox beta_catenin = new Checkbox("Beta catenin");
     public static Checkbox average_stress = new Checkbox("Average Stress");
@@ -268,6 +270,11 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 cells.setState(false);
             }
             System.out.println("Drawing cells as circles = "+drawCircles);
+        }
+        else if (cb == squares)
+        {
+            drawSquares = state;
+            System.out.println("Drawing cells as squares = "+drawSquares);
         }
         else if (cb == pde_solution)
         {
@@ -478,6 +485,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
         cells.addItemListener(this);
         ghost_nodes.addItemListener(this);
         circles.addItemListener(this);
+        squares.addItemListener(this);
         pde_solution.addItemListener(this);
         beta_catenin.addItemListener(this);
         average_stress.addItemListener(this);
@@ -492,6 +500,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
         checkPanel.add(cells);
         checkPanel.add(ghost_nodes);
         checkPanel.add(circles);
+        checkPanel.add(squares);
         checkPanel.add(axes);
         checkPanel.add(axes_equal);
         checkPanel.add(orientation);
@@ -518,6 +527,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
         springs.setState(false);
         ghost_nodes.setState(false);
         circles.setState(false);
+        squares.setState(false);
         pde_solution.setState(false);
         beta_catenin.setState(false);
         average_stress.setState(false);
@@ -554,6 +564,11 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
             {
                 drawCircles = true;
                 circles.setState(true);
+            }
+            else if (args[i].equals("squares"))
+            {
+                drawSquares = true;
+                squares.setState(true);
             }
             else if (args[i].equals("PDE"))
             {
@@ -1105,12 +1120,23 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     for (int i=0; i<numCells[row]; i++)
                     {
                         cell_type[row][i] = canvas.INVISIBLE_COLOUR;
+                        
+                        if (ancestorsFilePresent)
+                        {
+                            ancestor_values[row][i] = canvas.INVISIBLE_COLOUR;
+                        }
                     }
                     
                     for (int i=0; i<num_location_entries; i++)
                     {
                         locations[row][i] = Integer.parseInt(st_location.nextToken());
                         cell_type[row][locations[row][i]] = Integer.parseInt(st_cell_type.nextToken());
+                        
+                        if (ancestorsFilePresent)
+                        {
+                            ancestor_values[row][locations[row][i]] = Integer.parseInt(st_ancestors.nextToken());
+        
+                        }
                     }
                 }
                 
@@ -1156,11 +1182,14 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
 
                     if (drawAncestors)
                     {
-                        // If this is a real cell then read in ancestor from row
-                        if (cell_type[row][i] != canvas.INVISIBLE_COLOUR)    // if this is not a ghost cell
+                        if (!locationFilePresent)
                         {
-                            int ancestor_value = Integer.parseInt(st_ancestors.nextToken()); // index
-                            ancestor_values[row][i] = ancestor_value;
+                            // If this is a real cell then read in ancestor from row
+                            if (cell_type[row][i] != canvas.INVISIBLE_COLOUR)    // if this     is not a ghost cell
+                            {
+                                int ancestor_value = Integer.parseInt(st_ancestors.nextToken()); // index
+                                ancestor_values[row][i] = ancestor_value;
+                            }
                         }
                     }
 
@@ -1617,6 +1646,52 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                 if (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR) // if not ghost
                 {
                     g2.drawOval(p.x-rx, p.y-ry, 2*rx, 2*ry);
+                }
+            }
+        }
+        
+        if (vis.drawSquares)
+        {
+            double scaling = 0.4;
+            
+            for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
+            {
+                // Plot Cell Centres
+                
+                RealPoint real_point = vis.positions[vis.timeStep][i];
+                PlotPoint square_vertices[] = new PlotPoint[4];
+                
+                square_vertices[0] = scale(real_point.x - 0.5, real_point.y - 0.5);
+                square_vertices[1] = scale(real_point.x + 0.5, real_point.y - 0.5);
+                square_vertices[2] = scale(real_point.x + 0.5, real_point.y + 0.5);
+                square_vertices[3] = scale(real_point.x - 0.5, real_point.y + 0.5);
+                
+                int xpoints[] = new int[4];
+                int ypoints[] = new int[4];
+                for (int node=0; node<4; node++)
+                {
+                    xpoints[node] = square_vertices[node].x;
+                    ypoints[node] = square_vertices[node].y;
+                }
+                SetCellColour(i);
+                
+                if (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR) // if not ghost
+                {
+                    g2.fillPolygon(xpoints, ypoints, 4);
+                }
+                
+                // Plot cell boundary lines
+                g2.setColor(Color.black);
+                
+                if (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR) // if not ghost
+                {
+                    for (int node=0; node<4; node++)
+                    {
+                        g2.drawLine(xpoints[node],
+                                    ypoints[node],
+                                    xpoints[(node+1)%4],
+                                    ypoints[(node+1)%4]);
+                    }
                 }
             }
         }
