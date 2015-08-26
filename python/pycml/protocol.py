@@ -390,7 +390,11 @@ class Protocol(processors.ModelModifier):
                              and isinstance(rhs.xml_children[1], mathml_cn))):
                         raise ProtocolError("The computed variable " + str(var) + " may not be specified as an input.")
                     # It's the special Computed case - convert to a constant
-                    var.initial_value = unicode(rhs.evaluate())
+                    initial_value = rhs.evaluate()
+                    if not var.get_units().equals(rhs.get_units()):
+                        converter = self.get_units_converter()
+                        initial_value = converter.convert_constant(initial_value, rhs.get_units().extract(), var.get_units(), var.component)
+                    var.initial_value = unicode(initial_value)
                     self.remove_definition(var, keep_initial_value=True)
                     if deps[0] in self.inputs:
                         self.inputs.remove(deps[0])

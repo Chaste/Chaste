@@ -925,8 +925,7 @@ class UnitsConverter(ModelModifier):
                 in_interface = u'public'
             else:
                 in_interface = u'private'
-            var1_converter = self.add_variable(comp1, var1.name + u'_converter', u2,
-                                               interfaces={in_interface: u'in'})
+            var1_converter = self.add_variable(comp1, var1.name + u'_converter', u2, interfaces={in_interface: u'in'})
             var1._cml_var_type = VarTypes.Computed
             var1._cml_source_var = None
             delattr(var1, in_interface + u'_interface')
