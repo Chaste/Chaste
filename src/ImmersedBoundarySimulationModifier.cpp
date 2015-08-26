@@ -239,7 +239,6 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateCellNeighbours()
             mCellNeighbours[p_cell].erase(mCellNeighbours[p_cell].find(location_index));
         }
     }
-    MARK;
 }
 
 template<unsigned DIM>
