@@ -147,6 +147,16 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     }
 
     mInteractionDistance = mpCellPopulation->GetInteractionDistance();
+
+    // Set up threads for fftw
+    int potential_thread_errors = fftw_init_threads();
+
+    if (potential_thread_errors == 0)
+    {
+        EXCEPTION("fftw thread error");
+    }
+
+    fftw_plan_with_nthreads(2);
 }
 
 template<unsigned DIM>

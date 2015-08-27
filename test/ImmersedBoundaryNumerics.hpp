@@ -120,13 +120,13 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(11, 100, 0.2, 2.0, 1.0, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(11, 200, 0.2, 2.0, 1.0, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
-        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(100000.0);
+        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(400000.0);
         p_mesh->GetMembraneElement()->SetMembraneRestLength(0.4/100.0);
 
-        p_mesh->SetNumGridPtsXAndY(128);
+        p_mesh->SetNumGridPtsXAndY(256);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -143,9 +143,9 @@ public:
 
         // Set simulation properties
         simulator.SetOutputDirectory("ImmersedBoundaryNumerics/TestBenchmarkSimulation");
-        simulator.SetDt(0.01);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(10.0);
+        simulator.SetDt(0.001);
+        simulator.SetSamplingTimestepMultiple(1000);
+        simulator.SetEndTime(1.0);
 
         // Run and time the simulation
         mTimer.Reset();
