@@ -116,7 +116,7 @@ namespace serialization
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const DistributedQuadraticMesh<DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const DistributedQuadraticMesh<DIM> * t, const unsigned int file_version)
 {
     unsigned num_procs = PetscTools::GetNumProcs();
     const DistributedTetrahedralMeshPartitionType::type partition_type = t->GetPartitionType();

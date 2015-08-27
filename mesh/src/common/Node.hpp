@@ -559,7 +559,7 @@ namespace serialization
  */
 template<class Archive, unsigned SPACE_DIM>
 inline void save_construct_data(
-    Archive & ar, const Node<SPACE_DIM> * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const Node<SPACE_DIM> * t, const unsigned int file_version)
 {
 
     // Save data required to construct instance
@@ -576,6 +576,7 @@ inline void save_construct_data(
     bool is_boundary = t->IsBoundaryNode();
     ar << is_boundary;
 }
+
 /**
  * De-serialize constructor parameters and initialize a Cell.
  */
@@ -601,6 +602,7 @@ inline void load_construct_data(
     // Invoke inplace constructor to initialise instance
     ::new(t)Node<SPACE_DIM>(index, location, is_boundary);
 }
+
 }
 } // namespace ...
 

@@ -393,7 +393,7 @@ namespace serialization
  */
 template<class Archive>
 inline void save_construct_data(
-    Archive & ar, const Cell * t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const Cell * t, const unsigned int file_version)
 {
     // Save data required to construct instance
     const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();

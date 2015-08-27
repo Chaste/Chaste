@@ -210,7 +210,7 @@ namespace boost
     {
         template<class Archive>
         inline void save_construct_data(
-            Archive & ar, const MyBoundaryCondition * t, const BOOST_PFTO unsigned int file_version)
+            Archive & ar, const MyBoundaryCondition * t, const unsigned int file_version)
         {
             const AbstractCellPopulation<2>* const p_cell_population = t->GetCellPopulation();
             ar << p_cell_population;
