@@ -163,7 +163,7 @@ namespace serialization
  */
 template<class Archive, unsigned DIM>
 inline void save_construct_data(
-    Archive & ar, const CellwiseSourceParabolicPde<DIM>* t, const BOOST_PFTO unsigned int file_version)
+    Archive & ar, const CellwiseSourceParabolicPde<DIM>* t, const unsigned int file_version)
 {
     // Save data required to construct instance
     const AbstractCellPopulation<DIM, DIM>* p_cell_population = &(t->rGetCellPopulation());
