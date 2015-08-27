@@ -236,7 +236,12 @@ void ImmersedBoundarySimulationModifier<DIM>::UpdateCellNeighbours()
 
             // Erase the element of the set which coincides with location index of our reference cell
             // If no such index is found, it should still be fine.
-            mCellNeighbours[p_cell].erase(mCellNeighbours[p_cell].find(location_index));
+            std::set<unsigned>::iterator it_to_erase = mCellNeighbours[p_cell].find(location_index);
+
+            if (*it_to_erase < mCellNeighbours[p_cell].size())
+            {
+                mCellNeighbours[p_cell].erase(mCellNeighbours[p_cell].find(location_index));
+            }
         }
     }
 }
@@ -393,13 +398,13 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateCellCellInteractionElasti
         }
     }
 
-    // Now add force contributions from each AbstractForce
-    for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
-            iter != mForceCollection.end();
-            ++iter)
-    {
-        (*iter)->AddForceContribution(*(this->mpCellPopulation));
-    }
+//    // Now add force contributions from each AbstractForce
+//    for (typename std::vector<boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > >::iterator iter = mForceCollection.begin();
+//            iter != mForceCollection.end();
+//            ++iter)
+//    {
+//        (*iter)->AddForceContribution(*(this->mpCellPopulation));
+//    }
 }
 
 template<unsigned DIM>
