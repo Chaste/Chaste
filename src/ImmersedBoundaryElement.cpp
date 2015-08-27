@@ -39,16 +39,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigned index,
                                                                          const std::vector<Node<SPACE_DIM>*>& rNodes)
-        : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
-          mMembraneSpringConstant(1000.0),
-          mMembraneRestLength(0.05),
-          mCellCellSpringConstant(50.0),
-          mCellCellRestLength(0.01)
+        : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
 {
     assert(ELEMENT_DIM == SPACE_DIM);
 
     // Ensure number of nodes is at least 2
     assert(rNodes.size() > 2);
+
+    /*
+     * Set default parameter values:
+     *   Assuming the nodes are roughly uniformly spaced, the default rest length is 25% of the distance between
+     *   the first two nodes.
+     */
+    mMembraneSpringConstant = 1e5;
+    mMembraneRestLength = 0.25 * norm_2(rNodes[0]->rGetLocation() - rNodes[1]->rGetLocation());
+
+    mCellCellSpringConstant = 50.0;
+    mCellCellRestLength = 0.01;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

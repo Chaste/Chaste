@@ -110,7 +110,52 @@ public:
         }
     }
 
-    void TestSingleCellVolumeChangeWithNodeSpacing() throw(Exception)
+    void TestBenchmarkSimulation() throw(Exception)
+    {
+        /*
+         * 1: Num cells
+         * 2: Num nodes per cell
+         * 3: Superellipse exponent
+         * 4: Superellipse aspect ratio
+         * 5: Random y-variation
+         * 6: Include membrane
+         */
+        ImmersedBoundaryPalisadeMeshGenerator gen(11, 100, 0.2, 2.0, 1.0, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(100000.0);
+        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.4/100.0);
+
+        p_mesh->SetNumGridPtsXAndY(128);
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        OffLatticeSimulation<2> simulator(cell_population);
+
+        // Add main immersed boundary simulation modifier
+        MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
+        simulator.AddSimulationModifier(p_main_modifier);
+
+        // Set simulation properties
+        simulator.SetOutputDirectory("ImmersedBoundaryNumerics/TestBenchmarkSimulation");
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(10.0);
+
+        // Run and time the simulation
+        mTimer.Reset();
+        simulator.Solve();
+        double simulation_time = mTimer.GetElapsedTime();
+
+        PRINT_VARIABLE(simulation_time);
+    }
+
+    void xTestSingleCellVolumeChangeWithNodeSpacing() throw(Exception)
     {
         /**
          * This test relaxes a single circular cell for a fixed simulation time.
