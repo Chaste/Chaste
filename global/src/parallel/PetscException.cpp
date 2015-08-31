@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscException.hpp"
 #include "Exception.hpp"
 #include "Warnings.hpp"
+#include "ChasteBuildRoot.hpp"
+
 
 /*
  * Positive codes mean that there's an error.
@@ -64,8 +66,15 @@ void PetscException(PetscInt petscError,
             p_text=default_message;
         }
 
+// /todo #2656 - remove ifdef after cmake transition
+#ifdef CHASTE_CMAKE
+        const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
+        EXCEPTION(p_text << " in function '" << funct  << "' on line "
+                  << line << " of file ./" << file+root_dir_length);
+#else
         EXCEPTION(p_text << " in function '" << funct  << "' on line "
                   << line << " of file " << file);
+#endif
     }
 }
 
@@ -138,8 +147,15 @@ void KspException(PetscInt kspError,
     if (kspError < 0)
     {
         std::stringstream err_string_stream;
+        // /todo #2656 - remove ifdef after cmake transition
+#ifdef CHASTE_CMAKE
+        const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
+        err_string_stream << GetKspErrorMessage(kspError) << " in function '" << funct << "' on line "
+                      << line << " of file ./" << file + root_dir_length;
+#else
         err_string_stream << GetKspErrorMessage(kspError) << " in function '" << funct << "' on line "
                       << line << " of file " << file;
+#endif
         EXCEPTION(err_string_stream.str());
     }
 }
