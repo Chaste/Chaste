@@ -3,7 +3,9 @@
 # path will be in XSD_EXECUTABLE. Look in the usual locations, as well as in
 # the 'bin' directory in the path given in the XSD_ROOT environment variable.
 #
-FIND_PROGRAM( XSD_EXECUTABLE NAMES xsd xsdcxx
+
+# Mono also has a utility called xsd, so try to find xsdcxx first
+FIND_PROGRAM( XSD_EXECUTABLE NAMES xsdcxx xsd
 		   	  HINTS ${RWSL_DEPS}/xsd/bin $ENV{XSD_ROOT}/bin
 			  PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
 			  		/usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
