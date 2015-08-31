@@ -350,12 +350,86 @@ public:
         OutputFileHandler handler("TestPottsCellSorting", false);
         std::string results_dir = handler.GetOutputDirectoryFullPath();
         // Initial condition file
-        FileFinder vtk_file(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file.Exists());
+        FileFinder vtk_file_1(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_1.Exists());
+        FileFinder vtk_file_2(results_dir + "results_from_time_0/outlines_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_2.Exists());
 
         // Final file
-        FileFinder vtk_file2(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
-        TS_ASSERT(vtk_file2.Exists());
+        FileFinder vtk_file_3(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_3.Exists());
+        FileFinder vtk_file_4(results_dir + "results_from_time_0/outlines_10.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_4.Exists());
+
+ #endif //CHASTE_VTK
+    }
+
+    void TestPottsMonolayerCellSortingPeriodic() throw (Exception)
+    {
+        EXIT_IF_PARALLEL;    // Potts simulations don't work in parallel because they depend on NodesOnlyMesh for writing.
+
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(20, 5, 4, 20, 5, 4, 1, 1, 1, false, true, true); // Periodic in x and y
+        PottsMesh<2>* p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        // Randomly label some cells
+        boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
+        RandomlyLabelCells(cells, p_label, 0.5);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>(); // So outputs the labelled cells
+
+        // Set up cell-based simulation
+        OnLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("TestPottsCellSortingPeriodic");
+        simulator.SetDt(0.1);
+        simulator.SetEndTime(1.0);
+
+        // Create update rules and pass to the simulation
+        MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
+        p_volume_constraint_update_rule->SetMatureCellTargetVolume(16);
+        p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.2);
+        simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
+
+        MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
+        p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.16);
+        p_differential_adhesion_update_rule->SetLabelledCellCellAdhesionEnergyParameter(0.11);
+        p_differential_adhesion_update_rule->SetCellCellAdhesionEnergyParameter(0.02);
+        p_differential_adhesion_update_rule->SetLabelledCellBoundaryAdhesionEnergyParameter(0.16);
+        p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.16);
+        simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
+
+        // Run simulation
+        simulator.Solve();
+
+        // Check that the same number of cells
+        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 25u);
+
+        // Test no births or deaths
+        TS_ASSERT_EQUALS(simulator.GetNumBirths(), 0u);
+        TS_ASSERT_EQUALS(simulator.GetNumDeaths(), 0u);
+#ifdef CHASTE_VTK
+        //Test that VTK writer has produced some files
+        OutputFileHandler handler("TestPottsCellSortingPeriodic", false);
+        std::string results_dir = handler.GetOutputDirectoryFullPath();
+        // Initial condition file
+        FileFinder vtk_file_1(results_dir + "results_from_time_0/results_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_1.Exists());
+        FileFinder vtk_file_2(results_dir + "results_from_time_0/outlines_0.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_2.Exists());
+
+        // Final file
+        FileFinder vtk_file_3(results_dir + "results_from_time_0/results_10.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_3.Exists());
+        FileFinder vtk_file_4(results_dir + "results_from_time_0/outlines_10.vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtk_file_4.Exists());
  #endif //CHASTE_VTK
     }
 

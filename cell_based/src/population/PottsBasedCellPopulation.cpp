@@ -606,6 +606,147 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
+
+    // Extra Part to output the outlines of cells
+
+    if (DIM ==2 )
+    {
+        std::vector<Node<2>*> outline_nodes;
+        std::vector<VertexElement<2,2>*>  outline_elements;
+
+        unsigned outline_node_index = 0;
+        unsigned outline_element_index = 0;
+        for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mpPottsMesh->GetNodeIteratorBegin();
+             iter != mpPottsMesh->GetNodeIteratorEnd();
+             ++iter)
+        {
+            // Get the index of this node in the mesh and those elements (i.e. cells) that contain this node
+            unsigned node_index = iter->GetIndex();
+            std::set<unsigned> element_indices = iter->rGetContainingElementIndices();
+
+            std::set<unsigned> target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
+
+            for (std::set<unsigned>::iterator neighbour_iter = target_neighbouring_node_indices.begin();
+                 neighbour_iter != target_neighbouring_node_indices.end();
+                 ++neighbour_iter)
+            {
+                std::set<unsigned> neighbouring_element_indices = this->rGetMesh().GetNode(*neighbour_iter)->rGetContainingElementIndices();
+
+                //if different cells add a line
+                if ( element_indices != neighbouring_element_indices)
+                {
+                    std::vector<Node<2>*> element_nodes;
+
+                    c_vector<double, 2> node_location = this->mrMesh.GetNode(node_index)->rGetLocation();
+                    c_vector<double, 2> neighbour_node_location = this->mrMesh.GetNode(*neighbour_iter)->rGetLocation();
+
+                    c_vector<double, 2> unit_tangent = neighbour_node_location - node_location;
+
+
+                    if (norm_2(unit_tangent) > 1.0) // It's a periodic neighbour
+                    {
+                        c_vector<double, 2> mid_point = 0.5*(node_location + neighbour_node_location);
+                        if (unit_tangent(0)==0)
+                        {
+                            if (node_location(1) < neighbour_node_location (1))
+                            {
+                                mid_point(1) = node_location(1) - 0.5;
+                            }
+                            else
+                            {
+                                mid_point(1) = node_location(1) + 0.5;
+                            }
+                        }
+                        else
+                        {
+                            assert(unit_tangent(1)==0);
+
+                            if (node_location(0) < neighbour_node_location (0))
+                            {
+                                mid_point(0) = node_location(0) - 0.5;
+                            }
+                            else
+                            {
+                                mid_point(0) = node_location(0) + 0.5;
+                            }
+                        }
+                        assert(norm_2(unit_tangent)>0);
+                        unit_tangent = unit_tangent/norm_2(unit_tangent);
+
+                        c_vector<double, DIM> unit_normal;
+                        unit_normal(0) = -unit_tangent(1);
+                        unit_normal(1) = unit_tangent(0);
+
+                        std::vector<Node<2>*> element_nodes;
+
+                        // Need at least three points to visualise in Paraview
+                        Node<2>* p_node_1 = new Node<2>(outline_node_index, mid_point - 0.5*unit_normal);
+                        outline_nodes.push_back(p_node_1);
+                        element_nodes.push_back(outline_nodes[outline_node_index]);
+                        outline_node_index++;
+
+                        Node<2>* p_node_2 = new Node<2>(outline_node_index, mid_point);
+                        outline_nodes.push_back(p_node_2);
+                        element_nodes.push_back(outline_nodes[outline_node_index]);
+                        outline_node_index++;
+
+                        Node<2>* p_node_3 = new Node<2>(outline_node_index, mid_point + 0.5*unit_normal);
+                        outline_nodes.push_back(p_node_3);
+                        element_nodes.push_back(outline_nodes[outline_node_index]);
+                        outline_node_index++;
+
+                        VertexElement<2,2>* p_element = new VertexElement<2,2>(outline_element_index, element_nodes);
+                        outline_elements.push_back(p_element);
+                        outline_element_index++;
+
+                    }
+                    else // Standard Neighbour
+                    {
+                        c_vector<double, 2> mid_point = 0.5*(node_location + neighbour_node_location);
+
+                        assert(norm_2(unit_tangent)>0);
+                        unit_tangent = unit_tangent/norm_2(unit_tangent);
+
+                        c_vector<double, 2> unit_normal;
+                        unit_normal(0) = -unit_tangent(1);
+                        unit_normal(1) = unit_tangent(0);
+
+                        std::vector<Node<2>*> element_nodes;
+
+                        // Need at least three points to visualise in Paraview
+                        Node<2>* p_node_1 = new Node<2>(outline_node_index, mid_point - 0.5*unit_normal);
+                        outline_nodes.push_back(p_node_1);
+                        element_nodes.push_back(outline_nodes[outline_node_index]);
+                        outline_node_index++;
+
+                        Node<2>* p_node_2 = new Node<2>(outline_node_index, mid_point);
+                        outline_nodes.push_back(p_node_2);
+                        element_nodes.push_back(outline_nodes[outline_node_index]);
+                        outline_node_index++;
+
+                        Node<2>* p_node_3 = new Node<2>(outline_node_index, mid_point + 0.5*unit_normal);
+                        outline_nodes.push_back(p_node_3);
+                        element_nodes.push_back(outline_nodes[outline_node_index]);
+                        outline_node_index++;
+
+                        VertexElement<2,2>* p_element = new VertexElement<2,2>(outline_element_index, element_nodes);
+                        outline_elements.push_back(p_element);
+                        outline_element_index++;
+
+                    }
+
+                }
+
+            }
+        }
+        VertexMesh<2,2> cell_outline_mesh(outline_nodes,outline_elements);
+
+        VertexMeshWriter<2, 2> outline_mesh_writer(rDirectory, "outlines", false);
+        outline_mesh_writer.WriteVtkUsingMesh(cell_outline_mesh, time.str());
+        outline_mesh_writer.WriteFilesUsingMesh(cell_outline_mesh);
+
+
+    }
 #endif //CHASTE_VTK
 }
 
