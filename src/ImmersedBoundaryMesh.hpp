@@ -234,6 +234,11 @@ public:
     double GetCharacteristicNodeSpacing() const;
 
     /**
+     * @return the spacing ratio: Characteristic Node Spacing / Fluid Grid Spacing
+     */
+    double GetSpacingRatio() const;
+
+    /**
      * Overridden GetVectorFromAtoB() method.
      *
      * Evaluates the (surface) distance between two points in a periodic

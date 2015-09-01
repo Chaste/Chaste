@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // External library - included in Chaste
 #include "boost/lexical_cast.hpp"
+#include "boost/thread.hpp"
 
 #include <sys/stat.h>
 #include "CheckpointArchiveTypes.hpp"
@@ -58,6 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundarySimulationModifier.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "SuperellipseGenerator.hpp"
+
+#include "SpecificSimulations.hpp"
 
 // User project fcooper
 #include "CsvWriter.hpp"
@@ -110,7 +113,19 @@ public:
         }
     }
 
-    void TestBenchmarkSimulation() throw(Exception)
+//    void TestSpecific() throw(Exception)
+//    {
+//        SpecificSimulations test_1;
+//        boost::thread test_thread_1(boost::bind(&SpecificSimulations::SimulationWithVariableGridSpacing, &test_1, 256));
+//
+//        SpecificSimulations test_2;
+//        boost::thread test_thread_2(boost::bind(&SpecificSimulations::SimulationWithVariableGridSpacing, &test_2, 256));
+//
+//        test_thread_1.join();
+//        test_thread_2.join();
+//    }
+
+    void xTestBenchmarkSimulation() throw(Exception)
     {
         /*
          * 1: Num cells
@@ -244,7 +259,7 @@ public:
             p_simulator->SetEndTime(10.0);
 
             // Run and time the simulation
-            mTimer.Reset();            
+            mTimer.Reset();
             p_simulator->Solve();
             computation_time.push_back(mTimer.GetElapsedTime());
 
@@ -404,114 +419,115 @@ public:
         csv_writer.WriteDataToFile();
     }
 
-    void xTestSingleCellRelaxation() throw(Exception)
+    void TestNodeSpacingVsSpringConsant() throw(Exception)
     {
         /**
-         * This test relaxes a single elliptical cell from an ellipse to a circle, in a fixed simulation time.
+         * This test relaxes a single elliptical cell from an ellipse towards a circle, for a fixed simulation time.
          *
          * A second cell is then simulated with twice the node-density, and the spring constant in membrane-membrane
          * interactions is varied.  Membrane-membrane rest length is set at 10% of node spacing in both cases.
          *
          * All other parameters are fixed, and the following are exported to a csv file:
          *  * Simulation time
-         *  * Reference-cell aspect ratio
-         *  * Cell aspect ratio: major axis / minor axis, for each variation in spring constant
+         *  * Reference cell elongation shape factor
+         *  * Double-node-density cell elongation shape factor for each spring constant
          */
 
+        // Output vectors
         std::vector<double> simulation_time;
-        std::vector<double> ref_aspect_ratio;
-        std::vector<std::vector<double> > observed_aspect_ratios;
+        std::vector<double> ref_elongation_shape_factor;
+        std::vector<std::vector<double> > obs_elongation_shape_factor;
 
-        unsigned num_sim_timesteps = 40;
+        // Number of timepoints at which we sample the cell shapes
+        unsigned num_sim_timepoints = 40;
 
+        // Spring constant of the reference cell
         double ref_spring_const = 1e4;
 
-        /*
-         * Create an Immersed Boundary Mesh using a SuperellipseGenerator
-         *
-         * 1: Num nodes
-         * 2: Superellipse exponent
-         * 3: Width
-         * 4: Height
-         * 5: Bottom-left x
-         * 6: Botton-left y
-         */
-        SuperellipseGenerator* p_gen = new SuperellipseGenerator(128, 1.0, 0.3, 0.6, 0.35, 0.2);
-
-        // Generate a mesh using this superellipse
-        std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
-        delete p_gen;
-
-        std::vector<Node<2>* > nodes;
-        for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+        // Perform the first simulation
         {
-            nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse exponent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator gen(128, 1.0, 0.3, 0.6, 0.35, 0.2);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = gen.GetPointsAsVectors();
+
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 64, 64);
+
+            PRINT_VARIABLE(mesh.GetSpacingRatio());
+
+            // Set up cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+
+            // Set element properties
+            ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
+            p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+            p_elem->SetMembraneSpringConstant(ref_spring_const);
+
+            // Create simulation
+            OffLatticeSimulation<2> sim(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            sim.AddSimulationModifier(p_main_modifier);
+
+            std::string output_dir = "ImmersedBoundaryNumerics/TestNodeSpacingVsSpringConsantRef";
+            output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
+
+            // Set simulation properties
+            sim.SetOutputDirectory(output_dir);
+            sim.SetDt(0.01);
+            sim.SetSamplingTimestepMultiple(10);
+
+            // Calculate aspect ratio - this relies on the cell staying symmetric
+            c_vector<double, 2> long_axis = p_elem->GetNode(32)->rGetLocation() - p_elem->GetNode(96)->rGetLocation();
+            c_vector<double, 2> short_axis = p_elem->GetNode(0)->rGetLocation() - p_elem->GetNode(64)->rGetLocation();
+
+            // Store initial data point, and run simulation for all required timesteps
+            simulation_time.push_back(0.0);
+            ref_elongation_shape_factor.push_back(norm_2(long_axis) / norm_2(short_axis));
+
+            for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
+            {
+                // Calculate new end time and run simulation
+                double new_end_time = 0.1 * double(sim_time_idx);
+                sim.SetEndTime(new_end_time);
+                sim.Solve();
+
+                // Add data to relevant vectors
+                simulation_time.push_back(new_end_time);
+                ref_elongation_shape_factor.push_back(mesh.GetElongationShapeFactorOfElement(0));
+            }
         }
 
-        std::vector<ImmersedBoundaryElement<2,2>* > elements;
-        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
-
-        ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 64, 64);
-        
-         // Set up cell population
-        std::vector<CellPtr> cells;
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
-        ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
-
-        // Set element properties
-        ImmersedBoundaryElement<2, 2>* p_elem = mesh.GetElement(0u);
-        p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
-        p_elem->SetMembraneSpringConstant(ref_spring_const);
-
-        // Create simulation
-        OffLatticeSimulation<2> *p_simulator = new OffLatticeSimulation<2>(cell_population);
-
-        // Add main immersed boundary simulation modifier
-        MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
-        p_simulator->AddSimulationModifier(p_main_modifier);
-
-        std::string output_dir = "ImmersedBoundaryNumerics/TestSingleCellRelaxation";
-        output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
-
-        // Set simulation properties
-        p_simulator->SetOutputDirectory(output_dir);
-        p_simulator->SetDt(0.01);
-        p_simulator->SetSamplingTimestepMultiple(10);
-
-        // Calculate aspect ratio - this relies on the cell staying symmetric
-        c_vector<double, 2> long_axis = p_elem->GetNode(32)->rGetLocation() - p_elem->GetNode(96)->rGetLocation();
-        c_vector<double, 2> short_axis = p_elem->GetNode(0)->rGetLocation() - p_elem->GetNode(64)->rGetLocation();
-
-        // Store initial data point, and run simulation for all required timesteps
-        simulation_time.push_back(0.0);
-        ref_aspect_ratio.push_back(norm_2(long_axis) / norm_2(short_axis));
-
-        for (unsigned sim_time_idx = 1 ; sim_time_idx <= num_sim_timesteps ; sim_time_idx++)
-        {
-            // Calculate new end time and run simulation
-            double new_end_time = 0.1 * double(sim_time_idx);
-            p_simulator->SetEndTime(new_end_time);
-            p_simulator->Solve();
-
-            // Calculate aspect ratio and store data
-//            c_vector<double, 2> long_axis = p_elem->GetNode(32)->rGetLocation() - p_elem->GetNode(96)->rGetLocation();
-//            c_vector<double, 2> short_axis = p_elem->GetNode(0)->rGetLocation() - p_elem->GetNode(64)->rGetLocation();
-
-            simulation_time.push_back(new_end_time);
-            ref_aspect_ratio.push_back(mesh.GetElongationShapeFactorOfElement(0));
-        }
-
-        delete p_gen;
-        delete p_simulator;
-
         /*
-         * Now do the same again in a loop where we change the spring constant
+         * Now do the same again in a loop where we change the spring constant (2, 4 and 6 times the reference)
          */
 
         unsigned num_springs = 3;
-        observed_aspect_ratios.resize(num_springs);
+        obs_elongation_shape_factor.resize(num_springs);
 
         for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
         {
@@ -525,14 +541,14 @@ public:
              * 5: Bottom-left x
              * 6: Botton-left y
              */
-            SuperellipseGenerator* p_gen = new SuperellipseGenerator(256, 1.0, 0.3, 0.6, 0.35, 0.2);
+            SuperellipseGenerator gen(256, 1.0, 0.3, 0.6, 0.35, 0.2);
 
             // Because we have already run a simulation in this test, we must destroy the SimulationTime singleton
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
 
             // Generate a mesh using this superellipse
-            std::vector<c_vector<double, 2> > locations = p_gen->GetPointsAsVectors();
+            std::vector<c_vector<double, 2> > locations = gen.GetPointsAsVectors();
 
             std::vector<Node<2>* > nodes;
             for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
@@ -559,61 +575,52 @@ public:
             p_elem->SetMembraneSpringConstant(2.0 * double(sc_idx + 1) * ref_spring_const);
 
             // Create simulation
-            OffLatticeSimulation<2> *p_simulator = new OffLatticeSimulation<2>(cell_population);
+            OffLatticeSimulation<2> sim(cell_population);
 
             // Add main immersed boundary simulation modifier
             MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
-            p_simulator->AddSimulationModifier(p_main_modifier);
+            sim.AddSimulationModifier(p_main_modifier);
 
-            std::string output_dir = "ImmersedBoundaryNumerics/TestSingleCellRelaxationSC";
+            std::string output_dir = "ImmersedBoundaryNumerics/TestNodeSpacingVsSpringConsant";
             output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
 
             // Set simulation properties
-            p_simulator->SetOutputDirectory(output_dir);
-            p_simulator->SetDt(0.01);
-            p_simulator->SetSamplingTimestepMultiple(10);
+            sim.SetOutputDirectory(output_dir);
+            sim.SetDt(0.01);
+            sim.SetSamplingTimestepMultiple(10);
 
-            c_vector<double, 2> long_axis = p_elem->GetNode(64)->rGetLocation() - p_elem->GetNode(192)->rGetLocation();
-            c_vector<double, 2> short_axis = p_elem->GetNode(0)->rGetLocation() - p_elem->GetNode(128)->rGetLocation();
+            // Write initial elongation shape factor to output vector
+            obs_elongation_shape_factor[sc_idx].push_back(mesh.GetElongationShapeFactorOfElement(0));
 
-            observed_aspect_ratios[sc_idx].push_back(norm_2(long_axis) / norm_2(short_axis));
-
-            for (unsigned sim_time_idx = 1 ; sim_time_idx <= num_sim_timesteps ; sim_time_idx++)
+            for (unsigned sim_time_idx = 1 ; sim_time_idx <= num_sim_timepoints ; sim_time_idx++)
             {
                 // Calculate new end time and run simulation
                 double new_end_time = 0.1 * double(sim_time_idx);
-                p_simulator->SetEndTime(new_end_time);
-                p_simulator->Solve();
+                sim.SetEndTime(new_end_time);
+                sim.Solve();
 
-                // Calculate aspect ratio and store data
-                c_vector<double, 2> long_axis = p_elem->GetNode(64)->rGetLocation() - p_elem->GetNode(192)->rGetLocation();
-                c_vector<double, 2> short_axis = p_elem->GetNode(0)->rGetLocation() - p_elem->GetNode(128)->rGetLocation();
-
-                observed_aspect_ratios[sc_idx].push_back(norm_2(long_axis) / norm_2(short_axis));
+                // Add elongation shape factor to output vector
+                obs_elongation_shape_factor[sc_idx].push_back(mesh.GetElongationShapeFactorOfElement(0));
             }
-
-            delete p_gen;
-            delete p_simulator;
         }
 
-
+        // Add data to a csv_writer
         CsvWriter csv_writer;
         csv_writer.AddData(simulation_time);
-        csv_writer.AddData(ref_aspect_ratio);
+        csv_writer.AddData(ref_elongation_shape_factor);
 
         for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
         {
-            csv_writer.AddData(observed_aspect_ratios[sc_idx]);
+            csv_writer.AddData(obs_elongation_shape_factor[sc_idx]);
         }
 
-
         std::vector<std::string> header_names;
-        header_names.push_back("Simulation time (h)");
-        header_names.push_back("Reference aspect ratio");
+        header_names.push_back("Simulation time");
+        header_names.push_back("Ref elongation shape factor");
 
         for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
         {
-            std::string header = "Spring constant mult ";
+            std::string header = "Obs elongation shape factor ";
 
             std::ostringstream suffix;
             suffix << std::fixed << std::setprecision(1);
@@ -626,7 +633,7 @@ public:
         csv_writer.AddHeaders(header_names);
 
         csv_writer.SetDirectoryName(mOutputDirectory);
-        csv_writer.SetFileName("TestSingleCellRelaxation");
+        csv_writer.SetFileName("TestNodeSpacingVsSpringConsant");
 
         csv_writer.WriteDataToFile();
     }
