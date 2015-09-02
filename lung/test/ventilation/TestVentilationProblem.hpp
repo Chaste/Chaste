@@ -91,44 +91,6 @@ void GravitationalBCs(VentilationProblem* pProblem, TimeStepper& rTimeStepper, c
     pProblem->SetPressureAtBoundaryNode(rNode, pressure);
 }
 
-void SwanAcinarUnitsBC(VentilationProblem* pProblem, TimeStepper& rTimeStepper, const Node<3>& rNode)
-{
-    double time = rTimeStepper.GetTime();
-
-    AbstractAcinarUnit* p_acinus = pProblem->GetAcinus(rNode);
-
-    double pleural_pressure = -0.49 - 2.4*(1 + sin((M_PI/2)*(time - 1)));
-
-    p_acinus->SetPleuralPressure(pleural_pressure);
-    p_acinus->SetAirwayPressure(pProblem->GetPressureAtBoundaryNode(rNode));
-
-    if (time != rTimeStepper.GetNextTime()) //Don't advance if we're at the end of the simulation
-    {
-        p_acinus->SolveAndUpdateState(time, rTimeStepper.GetNextTime());
-
-        //Note that the acinar model defines positive flow as out of the acinus.
-        pProblem->SetFluxAtBoundaryNode(rNode, -p_acinus->GetFlow());
-    }
-}
-
-
-class SwanAcinarUnitFactory : public AbstractAcinarUnitFactory
-{
-public:
-    virtual AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode)
-    {
-        AbstractAcinarUnit* p_acinus = new Swan2012AcinarUnit;
-        double acinus_volume = 1.2e6/31000; //Assumes a residual capacity of 1.2l (x10^6 in mm^3)
-
-        p_acinus->SetStretchRatio(1.26); //Stretch ratio appropriate for a lung at functional residual capacity
-        p_acinus->SetUndeformedVolume(acinus_volume);
-        p_acinus->SetPleuralPressure(-0.49); //Pleural pressure at FRC in kPa
-        p_acinus->SetAirwayPressure(0.0);
-
-        return p_acinus;
-    }
-};
-
 
 class TestVentilationProblem : public CxxTest::TestSuite
 {
@@ -412,33 +374,6 @@ public:
         problem.SetOutflowPressure(0.0);
         TimeStepper stepper(0.0, 1.0, 0.1);
         problem.Solve(stepper, &GravitationalBCs, "TestVentilation", "three_bifurcations_gravity");
-    }
-
-    void TestSwanThreeBifurcations() throw (Exception)
-    {
-         SwanAcinarUnitFactory swan_factory;
-
-         TS_ASSERT_THROWS_CONTAINS(swan_factory.GetMesh(), "The mesh object has not been set in the acinar unit factory");
-
-         VentilationProblem problem(&swan_factory, "continuum_mechanics/test/data/three_bifurcations", 0u);
-
-         TS_ASSERT_EQUALS(swan_factory.GetNumberOfAcini(), 5u);
-
-         //The three_bifurcation mesh has very small radii leading to instability, we adjust them to the physiological range.
-         ///\todo This is partially ignored by the solver, which calculates the resistance of the acinar ducts in the constructor
-         TetrahedralMesh<1,3>& r_mesh = problem.rGetMesh();
-         for (TetrahedralMesh<1,3>::ElementIterator iter = r_mesh.GetElementIteratorBegin();
-              iter != r_mesh.GetElementIteratorEnd();
-              ++iter)
-         {
-             iter->SetAttribute(0.5);
-         }
-
-         problem.SetRadiusOnEdge();
-         problem.SetOutflowPressure(0.0);
-
-         TimeStepper stepper(0.0, 1.0, 0.005);
-         problem.Solve(stepper, &SwanAcinarUnitsBC, "TestVentilation", "swan_three_bifurcations");
     }
 
     /*

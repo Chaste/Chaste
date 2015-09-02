@@ -66,7 +66,26 @@ public:
      */
     virtual void SolveAndUpdateState(double tStart, double tEnd) = 0;
 
-    /** Set the air flow
+    /**
+     * Simulate this acinar's behaviour between the time interval [tStart, tEnd],
+     * with timestep #mDt. The flow into the acinus, and so its volume, are kept fixed.
+     *
+     * @param tStart The starting time
+     * @param tEnd The ending time
+     */
+    virtual void ComputeExceptFlow(double tStart, double tEnd) = 0;
+
+    /**
+     * Update the flow to the acinus across a time interval.
+     * Note that this will update the acinus' volume and other
+     * state variables.
+     *
+     * @param tStart The starting time
+     * @param tEnd The ending time
+     */
+    virtual void UpdateFlow(double tStart, double tEnd) = 0;
+
+        /** Set the air flow
      * @param flow  new value
      */
     virtual void SetFlow(double flow) = 0;
@@ -80,6 +99,11 @@ public:
      * @param pressure new value
      */
     virtual void SetAirwayPressure(double pressure) = 0;
+
+    /** Return the airway pressure
+     * @return Airway pressure
+     */
+    virtual double GetAirwayPressure() = 0;
 
     /** Set the pleural pressure
      * @param pressure new value

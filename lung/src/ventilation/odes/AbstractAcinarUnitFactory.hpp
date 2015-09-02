@@ -81,6 +81,14 @@ public:
     virtual unsigned GetNumberOfAcini();
 
     /**
+     *
+     * @param time The current time in seconds
+     * @param pNode Pointer to node object.
+     * @return The pleural pressure at the given node at the given time
+     */
+    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode);
+
+    /**
      * Default constructor.
      */
     AbstractAcinarUnitFactory();

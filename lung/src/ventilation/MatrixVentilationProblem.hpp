@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
-#include "Swan2012AcinarUnit.hpp"
 
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
@@ -78,8 +77,6 @@ private:
     double mDensity;
     double mFluxScaling;  /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux.  This should be the same scale as Poiseuille resistance (comparable to viscosity).*/
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
-
-    std::vector<Swan2012AcinarUnit*> mAcinarUnits; /**< One acinar unit for each terminal node. \todo These will be abstract*/
 
     double mLengthScaling; /**< This solver is designed to be used with SI units, but meshes in mm are common. This scaling allows this to be handled.*/
 

@@ -73,3 +73,8 @@ AbstractTetrahedralMesh<1,3>* AbstractAcinarUnitFactory::GetMesh()
     return mpMesh;
 }
 
+double AbstractAcinarUnitFactory::GetPleuralPressureForNode(double time, Node<3>* pNode)
+{
+    return 0.0;
+}
+
