@@ -43,7 +43,6 @@ DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* 
                                                                            mRootIndex(rootIndex)
 {
     mVentilationProblem.SetOutflowPressure(0.0);
-    mVentilationProblem.SetMeshInMilliMetres();
 
     mpAcinarFactory->SetMesh(&mrMesh);
 
