@@ -419,7 +419,7 @@ public:
         csv_writer.WriteDataToFile();
     }
 
-    void TestNodeSpacingVsSpringConsant() throw(Exception)
+    void xTestNodeSpacingVsSpringConsant() throw(Exception)
     {
         /**
          * This test relaxes a single elliptical cell from an ellipse towards a circle, for a fixed simulation time.
@@ -439,7 +439,7 @@ public:
         std::vector<std::vector<double> > obs_elongation_shape_factor;
 
         // Number of timepoints at which we sample the cell shapes
-        unsigned num_sim_timepoints = 40;
+        unsigned num_sim_timepoints = 30;
 
         // Spring constant of the reference cell
         double ref_spring_const = 1e4;
@@ -501,13 +501,9 @@ public:
             sim.SetDt(0.01);
             sim.SetSamplingTimestepMultiple(10);
 
-            // Calculate aspect ratio - this relies on the cell staying symmetric
-            c_vector<double, 2> long_axis = p_elem->GetNode(32)->rGetLocation() - p_elem->GetNode(96)->rGetLocation();
-            c_vector<double, 2> short_axis = p_elem->GetNode(0)->rGetLocation() - p_elem->GetNode(64)->rGetLocation();
-
             // Store initial data point, and run simulation for all required timesteps
             simulation_time.push_back(0.0);
-            ref_elongation_shape_factor.push_back(norm_2(long_axis) / norm_2(short_axis));
+            ref_elongation_shape_factor.push_back(mesh.GetElongationShapeFactorOfElement(0));
 
             for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
             {
@@ -634,6 +630,233 @@ public:
 
         csv_writer.SetDirectoryName(mOutputDirectory);
         csv_writer.SetFileName("TestNodeSpacingVsSpringConsant");
+
+        csv_writer.WriteDataToFile();
+    }
+
+    void TestCellSizeVsSpringConsant() throw(Exception)
+    {
+        /**
+         * This test relaxes a single elliptical cell from an ellipse towards a circle, for a fixed simulation time.
+         *
+         * A second cell is then simulated with half the size, and the spring constant in membrane-membrane
+         * interactions is varied.  Membrane-membrane rest length is set at 10% of node spacing in both cases.
+         *
+         * All other parameters are fixed, and the following are exported to a csv file:
+         *  * Simulation time
+         *  * Reference cell elongation shape factor
+         *  * Half-sized cell elongation shape factor for each spring constant
+         */
+
+        // Output vectors
+        std::vector<double> simulation_time;
+        std::vector<double> ref_elongation_shape_factor;
+        std::vector<std::vector<double> > obs_elongation_shape_factor;
+
+        // Number of timepoints at which we sample the cell shapes
+        unsigned num_sim_timepoints = 20;
+
+        // Spring constant of the reference cell
+        double ref_spring_const = 4e4;
+
+        // Perform the first simulation
+        {
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse exponent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator gen(256, 1.0, 0.3, 0.6, 0.0, 0.0);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = gen.GetPointsAsVectors();
+
+            std::vector<Node<2> *> nodes;
+            for (unsigned node_idx = 0; node_idx < locations.size(); node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement < 2, 2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, 128, 128);
+
+            PRINT_VARIABLE(mesh.GetSpacingRatio());
+            PRINT_VARIABLE(mesh.GetCharacteristicNodeSpacing());
+
+            // Set up cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+
+            // Set element properties
+            ImmersedBoundaryElement<2, 2> *p_elem = mesh.GetElement(0u);
+            p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+            p_elem->SetMembraneSpringConstant(ref_spring_const);
+
+            PRINT_VARIABLE(mesh.GetSurfaceAreaOfElement(0u));
+            PRINT_VARIABLE(mesh.GetVolumeOfElement(0u));
+
+            // Create simulation
+            OffLatticeSimulation<2> sim(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            sim.AddSimulationModifier(p_main_modifier);
+
+            std::string output_dir = "ImmersedBoundaryNumerics/TestCellSizeVsSpringConsantRef";
+            output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
+
+            // Set simulation properties
+            sim.SetOutputDirectory(output_dir);
+            sim.SetDt(0.01);
+            sim.SetSamplingTimestepMultiple(10);
+
+            // Store initial data point, and run simulation for all required timesteps
+            simulation_time.push_back(0.0);
+            ref_elongation_shape_factor.push_back(mesh.GetElongationShapeFactorOfElement(0));
+
+            for (unsigned sim_time_idx = 1; sim_time_idx <= num_sim_timepoints; sim_time_idx++)
+            {
+                // Calculate new end time and run simulation
+                double new_end_time = 0.1 * double(sim_time_idx);
+                sim.SetEndTime(new_end_time);
+                sim.Solve();
+
+                // Add data to relevant vectors
+                simulation_time.push_back(new_end_time);
+                ref_elongation_shape_factor.push_back(mesh.GetElongationShapeFactorOfElement(0));
+            }
+        }
+
+        /*
+         * Now do the same again in a loop where we change the spring constant (2, 4 and 6 times the reference)
+         */
+
+        unsigned num_springs = 10;
+        obs_elongation_shape_factor.resize(num_springs);
+
+
+        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        {
+            double scaling_factor = double(sc_idx + 1);
+
+            /*
+             * Create an Immersed Boundary Mesh using a SuperellipseGenerator
+             *
+             * 1: Num nodes
+             * 2: Superellipse expoHi Sanent
+             * 3: Width
+             * 4: Height
+             * 5: Bottom-left x
+             * 6: Botton-left y
+             */
+            SuperellipseGenerator gen(unsigned(256.0/scaling_factor), 1.0, 0.3/scaling_factor, 0.6/scaling_factor, 0.0, 0.0);
+
+            // Because we have already run a simulation in this test, we must destroy the SimulationTime singleton
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+
+            // Generate a mesh using this superellipse
+            std::vector<c_vector<double, 2> > locations = gen.GetPointsAsVectors();
+
+            std::vector<Node<2>* > nodes;
+            for (unsigned node_idx = 0 ; node_idx < locations.size() ; node_idx++)
+            {
+                nodes.push_back(new Node<2>(node_idx, locations[node_idx], true));
+            }
+
+            std::vector<ImmersedBoundaryElement<2,2>* > elements;
+            elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 128, 128);
+
+            PRINT_VARIABLE(mesh.GetCharacteristicNodeSpacing());
+
+            // Set up cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation <2> cell_population(mesh, cells);
+
+            // Set element properties
+            ImmersedBoundaryElement<2, 2>* p_elem = mesh.GetElement(0u);
+
+            p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
+            p_elem->SetMembraneSpringConstant( 1.0 / pow(scaling_factor, 1.1) * ref_spring_const);
+
+            PRINT_VARIABLE(mesh.GetSurfaceAreaOfElement(0u));
+            PRINT_VARIABLE(mesh.GetVolumeOfElement(0u));
+
+            // Create simulation
+            OffLatticeSimulation<2> sim(cell_population);
+
+            // Add main immersed boundary simulation modifier
+            MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
+            sim.AddSimulationModifier(p_main_modifier);
+
+            std::string output_dir = "ImmersedBoundaryNumerics/TestCellSizeVsSpringConsant";
+            output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
+
+            // Set simulation properties
+            sim.SetOutputDirectory(output_dir);
+            sim.SetDt(0.01);
+            sim.SetSamplingTimestepMultiple(10);
+
+            // Write initial elongation shape factor to output vector
+            obs_elongation_shape_factor[sc_idx].push_back(mesh.GetElongationShapeFactorOfElement(0));
+
+            for (unsigned sim_time_idx = 1 ; sim_time_idx <= num_sim_timepoints ; sim_time_idx++)
+            {
+                // Calculate new end time and run simulation
+                double new_end_time = 0.1 * double(sim_time_idx);
+                sim.SetEndTime(new_end_time);
+                sim.Solve();
+
+                // Add elongation shape factor to output vector
+                obs_elongation_shape_factor[sc_idx].push_back(mesh.GetElongationShapeFactorOfElement(0));
+            }
+        }
+
+        // Add data to a csv_writer
+        CsvWriter csv_writer;
+        csv_writer.AddData(simulation_time);
+        csv_writer.AddData(ref_elongation_shape_factor);
+
+        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        {
+            csv_writer.AddData(obs_elongation_shape_factor[sc_idx]);
+        }
+
+        std::vector<std::string> header_names;
+        header_names.push_back("Simulation time");
+        header_names.push_back("Ref elongation shape factor");
+
+        for (unsigned sc_idx = 0 ; sc_idx < num_springs ; sc_idx++)
+        {
+            std::string header = "Obs elongation shape factor ";
+
+            std::ostringstream suffix;
+            suffix << std::fixed << std::setprecision(1);
+            suffix << 1.0 * double(sc_idx + 1);
+            header += suffix.str();
+
+            header_names.push_back(header);
+        }
+
+        csv_writer.AddHeaders(header_names);
+
+        csv_writer.SetDirectoryName(mOutputDirectory);
+        csv_writer.SetFileName("TestCellSizeVsSpringConsant");
 
         csv_writer.WriteDataToFile();
     }
