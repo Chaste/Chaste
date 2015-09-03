@@ -38,11 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include "AbstractVentilationProblem.hpp"
-#include "AbstractAcinarUnitFactory.hpp"
 #include "LinearSystem.hpp"
 #include "TimeStepper.hpp"
 #include "VtkMeshWriter.hpp"
-#include "Swan2012AcinarUnit.hpp"
 
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
@@ -81,9 +79,6 @@ private:
      *  This is used in the dynamic (Pedley) resistance calculation
      */
     double mDensity;
-
-    /**< One acinar unit for each terminal node. */
-    std::map<unsigned, AbstractAcinarUnit*> mAcinarUnits;
 
     /**< Used to hold the flux solution (and boundary conditions) in edge index ordering */
     std::vector<double> mFlux;
@@ -147,9 +142,6 @@ private:
 
     /** The linear solver for the mTerminalInteractionMatrix terminal pressure to flux solver*/
     KSP mTerminalKspSolver;
-
-    /** The acinar unit factory creates an acinar unit for each distal node in the tree. */
-    AbstractAcinarUnitFactory* mpAcinarUnitFactory;
 
     /**
      * Use flux boundary conditions at leaves (and pressure condition at root) to perform a direct solve.
@@ -228,21 +220,6 @@ public:
      * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
      */
     VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex=0u);
-
-    /** Constructor
-     * Loads a mesh from file(s)
-     * Creates acinar units for the ends of the tree.
-     * Identifies the outlet node (a.k.a root of tree or the mouth end)
-     *   A check is made that it is a boundary node.
-     * Creates a linear system of the appropriate size to match the mesh
-     *
-     * @param pAcinarUnitFactory A factory to create acinar units with.
-     * @param rMeshDirFilePath  the path and root name of the .node and .edge files for the mesh
-     * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
-     */
-    VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFactory,
-                       const std::string& rMeshDirFilePath,
-                       unsigned rootIndex=0u);
 
     /** Destructor
      *  destroys the linear system
@@ -394,15 +371,6 @@ public:
         mDynamicResistance = dynamicResistance;
     }
 
-    /**
-     * @param rNode The node to get the acinus at. Must be a boundary node!
-     * @return The acinar unit at the given node.
-     */
-    AbstractAcinarUnit* GetAcinus(const Node<3>& rNode)
-    {
-        assert(mAcinarUnits.count(rNode.GetIndex()));
-        return mAcinarUnits[rNode.GetIndex()];
-    }
 
 };
 

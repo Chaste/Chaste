@@ -149,6 +149,7 @@ public:
         double acinar_compliance = total_compliance/4.0;
 
         SimpleAcinarUnitFactory factory(acinar_compliance, 2400.0);
+        TS_ASSERT_THROWS_CONTAINS(factory.GetMesh(), "The mesh object has not been set in the acinar unit factory");
 
         double viscosity = 1.92e-5;               //Pa s
         double terminal_airway_radius = 0.00005;   //m
@@ -163,6 +164,12 @@ public:
         problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
         problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
         problem.SetTimeStep(0.01);
+
+        ///\todo The below are for coverage until output is fully implemented
+        problem.SetPrintingTimeStep(0.1);
+        problem.SetOutputDirectory("TestDynamicVentilation");
+        problem.SetOutputFilenamePrefix("three_bifurcations");
+        factory.GetNumberOfAcini();
 
         TimeStepper time_stepper(0.0, 1.0, 0.01);
 

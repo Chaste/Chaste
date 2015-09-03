@@ -54,49 +54,6 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
 }
 
 
-VentilationProblem::VentilationProblem(AbstractAcinarUnitFactory* pAcinarUnitFactory,
-                                       const std::string& rMeshDirFilePath,
-                                       unsigned rootIndex) :
-                                                     AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
-                                                     mDynamicResistance(false),
-                                               mRadiusOnEdge(false),
-                                               mDensity(1.15e-6),
-                                               mFluxGivenAtInflow(false),
-                                               mTerminalInteractionMatrix(NULL),
-                                               mTerminalFluxChangeVector(NULL),
-                                               mTerminalPressureChangeVector(NULL),
-                                               mTerminalKspSolver(NULL)
-{
-    Initialise(rMeshDirFilePath);
-    pAcinarUnitFactory->SetMesh(&mMesh);
-
-    ///\todo We need to do some parallel here in order to load balance
-
-    //Set up acinar units using the factory
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
-          iter != mMesh.GetBoundaryNodeIteratorEnd();
-          ++iter)
-    {
-        if ((*iter)->GetIndex() != mOutletNodeIndex)
-        {
-
-            AbstractAcinarUnit* p_acinus = pAcinarUnitFactory->CreateAcinarUnitForNode(*iter);
-
-            //Sets the terminal bronchiole resistance of the acinar unit.
-            c_vector<double, 3> dummy;
-            double length;
-            unsigned edge_index = *( (*iter)->ContainingElementsBegin() );
-            mMesh.GetWeightedDirectionForElement(edge_index, dummy, length);
-
-            double radius = (*iter)->rGetNodeAttributes()[0];
-
-            double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
-            p_acinus->SetTerminalBronchioleResistance(resistance);
-
-            mAcinarUnits[(*iter)->GetIndex()] = p_acinus;
-        }
-    }
-}
 
 
 void VentilationProblem::Initialise(const std::string& rMeshDirFilePath)
@@ -108,14 +65,6 @@ void VentilationProblem::Initialise(const std::string& rMeshDirFilePath)
 
 VentilationProblem::~VentilationProblem()
 {
-    if(mAcinarUnits.size() > 0)
-    {
-        for (unsigned i=0; i<mAcinarUnits.size(); i++)
-        {
-            delete mAcinarUnits[i];
-        }
-    }
-
     /* Remove the PETSc context used in the iterative solver */
     if (mTerminalInteractionMatrix)
     {
@@ -569,25 +518,6 @@ void VentilationProblem::AddDataToVtk(VtkMeshWriter<1, 3>& rVtkWriter,
     GetSolutionAsFluxesAndPressures(fluxes, pressures);
     rVtkWriter.AddCellData("Flux"+rSuffix, fluxes);
     rVtkWriter.AddPointData("Pressure"+rSuffix, pressures);
-
-    if(mAcinarUnits.size() > 0)
-    {
-        std::vector<double> volumes(mMesh.GetNumNodes());
-        std::vector<double> stretch_ratios(mMesh.GetNumNodes());
-
-        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
-                 iter != mMesh.GetBoundaryNodeIteratorEnd();
-                 ++iter)
-        {
-            if( (*iter)->GetIndex() != mOutletNodeIndex)
-            {
-                volumes[(*iter)->GetIndex()] = mAcinarUnits[(*iter)->GetIndex()]->GetVolume();
-                stretch_ratios[(*iter)->GetIndex()] = mAcinarUnits[(*iter)->GetIndex()]->GetStretchRatio();
-            }
-        }
-        rVtkWriter.AddPointData("Volume"+rSuffix, volumes);
-        rVtkWriter.AddPointData("Stretch"+rSuffix, stretch_ratios);
-    }
 }
 
 #endif // CHASTE_VTK
