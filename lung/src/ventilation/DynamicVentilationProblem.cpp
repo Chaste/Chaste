@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "DynamicVentilationProblem.hpp"
+#include "ProgressReporter.hpp"
 
 DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* pAcinarFactory,
                                                      const std::string& rMeshDirFilePath,
@@ -106,6 +107,7 @@ void DynamicVentilationProblem::SetOutputFilenamePrefix(const std::string prefix
 void DynamicVentilationProblem::Solve()
 {
     TimeStepper time_stepper(mCurrentTime, mEndTime, mDt);
+    ProgressReporter progress_reporter(mOutputDirectory, mCurrentTime, mEndTime);
 
     std::vector<double> pressures(mrMesh.GetNumNodes(), -1);
     std::vector<double> fluxes(mrMesh.GetNumNodes() - 1, -1);
@@ -151,6 +153,7 @@ void DynamicVentilationProblem::Solve()
         }
 
         mCurrentTime = time_stepper.GetNextTime();
+        progress_reporter.Update(mCurrentTime);
         time_stepper.AdvanceOneTimeStep();
     }
 }
