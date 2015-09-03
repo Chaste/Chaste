@@ -156,8 +156,6 @@ list(APPEND CHASTE_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 #find PETSc
 find_package(PETSc REQUIRED COMPONENTS CXX)
-
-list(APPEND CHASTE_INCLUDES "${PETSC_INCLUDES}")
 list(APPEND CHASTE_LINK_LIBRARIES 
     "${PETSC_LIBRARIES}"
 )
@@ -183,6 +181,11 @@ list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
 list(APPEND CHASTE_LINK_LIBRARIES 
     "${HDF5_LIBRARIES}"
 )
+
+# put petsc includes after hdf5 includes or else the hdf5 headers 
+# in the petsc include dir will clobber those chosen on FindHdf5.cmake
+list(APPEND CHASTE_INCLUDES "${PETSC_INCLUDES}")
+
 
 #Locate MPI 
 set(MPI_CXX_COMPILER ${PETSC_COMPILER})
