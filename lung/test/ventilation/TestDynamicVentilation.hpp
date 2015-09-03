@@ -110,6 +110,7 @@ public:
 
         DynamicVentilationProblem problem(&factory, mesh_finder.GetAbsolutePath(), 0u);
         problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
+        problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
 
         problem.SetTimeStep(0.01);
 
@@ -155,10 +156,11 @@ public:
         //All airways in the mesh have radius 0.05 mm. The first branch is 3mm long, the others are 5mm.
         double total_airway_resistance = (0.003 + 0.005/2 + 0.005/4)*resistance_per_unit_length;
 
-        double ode_volume;
+        double ode_volume = 0.0;
 
         //Setup a simulation iterating between the flow solver and the acinar balloon.
         DynamicVentilationProblem problem(&factory, mesh_finder.GetAbsolutePath(), 0u);
+        problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
         problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
         problem.SetTimeStep(0.01);
 
@@ -226,6 +228,7 @@ public:
        DynamicVentilationProblem problem(&factory, mesh_finder.GetAbsolutePath(), 0u);
        problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
        problem.rGetMatrixVentilationProblem().SetRadiusOnEdge();
+       problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
 
        double expected_tidal_volume = effective_compliance*delta_p*std::sin(theta);
 

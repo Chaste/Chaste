@@ -40,6 +40,7 @@ DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* 
                                                      unsigned rootIndex) : mpAcinarFactory(pAcinarFactory),
                                                                            mVentilationProblem(rMeshDirFilePath, rootIndex),
                                                                            mrMesh(mVentilationProblem.rGetMesh()),
+                                                                           mCurrentTime(0.0),
                                                                            mRootIndex(rootIndex)
 {
     mVentilationProblem.SetOutflowPressure(0.0);
@@ -140,7 +141,7 @@ void DynamicVentilationProblem::Solve()
                 mAcinarMap[(*iter)->GetIndex()]->SetFlow(fluxes[boundary_element_index]);
 
                 double resistance = 0.0;
-                if(fluxes[(*iter)->GetIndex()] != 0.0)
+                if(fluxes[boundary_element_index] != 0.0)
                 {
                     resistance = std::fabs(pressures[(*iter)->GetIndex()]/fluxes[boundary_element_index]);
                 }
