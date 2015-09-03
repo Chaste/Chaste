@@ -95,6 +95,7 @@ public:
 
     void TestColemanDynamicVentilationSingleAirway() throw(Exception)
     {
+#ifdef LUNG_USE_UMFPACK
         FileFinder mesh_finder("lung/test/data/single_branch", RelativeTo::ChasteSourceRoot);
 
         double compliance = 0.1/98.0665/1e3;  //in m^3 / pa. Converted from 0.1 L/cmH2O per lung.
@@ -131,6 +132,9 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+#else
+        std::cout << "Warning: This test needs UMFPACK to execute correctly." << std::endl;
+#endif
     }
 
     void TestColemanDynamicVentilationThreeBifurcations() throw(Exception)
@@ -182,6 +186,7 @@ public:
 
     void TestColemanDynamicVentilationOtisBifurcations() throw(Exception)
     {
+#ifdef LUNG_USE_UMFPACK
        FileFinder mesh_finder("lung/test/data/otis_bifurcation", RelativeTo::ChasteSourceRoot);
 
        //The otis bifurcation mesh defines two branches of unequal radii leading to two acini
@@ -257,6 +262,9 @@ public:
        }
 
        TS_ASSERT_DELTA(expected_tidal_volume, max_total_volume - min_total_volume, 1e-7);
+#else
+        std::cout << "Warning: This test needs UMFPACK to execute correctly." << std::endl;
+#endif
     }
 };
 
