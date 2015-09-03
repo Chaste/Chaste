@@ -264,6 +264,22 @@ if(ENABLE_CHASTE_TESTING)
     find_package(CxxTest)
 endif()
 
+# if building shared libraries link any static third-party library with -Wl,-whole-archive 
+if (BUILD_SHARED_LIBS)
+    set(static_extension "a")
+    set(new_libraries "")
+    foreach(library ${CHASTE_LINK_LIBRARIES})
+        if (library MATCHES ".*\\.${static_extension}")
+            list(APPEND new_libraries "-Wl,-whole-archive ${library} -Wl,-no-whole-archive")
+        else()
+            list(APPEND new_libraries "${library}")
+        endif()
+    endforeach()
+    set(CHASTE_LINK_LIBRARIES ${new_libraries})
+endif()
+
+
+
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #
 ###########################################
