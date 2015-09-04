@@ -142,8 +142,6 @@ elseif (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h")   # > 2.3.3
 elseif (EXISTS "${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf.h") # <= 2.3.3
   set (petsc_conf_rules "${PETSC_DIR}/bmake/common/rules")
   set (petsc_conf_variables "${PETSC_DIR}/bmake/common/variables")
-  # petsc 2.3.3 only has C bindings
-  set (PETSC_LANGUAGE_BINDINGS "C")
 elseif (PETSC_DIR)
   message (SEND_ERROR "The pair PETSC_DIR=${PETSC_DIR} PETSC_ARCH=${PETSC_ARCH} do not specify a valid PETSc installation")
 endif ()
@@ -224,11 +222,9 @@ show :
     else (WIN32)
       set (libname ${name})
     endif (WIN32)
-    message("trying to find ${libname} in ${petsc_lib_dir} ")
     find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
     if (NOT PETSC_LIBRARY_${suffix})
         set (libname ${name})
-    message("trying to find ${libname} in ${petsc_lib_dir} ")
 		find_library (PETSC_LIBRARY_${suffix} NAMES ${libname} HINTS ${petsc_lib_dir} NO_DEFAULT_PATH)
     endif()
     set (PETSC_LIBRARIES_${suffix} "${PETSC_LIBRARY_${suffix}}")
@@ -269,7 +265,7 @@ show :
 
   include(Check${PETSC_LANGUAGE_BINDINGS}SourceRuns)
   macro (PETSC_TEST_RUNS includes libraries runs)
-    if(${PETSC_LANGUAGE_BINDINGS} STREQUAL "C")
+    if(${PETSC_LANGUAGE_BINDINGS} STREQUAL "C" OR ${PETSC_VERSION} VERSION_LESS 2.3.4)
       set(_PETSC_ERR_FUNC "CHKERRQ(ierr)")
     elseif(${PETSC_LANGUAGE_BINDINGS} STREQUAL "CXX")
       set(_PETSC_ERR_FUNC "CHKERRXX(ierr)")
