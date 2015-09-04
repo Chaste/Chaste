@@ -145,6 +145,11 @@ public:
         TS_ASSERT_DELTA(acinus.CalculateDerivativeStaticRecoilPressureByStrain(), dPedLambda, 1e-6);
         TS_ASSERT_DELTA(acinus.CalculateAcinarTissueCompliance(), 3*V0*lambda*lambda/dPedLambda, 1e-6);
 
+        //There are for coverage until the swan acinar model is updated to use the Coleman numerical method
+        acinus.ComputeExceptFlow(0.0,0.0);
+        acinus.UpdateFlow(0.0,0.0);
+        acinus.GetAirwayPressure();
+
     }
 
     void TestSwan2012AcinarUnitInspiration() throw(Exception)
