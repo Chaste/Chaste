@@ -78,27 +78,37 @@ public:
     std::map<unsigned, AbstractAcinarUnit*>& rGetAcinarUnitMap();
 
     /**
-     * Set the size of the global timestep
+     * Set the size of the global time step
+     *
+     * @param timeStep The timestep used by the simulation
      */
     void SetTimeStep(double timeStep);
 
     /**
-     * Set the size of the time interval between which data is written out
+     * Set the ratio of the number of actual time steps to the number of time steps at which results are written to file. Default value is set to 1 by the constructor.
+     *
+     * @param multiple Number of discrete timesteps between output being written.
      */
-    void SetPrintingTimeStep(double timeStep);
+    void SetSamplingTimeStepMultiple(unsigned multiple);
 
     /**
      * Set the finishing time of the simulation
+     *
+     * @param time The time to end the simulation
      */
     void SetEndTime(double time);
 
     /**
      * Specify the directory to write output to
+     *
+     * @param directory The directory to write to
      */
     void SetOutputDirectory(const std::string directory);
 
     /**
      * Specify the root of the output file name
+     *
+     * @param prefix Prefix of the output file name
      */
     void SetOutputFilenamePrefix(const std::string prefix);
 
@@ -106,6 +116,13 @@ public:
      * Solves up to the next finishing time
      */
     void Solve();
+
+    /**
+     * Tell the solver to output VTK files for visualisation or not
+     *
+     * @param writeVtkOutput Boolean indicating whether VTK output should be written or not
+     */
+    void SetWriteVtkOutput(bool writeVtkOutput = true);
 
 private:
     /**
@@ -134,9 +151,9 @@ private:
     double mDt;
 
     /**
-     * Interval between which output is written
+     * Number of timesteps before output is written to file
      */
-    double mPrintingTimeStep;
+    unsigned mSamplingTimeStepMultiple;
 
     /**
      * The current simulation time
@@ -162,6 +179,11 @@ private:
      * Prefix of output file name.
      */
     std::string mOutputFileNamePrefix;
+
+    /**
+     * Boolean to determine whether to write out VTK output or not.
+     */
+    bool mWriteVtkOutput;
 };
 
 #endif /* DYNAMICVENTILATIONPROBLEM_HPP_ */

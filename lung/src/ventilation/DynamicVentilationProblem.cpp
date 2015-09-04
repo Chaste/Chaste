@@ -41,6 +41,8 @@ DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* 
                                                      unsigned rootIndex) : mpAcinarFactory(pAcinarFactory),
                                                                            mVentilationProblem(rMeshDirFilePath, rootIndex),
                                                                            mrMesh(mVentilationProblem.rGetMesh()),
+                                                                           mDt(0.01),
+                                                                           mSamplingTimeStepMultiple(1u),
                                                                            mCurrentTime(0.0),
                                                                            mRootIndex(rootIndex)
 {
@@ -84,9 +86,9 @@ void DynamicVentilationProblem::SetTimeStep(double timeStep)
     mDt = timeStep;
 }
 
-void DynamicVentilationProblem::SetPrintingTimeStep(double timeStep)
+void DynamicVentilationProblem::SetSamplingTimeStepMultiple(unsigned timeStep)
 {
-    mPrintingTimeStep = timeStep;
+    mSamplingTimeStepMultiple = timeStep;
 }
 
 void DynamicVentilationProblem::SetEndTime(double time)
@@ -104,13 +106,22 @@ void DynamicVentilationProblem::SetOutputFilenamePrefix(const std::string prefix
     mOutputFileNamePrefix = prefix;
 }
 
+void DynamicVentilationProblem::SetWriteVtkOutput(bool writeVtkOutput)
+{
+    mWriteVtkOutput = writeVtkOutput;
+}
+
 void DynamicVentilationProblem::Solve()
 {
     TimeStepper time_stepper(mCurrentTime, mEndTime, mDt);
+
+    VtkMeshWriter<1, 3> vtk_writer(mOutputDirectory, mOutputFileNamePrefix, false);
+
     ProgressReporter progress_reporter(mOutputDirectory, mCurrentTime, mEndTime);
 
     std::vector<double> pressures(mrMesh.GetNumNodes(), -1);
     std::vector<double> fluxes(mrMesh.GetNumNodes() - 1, -1);
+    std::vector<double> volumes(mrMesh.GetNumNodes(), -1);
 
     while (!time_stepper.IsTimeAtEnd())
     {
@@ -152,8 +163,40 @@ void DynamicVentilationProblem::Solve()
             }
         }
 
+        if((time_stepper.GetTotalTimeStepsTaken() % mSamplingTimeStepMultiple) == 0u)
+        {
+            progress_reporter.Update(time_stepper.GetNextTime());
+
+            if(mWriteVtkOutput)
+            {
+                std::ostringstream suffix_name;
+                suffix_name <<  "_" << std::setw(6) << std::setfill('0') << time_stepper.GetTotalTimeStepsTaken()/mSamplingTimeStepMultiple;
+
+                vtk_writer.AddCellData("Flux"+suffix_name.str(), fluxes);
+                vtk_writer.AddPointData("Pressure"+suffix_name.str(), pressures);
+
+
+                for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
+                                                iter != mrMesh.GetBoundaryNodeIteratorEnd();
+                                                ++iter )
+                {
+                    if ((*iter)->GetIndex() != mRootIndex)
+                    {
+                        volumes[(*iter)->GetIndex()] = mAcinarMap[(*iter)->GetIndex()]->GetVolume();
+                    }
+                }
+
+                vtk_writer.AddPointData("Volume"+suffix_name.str(), volumes);
+            }
+        }
+
+
         mCurrentTime = time_stepper.GetNextTime();
-        progress_reporter.Update(mCurrentTime);
         time_stepper.AdvanceOneTimeStep();
+    }
+
+    if(mWriteVtkOutput)
+    {
+        vtk_writer.WriteFilesUsingMesh(mrMesh);
     }
 }

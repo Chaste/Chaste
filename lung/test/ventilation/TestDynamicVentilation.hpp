@@ -164,11 +164,6 @@ public:
         problem.rGetMatrixVentilationProblem().SetOutflowPressure(0.0);
         problem.rGetMatrixVentilationProblem().SetMeshInMilliMetres();
         problem.SetTimeStep(0.01);
-
-        ///\todo The below are for coverage until output is fully implemented
-        problem.SetPrintingTimeStep(0.1);
-        problem.SetOutputDirectory("TestDynamicVentilation");
-        problem.SetOutputFilenamePrefix("three_bifurcations");
         factory.GetNumberOfAcini();
 
         TimeStepper time_stepper(0.0, 1.0, 0.01);
@@ -190,6 +185,19 @@ public:
 
             time_stepper.AdvanceOneTimeStep();
         }
+
+        //Solve for longer and write output to VTK
+        problem.SetSamplingTimeStepMultiple(10u);
+        problem.SetOutputDirectory("TestDynamicVentilation");
+        problem.SetOutputFilenamePrefix("three_bifurcations");
+        problem.SetWriteVtkOutput();
+        problem.SetEndTime(1.5);
+        problem.Solve();
+
+        std::string filepath = OutputFileHandler::GetChasteTestOutputDirectory() + "TestDynamicVentilation/";
+        std::string basename = filepath + "three_bifurcations";
+        FileFinder vtu_file(basename + ".vtu", RelativeTo::Absolute);
+        TS_ASSERT(vtu_file.Exists());
     }
 
 
