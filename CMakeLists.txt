@@ -264,18 +264,18 @@ if(ENABLE_CHASTE_TESTING)
     find_package(CxxTest)
 endif()
 
-# if building shared libraries link any static third-party library with -Wl,-whole-archive 
+# if building shared libraries filter out any static third-party libraries. These will be linked into global only.
 if (BUILD_SHARED_LIBS)
     set(static_extension "a")
-    set(new_libraries "")
+    set(shared_libraries "")
     foreach(library ${CHASTE_LINK_LIBRARIES})
         if (library MATCHES ".*\\.${static_extension}")
-            list(APPEND new_libraries "-Wl,-whole-archive ${library} -Wl,-no-whole-archive")
+            list(APPEND Chaste_THIRD_PARTY_STATIC_LIBRARIES "${library}")
         else()
-            list(APPEND new_libraries "${library}")
+            list(APPEND shared_libraries "${library}")
         endif()
     endforeach()
-    set(CHASTE_LINK_LIBRARIES ${new_libraries})
+    set(CHASTE_LINK_LIBRARIES ${shared_libraries})
 endif()
 
 
@@ -367,7 +367,7 @@ endforeach(projectName)
 
 export(PACKAGE Chaste)
 
-export(TARGETS ${CHASTE_COMPONENTS}
+export(TARGETS ${CHASTE_COMPONENTS} 
     FILE "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
     #added in 2.8.12, need this?    EXPORT_LINK_INTERFACE_LIBRARIES 
     )
