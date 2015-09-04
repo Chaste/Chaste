@@ -229,7 +229,8 @@
 :membrane_stimulus_current_amplitude
     a :Annotation ;
     a :StimulusCurrent ;
-    rdfs:label "Membrane stimulus current pulse amplitude" .
+    rdfs:label "Membrane stimulus current pulse amplitude" ;
+    rdfs:comment "This should be negative in order to cause a positive change in voltage." .
 
 :membrane_stimulus_current_period
     a :Annotation ;
