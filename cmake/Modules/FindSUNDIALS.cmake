@@ -105,7 +105,7 @@ find_path( SUNDIALS_INCLUDE_DIR sundials_types.h
         include/sundials
 )
 if (SUNDIALS_INCLUDE_DIR)
-    GET_FILENAME_COMPONENT( root_dir "${SUNDIALS_INCLUDE_DIR}" DIRECTORY )
+    GET_FILENAME_COMPONENT( root_dir "${SUNDIALS_INCLUDE_DIR}" PATH)
     set( SUNDIALS_INCLUDE_DIRS
         "${root_dir}"
         "${SUNDIALS_INCLUDE_DIR}"
