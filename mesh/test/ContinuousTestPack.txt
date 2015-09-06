@@ -13,6 +13,10 @@ TestNonCachedTetrahedralMesh.hpp
 TestQuadraticMesh.hpp
 TestTetrahedralMesh.hpp
 TestTransformations.hpp
+mutable/TestCylindrical2dMesh.hpp
+mutable/TestCylindrical2dNodesOnlyMesh.hpp
+mutable/TestCylindricalHoneycombMeshGenerator.hpp
+mutable/TestHoneycombMeshGenerator.hpp
 reader/TestFemlabMeshReader.hpp
 reader/TestGmshMeshReader.hpp
 reader/TestMemfemMeshReader.hpp

@@ -2,9 +2,6 @@ cell/TestOdeBasedCellCycleModels.hpp
 cell/TestSimpleCellCycleModels.hpp
 cell/TestCell.hpp
 common/TestSimulationTime.hpp
-mesh/TestCylindrical2dMesh.hpp
-mesh/TestCylindricalHoneycombMeshGenerator.hpp
-mesh/TestHoneycombMeshGenerator.hpp
 odes/TestAlarcon2004OxygenBasedCellCycleOdeSystem.hpp
 odes/TestTysonNovak2001OdeSystem.hpp
 simulation/TestOffLatticeSimulation3d.hpp

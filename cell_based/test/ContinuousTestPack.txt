@@ -14,10 +14,6 @@ cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
 common/TestOdeLinearSystemSolver.hpp
 common/TestSimulationTime.hpp
-mesh/TestCylindrical2dMesh.hpp
-mesh/TestCylindrical2dNodesOnlyMesh.hpp
-mesh/TestCylindricalHoneycombMeshGenerator.hpp
-mesh/TestHoneycombMeshGenerator.hpp
 mesh/TestPottsElement.hpp
 mesh/TestPottsMesh.hpp
 mesh/TestPottsMeshGenerator.hpp
