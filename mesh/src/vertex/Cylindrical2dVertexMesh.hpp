@@ -40,6 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "MutableVertexMesh.hpp"
+#include "Cylindrical2dMesh.hpp"
+
+
 
 /**
  * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
@@ -98,6 +101,14 @@ public:
                             std::vector<VertexElement<2,2>*> vertexElements,
                             double cellRearrangementThreshold=0.01,
                             double t2Threshold=0.001);
+
+    /**
+     * Alternative constructor. Creates a Voronoi tessellation of a given Cylindrical2dMesh,
+     * which must be Delaunay (see TetrahedralMesh::CheckIsVoronoi).
+     *
+     * @param rMesh a Cylindrical2dMesh
+     */
+    Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh);
 
     /**
      * Destructor.

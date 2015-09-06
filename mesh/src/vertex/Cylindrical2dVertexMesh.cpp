@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "Cylindrical2dVertexMesh.hpp"
+#include "Cylindrical2dMesh.hpp"
+#include "Debug.hpp"
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  std::vector<Node<2>*> nodes,
@@ -45,6 +47,106 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
 {
     // ReMesh to remove any deleted nodes and relabel
     ReMesh();
+}
+
+Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh)
+    : mWidth(rMesh.GetWidth(0))
+{
+    mpDelaunayMesh = &rMesh;
+
+    // Reset member variables and clear mNodes, mFaces and mElements
+    Clear();
+
+    unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();
+    unsigned num_nodes = mpDelaunayMesh->GetNumAllElements();
+
+    // Allocate memory for mNodes and mElements
+    this->mNodes.reserve(num_nodes);
+
+    // Create as many elements as there are nodes in the mesh
+    mElements.reserve(num_elements);
+
+    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+    {
+        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
+        mElements.push_back(p_element);
+    }
+
+    // Populate mNodes
+    GenerateVerticesFromElementCircumcentres(rMesh);
+
+    // loop over all generated nodes and check they're not outside [0,mWidth]
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        double x_location = mNodes[i]->rGetLocation()[0];
+        if (x_location < 0 )
+        {
+            mNodes[i]->rGetModifiableLocation()[0] = x_location + mWidth;
+        }
+        else if (x_location > mWidth )
+        {
+            mNodes[i]->rGetModifiableLocation()[0] = x_location - mWidth;
+        }
+    }
+
+    // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
+    for (unsigned i=0; i<num_nodes; i++)
+    {
+        // Loop over nodes owned by this triangular element in the Delaunay mesh
+        // Add this node/vertex to each of the 3 vertex elements
+        for (unsigned local_index=0; local_index<3; local_index++)
+        {
+            unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
+            unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
+            unsigned end_index = num_nodes_in_elem>0 ? num_nodes_in_elem-1 : 0;
+
+            mElements[elem_index]->AddNode(this->mNodes[i], end_index);
+        }
+
+    }
+
+    // Reorder mNodes anticlockwise
+    for (unsigned elem_index=0; elem_index<mElements.size(); elem_index++)
+    {
+        /**
+         * Create a std::vector of pairs, where each pair comprises the angle
+         * between the centre of the Voronoi element and each node with that
+         * node's global index in the Voronoi mesh.
+         */
+        std::vector<std::pair<double, unsigned> > index_angle_list;
+        for (unsigned local_index=0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
+        {
+            c_vector<double, 2> vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
+            c_vector<double, 2> vectorB = mElements[elem_index]->GetNodeLocation(local_index);
+            c_vector<double, 2> centre_to_vertex = mpDelaunayMesh->GetVectorFromAtoB(vectorA, vectorB);
+
+            double angle = atan2(centre_to_vertex(1), centre_to_vertex(0));
+            unsigned global_index = mElements[elem_index]->GetNodeGlobalIndex(local_index);
+
+            std::pair<double, unsigned> pair(angle, global_index);
+            index_angle_list.push_back(pair);
+        }
+
+        // Sort the list in order of increasing angle
+        sort(index_angle_list.begin(), index_angle_list.end());
+
+        // Create a new Voronoi element and pass in the appropriate Nodes, ordered anticlockwise
+        VertexElement<2,2>* p_new_element = new VertexElement<2,2>(elem_index);
+        for (unsigned count = 0; count < index_angle_list.size(); count++)
+        {
+            unsigned local_index = count>1 ? count-1 : 0;
+            p_new_element->AddNode(mNodes[index_angle_list[count].second], local_index);
+
+        }
+
+        // Replace the relevant member of mElements with this Voronoi element
+        delete mElements[elem_index];
+        mElements[elem_index] = p_new_element;
+    }
+
+    this->mMeshChangesDuringSimulation = false;
+
+
 }
 
 Cylindrical2dVertexMesh::Cylindrical2dVertexMesh()
