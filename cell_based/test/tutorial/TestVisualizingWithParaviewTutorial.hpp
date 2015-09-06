@@ -54,11 +54,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * EMPTYLINE
  *
  * In this tutorial we show how Chaste is used to generate simulations
- * that can be viewed in Paraview, and how to use Paraview itself. Three examples
- * are provided: the first uses a `MeshBasedCellPopulation` (a cell-centre model
+ * that can be viewed in Paraview, and how to use Paraview itself. Four examples
+ * are provided: the first two use a `MeshBasedCellPopulation` (a cell-centre model
  * based on a Delaunay triangulation description of cell neighbours);
- * the second uses a `NodeBasedCellPopulation` (a cell-centre model based on an
- * 'overlapping spheres' description of cell neighbours); and the third uses a
+ * the third uses a `NodeBasedCellPopulation` (a cell-centre model based on an
+ * 'overlapping spheres' description of cell neighbours); and the fourth uses a
  * `VertexBasedCellPopulation` (in which each cell is represented by a polygon).
  * To be able to view these simulations, we must first have
  * downloaded and installed VTK and Paraview, and updated our hostconfig file
@@ -82,6 +82,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StochasticDurationCellCycleModel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
+#include "CylindricalHoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -147,7 +148,7 @@ public:
         /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("Test2DMonolayerSimulationForVisualizing");
+        simulator.SetOutputDirectory("Test2DMeshBasedMonolayerSimulationForVisualizing");
         simulator.SetEndTime(1.0);
 
         /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
@@ -171,7 +172,7 @@ public:
     * EMPTYLINE
     *
     * To visualize the results, we must first open Paraview. We open the folder containing our test output using the 'file' menu at
-    * the top. The output will be located in {{{/tmp/$USER/testoutput/Test2DMonolayerSimulationForVisualizing/results_from_time_0}}}.
+    * the top. The output will be located in {{{/tmp/$USER/testoutput/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0}}}.
     * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
     * simply select {{{results.pvd}}}. We should now see {{{results.pvd}}}  in the pipeline browser. We click {{{Apply}}} in the properties tab
     * of the object inspector, and we should now see a visualization in the right hand window.  (An alternative to opening the {{{results.pvd}}}
@@ -195,11 +196,70 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 2 - a node-based simulation ==
+    * == Test 2 - a periodic mesh-based cell centre monolayer simulation ==
+     *
+     * EMPTYLINE
+     *
+     * In the second test, similar to the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
+     * in which we use
+     * a honeycomb mesh with ghost nodes, and give each cell a stochastic cell-cycle model. However here we impose periodic boundaries.
+     * THe only differnece in this test is the generation of the mesh
+     */
+    void Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing() throw (Exception)
+    {
+        /*
+         * We setup the simulation in the same way as above but
+         * here we use a cylindrical mesh as we wish to enforce periodicity
+         * in the x direction.
+         */
+        CylindricalHoneycombMeshGenerator generator(10, 10, 2);
+        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        CellsGenerator<StochasticDurationCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, location_indices.size(), p_transit_type);
+
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+
+
+        cell_population.SetWriteVtkAsPoints(false);
+        cell_population.AddPopulationWriter<VoronoiDataWriter>();
+
+        OffLatticeSimulation<2> simulator(cell_population);
+        simulator.SetOutputDirectory("Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing");
+        simulator.SetEndTime(1.0);
+
+        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        p_linear_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_linear_force);
+
+        simulator.Solve();
+
+        /* The next two lines are for test purposes only and are not part of this tutorial.
+         * We are checking that we reached the end time of the simulation
+         * with the correct number of cells. If different simulation input parameters are being explored
+         * the lines should be removed.
+         */
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 102u);
+        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
+    }
+
+    /*
+    * EMPTYLINE
+    *
+    * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
+    * test output from the new folder, {{{Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing}}}. You will see that the left an righ sides
+    * of the monolayer are the same. As in the first test you can threshold to remove the ghost nodes.
+    *
+    * EMPTYLINE
+    *
+    * == Test 3 - a node-based simulation ==
     *
      * EMPTYLINE
      *
-    * We next run a similar simulation to the first example, but now use a `NodeBasedCellPopulation`,
+    * We next run a similar simulation to the first two examples, but now use a `NodeBasedCellPopulation`,
     * in which cells are represented as 'overlapping spheres'.
     */
     void Test2DNodeBasedMonolayerSimulationForVisualizing() throw (Exception)
@@ -249,7 +309,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 3 - a basic vertex-based simulation ==
+    * == Test 4 - a basic vertex-based simulation ==
     *
      * EMPTYLINE
      *

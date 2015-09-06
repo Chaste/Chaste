@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEventHandler.hpp"
 #include "ApoptoticCellProperty.hpp"
 #include "Cylindrical2dMesh.hpp"
+#include "Cylindrical2dVertexMesh.hpp"
 #include "NodesOnlyMesh.hpp"
 #include "Exception.hpp"
 
@@ -949,11 +950,13 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
     if (dynamic_cast<Cylindrical2dMesh*>(&mrMesh))
     {
         is_mesh_periodic = true;
+        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh));
     }
-
-    mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
+    else
+    {
+        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic);
+    }
 }
-
 /**
  * Can't tessellate 2d meshes in 3d space yet.
  */
