@@ -154,7 +154,7 @@ public: // Tests should be public!
 #ifdef LUNG_USE_UMFPACK
 
         /* First we need to create an acinar unit factory object from the class we specified earlier.
-         * An acinar compliance is specified in Pa/m^3. The given value is roughly equal to a lung compliance
+         * An acinar compliance is specified in Pa/m^3^. The given value is roughly equal to a lung compliance
          * of 0.1 cmH2O/L (assuming there are 30000 acini).
          */
         double acinar_compliance = 0.1/98.0665/1e3/30000;
