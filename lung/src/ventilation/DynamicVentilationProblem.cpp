@@ -44,7 +44,8 @@ DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* 
                                                                            mDt(0.01),
                                                                            mSamplingTimeStepMultiple(1u),
                                                                            mCurrentTime(0.0),
-                                                                           mRootIndex(rootIndex)
+                                                                           mRootIndex(rootIndex),
+                                                                           mWriteVtkOutput(false)
 {
     mVentilationProblem.SetOutflowPressure(0.0);
 
