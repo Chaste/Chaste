@@ -64,7 +64,7 @@ public:
      * @param isFlatBottom  Whether to enforce a flat bottom to the mesh (defaults to false)
      * @param cellRearrangementThreshold the minimum threshold distance for element rearrangement (defaults to 0.01)
      * @param t2Threshold the maximum threshold distance for Type 2 swaps (defaults to 0.001)
-     * @param elementArea the element area, which has default value 0.5*sqrt(3)
+     * @param elementArea the element area, which has default value 0.5*sqrt(3.0)
      */
     HoneycombVertexMeshGenerator(unsigned numElementsAcross,
                                  unsigned numElementsUp,

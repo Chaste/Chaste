@@ -423,15 +423,15 @@ public:
         TS_ASSERT_EQUALS(voronoi_mesh.GetElement(8)->GetNumNodes(), 3u);
 
         // Test element areas
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), sqrt(3)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), sqrt(3)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), sqrt(3)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), sqrt(3)/2.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), sqrt(3)/2.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), sqrt(3)/2.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), sqrt(3)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), sqrt(3)/12.0, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), sqrt(3)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), sqrt(3.0)/2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), sqrt(3.0)/2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), sqrt(3.0)/2.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), sqrt(3.0)/12.0, 1e-6);
+        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(8), sqrt(3.0)/12.0, 1e-6);
     }
 
     void TestArchiving() throw (Exception)
