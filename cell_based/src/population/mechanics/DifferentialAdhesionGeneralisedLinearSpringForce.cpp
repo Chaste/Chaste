@@ -52,29 +52,37 @@ double DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>:
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
     bool isCloserThanRestLength)
 {
-    // Determine which (if any) of the cells corresponding to these nodes are labelled
-    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
-    bool cell_A_is_labelled = p_cell_A->template HasCellProperty<CellLabel>();
 
-    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
-    bool cell_B_is_labelled = p_cell_B->template HasCellProperty<CellLabel>();
-
-    // For heterotypic interactions, scale the spring constant by mHeterotypicSpringConstantMultiplier
-    if (cell_A_is_labelled != cell_B_is_labelled)
+    if (isCloserThanRestLength)
     {
-        return mHeterotypicSpringConstantMultiplier;
+        return 1.0;
     }
     else
     {
-        // For homotypic interactions between labelled cells, scale the spring constant by mHomotypicLabelledSpringConstantMultiplier
-        if (cell_A_is_labelled)
+        // Determine which (if any) of the cells corresponding to these nodes are labelled
+        CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
+        bool cell_A_is_labelled = p_cell_A->template HasCellProperty<CellLabel>();
+
+        CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
+        bool cell_B_is_labelled = p_cell_B->template HasCellProperty<CellLabel>();
+
+        // For heterotypic interactions, scale the spring constant by mHeterotypicSpringConstantMultiplier
+        if (cell_A_is_labelled != cell_B_is_labelled)
         {
-            return mHomotypicLabelledSpringConstantMultiplier;
+            return mHeterotypicSpringConstantMultiplier;
         }
         else
         {
-            // For homotypic interactions between unlabelled cells, leave the spring constant unchanged from its normal value
-            return 1.0;
+            // For homotypic interactions between labelled cells, scale the spring constant by mHomotypicLabelledSpringConstantMultiplier
+            if (cell_A_is_labelled)
+            {
+                return mHomotypicLabelledSpringConstantMultiplier;
+            }
+            else
+            {
+                // For homotypic interactions between unlabelled cells, leave the spring constant unchanged from its normal value
+                return 1.0;
+            }
         }
     }
 }

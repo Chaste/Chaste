@@ -486,12 +486,12 @@ public:
 
         force.AddForceContribution(cell_population);
 
-        // ...for which the force magnitude should be increased by 4, our chosen multiplier for heterotypic interactions
+        // ...for which the force magnitude should be increased by 4, our chosen multiplier for heterotypic interactions under attraction
         TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 4.0*0.5*spring_stiffness, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], 4.0*(-3+4.0/sqrt(7.0))*spring_stiffness, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], -0.5*spring_stiffness+4.0*(4.0/sqrt(7.0)-2.5)*spring_stiffness, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 4.0*0.5*spring_stiffness, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*spring_stiffness, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Finally, test the case where node 59 and its neighbours are labelled...
@@ -509,12 +509,12 @@ public:
 
         force.AddForceContribution(cell_population);
 
-        // ...for which the force magnitude should be increased by 2, our chosen multiplier for homotypic labelled interactions
+        // ...for which the force magnitude should be increased by 2, our chosen multiplier for homotypic labelled interactions, again only for attractive interactions
         TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 2.0*0.5*spring_stiffness, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], 2.0*(-3+4.0/sqrt(7.0))*spring_stiffness, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], -0.5*spring_stiffness+2.0*(4.0/sqrt(7.0)-2.5)*spring_stiffness, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 2.0*0.5*spring_stiffness, 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*spring_stiffness, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
     }
 
