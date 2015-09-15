@@ -119,8 +119,10 @@ def run(startRev):
     if os.path.isdir(dir):
         print '### Erasing previous', dir
         shutil.rmtree(dir)
+    print '### Checking out...'
+    os.system('svn co -r '+str(startRev)+' https://chaste.cs.ox.ac.uk/svn/chaste/trunk '+dir+' > /dev/null')
+    print '### Checked out'
     print '###'
-    os.system('svn co -r 1 https://chaste.cs.ox.ac.uk/svn/chaste/trunk '+dir+' > /dev/null')
     os.chdir(dir)
 
     print_header()
@@ -133,7 +135,7 @@ def run(startRev):
         sys.stdout.flush()
 
 if __name__ == '__main__':
- start_rev = 24090
+ start_rev = 25180
  if len(sys.argv) > 1:
      start_rev = int(sys.argv[1])
      start_rev -= start_rev%10
