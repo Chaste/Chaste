@@ -220,7 +220,7 @@ public:
         // Test nothing's changed
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
         TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], sqrt(3)/2.0, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], sqrt(3.0)/2.0, 1e-4);
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
 
         delete p_mesh; // to stop memory leaks
@@ -273,7 +273,7 @@ public:
         // Test nothing's changed
         std::vector<double> node_4_location = simulator.GetNodeLocation(4);
         TS_ASSERT_DELTA(node_4_location[0], 1.5, 1e-4);
-        TS_ASSERT_DELTA(node_4_location[1], sqrt(3)/2.0, 1e-4);
+        TS_ASSERT_DELTA(node_4_location[1], sqrt(3.0)/2.0, 1e-4);
         TS_ASSERT_DELTA( (simulator.rGetCellPopulation().GetCellUsingLocationIndex(4))->GetCellData()->GetItem("oxygen"), 0.9869, 1e-4);
     }
 

@@ -332,7 +332,7 @@ public:
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-4);
     }
 
@@ -390,7 +390,7 @@ public:
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-2);
         //Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6296, 1e-4);
@@ -404,7 +404,7 @@ public:
         HoneycombVertexMeshGenerator generator(20,20);
         MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
 
-        p_mesh->Translate(-0.5,-sqrt(3)/3); // Shift so cells are on top of those in the above centre based tests.
+        p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre based tests.
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -452,7 +452,7 @@ public:
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 1e-1); //low error as mesh is slightlty larger than for centre based models.
           //Checking it doesn't change for this cell population
           TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6618, 1e-4);
@@ -465,7 +465,7 @@ public:
 
         // Translate and scale so cells are on top of those in the above centre based tests.
         p_mesh->Translate(-11.5,-11.5);
-        p_mesh->Scale(0.25,0.25 *sqrt(3)*0.5);
+        p_mesh->Scale(0.25,0.25 *sqrt(3.0)*0.5);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -513,7 +513,7 @@ public:
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
         //Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 1e-4);
@@ -525,7 +525,7 @@ public:
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests.
-        p_mesh->Scale(1.0,sqrt(3)*0.5);
+        p_mesh->Scale(1.0,sqrt(3.0)*0.5);
 
         // Specify where cells lie
         std::vector<unsigned> location_indices;
@@ -580,7 +580,7 @@ public:
         // Test the solution at some fixed points to compare with other cell populations
         CellPtr p_cell_210 = cell_population.GetCellUsingLocationIndex(210);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[0], 10, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_210)[1], 5.0*sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA( p_cell_210->GetCellData()->GetItem("variable"), 0.6309, 2e-1);//low error as mesh is slightly larger than for centre based models.
         //Checking it doesn't change for this cell population
         TS_ASSERT_DELTA(p_cell_210->GetCellData()->GetItem("variable"), 0.6086, 2e-3);// Low threshold as slightly different on Intel.
