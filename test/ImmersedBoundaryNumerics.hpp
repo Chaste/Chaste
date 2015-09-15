@@ -741,7 +741,7 @@ public:
          * Now do the same again in a loop where we change the spring constant (2, 4 and 6 times the reference)
          */
 
-        unsigned num_springs = 10;
+        unsigned num_springs = 3;
         obs_elongation_shape_factor.resize(num_springs);
 
 
@@ -792,7 +792,7 @@ public:
             ImmersedBoundaryElement<2, 2>* p_elem = mesh.GetElement(0u);
 
             p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
-            p_elem->SetMembraneSpringConstant( 1.0 / pow(scaling_factor, 1.1) * ref_spring_const);
+            p_elem->SetMembraneSpringConstant( (1.0/scaling_factor) * ref_spring_const);
 
             PRINT_VARIABLE(mesh.GetSurfaceAreaOfElement(0u));
             PRINT_VARIABLE(mesh.GetVolumeOfElement(0u));
@@ -803,6 +803,8 @@ public:
             // Add main immersed boundary simulation modifier
             MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
             sim.AddSimulationModifier(p_main_modifier);
+
+            p_main_modifier->SetDiffusionCoefficient(1.0 * (scaling_factor));
 
             std::string output_dir = "ImmersedBoundaryNumerics/TestCellSizeVsSpringConsant";
             output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);

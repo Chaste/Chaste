@@ -781,6 +781,18 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForce(boost::sh
     mForceCollection.push_back(pForce);
 }
 
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetFluidDensity(double fluidDensity)
+{
+    mFluidDensity = fluidDensity;
+}
+
+template<unsigned DIM>
+void ImmersedBoundarySimulationModifier<DIM>::SetDiffusionCoefficient(double diffCoef)
+{
+    mDiffusionCoef = diffCoef;
+}
+
 
 // Explicit instantiation
 template class ImmersedBoundarySimulationModifier<1>;

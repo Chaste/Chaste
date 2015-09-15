@@ -339,6 +339,10 @@ public:
      */
     void AddImmersedBoundaryForce(boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce);
 
+    void SetFluidDensity(double fluidDensity);
+
+    void SetDiffusionCoefficient(double diffCoef);
+
 };
 
 #include "SerializationExportWrapper.hpp"
