@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CryptShovingCaBasedDivisionRule.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "StemCellProliferativeType.hpp"
 
 bool CryptShovingCaBasedDivisionRule::IsNodeOnBase(unsigned NodeIndex, PottsMesh<2>* pPottsMesh)
 {
@@ -89,6 +90,13 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
      */
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
     unsigned direction = p_gen->randMod(3)+ (unsigned) is_not_on_base;
+
+    // Stem Cells only divide vertically
+    if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+    {
+        direction = 2;
+    }
+
 
     std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
 

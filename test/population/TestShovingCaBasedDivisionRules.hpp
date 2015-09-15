@@ -234,7 +234,7 @@ public:
     void TestAddCellWithCryptShovingBasedDivisionRule()
     {
         // Create a simple Potts mesh
-        PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0,1,0,0,false, true); // Periodic in x
+        PottsMeshGenerator<2> generator(3, 0, 0, 4, 0, 0,1,0,0,false, true); // Periodic in x
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
         // Create 6 cells in the bottom 2 rows
@@ -246,7 +246,7 @@ public:
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 1> cells_generator;
-        cells_generator.GenerateBasic(cells, location_indices.size());
+        cells_generator.GenerateBasic(cells, location_indices.size()); // Note all cells are stem cells by default.
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
@@ -264,11 +264,11 @@ public:
 
         // Make a new cell to add
         MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(StemCellProliferativeType, p_stem_type);
+        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
         FixedDurationGenerationBasedCellCycleModel* p_model = new FixedDurationGenerationBasedCellCycleModel();
         CellPtr p_new_cell(new Cell(p_state, p_model));
-        p_new_cell->SetCellProliferativeType(p_stem_type);
+        p_new_cell->SetCellProliferativeType(p_transit_type);
         p_new_cell->SetBirthTime(-1);
 
         // Set the division rule for our population to be the cryot shoving division rule
@@ -286,14 +286,14 @@ public:
 
         /*
          * Test adding the new cell in the population; this calls CalculateDaughterNodeIndex().
-         * The new cell moves into node 2.
+         * The new cell moves into node 3. This is because stem cells always divide upwards
          */
         cell_population.AddCell(p_new_cell, zero_vector<double>(2), p_cell_0);
 
         // Now check the cells are in the correct place
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 7u);
 
-        // Note the cell on node 13 has been shoved to node 14 and the new cell is on node 13
+        // Note the cell on node 3 has been shoved to node 6 and the new cell is on node 3
         unsigned new_cell_locations[7] = {0,1,2,6,4,5,3};
         index = 0;
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -301,6 +301,35 @@ public:
              ++cell_iter)
         {
             TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),new_cell_locations[index])
+            ++index;
+        }
+
+        //Now divide a non stem cell
+        // Select transit cell we just added
+        CellPtr p_cell_3 = cell_population.GetCellUsingLocationIndex(3);
+
+        FixedDurationGenerationBasedCellCycleModel* p_model_2 = new FixedDurationGenerationBasedCellCycleModel();
+        CellPtr p_new_cell_2(new Cell(p_state, p_model_2));
+        p_new_cell_2->SetCellProliferativeType(p_transit_type);
+        p_new_cell_2->SetBirthTime(-1);
+
+        /*
+         * Test adding the new cell in the population; this calls CalculateDaughterNodeIndex().
+         * The new cell moves into node 7.
+         */
+        cell_population.AddCell(p_new_cell_2, zero_vector<double>(2), p_cell_3);
+
+        // Now check the cells are in the correct place
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
+
+        // Note the cell on node 4 has been shoved to node 7 and the new cell is on node 4
+        unsigned new_cell_locations_2[8] = {0,1,2,6,7,5,3,4};
+        index = 0;
+        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+             cell_iter != cell_population.End();
+             ++cell_iter)
+        {
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),new_cell_locations_2[index])
             ++index;
         }
     }
