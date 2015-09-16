@@ -107,8 +107,8 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,
         }
         else
         {
-            // If this cell has no neighbours, such as an isolated cell in a CaBasedCellPopulation, store -1.0 for the cell data
-            cell_iter->GetCellData()->SetItem("mean delta", -1.0);
+            // If this cell has no neighbours, such as an isolated cell in a CaBasedCellPopulation, store 0.0 for the cell data
+            cell_iter->GetCellData()->SetItem("mean delta", 0.0);
         }
     }
 }

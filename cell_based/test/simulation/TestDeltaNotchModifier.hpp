@@ -111,14 +111,11 @@ public:
         simulator.SetOutputDirectory("TestDeltaNotchNodeBasedUpdateAtEndOfTimeStep");
         simulator.SetEndTime(0.01);
 
+        // No mechanics so cells don't move
+
         // Create a Delta-Notch tracking modifier and add it to the simulation
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
-
-        // Set up a force law and add to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        p_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_force);
 
         // Run simulation
         simulator.Solve();
@@ -136,6 +133,9 @@ public:
         TS_ASSERT_DELTA(delta, 0.9901, 1e-04);
         double mean_delta = dynamic_cast<DeltaNotchCellCycleModel*>(cell0->GetCellCycleModel())->GetMeanNeighbouringDelta();
         TS_ASSERT_DELTA(mean_delta, 1.0000, 1e-04);
+
+
+
     }
 
     void TestHeterogeneousDeltaNotchOnUntetheredTwoCellSystem()
@@ -204,14 +204,11 @@ public:
         simulator.SetOutputDirectory("TestDeltaNotchTwoCell_heterogee");
         simulator.SetEndTime(10.0);
 
+        // No mechanics so cells don't move
+
         // Add Delta-Notch tracking modifier
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
-
-        // Define the radius of interaction as we're dealing with a node-based simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(0.75);
-        simulator.AddForce(p_linear_force);
 
         // Run the simulation
         simulator.Solve();
@@ -229,6 +226,29 @@ public:
         TS_ASSERT_DELTA(notch_1b, 0.0261745, 1e-03);  //Default solution at t=10
         double delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
         TS_ASSERT_DELTA(delta_1b, 0.8151536, 1e-02);  //Default solution at t=10
+
+
+        // Now move cell so the cells have no neighboursthen they both run to a homogeneous steady state (note here mean delta=0)
+        c_vector<double,2> old_point = static_cast<NodesOnlyMesh<2>* >(&(simulator.rGetCellPopulation().rGetMesh()))->GetNode(1)->rGetLocation();
+        ChastePoint<2> new_point;
+        new_point.rGetLocation()[0] = old_point[0]+2.0;
+        new_point.rGetLocation()[1] = old_point[1];
+        static_cast<NodesOnlyMesh<2>* >(&(simulator.rGetCellPopulation().rGetMesh()))->SetNode(1, new_point);
+
+        // Run the simulation
+        simulator.SetEndTime(20.0);
+        simulator.Solve();
+
+        // Check that the simulation converges on the expected values
+        notch_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch_0b, 0.0, 1e-03);  //Default solution at t=20 for mean delta=0
+        delta_0b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_0b->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta_0b, 1.0, 1e-03);  //Default solution at t=20 for mean delta=0
+        notch_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetNotch();
+        TS_ASSERT_DELTA(notch_1b, 0.0, 1e-03);  //Default solution at t=20 for mean delta=0
+        delta_1b = dynamic_cast<DeltaNotchCellCycleModel*>(p_cell_1b->GetCellCycleModel())->GetDelta();
+        TS_ASSERT_DELTA(delta_1b, 1.0, 1e-03);  //Default solution at t=20 for mean delta=0
+
 
         // Avoid memory leaks
         for (unsigned i=0; i<nodes.size(); i++)
