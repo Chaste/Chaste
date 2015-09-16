@@ -159,12 +159,12 @@ endif()
 chaste_do_component(global ${generate_dir}/Version.cpp ${generate_dir}/ChasteBuildInfo.cpp)
 
 # if building shared libraries link any static third-party libraries into global with -Wl,-whole-archive 
-if (BUILD_SHARED_LIBS)
-    foreach(lib ${Chaste_THIRD_PARTY_STATIC_LIBRARIES})
-        target_link_libraries(global LINK_PRIVATE "-Wl,-whole-archive ${lib} -Wl,-no-whole-archive")
-    endforeach()
-    # the static libraries might need symbols from the shared, so link these again
-    target_link_libraries(global LINK_PRIVATE "${Chaste_THIRD_PARTY_LIBRARIES}")
-endif()
+#if (BUILD_SHARED_LIBS)
+#    foreach(lib ${Chaste_THIRD_PARTY_STATIC_LIBRARIES})
+#        target_link_libraries(global LINK_PRIVATE "-Wl,-whole-archive ${lib} -Wl,-no-whole-archive")
+#    endforeach()
+#    # the static libraries might need symbols from the shared, so link these again
+#    target_link_libraries(global LINK_PRIVATE "${Chaste_THIRD_PARTY_LIBRARIES}")
+#endif()
 
 add_dependencies(global generateTimestamp)
