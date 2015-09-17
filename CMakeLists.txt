@@ -162,7 +162,7 @@ list(APPEND CHASTE_LINK_LIBRARIES
 
 #find HDF5
 if (Chaste_USE_PETSC_HDF5)
-    set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}" "${PETSC_DIR}/externalpackages" "$ENV{HDF5_ROOT}")
+    set(ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}:${PETSC_DIR}/externalpackages:$ENV{HDF5_ROOT}")
 endif()
 find_program( HDF5_C_COMPILER_EXECUTABLE
     NAMES h5cc h5pcc
