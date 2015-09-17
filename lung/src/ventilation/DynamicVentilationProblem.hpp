@@ -42,6 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractAcinarUnitFactory.hpp"
 #include "AbstractAcinarUnit.hpp"
 #include "MatrixVentilationProblem.hpp"
+#include <map>
 
 /**
  * A class for solving dynamic one-dimensional lung ventilation problems in which each terminal of
