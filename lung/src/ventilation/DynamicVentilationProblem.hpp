@@ -38,7 +38,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractVentilationProblem.hpp"
 #include "TimeStepper.hpp"
+#ifdef CHASTE_VTK
 #include "VtkMeshWriter.hpp"
+#endif //CHASTE_VTK
 #include "AbstractAcinarUnitFactory.hpp"
 #include "AbstractAcinarUnit.hpp"
 #include "MatrixVentilationProblem.hpp"

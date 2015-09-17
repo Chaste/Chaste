@@ -116,7 +116,9 @@ void DynamicVentilationProblem::Solve()
 {
     TimeStepper time_stepper(mCurrentTime, mEndTime, mDt);
 
+#ifdef CHASTE_VTK
     VtkMeshWriter<1, 3> vtk_writer(mOutputDirectory, mOutputFileNamePrefix, false);
+#endif //CHASTE_VTK
 
     ProgressReporter progress_reporter(mOutputDirectory, mCurrentTime, mEndTime);
 
@@ -168,6 +170,7 @@ void DynamicVentilationProblem::Solve()
         {
             progress_reporter.Update(time_stepper.GetNextTime());
 
+#ifdef CHASTE_VTK
             if(mWriteVtkOutput)
             {
                 std::ostringstream suffix_name;
@@ -189,6 +192,7 @@ void DynamicVentilationProblem::Solve()
 
                 vtk_writer.AddPointData("Volume"+suffix_name.str(), volumes);
             }
+#endif //CHASTE_VTK
         }
 
 
@@ -196,8 +200,10 @@ void DynamicVentilationProblem::Solve()
         time_stepper.AdvanceOneTimeStep();
     }
 
+#ifdef CHASTE_VTK
     if(mWriteVtkOutput)
     {
         vtk_writer.WriteFilesUsingMesh(mrMesh);
     }
+#endif //CHASTE_VTK
 }
