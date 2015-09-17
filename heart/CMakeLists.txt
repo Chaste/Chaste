@@ -32,6 +32,9 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 
 chaste_do_component(heart ${Chaste_heart_SOURCES})
 
+# make sure to link dl libraries
+target_link_libraries(heart LINK_PUBLIC ${CMAKE_DL_LIBS})
+
 # Compile dynamic models
 set(dyn_sources dynamic/DynamicallyLoadableLr91.cpp dynamic/NotACellModel.cpp)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
