@@ -68,7 +68,13 @@ public:
         PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
 
         // Check
+#if ( PETSC_VERSION_MAJOR==3 && PETSC_VERSION_MINOR >= 6 ) //PETSc 3.6 or later
+        // Use 2015 version of PETSc citation
+        FileFinder reference_citations("global/test/data/citations-2015.txt", RelativeTo::ChasteSourceRoot);
+#else
+        // Use older version (or mocked up version)
         FileFinder reference_citations("global/test/data/citations.txt", RelativeTo::ChasteSourceRoot);
+#endif
         FileComparison check_files(output_file, reference_citations, false); // Not collective
         check_files.CompareFiles();
     }
