@@ -156,9 +156,7 @@ list(APPEND CHASTE_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 #find PETSc
 find_package(PETSc REQUIRED COMPONENTS CXX)
-list(APPEND CHASTE_LINK_LIBRARIES 
-    "${PETSC_LIBRARIES}"
-)
+list(APPEND CHASTE_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
 #find HDF5
 if (Chaste_USE_PETSC_HDF5)
@@ -178,9 +176,7 @@ find_program( HDF5_CXX_COMPILER_EXECUTABLE
     DOC "HDF5 C++ Wrapper compiler.  Used only to detect HDF5 compile flags." )
 find_package(HDF5 MODULE REQUIRED)
 list(APPEND CHASTE_INCLUDES "${HDF5_INCLUDE_DIRS}")
-list(APPEND CHASTE_LINK_LIBRARIES 
-    "${HDF5_LIBRARIES}"
-)
+list(APPEND CHASTE_LINK_LIBRARIES "${HDF5_LIBRARIES}")
 
 # put petsc includes after hdf5 includes or else the hdf5 headers 
 # in the petsc include dir will clobber those chosen on FindHdf5.cmake
@@ -214,6 +210,7 @@ if (Chaste_USE_CVODE)
     endif()
     find_package(SUNDIALS COMPONENTS sundials_cvode sundials_nvecserial REQUIRED)
     list(APPEND CHASTE_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
+    #chaste_add_libraries(CHASTE_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES CHASTE_LINK_LIBRARIES)
     list(APPEND CHASTE_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
     add_definitions(-DCHASTE_CVODE)
     math(EXPR Chaste_SUNDIALS_VERSION "${SUNDIALS_VERSION_MAJOR}*10000 + ${SUNDIALS_VERSION_MINOR}*100 + ${SUNDIALS_VERSION_SUBMINOR}")
@@ -222,6 +219,7 @@ endif()
 
 
 # ParMETIS and Sundials might need MPI, so add MPI libraries after these
+#chaste_add_libraries(MPI_CXX_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES CHASTE_LINK_LIBRARIES)
 list(APPEND CHASTE_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 
@@ -230,7 +228,7 @@ if (Chaste_USE_XERCES)
 	find_package(Xerces REQUIRED)
 	find_package(XSD REQUIRED)
 	list(APPEND CHASTE_INCLUDES "${XERCESC_INCLUDE}" "${XSD_INCLUDE_DIRS}")
-	list(APPEND CHASTE_LINK_LIBRARIES "${XERCESC_LIBRARY}")
+    list(APPEND CHASTE_LINK_LIBRARIES "${XERCESC_LIBRARY}")
     add_definitions(-DCHASTE_XERCES)
 endif()
 
@@ -263,22 +261,6 @@ if(ENABLE_CHASTE_TESTING)
     list(APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
     find_package(CxxTest)
 endif()
-
-# if building shared libraries filter out any static third-party libraries. These will be linked into global only.
-# if (BUILD_SHARED_LIBS)
-#    set(static_extension "a")
-#    set(shared_libraries "")
-#    foreach(library ${CHASTE_LINK_LIBRARIES})
-#        if (library MATCHES ".*\\.${static_extension}")
-#            list(APPEND Chaste_THIRD_PARTY_STATIC_LIBRARIES "${library}")
-#        else()
-#            list(APPEND shared_libraries "${library}")
-#        endif()
-#    endforeach()
-#    set(CHASTE_LINK_LIBRARIES ${shared_libraries})
-#endif()
-
-
 
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #
