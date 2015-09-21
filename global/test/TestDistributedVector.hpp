@@ -384,8 +384,7 @@ public:
         VecLockPush(petsc_vec);
 #endif
         {
-            // This may fail
-            DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec);
+            DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec, true);
 
             for (DistributedVector::Iterator index = distributed_vector_read.Begin();
                     index!= distributed_vector_read.End();

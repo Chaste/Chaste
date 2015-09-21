@@ -180,9 +180,9 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
     return vec;
 }
 
-DistributedVector DistributedVectorFactory::CreateDistributedVector(Vec vec)
+DistributedVector DistributedVectorFactory::CreateDistributedVector(Vec vec, bool readOnly)
 {
-    DistributedVector dist_vector(vec, this);
+    DistributedVector dist_vector(vec, this, readOnly);
     return dist_vector;
 }
 

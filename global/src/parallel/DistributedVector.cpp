@@ -41,9 +41,10 @@ bool DistributedVector::IsGlobalIndexLocal(unsigned globalIndex)
     return (mLo<=globalIndex && globalIndex<mHi);
 }
 
-DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory)
+DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory, bool readOnly)
     : mVec(vec),
-      mpFactory(pFactory)
+      mpFactory(pFactory),
+      mReadOnly(readOnly)
 {
     assert(pFactory != NULL);
 
@@ -52,8 +53,22 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
     mLo = pFactory->GetLow();
     mHi = pFactory->GetHigh();
 
+    if (mReadOnly)
+    {
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+        // Request read-only access properly
+        VecGetArrayRead(vec, (const PetscScalar**)&mpVec);
+#else
+        // Silently ignore the request and hope nothing breaks
+        VecGetArray(vec, &mpVec);
+#endif
+    }
+    else
+    {
+        VecGetArray(vec, &mpVec);
+    }
+
     // Set mSizeMultiplier by reading the vec size.
-    VecGetArray(vec, &mpVec);
     PetscInt size;
     VecGetSize(vec, &size);
     mSizeMultiplier = (unsigned) size / mProblemSize;
@@ -78,6 +93,7 @@ double& DistributedVector::operator[](Iterator index) throw (DistributedVectorEx
 
 void DistributedVector::Restore()
 {
+    assert(mReadOnly == false);
     VecRestoreArray(mVec, &mpVec);
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later

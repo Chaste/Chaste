@@ -85,6 +85,13 @@ private:
      */
     DistributedVectorFactory* mpFactory;
 
+    /** A hint to PETSc that we only want to read from the vector (and never write).
+     *  The only makes sense with PETSc 3.2 and above.
+     */
+    bool mReadOnly;
+    ///\todo #2688 It might not be necessary to cache this information (just use it in the constructor, then throw it away)
+
+
 public:
 
     /**
@@ -102,9 +109,10 @@ public:
      * Note that this class does NOT take over responsibility for destroying the Vec.
      *
      * @param vec PETSc vector of which this class shall be a portion
+     * @param readOnly A suggestion to PETSc that we are not going to change the content of the Vec
      * @param pFactory pointer to the DistributedVectorFactory used to create this vector
      */
-    DistributedVector(Vec vec, DistributedVectorFactory* pFactory);
+    DistributedVector(Vec vec, DistributedVectorFactory* pFactory, bool readOnly=false);
 
     /**
      * @return #mHi - The next index above the top one owned by the process.

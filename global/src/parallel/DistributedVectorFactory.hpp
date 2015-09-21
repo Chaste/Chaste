@@ -176,9 +176,10 @@ public:
      * Create a distributed vector which wraps a given petsc vector.
      *
      * @param vec is the vector
+     * @param readOnly flag to pass on to request that the distributed vector will only be used read-only
      * @return the distributed vector
      */
-    DistributedVector CreateDistributedVector(Vec vec);
+    DistributedVector CreateDistributedVector(Vec vec, bool readOnly=false);
 
     /**
      * Test if the given global index is owned by the current process, i.e. is local to it.
