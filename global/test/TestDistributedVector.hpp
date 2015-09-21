@@ -364,6 +364,44 @@ public:
         PetscTools::Destroy(petsc_vec);
     }
 
+    void TestReadOnlyDistributedVector() throw (Exception)
+    {
+        DistributedVectorFactory factory(10);
+        Vec petsc_vec = factory.CreateVec();
+
+        {
+            DistributedVector distributed_vector = factory.CreateDistributedVector(petsc_vec);
+            for (DistributedVector::Iterator index = distributed_vector.Begin();
+                    index!= distributed_vector.End();
+                    ++index)
+            {
+                distributed_vector[index] = (double) PetscTools::GetMyRank();
+            }
+       }
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
+        // Lock the vector so that modern PETSc (3.6) won't want to change it
+        VecLockPush(petsc_vec);
+#endif
+        {
+            // This may fail
+            DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec);
+
+            for (DistributedVector::Iterator index = distributed_vector_read.Begin();
+                    index!= distributed_vector_read.End();
+                    ++index)
+            {
+                TS_ASSERT_EQUALS(distributed_vector_read[index], (double) PetscTools::GetMyRank());
+            }
+        }
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
+        // Take the lock back
+        VecLockPop(petsc_vec);
+#endif
+
+        PetscTools::Destroy(petsc_vec);
+    }
+
     void TestArchiving() throw (Exception)
     {
         const unsigned TOTAL = 100;
