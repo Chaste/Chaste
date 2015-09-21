@@ -180,7 +180,16 @@ void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter first
     PetscScalar *p_1st_variable_vec;
     PetscScalar *p_2nd_variable_vec;
 
-    VecGetArray(interleavedVec, &p_interleaved_vec);
+    //  // Note that the first vector is normally locked read-only when this is used
+    //    PetscInt lock;
+    //    VecLockGet(interleavedVec, &lock);
+    //    assert(lock == 1);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+        // Request read-only access properly
+        VecGetArrayRead(interleavedVec, (const PetscScalar**)&p_interleaved_vec);
+#else
+        VecGetArray(interleavedVec, &p_interleaved_vec);
+#endif
     VecGetArray(firstVariableVec, &p_1st_variable_vec);
     VecGetArray(secondVariableVec, &p_2nd_variable_vec);
 

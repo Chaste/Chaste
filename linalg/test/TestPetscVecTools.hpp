@@ -84,7 +84,19 @@ public:
         VecScatter first_variable_context;
         VecScatter second_variable_context;
         PetscVecTools::SetupInterleavedVectorScatterGather(interleaved_vec, first_variable_context, second_variable_context);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
+        // When used in the preconditioner code within a KSP solve, the main (bidomain) vector will be locked.
+        // Lock the vector so that modern PETSc (3.6) won't want to change it
+        VecLockPush(interleaved_vec);
+#endif
+
         PetscVecTools::DoInterleavedVecScatter(interleaved_vec, first_variable_context, first_variable_vec, second_variable_context, second_variable_vec);
+
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later
+        // Unlock the vector (for symmetry)
+        VecLockPop(interleaved_vec);
+#endif
 
         // Check destination vectors are [-1 -2 -3 ...] and [1 2 3 ...] respectively.
         DistributedVector dist_1st_var_vec = factory.CreateDistributedVector(first_variable_vec);
