@@ -391,6 +391,7 @@ public:
                     ++index)
             {
                 TS_ASSERT_EQUALS(distributed_vector_read[index], (double) PetscTools::GetMyRank());
+                distributed_vector_read[index] = 2.0;
             }
         }
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 6) //PETSc 3.6 or later

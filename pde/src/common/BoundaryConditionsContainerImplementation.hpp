@@ -502,7 +502,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
     {
         this->mDirichIterator = this->mpDirichletMap[index_of_unknown]->begin();
 
-        DistributedVector solution_distributed = rFactory.CreateDistributedVector(currentSolution);
+        DistributedVector solution_distributed = rFactory.CreateDistributedVector(currentSolution, true /*Read-only*/);
         DistributedVector residual_distributed = rFactory.CreateDistributedVector(residual);
 
 
@@ -521,7 +521,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
             }
             this->mDirichIterator++;
         }
-        solution_distributed.Restore();
+        // Don't restore the read-only one: solution_distributed.Restore();
         residual_distributed.Restore();
     }
 }

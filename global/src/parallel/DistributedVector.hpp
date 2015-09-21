@@ -86,10 +86,11 @@ private:
     DistributedVectorFactory* mpFactory;
 
     /** A hint to PETSc that we only want to read from the vector (and never write).
+     *  Note that it may still be possible to alter the content of the vector in an
+     *  inconsistent way -- the user is responsible for ensuring that this doesn't happen.
      *  The only makes sense with PETSc 3.2 and above.
      */
     bool mReadOnly;
-    ///\todo #2688 It might not be necessary to cache this information (just use it in the constructor, then throw it away)
 
 
 public:
@@ -110,6 +111,8 @@ public:
      *
      * @param vec PETSc vector of which this class shall be a portion
      * @param readOnly A suggestion to PETSc that we are not going to change the content of the Vec
+     *        (Note that it may still be possible to alter the content of the vector in an
+     *         inconsistent way -- the user is responsible for ensuring that this doesn't happen.)     *
      * @param pFactory pointer to the DistributedVectorFactory used to create this vector
      */
     DistributedVector(Vec vec, DistributedVectorFactory* pFactory, bool readOnly=false);
@@ -151,6 +154,9 @@ public:
      * Store elements that have been written to
      * back into the PETSc vector. Call after you have finished writing.
      * It appears that you do not need to call this if you only read from the vector.
+     *
+     * Calling this method when the #mReadOnly flag is set results in error (as a
+     * reminder that there should be no changes to the data in the original Vec).
      */
     void Restore();
 
