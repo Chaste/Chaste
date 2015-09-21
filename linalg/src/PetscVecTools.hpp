@@ -212,7 +212,7 @@ public:
     /**
      * Performs scatter operation from a bidomain-like vector of interleaved values into two separate PETSc Vec.
      *
-     * @param interleavedVec Source vector with interleaved values.
+     * @param interleavedVec Source vector with interleaved values.  (The source vector is treated as read-only.)
      * @param firstVariableScatterContext Context for scattering/gathering first variable
      * @param firstVariableVec Destination vector for first variable
      * @param secondVariableScatterContext Context for scattering/gathering second variable
