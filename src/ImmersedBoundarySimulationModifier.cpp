@@ -51,8 +51,7 @@ ImmersedBoundarySimulationModifier<DIM>::ImmersedBoundarySimulationModifier()
       mGridSpacingX(0.0),
       mGridSpacingY(0.0),
       mFftNorm(0.0),
-      mDiffusionCoef(1.0),
-      mFluidDensity(1.0),
+      mReynolds(1e-4),
       mI(0.0 + 1.0 * 1i)
 {
 }
@@ -519,7 +518,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
             std::complex<double> numerator = -mI * (mSin2X[x] * VelX_hat[y][x] / mGridSpacingX + mSin2Y[y] * VelY_hat[y][x] / mGridSpacingY);
 
             double denominator = (mSin2X[x] * mSin2X[x] / (mGridSpacingX * mGridSpacingX)) + (mSin2Y[y] * mSin2Y[y] / (mGridSpacingY * mGridSpacingY));
-            denominator *= (dt / mFluidDensity);
+            denominator *= (dt / mReynolds);
 
             p_hat[y][x] = numerator / denominator;
         }
@@ -539,9 +538,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for( unsigned x = 0 ; x < mNumGridPtsX ; x++ )
         {
-            double op = 1 + (4 * mDiffusionCoef * dt / mFluidDensity) * ( (mSinX[x] * mSinX[x] / (mGridSpacingX * mGridSpacingX)) + (mSinY[y] * mSinY[y] / (mGridSpacingY * mGridSpacingY)));
-            pre_inverse_X[y][x] = (VelX_hat[y][x] - (mI * dt / (mFluidDensity * mGridSpacingX)) * mSin2X[x] * p_hat[y][x]) / op;
-            pre_inverse_Y[y][x] = (VelY_hat[y][x] - (mI * dt / (mFluidDensity * mGridSpacingY)) * mSin2Y[y] * p_hat[y][x]) / op;
+            double op = 1 + (4 * dt / mReynolds) * ( (mSinX[x] * mSinX[x] / (mGridSpacingX * mGridSpacingX)) + (mSinY[y] * mSinY[y] / (mGridSpacingY * mGridSpacingY)));
+            pre_inverse_X[y][x] = (VelX_hat[y][x] - (mI * dt / (mReynolds * mGridSpacingX)) * mSin2X[x] * p_hat[y][x]) / op;
+            pre_inverse_Y[y][x] = (VelY_hat[y][x] - (mI * dt / (mReynolds * mGridSpacingY)) * mSin2Y[y] * p_hat[y][x]) / op;
         }
     }
 
@@ -782,15 +781,16 @@ void ImmersedBoundarySimulationModifier<DIM>::AddImmersedBoundaryForce(boost::sh
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetFluidDensity(double fluidDensity)
+void ImmersedBoundarySimulationModifier<DIM>::SetReynoldsNumber(double reynoldsNumber)
 {
-    mFluidDensity = fluidDensity;
+    assert(reynoldsNumber > 0.0);
+    mReynolds = reynoldsNumber;
 }
 
 template<unsigned DIM>
-void ImmersedBoundarySimulationModifier<DIM>::SetDiffusionCoefficient(double diffCoef)
+double ImmersedBoundarySimulationModifier<DIM>::GetReynoldsNumber()
 {
-    mDiffusionCoef = diffCoef;
+    return mReynolds;
 }
 
 

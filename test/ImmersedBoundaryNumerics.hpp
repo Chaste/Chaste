@@ -349,7 +349,7 @@ public:
 
         ImmersedBoundaryMesh<2,2> mesh(nodes, elements, 128, 128);
 
-        double mesh_spacing = mesh.GetCharacteristicNodeSpacing();
+//        double mesh_spacing = mesh.GetCharacteristicNodeSpacing();
 
         /*
          * Set up cell population
@@ -367,7 +367,7 @@ public:
         p_elem->SetMembraneSpringConstant(1e4);
 
         double vol_at_t0 = mesh.GetVolumeOfElement(0);
-        double node_spacing = mesh.GetSurfaceAreaOfElement(0) / p_elem->GetNumNodes();
+//        double node_spacing = mesh.GetSurfaceAreaOfElement(0) / p_elem->GetNumNodes();
 
         OffLatticeSimulation<2> *p_simulator = new OffLatticeSimulation<2>(cell_population);
 
@@ -634,7 +634,7 @@ public:
         csv_writer.WriteDataToFile();
     }
 
-    void TestCellSizeVsSpringConsant() throw(Exception)
+    void xTestCellSizeVsSpringConsant() throw(Exception)
     {
         /**
          * This test relaxes a single elliptical cell from an ellipse towards a circle, for a fixed simulation time.
@@ -804,8 +804,6 @@ public:
             MAKE_PTR(ImmersedBoundarySimulationModifier < 2 >, p_main_modifier);
             sim.AddSimulationModifier(p_main_modifier);
 
-            p_main_modifier->SetDiffusionCoefficient(1.0 * (scaling_factor));
-
             std::string output_dir = "ImmersedBoundaryNumerics/TestCellSizeVsSpringConsant";
             output_dir += boost::lexical_cast<std::string>(p_elem->GetMembraneSpringConstant() / ref_spring_const);
 
@@ -926,7 +924,7 @@ public:
             p_elem->SetMembraneRestLength(0.1 * mesh.GetCharacteristicNodeSpacing());
             p_elem->SetMembraneSpringConstant(1e4);
 
-            double elongation_change = mesh.GetElongationShapeFactorOfElement(0);
+//            double elongation_change = mesh.GetElongationShapeFactorOfElement(0);
 
             OffLatticeSimulation<2> *p_simulator = new OffLatticeSimulation<2>(cell_population);
 
@@ -972,7 +970,7 @@ public:
         csv_writer.WriteDataToFile();
     }
 
-    void xTestPalisadeSimulation() throw(Exception)
+    void TestPalisadeSimulation() throw(Exception)
     {
         /*
          * 1: Num cells
@@ -982,11 +980,21 @@ public:
          * 5: Random y-variation
          * 6: Include membrane
          */
-        ImmersedBoundaryPalisadeMeshGenerator gen(11, 50, 0.2, 2.0, 1.0, true);
+        ImmersedBoundaryPalisadeMeshGenerator gen(9, 50, 0.2, 2.0, 0.0, false);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
-        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(10000000.0);
-        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0001);
+        p_mesh->SetNumGridPtsXAndY(128);
+
+        double spacing = p_mesh->GetCharacteristicNodeSpacing();
+
+        for (unsigned elem_idx = 0 ; elem_idx < p_mesh->GetNumElements() ; elem_idx++)
+        {
+            p_mesh->GetElement(elem_idx)->SetMembraneRestLength(0.1 * spacing);
+            p_mesh->GetElement(elem_idx)->SetMembraneSpringConstant(1e8);
+        }
+
+//        p_mesh->GetMembraneElement()->SetMembraneSpringConstant(1e8);
+//        p_mesh->GetMembraneElement()->SetMembraneRestLength(0.0);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -1003,11 +1011,80 @@ public:
 
         // Set simulation properties
         simulator.SetOutputDirectory("ImmersedBoundaryNumerics/TestPalisadeSimulation");
-        simulator.SetDt(0.05);
-        simulator.SetSamplingTimestepMultiple(1);
-        simulator.SetEndTime(0.05);
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetEndTime(10.0);
 
         // Run the simulation
         simulator.Solve();
+    }
+
+    double delta_1(double r)
+    {
+        return (0.25 * (1.0 + cos(0.5 * M_PI * r)));
+    }
+
+    double delta_2(double r)
+    {
+        double abs_r = fabs(r);
+        return abs_r <= 1.0
+               ? 0.125 * (3.0 - 2.0 * abs_r + sqrt(1.0 + 4.0 * abs_r - 4.0 * abs_r*abs_r))
+               : 0.5 - delta_2(2.0 - abs_r);
+    }
+
+    double delta_3(double r)
+    {
+        return fabs(r) <= 1.0
+               ? 0.125 * (3.0 - 2.0 * fabs(r) + sqrt(1.0 + 4.0 * fabs(r) - 4.0 * r*r))
+               : 0.5 - delta_2(2.0 - fabs(r));
+    }
+
+    void xTestDeltaFunctions() throw(Exception)
+    {
+        unsigned num_points = 1000000;
+        unsigned reps = 1000;
+
+        // Generate random numbers
+        std::vector<double> rand_numbers;
+        for (unsigned i = 0 ; i < num_points ; i++)
+        {
+            rand_numbers.push_back(-2.0 + 4.0 * RandomNumberGenerator::Instance()->ranf());
+        }
+
+        // Helper variables
+        double result = 0.0; result++;
+        double delta_1_time = 0.0;
+        double delta_2_time = 0.0;
+        double delta_3_time = 0.0;
+
+        for (unsigned rep = 0 ; rep < reps ; rep++)
+        {
+            // Time the first delta function
+            mTimer.Reset();
+            for (unsigned i = 0; i < num_points - 1; i++)
+            {
+                result = delta_1(rand_numbers[i]) * delta_1(rand_numbers[i + 1]);
+            }
+            delta_1_time += mTimer.GetElapsedTime();
+
+            // Time the second delta function
+            mTimer.Reset();
+            for (unsigned i = 0; i < num_points - 1; i++)
+            {
+                result = delta_2(rand_numbers[i]) * delta_2(rand_numbers[i + 1]);
+            }
+            delta_2_time += mTimer.GetElapsedTime();
+
+            // Time the second delta function
+            mTimer.Reset();
+            for (unsigned i = 0; i < num_points - 1; i++)
+            {
+                result = delta_3(rand_numbers[i]) * delta_3(rand_numbers[i + 1]);
+            }
+            delta_3_time += mTimer.GetElapsedTime();
+        }
+
+        PRINT_3_VARIABLES(delta_1_time, delta_2_time, delta_3_time);
+
     }
 };

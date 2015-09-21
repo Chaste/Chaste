@@ -116,11 +116,8 @@ private:
     /** Grid to store force x-component propagated to fluid by elastic interactions */
     std::vector<std::vector<double> > mFluidForceGridY;
 
-    /** The fluid diffusion coefficient */
-    double mDiffusionCoef;
-
-    /** The fluid density */
-    double mFluidDensity;
+    /** The fluid Reynolds number */
+    double mReynolds;
 
     /** The cell-cell interaction distance */
     double mInteractionDistance;
@@ -339,10 +336,15 @@ public:
      */
     void AddImmersedBoundaryForce(boost::shared_ptr<AbstractImmersedBoundaryForce<DIM> > pForce);
 
-    void SetFluidDensity(double fluidDensity);
+    /**
+     * @param reynoldsNumber the new Reynolds number
+     */
+    void SetReynoldsNumber(double reynoldsNumber);
 
-    void SetDiffusionCoefficient(double diffCoef);
-
+    /**
+     * @return the current Reynolds number
+     */
+    double GetReynoldsNumber();
 };
 
 #include "SerializationExportWrapper.hpp"
