@@ -35,7 +35,6 @@ endif()
 
 option(Chaste_USE_PETSC_PARMETIS "Prefer to compile Chaste with PARMETIS library used by PETSc" ON)
 option(Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used by PETSc" ON)
-option(Chaste_LINK_LIBRARIES_WITH_UNRESOLVED_SYMBOLS "All Chaste libraries will have unresolved symbols. User must link in all dependencies (third party and Chaste internal)" OFF)
 option(Chaste_COVERAGE "Build Chaste with coverage information" OFF)
 if (Chaste_COVERAGE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(SEND_ERROR "CMAKE_BUILD_TYPE must be \"Debug\" to build Chaste with coverage (Chaste_COVERAGE=ON)")

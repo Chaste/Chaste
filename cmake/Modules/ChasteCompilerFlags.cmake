@@ -3,12 +3,7 @@ message("* Adding compiler flags...")
 # default flags added to all compilers except MSVC
 set(default_flags "-Wall")
 set(default_exe_linker_flags "")
-
-if (NOT Chaste_LINK_LIBRARIES_WITH_UNRESOLVED_SYMBOLS)
-    set(default_shared_link_flags "-Wl,--no-undefined")
-else()
-    set(default_shared_link_flags "")
-endif()
+set(default_shared_link_flags "-Wl,--no-undefined")
 
 if (Chaste_COVERAGE)
     #--coverage seems to be the preferred flag
