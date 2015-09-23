@@ -244,6 +244,10 @@ endmacro()
 
 
   macro(CHASTE_DO_TEST_COMMON component)
+        # make tutorial directories
+        file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/UserTutorials)
+        file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/PaperTutorials)
+
         # Figure out include path for tests
         header_dirs("${CMAKE_CURRENT_SOURCE_DIR}" CHASTE_${component}_TEST_DIRS)
         include_directories("${CHASTE_${component}_TEST_DIRS}" "${CXXTEST_INCLUDES}")
@@ -298,6 +302,29 @@ endmacro()
                         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${testName}.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/${filename}"
                             DESTINATION test/${component} COMPONENT  ${component}_tests)
                     endif(NOT(${component} MATCHES "^project"))
+
+                    # filename is a user tutorial
+                    if(filename MATCHES "Test(.*)Tutorial.(hpp|py)") 
+                        set(out_filename  ${CMAKE_CURRENT_BINARY_DIR}/html/UserTutorials/${CMAKE_MATCH_1})
+                        add_custom_command(OUTPUT ${out_filename}
+                                           COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_SOURCE_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename}
+                                           DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
+                                           COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
+                        add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
+                        add_dependencies(tutorials ${CMAKE_MATCH_1})
+                    endif()
+
+                    # filename is a paper tutorial
+                    if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
+                        set(out_filename  ${CMAKE_CURRENT_BINARY_DIR}/html/PaperTutorials/${CMAKE_MATCH_1})
+                        add_custom_command(OUTPUT ${out_filename}
+                                           COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_SOURCE_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
+                                           DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
+                                           COMMENT "Generating paper tutorial ${out_filename}" VERBATIM)
+                        add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
+                        add_dependencies(tutorials ${CMAKE_MATCH_1})
+                    endif()
+
                 else()
                     get_property(myLabels TEST ${testTargetName} PROPERTY LABELS)
                     list(APPEND myLabels ${type})

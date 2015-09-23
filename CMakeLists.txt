@@ -285,6 +285,12 @@ foreach(potential_dir ${potential_dirs})
     endif ()
 endforeach(potential_dir ${potential_dirs})
 
+####################################
+# setup tutorial generation target #
+####################################
+
+add_custom_target(tutorials)
+
 #######################################################
 # SETUP COMPONENT DEPENDANCIES AND HEADER DIRECTORIES #
 #######################################################
