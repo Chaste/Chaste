@@ -336,9 +336,13 @@ foreach(component ${CHASTE_COMPONENTS})
 endforeach(component)
 
 ####################
-#  BUILD MAIN APPS (TODO) #
+#  BUILD MAIN APPS #
 ####################
 
+#note, heart not supported in windows
+if (NOT (WIN32 OR CYGWIN))
+    add_subdirectory(apps)
+endif()
 
 ####################
 #  BUILD PROJECTS  #
