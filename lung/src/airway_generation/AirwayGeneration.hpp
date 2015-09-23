@@ -53,9 +53,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelectEnclosedPoints.h"
 
 /**
- * Forward declaration of auxiliary growth datastructure
+ * Auxiliary class representing a growth apex in the system
+ *
+ * A growth apex contains all the information required to grow a branch
  */
-class Apex;
+class Apex
+{
+public:
+    /** The location of this growth apex */
+    double mCurrentLocation[3];
+
+    /** The direction of this growth apex */
+    double mOriginalDirection[3];
+
+    /** The direction of the parent branch of this growth apex */
+    double mParentDirection[3];
+
+    /** The ID of the the point in the airway tree to grow this apex from */
+    vtkIdType mStartId;
+
+    /** The generation number of this apex */
+    unsigned mGeneration;
+
+    /** The point cloud that this apex will attempt to grow into. */
+    vtkSmartPointer<vtkPolyData> mPointCloud;
+};
 
 /**
  * Utility class representing a complete generation of growth apices
@@ -104,32 +126,6 @@ private:
 };
 
 
-/**
- * Class representing a growth apex in the system
- *
- * A growth apex contains all the information required to grow a branch
- */
-class Apex
-{
-public:
-    /** The location of this growth apex */
-    double mCurrentLocation[3];
-
-    /** The direction of this growth apex */
-    double mOriginalDirection[3];
-
-    /** The direction of the parent branch of this growth apex */
-    double mParentDirection[3];
-
-    /** The ID of the the point in the airway tree to grow this apex from */
-    vtkIdType mStartId;
-
-    /** The generation number of this apex */
-    unsigned mGeneration;
-
-    /** The point cloud that this apex will attempt to grow into. */
-    vtkSmartPointer<vtkPolyData> mPointCloud;
-};
 
 #endif //( (VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
