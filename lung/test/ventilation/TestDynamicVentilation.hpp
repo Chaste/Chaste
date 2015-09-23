@@ -194,10 +194,12 @@ public:
         problem.SetEndTime(1.5);
         problem.Solve();
 
+#ifdef CHASTE_VTK
         std::string filepath = OutputFileHandler::GetChasteTestOutputDirectory() + "TestDynamicVentilation/";
         std::string basename = filepath + "three_bifurcations";
         FileFinder vtu_file(basename + ".vtu", RelativeTo::Absolute);
         TS_ASSERT(vtu_file.Exists());
+#endif
     }
 
 
