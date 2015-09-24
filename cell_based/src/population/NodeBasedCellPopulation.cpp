@@ -362,11 +362,11 @@ c_vector<double, DIM> NodeBasedCellPopulation<DIM>::GetSizeOfCellPopulation()
 template<unsigned DIM>
 std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadius(unsigned index, double neighbourhoodRadius)
 {
-	// Check neighbourhoodRadius is less than the interaction radius. If not you wont return all the correct nodes
-	if (neighbourhoodRadius > mpNodesOnlyMesh->GetMaximumInteractionDistance())
-	{
-		EXCEPTION("neighbourhoodRadius should be less than or equal to the  the maximum interaction radius defined on the NodesOnlyMesh");
-	}
+    // Check neighbourhoodRadius is less than the interaction radius. If not you wont return all the correct nodes
+    if (neighbourhoodRadius > mpNodesOnlyMesh->GetMaximumInteractionDistance())
+    {
+        EXCEPTION("neighbourhoodRadius should be less than or equal to the  the maximum interaction radius defined on the NodesOnlyMesh");
+    }
 
 
     // Check the mNodeNeighbours has been set up correctly

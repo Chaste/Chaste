@@ -65,7 +65,7 @@ public:
          * are in the correct locations.
          */
 
-    	// Make a simple Potts mesh
+        // Make a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -106,7 +106,7 @@ public:
 
         // Test adding the new cell in the population (note this calls CalculateDaughterNodeIndex)
         TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_cell_0, zero_vector<double>(2), p_parent_cell),
-        		"Trying to divide when there is no room to divide, check your division rule");
+                              "Trying to divide when there is no room to divide, check your division rule");
 
         // Test adding it in a free space
         p_parent_cell = cell_population.GetCellUsingLocationIndex(4);

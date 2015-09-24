@@ -718,7 +718,7 @@ public:
         // Test GetNeighbouringNodeIndices() method
         if (PetscTools::AmMaster())
         {
-        	// Coverage
+            // Coverage
             TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNeighbouringNodeIndices(0), "mNodeNeighbours not set up. Call Update() before GetNeighbouringNodeIndices()");
         }
 
@@ -803,122 +803,122 @@ public:
 
     void TestGetNodesWithinNeighbourhoodRadius()
     {
-		EXIT_IF_PARALLEL;    // Doesn't work in parallel yet until halo nodes are updated (#2364)
+        EXIT_IF_PARALLEL;    // Doesn't work in parallel yet until halo nodes are updated (#2364)
 
-		SimulationTime* p_simulation_time = SimulationTime::Instance();
-		p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
+        SimulationTime* p_simulation_time = SimulationTime::Instance();
+        p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
-		// Create a small node-based cell population
-		TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-		TetrahedralMesh<2,2> generating_mesh;
-		generating_mesh.ConstructFromMeshReader(mesh_reader);
+        // Create a small node-based cell population
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
 
-		NodesOnlyMesh<2> mesh;
-		mesh.ConstructNodesWithoutMesh(generating_mesh, 1.0);
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.0);
 
-		// Create cells
-		std::vector<CellPtr> cells;
-		CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
-		cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedDurationGenerationBasedCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-		// Create a cell population
-		NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
+        // Create a cell population
+        NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
-		// Test we have the right numbers of nodes and cells
-		TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
-		TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), mesh.GetNumNodes());
+        // Test we have the right numbers of nodes and cells
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumNodes(), mesh.GetNumNodes());
+        TS_ASSERT_EQUALS(node_based_cell_population.GetNumRealCells(), mesh.GetNumNodes());
 
-		// Test GetNodesWithinNeighbourhoodRadius() method
-		if (PetscTools::AmMaster())
-		{
-			// Coverage
-			TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.1), "mNodeNeighbours not set up. Call Update() before GetNodesWithinNeighbourhoodRadius()");
-		}
+        // Test GetNodesWithinNeighbourhoodRadius() method
+        if (PetscTools::AmMaster())
+        {
+            // Coverage
+            TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.1), "mNodeNeighbours not set up. Call Update() before GetNodesWithinNeighbourhoodRadius()");
+        }
 
-		node_based_cell_population.Update();
+        node_based_cell_population.Update();
 
-		if (PetscTools::AmMaster())
-		{
-			//All nodes should have no neighbours with small search radius
-			std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.1);
-			std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1,0.1);
-			std::set<unsigned> node_2_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(2,0.1);
-			std::set<unsigned> node_3_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(3,0.1);
-			std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,0.1);
+        if (PetscTools::AmMaster())
+        {
+            //All nodes should have no neighbours with small search radius
+            std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.1);
+            std::set<unsigned> node_1_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(1,0.1);
+            std::set<unsigned> node_2_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(2,0.1);
+            std::set<unsigned> node_3_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(3,0.1);
+            std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,0.1);
 
-			TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
-			TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
-			TS_ASSERT_EQUALS(node_1_neighbours.size(), 0u);
-			TS_ASSERT_EQUALS(node_1_neighbours, std::set<unsigned>());
-			TS_ASSERT_EQUALS(node_2_neighbours.size(), 0u);
-			TS_ASSERT_EQUALS(node_2_neighbours, std::set<unsigned>());
-			TS_ASSERT_EQUALS(node_3_neighbours.size(), 0u);
-			TS_ASSERT_EQUALS(node_3_neighbours, std::set<unsigned>());
-			TS_ASSERT_EQUALS(node_4_neighbours.size(), 0u);
-			TS_ASSERT_EQUALS(node_4_neighbours, std::set<unsigned>());
+            TS_ASSERT_EQUALS(node_0_neighbours.size(), 0u);
+            TS_ASSERT_EQUALS(node_0_neighbours, std::set<unsigned>());
+            TS_ASSERT_EQUALS(node_1_neighbours.size(), 0u);
+            TS_ASSERT_EQUALS(node_1_neighbours, std::set<unsigned>());
+            TS_ASSERT_EQUALS(node_2_neighbours.size(), 0u);
+            TS_ASSERT_EQUALS(node_2_neighbours, std::set<unsigned>());
+            TS_ASSERT_EQUALS(node_3_neighbours.size(), 0u);
+            TS_ASSERT_EQUALS(node_3_neighbours, std::set<unsigned>());
+            TS_ASSERT_EQUALS(node_4_neighbours.size(), 0u);
+            TS_ASSERT_EQUALS(node_4_neighbours, std::set<unsigned>());
 
 
-			//For a slightly  larger search radius, the corner nodes will have exactly 1 neighbours and the centre node will have 4
-			node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.72);
-			node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,0.72);
+            //For a slightly  larger search radius, the corner nodes will have exactly 1 neighbours and the centre node will have 4
+            node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,0.72);
+            node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,0.72);
 
-			std::set<unsigned> expected_node_0_neighbours;
-			expected_node_0_neighbours.insert(4);
-			std::set<unsigned> expected_node_4_neighbours;
-			expected_node_4_neighbours.insert(0);
-			expected_node_4_neighbours.insert(1);
-			expected_node_4_neighbours.insert(2);
-			expected_node_4_neighbours.insert(3);
+            std::set<unsigned> expected_node_0_neighbours;
+            expected_node_0_neighbours.insert(4);
+            std::set<unsigned> expected_node_4_neighbours;
+            expected_node_4_neighbours.insert(0);
+            expected_node_4_neighbours.insert(1);
+            expected_node_4_neighbours.insert(2);
+            expected_node_4_neighbours.insert(3);
 
-			TS_ASSERT_EQUALS(node_0_neighbours.size(), 1u);
-			TS_ASSERT_EQUALS(node_0_neighbours, expected_node_0_neighbours);
-			TS_ASSERT_EQUALS(node_4_neighbours.size(), 4u);
-			TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+            TS_ASSERT_EQUALS(node_0_neighbours.size(), 1u);
+            TS_ASSERT_EQUALS(node_0_neighbours, expected_node_0_neighbours);
+            TS_ASSERT_EQUALS(node_4_neighbours.size(), 4u);
+            TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
 
-			//For a larger search radius, the corner nodes will have exactly three neighbours and the centre node will have 4
-			node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,1);
-			node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,1);
+            //For a larger search radius, the corner nodes will have exactly three neighbours and the centre node will have 4
+            node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,1);
+            node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,1);
 
             expected_node_0_neighbours.insert(1);
             expected_node_0_neighbours.insert(3);
 
-			TS_ASSERT_EQUALS(node_0_neighbours.size(), 3u);
-			TS_ASSERT_EQUALS(node_0_neighbours, expected_node_0_neighbours);
-			TS_ASSERT_EQUALS(node_4_neighbours.size(), 4u);
-			TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+            TS_ASSERT_EQUALS(node_0_neighbours.size(), 3u);
+            TS_ASSERT_EQUALS(node_0_neighbours, expected_node_0_neighbours);
+            TS_ASSERT_EQUALS(node_4_neighbours.size(), 4u);
+            TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
 
-			TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,2.0), "neighbourhoodRadius should be less than or equal to the  the maximum interaction radius defined on the NodesOnlyMesh");
+            TS_ASSERT_THROWS_THIS(node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,2.0), "neighbourhoodRadius should be less than or equal to the  the maximum interaction radius defined on the NodesOnlyMesh");
 
-		}
+        }
 
-         //Now test with a bigger box
-         mesh.Clear();
-         mesh.ConstructNodesWithoutMesh(generating_mesh, 2.0);
+        //Now test with a bigger box
+        mesh.Clear();
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 2.0);
 
-         node_based_cell_population.Update();
+        node_based_cell_population.Update();
 
-         if (PetscTools::AmMaster())
-         {
+        if (PetscTools::AmMaster())
+        {
 
- 			//For a very large search radius, all nodes can see all other nodes so each have 4 neighbours
-        	std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,2);
-        	std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,2);
+            //For a very large search radius, all nodes can see all other nodes so each have 4 neighbours
+            std::set<unsigned> node_0_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(0,2);
+            std::set<unsigned> node_4_neighbours = node_based_cell_population.GetNodesWithinNeighbourhoodRadius(4,2);
 
- 			std::set<unsigned> expected_node_0_neighbours;
-			expected_node_0_neighbours.insert(1);
-			expected_node_0_neighbours.insert(2);
-			expected_node_0_neighbours.insert(3);
-			expected_node_0_neighbours.insert(4);
-			std::set<unsigned> expected_node_4_neighbours;
-			expected_node_4_neighbours.insert(0);
-			expected_node_4_neighbours.insert(1);
-			expected_node_4_neighbours.insert(2);
-			expected_node_4_neighbours.insert(3);
+            std::set<unsigned> expected_node_0_neighbours;
+            expected_node_0_neighbours.insert(1);
+            expected_node_0_neighbours.insert(2);
+            expected_node_0_neighbours.insert(3);
+            expected_node_0_neighbours.insert(4);
+            std::set<unsigned> expected_node_4_neighbours;
+            expected_node_4_neighbours.insert(0);
+            expected_node_4_neighbours.insert(1);
+            expected_node_4_neighbours.insert(2);
+            expected_node_4_neighbours.insert(3);
 
- 			TS_ASSERT_EQUALS(node_0_neighbours.size(), 4u);
- 			TS_ASSERT_EQUALS(node_0_neighbours, expected_node_0_neighbours);
- 			TS_ASSERT_EQUALS(node_4_neighbours.size(), 4u);
- 			TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
+            TS_ASSERT_EQUALS(node_0_neighbours.size(), 4u);
+            TS_ASSERT_EQUALS(node_0_neighbours, expected_node_0_neighbours);
+            TS_ASSERT_EQUALS(node_4_neighbours.size(), 4u);
+            TS_ASSERT_EQUALS(node_4_neighbours, expected_node_4_neighbours);
 
          }
     }

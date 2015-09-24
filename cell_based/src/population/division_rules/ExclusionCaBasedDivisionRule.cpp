@@ -38,110 +38,110 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned SPACE_DIM>
 bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
-	CellPtr pParentCell,
-    CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
-{
-	bool is_room = false;
+        CellPtr pParentCell,
+        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+        {
+    bool is_room = false;
 
-	 //Get node index corresponding to this cell
-	unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
+    //Get node index corresponding to this cell
+    unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
-	// Get the set of neighbouring node indices
-	std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM> *>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
+    // Get the set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM> *>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
 
-	// Iterate through the neighbours to see if there are any available sites
-	for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-		 neighbour_iter != neighbouring_node_indices.end();
-		 ++neighbour_iter)
-	{
-		if (rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell))
-		{
-			is_room = true;
-			break;
-		}
-	}
+    // Iterate through the neighbours to see if there are any available sites
+    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            neighbour_iter != neighbouring_node_indices.end();
+            ++neighbour_iter)
+    {
+        if (rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell))
+        {
+            is_room = true;
+            break;
+        }
+    }
 
-	return is_room;
-}
+    return is_room;
+        }
 
 template<unsigned SPACE_DIM>
 unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
-	CellPtr pNewCell,
-	CellPtr pParentCell,
-    CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
-{
-	// Check there is room to divide This will always pass as
-	// IsRoomToDivide is called before CalculateDaughterNodeIndex in the simulator.solve() method
-	if (!IsRoomToDivide(pParentCell,rCellPopulation))
-	{
-		EXCEPTION("Trying to divide when there is no room to divide, check your division rule");
-	}
+        CellPtr pNewCell,
+        CellPtr pParentCell,
+        CaBasedCellPopulation<SPACE_DIM>& rCellPopulation)
+        {
+    // Check there is room to divide This will always pass as
+    // IsRoomToDivide is called before CalculateDaughterNodeIndex in the simulator.solve() method
+    if (!IsRoomToDivide(pParentCell,rCellPopulation))
+    {
+        EXCEPTION("Trying to divide when there is no room to divide, check your division rule");
+    }
 
-	// Get node index corresponding to the parent cell
-	unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
+    // Get node index corresponding to the parent cell
+    unsigned parent_node_index = rCellPopulation.GetLocationIndexUsingCell(pParentCell);
 
-	PottsMesh<SPACE_DIM>* static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
+    PottsMesh<SPACE_DIM>* static_cast_mesh = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()));
 
-	// Get the set of neighbouring node indices
-	std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
-	unsigned num_neighbours = neighbouring_node_indices.size();
+    // Get the set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetMooreNeighbouringNodeIndices(parent_node_index);
+    unsigned num_neighbours = neighbouring_node_indices.size();
 
-	// Each node must have at least one neighbour
-	assert(!neighbouring_node_indices.empty());
+    // Each node must have at least one neighbour
+    assert(!neighbouring_node_indices.empty());
 
-	std::vector<double> neighbouring_node_propensities;
-	std::vector<unsigned> neighbouring_node_indices_vector;
+    std::vector<double> neighbouring_node_propensities;
+    std::vector<unsigned> neighbouring_node_indices_vector;
 
-	double total_propensity = 0.0;
+    double total_propensity = 0.0;
 
-	// Select Neighbour at random
-	for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-			neighbour_iter != neighbouring_node_indices.end();
-		 ++neighbour_iter)
-	{
-		neighbouring_node_indices_vector.push_back(*neighbour_iter);
+    // Select Neighbour at random
+    for (std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            neighbour_iter != neighbouring_node_indices.end();
+            ++neighbour_iter)
+    {
+        neighbouring_node_indices_vector.push_back(*neighbour_iter);
 
-		double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+        double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
 
         if (!(rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell)))
         {
             propensity_dividing_into_neighbour = 0.0;
         }
 
-		neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
-		total_propensity += propensity_dividing_into_neighbour;
-	}
-	assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
+        neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
+        total_propensity += propensity_dividing_into_neighbour;
+    }
+    assert(total_propensity>0); // if this trips the cell can't divided so need to include this in the IsSiteAvailable method
 
-	for (unsigned i=0; i<num_neighbours; i++)
-	{
-		neighbouring_node_propensities[i] /= total_propensity;
-	}
+    for (unsigned i=0; i<num_neighbours; i++)
+    {
+        neighbouring_node_propensities[i] /= total_propensity;
+    }
 
-	 // Sample random number to specify which move to make
-	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-	double random_number = p_gen->ranf();
+    // Sample random number to specify which move to make
+    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+    double random_number = p_gen->ranf();
 
-	double total_probability = 0.0;
-	unsigned daughter_node_index = UNSIGNED_UNSET;
+    double total_probability = 0.0;
+    unsigned daughter_node_index = UNSIGNED_UNSET;
 
-	unsigned counter;
-	for (counter=0; counter < num_neighbours; counter++)
-	{
-		total_probability += neighbouring_node_propensities[counter];
-		if (total_probability >= random_number)
-		{
-			// Divide the parent cell to this neighbour location
-			daughter_node_index = neighbouring_node_indices_vector[counter];
-			break;
-		}
-	}
-	// This loop should always break as sum(neighbouring_node_propensities) = 1
+    unsigned counter;
+    for (counter=0; counter < num_neighbours; counter++)
+    {
+        total_probability += neighbouring_node_propensities[counter];
+        if (total_probability >= random_number)
+        {
+            // Divide the parent cell to this neighbour location
+            daughter_node_index = neighbouring_node_indices_vector[counter];
+            break;
+        }
+    }
+    // This loop should always break as sum(neighbouring_node_propensities) = 1
 
-	assert(daughter_node_index != UNSIGNED_UNSET);
-	assert(daughter_node_index < static_cast_mesh->GetNumNodes());
+    assert(daughter_node_index != UNSIGNED_UNSET);
+    assert(daughter_node_index < static_cast_mesh->GetNumNodes());
 
-	return daughter_node_index;
+    return daughter_node_index;
 }
 
 // Explicit instantiation
