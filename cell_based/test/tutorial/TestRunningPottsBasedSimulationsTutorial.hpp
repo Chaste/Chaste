@@ -67,7 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
-#include "AbstractCellBasedTestSuite.hpp"
+#include "AbstractCellBasedWithTimingsTestSuite.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
 /* The remaining header files define classes that will be used in the cell population
@@ -94,7 +94,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
  * and defines some test methods.
  */
-class TestRunningPottsBasedSimulationsTutorial : public AbstractCellBasedTestSuite
+class TestRunningPottsBasedSimulationsTutorial : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
     /* EMPTYLINE
@@ -159,9 +159,11 @@ public:
         simulator.SetEndTime(50.0);
         /*
          * The default timestep is 0.1, but can be changed using the below command. The timestep is used in conjunction with the "Temperature" and
-         * number of sweeps per timestep to specify the relationship between cell movement and proliferation.
+         * number of sweeps per timestep to specify the relationship between cell movement and proliferation. We also set the simulation to only output
+         * every 10 steps i.e. once per hour.
          */
         simulator.SetDt(0.1);
+        simulator.SetSamplingTimestepMultiple(10);
 
         /* We must now create one or more update rules, which determine the Hamiltonian
          * in the Potts simulation. For this test, we use two update rules based upon
@@ -208,6 +210,26 @@ public:
      * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0}}}.
      * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
      * java executable.
+     *
+     * We could also visualize the results using paraview.
+     *
+     * See UserTutorials/VisualizingWithParaview for more information.
+     *
+     * Load the file {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd}}}, and click apply
+     *
+     * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
+     *
+     * Select the "Display" tab and select "color by" cell index to see individual cells
+     *
+     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unocupied lattice sites are labelled with -1). This will allow you to view only the cells.
+     *
+     * Load the files {{{/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/outlines_..vtu}}}, and click apply
+     *
+     * In order to see the cell outlines you will need to select "Surface With Edges" in the drop down menu
+     *
+     * Click play to see the evolution of the simulation.
+     *
+     * You should see that the cells sort into ones of the same type.
      *
      * EMPTYLINE
      *
@@ -267,6 +289,7 @@ public:
         OnLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("PottsMonolayerCellSorting");
         simulator.SetEndTime(20.0);
+        simulator.SetSamplingTimestepMultiple(10);
 
         /* We must now create one or more update rules, which determine the Hamiltonian
          * in the Potts simulation. For this test, we use two update rules based upon
@@ -304,6 +327,8 @@ public:
      * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/PottsMonolayerCellSorting/results_from_time_0}}}.
      * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
      * java executable.
+     *
+     *  You could also visualize in paraview as above.
      *
      * EMPTYLINE
      *
@@ -366,6 +391,7 @@ public:
         OnLatticeSimulation<3> simulator(cell_population);
         simulator.SetOutputDirectory("PottsCellSorting3D");
         simulator.SetEndTime(20.0);
+        simulator.SetSamplingTimestepMultiple(10);
 
         /* We must now create one or more update rules, which determine the Hamiltonian
          * in the Potts simulation. For this test, we use two update rules based upon
@@ -401,7 +427,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, we need to use Paraview.
+     * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
      * See UserTutorials/VisualizingWithParaview for more information.
      *
      * Load the file {{{/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd}}}, and click apply
