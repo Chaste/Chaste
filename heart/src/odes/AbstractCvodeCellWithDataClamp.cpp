@@ -89,7 +89,7 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
     // Special case - here the lower bound is equal to upper bound and both are pointing to end!
     if (low == mExperimentalTimes.end())
     {
-    	return mExperimentalVoltages.back();
+        return mExperimentalVoltages.back();
     }
 
     unsigned upper_index = low - mExperimentalTimes.begin();
@@ -97,7 +97,7 @@ double AbstractCvodeCellWithDataClamp::GetExperimentalVoltageAtTimeT(const doubl
     if (upper_index == 0u)
     {
         // Special case - here the lower bound is equal to upper bound and no interpolation needed
-    	return mExperimentalVoltages[0];
+        return mExperimentalVoltages[0];
     }
 
     double lower_time = mExperimentalTimes[upper_index-1];
