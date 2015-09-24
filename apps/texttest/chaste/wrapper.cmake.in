@@ -1,0 +1,27 @@
+#!/bin/bash
+
+source_root=${Chaste_SOURCE_DIR}
+build_root=${Chaste_BINARY_DIR}
+
+# For some tests, we want to simulate not having the source tree, containing the XML schemas,
+# available.  So we remove the execute permission from the 'heart' folder while running Chaste.
+hide="no"
+if [ "$1" == "--hide-schema" ]; then
+	shift
+	hide="yes"
+	chmod a-x "$source_root/heart"
+fi
+
+if [ "$1" == "--mesh-convert" ]; then
+	#Run the mesh converter exe
+	shift
+	"$build_root/apps/MeshConvert" "$@"
+else
+	#Run the Chaste exe
+	"$build_root/apps/Chaste" "$@"
+    ##2656 todo: remove the rm line after migration to CMake
+    rm -f luo_rudy_1991.cpp luo_rudy_1991.hpp LuoRudy1991.cpp LuoRudy1991.hpp
+fi	
+if [ "$hide" == "yes" ]; then
+	chmod a+x "$source_root/heart"
+fi
