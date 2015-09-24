@@ -236,7 +236,7 @@ endmacro()
             message("Configuring ${appName} app")
         endif()
         add_executable(${appName} ${app})
-
+        #set_target_properties(${appName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
         if (BUILD_SHARED_LIBS)
             target_link_libraries(${appName} LINK_PUBLIC ${component} ${Chaste_LIBRARIES})
         else()
@@ -246,6 +246,43 @@ endmacro()
             set_target_properties(${appName} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT /IGNORE:4217 /IGNORE:4049")
         endif()
     endforeach(app)
+    if (ENABLE_CHASTE_TESTING)
+        configure_file(texttest/chaste/wrapper.cmake.in texttest/chaste/wrapper)
+        file(COPY ${Chaste_SOURCE_DIR}/python/infra/RoundResultsFiles.py DESTINATION ${Chaste_BINARY_DIR}/python/infra)
+        file(GLOB test_directories texttest/*)
+        foreach(tests_dir ${test_directories})
+            file(RELATIVE_PATH acceptance_test ${CMAKE_CURRENT_SOURCE_DIR}/texttest ${tests_dir})
+            set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/texttest)
+            set(texttest_report_dir ${output_dir}/texttest_reports/${acceptance_test})
+            set(texttest_output_dir ${output_dir}/texttest_output/${acceptance_test})
+
+            file(WRITE ${tests_dir}/run_acceptance.cmake
+                "
+                set(ENV{CHASTE_TEST_OUTPUT} ${output_dir})
+                file(REMOVE_RECURSE ${texttest_report_dir})
+                file(REMOVE_RECURSE ${texttest_output_dir})
+                file(MAKE_DIRECTORY ${texttest_report_dir})
+                file(MAKE_DIRECTORY ${texttest_output_dir})
+                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${Chaste_BINARY_DIR} 
+                    RESULT_VARIABLE result)
+                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${Chaste_BINARY_DIR} -coll web)
+                if (result)
+                    message(SEND_ERROR \"Error running acceptance test\")
+                endif()
+                "
+                )
+
+            add_test(NAME acceptance_${acceptance_test} 
+                COMMAND ${CMAKE_COMMAND} -P ${tests_dir}/run_acceptance.cmake
+                )
+            if (${acceptance_test} STREQUAL "weekly")
+                set_property(TEST acceptance_${acceptance_test} PROPERTY LABELS ${component} Profile)
+            else()
+                set_property(TEST acceptance_${acceptance_test} PROPERTY LABELS ${component} Nightly)
+            endif()
+
+        endforeach()
+    endif()
   endmacro(CHASTE_DO_APPS_COMMON)
 
   macro(CHASTE_DO_APPS_PROJECT projectName)

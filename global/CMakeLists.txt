@@ -100,7 +100,7 @@ string(REPLACE "\nThis file is part of Chaste.\n" "" licence "${licence}")
 string(REPLACE "\n" "\\n" licence "${licence}")
 set(quote "\"")
 string(REPLACE ${quote} "\\${quote}" licence "${licence}")
-
+string(REGEX REPLACE "\\\\n$" "" licence "${licence}")
 
 # configure a header file to pass some of the CMake settings
 # to the source code

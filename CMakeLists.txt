@@ -110,6 +110,11 @@ set(CHASTE_LINK_LIBRARIES "")
 #Locate Python
 find_package(PythonInterp REQUIRED)
 
+if (ENABLE_CHASTE_TESTING)
+    #Locate TextTest
+    find_package(TextTest REQUIRED)
+endif()
+
 if(CHASTE_AUTO_INSTALL_DEPS)
 	set(CHASTE_DEPS_ROOT_DIR "${Chaste_BINARY_DIR}/../install/third_party_libs" CACHE PATH "Root directory for installed third party libraries")
 	  FILE(GLOB children RELATIVE ${CHASTE_DEPS_ROOT_DIR} ${CHASTE_DEPS_ROOT_DIR}/*)

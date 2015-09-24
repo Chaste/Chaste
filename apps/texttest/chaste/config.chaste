@@ -142,6 +142,7 @@ output:from revision number
 errors:{INTERNAL writedir}{REPLACE <texttest_dir>}
 # Handle source code line numbers
 errors:Chaste error: ([a-zA-Z./]+):([0-9]+):{REPLACE Chaste error: \1:line:}
+errors:scons: warning: Using dynamically loaded cell models MAY NOT WORK with chaste_libs=0.{LINES 3}
 
 # Ignore warnings about rounded results
 results_phi_e_dat:Warning: These have been
@@ -177,3 +178,5 @@ output:RunXsd\(\[.*\], \[(.*)\]\){REPLACE Run Xsd on \1}
 output:[^ ]*mpicxx .*(/[^/]+\.[a-zA-Z]+){REPLACE mpicxx <args> <path>\1}
 output:Running \['.*/python/ConvertCellModel.py', '-A', '-p', '--output-dir', '<chaste_dir>/<build_path>', '-y', '<build_path>/(.*).cellml'\]{REPLACE Running PyCml on \1}
 output:scons: building associated
+output:scons: Reading SConscript files ...{LINES 10}
+output:-- The C compiler identification is{LINES 19}
