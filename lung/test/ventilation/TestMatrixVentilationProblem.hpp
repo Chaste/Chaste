@@ -248,10 +248,10 @@ public:
         TS_ASSERT_DELTA(pressure[1], 6.66666 + 1.0,   1e-4);
         TS_ASSERT_DELTA(pressure[2], 12.22223 + 1.0, 1e-4);
         TS_ASSERT_DELTA(pressure[3], 12.22223 + 1.0, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-7); //BC
+        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-7); //BC
         TS_ASSERT_DELTA(flux[0], 2.8407e-10, 1e-4); // (Outflow flux)
         TS_ASSERT_DELTA(flux[10], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[11], -7.102e-11, 1e-13); // (Inflow flux)
@@ -321,9 +321,6 @@ public:
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_pedley");
 #endif
-
-///\todo #2300 Is needed here?        //For coverage
-//        problem.SetOutflowFlux(0.0);
     }
 
     void TestTimeVaryingThreeBifurcations() throw (Exception)
@@ -401,23 +398,6 @@ public:
         TS_ASSERT_DELTA(pressure[6], pressureAt6[2500], 1e-8); //BC
         TS_ASSERT_DELTA(pressure[7], pressureAt7[2500], 1e-8); //BC
     }
-//    void TestAnnotateGenerations() throw (Exception)
-//    {
-//        EXIT_IF_PARALLEL;
-//        MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations", 0u);
-//        Node<3>* p_root_node = problem.rGetMesh().GetNode(0);
-//        TS_ASSERT_EQUALS(p_root_node->rGetNodeAttributes().size(), 1u);
-//       // p_root_node->Set
-//        std::map<int, int> max_branch_at_generation;
-//        std::queue<Node<3>*> dfs_queue;
-//        dfs_queue.push(p_root_node);
-//
-//        while (!dfs_queue.empty())
-//        {
-//            std::cout<<dfs_queue.front()->GetIndex()<<"\n";
-//            dfs_queue.pop();
-//        }
-//    }
 
     void TestTopOfAirwaysPatientData() throw (Exception)
     {

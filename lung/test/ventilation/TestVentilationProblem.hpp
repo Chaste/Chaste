@@ -452,7 +452,7 @@ public:
         {
             // Pedley
             TS_ASSERT_DELTA(problem.GetFluxAtOutflow(), -7.24606e-3, 1.0);
-            TS_ASSERT_DELTA(top_reynolds_number, 4505, 1.0);
+            TS_ASSERT_DELTA(top_reynolds_number, 3754, 1.0);
         }
         else
         {
