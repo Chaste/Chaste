@@ -78,7 +78,6 @@ private:
     double mFluxScaling;  /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux.  This should be the same scale as Poiseuille resistance (comparable to viscosity).*/
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
 
-    double mLengthScaling; /**< This solver is designed to be used with SI units, but meshes in mm are common. This scaling allows this to be handled.*/
 
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
@@ -122,6 +121,7 @@ public:
 
     /**
      * Tells the solver that the supplied mesh has units in milli metres rather than metres.
+     * Overridden so we can scale other quantities in subclasses when working in SI units.
      */
     void SetMeshInMilliMetres();
 

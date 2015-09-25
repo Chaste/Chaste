@@ -68,6 +68,8 @@ protected:
      */
     double mViscosity;
 
+    double mLengthScaling; /**< This solver is designed to be used with SI units, but meshes in mm are common. This scaling allows this to be handled.*/
+
 public:
     /** Main constructor
      * Loads a mesh from file(s)
@@ -81,6 +83,11 @@ public:
      */
     AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex=0u);
 
+    /** Virtual destructor is empty. */
+    virtual ~AbstractVentilationProblem()
+    {
+
+    }
     /**
      * @return the viscosity in kg/(mm*sec)
      */
@@ -96,6 +103,13 @@ public:
     {
         mViscosity = viscosity;
     }
+
+    /**
+     * Tells the solver that the supplied mesh has units in milli metres rather than metres.
+     * Overridden so we can scale other quantities in subclasses when working in SI units.
+     */
+    virtual void SetMeshInMilliMetres();
+
 
  };
 

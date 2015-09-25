@@ -45,8 +45,7 @@ MatrixVentilationProblem::MatrixVentilationProblem(const std::string& rMeshDirFi
       mDynamicResistance(false),
       mRadiusOnEdge(false),
       mDensity(1.15),
-      mSolution(NULL),
-      mLengthScaling(1)
+      mSolution(NULL)
 {
 
     // We solve for flux at every edge and for pressure at each node/bifurcation
@@ -90,7 +89,7 @@ MatrixVentilationProblem::~MatrixVentilationProblem()
 
 void MatrixVentilationProblem::SetMeshInMilliMetres()
 {
-    mLengthScaling = 1e-3;
+    AbstractVentilationProblem::SetMeshInMilliMetres();
 
     /* In SI units, the flux is measured in m^3 (rather small amounts) but the
      * pressure is measured in Pascal.  These differ by orders of magnitude at the top of the tree and

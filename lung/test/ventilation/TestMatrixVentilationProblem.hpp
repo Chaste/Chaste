@@ -216,6 +216,7 @@ public:
         problem.SetOutflowPressure(0.0);
         problem.SetConstantInflowPressures(15.0);
         problem.Solve();
+
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
         TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
@@ -237,27 +238,27 @@ public:
     {
         MatrixVentilationProblem problem("continuum_mechanics/test/data/three_bifurcations_extra_links", 0u);
         problem.SetMeshInMilliMetres();
-        problem.SetOutflowPressure(0.0);
-        problem.SetConstantInflowPressures(15);
+        problem.SetOutflowPressure(0.0 + 1.0);
+        problem.SetConstantInflowPressures(15.0 + 1.0);
         problem.Solve();
 
         std::vector<double> flux, pressure;
         problem.GetSolutionAsFluxesAndPressures(flux, pressure);
-        TS_ASSERT_DELTA(pressure[0], 0.0, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[1], 6.66666,   1e-4);
-        TS_ASSERT_DELTA(pressure[2], 12.22223, 1e-4);
-        TS_ASSERT_DELTA(pressure[3], 12.22223, 1e-4);
-        TS_ASSERT_DELTA(pressure[4], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[5], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[6], 15, 1e-8); //BC
-        TS_ASSERT_DELTA(pressure[7], 15, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[0], 0.0 + 1.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[1], 6.66666 + 1.0,   1e-4);
+        TS_ASSERT_DELTA(pressure[2], 12.22223 + 1.0, 1e-4);
+        TS_ASSERT_DELTA(pressure[3], 12.22223 + 1.0, 1e-4);
+        TS_ASSERT_DELTA(pressure[4], 15 + 1.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[5], 15 + 1.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[6], 15 + 1.0, 1e-8); //BC
+        TS_ASSERT_DELTA(pressure[7], 15 + 1.0, 1e-8); //BC
         TS_ASSERT_DELTA(flux[0], 2.8407e-10, 1e-4); // (Outflow flux)
         TS_ASSERT_DELTA(flux[10], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[11], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[12], -7.102e-11, 1e-13); // (Inflow flux)
         TS_ASSERT_DELTA(flux[13], -7.102e-11, 1e-13); // (Inflow flux)
         //This is the extra node at the Trachea
-        TS_ASSERT_DELTA(pressure[8], 2.22225, 1e-4); //Between root and first bifurcation
+        TS_ASSERT_DELTA(pressure[8], 2.22225 + 1.0, 1e-4); //Between root and first bifurcation
 
 #ifdef CHASTE_VTK
         problem.WriteVtk("TestVentilation", "three_bifurcations_extra_links");

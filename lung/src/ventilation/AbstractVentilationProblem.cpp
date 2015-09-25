@@ -38,7 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
     : mOutletNodeIndex(rootIndex),
-      mViscosity(1.92e-5)
+      mViscosity(1.92e-5),
+      mLengthScaling(1.0)
 {
     TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
@@ -47,4 +48,10 @@ AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshD
     {
         EXCEPTION("Outlet node is not a boundary node");
     }
+}
+
+void
+AbstractVentilationProblem::SetMeshInMilliMetres()
+{
+    mLengthScaling = 1e-3;
 }

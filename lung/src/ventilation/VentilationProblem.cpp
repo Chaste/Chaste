@@ -42,7 +42,7 @@ VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsi
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mDynamicResistance(false),
       mRadiusOnEdge(false),
-      mDensity(1.15e-6),
+      mDensity(1.15),
       mFluxGivenAtInflow(false),
       mTerminalInteractionMatrix(NULL),
       mNumNonZeroesPerRow(25u), //See note in header definition
@@ -242,6 +242,11 @@ void VentilationProblem::SolveIterativelyFromPressure()
     unsigned max_iterations=1000;
     unsigned num_terminals = mMesh.GetNumBoundaryNodes()-1u;
     double pressure_tolerance = 1e-4;
+    if (mLengthScaling < 1e-2)
+    {
+        // Using SI units
+        pressure_tolerance = 1e-7;
+    }
     bool converged=false;
     double last_norm_pressure_change;
     Vec old_terminal_pressure_change;
@@ -351,6 +356,9 @@ double VentilationProblem::CalculateResistance(Element<1,3>& rElement, bool useP
     c_vector<double, 3> dummy;
     double length;
     mMesh.GetWeightedDirectionForElement(rElement.GetIndex(), dummy, length);
+
+    radius *= mLengthScaling;
+    length *= mLengthScaling;
 
     double resistance = 8.0*mViscosity*length/(M_PI*SmallPow(radius, 4));
     if ( usePedley )
