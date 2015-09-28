@@ -111,8 +111,10 @@ set(CHASTE_LINK_LIBRARIES "")
 find_package(PythonInterp REQUIRED)
 
 if (ENABLE_CHASTE_TESTING)
-    #Locate TextTest
-    find_package(TextTest REQUIRED)
+    if (NOT (WIN32 OR CYGWIN))
+        #Locate TextTest
+        find_package(TextTest REQUIRED)
+    endif()
 endif()
 
 if(CHASTE_AUTO_INSTALL_DEPS)
